@@ -3936,26 +3936,31 @@ try {
         ':list',
         'copy /y "%HERE%patch-names.txt" "%LISTING%" >nul || exit /b 3',
         'exit /b 0') -join "`r`n") + "`r`n"), [System.Text.Encoding]::ASCII)
-    # What GitHub answers: the served bundle and SBOM, a checksum list naming both (or $servedSums,
-    # when a case wants a wrong one), and the repository description. Dot-sourced into each runner,
-    # so the check it starts finds them first. The SBOM served is a copy of the one beside the bundle,
-    # which the cases below take away along with the bundle.
+    # What GitHub answers: the served bundle, SBOM and receipt, a checksum list naming all three (or
+    # $servedSums, when a case wants a wrong one), and the repository description. Dot-sourced into
+    # each runner, so the check it starts finds them first. The SBOM served is a copy of the one
+    # beside the bundle, which the cases below take away along with the bundle, and the receipt
+    # served is the release's own, as the release uploads it, unless a case serves another.
     $servedBundle = $releaseBundle
     $cleanServedSbom = Join-Path $releaseRoot "served\patches-$releaseVersionHere.cdx.json"
     New-Item -ItemType Directory -Path (Split-Path -Parent $cleanServedSbom) -Force | Out-Null
     Copy-Item -LiteralPath $releaseSbom -Destination $cleanServedSbom
     $servedSbom = $cleanServedSbom
     $servedSums = $null
+    $servedReceipt = $null
     $publishedStandIns = {
         function Invoke-WebRequest {
             param($Uri, $Method, $OutFile, $MaximumRedirection, $TimeoutSec, [switch]$PassThru, [switch]$UseBasicParsing)
+            $receiptServed = if ($servedReceipt) { $servedReceipt } else { $releaseReceipt }
             if ($OutFile) {
-                $served = if ("$Uri" -like '*.cdx.json') { $servedSbom } else { $servedBundle }
+                $served = if ("$Uri" -like '*.cdx.json') { $servedSbom } elseif ("$Uri" -like '*/release-receipt-*.json') {
+                    $receiptServed } else { $servedBundle }
                 Copy-Item -LiteralPath $served -Destination $OutFile -Force
             }
             $sums = if ($servedSums) { $servedSums } else {
                 "$((Get-FileHash -LiteralPath $servedBundle -Algorithm SHA256).Hash.ToLowerInvariant())  patches-$indexVersionHere.mpp`n" +
-                    "$((Get-FileHash -LiteralPath $servedSbom -Algorithm SHA256).Hash.ToLowerInvariant())  patches-$indexVersionHere.cdx.json`n"
+                    "$((Get-FileHash -LiteralPath $servedSbom -Algorithm SHA256).Hash.ToLowerInvariant())  patches-$indexVersionHere.cdx.json`n" +
+                    "$((Get-FileHash -LiteralPath $receiptServed -Algorithm SHA256).Hash.ToLowerInvariant())  release-receipt-$releaseVersionHere.json`n"
             }
             [pscustomobject]@{ StatusCode = 200; Content = [Text.Encoding]::UTF8.GetBytes($sums) }
         }
@@ -3999,6 +4004,36 @@ try {
             "The index push did not hold the hosted SBOM to the receipt, or did not ask OSV about it: $said"
         Assert-True ($said -like '*the Facebook-family source census is 0 day(s) old*every index lists Hushfacebook or has its submission*') `
             "The index push was not held to the Facebook-family source census: $said"
+        # The receipt the release hosts, held to SHA256SUMS.txt and to the receipt checked here.
+        Assert-True ($said -like "*the hosted release-receipt-$releaseVersionHere.json is the receipt checked here, as SHA256SUMS.txt lists it*") `
+            "The index push did not hold the hosted receipt to the one it checked: $said"
+        # And each way it can fail: SHA256SUMS.txt not listing it, listing another hash, or the
+        # release hosting another receipt, one cut again after the upload. That one differs in its
+        # last byte alone, and the push stops all the same.
+        $recutReceipt = Join-Path $releaseRoot "served\recut\release-receipt-$releaseVersionHere.json"
+        New-Item -ItemType Directory -Path (Split-Path -Parent $recutReceipt) -Force | Out-Null
+        $recutBytes = New-Object System.Collections.Generic.List[byte] (, [System.IO.File]::ReadAllBytes($releaseReceipt))
+        $recutBytes.Add(10)
+        [System.IO.File]::WriteAllBytes($recutReceipt, $recutBytes.ToArray())
+        $bundleAndSbomSums = "$((Get-FileHash -LiteralPath $releaseBundle -Algorithm SHA256).Hash.ToLowerInvariant())  patches-$indexVersionHere.mpp`n" +
+            "$((Get-FileHash -LiteralPath $cleanServedSbom -Algorithm SHA256).Hash.ToLowerInvariant())  patches-$indexVersionHere.cdx.json`n"
+        try {
+            $servedSums = $bundleAndSbomSums
+            Assert-Throws { Invoke-IndexPushCheck $publishedRun } "*SHA256SUMS.txt has no entry for release-receipt-$releaseVersionHere.json*" `
+                'An index push went through with a receipt SHA256SUMS does not list.'
+            $servedSums = $bundleAndSbomSums + "$('2' * 64)  release-receipt-$releaseVersionHere.json`n"
+            Assert-Throws { Invoke-IndexPushCheck $publishedRun } `
+                "*SHA256SUMS.txt lists $('2' * 64) for release-receipt-$releaseVersionHere.json, but the hosted receipt is*" `
+                'An index push went through with a receipt SHA256SUMS lists under another hash.'
+            $servedSums = $null
+            $servedReceipt = $recutReceipt
+            Assert-Throws { Invoke-IndexPushCheck $publishedRun } `
+                "*The hosted release-receipt-$releaseVersionHere.json is not the receipt checked here*" `
+                'An index push went through with a hosted receipt that is not the one it checked.'
+        } finally {
+            $servedSums = $null
+            $servedReceipt = $null
+        }
 
         # The census, one fact at a time. Fourteen days old is still a release; fifteen isn't. An
         # index that doesn't list Hushfacebook yet is named in what the release says, not a refusal:

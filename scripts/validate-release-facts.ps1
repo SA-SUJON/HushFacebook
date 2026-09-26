@@ -10,7 +10,8 @@
     preparation mode lets the source commit reach GitHub while the public index still points
     at the previous working bundle. Published-asset verification remains strict, and it also
     fetches the release SBOM the receipt names, holds it to the bundle and puts the libraries it
-    lists to OSV (release-advisories.ps1). It also refuses a release whose Facebook-family source
+    lists to OSV (release-advisories.ps1), and fetches the published receipt, which SHA256SUMS.txt
+    has to list and which has to be the receipt checked here. It also refuses a release whose Facebook-family source
     census (sources/facebook-sources.json, refreshed by audit-facebook-sources.ps1) is more than
     14 days old, breaks the ledger's rules, or lacks a listing or dated submission on an index.
 #>
@@ -499,6 +500,7 @@ if (-not $SkipDescriptionTestCount) {
 # receipt check downloads goes the same way.
 $hostedArtifact = $null
 $hostedSbom = $null
+$hostedReceiptDir = $null
 try {
 if ($VerifyPublishedAsset) {
     if (-not $ArtifactIsHosted) {
@@ -968,6 +970,41 @@ function Test-ReleaseReceiptHere {
     Write-Host ("[release] the receipt proves $($receiptDocument.release.patchCount) patches on " +
         ($proved -join ', ') + " from commit " + $receiptCommit.Substring(0, 8) +
         ", with no unreviewed manifest change")
+
+    # And it's the receipt the release publishes. CONTRIBUTING.md tells people the receipt goes out
+    # beside the bundle and in SHA256SUMS.txt, and nothing read that copy back: a receipt cut again
+    # after the upload, or a different one uploaded, left the published proof unchecked. So the
+    # hosted copy is fetched from beside the bundle, held to SHA256SUMS.txt, and has to be this
+    # file byte for byte.
+    if ($VerifyPublishedAsset) {
+        $receiptName = "release-receipt-$releaseVersion.json"
+        $script:hostedReceiptDir = Join-Path ([IO.Path]::GetTempPath()) ("hushfacebook-$([Guid]::NewGuid())")
+        New-Item -ItemType Directory -Path $script:hostedReceiptDir -Force | Out-Null
+        $hostedReceipt = Join-Path $script:hostedReceiptDir $receiptName
+        try {
+            $receiptResponse = Invoke-WebRequest -Uri ([Uri]::new($assetUri, $receiptName)) -OutFile $hostedReceipt `
+                -MaximumRedirection 5 -TimeoutSec 60 -PassThru
+        } catch {
+            throw "Could not download the hosted $receiptName, which a release publishes beside its bundle: $($_.Exception.Message)"
+        }
+        if ($receiptResponse.StatusCode -ne 200) {
+            throw "The hosted $receiptName returned HTTP $($receiptResponse.StatusCode)."
+        }
+        $hostedReceiptHash = (Get-FileHash -LiteralPath $hostedReceipt -Algorithm SHA256).Hash.ToLowerInvariant()
+        $listedReceipt = [regex]::Match($checksumText, "(?im)^\s*([0-9a-f]{64})\s+\*?$([regex]::Escape($receiptName))\s*$")
+        if (-not $listedReceipt.Success) {
+            throw "SHA256SUMS.txt has no entry for $receiptName, the release's receipt."
+        }
+        if ($listedReceipt.Groups[1].Value.ToLowerInvariant() -ne $hostedReceiptHash) {
+            throw "SHA256SUMS.txt lists $($listedReceipt.Groups[1].Value) for $receiptName, but the hosted receipt is $hostedReceiptHash."
+        }
+        $localReceiptHash = (Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($localReceiptHash -ne $hostedReceiptHash) {
+            throw ("The hosted $receiptName is not the receipt checked here: the release publishes $hostedReceiptHash " +
+                "and $receiptPath is $localReceiptHash. Publish this receipt, or check the one the release carries.")
+        }
+        Write-Host "[release] the hosted $receiptName is the receipt checked here, as SHA256SUMS.txt lists it"
+    }
     if ($sbomForComparison) {
         $sbomDocument = Read-ReleaseSbom -Path $sbomForComparison
         Write-Host ("[release] the hosted $sbomName is the SBOM the receipt names and SHA256SUMS.txt lists, " +
@@ -1034,4 +1071,5 @@ exit 0
 } finally {
     if ($hostedArtifact) { Remove-Item -LiteralPath $hostedArtifact -Force -ErrorAction SilentlyContinue }
     if ($hostedSbom) { Remove-Item -LiteralPath $hostedSbom -Recurse -Force -ErrorAction SilentlyContinue }
+    if ($hostedReceiptDir) { Remove-Item -LiteralPath $hostedReceiptDir -Recurse -Force -ErrorAction SilentlyContinue }
 }
