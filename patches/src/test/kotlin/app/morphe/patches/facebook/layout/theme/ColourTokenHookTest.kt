@@ -87,18 +87,29 @@ class ColourTokenHookTest {
 
     /**
      * A long before the token takes two registers. Counted as one, the hook read the long's upper
-     * half as the token.
+     * half as the token. A long after it moves nothing, which a count of parameters in place of
+     * their registers would get wrong.
      */
     @Test
-    fun `the token after a wide parameter is read from its own register`() {
-        val method = resolver(
+    fun `the token is read from its own register with a wide parameter on either side`() {
+        val after = resolver(
             listOf("J", "Lfixture/Token;"), 4,
             """
                 long-to-int v0, v1
                 return v0
             """,
         )
-        method.hookColorReturns(tokenParameterIndex = 1, target = APPLY)
-        assertEquals(listOf(listOf(0, 3)), method.hookCalls())
+        after.hookColorReturns(tokenParameterIndex = 1, target = APPLY)
+        assertEquals("after a long", listOf(listOf(0, 3)), after.hookCalls())
+
+        val before = resolver(
+            listOf("Lfixture/Token;", "J"), 4,
+            """
+                long-to-int v0, v2
+                return v0
+            """,
+        )
+        before.hookColorReturns(tokenParameterIndex = 0, target = APPLY)
+        assertEquals("before a long", listOf(listOf(0, 1)), before.hookCalls())
     }
 }
