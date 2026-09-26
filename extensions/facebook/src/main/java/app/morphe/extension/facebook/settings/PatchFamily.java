@@ -61,6 +61,8 @@ public enum PatchFamily {
             Settings.OPEN_LINKS_EXTERNALLY),
     SANITIZE_SHARING_LINKS(FamilyNames.SANITIZE_SHARING_LINKS, "sanitizeSharingLinks", null,
             Settings.SANITIZE_SHARING_LINKS),
+    UPDATE_PROMPTS(FamilyNames.UPDATE_PROMPTS, "updatePrompts", null,
+            Settings.STOP_UPDATE_PROMPTS),
     STORY_DOWNLOAD(FamilyNames.STORY_DOWNLOAD, "storyDownload", null,
             Settings.DOWNLOAD_STORIES),
     REEL_DOWNLOAD(FamilyNames.REEL_DOWNLOAD, "reelDownload", null,

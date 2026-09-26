@@ -196,3 +196,6 @@ File name set to %1$s.	Dosya adı %1$s olarak ayarlandı.
 No app on this phone can open the link. The address is %1$s.	Bu telefondaki hiçbir uygulama bağlantıyı açamıyor. Adres: %1$s.
 Hushfacebook pauses when Facebook restarts.	Hushfacebook, Facebook yeniden başladığında duraklatılır.
 Pause, backup and diagnostics	Duraklatma, yedekleme ve tanılama
+Updates	Güncellemeler
+Stop update prompts	Güncelleme uyarılarını durdur
+Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook, Meta App Manager üzerinden güncelleme istemeyi ve ona güncelleme aratmayı bırakır. Eski sürümlere yönelik sohbet tanıtımları da kalkar. Yamalı bir sürüm zaten Meta'nın güncellemelerini yükleyemez.

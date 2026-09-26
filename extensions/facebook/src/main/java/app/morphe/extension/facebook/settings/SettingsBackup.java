@@ -93,6 +93,7 @@ public final class SettingsBackup {
             Settings.HIDE_REEL_SOCIAL_FOOTER,
             Settings.OPEN_LINKS_EXTERNALLY,
             Settings.SANITIZE_SHARING_LINKS,
+            Settings.STOP_UPDATE_PROMPTS,
             Settings.DOWNLOAD_STORIES,
             Settings.DOWNLOAD_REELS,
             Settings.DOWNLOAD_VIDEOS));

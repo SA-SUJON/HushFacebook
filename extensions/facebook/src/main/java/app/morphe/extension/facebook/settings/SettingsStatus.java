@@ -78,6 +78,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean updatePrompts() {
+        return false;
+    }
+
     public static boolean restoreTrust() {
         return false;
     }

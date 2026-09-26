@@ -5,6 +5,7 @@ Every Hushfacebook release, newest first.
 ## Unreleased
 
 * **Facebook:** The Hide Stories tray switch now says, in its settings row and in the README, that it takes effect when Facebook restarts. Facebook builds the feed's fixed rows once, when the feed is set up, so pulling to refresh or coming back to the feed neither brings the tray back nor takes it away. The README used to say the tray comes or goes the next time the feed is built.
+* **Facebook:** New patch, Stop update prompts. A patched Facebook can't install Meta's updates, so this stops Facebook asking. It turns off the two things Facebook does for Meta App Manager, the update promotions it shows for it and the push message that has the manager look for an update, and it drops the chat promotions aimed at older versions. Its switch sits under Updates. Meta App Manager's own notices come from that app, which the patch can't reach, and the README says what to do about them.
 
 ## 0.1.8 (2026-09-26)
 

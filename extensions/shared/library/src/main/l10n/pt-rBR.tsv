@@ -196,3 +196,6 @@ File name set to %1$s.	Nome do arquivo definido como %1$s.
 No app on this phone can open the link. The address is %1$s.	Nenhum app deste celular consegue abrir o link. O endereço é %1$s.
 Hushfacebook pauses when Facebook restarts.	O Hushfacebook será pausado quando o Facebook reiniciar.
 Pause, backup and diagnostics	Pausa, backup e diagnóstico
+Updates	Atualizações
+Stop update prompts	Parar os avisos de atualização
+Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	O Facebook para de pedir que você atualize pelo Meta App Manager e para de mandá-lo procurar uma atualização. As promoções de chat voltadas a versões antigas também somem. Uma versão com patch não consegue instalar as atualizações da Meta de qualquer forma.

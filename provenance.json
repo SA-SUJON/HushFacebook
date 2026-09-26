@@ -202,6 +202,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the Reels viewer clean-up, which drops the chips under a reel by their GraphQL type, answers Facebook's own Follow check and its config for removing the Following button, and skips the footer's hot comment and friends' reaction queries, each behind its own switch, with the hooks found in Facebook 577 and 580 by kept literals and Redex names."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/updates/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/updates/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the switch on Facebook's own update prompts. Facebook 577 and 580 carry no installer of their own, so the patch fails the two QuickPromotion filters that ask Meta App Manager about updates, skips the push handler that has the manager look for one, and fails the chat promotion filter aimed at versions below a ceiling, each found by its shape and the literals it keeps."
     }
   ]
 }

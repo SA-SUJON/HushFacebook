@@ -49,6 +49,7 @@ import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.stories.StoryAdvance;
+import app.morphe.extension.facebook.updates.UpdatePrompts;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.diagnostics.FeedFilterCounters;
 import app.morphe.extension.shared.settings.BaseSettings;
@@ -199,6 +200,12 @@ public class PausedHooksTest {
             String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
             return !shared.equals(LinkCleaner.sanitizeShared(shared));
         }));
+        // Both Meta App Manager promotion filters fail, the force-sync push is skipped, and the
+        // chat filter that targets older versions fails.
+        probes.put(PatchFamily.UPDATE_PROMPTS, Arrays.asList(
+                UpdatePrompts::blockPromotion,
+                UpdatePrompts::blockForceSync,
+                () -> UpdatePrompts.blockVersionCeiling(UpdatePrompts.VERSION_CEILING_FILTER)));
         return probes;
     }
 

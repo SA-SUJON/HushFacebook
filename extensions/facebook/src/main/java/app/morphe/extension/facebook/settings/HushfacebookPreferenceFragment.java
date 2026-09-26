@@ -303,6 +303,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
         }
 
+        if (build.contains(PatchFamily.UPDATE_PROMPTS)) {
+            PreferenceCategory updates = category(screen, L10n.t("Updates"));
+            updates.addPreference(toggle(context, Settings.STOP_UPDATE_PROMPTS, L10n.t("Stop update prompts"),
+                    L10n.t("Facebook stops asking you to update through Meta App Manager and stops having it look for one. "
+                            + "Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.")));
+        }
+
         if (build.contains(PatchFamily.AD_PREFETCH) || build.contains(PatchFamily.AD_TELEMETRY)
                 || build.contains(PatchFamily.AUDIENCE_NETWORK) || build.contains(PatchFamily.AMOLED_THEME)
                 || build.contains(PatchFamily.MATERIAL_YOU_THEME) || build.contains(PatchFamily.RESTORE_TRUST)) {

@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(392);
+        Map<String, String> table = new HashMap<>(398);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -186,6 +186,8 @@ public final class L10nTranslations {
                 "Facebook l\u00e4dt im Hintergrund weder Werbung noch sein Werbemodell herunter.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "Facebook liefert keine Werbung an andere Apps auf diesem Handy aus.");
+        table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
+                "Facebook fordert dich nicht mehr auf, \u00fcber den Meta App Manager zu aktualisieren, und l\u00e4sst ihn nicht mehr nach einem Update suchen. Chat-Hinweise f\u00fcr \u00e4ltere Versionen entfallen ebenfalls. Ein gepatchter Build kann Metas Updates ohnehin nicht installieren.");
         table.put("File name",
                 "Dateiname");
         table.put("File name set to %1$s.",
@@ -294,11 +296,11 @@ public final class L10nTranslations {
                 "Einstellungsdatei wird gelesen");
         table.put("Reels and Watch",
                 "Reels und Watch");
-        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
-                "Die Buttons Remix, Vorlage verwenden, \u201eDu bist dran\u201c und Edits sowie die f\u00fcr Sterne, Spiele, Partner-Apps und externe Links. Der Song und andere Hinweise bleiben.");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
+                "Die Buttons Remix, Vorlage verwenden, \u201eDu bist dran\u201c und Edits sowie die f\u00fcr Sterne, Spiele, Partner-Apps und externe Links. Der Song und andere Hinweise bleiben.");
         table.put("Remove tracking from shared links",
                 "Tracking aus geteilten Links entfernen");
         table.put("Retry",
@@ -361,6 +363,8 @@ public final class L10nTranslations {
                 "Bleibt w\u00e4hrend der Pause aktiv");
         table.put("Stop Story auto-advance",
                 "Automatisches Weiterspringen bei Stories stoppen");
+        table.put("Stop update prompts",
+                "Update-Aufforderungen stoppen");
         table.put("Stories",
                 "Stories");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -413,15 +417,17 @@ public final class L10nTranslations {
                 "Dieses Handy hat keine Dateiauswahl, hier l\u00e4sst sich also keine Datei w\u00e4hlen.");
         table.put("Try again, or go back to Facebook.",
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
+        table.put("Updates",
+                "Updates");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("Version",
                 "Version");
         table.put("Version %1$s for Facebook %2$s",
                 "Version %1$s f\u00fcr Facebook %2$s");
         table.put("Video file name",
                 "Dateiname f\u00fcr Videos");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Videos hei\u00dfen %1$s. Fotos behalten Facebooks eigene Namen mit %2$s.");
         table.put("Videos go to %1$s and photos to %2$s.",
@@ -457,7 +463,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(392);
+        Map<String, String> table = new HashMap<>(398);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -599,6 +605,8 @@ public final class L10nTranslations {
                 "Facebook no descarga anuncios ni su modelo de anuncios en segundo plano.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "Facebook no env\u00eda anuncios a otras apps de este tel\u00e9fono.");
+        table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
+                "Facebook deja de pedirte que actualices a trav\u00e9s de Meta App Manager y deja de hacer que busque una actualizaci\u00f3n. Las promociones de chat dirigidas a versiones antiguas tambi\u00e9n desaparecen. Una versi\u00f3n parcheada no puede instalar las actualizaciones de Meta de todos modos.");
         table.put("File name",
                 "Nombre de archivo");
         table.put("File name set to %1$s.",
@@ -707,11 +715,11 @@ public final class L10nTranslations {
                 "Leyendo el archivo de configuraci\u00f3n");
         table.put("Reels and Watch",
                 "Reels y Watch");
-        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
-                "Los botones para hacer un remix, usar la plantilla, sumar el tuyo o abrir Edits, y los de estrellas, juegos, apps asociadas y enlaces externos. La canci\u00f3n y las dem\u00e1s etiquetas se quedan.");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
+                "Los botones para hacer un remix, usar la plantilla, sumar el tuyo o abrir Edits, y los de estrellas, juegos, apps asociadas y enlaces externos. La canci\u00f3n y las dem\u00e1s etiquetas se quedan.");
         table.put("Remove tracking from shared links",
                 "Quitar el seguimiento de los enlaces compartidos");
         table.put("Retry",
@@ -774,6 +782,8 @@ public final class L10nTranslations {
                 "Se mantiene durante la pausa");
         table.put("Stop Story auto-advance",
                 "Detener el avance autom\u00e1tico de historias");
+        table.put("Stop update prompts",
+                "Detener los avisos de actualizaci\u00f3n");
         table.put("Stories",
                 "Historias");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -826,15 +836,17 @@ public final class L10nTranslations {
                 "Este tel\u00e9fono no tiene selector de archivos, as\u00ed que aqu\u00ed no hay forma de elegir un archivo.");
         table.put("Try again, or go back to Facebook.",
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
+        table.put("Updates",
+                "Actualizaciones");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("Version",
                 "Versi\u00f3n");
         table.put("Version %1$s for Facebook %2$s",
                 "Versi\u00f3n %1$s para Facebook %2$s");
         table.put("Video file name",
                 "Nombre de archivo de los videos");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Los videos se llaman %1$s. Las fotos conservan los nombres %2$s propios de Facebook.");
         table.put("Videos go to %1$s and photos to %2$s.",
@@ -870,7 +882,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(392);
+        Map<String, String> table = new HashMap<>(398);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1012,6 +1024,8 @@ public final class L10nTranslations {
                 "Facebook tidak mengunduh iklan atau model iklannya di latar belakang.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.");
+        table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
+                "Facebook berhenti meminta Anda memperbarui lewat Meta App Manager dan berhenti menyuruhnya mencari pembaruan. Promosi obrolan yang ditujukan ke versi lama juga hilang. Build yang dipatch memang tidak bisa memasang pembaruan Meta.");
         table.put("File name",
                 "Nama file");
         table.put("File name set to %1$s.",
@@ -1120,11 +1134,11 @@ public final class L10nTranslations {
                 "Membaca file pengaturan");
         table.put("Reels and Watch",
                 "Reels dan Watch");
-        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
-                "Tombol untuk Remix, memakai templat, menambahkan milik Anda, dan Edits, serta tombol Bintang, game, aplikasi mitra, dan tautan eksternal. Lagu dan label lainnya tetap ada.");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
+                "Tombol untuk Remix, memakai templat, menambahkan milik Anda, dan Edits, serta tombol Bintang, game, aplikasi mitra, dan tautan eksternal. Lagu dan label lainnya tetap ada.");
         table.put("Remove tracking from shared links",
                 "Hapus pelacakan dari tautan yang dibagikan");
         table.put("Retry",
@@ -1187,6 +1201,8 @@ public final class L10nTranslations {
                 "Tetap aktif saat dijeda");
         table.put("Stop Story auto-advance",
                 "Hentikan perpindahan otomatis Cerita");
+        table.put("Stop update prompts",
+                "Hentikan permintaan pembaruan");
         table.put("Stories",
                 "Cerita");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -1239,15 +1255,17 @@ public final class L10nTranslations {
                 "Ponsel ini tidak memiliki pemilih file, jadi file tidak dapat dipilih di sini.");
         table.put("Try again, or go back to Facebook.",
                 "Coba lagi, atau kembali ke Facebook.");
+        table.put("Updates",
+                "Pembaruan");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("Version",
                 "Versi");
         table.put("Version %1$s for Facebook %2$s",
                 "Versi %1$s untuk Facebook %2$s");
         table.put("Video file name",
                 "Nama file video");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Video diberi nama %1$s. Foto tetap memakai nama %2$s bawaan Facebook.");
         table.put("Videos go to %1$s and photos to %2$s.",
@@ -1283,7 +1301,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(392);
+        Map<String, String> table = new HashMap<>(398);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1425,6 +1443,8 @@ public final class L10nTranslations {
                 "O Facebook n\u00e3o baixa an\u00fancios nem o modelo de an\u00fancios dele em segundo plano.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "O Facebook n\u00e3o envia an\u00fancios para outros apps deste celular.");
+        table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
+                "O Facebook para de pedir que voc\u00ea atualize pelo Meta App Manager e para de mand\u00e1-lo procurar uma atualiza\u00e7\u00e3o. As promo\u00e7\u00f5es de chat voltadas a vers\u00f5es antigas tamb\u00e9m somem. Uma vers\u00e3o com patch n\u00e3o consegue instalar as atualiza\u00e7\u00f5es da Meta de qualquer forma.");
         table.put("File name",
                 "Nome do arquivo");
         table.put("File name set to %1$s.",
@@ -1533,11 +1553,11 @@ public final class L10nTranslations {
                 "Lendo o arquivo de configura\u00e7\u00f5es");
         table.put("Reels and Watch",
                 "Reels e Watch");
-        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
-                "Os bot\u00f5es de remix, usar modelo, adicionar o seu e Edits, e os de estrelas, jogos, apps parceiros e links externos. A m\u00fasica e as outras etiquetas continuam.");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
+                "Os bot\u00f5es de remix, usar modelo, adicionar o seu e Edits, e os de estrelas, jogos, apps parceiros e links externos. A m\u00fasica e as outras etiquetas continuam.");
         table.put("Remove tracking from shared links",
                 "Remover o rastreamento dos links compartilhados");
         table.put("Retry",
@@ -1600,6 +1620,8 @@ public final class L10nTranslations {
                 "O que continua ativo na pausa");
         table.put("Stop Story auto-advance",
                 "Parar o avan\u00e7o autom\u00e1tico dos stories");
+        table.put("Stop update prompts",
+                "Parar os avisos de atualiza\u00e7\u00e3o");
         table.put("Stories",
                 "Stories");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -1652,15 +1674,17 @@ public final class L10nTranslations {
                 "Este celular n\u00e3o tem seletor de arquivos, ent\u00e3o n\u00e3o d\u00e1 para escolher um arquivo aqui.");
         table.put("Try again, or go back to Facebook.",
                 "Tente de novo ou volte para o Facebook.");
+        table.put("Updates",
+                "Atualiza\u00e7\u00f5es");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Version",
                 "Vers\u00e3o");
         table.put("Version %1$s for Facebook %2$s",
                 "Vers\u00e3o %1$s para o Facebook %2$s");
         table.put("Video file name",
                 "Nome do arquivo de v\u00eddeo");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Os v\u00eddeos se chamam %1$s. As fotos mant\u00eam os nomes %2$s do pr\u00f3prio Facebook.");
         table.put("Videos go to %1$s and photos to %2$s.",
@@ -1696,7 +1720,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(392);
+        Map<String, String> table = new HashMap<>(398);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -1838,6 +1862,8 @@ public final class L10nTranslations {
                 "Facebook reklamlar\u0131 veya reklam modelini arka planda indirmez.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "Facebook bu telefondaki di\u011fer uygulamalara reklam sunmaz.");
+        table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
+                "Facebook, Meta App Manager \u00fczerinden g\u00fcncelleme istemeyi ve ona g\u00fcncelleme aratmay\u0131 b\u0131rak\u0131r. Eski s\u00fcr\u00fcmlere y\u00f6nelik sohbet tan\u0131t\u0131mlar\u0131 da kalkar. Yamal\u0131 bir s\u00fcr\u00fcm zaten Meta'n\u0131n g\u00fcncellemelerini y\u00fckleyemez.");
         table.put("File name",
                 "Dosya ad\u0131");
         table.put("File name set to %1$s.",
@@ -1946,11 +1972,11 @@ public final class L10nTranslations {
                 "Ayar dosyas\u0131 okunuyor");
         table.put("Reels and Watch",
                 "Reels ve Watch");
-        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
-                "Remix, \u015fablon kullanma, kendi videonu ekleme ve Edits d\u00fc\u011fmeleri ile y\u0131ld\u0131z, oyun, i\u015f orta\u011f\u0131 uygulamas\u0131 ve d\u0131\u015f ba\u011flant\u0131 d\u00fc\u011fmeleri. \u015eark\u0131 ve di\u011fer etiketler kal\u0131r.");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
+                "Remix, \u015fablon kullanma, kendi videonu ekleme ve Edits d\u00fc\u011fmeleri ile y\u0131ld\u0131z, oyun, i\u015f orta\u011f\u0131 uygulamas\u0131 ve d\u0131\u015f ba\u011flant\u0131 d\u00fc\u011fmeleri. \u015eark\u0131 ve di\u011fer etiketler kal\u0131r.");
         table.put("Remove tracking from shared links",
                 "Payla\u015f\u0131lan ba\u011flant\u0131lardan izlemeyi kald\u0131r");
         table.put("Retry",
@@ -2013,6 +2039,8 @@ public final class L10nTranslations {
                 "Duraklat\u0131lsa da devrede kal\u0131r");
         table.put("Stop Story auto-advance",
                 "Hikayelerin otomatik ilerlemesini durdur");
+        table.put("Stop update prompts",
+                "G\u00fcncelleme uyar\u0131lar\u0131n\u0131 durdur");
         table.put("Stories",
                 "Hikayeler");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -2065,15 +2093,17 @@ public final class L10nTranslations {
                 "Bu telefonda dosya se\u00e7ici yok, bu y\u00fczden burada dosya se\u00e7menin bir yolu yok.");
         table.put("Try again, or go back to Facebook.",
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
+        table.put("Updates",
+                "G\u00fcncellemeler");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("Version",
                 "S\u00fcr\u00fcm");
         table.put("Version %1$s for Facebook %2$s",
                 "Facebook %2$s i\u00e7in %1$s s\u00fcr\u00fcm\u00fc");
         table.put("Video file name",
                 "Video dosya ad\u0131");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Videolar\u0131n ad\u0131 %1$s olur. Foto\u011fraflar Facebook'un kendi %2$s adlar\u0131n\u0131 korur.");
         table.put("Videos go to %1$s and photos to %2$s.",

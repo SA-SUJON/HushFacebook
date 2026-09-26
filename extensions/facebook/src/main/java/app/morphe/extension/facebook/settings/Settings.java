@@ -120,6 +120,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_sanitize_sharing_links", TRUE);
 
     /**
+     * Facebook's own update prompts, which a build signed with the patcher's key can't act on:
+     * the Meta App Manager promotions, the push that has the manager look for an update, and the
+     * chat promotions aimed at versions below a ceiling.
+     */
+    public static final BooleanSetting STOP_UPDATE_PROMPTS =
+            new BooleanSetting("hushfacebook_stop_update_prompts", TRUE);
+
+    /**
      * The story viewer's menu offers Save on anyone's story, and Save runs Hushfacebook's own
      * download. Off, only your own stories offer it, and it's Facebook's own save.
      */
