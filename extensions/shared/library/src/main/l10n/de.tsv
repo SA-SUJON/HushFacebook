@@ -196,9 +196,11 @@ Videos are named %1$s. Photos keep Facebook's own %2$s names.	Videos heißen %1$
 Saved videos will be named %1$s.	Gespeicherte Videos heißen dann %1$s.
 File name	Dateiname
 File name set to %1$s.	Dateiname auf %1$s gesetzt.
+Hide AI-detected reels and videos	Als KI erkannte Reels und Videos ausblenden
 No app on this phone can open the link. The address is %1$s.	Keine App auf diesem Handy kann den Link öffnen. Die Adresse ist %1$s.
 Hushfacebook pauses when Facebook restarts.	Hushfacebook pausiert, sobald Facebook neu startet.
 Pause, backup and diagnostics	Pause, Sicherung und Diagnose
 Updates	Updates
 Stop update prompts	Update-Aufforderungen stoppen
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook fordert dich nicht mehr auf, über den Meta App Manager zu aktualisieren, und lässt ihn nicht mehr nach einem Update suchen. Chat-Hinweise für ältere Versionen entfallen ebenfalls. Ein gepatchter Build kann Metas Updates ohnehin nicht installieren.
+Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reels und Watch-Videos, die Facebooks eigene Erkennung als mit KI erstellt markiert. Eines, das nur die Person, die es erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardmäßig aus, weil er noch nicht mit einem echten Konto getestet wurde.

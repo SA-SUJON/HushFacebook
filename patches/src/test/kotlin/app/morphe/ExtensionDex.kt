@@ -29,6 +29,9 @@ internal object ExtensionDex {
     fun classDef(type: String): ClassDef =
         dex.classes.firstOrNull { it.type == type } ?: throw AssertionError("$PAYLOAD holds no $type")
 
+    /** Every class in the payload, as the patcher sees them merged into the app. */
+    fun classes(): List<ClassDef> = dex.classes.toList()
+
     /** The value a static final String field of [type] starts with, as javac wrote it into the class. */
     fun stringConstant(type: String, field: String): String {
         val declared = classDef(type).staticFields.firstOrNull { it.name == field }

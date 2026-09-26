@@ -113,6 +113,11 @@ public class ColdStartHooksTest {
         assertFalse(FeedGuardForTests.hidesShowcaseReels(Category.SHOWCASE, ShowcaseStoryType.SHOWCASE_SHORT_VIDEO));
         assertFalse(FeedFilter.hidePreEofReels());
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.detectedInfo(true)));
+        assertFalse(FeedGuardForTests.hidesAiReel(new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true))));
+        FeedGuardForTests.ReelItem flaggedReel = new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true));
+        Section reelSection = new Section(new ArrayList<>(Arrays.asList(new Reel(), flaggedReel)));
+        FeedGuardForTests.aiReelSections(Collections.singletonList(reelSection));
+        assertTrue(reelSection.items.contains(flaggedReel));
         assertFalse(FeedFilter.hideEdge(Category.SPONSORED, new Object()));
         assertFalse(FeedFilter.hideSponsoredStories());
         VideoAd reelAd = new VideoAd();

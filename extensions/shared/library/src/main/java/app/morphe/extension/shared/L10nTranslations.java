@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(404);
+        Map<String, String> table = new HashMap<>(408);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -212,6 +212,8 @@ public final class L10nTranslations {
                 "\u201eVorschl\u00e4ge f\u00fcr dich\u201c ausblenden");
         table.put("Hide AI-detected posts",
                 "Als KI erkannte Beitr\u00e4ge ausblenden");
+        table.put("Hide AI-detected reels and videos",
+                "Als KI erkannte Reels und Videos ausblenden");
         table.put("Hide Reels in the feed",
                 "Reels im Feed ausblenden");
         table.put("Hide comment and reaction previews",
@@ -294,15 +296,17 @@ public final class L10nTranslations {
                 "Beitr\u00e4ge, die Facebooks eigene Erkennung als mit KI erstellt markiert. Ein Beitrag, den nur die Person, die ihn erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profile und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
-        table.put("Re-signed build fix",
-                "Fix f\u00fcr neu signierte Builds");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Re-signed build fix",
+                "Fix f\u00fcr neu signierte Builds");
         table.put("Reading the settings file",
                 "Einstellungsdatei wird gelesen");
         table.put("Reels and Watch",
                 "Reels und Watch");
+        table.put("Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
+                "Reels und Watch-Videos, die Facebooks eigene Erkennung als mit KI erstellt markiert. Eines, das nur die Person, die es erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht mit einem echten Konto getestet wurde.");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Die Buttons Remix, Vorlage verwenden, \u201eDu bist dran\u201c und Edits sowie die f\u00fcr Sterne, Spiele, Partner-Apps und externe Links. Der Song und andere Hinweise bleiben.");
         table.put("Remove tracking from shared links",
@@ -415,13 +419,13 @@ public final class L10nTranslations {
                 "Es gibt keine Diagnosedaten zum Wiederherstellen.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Noch nichts zu berichten. Schalte die Debug-Protokollierung ein, wiederhole, was schiefgelaufen ist, und exportiere dann erneut.");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Diese werden beim Patchen in Morphe Manager ausgew\u00e4hlt, und die Pause schaltet sie nicht aus. Patche erneut, um sie zu \u00e4ndern.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Dieses Handy hat keine Dateiauswahl, hier l\u00e4sst sich also keine Datei w\u00e4hlen.");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
         table.put("Updates",
@@ -469,7 +473,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(404);
+        Map<String, String> table = new HashMap<>(408);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -637,6 +641,8 @@ public final class L10nTranslations {
                 "Ocultar publicaciones \u201cSugerencias para ti\u201d");
         table.put("Hide AI-detected posts",
                 "Ocultar publicaciones detectadas como IA");
+        table.put("Hide AI-detected reels and videos",
+                "Ocultar reels y videos detectados como IA");
         table.put("Hide Reels in the feed",
                 "Ocultar reels en el feed");
         table.put("Hide comment and reaction previews",
@@ -719,15 +725,17 @@ public final class L10nTranslations {
                 "Publicaciones que la detecci\u00f3n propia de Facebook marca como creadas con IA. Una publicaci\u00f3n que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
-        table.put("Re-signed build fix",
-                "Arreglo para la nueva firma");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Re-signed build fix",
+                "Arreglo para la nueva firma");
         table.put("Reading the settings file",
                 "Leyendo el archivo de configuraci\u00f3n");
         table.put("Reels and Watch",
                 "Reels y Watch");
+        table.put("Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
+                "Reels y videos de Watch que la detecci\u00f3n propia de Facebook marca como creados con IA. Uno que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 con una cuenta real.");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Los botones para hacer un remix, usar la plantilla, sumar el tuyo o abrir Edits, y los de estrellas, juegos, apps asociadas y enlaces externos. La canci\u00f3n y las dem\u00e1s etiquetas se quedan.");
         table.put("Remove tracking from shared links",
@@ -840,13 +848,13 @@ public final class L10nTranslations {
                 "No hay datos de diagn\u00f3stico que restaurar.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Todav\u00eda no hay nada que informar. Activa el Registro de depuraci\u00f3n, repite lo que fall\u00f3 y vuelve a exportar.");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Se eligen en Morphe Manager al parchear, y Pausar no los desactiva. Vuelve a parchear para cambiarlos.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este tel\u00e9fono no tiene selector de archivos, as\u00ed que aqu\u00ed no hay forma de elegir un archivo.");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
         table.put("Updates",
@@ -894,7 +902,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(404);
+        Map<String, String> table = new HashMap<>(408);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1062,6 +1070,8 @@ public final class L10nTranslations {
                 "Sembunyikan postingan \u201cDisarankan untuk Anda\u201d");
         table.put("Hide AI-detected posts",
                 "Sembunyikan postingan yang terdeteksi dibuat dengan AI");
+        table.put("Hide AI-detected reels and videos",
+                "Sembunyikan reel dan video yang terdeteksi dibuat dengan AI");
         table.put("Hide Reels in the feed",
                 "Sembunyikan Reels di Kabar Beranda");
         table.put("Hide comment and reaction previews",
@@ -1144,15 +1154,17 @@ public final class L10nTranslations {
                 "Postingan yang ditandai deteksi Facebook sendiri sebagai buatan AI. Postingan yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
-        table.put("Re-signed build fix",
-                "Perbaikan build yang ditandatangani ulang");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Re-signed build fix",
+                "Perbaikan build yang ditandatangani ulang");
         table.put("Reading the settings file",
                 "Membaca file pengaturan");
         table.put("Reels and Watch",
                 "Reels dan Watch");
+        table.put("Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
+                "Reel dan video Watch yang ditandai deteksi Facebook sendiri sebagai buatan AI. Yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji dengan akun sungguhan.");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Tombol untuk Remix, memakai templat, menambahkan milik Anda, dan Edits, serta tombol Bintang, game, aplikasi mitra, dan tautan eksternal. Lagu dan label lainnya tetap ada.");
         table.put("Remove tracking from shared links",
@@ -1265,13 +1277,13 @@ public final class L10nTranslations {
                 "Tidak ada data diagnostik yang dapat dikembalikan.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Belum ada yang bisa dilaporkan. Aktifkan Pencatatan debug, ulangi hal yang bermasalah, lalu ekspor lagi.");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Semua ini dipilih di Morphe Manager saat Anda menambal, dan Jeda tidak mematikannya. Tambal ulang untuk mengubahnya.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Ponsel ini tidak memiliki pemilih file, jadi file tidak dapat dipilih di sini.");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Coba lagi, atau kembali ke Facebook.");
         table.put("Updates",
@@ -1319,7 +1331,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(404);
+        Map<String, String> table = new HashMap<>(408);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1487,6 +1499,8 @@ public final class L10nTranslations {
                 "Ocultar publica\u00e7\u00f5es \u201cSugest\u00f5es para voc\u00ea\u201d");
         table.put("Hide AI-detected posts",
                 "Ocultar posts detectados como IA");
+        table.put("Hide AI-detected reels and videos",
+                "Ocultar reels e v\u00eddeos detectados como IA");
         table.put("Hide Reels in the feed",
                 "Ocultar reels no feed");
         table.put("Hide comment and reaction previews",
@@ -1569,15 +1583,17 @@ public final class L10nTranslations {
                 "Posts que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como feitos com IA. Um post que s\u00f3 o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desligada porque ainda n\u00e3o foi testada em um feed real.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o reassinada.");
-        table.put("Re-signed build fix",
-                "Corre\u00e7\u00e3o para vers\u00e3o reassinada");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Re-signed build fix",
+                "Corre\u00e7\u00e3o para vers\u00e3o reassinada");
         table.put("Reading the settings file",
                 "Lendo o arquivo de configura\u00e7\u00f5es");
         table.put("Reels and Watch",
                 "Reels e Watch");
+        table.put("Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
+                "Reels e v\u00eddeos do Watch que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como feitos com IA. Um que s\u00f3 o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desligada porque ainda n\u00e3o foi testada com uma conta real.");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Os bot\u00f5es de remix, usar modelo, adicionar o seu e Edits, e os de estrelas, jogos, apps parceiros e links externos. A m\u00fasica e as outras etiquetas continuam.");
         table.put("Remove tracking from shared links",
@@ -1690,13 +1706,13 @@ public final class L10nTranslations {
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para restaurar.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Ainda n\u00e3o h\u00e1 nada para relatar. Ative o Registro de depura\u00e7\u00e3o, repita o que deu errado e exporte de novo.");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Eles s\u00e3o escolhidos no Morphe Manager quando voc\u00ea aplica os patches, e a pausa n\u00e3o os desliga. Aplique os patches de novo para mud\u00e1-los.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este celular n\u00e3o tem seletor de arquivos, ent\u00e3o n\u00e3o d\u00e1 para escolher um arquivo aqui.");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Tente de novo ou volte para o Facebook.");
         table.put("Updates",
@@ -1744,7 +1760,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(404);
+        Map<String, String> table = new HashMap<>(408);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -1912,6 +1928,8 @@ public final class L10nTranslations {
                 "\u201cSenin i\u00e7in \u00f6nerilenler\u201d g\u00f6nderilerini gizle");
         table.put("Hide AI-detected posts",
                 "Yapay zek\u00e2 ile \u00fcretildi\u011fi tespit edilen g\u00f6nderileri gizle");
+        table.put("Hide AI-detected reels and videos",
+                "Yapay zek\u00e2 ile \u00fcretildi\u011fi tespit edilen reels ve videolar\u0131 gizle");
         table.put("Hide Reels in the feed",
                 "Ak\u0131\u015ftaki Reels videolar\u0131n\u0131 gizle");
         table.put("Hide comment and reaction previews",
@@ -1994,15 +2012,17 @@ public final class L10nTranslations {
                 "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi g\u00f6nderiler. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir g\u00f6nderi kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
-        table.put("Re-signed build fix",
-                "Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Re-signed build fix",
+                "Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
         table.put("Reading the settings file",
                 "Ayar dosyas\u0131 okunuyor");
         table.put("Reels and Watch",
                 "Reels ve Watch");
+        table.put("Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
+                "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi reels ve Watch videolar\u0131. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir video kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir hesapla test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Remix, \u015fablon kullanma, kendi videonu ekleme ve Edits d\u00fc\u011fmeleri ile y\u0131ld\u0131z, oyun, i\u015f orta\u011f\u0131 uygulamas\u0131 ve d\u0131\u015f ba\u011flant\u0131 d\u00fc\u011fmeleri. \u015eark\u0131 ve di\u011fer etiketler kal\u0131r.");
         table.put("Remove tracking from shared links",
@@ -2115,13 +2135,13 @@ public final class L10nTranslations {
                 "Geri getirilecek tan\u0131lama verisi yok.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Hen\u00fcz raporlanacak bir \u015fey yok. Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fcn\u00fc a\u00e7, sorunu yeniden olu\u015ftur, sonra tekrar d\u0131\u015fa aktar.");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Bunlar yamalarken Morphe Manager'da se\u00e7ilir ve Duraklatma bunlar\u0131 kapatmaz. De\u011fi\u015ftirmek i\u00e7in yeniden yamala.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Bu telefonda dosya se\u00e7ici yok, bu y\u00fczden burada dosya se\u00e7menin bir yolu yok.");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
         table.put("Updates",

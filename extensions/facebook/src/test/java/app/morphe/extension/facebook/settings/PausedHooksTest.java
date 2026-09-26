@@ -152,9 +152,17 @@ public class PausedHooksTest {
             ReturnRefresh.uiHidden();
             return ReturnRefresh.skip();
         }));
-        // A story Facebook's own detection marked as made with AI.
-        probes.put(PatchFamily.AI_DETECTED_POSTS, Collections.singletonList(
-                () -> FeedGuardForTests.hides(Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.detectedInfo(true))));
+        // A story Facebook's own detection marked as made with AI, and a reel whose GenAI attribution
+        // carries the same flag, at both levels a page of reels enters.
+        probes.put(PatchFamily.AI_DETECTED_POSTS, Arrays.asList(
+                () -> FeedGuardForTests.hides(Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.detectedInfo(true)),
+                () -> FeedGuardForTests.hidesAiReel(new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true))),
+                () -> {
+                    FeedGuardForTests.ReelItem reel = new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true));
+                    Section section = new Section(new ArrayList<>(Arrays.asList(new Reel(), reel)));
+                    FeedGuardForTests.aiReelSections(Collections.singletonList(section));
+                    return !section.items.contains(reel);
+                }));
         probes.put(PatchFamily.SPONSORED_STORIES, Collections.singletonList(FeedFilter::hideSponsoredStories));
         probes.put(PatchFamily.STORY_AUTO_ADVANCE, Collections.singletonList(StoryAdvance::waitForTap));
         probes.put(PatchFamily.SPONSORED_REELS, Arrays.asList(

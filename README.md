@@ -76,7 +76,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `Download any reel` | Adds a Download button beside every reel. Videos save at the Download quality you set, best by default. |
 | `Download any video` | Adds Download to phone to the menu of videos in the feed and in Watch, below Facebook's own items. Videos save at the Download quality you set, best by default. |
 | `Download any story` | Adds Save to the menu of any story, including stories with music. Videos save at the Download quality you set, best by default. |
-| `Hide AI-detected posts` | Removes feed posts that Facebook's own detection marked as made with AI. Its switch starts off, so turn it on in Hushfacebook's settings. |
+| `Hide AI-detected posts` | Removes feed posts that Facebook's own detection marked as made with AI, and the reels and Watch videos it flagged the same way. Both switches start off, so turn them on in Hushfacebook's settings. |
 | `Hide sponsored posts` | Removes sponsored and promoted posts from the news feed, with no gap left behind. |
 | `Hide sponsored reels` | Removes ads from Reels and Watch, including product banners over a reel and ads inside a video. |
 | `Hide sponsored stories` | Removes ad cards from the story viewer, so swiping through stories only shows stories people posted. |
@@ -92,7 +92,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `Stop update prompts` | Stops Facebook's own update prompts on a patched build, which can't install Meta's updates anyway. Meta App Manager's update promotions and the push message that has it look for an update go, and so do chat promotions aimed at older versions. |
 | `Use the system font` | Draws Facebook's own text in your phone's font instead of Meta's Optimistic typeface. Icons and emoji keep their fonts, and so does the text you put on a story. Restart Facebook after changing the switch. |
 
-`Download any video`, `AMOLED black theme`, `Material You theme`, `Hide Stories tray`, `Hide Reels in the feed`, `Block background-return feed refresh`, `Stop Story auto-advance`, `Clean up Reels` and `Use the system font` are off by default. Everything else is on, though `Hide AI-detected posts` goes in with its switch off. Nobody has checked it on a signed-in feed yet, so it waits until you turn it on in Hushfacebook's settings.
+`Download any video`, `AMOLED black theme`, `Material You theme`, `Hide Stories tray`, `Hide Reels in the feed`, `Block background-return feed refresh`, `Stop Story auto-advance`, `Clean up Reels` and `Use the system font` are off by default. Everything else is on, though `Hide AI-detected posts` goes in with both its switches off. Nobody has checked either on a signed-in account yet, so each waits until you turn it on in Hushfacebook's settings: the feed one under News feed, the reels one under Reels and Watch.
 
 ### Dark mode themes
 
@@ -128,7 +128,7 @@ Hushfacebook pauses itself when Facebook crashes or freezes within a minute of s
 | Hide suggested and promoted posts | Off. |
 | Hide Stories tray | Off. The row of stories comes back. |
 | Hide Reels in the feed | Off. The rows of reels come back. |
-| Hide AI-detected posts | Off. Posts Facebook detected as made with AI come back. |
+| Hide AI-detected posts | Off. Posts Facebook detected as made with AI come back, and so do the reels and videos it flagged. |
 | Hide sponsored stories | Off. |
 | Stop Story auto-advance | Off. Stories use Facebook's timing. |
 | Hide sponsored reels | Partly. Ads inside a page of reels come back. Banners over a reel and mid-roll ads stay blocked, and so do ads the app adds on its own. |

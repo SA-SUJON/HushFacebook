@@ -196,9 +196,11 @@ Videos are named %1$s. Photos keep Facebook's own %2$s names.	Video diberi nama 
 Saved videos will be named %1$s.	Video yang disimpan akan diberi nama %1$s.
 File name	Nama file
 File name set to %1$s.	Nama file diatur menjadi %1$s.
+Hide AI-detected reels and videos	Sembunyikan reel dan video yang terdeteksi dibuat dengan AI
 No app on this phone can open the link. The address is %1$s.	Tidak ada aplikasi di ponsel ini yang dapat membuka tautan ini. Alamatnya %1$s.
 Hushfacebook pauses when Facebook restarts.	Hushfacebook dijeda saat Facebook dimulai ulang.
 Pause, backup and diagnostics	Jeda, cadangan, dan diagnostik
 Updates	Pembaruan
 Stop update prompts	Hentikan permintaan pembaruan
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook berhenti meminta Anda memperbarui lewat Meta App Manager dan berhenti menyuruhnya mencari pembaruan. Promosi obrolan yang ditujukan ke versi lama juga hilang. Build yang dipatch memang tidak bisa memasang pembaruan Meta.
+Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reel dan video Watch yang ditandai deteksi Facebook sendiri sebagai buatan AI. Yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji dengan akun sungguhan.

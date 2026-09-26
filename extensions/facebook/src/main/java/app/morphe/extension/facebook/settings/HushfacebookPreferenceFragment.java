@@ -249,12 +249,19 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
         }
 
-        if (build.contains(PatchFamily.SPONSORED_REELS) || build.contains(PatchFamily.REEL_DECLUTTER)
-                || build.contains(PatchFamily.REEL_DOWNLOAD)) {
+        if (build.contains(PatchFamily.SPONSORED_REELS) || build.contains(PatchFamily.AI_DETECTED_POSTS)
+                || build.contains(PatchFamily.REEL_DECLUTTER) || build.contains(PatchFamily.REEL_DOWNLOAD)) {
             PreferenceCategory reels = category(screen, L10n.t("Reels and Watch"));
             if (build.contains(PatchFamily.SPONSORED_REELS)) {
                 reels.addPreference(toggle(context, Settings.HIDE_SPONSORED_REELS, L10n.t("Hide sponsored reels"),
                         L10n.t("Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.")));
+            }
+            if (build.contains(PatchFamily.AI_DETECTED_POSTS)) {
+                reels.addPreference(toggle(context, Settings.HIDE_AI_DETECTED_REELS,
+                        L10n.t("Hide AI-detected reels and videos"),
+                        L10n.t("Reels and Watch videos that Facebook's own detection marks as made with AI. One "
+                                + "that only its creator labelled as AI stays. It's off by default because it "
+                                + "hasn't been tested on a real account yet.")));
             }
             if (build.contains(PatchFamily.REEL_DECLUTTER)) {
                 reels.addPreference(toggle(context, Settings.HIDE_REEL_CHIPS,

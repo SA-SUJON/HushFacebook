@@ -17,6 +17,11 @@ public final class FamilyNames {
     public static final String SPONSORED_POSTS = "Hide sponsored posts";
     public static final String SUGGESTED_POSTS = "Hide suggested and promoted posts";
     public static final String AI_DETECTED_POSTS = "Hide AI-detected posts";
+    /**
+     * The Hook status row of the same patch's Reels and Watch hooks, so the report tells the feed
+     * guard's reads from the reel page filters'. Not a patch name: PatchFamily lists the patch once.
+     */
+    public static final String AI_DETECTED_REELS = "Hide AI-detected posts (Reels and Watch)";
     public static final String STORIES_TRAY = "Hide Stories tray";
     public static final String FEED_REELS = "Hide Reels in the feed";
     public static final String RETURN_REFRESH = "Block background-return feed refresh";

@@ -20,9 +20,9 @@ import app.morphe.extension.shared.settings.StringSetting;
 /**
  * The switches behind the hooks that ask before they act.
  *
- * <p>All but one of them are on by default. Picking a patch in Morphe Manager is the choice to use
- * it, and the switch is the way to turn it off again without patching a second time. The GenAI
- * switch is the exception: it starts off until the rule has been checked on a signed-in feed. While
+ * <p>All but two of them are on by default. Picking a patch in Morphe Manager is the choice to use
+ * it, and the switch is the way to turn it off again without patching a second time. The two GenAI
+ * switches are the exception: each starts off until its rule has been checked on a signed-in feed. While
  * Hushfacebook is paused, or in safe mode after three crashed starts, each switch answers off
  * and the hook behind it takes Facebook's own path.
  */
@@ -75,6 +75,14 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting HIDE_AI_DETECTED_POSTS =
             new BooleanSetting("hushfacebook_hide_ai_detected_posts", FALSE);
+
+    /**
+     * Reels and Watch videos Facebook's own detection marked as made with AI, read off the
+     * attribution the Reels viewer draws its AI label from. Off until it has been checked on a
+     * signed-in Reels feed, like the feed switch above.
+     */
+    public static final BooleanSetting HIDE_AI_DETECTED_REELS =
+            new BooleanSetting("hushfacebook_hide_ai_detected_reels", FALSE);
 
     /** The four story bucket sources that splice ad cards into the story viewer. */
     public static final BooleanSetting HIDE_SPONSORED_STORIES =
