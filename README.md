@@ -40,7 +40,7 @@ This project has no connection to Meta or to the Morphe project. Neither endorse
 
 There are 24 patches for `com.facebook.katana`. The arm64-v8a builds are the ones they're checked against. Meta builds the armeabi-v7a and Android 9 variants of each release separately, and those lack code some of the patches need.
 
-Facebook releases a new version about once a week, and each one renames most of its code. Every patch here finds what it changes by names Facebook keeps (its GraphQL model classes, log strings, enum names, manifest components) rather than by the names that change, which is why most of them carry over from one build to the next. When one doesn't, patching stops with a message naming what it couldn't find, instead of producing an app that quietly does nothing. Please report it.
+Facebook releases a new version about once a week, and each one renames most of its code. Every patch here finds what it changes by names Facebook keeps (its GraphQL model classes, log strings, enum names, manifest components) rather than by the names that change, which is why most of them carry over from one build to the next. When one doesn't, patching stops with a message naming what it couldn't find, instead of producing an app that quietly does nothing. Four patches work down a list of separate targets instead: Block background ad prefetch, Block ad telemetry, Disable Audience Network and Hide suggested and promoted posts. They stop only when a build has none of the list. If it has some, they apply to what's there and name each missing target in the patch log. Facebook 580 dropped six of the feed units the suggested posts patch looks for, so patching 580 lists those six. Please report a stop, or a missing target beyond those six.
 
 ## Keep your signing key
 
@@ -186,6 +186,10 @@ Some of Meta's apps declare permissions under the same names as Facebook, and An
 ### Patching stops on one patch
 
 A patch couldn't find the code it changes, and the log names the patch and what it looked for. That happens when the file isn't one of the builds Hushfacebook declares, because Facebook moves its code around from one build to the next. Pick the bundle [Install](#install) names, or patch without that one. If it stops on the declared bundle, please [report it](https://github.com/SysAdminDoc/Hushfacebook/issues/new?template=bug_report.yml) and paste the log.
+
+### The log says a patch goes on without something
+
+A line like `WARNING: Block ad telemetry: com.facebook.ads.AdsScreenshotDetector isn't in this Facebook build. The patch goes on with the 3 of 4 ad telemetry classes it found.` comes from one of the four patches that work down a list of separate targets. That patch still applied, and it covers the rest of its list. Patching Facebook 580 gives six of these from Hide suggested and promoted posts, for feed units Facebook took out of that version. Any other one on a declared bundle is worth [reporting](https://github.com/SysAdminDoc/Hushfacebook/issues/new?template=bug_report.yml) with the log.
 
 ## Your Facebook account
 

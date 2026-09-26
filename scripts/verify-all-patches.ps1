@@ -129,9 +129,11 @@ $exitCode = 1
 try {
     $cliOutput = @(& $Java '-jar' $DesktopJar @arguments 2>&1)
     $cliExitCode = $LASTEXITCODE
+    # WARNING lines are the patches' own: a patch that works down a list of targets names each one
+    # the build lacks there, and still applies.
     $cliOutput | ForEach-Object {
         $line = [string]$_
-        if ($line -match 'SEVERE|ERROR|Exception|result saved|Saved to') { Write-Host "[verify] $line" }
+        if ($line -match 'SEVERE|ERROR|WARNING|Exception|result saved|Saved to') { Write-Host "[verify] $line" }
     }
 
     $report = $null
