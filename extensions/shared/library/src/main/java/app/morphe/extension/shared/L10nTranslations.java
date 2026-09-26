@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(398);
+        Map<String, String> table = new HashMap<>(404);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -95,6 +95,8 @@ public final class L10nTranslations {
                 "F\u00fcgt \u201eSpeichern\u201c zum Men\u00fc jeder Story hinzu, egal von wem, und speichert sie in der Qualit\u00e4t, die unter \u201eDownloads\u201c eingestellt ist. Ist der Schalter aus oder Hushfacebook pausiert, gibt es \u201eSpeichern\u201c nur bei deinen eigenen Stories, und dort l\u00e4uft Facebooks eigene Speicherfunktion.");
         table.put("Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Anzeigen in Reels. Banner, Werbeunterbrechungen und von der App eingef\u00fcgte Anzeigen bleiben auch w\u00e4hrend einer Pause blockiert.");
+        table.put("Appearance",
+                "Darstellung");
         table.put("Audience Network off",
                 "Audience Network aus");
         table.put("Back",
@@ -171,11 +173,11 @@ public final class L10nTranslations {
                 "Leert das Protokoll und die Filterz\u00e4hler, die ein Bericht enthalten w\u00fcrde.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Jeder Schalter au\u00dfer der Debug-Protokollierung verh\u00e4lt sich, als w\u00e4re er aus, und was beim Patchen festgelegt wurde, bleibt aktiv. Deine Einstellungen bleiben, wie sie sind.");
-        table.put("Export diagnostic report",
-                "Diagnosebericht exportieren");
     }
 
     private static void fillDe1(Map<String, String> table) {
+        table.put("Export diagnostic report",
+                "Diagnosebericht exportieren");
         table.put("Export settings",
                 "Einstellungen exportieren");
         table.put("Facebook crashed or froze within a minute of starting three times in a row, so Hushfacebook paused itself.",
@@ -188,6 +190,8 @@ public final class L10nTranslations {
                 "Facebook liefert keine Werbung an andere Apps auf diesem Handy aus.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "Facebook fordert dich nicht mehr auf, \u00fcber den Meta App Manager zu aktualisieren, und l\u00e4sst ihn nicht mehr nach einem Update suchen. Chat-Hinweise f\u00fcr \u00e4ltere Versionen entfallen ebenfalls. Ein gepatchter Build kann Metas Updates ohnehin nicht installieren.");
+        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
+                "Facebooks Text wird in der Schriftart deines Handys statt in Metas eigener gezeichnet. Starte Facebook nach dem \u00c4ndern neu.");
         table.put("File name",
                 "Dateiname");
         table.put("File name set to %1$s.",
@@ -292,13 +296,13 @@ public final class L10nTranslations {
                 "Profile und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
         table.put("Re-signed build fix",
                 "Fix f\u00fcr neu signierte Builds");
+    }
+
+    private static void fillDe2(Map<String, String> table) {
         table.put("Reading the settings file",
                 "Einstellungsdatei wird gelesen");
         table.put("Reels and Watch",
                 "Reels und Watch");
-    }
-
-    private static void fillDe2(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Die Buttons Remix, Vorlage verwenden, \u201eDu bist dran\u201c und Edits sowie die f\u00fcr Sterne, Spiele, Partner-Apps und externe Links. Der Song und andere Hinweise bleiben.");
         table.put("Remove tracking from shared links",
@@ -415,13 +419,15 @@ public final class L10nTranslations {
                 "Diese werden beim Patchen in Morphe Manager ausgew\u00e4hlt, und die Pause schaltet sie nicht aus. Patche erneut, um sie zu \u00e4ndern.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Dieses Handy hat keine Dateiauswahl, hier l\u00e4sst sich also keine Datei w\u00e4hlen.");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
         table.put("Updates",
                 "Updates");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
+        table.put("Use the system font",
+                "Systemschriftart verwenden");
         table.put("Version",
                 "Version");
         table.put("Version %1$s for Facebook %2$s",
@@ -463,7 +469,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(398);
+        Map<String, String> table = new HashMap<>(404);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -514,6 +520,8 @@ public final class L10nTranslations {
                 "Agrega la opci\u00f3n Guardar al men\u00fa de cualquier historia, sea de quien sea, y la guarda con la calidad elegida en Descargas. Con este interruptor desactivado o Hushfacebook en pausa, solo tus propias historias tienen la opci\u00f3n Guardar, y se usa el guardado propio de Facebook.");
         table.put("Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Anuncios dentro de Reels. Los banners, los anuncios a mitad de video y los que inserta la app siguen bloqueados incluso en pausa.");
+        table.put("Appearance",
+                "Apariencia");
         table.put("Audience Network off",
                 "Sin Audience Network");
         table.put("Back",
@@ -590,11 +598,11 @@ public final class L10nTranslations {
                 "Vac\u00eda el registro y los recuentos de filtros que incluir\u00eda un informe.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Todos los interruptores, salvo el Registro de depuraci\u00f3n, funcionan como si estuvieran desactivados, y lo que se aplic\u00f3 al parchear se mantiene. Tu configuraci\u00f3n no cambia.");
-        table.put("Export diagnostic report",
-                "Exportar informe de diagn\u00f3stico");
     }
 
     private static void fillEs1(Map<String, String> table) {
+        table.put("Export diagnostic report",
+                "Exportar informe de diagn\u00f3stico");
         table.put("Export settings",
                 "Exportar configuraci\u00f3n");
         table.put("Facebook crashed or froze within a minute of starting three times in a row, so Hushfacebook paused itself.",
@@ -607,6 +615,8 @@ public final class L10nTranslations {
                 "Facebook no env\u00eda anuncios a otras apps de este tel\u00e9fono.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "Facebook deja de pedirte que actualices a trav\u00e9s de Meta App Manager y deja de hacer que busque una actualizaci\u00f3n. Las promociones de chat dirigidas a versiones antiguas tambi\u00e9n desaparecen. Una versi\u00f3n parcheada no puede instalar las actualizaciones de Meta de todos modos.");
+        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
+                "El texto de Facebook se dibuja con la fuente de tu tel\u00e9fono en lugar de la propia de Meta. Reinicia Facebook despu\u00e9s de cambiar esto.");
         table.put("File name",
                 "Nombre de archivo");
         table.put("File name set to %1$s.",
@@ -711,13 +721,13 @@ public final class L10nTranslations {
                 "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
         table.put("Re-signed build fix",
                 "Arreglo para la nueva firma");
+    }
+
+    private static void fillEs2(Map<String, String> table) {
         table.put("Reading the settings file",
                 "Leyendo el archivo de configuraci\u00f3n");
         table.put("Reels and Watch",
                 "Reels y Watch");
-    }
-
-    private static void fillEs2(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Los botones para hacer un remix, usar la plantilla, sumar el tuyo o abrir Edits, y los de estrellas, juegos, apps asociadas y enlaces externos. La canci\u00f3n y las dem\u00e1s etiquetas se quedan.");
         table.put("Remove tracking from shared links",
@@ -834,13 +844,15 @@ public final class L10nTranslations {
                 "Se eligen en Morphe Manager al parchear, y Pausar no los desactiva. Vuelve a parchear para cambiarlos.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este tel\u00e9fono no tiene selector de archivos, as\u00ed que aqu\u00ed no hay forma de elegir un archivo.");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
         table.put("Updates",
                 "Actualizaciones");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
+        table.put("Use the system font",
+                "Usar la fuente del sistema");
         table.put("Version",
                 "Versi\u00f3n");
         table.put("Version %1$s for Facebook %2$s",
@@ -882,7 +894,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(398);
+        Map<String, String> table = new HashMap<>(404);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -933,6 +945,8 @@ public final class L10nTranslations {
                 "Menambahkan opsi Simpan ke menu cerita siapa pun dan menyimpannya dengan kualitas yang diatur di bagian Unduhan. Jika nonaktif atau dijeda, opsi Simpan hanya ada di cerita Anda sendiri dan memakai fitur simpan bawaan Facebook.");
         table.put("Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Iklan di dalam Reels. Banner, iklan di tengah video, dan iklan yang disisipkan aplikasi tetap diblokir saat dijeda.");
+        table.put("Appearance",
+                "Tampilan");
         table.put("Audience Network off",
                 "Audience Network nonaktif");
         table.put("Back",
@@ -1009,11 +1023,11 @@ public final class L10nTranslations {
                 "Mengosongkan log dan hitungan filter yang akan dimasukkan ke laporan.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Semua sakelar kecuali Pencatatan debug dianggap nonaktif, dan yang diatur saat Anda menambal tetap aktif. Pengaturan Anda tetap seperti semula.");
-        table.put("Export diagnostic report",
-                "Ekspor laporan diagnostik");
     }
 
     private static void fillIn1(Map<String, String> table) {
+        table.put("Export diagnostic report",
+                "Ekspor laporan diagnostik");
         table.put("Export settings",
                 "Ekspor pengaturan");
         table.put("Facebook crashed or froze within a minute of starting three times in a row, so Hushfacebook paused itself.",
@@ -1026,6 +1040,8 @@ public final class L10nTranslations {
                 "Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "Facebook berhenti meminta Anda memperbarui lewat Meta App Manager dan berhenti menyuruhnya mencari pembaruan. Promosi obrolan yang ditujukan ke versi lama juga hilang. Build yang dipatch memang tidak bisa memasang pembaruan Meta.");
+        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
+                "Teks Facebook digambar dengan font ponsel Anda, bukan font milik Meta. Mulai ulang Facebook setelah mengubah ini.");
         table.put("File name",
                 "Nama file");
         table.put("File name set to %1$s.",
@@ -1130,13 +1146,13 @@ public final class L10nTranslations {
                 "Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
         table.put("Re-signed build fix",
                 "Perbaikan build yang ditandatangani ulang");
+    }
+
+    private static void fillIn2(Map<String, String> table) {
         table.put("Reading the settings file",
                 "Membaca file pengaturan");
         table.put("Reels and Watch",
                 "Reels dan Watch");
-    }
-
-    private static void fillIn2(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Tombol untuk Remix, memakai templat, menambahkan milik Anda, dan Edits, serta tombol Bintang, game, aplikasi mitra, dan tautan eksternal. Lagu dan label lainnya tetap ada.");
         table.put("Remove tracking from shared links",
@@ -1253,13 +1269,15 @@ public final class L10nTranslations {
                 "Semua ini dipilih di Morphe Manager saat Anda menambal, dan Jeda tidak mematikannya. Tambal ulang untuk mengubahnya.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Ponsel ini tidak memiliki pemilih file, jadi file tidak dapat dipilih di sini.");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Coba lagi, atau kembali ke Facebook.");
         table.put("Updates",
                 "Pembaruan");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
+        table.put("Use the system font",
+                "Gunakan font sistem");
         table.put("Version",
                 "Versi");
         table.put("Version %1$s for Facebook %2$s",
@@ -1301,7 +1319,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(398);
+        Map<String, String> table = new HashMap<>(404);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1352,6 +1370,8 @@ public final class L10nTranslations {
                 "Adiciona o item Salvar ao menu do story de qualquer pessoa e salva na qualidade definida em Downloads. Com esta op\u00e7\u00e3o desligada ou durante a pausa, o item Salvar s\u00f3 aparece nos seus pr\u00f3prios stories, e quem salva \u00e9 o pr\u00f3prio Facebook.");
         table.put("Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "An\u00fancios dentro dos Reels. Banners, an\u00fancios no meio do v\u00eddeo e an\u00fancios inseridos pelo app continuam bloqueados mesmo durante a pausa.");
+        table.put("Appearance",
+                "Apar\u00eancia");
         table.put("Audience Network off",
                 "Audience Network desativado");
         table.put("Back",
@@ -1428,11 +1448,11 @@ public final class L10nTranslations {
                 "Apaga o registro e as contagens dos filtros que iriam para um relat\u00f3rio.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Todas as op\u00e7\u00f5es, menos o Registro de depura\u00e7\u00e3o, funcionam como se estivessem desligadas, e o que foi definido ao aplicar os patches continua ativo. Suas configura\u00e7\u00f5es ficam como est\u00e3o.");
-        table.put("Export diagnostic report",
-                "Exportar relat\u00f3rio de diagn\u00f3stico");
     }
 
     private static void fillPt_rBR1(Map<String, String> table) {
+        table.put("Export diagnostic report",
+                "Exportar relat\u00f3rio de diagn\u00f3stico");
         table.put("Export settings",
                 "Exportar configura\u00e7\u00f5es");
         table.put("Facebook crashed or froze within a minute of starting three times in a row, so Hushfacebook paused itself.",
@@ -1445,6 +1465,8 @@ public final class L10nTranslations {
                 "O Facebook n\u00e3o envia an\u00fancios para outros apps deste celular.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "O Facebook para de pedir que voc\u00ea atualize pelo Meta App Manager e para de mand\u00e1-lo procurar uma atualiza\u00e7\u00e3o. As promo\u00e7\u00f5es de chat voltadas a vers\u00f5es antigas tamb\u00e9m somem. Uma vers\u00e3o com patch n\u00e3o consegue instalar as atualiza\u00e7\u00f5es da Meta de qualquer forma.");
+        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
+                "O texto do Facebook \u00e9 desenhado com a fonte do seu celular em vez da fonte da Meta. Reinicie o Facebook depois de mudar isso.");
         table.put("File name",
                 "Nome do arquivo");
         table.put("File name set to %1$s.",
@@ -1549,13 +1571,13 @@ public final class L10nTranslations {
                 "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o reassinada.");
         table.put("Re-signed build fix",
                 "Corre\u00e7\u00e3o para vers\u00e3o reassinada");
+    }
+
+    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Reading the settings file",
                 "Lendo o arquivo de configura\u00e7\u00f5es");
         table.put("Reels and Watch",
                 "Reels e Watch");
-    }
-
-    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Os bot\u00f5es de remix, usar modelo, adicionar o seu e Edits, e os de estrelas, jogos, apps parceiros e links externos. A m\u00fasica e as outras etiquetas continuam.");
         table.put("Remove tracking from shared links",
@@ -1672,13 +1694,15 @@ public final class L10nTranslations {
                 "Eles s\u00e3o escolhidos no Morphe Manager quando voc\u00ea aplica os patches, e a pausa n\u00e3o os desliga. Aplique os patches de novo para mud\u00e1-los.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este celular n\u00e3o tem seletor de arquivos, ent\u00e3o n\u00e3o d\u00e1 para escolher um arquivo aqui.");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Tente de novo ou volte para o Facebook.");
         table.put("Updates",
                 "Atualiza\u00e7\u00f5es");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Use the system font",
+                "Usar a fonte do sistema");
         table.put("Version",
                 "Vers\u00e3o");
         table.put("Version %1$s for Facebook %2$s",
@@ -1720,7 +1744,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(398);
+        Map<String, String> table = new HashMap<>(404);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -1771,6 +1795,8 @@ public final class L10nTranslations {
                 "Kimin olursa olsun her hikayenin men\u00fcs\u00fcne Kaydet se\u00e7ene\u011fini ekler ve hikayeyi \u0130ndirmeler b\u00f6l\u00fcm\u00fcnde se\u00e7ilen kalitede kaydeder. Kapal\u0131yken veya duraklat\u0131lm\u0131\u015fken Kaydet se\u00e7ene\u011fi yaln\u0131zca kendi hikayelerinde bulunur ve Facebook'un kendi kaydetme i\u015flevini \u00e7al\u0131\u015ft\u0131r\u0131r.");
         table.put("Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Reels i\u00e7indeki reklamlar. Banner'lar, video ortas\u0131 reklamlar ve uygulaman\u0131n ekledi\u011fi reklamlar duraklat\u0131ld\u0131\u011f\u0131nda da engellenir.");
+        table.put("Appearance",
+                "G\u00f6r\u00fcn\u00fcm");
         table.put("Audience Network off",
                 "Audience Network kapal\u0131");
         table.put("Back",
@@ -1847,11 +1873,11 @@ public final class L10nTranslations {
                 "Bir raporun i\u00e7erece\u011fi g\u00fcnl\u00fc\u011f\u00fc ve filtre saya\u00e7lar\u0131n\u0131 bo\u015falt\u0131r.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc d\u0131\u015f\u0131ndaki her anahtar kapal\u0131ym\u0131\u015f gibi davran\u0131r, yamalad\u0131\u011f\u0131nda ayarlananlar ise devrede kal\u0131r. Ayarlar\u0131n oldu\u011fu gibi kal\u0131r.");
-        table.put("Export diagnostic report",
-                "Tan\u0131lama raporunu d\u0131\u015fa aktar");
     }
 
     private static void fillTr1(Map<String, String> table) {
+        table.put("Export diagnostic report",
+                "Tan\u0131lama raporunu d\u0131\u015fa aktar");
         table.put("Export settings",
                 "Ayarlar\u0131 d\u0131\u015fa aktar");
         table.put("Facebook crashed or froze within a minute of starting three times in a row, so Hushfacebook paused itself.",
@@ -1864,6 +1890,8 @@ public final class L10nTranslations {
                 "Facebook bu telefondaki di\u011fer uygulamalara reklam sunmaz.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "Facebook, Meta App Manager \u00fczerinden g\u00fcncelleme istemeyi ve ona g\u00fcncelleme aratmay\u0131 b\u0131rak\u0131r. Eski s\u00fcr\u00fcmlere y\u00f6nelik sohbet tan\u0131t\u0131mlar\u0131 da kalkar. Yamal\u0131 bir s\u00fcr\u00fcm zaten Meta'n\u0131n g\u00fcncellemelerini y\u00fckleyemez.");
+        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
+                "Facebook'un metni Meta'n\u0131n kendi yaz\u0131 tipi yerine telefonunun yaz\u0131 tipiyle \u00e7izilir. Bunu de\u011fi\u015ftirdikten sonra Facebook'u yeniden ba\u015flat.");
         table.put("File name",
                 "Dosya ad\u0131");
         table.put("File name set to %1$s.",
@@ -1968,13 +1996,13 @@ public final class L10nTranslations {
                 "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
         table.put("Re-signed build fix",
                 "Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
+    }
+
+    private static void fillTr2(Map<String, String> table) {
         table.put("Reading the settings file",
                 "Ayar dosyas\u0131 okunuyor");
         table.put("Reels and Watch",
                 "Reels ve Watch");
-    }
-
-    private static void fillTr2(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Remix, \u015fablon kullanma, kendi videonu ekleme ve Edits d\u00fc\u011fmeleri ile y\u0131ld\u0131z, oyun, i\u015f orta\u011f\u0131 uygulamas\u0131 ve d\u0131\u015f ba\u011flant\u0131 d\u00fc\u011fmeleri. \u015eark\u0131 ve di\u011fer etiketler kal\u0131r.");
         table.put("Remove tracking from shared links",
@@ -2091,13 +2119,15 @@ public final class L10nTranslations {
                 "Bunlar yamalarken Morphe Manager'da se\u00e7ilir ve Duraklatma bunlar\u0131 kapatmaz. De\u011fi\u015ftirmek i\u00e7in yeniden yamala.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Bu telefonda dosya se\u00e7ici yok, bu y\u00fczden burada dosya se\u00e7menin bir yolu yok.");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("Try again, or go back to Facebook.",
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
         table.put("Updates",
                 "G\u00fcncellemeler");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
+        table.put("Use the system font",
+                "Sistem yaz\u0131 tipini kullan");
         table.put("Version",
                 "S\u00fcr\u00fcm");
         table.put("Version %1$s for Facebook %2$s",

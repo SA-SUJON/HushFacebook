@@ -310,6 +310,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                             + "Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.")));
         }
 
+        if (build.contains(PatchFamily.SYSTEM_FONT)) {
+            PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
+            appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT, L10n.t("Use the system font"),
+                    L10n.t("Facebook's text is drawn in your phone's font instead of Meta's own. Restart "
+                            + "Facebook after changing this.")));
+        }
+
         if (build.contains(PatchFamily.AD_PREFETCH) || build.contains(PatchFamily.AD_TELEMETRY)
                 || build.contains(PatchFamily.AUDIENCE_NETWORK) || build.contains(PatchFamily.AMOLED_THEME)
                 || build.contains(PatchFamily.MATERIAL_YOU_THEME) || build.contains(PatchFamily.RESTORE_TRUST)) {

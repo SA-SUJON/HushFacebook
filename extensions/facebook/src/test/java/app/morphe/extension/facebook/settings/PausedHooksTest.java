@@ -11,6 +11,7 @@ import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 
 import com.facebook.graphql.model.GraphQLPagesYouMayLikeFeedUnit;
@@ -45,6 +46,7 @@ import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
+import app.morphe.extension.facebook.font.SystemFont;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
@@ -75,6 +77,9 @@ public class PausedHooksTest {
 
     /** Stands in for the showcase story type enum: only the constant names matter to the rule. */
     enum ShowcaseStoryType { SHOWCASE_SHORT_VIDEO }
+
+    /** Stands in for Facebook's font family enum: only the constant's name matters to the swap. */
+    enum FontFamily { OPTIMISTIC_TEXT_APP_BOLD }
 
     /** Stands in for the obfuscated ad item base class; the patch passes its binary name. */
     public static class AdBase {
@@ -171,6 +176,14 @@ public class PausedHooksTest {
                 ReelDeclutter::hideFollowingButton,
                 ReelDeclutter::skipHotComment,
                 ReelDeclutter::skipSocialBubbles));
+        // The repository's answer for one of Meta's families, and a variable-font builder's.
+        probes.put(PatchFamily.SYSTEM_FONT, Arrays.asList(
+                () -> SystemFont.systemize(Typeface.SERIF, FontFamily.OPTIMISTIC_TEXT_APP_BOLD, -1) != Typeface.SERIF,
+                () -> {
+                    Object builder = new Object();
+                    SystemFont.rememberVariation(builder, "'wght' 700");
+                    return SystemFont.systemizeBuilt(Typeface.SERIF, builder) != Typeface.SERIF;
+                }));
         probes.put(PatchFamily.EXTERNAL_BROWSER, Collections.singletonList(() -> {
             Activity browser = Robolectric.buildActivity(Activity.class,
                     new Intent(Intent.ACTION_VIEW, Uri.parse("https://example.org/"))).create().get();

@@ -212,6 +212,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the switch on Facebook's own update prompts. Facebook 577 and 580 carry no installer of their own, so the patch fails the two QuickPromotion filters that ask Meta App Manager about updates, skips the push handler that has the manager look for one, and fails the chat promotion filter aimed at versions below a ceiling, each found by its shape and the literals it keeps."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/font/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/font/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the system font swap. It stands at the exit of the typeface repository's resolver, found in Facebook 577 and 580 by the refusal it throws for a family with no source, and at the exit of the variable-font builders the kept com.meta.foa.typefacebuilder.ApiUtils makes, and answers the phone's default font at the same weight and slant for Meta's interface families only, by the enum constant names Redex keeps."
     }
   ]
 }

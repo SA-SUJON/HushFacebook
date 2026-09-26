@@ -111,6 +111,13 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_REEL_SOCIAL_FOOTER =
             new BooleanSetting("hushfacebook_hide_reel_social_footer", TRUE);
 
+    /**
+     * Facebook's own text drawn in the phone's font instead of Meta's Optimistic, at the same
+     * weight and slant. A typeface already on screen keeps its font until Facebook restarts.
+     */
+    public static final BooleanSetting USE_SYSTEM_FONT =
+            new BooleanSetting("hushfacebook_use_system_font", TRUE);
+
     /** Web links leave Facebook's in-app browser for the default browser. */
     public static final BooleanSetting OPEN_LINKS_EXTERNALLY =
             new BooleanSetting("hushfacebook_open_links_externally", TRUE);

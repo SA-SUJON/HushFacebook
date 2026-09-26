@@ -19,6 +19,7 @@ Adds "Download to phone" to feed and Watch video menus. Saves at the quality set
 Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.	Agrega la opción Guardar al menú de cualquier historia, sea de quien sea, y la guarda con la calidad elegida en Descargas. Con este interruptor desactivado o Hushfacebook en pausa, solo tus propias historias tienen la opción Guardar, y se usa el guardado propio de Facebook.
 Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.	Anuncios dentro de Reels. Los banners, los anuncios a mitad de video y los que inserta la app siguen bloqueados incluso en pausa.
 AMOLED black theme	Tema negro AMOLED
+Appearance	Apariencia
 Audience Network off	Sin Audience Network
 Back	Atrás
 Background ad prefetch blocked	Precarga de anuncios en segundo plano bloqueada
@@ -56,6 +57,7 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook no descarga anuncios ni su modelo de anuncios en segundo plano.
 Facebook doesn't serve ads to other apps on this phone.	Facebook no envía anuncios a otras apps de este teléfono.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	El modo oscuro de Facebook y esta pantalla usan los colores de tu fondo. Android 11 usa azul en su lugar. Activa el modo oscuro de Facebook para verlo.
+Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.	El texto de Facebook se dibuja con la fuente de tu teléfono en lugar de la propia de Meta. Reinicia Facebook después de cambiar esto.
 From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Desde el próximo inicio, los interruptores de arriba dejan de actuar y vuelve el comportamiento de Facebook. El Registro de depuración sigue funcionando y tus elecciones se conservan.
 Full report saved to %1$s	Informe completo guardado en %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, con los avisos de los proyectos en los que se basa
@@ -155,6 +157,7 @@ They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off
 This phone has no file picker, so there's no way to choose a file here.	Este teléfono no tiene selector de archivos, así que aquí no hay forma de elegir un archivo.
 Try again, or go back to Facebook.	Inténtalo de nuevo o vuelve a Facebook.
 The switch takes effect when Facebook restarts.	El interruptor surte efecto cuando Facebook se reinicie.
+Use the system font	Usar la fuente del sistema
 Version	Versión
 Version %1$s for Facebook %2$s	Versión %1$s para Facebook %2$s
 Videos go to %1$s and photos to %2$s.	Los videos van a %1$s y las fotos a %2$s.
