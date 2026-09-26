@@ -8,8 +8,9 @@
 #
 # scripts/build-release-receipt.ps1 writes the delta it measures into the release receipt, and
 # scripts/validate-release-facts.ps1 refuses a receipt carrying a change that is not listed here.
-# A line nothing produces any more fails the run as well, so this cannot quietly outlive the
-# change it approved.
+# scripts/verify-all-patches.ps1 reads it too, and stops a run whose patched manifest changed in
+# a way it doesn't list. A line nothing produces any more fails the receipt as well, so this
+# cannot quietly outlive the change it approved.
 #
 # The list is deliberately empty. The patches change bytecode, not the manifest, and that is a
 # claim worth failing on: if patching ever starts asking for a permission or exporting a

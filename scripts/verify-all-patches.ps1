@@ -15,11 +15,14 @@
     starts. The package still has to be the catalog's.
 
     A split bundle is merged into one APK first, with the CLI's own merger (Get-MergedApk), and
-    the CLI patches that merge. A clean run then holds the patched APK's resource table to the
-    merge's with ResourceTableCheck.java: every resource of every package has to resolve by its id
-    with its type and each configuration's value, and every file and reference the patched values
-    name has to be there. A failure names the id. What the patches rewrote, what the rebuild
-    renamed and what was added go in a report beside the result file.
+    the CLI patches that merge. A clean run reads the manifests of the merge and the patched APK
+    the way the release receipt does and prints what patching changed: permissions asked for or
+    dropped, components exported or no longer. A change scripts/manifest-delta-allowlist.txt
+    doesn't approve stops the run there, before the release. It then holds the patched APK's
+    resource table to the merge's with ResourceTableCheck.java: every resource of every package
+    has to resolve by its id with its type and each configuration's value, and every file and
+    reference the patched values name has to be there. A failure names the id. What the patches
+    rewrote, what the rebuild renamed and what was added go in a report beside the result file.
 
     Last, verify-injected-registers.ps1 holds the patched dex to the stock dex: register counts,
     branch targets, invoke registers, parameter kinds, try ranges and the one feed guard. Its
@@ -166,7 +169,29 @@ try {
     Write-Host "[verify] result file: $result"
     if ($cliExitCode -ne 0) { Write-Warning "The desktop CLI exited with $cliExitCode." }
     if (-not $validation.Valid) { Write-Warning "[verify] $($validation.Reason)" }
+    $unapprovedChanges = @()
     if ($cliExitCode -eq 0 -and $validation.Valid) {
+        # What patching did to the manifest, read the way the release receipt reads it, against the
+        # APK the CLI patched, and held to the same allowlist, so a change nobody approved stops this
+        # run and not only the release. An approved change this run didn't make is reported and left
+        # to the receipt, which needs every declared build to decide it.
+        $manifestChanges = @(ConvertTo-ManifestDeltaEntries -Delta (Get-ManifestDelta `
+            -Stock (Get-ApkManifestFacts -Apk $patchInput -Aapt2 $Aapt2) -Patched (Get-ApkManifestFacts -Apk $out -Aapt2 $Aapt2)))
+        $approvedChanges = @(Read-ManifestDeltaAllowlist -Path (Join-Path $PSScriptRoot 'manifest-delta-allowlist.txt') |
+            Where-Object { $_ })
+        $unapprovedChanges = @($manifestChanges | Where-Object { $approvedChanges -cnotcontains $_ })
+        Write-Host "[verify] manifest delta: $($manifestChanges.Count) change(s), $($unapprovedChanges.Count) not approved"
+        foreach ($change in $manifestChanges) {
+            $mark = if ($approvedChanges -ccontains $change) { 'approved' } else { 'NOT APPROVED' }
+            Write-Host "[verify]   $change ($mark)"
+        }
+        $unmade = @($approvedChanges | Where-Object { $manifestChanges -cnotcontains $_ })
+        if ($unmade.Count -gt 0) { Write-Host "[verify] approved but not made here: $($unmade -join ', ')" }
+    }
+    if ($cliExitCode -eq 0 -and $validation.Valid -and $unapprovedChanges.Count -gt 0) {
+        Write-Warning ('[verify] the patched manifest changed in ways scripts/manifest-delta-allowlist.txt ' +
+            "doesn't approve: $($unapprovedChanges -join ', ')")
+    } elseif ($cliExitCode -eq 0 -and $validation.Valid) {
         # The rebuilt resource table against the stock one. A resource patch has Morphe decode and
         # rebuild the app's whole table, and an id the rebuild loses only fails when the app
         # inflates it (Hushfeed upstream #84, a layout in one of TikTok's feature packages). The
@@ -191,8 +216,9 @@ try {
             $registerExitCode = $LASTEXITCODE
             Write-Host "[verify] register report: $registerReport"
             if ($registerExitCode -eq 0) {
-                Write-Host ('[verify] success: every requested patch applied to a valid APK whose resource table ' +
-                    'holds every stock resource and whose injected code passes the structural checks.')
+                Write-Host ('[verify] success: every requested patch applied to a valid APK whose manifest changes ' +
+                    'are all approved, whose resource table holds every stock resource and whose injected code ' +
+                    'passes the structural checks.')
                 $exitCode = 0
             } else {
                 Write-Warning "[verify] the injected code failed its structural checks (exit $registerExitCode)."

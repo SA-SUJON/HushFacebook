@@ -3870,9 +3870,11 @@ try {
         'versionCode\(0x0101021b\)=(\d+)').Groups[1].Value
     Set-Content -LiteralPath $plainFixture -Encoding ASCII -NoNewline `
         -Value (Get-FixtureManifest -Build $releaseTarget.PackageVersion -Code $newestCode)
-    foreach ($suffix in '.result.json', '.patched.txt') {
-        Copy-Item -LiteralPath "$newestFixture$suffix" -Destination "$plainFixture$suffix"
-    }
+    Copy-Item -LiteralPath "$newestFixture.result.json" -Destination "$plainFixture.result.json"
+    # Patched from the plain APK itself: its own manifest and no split's component, which
+    # verify-all-patches.ps1 would refuse as a change nobody approved.
+    Set-Content -LiteralPath "$plainFixture.patched.txt" -Encoding ASCII -NoNewline `
+        -Value (Get-FixtureManifest -Build $releaseTarget.PackageVersion -Code $newestCode)
     try {
         $said = Invoke-VerifyAll -Apk $plainFixture
         Assert-True ($said -like '*success: every requested patch applied*' -and $said -notlike '*into one APK for the CLI*' -and
