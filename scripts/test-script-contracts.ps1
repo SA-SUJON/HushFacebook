@@ -2839,6 +2839,67 @@ try {
             $contractsBroken = Save-GateContracts 'broken'
             Assert-Throws { & $prePushScript -Root $gateRepo -PushedRefs "refs/heads/main $contractsBroken refs/heads/main $contractsGood" 6> $null } `
                 '*script contract tests did not pass*' 'A push whose own script contract tests fail was let through.'
+
+            # A pushed commit's suite and facts check run in a process of their own. Run in the
+            # hook's, they saw every function the hook and the working tree's common.ps1 define, so
+            # a suite calling a helper that exists only uncommitted passed the hook and failed for
+            # anyone who checked the commit out. A copy of the hook sits in this working tree beside
+            # a common.ps1 that defines such a helper, uncommitted; the commit's own common.ps1
+            # doesn't, until the control commits it. The suite and the check each call it.
+            $helperMarker = Join-Path $hookRoot 'gate-helper-ran.txt'
+            $gateCommon = Join-Path $gateRepo 'scripts/common.ps1'
+            $gateHook = Join-Path $gateRepo 'scripts/pre-push.ps1'
+            $helperCalls = @('$ErrorActionPreference = ''Stop''', '. (Join-Path $PSScriptRoot ''common.ps1'')',
+                "Set-Content -LiteralPath '$helperMarker' -Value (Get-UncommittedHelper)")
+            function Save-GateHelperCommit([string]$Message, [string[]]$Common, [string[]]$Suite, [string[]]$Facts) {
+                Set-Content -LiteralPath $gateCommon -Encoding UTF8 -Value $Common
+                if ($Suite) { Set-Content -LiteralPath $contractsStub -Encoding UTF8 -Value $Suite }
+                if ($Facts) { Set-Content -LiteralPath (Join-Path $gateRepo 'scripts/validate-release-facts.ps1') -Encoding UTF8 -Value $Facts }
+                # By name: the hook's copy sits in scripts/ too, and it isn't part of any commit.
+                & git -C $gateRepo add scripts/common.ps1 scripts/test-script-contracts.ps1 scripts/validate-release-facts.ps1
+                & git -C $gateRepo commit --quiet -m $Message
+                return (& git -C $gateRepo rev-parse HEAD).Trim()
+            }
+            $withoutHelper = @('function Get-CommittedHelper { ''committed'' }')
+            $suiteCallingHelper = @('param([string]$Root)') + $helperCalls + @('exit 0')
+            $factsCallingHelper = @('param([string]$Root, [switch]$SkipDescriptionTestCount, [switch]$AllowPublishedIndexLag,',
+                '    [switch]$VerifyPublishedAsset, [string]$ArtifactPath, [switch]$SkipTestResults)') + $helperCalls + @('exit 0')
+            $helperBase = (& git -C $gateRepo rev-parse HEAD).Trim()
+            $suiteNeedsHelper = Save-GateHelperCommit 'suite calls a helper' -Common $withoutHelper -Suite $suiteCallingHelper
+            # The working tree's common.ps1: the hook's own helpers, and the one nobody committed.
+            Set-Content -LiteralPath $gateCommon -Encoding UTF8 -Value (@(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'common.ps1')) +
+                @('function Get-UncommittedHelper { ''uncommitted'' }'))
+            Copy-Item -LiteralPath $prePushScript -Destination $gateHook
+            try {
+                Remove-Item -LiteralPath $helperMarker -Force -ErrorAction SilentlyContinue
+                Assert-Throws { & $gateHook -Root $gateRepo -PushedRefs "refs/heads/main $suiteNeedsHelper refs/heads/main $helperBase" 6> $null } `
+                    '*script contract tests did not pass*' `
+                    'A pushed suite calling a helper only the working tree defines passed the hook.'
+                Assert-True (-not (Test-Path -LiteralPath $helperMarker)) 'The pushed suite reached a helper its commit does not define.'
+                # The facts check the same way, on a README push, with a suite that calls nothing.
+                $factsNeedsHelper = Save-GateHelperCommit 'facts check calls a helper' -Common $withoutHelper `
+                    -Suite @('param([string]$Root)', 'exit 0') -Facts $factsCallingHelper
+                Set-Content -LiteralPath $gateCommon -Encoding UTF8 -Value (@(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'common.ps1')) +
+                    @('function Get-UncommittedHelper { ''uncommitted'' }'))
+                $factsReadme = Save-GateReadme 'helper'
+                Assert-Throws { & $gateHook -Root $gateRepo -PushedRefs "refs/heads/main $factsReadme refs/heads/main $factsNeedsHelper" 6> $null } `
+                    '*release facts do not agree*' 'A pushed facts check calling a helper only the working tree defines passed the hook.'
+                # The control: the helper committed, and the same pushes go through from the same
+                # dirty tree, each script finding it in its own commit's common.ps1.
+                $helperCommitted = Save-GateHelperCommit 'helper committed' -Common @($withoutHelper + @('function Get-UncommittedHelper { ''committed now'' }')) `
+                    -Suite $suiteCallingHelper -Facts $factsCallingHelper
+                Set-Content -LiteralPath $gateCommon -Encoding UTF8 -Value (@(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'common.ps1')) +
+                    @('function Get-UncommittedHelper { ''uncommitted'' }'))
+                $controlReadme = Save-GateReadme 'control'
+                Remove-Item -LiteralPath $helperMarker -Force -ErrorAction SilentlyContinue
+                $global:LASTEXITCODE = 0
+                & $gateHook -Root $gateRepo -PushedRefs "refs/heads/main $controlReadme refs/heads/main $helperBase" 6> $null
+                Assert-True ($LASTEXITCODE -eq 0 -and (Get-Content -LiteralPath $helperMarker -Raw).Trim() -eq 'committed now') `
+                    "A pushed commit whose own common.ps1 defines the helper did not pass from a dirty tree: $LASTEXITCODE"
+            } finally {
+                Remove-Item -LiteralPath $gateHook -Force -ErrorAction SilentlyContinue
+                & git -C $gateRepo checkout --quiet -- scripts
+            }
         } finally {
             foreach ($line in @(& git -C $gateRepo worktree list --porcelain)) {
                 if ($line -like 'worktree *') {

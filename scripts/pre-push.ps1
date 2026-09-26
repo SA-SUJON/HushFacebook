@@ -251,6 +251,45 @@ function Invoke-HookGit {
     }
 }
 
+function Invoke-CommitScript {
+    <#
+        A pushed commit's script, run from its gate worktree in a PowerShell process of its own and
+        with no GIT_* variables. Run in this one, it saw every function this hook and the working
+        tree's common.ps1 had defined, so a suite calling a helper the working tree holds uncommitted
+        passed here and failed for anyone who checked the commit out. -Arguments are its named
+        parameters; a switch goes as its name alone when it's on. Its output goes where this hook's
+        does, and its exit code is left in $LASTEXITCODE.
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$Script,
+        [hashtable]$Arguments = @{}
+    )
+    $argv = @()
+    foreach ($name in $Arguments.Keys) {
+        $value = $Arguments[$name]
+        if ($value -is [bool] -or $value -is [System.Management.Automation.SwitchParameter]) {
+            if ($value) { $argv += "-$name" }
+        } else {
+            $argv += "-$name"
+            $argv += [string]$value
+        }
+    }
+    # The shell this hook runs in, so a suite that has to pass under Windows PowerShell 5.1 gets it.
+    $shell = (Get-Process -Id $PID).Path
+    Invoke-WithoutGitEnvironment {
+        # Windows PowerShell 5.1 turns a native command's standard error into a terminating error
+        # under Stop, and a failing suite says why on it.
+        $preference = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            & $shell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $Script @argv 2>&1 |
+                ForEach-Object { Write-Host "$_" }
+        } finally {
+            $ErrorActionPreference = $preference
+        }
+    }
+}
+
 function Get-GateKey {
     # Names this checkout's gate worktree and lock, so two checkouts never share either.
     $hasher = [System.Security.Cryptography.SHA256]::Create()
@@ -583,7 +622,13 @@ try {
                     $where = if ($scriptsRoot -eq $Root) { '' } else { " for $scriptsCommit in $scriptsRoot" }
                     Write-Step ($suite[1] + $where)
                     $global:LASTEXITCODE = 0
-                    Invoke-WithoutGitEnvironment { & $suiteScript -Root $scriptsRoot }
+                    # In place, the working tree is the commit, helpers and all. A gate worktree's
+                    # suite runs where nothing the working tree holds can reach it.
+                    if ($scriptsRoot -eq $Root) {
+                        Invoke-WithoutGitEnvironment { & $suiteScript -Root $scriptsRoot }
+                    } else {
+                        Invoke-CommitScript -Script $suiteScript -Arguments @{ Root = $scriptsRoot }
+                    }
                     if ($LASTEXITCODE -ne 0) { throw $suite[2] }
                 }
                 } finally {
@@ -761,7 +806,12 @@ try {
                     }
                     try {
                     $global:LASTEXITCODE = 0
-                    & $validate -Root $factsRoot @arguments
+                    if ($factsRoot -eq $Root) {
+                        & $validate -Root $factsRoot @arguments
+                    } else {
+                        $arguments['Root'] = $factsRoot
+                        Invoke-CommitScript -Script $validate -Arguments $arguments
+                    }
                     if ($LASTEXITCODE -ne 0) { throw $factsFailed }
                     } finally {
                         if ($factsRoot -eq $Root) { Assert-TreeUnchanged 'the release facts check' }
