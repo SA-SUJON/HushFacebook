@@ -70,6 +70,7 @@
       "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/DownloadQuality.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/FileNameTemplate.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/PostDetails.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/SaveFolder.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/VideoMenuItem.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/downloads/video/DownloadVideoPatch.kt",
@@ -78,7 +79,7 @@
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: Download to phone in the menu of a feed or Watch video, added after Facebook fills the menu so its own Save and Download rows stay as they are, found in Facebook 577 and 580 through the video feed menu's log tag, the kept GraphQL models and the hashes of their field names; the save folder, one sanitized folder name under Movies and Pictures; the download quality, the ceiling a save holds the DASH track and the single file to, falling back to the nearest above it; and the video file name, a template with {date} and {video_id} cleaned like the folder name, kept off the photo prefix, a typed extension and one name for every save, and bounded in bytes."
+      "changes": "Written for Hushfacebook: Download to phone in the menu of a feed or Watch video, added after Facebook fills the menu so its own Save and Download rows stay as they are, found in Facebook 577 and 580 through the video feed menu's log tag, the kept GraphQL models and the hashes of their field names; the save folder, one sanitized folder name under Movies and Pictures; the download quality, the ceiling a save holds the DASH track and the single file to, falling back to the nearest above it; and the video file name, a template with {date}, {video_id}, {owner} and {posted} cleaned like the folder name, kept off the photo prefix, a typed extension and one name for every save, and bounded in bytes, with the poster and the post day read off every model's kept TreeJNI accessors by the hash of the field's GraphQL name, from the reel's story, which the reel sidebar hands its assembly call, the story card's own tree, found by the card's kept getTimestamp, and the post and media a video's menu holds."
     },
     {
       "paths": [

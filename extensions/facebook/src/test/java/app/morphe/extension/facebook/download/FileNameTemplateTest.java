@@ -15,6 +15,7 @@ import android.content.Context;
 import android.os.Looper;
 import android.provider.MediaStore;
 
+import com.facebook.graphservice.tree.TreeJNI;
 import com.facebook.video.engine.api.VideoDataSource;
 import com.facebook.video.engine.api.VideoPlayerParams;
 
@@ -34,13 +35,17 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import app.morphe.extension.facebook.settings.Settings;
@@ -76,6 +81,21 @@ public class FileNameTemplateTest {
     private static final String STAMP = "20260925_143005";
     private static final String ID = "1234567890123456";
 
+    /** When the post went up: noon on 2026-09-01 on the phone's clock, so the day is the 1st in any zone. */
+    private static Date posted() {
+        Calendar calendar = new GregorianCalendar();
+        calendar.clear();
+        calendar.set(2026, Calendar.SEPTEMBER, 1, 12, 0, 0);
+        return calendar.getTime();
+    }
+
+    private static final String DAY = "20260901";
+
+    /** A save that knows everything of its post. */
+    private static PostDetails full() {
+        return new PostDetails(ID, "Stevi Ous", posted());
+    }
+
     /** The extensions MediaStoreWriter gives a file, which no template may end with. */
     private static final String[] EXTENSIONS = {".mp4", ".m4v", ".mov", ".webm", ".3gp", ".jpg", ".jpeg", ".png",
             ".webp", ".heic", ".heif", ".avif", ".gif"};
@@ -91,7 +111,7 @@ public class FileNameTemplateTest {
     public void tearDown() {
         Settings.FILENAME_TEMPLATE.resetToDefault();
         MediaDownload.policyForTests = null;
-        MediaDownload.videoIdsForTests = null;
+        MediaDownload.detailsForTests = null;
         LogBufferManager.clearLogBuffer();
     }
 
@@ -102,7 +122,7 @@ public class FileNameTemplateTest {
     public void theDefaultIsFacebooksOwnName() {
         assertEquals("FB_VID_{date}", FileNameTemplate.DEFAULT);
         assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName(FileNameTemplate.DEFAULT, when(), ID));
-        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName(FileNameTemplate.DEFAULT, when(), null));
+        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName(FileNameTemplate.DEFAULT, when(), (String) null));
         assertEquals(FileNameTemplate.DEFAULT, FileNameTemplate.current());
         assertTrue(FileNameTemplate.isClean(FileNameTemplate.DEFAULT));
     }
@@ -116,17 +136,29 @@ public class FileNameTemplateTest {
         // Other braces stay as they are.
         assertEquals("{creator}_" + STAMP, FileNameTemplate.videoName("{creator}_{date}", when(), ID));
         // With no id, or one that isn't a number, the token is left out.
-        assertEquals(STAMP + "_", FileNameTemplate.videoName("{date}_{video_id}", when(), null));
+        assertEquals(STAMP + "_", FileNameTemplate.videoName("{date}_{video_id}", when(), (String) null));
         assertEquals(STAMP, FileNameTemplate.videoName("{date}{video_id}", when(), "12a4"));
+        // The poster and the day the post went up fill in the same way, and only when known.
+        assertEquals("Stevi Ous_" + DAY, FileNameTemplate.videoName("{owner}_{posted}", when(), full()));
+        assertEquals("Stevi Ous_" + DAY + "_" + ID, FileNameTemplate.videoName("{owner}_{posted}_{video_id}", when(), full()));
+        assertEquals(STAMP + " Stevi Ous", FileNameTemplate.videoName("{date} {owner}", when(), full()));
+        assertEquals(STAMP + "_", FileNameTemplate.videoName("{date}_{owner}", when(), PostDetails.of(ID)));
+        assertEquals(STAMP, FileNameTemplate.videoName("{date}{posted}", when(), new PostDetails(ID, "Stevi Ous", null)));
+        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("{owner}{posted}", when(), PostDetails.NONE));
+        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("{owner}", when(), (PostDetails) null));
+        // The separators typed between tokens the save didn't know aren't a name either.
+        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("{owner}_{posted}", when(), PostDetails.NONE));
+        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("{video_id}-{owner}", when(), PostDetails.NONE));
+        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("{owner} - {posted}", when(), PostDetails.of("x")));
         // A name that fills in to nothing is Facebook's own.
-        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("{video_id}", when(), null));
+        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("{video_id}", when(), (String) null));
         assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("", when(), ID));
         assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName(null, when(), ID));
         // The date is written in Western digits and the Gregorian calendar whatever the locale.
         Locale saved = Locale.getDefault();
         try {
             Locale.setDefault(Locale.forLanguageTag("th-TH-u-ca-buddhist-nu-thai"));
-            assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName(FileNameTemplate.DEFAULT, when(), null));
+            assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName(FileNameTemplate.DEFAULT, when(), (String) null));
         } finally {
             Locale.setDefault(saved);
         }
@@ -134,32 +166,107 @@ public class FileNameTemplateTest {
 
     /**
      * MediaStore numbers a name that's taken, (1) to (31), and then refuses the save. So no two
-     * saves a second apart may get one name: a template without either token gets the date, and
-     * one that counts on an id the save doesn't have gets the date and time on the end.
+     * saves a second apart may get one name: a template without any token gets the date, and one
+     * that counts on something the save doesn't know, the id, the poster or the post day, gets the
+     * date and time on the end. Known, the poster and the day stand on their own: every video one
+     * person posted on one day gets one name, which MediaStore numbers, as it numbers two saves of
+     * one video named by its id.
      */
     @Test
     public void noTemplateNamesEverySaveTheSame() {
         assertEquals("Clip_" + STAMP, FileNameTemplate.videoName("Clip", when(), ID));
-        assertEquals("Reel_" + STAMP, FileNameTemplate.videoName("Reel {video_id}", when(), null));
+        assertEquals("Reel_" + STAMP, FileNameTemplate.videoName("Reel {video_id}", when(), (String) null));
         for (String notAnId : new String[]{"12a4", "../../1", "12345678901234567890123456", "", " 1"}) {
             assertEquals(notAnId, "Reel_" + STAMP, FileNameTemplate.videoName("Reel {video_id}", when(), notAnId));
         }
-        assertEquals("Reel_" + STAMP, FileNameTemplate.videoName("Reel_{video_id}", when(), null));
+        assertEquals("Reel_" + STAMP, FileNameTemplate.videoName("Reel_{video_id}", when(), (String) null));
+        assertEquals("Reel_" + STAMP, FileNameTemplate.videoName("Reel {owner}", when(), PostDetails.NONE));
+        // An unknown token goes, and the separator typed beside it stays, as it does for the id.
+        assertEquals("_" + DAY + "_" + STAMP,
+                FileNameTemplate.videoName("{owner}_{posted}", when(), new PostDetails(null, null, posted())));
+        assertEquals("Stevi Ous_" + STAMP,
+                FileNameTemplate.videoName("{owner}_{posted}", when(), new PostDetails(null, "Stevi Ous", null)));
+        // A known id keeps saves apart on its own, whatever else is missing.
+        assertEquals(ID + "_", FileNameTemplate.videoName("{video_id}_{owner}", when(), PostDetails.of(ID)));
+        assertEquals("Stevi Ous_" + DAY, FileNameTemplate.videoName("{owner}_{posted}", when(), full()));
+        assertEquals("Stevi Ous", FileNameTemplate.videoName("{owner}", when(), full()));
 
         String[] templates = {"Clip", "Reel {video_id}", "{video_id}", "Clip_", "x-", FileNameTemplate.DEFAULT,
-                "{date}", "{creator}"};
+                "{date}", "{creator}", "{owner}", "{posted}", "{owner}_{posted}", "{owner} {video_id}", "{posted}{date}",
+                "Reel {owner}"};
+        PostDetails[] known = {PostDetails.NONE, PostDetails.of(ID), new PostDetails(null, "Stevi Ous", posted()), full()};
         for (String template : templates) {
-            for (String id : new String[]{null, ID}) {
-                String first = FileNameTemplate.videoName(template, at(5), id);
-                String second = FileNameTemplate.videoName(template, at(6), id);
-                if (id != null && FileNameTemplate.sanitize(template).contains(FileNameTemplate.VIDEO_ID)
-                        && !FileNameTemplate.sanitize(template).contains(FileNameTemplate.DATE)) {
-                    // One video, named by its own number: the same name for the same video.
-                    assertEquals(template, first, second);
+            for (PostDetails details : known) {
+                String clean = FileNameTemplate.sanitize(template);
+                String first = FileNameTemplate.videoName(template, at(5), details);
+                String second = FileNameTemplate.videoName(template, at(6), details);
+                boolean byThePost = !FileNameTemplate.usesDate(clean) && FileNameTemplate.keepsApart(clean,
+                        details.hasVideoId(), details.hasOwner(), details.hasPosted());
+                if (byThePost) {
+                    // Named by what the post is: the same name for the same post.
+                    assertEquals(template + " with " + details, first, second);
                 } else {
-                    assertNotEquals(template + " with id " + id, first, second);
+                    assertNotEquals(template + " with " + details, first, second);
                 }
             }
+        }
+    }
+
+    /**
+     * The poster's name comes in cleaned the way a folder name is and bounded like one, and it's
+     * what gets cut when the name would run long, so a date at the end of the template survives.
+     */
+    @Test
+    public void thePosterIsCleanedLikeTheFolderAndCutToWhatFits() {
+        assertEquals("Stevi_Ous_" + DAY,
+                FileNameTemplate.videoName("{owner}_{posted}", when(), new PostDetails(null, " Stevi/Ous. ", posted())));
+        assertEquals("ab_" + STAMP,
+                FileNameTemplate.videoName("{owner}_{date}", when(), new PostDetails(null, "a" + u(0x200B) + "b", null)));
+        assertEquals("FB_VID_a_b", FileNameTemplate.videoName("FB_IMG_{owner}", when(), new PostDetails(ID, "a:b", null)));
+        // A name of nothing but what a folder can't hold is no poster at all.
+        assertFalse(new PostDetails(null, " .. ", null).hasOwner());
+        assertFalse(new PostDetails(null, "", null).hasOwner());
+        assertEquals("FB_VID_" + STAMP, FileNameTemplate.videoName("{owner}", when(), new PostDetails(null, "...", null)));
+
+        String emoji = new String(Character.toChars(0x1F3AC));
+        PostDetails longName = new PostDetails(null, repeat(emoji, 80), null);
+        assertEquals(FileNameTemplate.MAX_OWNER_CODE_POINTS, longName.owner.codePointCount(0, longName.owner.length()));
+        String name = FileNameTemplate.videoName(repeat("x", 30) + "{owner}_{date}", when(), longName);
+        assertTrue(name, name.endsWith("_" + STAMP));
+        assertTrue(name, name.startsWith(repeat("x", 30) + emoji));
+        assertTrue(name, name.getBytes(StandardCharsets.UTF_8).length <= FileNameTemplate.MAX_NAME_BYTES);
+        assertTrue(name, name.getBytes(StandardCharsets.UTF_8).length > FileNameTemplate.MAX_NAME_BYTES - 4);
+        // Two places for the poster share the room.
+        String twice = FileNameTemplate.videoName("{owner}_{owner}_{date}", when(), longName);
+        assertTrue(twice, twice.endsWith("_" + STAMP));
+        assertTrue(twice, twice.getBytes(StandardCharsets.UTF_8).length <= FileNameTemplate.MAX_NAME_BYTES);
+        assertTrue(twice, twice.startsWith(emoji) && twice.contains("_" + emoji));
+        assertTrue(twice, twice.getBytes(StandardCharsets.UTF_8).length > FileNameTemplate.MAX_NAME_BYTES - 8);
+    }
+
+    /** The post day is the phone's day: the same moment is one day in New York and the next in Tokyo. */
+    @Test
+    public void thePostDayIsThePhonesDay() {
+        Calendar utc = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        utc.clear();
+        utc.set(2026, Calendar.SEPTEMBER, 1, 23, 30, 0);
+        Date late = utc.getTime();
+        TimeZone saved = TimeZone.getDefault();
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
+            assertEquals("20260901", FileNameTemplate.videoName("{posted}", when(), new PostDetails(null, null, late)));
+            TimeZone.setDefault(TimeZone.getTimeZone("Asia/Tokyo"));
+            assertEquals("20260902", FileNameTemplate.videoName("{posted}", when(), new PostDetails(null, null, late)));
+        } finally {
+            TimeZone.setDefault(saved);
+        }
+        // Western digits and the Gregorian calendar whatever the locale, like the date.
+        Locale savedLocale = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("th-TH-u-ca-buddhist-nu-thai"));
+            assertEquals(DAY, FileNameTemplate.videoName("{posted}", when(), new PostDetails(null, null, posted())));
+        } finally {
+            Locale.setDefault(savedLocale);
         }
     }
 
@@ -182,12 +289,18 @@ public class FileNameTemplateTest {
         cases.put(u(0x202E) + "Clip{date}", "Clip{date}");
         cases.put("a\nb{date}", "a b{date}");
         cases.put(u(0xFF0F) + "{date}", "{date}");
-        // A template with neither token gets the date.
+        // A template with no token gets the date; any one of the four is a token.
         cases.put("Clip", "Clip_{date}");
         cases.put("Clip_", "Clip_{date}");
         cases.put("Clip-", "Clip-{date}");
         cases.put("a\\b", "a_b_{date}");
         cases.put("{creator}", "{creator}_{date}");
+        cases.put("{owner}", "{owner}");
+        cases.put("{posted}", "{posted}");
+        cases.put("{owner}_{posted}", "{owner}_{posted}");
+        cases.put("Reel {owner}.mp4", "Reel {owner}");
+        cases.put("FB_IMG_{posted}", "FB_VID_{posted}");
+        cases.put("../{owner}", "{owner}");
         // The extension is the writer's to give.
         cases.put("{date}.mp4", "{date}");
         cases.put("{video_id}.jpg.WEBM", "{video_id}");
@@ -234,20 +347,23 @@ public class FileNameTemplateTest {
         assertTrue(FileNameTemplate.videoName(fifty, when(), ID).getBytes(StandardCharsets.UTF_8).length
                 <= FileNameTemplate.MAX_NAME_BYTES);
         String ids = FileNameTemplate.sanitize(repeat(emoji, 40) + "{video_id}");
-        assertTrue(FileNameTemplate.videoName(ids, when(), null).getBytes(StandardCharsets.UTF_8).length
+        assertTrue(FileNameTemplate.videoName(ids, when(), (String) null).getBytes(StandardCharsets.UTF_8).length
                 <= FileNameTemplate.MAX_NAME_BYTES);
 
         Random random = new Random(20260925L);
         String[] pool = {"a", "Z", "0", " ", ".", "/", "\\", ":", "_", "-", "{date}", "{video_id}", "{", "}", "\u0000",
                 "\n", u(0x200B), u(0x202E), u(0xFF0F), u(0x00E9), u(0x0301), emoji, u(0xAC00), u(0x3164),
-                "FB_IMG_", "fb_img_", ".mp4", ".JPG", "mp", "4", ".pending-"};
+                "FB_IMG_", "fb_img_", ".mp4", ".JPG", "mp", "4", ".pending-", "{owner}", "{posted}"};
+        PostDetails[] known = {PostDetails.NONE, PostDetails.of(ID), PostDetails.of("x/1"), full(),
+                new PostDetails(ID, "Stevi/Ous " + emoji + u(0x202E) + ".", posted()),
+                new PostDetails(null, repeat(emoji, 80), null), new PostDetails(null, " . ", posted())};
         Pattern bad = Pattern.compile("[/\\\\:*?\"<>|\\p{Cntrl}\\p{Cf}]");
         for (int round = 0; round < 5_000; round++) {
             StringBuilder template = new StringBuilder();
             int length = random.nextInt(40);
             for (int i = 0; i < length; i++) template.append(pool[random.nextInt(pool.length)]);
-            String id = random.nextBoolean() ? ID : random.nextBoolean() ? null : "x/1";
-            String name = FileNameTemplate.videoName(template.toString(), when(), id);
+            PostDetails details = known[random.nextInt(known.length)];
+            String name = FileNameTemplate.videoName(template.toString(), when(), details);
             assertFalse(template + " -> " + name, name.isEmpty() || bad.matcher(name).find()
                     || name.startsWith(".") || name.endsWith(".") || name.startsWith(" ") || name.endsWith(" "));
             assertFalse(template + " -> " + name, name.regionMatches(true, 0, "FB_IMG_", 0, 7));
@@ -255,7 +371,9 @@ public class FileNameTemplateTest {
                     name.getBytes(StandardCharsets.UTF_8).length <= FileNameTemplate.MAX_NAME_BYTES);
             String once = FileNameTemplate.sanitize(template.toString());
             assertEquals(template.toString(), once, FileNameTemplate.sanitize(once));
-            assertTrue(template + " -> " + once, once.contains("{date}") || once.contains("{video_id}"));
+            boolean tokened = false;
+            for (String token : FileNameTemplate.TOKENS) tokened |= once.contains(token);
+            assertTrue(template + " -> " + once, tokened);
             assertFalse(template + " -> " + once, once.regionMatches(true, 0, "FB_IMG_", 0, 7));
             for (String extension : EXTENSIONS) {
                 assertFalse(template + " -> " + once, once.toLowerCase(Locale.ROOT).endsWith(extension));
@@ -325,7 +443,7 @@ public class FileNameTemplateTest {
         writable(gallery, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, 3);
         new MediaStoreWriter(context, true, ID).open("video/webm").close();
         new MediaStoreWriter(context, false, ID).open("image/jpeg").close();
-        new MediaStoreWriter(context, true, null).open("video/mp4").close();
+        new MediaStoreWriter(context, true, (String) null).open("video/mp4").close();
         assertEquals("Reel " + ID + ".webm", nameOf(gallery.rows.get(1L)));
         assertTrue(nameOf(gallery.rows.get(2L)), nameOf(gallery.rows.get(2L)).matches("FB_IMG_\\d{8}_\\d{6}\\.jpg"));
         // No id: the date and time keep this save's name apart from the next one's.
@@ -341,6 +459,35 @@ public class FileNameTemplateTest {
     private void writable(SaveProgressTest.Gallery gallery, android.net.Uri table, long id) {
         Shadows.shadowOf(context.getContentResolver()).registerOutputStream(
                 android.content.ContentUris.withAppendedId(table, id), new ByteArrayOutputStream());
+    }
+
+    /**
+     * A template of the poster and the post day names a video after them, as issue #6 asked; a
+     * save that knows neither falls back to Facebook's own name, and the report says so without
+     * naming anyone.
+     */
+    @Test
+    public void aTemplateNamesVideosAfterThePosterAndTheDay() throws Exception {
+        Settings.FILENAME_TEMPLATE.save("{owner}_{posted}");
+        SaveProgressTest.Gallery gallery = gallery();
+        writable(gallery, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, 1);
+        writable(gallery, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, 2);
+        writable(gallery, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, 3);
+        new MediaStoreWriter(context, true, full()).open("video/mp4").close();
+        new MediaStoreWriter(context, true, PostDetails.of(ID)).open("video/mp4").close();
+        new MediaStoreWriter(context, true, new PostDetails(ID, "Stevi Ous", null)).open("video/webm").close();
+
+        assertEquals("Stevi Ous_" + DAY + ".mp4", nameOf(gallery.rows.get(1L)));
+        assertTrue(nameOf(gallery.rows.get(2L)), nameOf(gallery.rows.get(2L)).matches("FB_VID_\\d{8}_\\d{6}\\.mp4"));
+        assertTrue(nameOf(gallery.rows.get(3L)), nameOf(gallery.rows.get(3L)).matches("Stevi Ous_\\d{8}_\\d{6}\\.webm"));
+
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("the file name asks for the poster and the post date and this save has "
+                + "neither, so the date and time go on the end"));
+        assertTrue(report, report.contains("the file name asks for the post date and this save has none, so the "
+                + "date and time go on the end"));
+        assertFalse(report, report.contains("Stevi"));
+        assertFalse(report, report.contains(ID));
     }
 
     /**
@@ -430,38 +577,82 @@ public class FileNameTemplateTest {
     }
 
     /**
-     * Each route hands the save the id it has: a reel its player's, a story the id its recorded
-     * player was kept under, and a feed video the id its post carries.
+     * Each route hands the save what it knows of the post: a reel its player's id and the model
+     * the patch reads off the sidebar beside the player, a story the id its recorded player was
+     * kept under and its card's own tree, and a feed video what its menu read of the post.
      */
     @Test
-    public void everyRouteHandsTheSaveItsVideosId() throws Exception {
-        List<String> ids = new ArrayList<>();
-        MediaDownload.videoIdsForTests = id -> {
-            synchronized (ids) {
-                ids.add(id);
+    public void everyRouteHandsTheSaveWhatItKnowsOfThePost() throws Exception {
+        List<PostDetails> handed = new ArrayList<>();
+        MediaDownload.detailsForTests = details -> {
+            synchronized (handed) {
+                handed.add(details);
             }
         };
         // Every Meta name answers a private address, so each save stops before it connects.
         MediaDownload.policyForTests = new MediaUrlPolicy(host -> new InetAddress[] { InetAddress.getByName("10.9.8.7") });
         String clip = "https://video-iad3-1.xx.fbcdn.net/o1/v/t2/f2/m69/clip_720p.mp4?oh=1&oe=2";
+        long seconds = posted().getTime() / 1000;
 
-        // A reel: its Download button's handler, tapped.
+        // A reel: its Download button's handler, tapped, with the reel's story beside the player.
         ReelSourceParams reel = new ReelSourceParams(new VideoPlayerParams("VideoId: 2233445566778899",
                 new ReelSource(clip)));
-        new ReelDownload(reel, context, "hd", "sd", "manifest", 1, true).invoke(null);
+        TreeJNI story = new TreeJNI().with("actors", Collections.singletonList(new TreeJNI().with("name", "Reel Maker")))
+                .with("creation_time", seconds);
+        new ReelDownload(reel, context, "hd", "sd", "manifest", 1, true, story).invoke(null);
         waitForSaves();
 
-        // A story: its card holds the id its player was recorded under.
+        // A story: its card holds the id its player was recorded under, its own tree, and that
+        // tree's creation time in milliseconds.
         PlayerSources.remember(new PlayerSourcesForTests.Params("3344556677889900",
                 new PlayerSourcesForTests.HdSource(clip, null)), "videoId", "hd", "manifest");
+        TreeJNI card = new TreeJNI().with("actors", Collections.singletonList(new TreeJNI().with("name", "Story Teller")))
+                .with("creation_time", seconds);
+        assertTrue(MediaDownload.saveStory(context, new TreeCard("3344556677889900", card, seconds * 1000)));
+        waitForSaves();
+
+        // A feed video: the post's own id, and what its menu read of the post.
+        assertTrue(MediaDownload.saveFeedVideo(context, new PostDetails("4455667788990011", "Video Owner", posted()), clip, null));
+        waitForSaves();
+
+        // A reel and a story with nothing beside the id, as before the poster was read.
+        new ReelDownload(reel, context, "hd", "sd", "manifest", 1, true).invoke(null);
+        waitForSaves();
         assertTrue(MediaDownload.saveStory(context, new PlayerSourcesForTests.Card("3344556677889900")));
         waitForSaves();
 
-        // A feed video: the post's own id.
-        assertTrue(MediaDownload.saveFeedVideo(context, "4455667788990011", clip, null));
-        waitForSaves();
+        List<String> ids = new ArrayList<>();
+        List<String> owners = new ArrayList<>();
+        List<Date> days = new ArrayList<>();
+        for (PostDetails details : handed) {
+            ids.add(details.videoId);
+            owners.add(details.owner);
+            days.add(details.posted);
+        }
+        assertEquals(Arrays.asList("2233445566778899", "3344556677889900", "4455667788990011", "2233445566778899",
+                "3344556677889900"), ids);
+        assertEquals(Arrays.asList("Reel Maker", "Story Teller", "Video Owner", null, null), owners);
+        assertEquals(Arrays.asList(posted(), posted(), posted(), null, null), days);
+    }
 
-        assertEquals(java.util.Arrays.asList("2233445566778899", "3344556677889900", "4455667788990011"), ids);
+    /**
+     * A story card as the patch hands it over: the id its player was recorded under, its own tree,
+     * and the kept getTimestamp, that tree's creation time in milliseconds.
+     */
+    static final class TreeCard {
+        final String id;
+        final TreeJNI tree;
+        final long millis;
+
+        TreeCard(String id, TreeJNI tree, long millis) {
+            this.id = id;
+            this.tree = tree;
+            this.millis = millis;
+        }
+
+        public long getTimestamp() {
+            return millis;
+        }
     }
 
     /** A reel's source, its address field named the way the patch passes it. */

@@ -65,7 +65,9 @@ class DownloadReelShapesTest {
                 session = 30,
                 scoped = 31,
                 player = 32,
-                helper = "Lfixture/Sidebar;->hushfacebookDownloadButton(${session}Lfixture/Scope;Lfixture/Player;)Lfixture/Button;",
+                story = 33,
+                storyScratch = 4,
+                helper = HELPER,
                 buttons = 20,
                 icon = "Lfixture/Icon;->DOWNLOAD:Lfixture/Icon;",
                 marker = "Lfixture/Marker;->of(Lfixture/Icon;)Lfixture/Marker;",
@@ -75,7 +77,31 @@ class DownloadReelShapesTest {
         )
     }
 
+    private val HELPER =
+        "Lfixture/Sidebar;->hushfacebookDownloadButton(${session}Lfixture/Scope;Lfixture/Player;Ljava/lang/Object;)Lfixture/Button;"
+
     private val Instruction.call get() = ((this as? ReferenceInstruction)?.reference as? MethodReference)?.toString()
+
+    /**
+     * The helper gets the session, the scoped context, the player and the reel's story, the last
+     * in the 4-bit register the patch found dead, copied from the assembly argument that holds it.
+     */
+    @Test
+    fun `the helper is handed the reel's story in the dead register`() {
+        val body = sidebar().implementation!!.instructions.toList()
+        val at = body.indexOfFirst { it.call == HELPER }
+        assertTrue("no call to the helper", at > 0)
+        val call = body[at] as FiveRegisterInstruction
+        assertEquals(Opcode.INVOKE_STATIC, call.opcode)
+        assertEquals(listOf(0, 1, 2, 4), listOf(call.registerC, call.registerD, call.registerE, call.registerF))
+        val copy = body[at - 1] as TwoRegisterInstruction
+        assertEquals(Opcode.MOVE_OBJECT_FROM16, copy.opcode)
+        assertEquals(4, copy.registerA)
+        assertEquals(33, copy.registerB)
+        // The switch is still asked first, and the story's copy sits after the three the helper always took.
+        assertTrue(body[4].call!!.endsWith("->showsButton()Z"))
+        assertEquals(listOf(30, 31, 32), (at - 4 until at - 1).map { (body[it] as TwoRegisterInstruction).registerB })
+    }
 
     /**
      * `AbstractCollection.add` through invoke-virtual only verifies on a register the verifier

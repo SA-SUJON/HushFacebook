@@ -14,8 +14,10 @@ import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.smali.ExternalLabel
+import app.morphe.util.RegisterLiveness
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMutable
 import app.morphe.util.singleOrPatchException
@@ -47,6 +49,7 @@ private const val CONTEXT = "Landroid/content/Context;"
 private const val FUNCTION1 = "Lkotlin/jvm/functions/Function1;"
 private const val LIST = "Ljava/util/List;"
 private const val ARRAY_LIST = "Ljava/util/ArrayList;"
+private const val OBJECT = "Ljava/lang/Object;"
 
 /**
  * How the injection adds to the sidebar's lists: through the List interface.
@@ -288,6 +291,7 @@ val downloadReelPatch = bytecodePatch(
                 ImmutableMethodParameter(FB_USER_SESSION, null, null),
                 ImmutableMethodParameter(scopedType, null, null),
                 ImmutableMethodParameter(playerField.type.toString(), null, null),
+                ImmutableMethodParameter(OBJECT, null, null),
             ),
             factory.returnType.toString(),
             AccessFlags.PUBLIC.value or AccessFlags.STATIC.value,
@@ -390,6 +394,19 @@ val downloadReelPatch = bytecodePatch(
             "v$playerRegister is written $parkedOnce times, so it does not hold the player throughout"
         }
 
+        // The reel's own story is the props the sidebar was built from, and the assembly call
+        // receives it too: the one argument, besides the session, whose type is also the type of
+        // one of the component's fields. Its class is a GraphQL tree, and Facebook reads the
+        // reel's creation_time off it for the reel's time label. The handler reads that and the
+        // first actor's name for the file name. (The component's own tree field is the reel's
+        // feedback, which knows neither.)
+        val storyType = assemblyReference.parameterTypes.map(CharSequence::toString)
+            .filter { type ->
+                type.startsWith("L") && type != FB_USER_SESSION &&
+                    component.fields.any { it.type.toString() == type }
+            }
+            .singleOrPatchException("$PATCH: the one argument of the sidebar assembly, besides the session, the component also holds")
+
         // Each button of the strip is registered twice: the component in one list, and a marker
         // for what kind of button it is in another. A component added without its marker draws
         // but does not answer a tap.
@@ -419,14 +436,24 @@ val downloadReelPatch = bytecodePatch(
         // The window is from the injection to the call. Any touch of one of these registers in it
         // counts, whether it reads or writes, because that is the cheap and safe way round.
         val scratch = setOf(0, 1, 2)
-        val busy = (assemblyIndex - 3..assemblyIndex)
-            .filter { it in instructions.indices }
-            .filter { registersTouched(instructions[it]).any(scratch::contains) }
+        val injectAt = assemblyIndex - 3
+        val window = (injectAt..assemblyIndex).filter { it in instructions.indices }
+        val busy = window.filter { registersTouched(instructions[it]).any(scratch::contains) }
 
         check(busy.isEmpty()) {
             "$sidebarName still uses " + scratch.joinToString { "v$it" } +
                 " at instruction(s) ${busy.joinToString()}, so the injection cannot borrow them"
         }
+
+        // The story needs a fourth 4-bit register, and one that is not only untouched in the
+        // window but dead at the injection point: a register the window leaves alone can still be
+        // read after the call (on 577 one is, on a branch that jumps in past the injection point,
+        // which a read in straight-line order would have counted). The liveness is computed over
+        // the whole method's control flow, so a register it calls dead is dead.
+        val live = RegisterLiveness.of(sidebar).liveInto(injectAt)
+        val touched = window.flatMap { registersTouched(instructions[it]) }.toSet()
+        val storyScratch = (3..15).firstOrNull { it !in live && it !in touched }
+            ?: throw PatchException("$PATCH: $sidebarName has no dead 4-bit register at the injection point for the reel's story")
 
         // The switch is asked first, every time a reel's sidebar is built. Off, paused, or before the
         // settings are ready, the branch goes straight to the instruction the block was put in
@@ -434,12 +461,14 @@ val downloadReelPatch = bytecodePatch(
         // keeps a paused or safe-mode start clear of this injection, and a Download button that
         // crashed a start away from the next one.
         sidebar.addInstructionsWithLabels(
-            assemblyIndex - 3,
+            injectAt,
             sidebarButtonBlock(
                 session = argumentRegister(FB_USER_SESSION),
                 scoped = argumentRegister(scopedType),
                 player = playerRegister,
-                helper = "$sidebarClass->$HELPER($FB_USER_SESSION$scopedType${playerField.type})${factory.returnType}",
+                story = argumentRegister(storyType),
+                storyScratch = storyScratch,
+                helper = "$sidebarClass->$HELPER($FB_USER_SESSION$scopedType${playerField.type}$OBJECT)${factory.returnType}",
                 buttons = sourceRegister,
                 icon = "${icon!!.definingClass}->${icon!!.name}:$iconEnumType",
                 marker = "${marker.definingClass}->${marker.name}($iconEnumType)${marker.returnType}",
@@ -447,7 +476,7 @@ val downloadReelPatch = bytecodePatch(
             ),
             // Bound to the instruction the block goes in front of. A label written inside an
             // injected block is resolved against the block's own addresses.
-            ExternalLabel("facebooks_own", sidebar.getInstruction(assemblyIndex - 3)),
+            ExternalLabel("facebooks_own", sidebar.getInstruction(injectAt)),
         )
 
         enableStatus("reelDownload")
@@ -457,7 +486,8 @@ val downloadReelPatch = bytecodePatch(
 /**
  * What goes in front of the sidebar assembly: ask the switch, then build the button through the
  * helper and add it to the list of buttons, and its marker to the list of markers. Each number is
- * the register that holds that value at the insertion point; v0 to v2 are free there.
+ * the register that holds that value at the insertion point; v0 to v2 are free there, and
+ * [storyScratch] is a fourth register the liveness of the method says is dead.
  *
  * Both adds go through [LIST_ADD], an interface call, so they verify whatever List the builder
  * hands the assembly.
@@ -466,6 +496,8 @@ internal fun sidebarButtonBlock(
     session: Int,
     scoped: Int,
     player: Int,
+    story: Int,
+    storyScratch: Int,
     helper: String,
     buttons: Int,
     icon: String,
@@ -478,7 +510,8 @@ internal fun sidebarButtonBlock(
     move-object/from16 v0, v$session
     move-object/from16 v1, v$scoped
     move-object/from16 v2, v$player
-    invoke-static { v0, v1, v2 }, $helper
+    move-object/from16 v$storyScratch, v$story
+    invoke-static { v0, v1, v2, v$storyScratch }, $helper
     move-result-object v1
     move-object/from16 v0, v$buttons
     invoke-interface { v0, v1 }, $LIST_ADD
@@ -501,6 +534,9 @@ internal fun <T : Field> fieldOfType(fields: Iterable<T>, type: String, what: St
  * `v0` to `v15`. The factory takes nineteen arguments, and thus needs nineteen **consecutive**
  * registers, so its block sits high at `v40` and each value is moved up once it is built.
  * `new-instance` and `const-string` take 8-bit registers, so those can write high directly.
+ *
+ * The four parameters are the session, the scoped context, the player and the reel's story, and
+ * the story goes to every handler beside the player, as `v3`.
  */
 private fun buildButton(
     factory: MethodReference,
@@ -527,6 +563,7 @@ private fun buildButton(
         move-object/from16 v5, v0
         move-object/from16 v4, p2
         move-object/from16 v6, p0
+        move-object/from16 v3, p3
 
 ${handlers(hdField, sdField, manifestField)}
         invoke-static { }, $LABEL
@@ -588,7 +625,7 @@ private fun trailingBooleanArguments(count: Int): String =
  *
  * Only the tap slot saves. The others are still given a handler rather than null, because the
  * factory is not documented to accept null, and a handler that returns without a word costs
- * nothing.
+ * nothing. Each gets the player (v4), the context (v5) and the reel's story (v3).
  */
 private fun handlers(hd: String, sd: String, manifest: String) = (0..6).joinToString("\n") { slot ->
     val saves = if (slot == TAP_SLOT) 1 else 0
@@ -602,7 +639,8 @@ private fun handlers(hd: String, sd: String, manifest: String) = (0..6).joinToSt
         const-string v25, "$manifest"
         const/16 v26, 0x$slot
         const/16 v27, 0x$saves
-        invoke-direct/range { v20 .. v27 }, $HANDLER-><init>(Ljava/lang/Object;${CONTEXT}Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZ)V
+        move-object/from16 v28, v3
+        invoke-direct/range { v20 .. v28 }, $HANDLER-><init>($OBJECT${CONTEXT}Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZ$OBJECT)V
         move-object/from16 v${8 + slot}, v20
     """
 }

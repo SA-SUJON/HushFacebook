@@ -69,6 +69,16 @@ public final class ReelDownload implements Function1<Object, Object> {
     /** The real name of the field that holds the DASH manifest. The patch reads it the same way. */
     private final String manifestField;
 
+    /**
+     * The reel's own story: the props its sidebar was built from, a GraphQL tree the patch hands
+     * over beside the player. Facebook reads the reel's creation_time off it for the reel's time
+     * label, and its actors are who posted the reel, so it gives the file name its poster and post
+     * day ({@link PostDetails}). Null, or a model that isn't a tree, costs those two tokens and
+     * nothing else.
+     */
+    private final Object story;
+
+    /** A handler with no story of the reel: the name then has no poster and no post day. */
     public ReelDownload(
         Object playerParams,
         Context context,
@@ -78,6 +88,19 @@ public final class ReelDownload implements Function1<Object, Object> {
         int slot,
         boolean saves
     ) {
+        this(playerParams, context, hdField, sdField, manifestField, slot, saves, null);
+    }
+
+    public ReelDownload(
+        Object playerParams,
+        Context context,
+        String hdField,
+        String sdField,
+        String manifestField,
+        int slot,
+        boolean saves,
+        Object story
+    ) {
         this.playerParams = playerParams;
         this.context = context;
         this.hdField = hdField;
@@ -85,6 +108,7 @@ public final class ReelDownload implements Function1<Object, Object> {
         this.manifestField = manifestField;
         this.slot = slot;
         this.saves = saves;
+        this.story = story;
     }
 
     /**
@@ -154,7 +178,8 @@ public final class ReelDownload implements Function1<Object, Object> {
             return;
         }
 
-        MediaDownload.saveVideo(context, source, hdField, sdField, manifestField, videoIdOf(playerParams));
+        MediaDownload.saveVideo(context, source, hdField, sdField, manifestField,
+            PostDetails.read(videoIdOf(playerParams), story));
     }
 
     /** What Facebook's player params say of themselves on 577 and 580, before the id. */

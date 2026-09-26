@@ -109,15 +109,16 @@ public final class MediaDownload {
 
             // The card holds one video address, and it is 360p. The player of the same video can
             // hold a better one. So the save tries the recorded source of the player first. The
-            // id it was recorded under is the video's, for the file name.
+            // id it was recorded under is the video's, for the file name, and the card's own tree
+            // says who posted the story and when.
             PlayerSources.Source source = PlayerSources.find(host);
-            String videoId = source == null ? null : source.videoId;
+            PostDetails details = PostDetails.ofCard(source == null ? null : source.videoId, host);
             if (source != null) {
                 addIfUsable(urls, source.hdUrl);
-                if (beginDash(context, "the story video", source.manifest, urls, videoId)) return true;
+                if (beginDash(context, "the story video", source.manifest, urls, details)) return true;
             }
 
-            return begin(context, urls, true, videoId);
+            return begin(context, urls, true, details);
         } catch (Throwable t) {
             // Throwable and not Exception. A renamed field surfaces as NoSuchFieldError, and a
             // reflective call on a changed class surfaces as a LinkageError. Neither is an
@@ -150,7 +151,7 @@ public final class MediaDownload {
         String sdField,
         String manifestField
     ) {
-        return saveVideo(context, host, hdField, sdField, manifestField, null);
+        return saveVideo(context, host, hdField, sdField, manifestField, PostDetails.NONE);
     }
 
     /** The same, with the video's id on Facebook for the file name, or null when it isn't known. */
@@ -162,13 +163,25 @@ public final class MediaDownload {
         String manifestField,
         String videoId
     ) {
+        return saveVideo(context, host, hdField, sdField, manifestField, PostDetails.of(videoId));
+    }
+
+    /** The same, with everything the save knows of the post for the file name. */
+    static boolean saveVideo(
+        Context context,
+        Object host,
+        String hdField,
+        String sdField,
+        String manifestField,
+        PostDetails details
+    ) {
         try {
             List<String> urls = collectVideoUrls(host, hdField, sdField);
 
             String manifest = RenditionPicker.fieldValue(host, manifestField);
-            if (beginDash(context, "the reel", manifest, urls, videoId)) return true;
+            if (beginDash(context, "the reel", manifest, urls, details)) return true;
 
-            return begin(context, urls, true, videoId);
+            return begin(context, urls, true, details);
         } catch (Throwable t) {
             HookStatus.threw(FamilyNames.REEL_DOWNLOAD, "reel save", t);
             failure(() -> "the video save could not start", t);
@@ -193,12 +206,18 @@ public final class MediaDownload {
      *     says why.
      */
     static boolean saveFeedVideo(Context context, String videoId, String hdUrl, String sdUrl) {
+        return saveFeedVideo(context, PostDetails.of(videoId), hdUrl, sdUrl);
+    }
+
+    /** The same, with everything the post's menu read of the post for the file name. */
+    static boolean saveFeedVideo(Context context, PostDetails details, String hdUrl, String sdUrl) {
         try {
             // The item was added while the switch was on; the menu can stay open past a change.
             if (!Utils.settingsReady() || !Settings.DOWNLOAD_VIDEOS.get()) return false;
+            if (details == null) details = PostDetails.NONE;
 
             List<String> urls = new ArrayList<>();
-            PlayerSources.Source source = PlayerSources.byId(videoId);
+            PlayerSources.Source source = PlayerSources.byId(details.videoId);
             if (source != null) addIfUsable(urls, source.hdUrl);
             addIfUsable(urls, hdUrl);
             addIfUsable(urls, sdUrl);
@@ -208,9 +227,9 @@ public final class MediaDownload {
                 return false;
             }
 
-            if (source != null && beginDash(context, "the video", source.manifest, urls, videoId)) return true;
+            if (source != null && beginDash(context, "the video", source.manifest, urls, details)) return true;
 
-            return begin(context, urls, false, videoId);
+            return begin(context, urls, false, details);
         } catch (Throwable t) {
             HookStatus.threw(FamilyNames.VIDEO_DOWNLOAD, "video save", t);
             failure(() -> "the video save could not start", t);
@@ -270,10 +289,10 @@ public final class MediaDownload {
      * releases, and one constant mistaken for another saves the wrong file without a word.
      *
      * <p>[imagesToo] is false for a caller that knows the item is a video, so a thumbnail can't
-     * stand in for a video it couldn't find. [videoId] is the video's id on Facebook for the file
-     * name, or null.
+     * stand in for a video it couldn't find. [details] is what the save knows of the post for the
+     * file name.
      */
-    private static boolean begin(Context context, List<String> urls, boolean imagesToo, String videoId) {
+    private static boolean begin(Context context, List<String> urls, boolean imagesToo, PostDetails details) {
         if (urls == null || urls.isEmpty()) {
             failure(() -> "nothing to save: the item carried no address", null);
             return false;
@@ -322,7 +341,7 @@ public final class MediaDownload {
             + (isVideo ? qualityNote(quality) : ""));
 
         Downloader.Kind kind = isVideo ? Downloader.Kind.VIDEO : Downloader.Kind.IMAGE;
-        start(safe, isVideo, videoId, fileJob(safe, chosen, kind));
+        start(safe, isVideo, details, fileJob(safe, chosen, kind));
         return true;
     }
 
@@ -414,7 +433,7 @@ public final class MediaDownload {
      * @return whether a download started. {@code false} lets the caller save a single file.
      */
     private static boolean beginDash(Context context, String label, String manifest, List<String> urls,
-            String videoId) {
+            PostDetails details) {
         List<DashManifest.Track> tracks = new ArrayList<>();
         for (DashManifest.Track track : DashManifest.parse(manifest)) {
             if (MediaUrlPolicy.shapeRefusal(track.url) == null) tracks.add(track);
@@ -449,7 +468,7 @@ public final class MediaDownload {
             + ", instead of " + (fallback == null ? "nothing" : describe(fallback))
             + qualityNote(quality));
 
-        start(safe, true, videoId, dashJob(safe, video, audio, fallback));
+        start(safe, true, details, dashJob(safe, video, audio, fallback));
         return true;
     }
 
@@ -499,22 +518,28 @@ public final class MediaDownload {
      * The save shows a notification with its progress and a Cancel button while it runs.
      */
     static Thread start(Context application, boolean video, Job job) {
-        return start(application, video, null, job);
+        return start(application, video, PostDetails.NONE, job);
     }
-
-    /** Hands each save's video id to a test, which can't see the name of a save that fails. Never set on a phone. */
-    static volatile java.util.function.Consumer<String> videoIdsForTests;
 
     /** As above, naming a video from [videoId] when the file name asks for it. */
     static Thread start(Context application, boolean video, String videoId, Job job) {
-        java.util.function.Consumer<String> watching = videoIdsForTests;
-        if (watching != null) watching.accept(videoId);
+        return start(application, video, PostDetails.of(videoId), job);
+    }
+
+    /** Hands each save's details to a test, which can't see the name of a save that fails. Never set on a phone. */
+    static volatile java.util.function.Consumer<PostDetails> detailsForTests;
+
+    /** As above, naming the video from whatever of the post [details] holds and the file name asks for. */
+    static Thread start(Context application, boolean video, PostDetails details, Job job) {
+        final PostDetails known = details == null ? PostDetails.NONE : details;
+        java.util.function.Consumer<PostDetails> watching = detailsForTests;
+        if (watching != null) watching.accept(known);
         IN_FLIGHT.incrementAndGet();
         Feedback.show(application, L10n.t(application, "Saving..."), false);
         SaveControl.Save save = SaveControl.begin(application, video);
 
         Thread worker = new Thread(() -> {
-            MediaStoreWriter writer = new MediaStoreWriter(application, video, videoId);
+            MediaStoreWriter writer = new MediaStoreWriter(application, video, known);
 
             try {
                 // What a save in a process Android ended left behind goes before this one makes

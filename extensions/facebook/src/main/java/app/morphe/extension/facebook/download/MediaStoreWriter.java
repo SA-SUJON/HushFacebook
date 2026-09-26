@@ -17,8 +17,10 @@ import android.provider.MediaStore;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -46,21 +48,26 @@ final class MediaStoreWriter implements Downloader.Sink {
     private final Context context;
     private final boolean video;
 
-    /** The video's id on Facebook, for the file name's {video_id}, or null when the save has none. */
-    private final String videoId;
+    /** What the save knows of the post, for the file name's tokens. Never null. */
+    private final PostDetails details;
 
     private Uri item;
     private OutputStream stream;
     private String location;
 
     MediaStoreWriter(Context applicationContext, boolean video) {
-        this(applicationContext, video, null);
+        this(applicationContext, video, PostDetails.NONE);
     }
 
+    /** A writer knowing the video's id on Facebook, or null, and nothing else of the post. */
     MediaStoreWriter(Context applicationContext, boolean video, String videoId) {
+        this(applicationContext, video, PostDetails.of(videoId));
+    }
+
+    MediaStoreWriter(Context applicationContext, boolean video, PostDetails details) {
         this.context = applicationContext;
         this.video = video;
-        this.videoId = videoId;
+        this.details = details == null ? PostDetails.NONE : details;
     }
 
     /**
@@ -178,21 +185,37 @@ final class MediaStoreWriter implements Downloader.Sink {
             // The person's template, read here, per file, and cleaned where it's read. As it
             // ships it's Facebook's own FB_VID_ name.
             String template = FileNameTemplate.current();
-            if (!FileNameTemplate.isVideoId(videoId) && FileNameTemplate.usesVideoId(template)) {
-                // Without the date in it, the name would come out the same for every such save,
-                // and MediaStore refuses a name once it has numbered it 31 times.
-                final String instead = FileNameTemplate.usesDate(template)
-                    ? "it's left out" : "the date and time go on the end";
-                Logger.diagnosticInfo(DiagnosticCategory.DOWNLOADS, SOURCE,
-                    () -> "the file name asks for the video id and this save has none, so " + instead);
-            }
-            return FileNameTemplate.videoName(template, now, videoId) + suffix;
+            reportMissingTokens(template);
+            return FileNameTemplate.videoName(template, now, details) + suffix;
         }
 
         // Facebook's own naming, so that files from this patch and from Facebook sit together.
         // The locale has to be fixed. Under a Thai or an Arabic locale the default calendar
         // writes Buddhist years or Eastern Arabic digits into the file name.
         return FileNameTemplate.PHOTO_PREFIX + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(now) + suffix;
+    }
+
+    /**
+     * One line in the report when [template] asks for something this save doesn't know, saying
+     * what the name does about it: left out when the name still tells saves apart, and the date
+     * and time on the end when it wouldn't, since MediaStore refuses a name once it has numbered
+     * it 31 times. Never the id or the poster's name: the report is pasted into public issues.
+     */
+    private void reportMissingTokens(String template) {
+        List<String> missing = new ArrayList<>();
+        if (FileNameTemplate.usesVideoId(template) && !details.hasVideoId()) missing.add("the video id");
+        if (FileNameTemplate.usesOwner(template) && !details.hasOwner()) missing.add("the poster");
+        if (FileNameTemplate.usesPosted(template) && !details.hasPosted()) missing.add("the post date");
+        if (missing.isEmpty()) return;
+
+        boolean apart = FileNameTemplate.keepsApart(template, details.hasVideoId(), details.hasOwner(), details.hasPosted());
+        String asked = missing.size() == 1 ? missing.get(0)
+            : String.join(", ", missing.subList(0, missing.size() - 1)) + " and " + missing.get(missing.size() - 1);
+        String has = missing.size() == 1 ? "none" : missing.size() == 2 ? "neither" : "none of them";
+        String instead = !apart ? "the date and time go on the end"
+            : missing.size() == 1 ? "it's left out" : "they're left out";
+        final String line = "the file name asks for " + asked + " and this save has " + has + ", so " + instead;
+        Logger.diagnosticInfo(DiagnosticCategory.DOWNLOADS, SOURCE, () -> line);
     }
 
     /**

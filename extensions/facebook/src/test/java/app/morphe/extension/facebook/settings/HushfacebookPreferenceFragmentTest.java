@@ -345,6 +345,7 @@ public class HushfacebookPreferenceFragmentTest {
                     + L10n.isolate("FB_IMG_") + " names.", String.valueOf(name.getSummary()));
             String message = String.valueOf(name.getDialogMessage());
             assertTrue(message, message.contains(L10n.isolate("{date}")) && message.contains(L10n.isolate("{video_id}"))
+                    && message.contains(L10n.isolate("{owner}")) && message.contains(L10n.isolate("{posted}"))
                     && message.contains(L10n.isolate("FB_VID_{date}")));
             // The folder's dialog, in the same words: a Save button and a hint that says what goes in.
             assertEquals("Save", String.valueOf(name.getPositiveButtonText()));

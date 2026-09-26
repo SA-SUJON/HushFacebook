@@ -179,10 +179,11 @@ public class Settings extends BaseSettings {
             new EnumSetting<>("hushfacebook_download_quality", DownloadQuality.BEST);
 
     /**
-     * The name a saved video gets: {date} and {video_id} fill in per save, and the default is
-     * Facebook's own FB_VID_ name, so nothing changes for anyone who leaves it. Photos keep their
-     * FB_IMG_ names. Cleaned like the folder wherever it's read ({@link FileNameTemplate#sanitize}),
-     * and like the folder, it isn't a switch.
+     * The name a saved video gets: {date}, {video_id}, {owner} and {posted} fill in per save, the
+     * last three only when the save knows them, and the default is Facebook's own FB_VID_ name, so
+     * nothing changes for anyone who leaves it. Photos keep their FB_IMG_ names. Cleaned like the
+     * folder wherever it's read ({@link FileNameTemplate#sanitize}), and like the folder, it isn't
+     * a switch.
      */
     public static final StringSetting FILENAME_TEMPLATE =
             new StringSetting("hushfacebook_filename_template", FileNameTemplate.DEFAULT);
