@@ -74,6 +74,23 @@ Assert-True (($three.PackageVersions -join ',') -eq '580.0.0.51.74,577.0.0.50.72
     $three.PackageVersion -eq '580.0.0.51.74') `
     "Declared builds were not ordered newest first by number: $($three.PackageVersions -join ', ')"
 
+# Every part of the version, as a number. Facebook's have five and [version] takes four, so the fifth
+# was dropped and builds apart only there sorted as equals, the older one first in both shells.
+$fifthPart = [pscustomobject]@{
+    patches = @([pscustomobject]@{ name = 'hotfixes'
+        compatiblePackages = [pscustomobject]@{ 'com.example.app' = @('580.0.0.51.8', '580.0.0.51.10', '580.0.0.51', '580.0.0.51.9') } })
+}
+$fifth = Get-PatchTarget -PatchList $fifthPart
+Assert-True (($fifth.PackageVersions -join ',') -eq '580.0.0.51.10,580.0.0.51.9,580.0.0.51.8,580.0.0.51' -and
+    $fifth.PackageVersion -eq '580.0.0.51.10') `
+    "Builds apart only in their fifth part were not ordered newest first: $($fifth.PackageVersions -join ', ')"
+$notNumbers = [pscustomobject]@{
+    patches = @([pscustomobject]@{ name = 'lettered'
+        compatiblePackages = [pscustomobject]@{ 'com.example.app' = @('580.0.0.51.74', '580.0.0.51.x') } })
+}
+Assert-Throws { Get-PatchTarget -PatchList $notNumbers } "*580.0.0.51.x, which isn't a version of dotted numbers*" `
+    'A declared version that is not dotted numbers was sorted instead of refused.'
+
 $uneven = [pscustomobject]@{
     patches = @(
         [pscustomobject]@{ name = 'both builds'
