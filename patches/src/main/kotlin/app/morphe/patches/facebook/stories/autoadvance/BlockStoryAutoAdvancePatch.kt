@@ -13,7 +13,7 @@ import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
-import app.morphe.patches.facebook.misc.extension.requireLocals
+import app.morphe.patches.facebook.misc.extension.freeLocalsAt
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.Opcode
@@ -49,20 +49,32 @@ val blockStoryAutoAdvancePatch = bytecodePatch(
         val mutable = mutableClassDefBy(callback.definingClass).methods.single {
             it.name == callback.name && it.parameterTypes == callback.parameterTypes
         }
-        mutable.requireLocals("Stop Story auto-advance", 1)
         mutable.addInstructionsWithLabels(
             callIndex,
-            """
-                invoke-static { }, $WAIT_FOR_TAP
-                move-result v0
-                if-eqz v0, :navigate
-                return-void
-            """,
+            waitForTapBlock(mutable.waitForTapRegister(callIndex)),
             ExternalLabel("navigate", mutable.getInstruction(callIndex)),
         )
         enableStatus("storyAutoAdvance")
     }
 }
+
+/**
+ * The register the guard borrows in front of the navigation call at [callIndex]: the lowest local
+ * that nothing reads from the call on. The guard sits in the middle of the callback, where a local
+ * can still hold something the call or the code after it wants, so having locals isn't enough.
+ * The guard only branches back to the call or returns, and names the register in a `move-result`
+ * and an `if-eqz`, which reach v255.
+ */
+internal fun Method.waitForTapRegister(callIndex: Int): Int =
+    freeLocalsAt("Stop Story auto-advance", callIndex, 1, highest = 255).single()
+
+/** What goes in front of the navigation call: ask the extension, and return instead of navigating. */
+internal fun waitForTapBlock(register: Int) = """
+    invoke-static { }, $WAIT_FOR_TAP
+    move-result v$register
+    if-eqz v$register, :navigate
+    return-void
+"""
 
 /** The only callback that receives Story progress and invokes this controller's auto navigation. */
 internal fun autoAdvanceHook(owner: ClassDef): Pair<Method, Int>? {

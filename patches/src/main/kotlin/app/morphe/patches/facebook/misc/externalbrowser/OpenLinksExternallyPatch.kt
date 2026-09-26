@@ -10,7 +10,9 @@ package app.morphe.patches.facebook.misc.externalbrowser
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.freeLocalsAt
 import app.morphe.patches.facebook.misc.extension.localRegisterCount
+import app.morphe.util.namedRegisters
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
@@ -43,7 +45,7 @@ private const val PATCH = "Open links in external browser"
  * Both names are kept names, and `AndroidManifest.xml` declares them. Each has a subclass that
  * comes through `super.onCreate`. Thus these two entries cover four activities.
  */
-private val IN_APP_BROWSERS = listOf(
+internal val IN_APP_BROWSERS = listOf(
     // The newer browser. Ordinary links go to this one.
     "Lcom/facebook/browser/litev2/lite/BrowserLiteDIActivity;",
     // The original. Some surfaces still reach it, thus it keeps its hook.
@@ -72,17 +74,12 @@ val openLinksExternallyPatch = bytecodePatch(
 
             // onCreate: the URL is the data of the launch intent. Read it from the activity.
             val onCreate = lifecycleMethod(classDef.methods, descriptor, "onCreate", "Landroid/os/Bundle;")
-            onCreate.hookRedirect(
-                loadIntent = """
-                    invoke-virtual { p0 }, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
-                    move-result-object v0
-                """,
-            )
+            onCreate.hookRedirect(intentFromActivity = true)
 
             // onNewIntent: the new URL comes in as the parameter. getIntent() still returns the
             // intent that started the browser, which holds the previous link.
             val onNewIntent = lifecycleMethod(classDef.methods, descriptor, "onNewIntent", "Landroid/content/Intent;")
-            onNewIntent.hookRedirect(loadIntent = null)
+            onNewIntent.hookRedirect(intentFromActivity = false)
 
             2
         }
@@ -103,40 +100,50 @@ internal fun <T : Method> lifecycleMethod(methods: Iterable<T>, activity: String
 /**
  * Put the redirect after the superclass call of this method.
  *
- * [loadIntent] is the smali that leaves the intent in `v0`. It must hold its own
- * `move-result-object`, because the call that gets the intent is of no use without one. It is null
- * when the intent is already the parameter of the method.
+ * With [intentFromActivity] the redirect asks the activity for its intent, as onCreate has to;
+ * without it the intent is the method's parameter, as onNewIntent gets it.
  *
  * The redirect must go after the superclass call. Before it, the superclass call does not run, and
  * Android answers with `SuperNotCalledException`.
  */
-internal fun MutableMethod.hookRedirect(loadIntent: String?) {
-    val injectIndex = ownSuperCallIndex() + 1
-    val intent = if (loadIntent != null) "v0" else "p1"
+internal fun MutableMethod.hookRedirect(intentFromActivity: Boolean) {
+    val superCall = ownSuperCallIndex()
+    val injectIndex = superCall + 1
 
     // The calls below name p0, and onNewIntent's p1, in operands that only reach v15. The
     // patcher's smali compiler leaves out an instruction whose register doesn't fit, without a
     // word, so a method with its parameters higher up has to stop the patch here instead.
-    val highest = localRegisterCount() + if (loadIntent != null) 0 else 1
+    val highest = localRegisterCount() + if (intentFromActivity) 0 else 1
     if (highest > 15) {
         throw PatchException(
             "$PATCH: $definingClass->$name holds a parameter the redirect names in v$highest, above v15",
         )
     }
-    val call = """
-        ${loadIntent ?: ""}
-        invoke-static { p0, $intent }, $REDIRECT
-        move-result v0
-    """
+    requireSuperCallPassesParameters(superCall, if (intentFromActivity) 1 else 2)
 
     val traceClose = traceCloseIndex()
+    val register = redirectRegister(injectIndex, traceClose)
+    val intent = if (intentFromActivity) "v$register" else "p1"
+    val loadIntent = if (intentFromActivity) {
+        """
+            invoke-virtual { p0 }, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
+            move-result-object v$register
+        """
+    } else {
+        ""
+    }
+    val call = """
+        $loadIntent
+        invoke-static { p0, $intent }, $REDIRECT
+        move-result v$register
+    """
 
     if (traceClose != null) {
         // The method opens a trace section in its prologue. A direct return leaves that section
         // open. Thus the branch jumps to the instruction that loads the marker of the close call.
         addInstructionsWithLabels(
             injectIndex,
-            "$call\nif-nez v0, :handled",
+            "$call\nif-nez v$register, :handled",
             ExternalLabel("handled", getInstruction(traceClose)),
         )
     } else {
@@ -144,8 +151,37 @@ internal fun MutableMethod.hookRedirect(loadIntent: String?) {
         // real instruction that comes after, and never to one inside the injected block.
         addInstructionsWithLabels(
             injectIndex,
-            "$call\nif-eqz v0, :keepInApp\nreturn-void",
+            "$call\nif-eqz v$register, :keepInApp\nreturn-void",
             ExternalLabel("keepInApp", getInstruction(injectIndex)),
+        )
+    }
+}
+
+/**
+ * The register the redirect borrows after the super call at [injectIndex] - 1: the lowest local,
+ * v15 or below since the redirect call names it, that nothing reads from there on. When the
+ * redirect jumps to the trace section's close at [traceClose], nothing may read it from there
+ * either. The redirect sits in the middle of the method, where a local can still hold something
+ * the rest of it wants, so v0 isn't taken on trust.
+ */
+internal fun Method.redirectRegister(injectIndex: Int, traceClose: Int?): Int =
+    freeLocalsAt(PATCH, injectIndex, 1, targets = listOfNotNull(traceClose)).single()
+
+/**
+ * Throws unless the super call at [superCall] passes the method's own first [count] parameter
+ * registers, `this` and then the rest, in order. The redirect right after it reads p0, and
+ * onNewIntent's p1, as the activity and the new intent. A method that had put something else in
+ * one of them would still hand the super call the real ones from another register, and the
+ * redirect would read the other value without a word.
+ */
+internal fun Method.requireSuperCallPassesParameters(superCall: Int, count: Int) {
+    val call = implementation!!.instructions.elementAt(superCall)
+    val passed = call.namedRegisters()
+    val parameters = (0 until count).map { localRegisterCount() + it }
+    if (passed.take(count) != parameters) {
+        throw PatchException(
+            "$PATCH: $definingClass->$name's super call passes ${passed.joinToString { "v$it" }}, not its own " +
+                parameters.joinToString { "v$it" } + ", so they may hold something else where the redirect reads them",
         )
     }
 }

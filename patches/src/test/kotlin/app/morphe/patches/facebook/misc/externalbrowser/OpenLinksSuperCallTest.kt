@@ -7,9 +7,12 @@ package app.morphe.patches.facebook.misc.externalbrowser
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
+import app.morphe.patches.facebook.misc.extension.freeLocalsAt
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
@@ -86,12 +89,7 @@ class OpenLinksSuperCallTest {
     @Test
     fun `the redirect goes after super onCreate when another super call comes first`() {
         val method = onCreate(resourcesFirst)
-        method.hookRedirect(
-            loadIntent = """
-                invoke-virtual { p0 }, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
-                move-result-object v0
-            """,
-        )
+        method.hookRedirect(intentFromActivity = true)
         val body = method.body()
         assertEquals(getResources, body[0].call)
         assertEquals(Opcode.MOVE_RESULT_OBJECT, body[1].opcode)
@@ -107,16 +105,12 @@ class OpenLinksSuperCallTest {
      */
     @Test
     fun `a redirect whose parameters sit above v15 stops the patch`() {
-        val getIntent = """
-            invoke-virtual { p0 }, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
-            move-result-object v0
-        """
         val highest = method("onCreate", bundle, "invoke-super/range { p0 .. p1 }, $superOnCreate\nreturn-void", registers = 17)
-        highest.hookRedirect(loadIntent = getIntent)
+        highest.hookRedirect(intentFromActivity = true)
         assertEquals("p0 in v15 still fits", redirect, highest.body()[3].call)
 
         val above = method("onCreate", bundle, "invoke-super/range { p0 .. p1 }, $superOnCreate\nreturn-void", registers = 20)
-        val refused = assertThrows(PatchException::class.java) { above.hookRedirect(loadIntent = getIntent) }
+        val refused = assertThrows(PatchException::class.java) { above.hookRedirect(intentFromActivity = true) }
         assertTrue(refused.message, refused.message.orEmpty().contains("v18"))
 
         // onNewIntent names its intent, p1, as well: v16 here.
@@ -126,7 +120,109 @@ class OpenLinksSuperCallTest {
             "invoke-super/range { p0 .. p1 }, Lfixture/BaseActivity;->onNewIntent(Landroid/content/Intent;)V\nreturn-void",
             registers = 17,
         )
-        assertThrows(PatchException::class.java) { newIntent.hookRedirect(loadIntent = null) }
+        assertThrows(PatchException::class.java) { newIntent.hookRedirect(intentFromActivity = false) }
+    }
+
+    /** The registers the redirect call at [index] passes, and the one its answer goes in. */
+    private fun MutableMethod.redirectAt(index: Int): Pair<List<Int>, Int> {
+        val body = body()
+        assertEquals(redirect, body[index].call)
+        val call = body[index] as FiveRegisterInstruction
+        val answer = body[index + 1] as OneRegisterInstruction
+        return listOf(call.registerC, call.registerD) to answer.registerA
+    }
+
+    /**
+     * The redirect sits right after the super call, in the middle of the method. A local the rest
+     * of onCreate still reads there used to be taken as v0 anyway, and the code after the redirect
+     * would have read the redirect's answer in place of its own value.
+     */
+    @Test
+    fun `the redirect borrows a local nothing reads after the super call`() {
+        val method = onCreate(
+            """
+                const/4 v0, 0x1
+                invoke-super { p0, p1 }, $superOnCreate
+                invoke-static { v0 }, Lfixture/Log;->note(I)V
+                return-void
+            """,
+        )
+        method.hookRedirect(intentFromActivity = true)
+        // Two locals, p0 in v2: the intent and the answer go in v1.
+        assertEquals(listOf(2, 1) to 1, method.redirectAt(4))
+
+        val full = method(
+            "onCreate", bundle,
+            """
+                const/4 v0, 0x1
+                invoke-super { p0, p1 }, $superOnCreate
+                invoke-static { v0 }, Lfixture/Log;->note(I)V
+                return-void
+            """,
+            registers = 3,
+        )
+        val refused = assertThrows(PatchException::class.java) { full.hookRedirect(intentFromActivity = true) }
+        assertTrue(refused.message, refused.message.orEmpty().startsWith("Open links in external browser:"))
+    }
+
+    /**
+     * With a trace section the redirect jumps to the instruction that feeds the section's close.
+     * Here v0 is overwritten right after the super call, so it looks free there, but the close's
+     * feed reads it: had the redirect taken v0, its answer would become the close's marker.
+     */
+    @Test
+    fun `the redirect leaves alone what the trace section's close reads`() {
+        val method = method(
+            "onCreate", bundle,
+            """
+                const v2, 0x7b
+                invoke-static { v2 }, Lfixture/Trace;->begin(I)I
+                move-result v1
+                const/4 v0, 0x1
+                invoke-super { p0, p1 }, $superOnCreate
+                const/4 v0, 0x0
+                move v2, v0
+                invoke-static { v2, v1 }, Lfixture/Trace;->end(II)V
+                return-void
+            """,
+            registers = 5,
+        )
+        assertEquals("right after the super call v0 looks free", listOf(0), method.freeLocalsAt("Fixture", 5, 1))
+        method.hookRedirect(intentFromActivity = true)
+        // Three locals, p0 in v3: v0 is read at the close's feed and v1 holds the section, so v2.
+        assertEquals(listOf(3, 2) to 2, method.redirectAt(7))
+        assertEquals(Opcode.IF_NEZ, method.body()[9].opcode)
+    }
+
+    /**
+     * onNewIntent's redirect reads p1 as the new intent. A method that had put something else there
+     * and handed the super call a copy would pass the redirect the other value.
+     */
+    @Test
+    fun `the super call has to pass the method's own parameters`() {
+        val newIntent = "Lfixture/BaseActivity;->onNewIntent(Landroid/content/Intent;)V"
+        val copied = method(
+            "onNewIntent", "Landroid/content/Intent;",
+            """
+                move-object v0, p1
+                const/4 p1, 0x0
+                invoke-super { p0, v0 }, $newIntent
+                return-void
+            """,
+        )
+        val refused = assertThrows(PatchException::class.java) { copied.hookRedirect(intentFromActivity = false) }
+        assertTrue(refused.message, refused.message.orEmpty().contains("passes v2, v0, not its own v2, v3"))
+
+        // onCreate reads only p0 after the super call, so its bundle may come from anywhere.
+        val bundleCopy = onCreate(
+            """
+                move-object v0, p1
+                invoke-super { p0, v0 }, $superOnCreate
+                return-void
+            """,
+        )
+        bundleCopy.hookRedirect(intentFromActivity = true)
+        assertEquals(listOf(2, 0) to 0, bundleCopy.redirectAt(4))
     }
 
     @Test

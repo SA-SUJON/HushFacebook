@@ -27,6 +27,8 @@ class StoryAutoAdvanceFixtureTest {
                 val locals = implementation.registerCount - 1 - callback.parameterTypes.size
                 assertTrue("${bundle.name}: no local register", locals >= 1)
                 assertTrue("${bundle.name}: navigation call missing", index < implementation.instructions.count())
+                // Nothing reads v0 from the navigation call on, so the guard borrows it there.
+                assertEquals("${bundle.name}: the guard's register", 0, callback.waitForTapRegister(index))
 
                 // A separate touch handler must still call the same navigator. The patch only
                 // guards the progress callback, so this call proves taps retain their route.
