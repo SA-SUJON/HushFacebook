@@ -742,7 +742,8 @@ tasks {
         inputs.file(rootProject.file("NOTICE"))
             .withPropertyName("notice")
             .withPathSensitivity(PathSensitivity.RELATIVE)
-        // ShortcutCallsTest holds the settings patch's shortcut rewrite to the no-call rules there.
+        // ShortcutCallsTest holds the settings patch's shortcut rewrite to the no-call rules there,
+        // and LogoLongPressTest its Facebook logo hook to the next-call rule.
         inputs.file(rootProject.file("scripts/injected-mutation-contracts.txt"))
             .withPropertyName("mutationContracts")
             .withPathSensitivity(PathSensitivity.RELATIVE)

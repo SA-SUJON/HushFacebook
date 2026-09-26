@@ -37,3 +37,9 @@ no-call Landroid/content/pm/ShortcutManager;->addDynamicShortcuts(Ljava/util/Lis
 no-call Landroid/content/pm/ShortcutManager;->setDynamicShortcuts(Ljava/util/List;)Z outside Lapp/morphe/extension/
 no-call Landroid/content/pm/ShortcutManager;->updateShortcuts(Ljava/util/List;)Z outside Lapp/morphe/extension/
 no-call Landroid/content/pm/ShortcutManager;->removeAllDynamicShortcuts()V outside Lapp/morphe/extension/
+# A long press on the Facebook logo at the top of the feed opens the settings screen, the way in
+# for a launcher with no shortcut menu (#2). The settings patch sends the call that gives the logo
+# its touch listener to SettingsEntry, in the top bar's method holding the logo's trace section,
+# right after the logo gets its tap. Left out, the long press does nothing; on another call or
+# register, another view takes it.
+next-call Lapp/morphe/extension/facebook/settings/SettingsEntry;->setLogoTouchListener(Landroid/view/View;Landroid/view/View$OnTouchListener;)V after Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V holding WordmarkNavigationBar#createWordmarkView

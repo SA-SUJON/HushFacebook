@@ -24,7 +24,11 @@
     answering its type name, and Clean up Reels' hook deleted from Facebook's Follow check or put
     after a branch there. Each of the five ShortcutManager calls the settings patch sends to the
     extension is left in Facebook's code by a build of its own, which has to fail that call's no-call
-    rule and no other, and the contract file may hold no no-call rule without such a build.
+    rule and no other, and the contract file may hold no no-call rule without such a build. The
+    call that gives the Facebook logo its touch listener is left as Facebook makes it, the stand-in
+    is sent in place of the container's call instead, made on the container's register, or sent
+    twice, a build each, and each has to fail the logo's next-call rule for its own reason; the
+    contract file may hold no other next-call rule.
     The good build carries the joins, copies and reads ART accepts, a zero tested against
     an object among them, so a check made stricter still has to pass them. Each bad build has to
     fail with findings of its own category only, so a check that fires for the wrong reason fails
@@ -600,6 +604,20 @@ try {
             ("The good build's $($shortcut.Call), sent to the stand-in whose own call is inside the extension, " +
             "was not reported clean.`n$($good.Output -join "`n")")
     }
+    # The settings patch sends the call that gives the Facebook logo its touch listener to a stand-in,
+    # right after the logo gets its tap. The contract file's one next-call rule is that hook, so a
+    # rule this suite builds no bad fixtures for can't pass on a count nobody checks.
+    $logoHook = 'Lapp/morphe/extension/facebook/settings/SettingsEntry;->setLogoTouchListener(Landroid/view/View;Landroid/view/View$OnTouchListener;)V'
+    $logoTap = 'Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V'
+    $logoBuilder = 'Lfixture/TopBar;->buildLogo(Landroid/view/View;Landroid/view/View;Landroid/view/View$OnClickListener;Landroid/view/View$OnTouchListener;)V'
+    $logoRule = "next-call $logoHook after $logoTap holding WordmarkNavigationBar#createWordmarkView"
+    $nextCallRules = @(Get-Content -LiteralPath $contracts | Where-Object { $_ -match '^\s*next-call\s' } |
+        ForEach-Object { ($_.Trim() -split '\s+') -join ' ' })
+    Assert-True ($nextCallRules.Count -eq 1 -and $nextCallRules[0] -ceq $logoRule) `
+        "The contract file's next-call rules are not the logo hook this suite builds bad fixtures for:`n$($nextCallRules -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        "contract $logoRule`: right after it on v1 in $logoBuilder")) `
+        "The good build's logo hook was not reported right after the logo's tap.`n$($good.Output -join "`n")"
 
     $bad = [ordered]@{
         'bad-branch' = 'branch'
@@ -686,6 +704,10 @@ try {
         'bad-return-refresh-hook-late' = 'contract'
         'bad-follow-hook-missing' = 'contract'
         'bad-follow-hook-late' = 'contract'
+        'bad-logo-hook-missing' = 'contract'
+        'bad-logo-hook-other-call' = 'contract'
+        'bad-logo-hook-other-view' = 'contract'
+        'bad-logo-hook-twice' = 'contract'
     }
     foreach ($shortcut in $shortcutCalls) { $bad["bad-shortcut-$($shortcut.Case)-left"] = 'contract' }
     $failures = @()
@@ -725,6 +747,23 @@ try {
         }
     }
 
+    # Each logo build fails on the logo rule alone, for its own reason: no stand-in, a stand-in not
+    # right after the logo's tap, one made on another view, or two.
+    $logoFails = [ordered]@{
+        'bad-logo-hook-missing' = "[diff] FAIL: contract: $logoHook has 0 call sites in methods holding " +
+            '"WordmarkNavigationBar#createWordmarkView", and must have exactly one'
+        'bad-logo-hook-other-call' = "[diff] FAIL: contract: $logoHook is called in $logoBuilder, but not right after $logoTap"
+        'bad-logo-hook-other-view' = "[diff] FAIL: contract: $logoHook is called in $logoBuilder on v2, not on v1, " +
+            "the register $logoTap is made on"
+        'bad-logo-hook-twice' = "[diff] FAIL: contract: $logoHook has 2 call sites in methods holding " +
+            "`"WordmarkNavigationBar#createWordmarkView`", and must have exactly one: $logoBuilder, $logoBuilder"
+    }
+    foreach ($case in $logoFails.GetEnumerator()) {
+        $fails = @((Get-Findings $badResults[$case.Key]).Fails)
+        Assert-True ($fails.Count -eq 1 -and $fails[0] -ceq $case.Value) `
+            "$($case.Key) did not fail with its own logo finding alone.`nExpected: $($case.Value)`nGot:`n$($fails -join "`n")"
+    }
+
     # Without a contract file the structural checks still run; only the call-site rule is off.
     $noContract = Invoke-DexDiff -Clean $cleanApk -Patched (Join-Path $caseRoot 'bad-no-guard.apk') `
         -Allowlist $emptyAllowlist -Name 'no-contract-file'
@@ -753,7 +792,13 @@ try {
             'no-call Landroid/content/pm/ShortcutManager;->pushDynamicShortcut(Landroid/content/pm/ShortcutInfo;)V in Lapp/morphe/extension/',
             'no-call pushDynamicShortcut outside Lapp/morphe/extension/',
             'no-call Landroid/content/pm/ShortcutManager;->pushDynamicShortcut(Landroid/content/pm/ShortcutInfo;)V outside',
-            'no-call Landroid/content/pm/ShortcutManager;->pushDynamicShortcut(Landroid/content/pm/ShortcutInfo;)V outside Lapp/morphe/extension')) {
+            'no-call Landroid/content/pm/ShortcutManager;->pushDynamicShortcut(Landroid/content/pm/ShortcutInfo;)V outside Lapp/morphe/extension',
+            "next-call $logoHook after setOnClickListener holding WordmarkNavigationBar#createWordmarkView",
+            "next-call setLogoTouchListener after $logoTap holding WordmarkNavigationBar#createWordmarkView",
+            "next-call $logoHook after $logoTap in WordmarkNavigationBar#createWordmarkView",
+            "next-call $logoHook before $logoTap holding WordmarkNavigationBar#createWordmarkView",
+            "next-call $logoHook after $logoTap holding",
+            "next-call $logoHook after $logoTap holding WordmarkNavigationBar#createWordmarkView and more")) {
         [System.IO.File]::WriteAllText($badContract, "# a comment line first`n$line`n")
         $unreadableFirstCall = Invoke-DexDiff -Clean $cleanApk -Patched (Join-Path $caseRoot 'good.apk') `
             -Allowlist $emptyAllowlist -Name 'bad-first-call-contract' -Contracts $badContract

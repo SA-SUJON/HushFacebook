@@ -7,6 +7,7 @@ package app.morphe.patches.facebook.misc.settings
 import app.morphe.ExtensionDex
 import app.morphe.Fixtures
 import app.morphe.PatchContexts
+import app.morphe.RepoFiles
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.holdsString
@@ -28,6 +29,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstructio
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodImplementation
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction10x
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction3rc
+import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -132,6 +134,19 @@ class LogoLongPressTest {
             .filter { AccessFlags.PUBLIC.isSet(it.accessFlags) && AccessFlags.STATIC.isSet(it.accessFlags) }
             .map { "$ENTRY->${it.name}(${it.parameterTypes.joinToString("")})${it.returnType}" }
         assertTrue("SettingsEntry declares no public static $LOGO_TOUCH_STAND_IN: $declared", LOGO_TOUCH_STAND_IN in declared)
+    }
+
+    /**
+     * The receipt refuses a patched build whose logo call isn't the stand-in, right after the logo
+     * gets its tap, in the method holding the logo's trace section. The rule names what the patch
+     * names, so a rename on one side can't leave the rule looking for something no build has.
+     */
+    @Test
+    fun theContractFileHoldsTheLogoHook() {
+        val rules = File(RepoFiles.root, "scripts/injected-mutation-contracts.txt").readLines()
+            .map { it.trim() }
+            .filter { it.startsWith("next-call ") && it.contains("->setLogoTouchListener(") }
+        assertEquals(listOf("next-call $LOGO_TOUCH_STAND_IN after $LOGO_CLICK_CALL holding $CREATE_WORDMARK_VIEW"), rules)
     }
 
     /** Where each declared build gives its logo the touch listener, and the registers it uses. */

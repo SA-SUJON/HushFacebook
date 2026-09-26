@@ -64,7 +64,9 @@ import java.util.Set;
  * call to {@code FeedFilter.hidePreEofReels} first. So is a shortcut publisher making each of the
  * five calls the settings patch sends to {@code SettingsEntry}, which makes the real ones, and
  * Facebook's Follow check for a reel's author row, holding its two surface names, with Clean up
- * Reels' call to {@code ReelDeclutter.hideFollowButton} first.
+ * Reels' call to {@code ReelDeclutter.hideFollowButton} first. And the top bar's method building
+ * the Facebook logo, holding its trace section, where the settings patch sends the logo's touch
+ * listener call to {@code SettingsEntry.setLogoTouchListener} right after the logo gets its tap.
  *
  *   java -cp &lt;cli jar&gt; BadDexFixture.java &lt;outDir&gt;
  */
@@ -114,6 +116,19 @@ public class BadDexFixture {
     private static final String SHORTCUT_LIST = "Ljava/util/List;";
     private static final String SHORTCUTS = "Lfixture/Shortcuts;";
     private static final String SETTINGS_ENTRY = "Lapp/morphe/extension/facebook/settings/SettingsEntry;";
+
+    private static final String TOP_BAR = "Lfixture/TopBar;";
+    private static final String VIEW = "Landroid/view/View;";
+    private static final String ON_CLICK_LISTENER = "Landroid/view/View$OnClickListener;";
+    private static final String ON_TOUCH_LISTENER = "Landroid/view/View$OnTouchListener;";
+    private static final ImmutableMethodReference SET_ON_CLICK_LISTENER =
+            method(VIEW, "setOnClickListener", "V", ON_CLICK_LISTENER);
+    private static final ImmutableMethodReference SET_ON_TOUCH_LISTENER =
+            method(VIEW, "setOnTouchListener", "V", ON_TOUCH_LISTENER);
+    private static final ImmutableMethodReference SET_CONTENT_DESCRIPTION =
+            method(VIEW, "setContentDescription", "V", "Ljava/lang/CharSequence;");
+    private static final ImmutableMethodReference LOGO_TOUCH_STAND_IN =
+            method(SETTINGS_ENTRY, "setLogoTouchListener", "V", VIEW, ON_TOUCH_LISTENER);
 
     /**
      * One of the ShortcutManager calls the settings patch sends to SettingsEntry: its name, what it
@@ -611,14 +626,60 @@ public class BadDexFixture {
         return names;
     }
 
-    /** The extension's stand-ins, each making the real call. The no-call rule lets its package make them. */
+    /**
+     * The extension's stand-ins, each making the real call. The no-call rule lets its package make
+     * them. The logo's stand-in, static: v0 the logo, v1 the listener it gives it.
+     */
     private static ClassDef settingsEntry() {
         List<Method> methods = new ArrayList<>();
         for (ShortcutCall call : SHORTCUT_CALLS) {
             methods.add(shortcutMethod(SETTINGS_ENTRY, call.name, call, shortcutInvoke(call, false)));
         }
+        methods.add(define(SETTINGS_ENTRY, "setLogoTouchListener", "V", true, body(2,
+                new ImmutableInstruction35c(Opcode.INVOKE_VIRTUAL, 2, 0, 1, 0, 0, 0, SET_ON_TOUCH_LISTENER),
+                op(Opcode.RETURN_VOID)), VIEW, ON_TOUCH_LISTENER));
         return new ImmutableClassDef(SETTINGS_ENTRY, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
                 OBJECT, null, null, null, null, methods);
+    }
+
+    /** A framework View call on [registers], the view first. */
+    private static Instruction onView(ImmutableMethodReference call, int... registers) {
+        int[] r = Arrays.copyOf(registers, 5);
+        return new ImmutableInstruction35c(Opcode.INVOKE_VIRTUAL, registers.length, r[0], r[1], r[2], r[3], r[4], call);
+    }
+
+    /** A touch listener call on the view in [view] with the listener in v4, Facebook's or, when [sent], the stand-in. */
+    private static Instruction touchListener(boolean sent, int view) {
+        return sent ? invoke(LOGO_TOUCH_STAND_IN, view, 4) : onView(SET_ON_TOUCH_LISTENER, view, 4);
+    }
+
+    /**
+     * Facebook's top bar building the Facebook logo, static: v0 free, v1 the logo, v2 a container
+     * around it, v3 the logo's tap and v4 a touch listener. It holds the logo's trace section, gives
+     * the container a touch listener of its own, then gives the logo its tap, its touch listener
+     * and its content description, in that order, the way 573, 577 and 580 do. [containerSent] and
+     * [logoSent] say which of the two touch listener calls went to the settings patch's stand-in,
+     * and [logoView] the register the logo's goes to.
+     */
+    private static ClassDef topBar(boolean containerSent, boolean logoSent, int logoView) {
+        return new ImmutableClassDef(TOP_BAR, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Collections.singletonList(define(TOP_BAR, "buildLogo", "V", true, body(5,
+                        new ImmutableInstruction21c(Opcode.CONST_STRING, 0,
+                                new ImmutableStringReference("WordmarkNavigationBar#createWordmarkView")), // 0
+                        touchListener(containerSent, 2),                                                     // 2
+                        onView(SET_ON_CLICK_LISTENER, 1, 3),                                                 // 5
+                        touchListener(logoSent, logoView),                                                   // 8
+                        onView(SET_CONTENT_DESCRIPTION, 1, 0),                                               // 11
+                        op(Opcode.RETURN_VOID)),                                                             // 14
+                        VIEW, VIEW, ON_CLICK_LISTENER, ON_TOUCH_LISTENER)));
+    }
+
+    /** [classes] with the top bar replaced by [topBar]. */
+    private static List<ClassDef> withTopBar(List<ClassDef> classes, ClassDef topBar) {
+        List<ClassDef> replaced = new ArrayList<>(classes);
+        replaced.removeIf(cd -> cd.getType().equals(TOP_BAR));
+        replaced.add(topBar);
+        return replaced;
     }
 
     private static ClassDef cleanHost() {
@@ -774,7 +835,7 @@ public class BadDexFixture {
             ClassDef adapters, ClassDef showcaseType, ClassDef preEof) {
         return Arrays.asList(host, adapters, filter(), genAiLabel, recommendationLabel, showcaseUnit(), showcaseType,
                 preEof, returnController(returnHook()), returnRefresh(), shortcuts(Collections.<String>emptySet()),
-                settingsEntry(), followCheck(followHook()), reelDeclutter());
+                settingsEntry(), followCheck(followHook()), reelDeclutter(), topBar(false, true, 1));
     }
 
     /** A patched build that breaks only the reels patch's changes, as [showcaseType] and [preEof]. */
@@ -857,7 +918,8 @@ public class BadDexFixture {
         Map<String, List<ClassDef>> dexes = new LinkedHashMap<>();
         dexes.put("clean", Arrays.asList(cleanHost(), cleanAdapters(), showcaseUnit(),
                 preEof(Collections.<Instruction>emptyList()), returnController(Collections.<Instruction>emptyList()),
-                shortcuts(allShortcutCalls()), followCheck(Collections.<Instruction>emptyList())));
+                shortcuts(allShortcutCalls()), followCheck(Collections.<Instruction>emptyList()),
+                topBar(false, false, 1)));
         dexes.put("secondary", Collections.singletonList(secondary()));
         dexes.put("good", good());
         List<ClassDef> goodWithSecondary = new ArrayList<>(good());
@@ -1216,6 +1278,18 @@ public class BadDexFixture {
             shortcutLeft.add(shortcuts(Collections.singleton(call.name)));
             dexes.put("bad-shortcut-" + call.caseName + "-left", shortcutLeft);
         }
+
+        // contract: the logo's touch listener call left as Facebook makes it, so the long press
+        // does nothing.
+        dexes.put("bad-logo-hook-missing", withTopBar(good(), topBar(false, false, 1)));
+        // contract: the stand-in sent in place of the container's touch listener call instead, and
+        // the logo's left alone. It isn't right after the logo's tap.
+        dexes.put("bad-logo-hook-other-call", withTopBar(good(), topBar(true, false, 1)));
+        // contract: the stand-in right after the logo's tap, but made on the container's register,
+        // so the container takes the long press and the logo loses its touch listener.
+        dexes.put("bad-logo-hook-other-view", withTopBar(good(), topBar(false, true, 2)));
+        // contract: both touch listener calls sent, so the container takes a long press too.
+        dexes.put("bad-logo-hook-twice", withTopBar(good(), topBar(true, true, 1)));
 
         for (Map.Entry<String, List<ClassDef>> e : dexes.entrySet()) {
             File dex = new File(out, e.getKey() + ".dex");
