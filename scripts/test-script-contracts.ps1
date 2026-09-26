@@ -2051,7 +2051,7 @@ try {
         'scripts/test-injected-registers.ps1' = @('BadDexFixture.java', 'DexDiff.java', 'injected-mutation-contracts.txt',
             'injected-register-contracts.ps1', 'injected-register-removal-allowlist.txt', 'script-wiring.ps1',
             'test-injected-registers.ps1', 'verify-all-patches.ps1', 'verify-injected-registers.ps1')
-        'scripts/test-resource-table-check.ps1' = @('ResourceTableCheck.java', 'test-resource-table-check.ps1',
+        'scripts/test-resource-table-check.ps1' = @('MergeSplits.java', 'ResourceTableCheck.java', 'test-resource-table-check.ps1',
             'verify-all-patches.ps1')
         'scripts/test-injected-register-device.ps1' = @('injected-register-device.ps1', 'script-wiring.ps1',
             'test-injected-register-device.ps1', 'verify-injected-registers.ps1')
@@ -3293,15 +3293,22 @@ Write-Host '[scripts] shared helper contracts passed'
 
 # --- split bundle callers ----------------------------------------------------------------------
 #
-# The morphe CLI merges an .apkm's splits into one APK before it patches and leaves the merge
-# beside its output. The patched manifest has to be compared with that merge, not with the base
-# APK: the merge itself moves the manifest, and a receipt compared with the base would record the
-# merge's changes as the patches' own, for somebody to allowlist. build-release-receipt.ps1 is run
-# against exactly that in the release root section below; a pattern over its text passed with the
-# merged APK ignored. Every caller that reads an APK out of a bundle goes through Get-BaseApk.
+# The morphe CLI merges an .apkm's splits into one APK before it patches, and since 1.17.0 deletes
+# that merge when it's done. The patched manifest and resource table have to be compared with the
+# merge, not with the base APK: the merge itself moves the manifest, and base.apk lacks every
+# resource the splits carry. So the receipt builder and verify-all-patches.ps1 merge first
+# (Get-MergedApk) and hand the CLI the merge, and both are run against exactly that in the release
+# root section below, a merge that yields nothing among the cases. Every caller that reads the
+# manifest facts out of a bundle goes through Get-BaseApk, and no caller looks for a merge the CLI
+# left behind: there is none to find.
 foreach ($name in @('build-release-receipt.ps1', 'verify-all-patches.ps1', 'verify-injected-registers.ps1')) {
     Assert-True ((Get-Content -LiteralPath (Join-Path $PSScriptRoot $name) -Raw) -match 'Get-BaseApk -Apk') `
         "$name reads a bundle without taking its base APK out first."
+}
+foreach ($name in @('build-release-receipt.ps1', 'verify-all-patches.ps1')) {
+    $text = Get-Content -LiteralPath (Join-Path $PSScriptRoot $name) -Raw
+    Assert-True ($text -match '(?m)^[^#\r\n]*\$patchInput = Get-MergedApk -Apk ' -and $text -notmatch '\*-merged\.apk') `
+        "$name does not merge a bundle before it patches, or still looks for the merge the CLI deletes."
 }
 
 Write-Host '[scripts] split bundle contracts passed'
@@ -3546,13 +3553,16 @@ try {
         'The release check accepted a receipt with no run of an older declared build.'
 
     # build-release-receipt.ps1 itself, on the same root. Stand-ins take the tools' places: a JDK
-    # that answers -version and does what the desktop CLI leaves behind for each input (the result
-    # report, the patched APK and the merged APK beside it), and an aapt2 that prints the manifest
-    # lines written for each APK. One .apkm per declared build, and a bundle stamped with the
-    # commit's time where buildAndroid leaves it, carrying the classes.dex the published asset check
-    # at the end of this section looks for. The CLI's merge carries a component the base
-    # APK's manifest lacks, so a delta taken against the base instead of the merge records it as
-    # the patches' own and the empty allowlist refuses the receipt.
+    # that answers -version, plays MergeSplits.java (the merged APK, and a note beside it naming
+    # the bundle it came from), and does what the desktop CLI leaves behind for each input (the
+    # result report and the patched APK), and an aapt2 that prints the manifest lines written for
+    # each APK. One .apkm per declared build, and a bundle stamped with the commit's time where
+    # buildAndroid leaves it, carrying the classes.dex the published asset check at the end of
+    # this section looks for. The merge carries a component the base APK's manifest lacks, so a
+    # delta taken against the base instead of the merge records it as the patches' own and the
+    # empty allowlist refuses the receipt. The JDK also plays ResourceTableCheck.java, keeping a
+    # copy of the stock APK it was handed, and DexDiff.java, and an apksigner beside aapt2 names
+    # Meta's signer, so verify-all-patches.ps1 runs on the same stand-ins.
     $tools = Join-Path $releaseRoot 'tools'
     $fixtures = Join-Path $releaseRoot 'fixtures'
     New-Item -ItemType Directory -Path $tools, $fixtures -Force | Out-Null
@@ -3560,6 +3570,8 @@ try {
     $stubAapt2 = Join-Path $tools 'aapt2.cmd'
     $stubJar = Join-Path $tools 'morphe-desktop.jar'
     $javaLog = Join-Path $tools 'java.log'
+    $mergeLog = Join-Path $tools 'merge.log'
+    $resourceStock = Join-Path $tools 'resource-stock.txt'
     [System.IO.File]::WriteAllText($stubJava, ((@(
         '@echo off',
         'setlocal EnableExtensions EnableDelayedExpansion',
@@ -3567,9 +3579,13 @@ try {
         '    echo openjdk version "21.0.5" 2024-10-15',
         '    exit /b 0',
         ')',
-        'set "OUT=" & set "RESULT=" & set "LAST=" & set "PREV=" & set "FORCED=0"',
         'rem Its own folder, read before shift moves %0 along with the arguments.',
         'set "HERE=%~dp0"',
+        'rem -Xmx -cp <jar> <tool>.java and the tool''s arguments.',
+        'if /i "%~nx4"=="MergeSplits.java" goto merge',
+        'if /i "%~nx4"=="ResourceTableCheck.java" goto resources',
+        'if /i "%~nx4"=="DexDiff.java" goto dexdiff',
+        'set "OUT=" & set "RESULT=" & set "LAST=" & set "PREV=" & set "FORCED=0"',
         'shift',
         'shift',
         'rem patch-for-device.ps1 hands the CLI one argument file, a quoted value a line with',
@@ -3597,15 +3613,38 @@ try {
         'set "LAST=!V!"',
         'exit /b 0',
         ':run',
-        '>>"!HERE!java.log" echo patch !LAST! forced=!FORCED!',
+        'rem A merged APK names the bundle it came from, whose report and patched manifest these are.',
+        'set "SRC=!LAST!"',
+        'set "VIA="',
+        'if exist "!LAST!.source" (',
+        '    set /p SRC=<"!LAST!.source"',
+        '    set "VIA= merged"',
+        ')',
+        '>>"!HERE!java.log" echo patch !SRC!!VIA! forced=!FORCED!',
         'rem A case that needs something to change while a fixture is patched leaves this behind.',
         'if exist "!HERE!during-patch.cmd" call "!HERE!during-patch.cmd"',
-        'copy /y "!LAST!.result.json" "!RESULT!" >nul || exit /b 3',
+        'copy /y "!SRC!.result.json" "!RESULT!" >nul || exit /b 3',
         'copy /y "!HERE!patched.apk" "!OUT!" >nul || exit /b 4',
-        'copy /y "!LAST!.patched.txt" "!OUT!.xmltree" >nul || exit /b 5',
-        'for %%F in ("!OUT!") do set "OUTDIR=%%~dpF"',
-        'for %%F in ("!LAST!") do set "STEM=%%~nF"',
-        'copy /y "!LAST!.merged.txt" "!OUTDIR!!STEM!-merged.apk" >nul || exit /b 6',
+        'copy /y "!SRC!.patched.txt" "!OUT!.xmltree" >nul || exit /b 5',
+        'exit /b 0',
+        'rem MergeSplits.java <bundle> <merged.apk>. A case can make it fail, or leave no APK behind.',
+        ':merge',
+        '>>"!HERE!merge.log" echo merge %~5',
+        'if exist "!HERE!merge-fails.txt" (',
+        '    echo [merge] could not read the bundle 1>&2',
+        '    exit /b 9',
+        ')',
+        'if exist "!HERE!merge-writes-nothing.txt" exit /b 0',
+        'copy /y "%~5.merged.txt" "%~6" >nul || exit /b 7',
+        '>"%~6.source" echo %~5',
+        'exit /b 0',
+        'rem ResourceTableCheck.java <stock> <patched> <report>: keeps what it was handed as the stock side.',
+        ':resources',
+        'copy /y "%~5" "!HERE!resource-stock.txt" >nul || exit /b 8',
+        'echo [resources] stand-in: every stock resource resolves in the patched table',
+        'exit /b 0',
+        ':dexdiff',
+        'echo [diff] structural findings: 0',
         'exit /b 0') -join "`r`n") + "`r`n"), [System.Text.Encoding]::ASCII)
     [System.IO.File]::WriteAllText($stubAapt2, ((@(
         '@echo off',
@@ -3689,7 +3728,7 @@ try {
     $builderSaid = ''
     function Invoke-ReceiptBuilder([string[]]$Fixtures, [string]$Bundle,
             [string]$WorkDir = (Join-Path $releaseRoot 'work'), [string]$DesktopJar = $stubJar, [switch]$SkipAdvisoryCheck) {
-        Remove-Item -LiteralPath $javaLog -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $javaLog, $mergeLog -Force -ErrorAction SilentlyContinue
         $saved = @{}
         foreach ($variable in @(Get-ChildItem Env: | Where-Object { $_.Name -like 'GIT_*' })) {
             $saved[$variable.Name] = $variable.Value
@@ -3737,11 +3776,16 @@ try {
         $changes = @(ConvertTo-ManifestDeltaEntries -Delta $builtTarget.manifestDelta)
         Assert-True ($changes.Count -eq 0) "The receipt records the merge's own manifest change for $label as the patches': $($changes -join ', ')"
     }
+    # Each fixture merged once, and the CLI handed that merge rather than the bundle: the CLI deletes
+    # its own merge, and the manifest delta above is taken against this one.
+    $mergeRuns = @(Get-Content -LiteralPath $mergeLog)
+    Assert-True (($mergeRuns -join "`n") -eq (@($builtBuilds | ForEach-Object { "merge $($fixturePaths[$_])" }) -join "`n")) `
+        "Each fixture was not merged once, before it was patched: $($mergeRuns -join '; ')"
     $patchRuns = @(Get-Content -LiteralPath $javaLog)
     $expectedRuns = @($builtBuilds | ForEach-Object {
-        "patch $($fixturePaths[$_]) forced=$(if ($releaseTarget.PackageVersions -contains $_) { 0 } else { 1 })" })
+        "patch $($fixturePaths[$_]) merged forced=$(if ($releaseTarget.PackageVersions -contains $_) { 0 } else { 1 })" })
     Assert-True (($patchRuns -join "`n") -eq ($expectedRuns -join "`n")) `
-        "The CLI was not run once per fixture, with -f for the undeclared build only: $($patchRuns -join '; ')"
+        "The CLI was not run once per fixture, on its merge, with -f for the undeclared build only: $($patchRuns -join '; ')"
     # The SBOM beside the bundle, recorded by name, hash and count, once OSV had been asked about it.
     Assert-True ($built.sbom.file -eq "patches-$releaseVersionHere.cdx.json" -and
         $built.sbom.sha256 -ceq (Get-Sha256Hex -Path $releaseSbom) -and [int]$built.sbom.components -eq 3) `
@@ -3753,6 +3797,94 @@ try {
     $builtProved = "the receipt proves $($releaseNames.Count) patches on $($builtVersions -join ', ') " +
         "from commit $($releaseCommit.Substring(0, 8))"
     Assert-True ($said -like "*$builtProved*") "The release check did not accept the receipt the builder wrote: $said"
+
+    # A merge that fails, and one that exits 0 and writes nothing, stop the run before the CLI
+    # patches anything. base.apk is not what the CLI patches, so there's no receipt to fall back to.
+    $builtReceiptBeforeMerge = [System.IO.File]::ReadAllBytes($releaseReceipt)
+    $brokenMerges = @(
+        @{ Flag = 'merge-fails.txt'; Pattern = '*Could not merge facebook-*.apkm into one APK (exit 9)*could not read the bundle*' },
+        @{ Flag = 'merge-writes-nothing.txt'; Pattern = '*The merge of facebook-*.apkm wrote no APK at *stock-merged.apk*' })
+    foreach ($broken in $brokenMerges) {
+        $flag = Join-Path $tools $broken.Flag
+        Set-Content -LiteralPath $flag -Value 'on' -Encoding ASCII
+        Remove-Item -LiteralPath $releaseReceipt -Force
+        try {
+            Assert-Throws { Invoke-ReceiptBuilder -Fixtures $allFixtures } $broken.Pattern `
+                "build-release-receipt.ps1 went ahead when $($broken.Flag -replace '\.txt$', '')."
+            Assert-True (-not (Test-Path -LiteralPath $javaLog) -and -not (Test-Path -LiteralPath $releaseReceipt)) `
+                "build-release-receipt.ps1 patched or wrote a receipt when $($broken.Flag -replace '\.txt$', '')."
+            Assert-True (@(Get-ChildItem -LiteralPath (Join-Path $releaseRoot 'work') -Directory -Filter 'receipt-*').Count -eq 0) `
+                "build-release-receipt.ps1 left its run folder behind when $($broken.Flag -replace '\.txt$', '')."
+        } finally {
+            Remove-Item -LiteralPath $flag -Force -ErrorAction SilentlyContinue
+            [System.IO.File]::WriteAllBytes($releaseReceipt, $builtReceiptBeforeMerge)
+        }
+    }
+
+    # verify-all-patches.ps1 on the same stand-ins, with an apksigner beside aapt2 that names Meta's
+    # signer. Once the CLI stopped leaving its merge behind (1.17.0) it held the patched table to
+    # base.apk, so the 7,588 resources 580's splits carry were never compared. It merges first now:
+    # the CLI is handed the merge, the resource check's stock side is that merge, and a bundle that
+    # yields no merged APK stops the run before anything is patched. A plain APK goes to the CLI as
+    # it is and is its own stock side.
+    $releaseSigner = @($releaseCatalog.patches | ForEach-Object { $_.compatibility } |
+        Where-Object { $_.packageName -eq $releaseTarget.PackageName } | ForEach-Object { $_.signatures } |
+        Sort-Object -Unique | Select-Object -First 1)
+    Assert-True ($releaseSigner.Count -eq 1) 'The release catalog names no signer for the stand-in apksigner.'
+    Set-Content -LiteralPath (Join-Path $tools 'apksigner.bat') -Encoding ASCII -Value @(
+        '@echo off', "echo Signer #1 certificate SHA-256 digest: $($releaseSigner[0])", 'exit /b 0')
+    $verifyAllScript = Join-Path $PSScriptRoot 'verify-all-patches.ps1'
+    function Invoke-VerifyAll([string]$Apk) {
+        Remove-Item -LiteralPath $javaLog, $mergeLog, $resourceStock -Force -ErrorAction SilentlyContinue
+        $global:LASTEXITCODE = 0
+        $said = @(& $verifyAllScript -Apk $Apk -DesktopJar $stubJar -WorkDir (Join-Path $releaseRoot 'verify-work') `
+            -Bundle $releaseBundle -PatchList (Join-Path $releaseRepo 'patches-list.json') -Java $stubJava `
+            -Aapt2 $stubAapt2 3>&1 6>&1 | ForEach-Object { "$_" }) -join "`n"
+        if ($LASTEXITCODE -ne 0) { throw "verify-all-patches.ps1 exited $LASTEXITCODE`: $said" }
+        return $said
+    }
+    $newestFixture = $fixturePaths[$releaseTarget.PackageVersion]
+    $said = Invoke-VerifyAll -Apk $newestFixture
+    Assert-True ($said -like "*merged $(Split-Path -Leaf $newestFixture) into one APK for the CLI*" -and
+        $said -like '*success: every requested patch applied*') "verify-all-patches.ps1 did not merge the bundle and pass: $said"
+    Assert-True ((@(Get-Content -LiteralPath $mergeLog) -join "`n") -eq "merge $newestFixture" -and
+        (@(Get-Content -LiteralPath $javaLog) -join "`n") -eq "patch $newestFixture merged forced=0") `
+        ("verify-all-patches.ps1 did not merge the bundle once and hand the CLI that merge: " +
+            "$(@(Get-Content -LiteralPath $javaLog) -join '; ')")
+    Assert-True ((Get-Content -LiteralPath $resourceStock -Raw) -ceq (Get-Content -LiteralPath "$newestFixture.merged.txt" -Raw)) `
+        'The resource check was not handed the merge as its stock side.'
+    foreach ($broken in $brokenMerges) {
+        $flag = Join-Path $tools $broken.Flag
+        Set-Content -LiteralPath $flag -Value 'on' -Encoding ASCII
+        try {
+            Assert-Throws { Invoke-VerifyAll -Apk $newestFixture } $broken.Pattern `
+                "verify-all-patches.ps1 went ahead when $($broken.Flag -replace '\.txt$', '')."
+            Assert-True (-not (Test-Path -LiteralPath $javaLog) -and -not (Test-Path -LiteralPath $resourceStock)) `
+                "verify-all-patches.ps1 patched or compared a table when $($broken.Flag -replace '\.txt$', '')."
+        } finally {
+            Remove-Item -LiteralPath $flag -Force -ErrorAction SilentlyContinue
+        }
+    }
+    $plainFixture = Join-Path $fixtures "facebook-$($releaseTarget.PackageVersion)-arm64-v8a.apk"
+    $newestCode = [regex]::Match((Get-Content -LiteralPath "$newestFixture.merged.txt" -Raw),
+        'versionCode\(0x0101021b\)=(\d+)').Groups[1].Value
+    Set-Content -LiteralPath $plainFixture -Encoding ASCII -NoNewline `
+        -Value (Get-FixtureManifest -Build $releaseTarget.PackageVersion -Code $newestCode)
+    foreach ($suffix in '.result.json', '.patched.txt') {
+        Copy-Item -LiteralPath "$newestFixture$suffix" -Destination "$plainFixture$suffix"
+    }
+    try {
+        $said = Invoke-VerifyAll -Apk $plainFixture
+        Assert-True ($said -like '*success: every requested patch applied*' -and $said -notlike '*into one APK for the CLI*' -and
+            -not (Test-Path -LiteralPath $mergeLog) -and
+            (@(Get-Content -LiteralPath $javaLog) -join "`n") -eq "patch $plainFixture forced=0" -and
+            (Get-Content -LiteralPath $resourceStock -Raw) -ceq (Get-Content -LiteralPath $plainFixture -Raw)) `
+            "verify-all-patches.ps1 did not patch a plain APK as it is and hold the table to it: $said"
+    } finally {
+        Remove-Item -LiteralPath $plainFixture, "$plainFixture.result.json", "$plainFixture.patched.txt" -Force -ErrorAction SilentlyContinue
+    }
+    Assert-True (@(Get-ChildItem -LiteralPath (Join-Path $releaseRoot 'verify-work') -Directory -Filter 'verify-*').Count -eq 0) `
+        'verify-all-patches.ps1 left a run folder behind.'
 
     # The newest build alone, or beside the undeclared one, is not enough for a receipt: the older
     # declared build has no run. The builder says so before it patches anything. It used to patch

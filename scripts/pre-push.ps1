@@ -460,6 +460,7 @@ try {
         $_ -in $injectedRegisterVerifierPaths
     }).Count -gt 0
     $resourceTableCheckPaths = @(
+        'scripts/MergeSplits.java',
         'scripts/ResourceTableCheck.java',
         'scripts/test-resource-table-check.ps1',
         'scripts/verify-all-patches.ps1'

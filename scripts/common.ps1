@@ -251,6 +251,60 @@ function Get-BaseApk {
     return $Destination
 }
 
+function Get-MergedApk {
+    <#
+    .SYNOPSIS
+        The one APK the desktop CLI patches: a split bundle merged the way the CLI merges it,
+        written to -Destination, or the APK itself when it isn't a bundle.
+    .DESCRIPTION
+        morphe-desktop merges an .apkm, .apks or .xapk into <name>-merged.apk beside its output,
+        patches that, and since 1.17.0 deletes it on the way out. The patched APK's resource table
+        and manifest were rebuilt from that merge, so the checks compared them with base.apk
+        instead, which lacks every resource the splits carry: on 580 the patched table held 7,588
+        resources base.apk doesn't, and none of them was compared. So the scripts merge first,
+        with the CLI's own merger and the arguments it passes (MergeSplits.java), and hand the CLI
+        the merged APK, which it patches as it is. There is nothing else to fall back to, so a
+        merge that fails or writes no APK throws. The extensions are the CLI's own list
+        (BundleFormats); anything else goes to the CLI as it is.
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$Apk,
+        [Parameter(Mandatory = $true)][string]$Destination,
+        [Parameter(Mandatory = $true)][string]$Java,
+        [Parameter(Mandatory = $true)][string]$DesktopJar
+    )
+
+    $Apk = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Apk)
+    $Destination = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Destination)
+    if ([System.IO.Path]::GetExtension($Apk).TrimStart('.').ToLowerInvariant() -notin @('apkm', 'apks', 'xapk')) {
+        return $Apk
+    }
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination) | Out-Null
+    if (Test-Path -LiteralPath $Destination) { Remove-Item -LiteralPath $Destination -Force }
+    # Continue for the call alone: Windows PowerShell 5.1 turns a JDK warning on stderr into a
+    # terminating error under Stop. The exit code and the file are what decide.
+    $preference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $global:LASTEXITCODE = -1
+        $output = @(& $Java '-Xmx6g' '-cp' $DesktopJar (Join-Path $PSScriptRoot 'MergeSplits.java') $Apk $Destination 2>&1 |
+            ForEach-Object { "$_" })
+        $exitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $preference
+    }
+    # What the merger said, without the stack frames under an exception.
+    $said = @($output | Where-Object { $_ -notmatch '^\s+at ' } | Select-Object -Last 3) -join ' '
+    if ($exitCode -ne 0) {
+        throw "Could not merge $(Split-Path -Leaf $Apk) into one APK (exit $exitCode): $said"
+    }
+    if (-not (Test-Path -LiteralPath $Destination -PathType Leaf) -or (Get-Item -LiteralPath $Destination).Length -eq 0) {
+        throw ("The merge of $(Split-Path -Leaf $Apk) wrote no APK at $Destination, and base.apk is not what " +
+            'the CLI patches, so there is nothing to hold the patched APK to.')
+    }
+    return $Destination
+}
+
 function Assert-UrlReachable {
     <#
     .SYNOPSIS

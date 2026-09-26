@@ -14,11 +14,12 @@
     run answers "which patches still apply on this build" rather than being refused before it
     starts. The package still has to be the catalog's.
 
-    A clean run then holds the patched APK's resource table to the stock one with
-    ResourceTableCheck.java: every resource of every package has to resolve by its id with its
-    type and each configuration's value, and every file and reference the patched values name
-    has to be there. A failure names the id. What the patches rewrote, what the rebuild renamed
-    and what was added go in a report beside the result file.
+    A split bundle is merged into one APK first, with the CLI's own merger (Get-MergedApk), and
+    the CLI patches that merge. A clean run then holds the patched APK's resource table to the
+    merge's with ResourceTableCheck.java: every resource of every package has to resolve by its id
+    with its type and each configuration's value, and every file and reference the patched values
+    name has to be there. A failure names the id. What the patches rewrote, what the rebuild
+    renamed and what was added go in a report beside the result file.
 
     Last, verify-injected-registers.ps1 holds the patched dex to the stock dex: register counts,
     branch targets, invoke registers, parameter kinds, try ranges and the one feed guard. Its
@@ -85,8 +86,9 @@ $runId = [guid]::NewGuid().ToString('N')
 $runDir = Join-Path $workRoot "verify-$runId"
 New-Item -ItemType Directory -Force -Path $runDir | Out-Null
 
-# Facebook ships split bundles. aapt2 and the resource check read one APK, the base, which holds
-# the manifest and the app's own resource table.
+# Facebook ships split bundles. aapt2 reads the version facts off one APK, the base, which holds
+# the manifest, and the register check's clean side is the base too: it carries every dex and
+# Meta's signature, which a merge doesn't keep.
 $stockApk = Get-BaseApk -Apk $Apk -Destination (Resolve-WithinRoot -Path (Join-Path $runDir 'stock-base.apk') -Root $workRoot)
 
 # The version the result is held to: the stock APK's own, read the same way the receipt reads
@@ -118,15 +120,22 @@ if ($forced) {
 $out = Resolve-WithinRoot -Path (Join-Path $runDir 'verify-all.apk') -Root $workRoot
 $temp = Resolve-WithinRoot -Path (Join-Path $runDir 'verify-all-tmp') -Root $workRoot
 $result = Resolve-WithinRoot -Path (Join-Path $workRoot "verify-all-result-$runId.json") -Root $workRoot
-$enable = @()
-foreach ($name in $names) { $enable += '-e'; $enable += $name }
-$arguments = @('patch', '--exclusive', '--continue-on-error', '--unsigned', '-p', $Bundle,
-    '-o', $out, '-t', $temp, '-r', $result)
-if ($forced) { $arguments += '-f' }
-$arguments = $arguments + $enable + @($Apk)
 $exitCode = 1
 
 try {
+    # What the CLI patches and what the patched table is held to, one file: a bundle's merge, made
+    # here because the CLI deletes its own, or the APK itself. A bundle that won't merge stops the
+    # run; base.apk alone lacks the splits' resources and would pass a table that lost them.
+    $mergedApk = Resolve-WithinRoot -Path (Join-Path $runDir 'stock-merged.apk') -Root $workRoot
+    $patchInput = Get-MergedApk -Apk $Apk -Destination $mergedApk -Java $Java -DesktopJar $DesktopJar
+    if ($patchInput -eq $mergedApk) { Write-Host "[verify] merged $(Split-Path -Leaf $Apk) into one APK for the CLI" }
+    $enable = @()
+    foreach ($name in $names) { $enable += '-e'; $enable += $name }
+    $arguments = @('patch', '--exclusive', '--continue-on-error', '--unsigned', '-p', $Bundle,
+        '-o', $out, '-t', $temp, '-r', $result)
+    if ($forced) { $arguments += '-f' }
+    $arguments = $arguments + $enable + @($patchInput)
+
     $cliOutput = @(& $Java '-jar' $DesktopJar @arguments 2>&1)
     $cliExitCode = $LASTEXITCODE
     # WARNING lines are the patches' own: a patch that works down a list of targets names each one
@@ -160,15 +169,13 @@ try {
     if ($cliExitCode -eq 0 -and $validation.Valid) {
         # The rebuilt resource table against the stock one. A resource patch has Morphe decode and
         # rebuild the app's whole table, and an id the rebuild loses only fails when the app
-        # inflates it (Hushfeed upstream #84, a layout in one of TikTok's feature packages). A
-        # split bundle's stock side is the merged APK the CLI wrote beside its output: that is the
+        # inflates it (Hushfeed upstream #84, a layout in one of TikTok's feature packages). The
+        # stock side is the APK the CLI patched, a split bundle's merge among them: that is the
         # table the patched APK was rebuilt from.
-        $merged = @(Get-ChildItem -LiteralPath $runDir -Filter '*-merged.apk' -File -ErrorAction SilentlyContinue)
-        $stockTable = if ($merged.Count -eq 1) { $merged[0].FullName } else { $stockApk }
         $resourceReport = Resolve-WithinRoot -Path (Join-Path $workRoot "verify-all-resources-$runId.txt") -Root $workRoot
         $global:LASTEXITCODE = 0
         $resourceOutput = @(& $Java '-Xmx4g' '-cp' $DesktopJar (Join-Path $PSScriptRoot 'ResourceTableCheck.java') `
-            $stockTable $out $resourceReport 2>&1)
+            $patchInput $out $resourceReport 2>&1)
         $resourceExitCode = $LASTEXITCODE
         $resourceOutput | ForEach-Object { Write-Host "[verify] $_" }
         Write-Host "[verify] resource report: $resourceReport"

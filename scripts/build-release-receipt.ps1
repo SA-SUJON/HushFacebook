@@ -10,7 +10,10 @@
     every patch in the catalog applied to it, and what patching did to the Android manifest.
 
     Nothing here is asserted. Each fixture is patched with the real desktop CLI, the verdicts
-    come out of the CLI's own result report, and both manifests are read back with aapt2. A
+    come out of the CLI's own result report, and both manifests are read back with aapt2: the
+    patched one, and the one the patches started from. A split bundle is merged into one APK first
+    with the CLI's own merger (Get-MergedApk), the CLI patches that merge, and its manifest is the
+    baseline, since the merge rewrites the manifest before any patch runs. A
     patch that fails on any fixture stops the run with its name and no receipt is written: the
     receipt describes a bundle that fully applies, which is why the validator refuses any
     verdict of applied = false rather than reading it as a recorded failure. Every build the
@@ -299,12 +302,17 @@ foreach ($apk in $Fixture) {
         $forced = -not ([System.Collections.Generic.HashSet[string]]::new(
             [string[]]$expectedTarget.PackageVersions, [System.StringComparer]::Ordinal)).Contains([string]$stock.versionName)
 
+        # The one APK the CLI patches: the fixture's merge when it's a split bundle, made here
+        # because the CLI deletes its own, or the fixture itself. No merge, no receipt.
+        $mergedApk = Resolve-WithinRoot -Path (Join-Path $runDir 'stock-merged.apk') -Root $workRoot
+        $patchInput = Get-MergedApk -Apk $apk -Destination $mergedApk -Java $Java -DesktopJar $DesktopJar
+
         $enable = @()
         foreach ($name in $patchNames) { $enable += '-e'; $enable += $name }
         $arguments = @('patch', '--exclusive', '--continue-on-error', '--unsigned', '-p', $Bundle,
             '-o', $out, '-t', $temp, '-r', $resultPath)
         if ($forced) { $arguments += '-f' }
-        $arguments = $arguments + $enable + @($apk)
+        $arguments = $arguments + $enable + @($patchInput)
         & $Java '-jar' $DesktopJar @arguments 2>&1 | Out-Null
         $cliExitCode = $LASTEXITCODE
 
@@ -320,11 +328,10 @@ foreach ($apk in $Fixture) {
         if ($cliExitCode -ne 0) { throw "The desktop CLI exited with $cliExitCode on $label." }
 
         $patched = Get-ApkManifestFacts -Apk $out -Aapt2 $Aapt2
-        # The CLI merges a bundle's splits into one APK before it patches, and leaves that merge
-        # beside its output. Its manifest, not the base APK's, is what the patches started from,
-        # so the delta against it is the patches' own and not the merge's.
-        $merged = Get-ChildItem -LiteralPath $runDir -Filter '*-merged.apk' -File | Select-Object -First 1
-        $baseline = if ($merged) { Get-ApkManifestFacts -Apk $merged.FullName -Aapt2 $Aapt2 } else { $stock }
+        # The manifest the patches started from is the APK the CLI patched, the merge for a split
+        # bundle, not the base APK's: the merge rewrites the manifest itself, and a delta against
+        # the base would record its changes as the patches' own.
+        $baseline = Get-ApkManifestFacts -Apk $patchInput -Aapt2 $Aapt2
         $delta = Get-ManifestDelta -Stock $baseline -Patched $patched
         $verdicts = Get-PatchVerdicts -Report $report -Names $patchNames
         $changes = @(ConvertTo-ManifestDeltaEntries -Delta $delta)
