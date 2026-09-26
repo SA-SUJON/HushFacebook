@@ -17,6 +17,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,10 +29,6 @@ import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.preference.TwoStatePreference;
 import android.text.Layout;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
@@ -42,6 +39,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.Switch;
@@ -919,29 +917,29 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             super(context);
         }
 
+        /** The two choices as cards, each saying what it does under its name. */
         @Override
-        protected CharSequence[] labels() {
-            return new CharSequence[]{
-                    choice(L10n.t(getContext(), "Copy quick report"),
-                            L10n.t(getContext(), "Copy a short report to the clipboard.")),
-                    choice(L10n.t(getContext(), "Save full report"),
-                            L10n.t(getContext(), "Save the full report in Download/Morphe."))};
-        }
-
-        private CharSequence choice(CharSequence title, CharSequence detail) {
-            SpannableStringBuilder label = new SpannableStringBuilder(title);
-            label.append('\n');
-            int start = label.length();
-            label.append(detail);
+        protected ListAdapter choices(Context dialogContext) {
             ScreenColors colors = ScreenColors.shown == null ? ScreenColors.DEFAULT : ScreenColors.shown;
-            label.setSpan(new ForegroundColorSpan(colors.summary), start, label.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            label.setSpan(new RelativeSizeSpan(.86f), start, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return label;
+            return new ChoiceCards(colors,
+                    new CharSequence[]{L10n.t(getContext(), "Copy quick report"),
+                            L10n.t(getContext(), "Save full report")},
+                    new CharSequence[]{L10n.t(getContext(), "Copy a short report to the clipboard."),
+                            L10n.t(getContext(), "Save the full report in Download/Morphe.")});
         }
 
+        /**
+         * The screen's colours, before the dialog is shown so its first layout measures them. The
+         * cards bring their own spacing and press ripple, so the list draws no divider and no
+         * highlight of its own over them.
+         */
         @Override
-        protected void onDialogShown(AlertDialog dialog) {
+        protected void onDialogCreated(AlertDialog dialog) {
+            ListView list = dialog.getListView();
+            if (list != null) {
+                list.setDivider(null);
+                list.setSelector(new ColorDrawable(Color.TRANSPARENT));
+            }
             ScreenColors.dialog(dialog);
         }
 

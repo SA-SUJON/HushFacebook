@@ -88,6 +88,9 @@ public class ScreenColorsTest {
         text.put("title bar and back arrow on the page", new int[]{c.title, c.background});
         text.put("dialog title on the dialog", new int[]{c.title, c.dialog});
         text.put("dialog message on the dialog", new int[]{c.summary, c.dialog});
+        // A dialog's choice cards take the page's tone, a step off the dialog's.
+        text.put("dialog choice's name on its card", new int[]{c.title, c.background});
+        text.put("dialog choice's detail on its card", new int[]{c.summary, c.background});
         text.put("primary action text on its fill", new int[]{c.onAccent, c.accent});
         text.put("secondary action on the dialog", new int[]{c.secondaryActionText(), c.dialog});
         text.put("secondary recovery action on its card", new int[]{c.secondaryActionText(), c.card});

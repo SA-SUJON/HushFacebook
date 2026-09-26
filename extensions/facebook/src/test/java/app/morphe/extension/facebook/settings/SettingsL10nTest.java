@@ -341,7 +341,8 @@ public class SettingsL10nTest {
             assertNotNull("the export row opened no dialog", choices);
             ShadowAlertDialog shadow = org.robolectric.Shadows.shadowOf(choices);
             shown.add(String.valueOf(shadow.getTitle()));
-            for (CharSequence item : shadow.getItems()) shown.add(String.valueOf(item));
+            // Each choice is its name and, on the next line, what it does: two catalog strings.
+            for (CharSequence item : shadow.getItems()) shown.addAll(Arrays.asList(String.valueOf(item).split("\n")));
             // Its button is the catalog's Cancel, so the activity's own language can't reach it.
             String cancel = String.valueOf(choices.getButton(AlertDialog.BUTTON_NEGATIVE).getText());
             assertEquals(L10n.t("Cancel"), cancel);

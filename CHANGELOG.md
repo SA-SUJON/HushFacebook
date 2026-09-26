@@ -17,6 +17,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** A debug setting stored with the wrong type used to make Facebook crash as it started. Now Hushfacebook clears that value and starts with the default, and the diagnostic report says which setting it was. Nothing writes such a value today, but a hand-edited or restored preferences file could.
 * **Facebook:** Copy quick report builds the report in the background now, so the settings screen no longer stalls while a long diagnostic log is filtered. The copy and its message arrive once it's ready.
 * **Facebook:** In Hushfacebook's settings, a row that opens something when you tap it, such as a dialog or the file picker, now ends in a chevron. Its title's colour was the only thing that set it apart from a plain line of text, so Licenses and Version looked alike. The chevron points the other way in right-to-left languages. Switch rows keep their switch, and the two rows that act as soon as they're tapped, Clear diagnostic data and the paused status card, go without one.
+* **Facebook:** Export diagnostic report's two choices now show as cards, each with what it does under its name. Both show whole above Cancel at any text size, in right-to-left languages too.
 
 ## 0.1.8 (2026-09-26)
 
