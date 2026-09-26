@@ -1096,6 +1096,51 @@ try {
         ('validate-release-facts.ps1 no longer holds the receipt to the patch list its own commit ' +
             'carried, or to every build that list declares.')
 
+    # The manifest delta allowlist, the same way: the one the receipt's own commit carried. An entry
+    # added in the working tree and never committed approved a change into a release no commit had
+    # reviewed, and one pruned after a release refused the release that needed it. A commit with no
+    # allowlist, or no commit, gets the working one, the first with a note, and a malformed line at
+    # the commit says where it is. Written without a byte order mark, as the repository's is, and
+    # then with one, which git hands back as text.
+    $allowlistFile = Join-Path $toolchainRoot 'scripts/manifest-delta-allowlist.txt'
+    New-Item -ItemType Directory -Path (Split-Path -Parent $allowlistFile) -Force | Out-Null
+    function Save-FixtureAllowlist([string[]]$Lines, [switch]$Bom, [switch]$Commit) {
+        [System.IO.File]::WriteAllText($allowlistFile, (($Lines -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding($Bom.IsPresent)))
+        if (-not $Commit) { return $null }
+        Invoke-FixtureGit -Root $toolchainRoot -Arguments @('add', '-A') | Out-Null
+        Invoke-FixtureGit -Root $toolchainRoot -Arguments @('commit', '-m', 'allowlist', '--quiet') | Out-Null
+        return "$(Invoke-FixtureGit -Root $toolchainRoot -Arguments @('rev-parse', 'HEAD') | Select-Object -First 1)".Trim()
+    }
+    $reviewed = 'exported-added activity:com.example.Reviewed'
+    $unreviewed = 'exported-added activity:com.example.Unreviewed'
+    foreach ($bom in $false, $true) {
+        $allowlistCommit = Save-FixtureAllowlist @('# reviewed at the release', $reviewed) -Bom:$bom -Commit
+        Save-FixtureAllowlist @('# added since, never committed', $unreviewed) | Out-Null
+        $atAllowlist = Resolve-ReceiptManifestAllowlist -Root $toolchainRoot -Commit $allowlistCommit -WorkingPath $allowlistFile
+        Assert-True ((@($atAllowlist.Entries) -join ',') -ceq $reviewed -and
+            $atAllowlist.Note -like "*allowlist at its own commit $($allowlistCommit.Substring(0, 8)) reviews*") `
+            "The receipt was not held to the allowlist its own commit carried (byte order mark: $bom): $(@($atAllowlist.Entries) -join ', ') / $($atAllowlist.Note)"
+    }
+    $atNoAllowlist = Resolve-ReceiptManifestAllowlist -Root $toolchainRoot -Commit $releaseCommitSha -WorkingPath $allowlistFile
+    Assert-True ((@($atNoAllowlist.Entries) -join ',') -ceq $unreviewed -and $atNoAllowlist.Note -like '*has no manifest delta allowlist*') `
+        "A commit with no allowlist did not fall back to the working one, saying so: $($atNoAllowlist.Note)"
+    $noCommitAllowlist = Resolve-ReceiptManifestAllowlist -Root $toolchainRoot -Commit '' -WorkingPath $allowlistFile
+    Assert-True ((@($noCommitAllowlist.Entries) -join ',') -ceq $unreviewed -and $null -eq $noCommitAllowlist.Note) `
+        'A receipt naming no commit was not held quietly to the working allowlist.'
+    $sameAllowlist = Resolve-ReceiptManifestAllowlist -Root $toolchainRoot -Commit (Save-FixtureAllowlist @($unreviewed) -Commit) `
+        -WorkingPath $allowlistFile
+    Assert-True ((@($sameAllowlist.Entries) -join ',') -ceq $unreviewed -and $null -eq $sameAllowlist.Note) `
+        "An allowlist the working tree still holds as committed reported a difference: $($sameAllowlist.Note)"
+    $brokenAllowlist = Save-FixtureAllowlist @('exported-added') -Commit
+    Assert-Throws { Resolve-ReceiptManifestAllowlist -Root $toolchainRoot -Commit $brokenAllowlist -WorkingPath $allowlistFile } `
+        "*allowlist at $($brokenAllowlist.Substring(0, 8)) has a line that is not*" `
+        'A malformed allowlist at the receipt''s commit was read without complaint.'
+    Assert-True ($factsSource -match '\$resolvedAllowlist = Resolve-ReceiptManifestAllowlist -Root \$rootPath -Commit \$receiptCommit' -and
+        $factsSource -match '\$approvedDelta = @\(\$resolvedAllowlist\.Entries\)' -and
+        $factsSource -match '-ApprovedManifestDelta \$approvedDelta' -and
+        $factsSource -notmatch 'Read-ManifestDeltaAllowlist') `
+        'validate-release-facts.ps1 no longer holds the receipt to the allowlist its own commit carried.'
+
     # The receipt schema, read the same way: out of scripts/release-receipt.ps1 at the receipt's
     # commit. A release cut before the SBOM is held to schema 1 and says so, one cut since to this
     # checkout's schema, one from a newer checkout is refused rather than misread, and a commit

@@ -547,12 +547,25 @@ function Read-ManifestDeltaAllowlist {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         throw "The manifest delta allowlist is missing: $Path"
     }
+    return ConvertFrom-ManifestDeltaAllowlist -Lines @(Get-Content -LiteralPath $Path)
+}
+
+function ConvertFrom-ManifestDeltaAllowlist {
+    <#
+    .SYNOPSIS
+        The reviewed manifest changes out of an allowlist's lines, wherever they were read from.
+    .DESCRIPTION
+        -Source says where, for a failure: " at <commit>" for one read out of git.
+    #>
+    param([AllowEmptyCollection()][string[]]$Lines = @(), [string]$Source = '')
+
     $entries = New-Object System.Collections.Generic.List[string]
-    foreach ($line in Get-Content -LiteralPath $Path) {
-        $text = ([string]$line).Trim()
+    foreach ($line in @($Lines)) {
+        # A byte order mark is read as text when the lines come out of git rather than Get-Content.
+        $text = ([string]$line).TrimStart([char]0xFEFF).Trim()
         if (-not $text -or $text.StartsWith('#')) { continue }
         if ($text -notmatch '^(permission-added|permission-removed|exported-added|exported-removed) \S+$') {
-            throw "The manifest delta allowlist has a line that is not `"<kind> <value>`": $text"
+            throw "The manifest delta allowlist$Source has a line that is not `"<kind> <value>`": $text"
         }
         $entries.Add($text)
     }
@@ -561,6 +574,48 @@ function Read-ManifestDeltaAllowlist {
     # `@(Read-ManifestDeltaAllowlist ...)` call site instead, which would then see one array
     # inside an array. Test-ReleaseReceipt drops the null on the way in.
     return @($entries | Sort-Object -Unique -CaseSensitive)
+}
+
+function Resolve-ReceiptManifestAllowlist {
+    <#
+    .SYNOPSIS
+        The reviewed manifest changes a receipt is held to: the allowlist its own commit carried.
+    .DESCRIPTION
+        The allowlist is the review of what a release's patches do to the manifest, so the one a
+        receipt answers to is the one committed with it, for the reason Resolve-ReceiptToolchain
+        gives. Read from the working tree, an entry added and never committed approved a change no
+        commit ever reviewed, and one pruned after the release (an entry nothing produces fails the
+        next receipt) refused the release that had needed it. On a release push the receipt's
+        commit is the release commit, so the list is the one the tree carries and nothing is
+        relaxed. A commit with no allowlist, and a receipt naming no commit, are held to the one at
+        -WorkingPath, the first with a note. Answers @{ Entries; Note }.
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$Root,
+        [string]$Commit,
+        [Parameter(Mandatory = $true)][string]$WorkingPath
+    )
+
+    if ($Commit -notmatch '^[0-9a-f]{40}$') {
+        return [pscustomobject]@{ Entries = @(Read-ManifestDeltaAllowlist -Path $WorkingPath); Note = $null }
+    }
+    $short = $Commit.Substring(0, 8)
+    $path = 'scripts/manifest-delta-allowlist.txt'
+    $kind = "$(Invoke-RepoGit -Root $Root -Arguments @('cat-file', '-t', "${Commit}:$path") | Select-Object -First 1)".Trim()
+    if ($kind -ne 'blob') {
+        return [pscustomobject]@{
+            Entries = @(Read-ManifestDeltaAllowlist -Path $WorkingPath)
+            Note = "commit $short has no manifest delta allowlist, so the receipt is held to the working one"
+        }
+    }
+    $atCommit = @(ConvertFrom-ManifestDeltaAllowlist -Lines @(Invoke-RepoGit -Root $Root -Arguments @('show', "${Commit}:$path")) `
+        -Source " at $short")
+    $working = @(if (Test-Path -LiteralPath $WorkingPath -PathType Leaf) { Read-ManifestDeltaAllowlist -Path $WorkingPath })
+    $note = if ((@($atCommit) -join "`n") -ceq (@($working) -join "`n")) { $null } else {
+        "the receipt is held to the $($atCommit.Count) manifest change(s) the allowlist at its own commit $short " +
+            "reviews; the working allowlist has $($working.Count)"
+    }
+    return [pscustomobject]@{ Entries = $atCommit; Note = $note }
 }
 
 function Get-ChangelogVersions {

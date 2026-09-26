@@ -862,7 +862,6 @@ function Test-ReleaseReceiptHere {
     # parameter, and it is typed [string]. Assigning the parsed document to it coerces the whole
     # object to its string form, and every field then reads as empty.
     $receiptDocument = Read-JsonFile $receiptPath
-    $approvedDelta = Read-ManifestDeltaAllowlist -Path (Join-Path $PSScriptRoot 'manifest-delta-allowlist.txt')
 
     # The commit the receipt names, checked against git rather than against the receipt's own
     # other field. Its timestamp and the bundle stamp both come out of the same document, so on
@@ -911,6 +910,12 @@ function Test-ReleaseReceiptHere {
     # after the release doesn't make the release's receipt wrong.
     $resolvedList = Resolve-ReceiptCatalog -Root $rootPath -Commit $receiptCommit -WorkingPatchList $patchList
     if ($resolvedList.Note) { Write-Host "[release] $($resolvedList.Note)" }
+    # And the manifest changes its own commit reviewed. Read from the working tree, an allowlist
+    # entry nobody committed approved a change into the release.
+    $resolvedAllowlist = Resolve-ReceiptManifestAllowlist -Root $rootPath -Commit $receiptCommit `
+        -WorkingPath (Join-Path $PSScriptRoot 'manifest-delta-allowlist.txt')
+    if ($resolvedAllowlist.Note) { Write-Host "[release] $($resolvedAllowlist.Note)" }
+    $approvedDelta = @($resolvedAllowlist.Entries)
     $receiptTarget = Get-PatchTarget -PatchList $resolvedList.PatchList
     # From schema 2 a receipt names the release SBOM, and which schema is read at the receipt's own
     # commit, so a release cut before there was an SBOM is read as it was written.
