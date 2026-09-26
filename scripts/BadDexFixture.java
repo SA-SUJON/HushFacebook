@@ -67,6 +67,9 @@ import java.util.Set;
  * Reels' call to {@code ReelDeclutter.hideFollowButton} first. And the top bar's method building
  * the Facebook logo, holding its trace section, where the settings patch sends the logo's touch
  * listener call to {@code SettingsEntry.setLogoTouchListener} right after the logo gets its tap.
+ * Beside each method a start-call rule picks sit methods holding part of what it's picked by, as
+ * Facebook's do: the tray controller, the refresh controller's onPause and two other methods naming
+ * both surfaces.
  *
  *   java -cp &lt;cli jar&gt; BadDexFixture.java &lt;outDir&gt;
  */
@@ -91,7 +94,13 @@ public class BadDexFixture {
     private static final ImmutableMethodReference STORY_ACCESSOR = method(STORY, "A0X", MODEL);
 
     private static final String ADAPTERS = "Lfixture/Adapters;";
+    /** Holds the unified tray's start and stop names without "tofu", as Facebook's tray controller does. */
+    private static final String TRAY_CONTROLLER = "Lfixture/TrayController;";
+    private static final String TRAY_START = "stories_tray_create_adapter_start";
+    private static final String TRAY_STOP = "stories_tray_create_adapter_stop";
     private static final ImmutableMethodReference HIDE_STORIES_TRAY = method(FILTER, "hideStoriesTray", "Z", "I");
+    /** An extension class of the bundle's own, for an added method that writes past its registers. */
+    private static final String PACK = "Lapp/morphe/extension/facebook/feed/Pack;";
 
     private static final String SHOWCASE_TYPE = "Lapp/morphe/extension/facebook/feed/ShowcaseType;";
     /** The class whose getTypeName() answers ShowcaseFeedUnit, and its story type accessor. */
@@ -436,14 +445,16 @@ public class BadDexFixture {
 
     /**
      * One of the feed's two Stories tray adapter methods, static: v0 free, v1 the argument. [prefix]
-     * comes first, then its trace name, then the null it answers when Facebook leaves the tray out.
+     * comes first, then the names it holds, then the null it answers when Facebook leaves the tray out.
      */
-    private static Method trayAdapter(String name, String traceName, List<Instruction> prefix) {
+    private static Method trayAdapter(String owner, String name, List<Instruction> prefix, String... names) {
         List<Instruction> instructions = new ArrayList<>(prefix);
-        instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(traceName)));
+        for (String held : names) {
+            instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(held)));
+        }
         instructions.add(new ImmutableInstruction11n(Opcode.CONST_4, 0, 0));
         instructions.add(op(Opcode.RETURN_OBJECT, 0));
-        return define(ADAPTERS, name, OBJECT, true, new ImmutableMethodImplementation(2, instructions, null, null), OBJECT);
+        return define(owner, name, OBJECT, true, new ImmutableMethodImplementation(2, instructions, null, null), OBJECT);
     }
 
     /** What the tray patch puts first: ask, and return null when told to. The keep path lands at 9. */
@@ -460,12 +471,22 @@ public class BadDexFixture {
     private static ClassDef adapters(List<Instruction> legacyPrefix, List<Instruction> unifiedPrefix) {
         return new ImmutableClassDef(ADAPTERS, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
                 Arrays.asList(
-                        trayAdapter("addStoriesAdapter", "NewsFeedAdapterConfiguration.addStoriesAdapter", legacyPrefix),
-                        trayAdapter("addUnifiedTray", "stories_tray_create_adapter_stop", unifiedPrefix)));
+                        trayAdapter(ADAPTERS, "addStoriesAdapter", legacyPrefix, "NewsFeedAdapterConfiguration.addStoriesAdapter"),
+                        trayAdapter(ADAPTERS, "addUnifiedTray", unifiedPrefix, TRAY_START, TRAY_STOP, "tofu")));
     }
 
     private static ClassDef cleanAdapters() {
         return adapters(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList());
+    }
+
+    /**
+     * The tray controller: a method holding the unified tray's start and stop names but not "tofu",
+     * the way Facebook's tray controller constructor does, with [prefix] first. The unified tray's
+     * rule has to tell the adapter from it.
+     */
+    private static ClassDef trayController(List<Instruction> prefix) {
+        return new ImmutableClassDef(TRAY_CONTROLLER, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Collections.singletonList(trayAdapter(TRAY_CONTROLLER, "create", prefix, TRAY_START, TRAY_STOP)));
     }
 
     /**
@@ -509,16 +530,36 @@ public class BadDexFixture {
     }
 
     private static ClassDef returnController(List<Instruction> prefix) {
+        return returnController(prefix, Collections.<Instruction>emptyList(), false);
+    }
+
+    /**
+     * The feed refresh controller: the resume callback, holding its name and "onRefresh", with
+     * [prefix] first; onPause, holding its name alone as four of Facebook's five holders of it do,
+     * with [pausePrefix] first; and with [twoCallbacks] a second method holding both, which leaves
+     * the return-refresh rule nothing to tell the two apart by.
+     */
+    private static ClassDef returnController(List<Instruction> prefix, List<Instruction> pausePrefix, boolean twoCallbacks) {
+        List<Method> methods = new ArrayList<>();
+        methods.add(resumeCallback("resumeAfterBackground", prefix));
+        if (twoCallbacks) methods.add(resumeCallback("resumeAgain", Collections.<Instruction>emptyList()));
+        List<Instruction> pause = new ArrayList<>(pausePrefix);
+        pause.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference("FeedRefreshTriggerController")));
+        pause.add(op(Opcode.RETURN_VOID));
+        methods.add(define(RETURN_CONTROLLER, "onPause", "V", false, new ImmutableMethodImplementation(2, pause, null, null)));
+        return new ImmutableClassDef(RETURN_CONTROLLER, AccessFlags.PUBLIC.getValue(), OBJECT,
+                null, null, null, null, methods);
+    }
+
+    /** A resume callback of the controller, an instance method: v0 free, v1 this, v2 the argument. */
+    private static Method resumeCallback(String name, List<Instruction> prefix) {
         List<Instruction> instructions = new ArrayList<>(prefix);
         instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0,
                 new ImmutableStringReference("FeedRefreshTriggerController")));
         instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0,
                 new ImmutableStringReference("onRefresh")));
         instructions.add(op(Opcode.RETURN_VOID));
-        return new ImmutableClassDef(RETURN_CONTROLLER, AccessFlags.PUBLIC.getValue(), OBJECT,
-                null, null, null, null, Collections.singletonList(define(RETURN_CONTROLLER,
-                        "resumeAfterBackground", "V", false, new ImmutableMethodImplementation(3,
-                                instructions, null, null), OBJECT)));
+        return define(RETURN_CONTROLLER, name, "V", false, new ImmutableMethodImplementation(3, instructions, null, null), OBJECT);
     }
 
     private static List<Instruction> returnHook() {
@@ -537,19 +578,34 @@ public class BadDexFixture {
         return adapters(trayHook(0), trayHook(1));
     }
 
+    private static ClassDef followCheck(List<Instruction> prefix) {
+        return followCheck(prefix, Collections.<Instruction>emptyList());
+    }
+
     /**
      * Facebook's Follow check for a reel's author row, static: v0 free, v1 the session. [prefix]
-     * comes first, then the two surface names it holds, then Facebook's own yes.
+     * comes first, then the two surface names it holds, then Facebook's own yes. Beside it, two of
+     * the other methods naming both surfaces, as nineteen do on 580: an instance method taking the
+     * session and answering a boolean, with [instancePrefix] first, and a static one taking a
+     * string. Only the check's shape tells it from them.
      */
-    private static ClassDef followCheck(List<Instruction> prefix) {
+    private static ClassDef followCheck(List<Instruction> prefix, List<Instruction> instancePrefix) {
+        return new ImmutableClassDef(FOLLOW_CHECK, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Arrays.asList(
+                        define(FOLLOW_CHECK, "offersFollow", "Z", true, surfaceCheck(2, prefix), FB_USER_SESSION),
+                        define(FOLLOW_CHECK, "offersFollowHere", "Z", false, surfaceCheck(3, instancePrefix), FB_USER_SESSION),
+                        define(FOLLOW_CHECK, "surfaceAllows", "Z", true, surfaceCheck(2, Collections.<Instruction>emptyList()),
+                                "Ljava/lang/String;")));
+    }
+
+    /** [prefix], then both surface names and a yes, in [registers] with v0 free. */
+    private static ImmutableMethodImplementation surfaceCheck(int registers, List<Instruction> prefix) {
         List<Instruction> instructions = new ArrayList<>(prefix);
         instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference("friendly_feed")));
         instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference("friends_tab_ifu")));
         instructions.add(new ImmutableInstruction11n(Opcode.CONST_4, 0, 1));
         instructions.add(op(Opcode.RETURN, 0));
-        return new ImmutableClassDef(FOLLOW_CHECK, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
-                Collections.singletonList(define(FOLLOW_CHECK, "offersFollow", "Z", true,
-                        new ImmutableMethodImplementation(2, instructions, null, null), FB_USER_SESSION)));
+        return new ImmutableMethodImplementation(registers, instructions, null, null);
     }
 
     /** What Clean up Reels puts first in the check: ask, and answer no when told to. The check's own path lands at 8. */
@@ -571,10 +627,33 @@ public class BadDexFixture {
 
     /** [classes] with the Follow check replaced by one whose prefix is [prefix]. */
     private static List<ClassDef> withFollowCheck(List<ClassDef> classes, List<Instruction> prefix) {
-        List<ClassDef> replaced = new ArrayList<>(classes);
-        replaced.removeIf(cd -> cd.getType().equals(FOLLOW_CHECK));
-        replaced.add(followCheck(prefix));
-        return replaced;
+        return replaced(classes, followCheck(prefix));
+    }
+
+    /** [classes] with each of [replacements] in place of the class of its type. */
+    private static List<ClassDef> replaced(List<ClassDef> classes, ClassDef... replacements) {
+        List<ClassDef> out = new ArrayList<>(classes);
+        for (ClassDef replacement : replacements) {
+            out.removeIf(cd -> cd.getType().equals(replacement.getType()));
+            out.add(replacement);
+        }
+        return out;
+    }
+
+    /** [classes] with [extra] added to the host's class, the way a patch adds a helper to one of Facebook's. */
+    private static List<ClassDef> withHostMethod(List<ClassDef> classes, Method extra) {
+        List<ClassDef> out = new ArrayList<>();
+        for (ClassDef cd : classes) {
+            if (!cd.getType().equals(HOST)) {
+                out.add(cd);
+                continue;
+            }
+            List<Method> methods = new ArrayList<>();
+            for (Method m : cd.getMethods()) methods.add(m);
+            methods.add(extra);
+            out.add(new ImmutableClassDef(HOST, cd.getAccessFlags(), cd.getSuperclass(), null, null, null, packedField(HOST), methods));
+        }
+        return out;
     }
 
     /**
@@ -839,10 +918,10 @@ public class BadDexFixture {
     /** A patched build with the reels patch's two changes passed in too, and the showcase unit. */
     private static List<ClassDef> bundle(ClassDef host, ClassDef genAiLabel, ClassDef recommendationLabel,
             ClassDef adapters, ClassDef showcaseType, ClassDef preEof) {
-        return Arrays.asList(host, adapters, filter(), genAiLabel, recommendationLabel, showcaseUnit(), showcaseType,
-                preEof, returnController(returnHook()), returnRefresh(), shortcuts(Collections.<String>emptySet()),
-                settingsEntry(), followCheck(followHook()), reelDeclutter(), topBar(false, true, 1),
-                finderStub(FILLED_FINDER_STUB));
+        return Arrays.asList(host, adapters, trayController(Collections.<Instruction>emptyList()), filter(), genAiLabel,
+                recommendationLabel, showcaseUnit(), showcaseType, preEof, returnController(returnHook()), returnRefresh(),
+                shortcuts(Collections.<String>emptySet()), settingsEntry(), followCheck(followHook()), reelDeclutter(),
+                topBar(false, true, 1), finderStub(FILLED_FINDER_STUB));
     }
 
     /**
@@ -952,8 +1031,8 @@ public class BadDexFixture {
         if (!out.isDirectory() && !out.mkdirs()) throw new IllegalStateException("Cannot create " + out);
 
         Map<String, List<ClassDef>> dexes = new LinkedHashMap<>();
-        dexes.put("clean", Arrays.asList(cleanHost(), cleanAdapters(), showcaseUnit(),
-                preEof(Collections.<Instruction>emptyList()), returnController(Collections.<Instruction>emptyList()),
+        dexes.put("clean", Arrays.asList(cleanHost(), cleanAdapters(), trayController(Collections.<Instruction>emptyList()),
+                showcaseUnit(), preEof(Collections.<Instruction>emptyList()), returnController(Collections.<Instruction>emptyList()),
                 shortcuts(allShortcutCalls()), followCheck(Collections.<Instruction>emptyList()),
                 topBar(false, false, 1)));
         dexes.put("secondary", Collections.singletonList(secondary()));
@@ -1342,6 +1421,40 @@ public class BadDexFixture {
         dexes.put("bad-logo-hook-other-view", withTopBar(good(), topBar(false, true, 2)));
         // contract: both touch listener calls sent, so the container takes a long press too.
         dexes.put("bad-logo-hook-twice", withTopBar(good(), topBar(true, true, 1)));
+
+        // contract: each start-call hook put first in a method that holds the rule's first string
+        // but isn't the one the patch hooks. A rule naming only that string counted any method
+        // holding it, so each of these passed: the unified tray hook in the tray controller, which
+        // holds the adapter's start and stop names but not "tofu"; the return-refresh hook in
+        // onPause, which holds the controller's name without "onRefresh"; and the Follow hook in
+        // an instance method naming both surfaces, which isn't the static check.
+        List<Instruction> none = Collections.<Instruction>emptyList();
+        dexes.put("bad-tray-hook-wrong-method", replaced(good(), adapters(trayHook(0), none), trayController(trayHook(1))));
+        dexes.put("bad-return-refresh-hook-wrong-method", replaced(good(), returnController(none, returnHook(), false)));
+        dexes.put("bad-follow-hook-wrong-method", replaced(good(), followCheck(none, followHook())));
+        // contract: a second method answering the return-refresh rule, so it can't say which one
+        // the hook belongs in, although the hook is where it was.
+        dexes.put("bad-return-refresh-two-callbacks", replaced(good(), returnController(returnHook(), none, true)));
+
+        // register: a helper the patch adds to one of the host's own classes, naming a register its
+        // one-register body doesn't have. Only the extension's added methods were held to their
+        // count, and the kind checks stepped over a register out of range, so this passed.
+        dexes.put("bad-register-added-helper", withHostMethod(good(), define(HOST, "helper", "V", true,
+                body(1, new ImmutableInstruction11n(Opcode.CONST_4, 1, 0), op(Opcode.RETURN_VOID)))));
+        // register: a long read from a helper's last register, whose upper half is past the count.
+        // Nothing named that half, so nothing noticed it.
+        dexes.put("bad-register-wide-source", withHostMethod(good(), define(HOST, "copyWide", "V", true,
+                body(2, new ImmutableInstruction12x(Opcode.MOVE_WIDE, 0, 1), op(Opcode.RETURN_VOID)))));
+        // register: an extension method writing a long into its last register.
+        List<ClassDef> ownWide = new ArrayList<>(good());
+        ownWide.add(new ImmutableClassDef(PACK, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(), OBJECT,
+                null, null, null, null, Collections.singletonList(define(PACK, "pack", "V", true,
+                        body(2, new ImmutableInstruction21s(Opcode.CONST_WIDE_16, 1, 0), op(Opcode.RETURN_VOID))))));
+        dexes.put("bad-register-own-wide", ownWide);
+        // register: the feed guard's answer moved into v4 of its four registers and tested there.
+        dexes.put("bad-register-changed", withFeedEdge(body(4,
+                invoke(HIDE_EDGE, 2, 3), op(Opcode.MOVE_RESULT, 4), ifEqz(4, 3),
+                op(Opcode.RETURN_VOID), op(Opcode.RETURN_VOID))));
 
         for (Map.Entry<String, List<ClassDef>> e : dexes.entrySet()) {
             File dex = new File(out, e.getKey() + ".dex");

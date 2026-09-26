@@ -33,9 +33,11 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,11 @@ import java.util.TreeSet;
  * never declared assembles happily and only fails when a device verifies the class, so every
  * instruction that was not in the clean body is checked against the register count of the method it
  * landed in. Methods the patch adds outright, which is where a hand-written bridge lives and where
- * the registers are chosen rather than inherited, are checked the same way.
+ * the registers are chosen rather than inherited, are checked the same way: every one of them, the
+ * helpers a patch adds to one of Facebook's own classes as well as the extension's. Every
+ * instruction of every changed and added method is also held to its method's count in the structural
+ * pass, the upper half of each wide value it reads or writes included, and one out of range is a
+ * finding there rather than a register the later checks step over.
  *
  * <p>Three things this deliberately does not leave to chance:
  *
@@ -85,7 +91,10 @@ import java.util.TreeSet;
  * that answers its marker forever; and the Stories tray hook comes first in each of the two tray
  * adapter methods, and the reels hook first in the pre-EOF injector; and the settings patch's
  * stand-in for the Facebook logo's touch listener comes right after the logo gets its tap, on the
- * same view. The device verifier stays the authority; these catch the known shapes without a phone.
+ * same view. A start-call rule names its method by the strings it loads, and a shape where strings
+ * alone don't tell it apart, and exactly one of Facebook's methods may answer that: five hold
+ * "FeedRefreshTriggerController" on 580, so a rule naming that string alone passed a hook in any
+ * of them. The device verifier stays the authority; these catch the known shapes without a phone.
  *
  *   java -cp &lt;cli jar&gt; DexDiff.java &lt;cleanApk&gt; &lt;patchedApk&gt; &lt;reportFile&gt;
  *       &lt;removalAllowlist&gt; [&lt;contracts&gt;]
@@ -147,9 +156,13 @@ public class DexDiff {
      *       found by what the method does, whose class is a Redex name and no model answering a type
      *       name. A stub still answering its marker makes no call, and one whose only call stays in
      *       the extension doesn't leave it.
-     *   <li>"start-call &lt;method reference&gt; holding &lt;string&gt;": of the method's call sites,
-     *       exactly one is in a method that loads &lt;string&gt;, and there nothing comes before it
-     *       but plain instructions: no other call, branch, switch, return or throw.
+     *   <li>"start-call &lt;method reference&gt; [in [static|instance] &lt;shape&gt;] holding
+     *       &lt;string&gt; [&lt;string&gt; ...]": exactly one method outside the bundle's own code
+     *       loads every one of the strings and has the shape, a descriptor such as
+     *       {@code (Lcom/facebook/auth/usersession/FbUserSession;*)Z} where * stands for any run of
+     *       characters. That method calls the method reference, with nothing before the call but
+     *       plain instructions (no other call, branch, switch, return or throw), and no other
+     *       method loading the strings calls it.
      *   <li>"no-call &lt;method reference&gt; outside &lt;class prefix&gt;": no class but those whose
      *       type starts with &lt;class prefix&gt; calls it. For a call the patch sends to the
      *       extension everywhere, where the extension makes the real one and a call left anywhere
@@ -172,17 +185,81 @@ public class DexDiff {
         final String target;
         /** For a next-call rule, the call that has to come just before; null for the others. */
         final String after;
+        /** start-call: the strings its method loads, every one of them. */
+        final List<String> strings;
+        /** start-call: whether its method is static, or null when the rule doesn't say. */
+        final Boolean isStatic;
+        /** start-call: its method's descriptor, "*" for any run of characters, or null. */
+        final String shape;
 
         Contract(String kind, String callee, String target) {
             this(kind, callee, target, null);
         }
 
         Contract(String kind, String callee, String target, String after) {
+            this(kind, callee, target, after, List.of(), null, null);
+        }
+
+        Contract(String kind, String callee, String target, String after, List<String> strings, Boolean isStatic,
+                String shape) {
             this.kind = kind;
             this.callee = callee;
             this.target = target;
             this.after = after;
+            this.strings = strings;
+            this.isStatic = isStatic;
+            this.shape = shape;
         }
+
+        /** How a start-call rule reads in the contract file, after its method reference. */
+        String startRule() {
+            StringBuilder b = new StringBuilder();
+            if (shape != null) {
+                b.append(" in ");
+                if (isStatic != null) b.append(isStatic ? "static " : "instance ");
+                b.append(shape);
+            }
+            return b.append(" holding ").append(String.join(" ", strings)).toString();
+        }
+
+        /** Whether [m] has this start-call rule's shape: its static flag and its descriptor. */
+        boolean hasShape(Method m) {
+            if (isStatic != null && AccessFlags.STATIC.isSet(m.getAccessFlags()) != isStatic) return false;
+            if (shape == null) return true;
+            StringBuilder descriptor = new StringBuilder("(");
+            for (CharSequence p : m.getParameterTypes()) descriptor.append(p);
+            descriptor.append(')').append(m.getReturnType());
+            String[] pieces = shape.split("\\*", -1);
+            StringBuilder pattern = new StringBuilder();
+            for (int k = 0; k < pieces.length; k++) {
+                if (k > 0) pattern.append(".*");
+                pattern.append(java.util.regex.Pattern.quote(pieces[k]));
+            }
+            return descriptor.toString().matches(pattern.toString());
+        }
+    }
+
+    /**
+     * A start-call line after its method reference: "[in [static|instance] &lt;shape&gt;] holding
+     * &lt;string&gt; [&lt;string&gt; ...]", or null when it isn't one.
+     */
+    private static Contract readStartCall(String callee, String[] parts) {
+        int at = 2;
+        Boolean isStatic = null;
+        String shape = null;
+        if (at < parts.length && parts[at].equals("in")) {
+            at++;
+            if (at < parts.length && (parts[at].equals("static") || parts[at].equals("instance"))) {
+                isStatic = parts[at].equals("static");
+                at++;
+            }
+            if (at >= parts.length || !parts[at].startsWith("(") || parts[at].indexOf(')') < 1) return null;
+            shape = parts[at++];
+        }
+        if (at >= parts.length || !parts[at].equals("holding")) return null;
+        List<String> strings = new ArrayList<>(Arrays.asList(parts).subList(at + 1, parts.length));
+        if (strings.isEmpty() || new TreeSet<>(strings).size() != strings.size()) return null;
+        return new Contract("start-call", callee, String.join(" ", strings), null, strings, isStatic, shape);
     }
 
     private static List<Contract> readContracts(File file) throws Exception {
@@ -211,19 +288,25 @@ public class DexDiff {
                     && parts[2].equals("on-type-named") && parts[3].matches("[A-Za-z][A-Za-z0-9_]*");
             boolean firstCallOutside = parts.length == 4 && parts[0].equals("first-call") && parts[2].equals("outside")
                     && parts[3].startsWith("L") && parts[3].endsWith("/");
-            boolean startCall = parts.length == 4 && parts[0].equals("start-call") && parts[2].equals("holding");
+            Contract startCall = parts.length >= 4 && parts[0].equals("start-call") && parts[1].contains("->")
+                    ? readStartCall(parts[1], parts) : null;
             boolean noCall = parts.length == 4 && parts[0].equals("no-call") && parts[2].equals("outside")
                     && parts[3].startsWith("L") && parts[3].endsWith("/");
-            if ((!singleCall && !firstCall && !firstCallTyped && !firstCallOutside && !startCall && !noCall)
+            if ((!singleCall && !firstCall && !firstCallTyped && !firstCallOutside && startCall == null && !noCall)
                     || !parts[1].contains("->")) {
                 throw new IllegalArgumentException("Invalid contract line " + lineNumber
                         + ": expected single-call <method reference> in <caller method name>,"
                         + " first-call <method reference> on <class>,"
                         + " first-call <method reference> on-type-named <GraphQL type>,"
                         + " first-call <method reference> outside <package prefix ending in />,"
-                        + " start-call <method reference> holding <string>,"
+                        + " start-call <method reference> [in [static|instance] <(parameters)return>]"
+                        + " holding <string> [<string> ...],"
                         + " no-call <method reference> outside <package prefix ending in />,"
                         + " or next-call <method reference> after <method reference> holding <string>");
+            }
+            if (startCall != null) {
+                contracts.add(startCall);
+                continue;
             }
             String kind = firstCallTyped ? TYPED_FIRST_CALL : firstCallOutside ? OUTSIDE_FIRST_CALL : parts[0];
             contracts.add(new Contract(kind, parts[1], parts[3]));
@@ -554,6 +637,7 @@ public class DexDiff {
      * below a live pair.
      */
     private static void write(char[] out, int register, char kind) {
+        // Out of range has no kind to hold; the register check in structuralFindings reports it.
         if (register >= out.length) return;
         if (out[register] == 'W' && register + 1 < out.length && out[register + 1] == 'w' && kind != 'W') {
             out[register + 1] = 'b';
@@ -732,6 +816,21 @@ public class DexDiff {
         if (impl == null) return findings;
         Layout layout = new Layout(impl);
 
+        // Registers: every one an instruction names, and the upper half of each wide value it
+        // writes or reads, has to be below the count the method declares. ART checks that for each
+        // instruction before it follows any path, so one out of range fails the class wherever it
+        // sits, reachable or not. The kind checks further down have no kind to give such a
+        // register and step over it, which is why it's a finding here, once for each instruction.
+        int registerCount = impl.getRegisterCount();
+        for (int k = 0; k < layout.instructions.size(); k++) {
+            Instruction i = layout.instructions.get(k);
+            int reach = reach(i);
+            if (reach >= registerCount) {
+                findings.add("register: " + i.getOpcode().name + " at " + layout.addresses.get(k) + " reaches v" + reach
+                        + ", and the method declares " + registerCount + (registerCount == 1 ? " register" : " registers"));
+            }
+        }
+
         // A move-result takes the result of the instruction right before it, so an instruction
         // injected between an invoke and its move-result leaves nothing to take.
         for (int k = 0; k < layout.instructions.size(); k++) {
@@ -885,6 +984,7 @@ public class DexDiff {
             int at = layout.addresses.get(k);
 
             for (int[] read : valueReads(i)) {
+                // A register out of range is already a register finding for this instruction.
                 if (read[0] >= kinds[k].length) continue;
                 char have = kinds[k][read[0]];
                 if (readableAs(have, (char) read[1]) || (have == 'C' && copiesConflict(opcode))) continue;
@@ -918,6 +1018,8 @@ public class DexDiff {
             if (regs.length != expected.size()) continue;
             for (int a = 0; a < regs.length; a++) {
                 char want = expected.get(a);
+                // The upper half of a wide argument is checked with its pair, and a register out
+                // of range is already a register finding for this instruction.
                 if (want == 'w' || regs[a] >= kinds[k].length) continue;
                 char have = kinds[k][regs[a]];
                 if (!readableAs(have, want)) {
@@ -971,6 +1073,36 @@ public class DexDiff {
             }
         }
         return findings;
+    }
+
+    /**
+     * The highest register an instruction touches: every register it names, the upper half of a
+     * wide value it writes, and the upper half of each wide value it reads (valueReads knows which
+     * operands those are, opcode by opcode). -1 for an instruction with no register.
+     */
+    private static int reach(Instruction i) {
+        int high = -1;
+        if (i instanceof RegisterRangeInstruction) {
+            RegisterRangeInstruction r = (RegisterRangeInstruction) i;
+            high = r.getStartRegister() + r.getRegisterCount() - 1;
+        } else if (i instanceof FiveRegisterInstruction) {
+            for (int register : invokeRegisters(i)) high = Math.max(high, register);
+        } else if (i instanceof ThreeRegisterInstruction) {
+            ThreeRegisterInstruction r = (ThreeRegisterInstruction) i;
+            high = Math.max(r.getRegisterA(), Math.max(r.getRegisterB(), r.getRegisterC()));
+        } else if (i instanceof TwoRegisterInstruction) {
+            TwoRegisterInstruction r = (TwoRegisterInstruction) i;
+            high = Math.max(r.getRegisterA(), r.getRegisterB());
+        } else if (i instanceof OneRegisterInstruction) {
+            high = ((OneRegisterInstruction) i).getRegisterA();
+        }
+        if (i.getOpcode().setsWideRegister() && i instanceof OneRegisterInstruction) {
+            high = Math.max(high, ((OneRegisterInstruction) i).getRegisterA() + 1);
+        }
+        for (int[] read : valueReads(i)) {
+            if (read[1] == 'W') high = Math.max(high, read[0] + 1);
+        }
+        return high;
     }
 
     /**
@@ -1045,9 +1177,15 @@ public class DexDiff {
         Map<String, Set<String>> typeNamedClasses = new HashMap<>();
         // first-call outside: the method, and the class prefix its first call has to leave.
         Map<String, String> outsideFirstCallTargets = new HashMap<>();
-        // start-call: every call site of the method, with whether the call comes first there and
-        // the strings its method loads.
-        Map<String, List<StartSite>> startSites = new LinkedHashMap<>();
+        // start-call: for each rule, every method outside the bundle's own code that loads all of
+        // its strings, with whether that method has the rule's shape and where it calls the rule's
+        // method. The rule's own strings are the only ones collected, so a method is read once.
+        List<Contract> startRules = new ArrayList<>();
+        Map<Contract, List<StartHolder>> startHolders = new LinkedHashMap<>();
+        Set<String> startStrings = new HashSet<>();
+        // And every method outside the bundle's own code that calls a start-call rule's method, to
+        // say where a hook went when it isn't in the method its rule picks.
+        Map<String, List<String>> startCallers = new HashMap<>();
         // no-call: the package prefix whose classes may call the method, and the methods of every
         // other class that do.
         Map<String, String> noCallInside = new HashMap<>();
@@ -1068,7 +1206,12 @@ public class DexDiff {
                 noCallSites.put(contract.callee, new ArrayList<>());
             } else if (contract.kind.equals("next-call")) {
                 nextSites.put(contract.callee, new ArrayList<>());
-            } else startSites.put(contract.callee, new ArrayList<>());
+            } else {
+                startRules.add(contract);
+                startHolders.put(contract, new ArrayList<>());
+                startStrings.addAll(contract.strings);
+                startCallers.put(contract.callee, new ArrayList<>());
+            }
         }
         MultiDexContainer<? extends DexFile> container =
                 DexFileFactory.loadDexContainer(apk, Opcodes.getDefault());
@@ -1086,9 +1229,12 @@ public class DexDiff {
                     String leaving = outsideFirstCallTargets.get(s);
                     if (leaving != null) firstCalls.put(s, firstCallOutside(m, leaving));
                     if (!typeNamedClasses.isEmpty()) recordTypeNamed(cd, m, typeNamedClasses);
-                    if (!startSites.isEmpty()) recordStartSites(s, m, startSites);
+                    if (!startRules.isEmpty() && !cd.getType().startsWith(OWN)) {
+                        recordStartHolders(s, m, startRules, startStrings, startHolders);
+                    }
                     if (!nextSites.isEmpty()) recordNextSites(s, m, nextSites);
-                    if ((callSites.isEmpty() && noCallSites.isEmpty()) || m.getImplementation() == null) continue;
+                    if ((callSites.isEmpty() && noCallSites.isEmpty() && startCallers.isEmpty())
+                            || m.getImplementation() == null) continue;
                     for (Instruction i : m.getImplementation().getInstructions()) {
                         if (!(i instanceof ReferenceInstruction)) continue;
                         Reference r = ((ReferenceInstruction) i).getReference();
@@ -1097,6 +1243,8 @@ public class DexDiff {
                         if (sites != null) sites.add(s);
                         String inside = noCallInside.get(r.toString());
                         if (inside != null && !cd.getType().startsWith(inside)) noCallSites.get(r.toString()).add(s);
+                        List<String> callers = startCallers.get(r.toString());
+                        if (callers != null && !cd.getType().startsWith(OWN) && !callers.contains(s)) callers.add(s);
                     }
                 }
             }
@@ -1149,25 +1297,43 @@ public class DexDiff {
                 continue;
             }
             if (contract.kind.equals("start-call")) {
-                String rule = "contract start-call " + contract.callee + " holding " + contract.target;
-                List<StartSite> holding = new ArrayList<>();
-                for (StartSite site : startSites.get(contract.callee)) {
-                    if (site.strings.contains(contract.target)) holding.add(site);
+                String rule = "contract start-call " + contract.callee + contract.startRule();
+                String held = describeStart(contract);
+                List<String> shaped = new ArrayList<>();
+                List<String> calling = new ArrayList<>();
+                StartHolder only = null;
+                for (StartHolder holder : startHolders.get(contract)) {
+                    if (holder.shaped) {
+                        shaped.add(holder.method);
+                        only = holder;
+                    }
+                    if (holder.call != NOT_CALLED) calling.add(holder.method);
                 }
-                if (holding.size() != 1) {
-                    List<String> where = new ArrayList<>();
-                    for (StartSite site : holding) where.add(site.method);
-                    System.out.println("[diff] " + rule + ": " + holding.size() + " call sites in such methods"
-                            + (where.isEmpty() ? "" : ", in " + String.join(", ", where)));
-                    contractFindings.add("contract: " + contract.callee + " has " + holding.size()
-                            + " call sites in methods holding \"" + contract.target + "\", and must have exactly one"
-                            + (where.isEmpty() ? "" : ": " + String.join(", ", where)));
-                } else if (!holding.get(0).first) {
-                    System.out.println("[diff] " + rule + ": not first in " + holding.get(0).method);
-                    contractFindings.add("contract: " + contract.callee + " is called in " + holding.get(0).method
+                if (shaped.size() != 1) {
+                    // None, and the method moved or lost a string; several, and the rule can't tell
+                    // the right one from the others, so a hook in any of them would pass.
+                    System.out.println("[diff] " + rule + ": " + shaped.size() + " methods answer it" + named(shaped));
+                    contractFindings.add("contract: " + shaped.size() + " methods hold " + held + ", and exactly one"
+                            + " must, so the rule can't say which one calls " + contract.callee + named(shaped));
+                } else if (only.call == NOT_CALLED) {
+                    List<String> callers = startCallers.get(contract.callee);
+                    System.out.println("[diff] " + rule + ": not called in " + only.method
+                            + (callers.isEmpty() ? "" : "; called in " + String.join(", ", callers)));
+                    contractFindings.add("contract: " + contract.callee + " is not called in " + only.method
+                            + ", the one method holding " + held
+                            + (callers.isEmpty() ? "" : "; the host methods that call it: " + String.join(", ", callers)));
+                } else if (calling.size() > 1) {
+                    List<String> others = new ArrayList<>(calling);
+                    others.remove(only.method);
+                    System.out.println("[diff] " + rule + ": called in " + only.method + " and in " + String.join(", ", others));
+                    contractFindings.add("contract: " + contract.callee + " is called in " + String.join(", ", others)
+                            + " as well as in " + only.method + ", the one method holding " + held);
+                } else if (only.call != FIRST) {
+                    System.out.println("[diff] " + rule + ": not first in " + only.method);
+                    contractFindings.add("contract: " + contract.callee + " is called in " + only.method
                             + ", but after a call, branch, switch, return or throw, not first");
                 } else {
-                    System.out.println("[diff] " + rule + ": first in " + holding.get(0).method);
+                    System.out.println("[diff] " + rule + ": first in " + only.method);
                 }
                 continue;
             }
@@ -1245,51 +1411,83 @@ public class DexDiff {
         return out;
     }
 
-    /** One call site of a start-call method: where it is, whether it comes first, and what its method loads. */
-    private static final class StartSite {
-        final String method;
-        final boolean first;
-        final Set<String> strings;
+    /** Where a method calls a start-call rule's method: not at all, first thing, or later. */
+    private static final int NOT_CALLED = 0;
+    private static final int LATER = 1;
+    private static final int FIRST = 2;
 
-        StartSite(String method, boolean first, Set<String> strings) {
+    /**
+     * A method that loads every string of a start-call rule: its signature, whether it has the
+     * rule's shape, and where it calls the rule's method.
+     */
+    private static final class StartHolder {
+        final String method;
+        final boolean shaped;
+        final int call;
+
+        StartHolder(String method, boolean shaped, int call) {
             this.method = method;
-            this.first = first;
-            this.strings = strings;
+            this.shaped = shaped;
+            this.call = call;
+        }
+    }
+
+    /** Adds [m] to each start-call rule whose strings it loads, every one of them. */
+    private static void recordStartHolders(String s, Method m, List<Contract> rules, Set<String> wanted,
+            Map<Contract, List<StartHolder>> holders) {
+        if (m.getImplementation() == null) return;
+        Set<String> held = null;
+        for (Instruction i : m.getImplementation().getInstructions()) {
+            if (!(i instanceof ReferenceInstruction)) continue;
+            Reference r = ((ReferenceInstruction) i).getReference();
+            if (!(r instanceof StringReference) || !wanted.contains(((StringReference) r).getString())) continue;
+            if (held == null) held = new HashSet<>();
+            held.add(((StringReference) r).getString());
+        }
+        if (held == null) return;
+        for (Contract rule : rules) {
+            if (held.containsAll(rule.strings)) holders.get(rule).add(new StartHolder(s, rule.hasShape(m), callOf(m, rule.callee)));
         }
     }
 
     /**
-     * Records each call [m] makes to a start-call method: whether only plain instructions come
-     * before it, and the strings [m] loads, which the contract picks its method by.
+     * FIRST when [m]'s first call to [callee] has only plain instructions before it (no other
+     * call, branch, switch, return or throw), LATER when it calls it after one, NOT_CALLED when it
+     * doesn't call it at all.
      */
-    private static void recordStartSites(String s, Method m, Map<String, List<StartSite>> startSites) {
-        if (m.getImplementation() == null) return;
-        List<Instruction> body = new ArrayList<>();
-        for (Instruction i : m.getImplementation().getInstructions()) body.add(i);
-        Set<String> strings = null;
+    private static int callOf(Method m, String callee) {
         boolean plainSoFar = true;
-        for (Instruction i : body) {
+        boolean called = false;
+        for (Instruction i : m.getImplementation().getInstructions()) {
             String name = i.getOpcode().name;
-            if (name.startsWith("invoke") && i instanceof ReferenceInstruction) {
-                List<StartSite> sites = startSites.get(((ReferenceInstruction) i).getReference().toString());
-                if (sites != null) {
-                    if (strings == null) {
-                        strings = new TreeSet<>();
-                        for (Instruction j : body) {
-                            if (j instanceof ReferenceInstruction
-                                    && ((ReferenceInstruction) j).getReference() instanceof StringReference) {
-                                strings.add(((StringReference) ((ReferenceInstruction) j).getReference()).getString());
-                            }
-                        }
-                    }
-                    sites.add(new StartSite(s, plainSoFar, strings));
-                }
+            if (name.startsWith("invoke") && i instanceof ReferenceInstruction
+                    && ((ReferenceInstruction) i).getReference().toString().equals(callee)) {
+                if (plainSoFar) return FIRST;
+                called = true;
             }
             if (name.startsWith("invoke") || name.startsWith("return") || name.startsWith("goto")
                     || name.startsWith("if-") || name.endsWith("-switch") || name.equals("throw")) {
                 plainSoFar = false;
             }
         }
+        return called ? LATER : NOT_CALLED;
+    }
+
+    /** A start-call rule's strings as a finding names them, and its shape when it has one. */
+    private static String describeStart(Contract rule) {
+        List<String> quoted = new ArrayList<>();
+        for (String s : rule.strings) quoted.add("\"" + s + "\"");
+        String strings = quoted.size() == 1 ? quoted.get(0)
+                : String.join(", ", quoted.subList(0, quoted.size() - 1)) + " and " + quoted.get(quoted.size() - 1);
+        if (rule.shape == null) return strings;
+        return strings + " with the shape " + (rule.isStatic == null ? "" : rule.isStatic ? "static " : "instance ") + rule.shape;
+    }
+
+    /** ": " and the first eight of [methods], or nothing for none. */
+    private static String named(List<String> methods) {
+        if (methods.isEmpty()) return "";
+        List<String> shown = methods.subList(0, Math.min(8, methods.size()));
+        return ": " + String.join(", ", shown) + (methods.size() > shown.size() ? " and " + (methods.size() - shown.size()) + " more" : "");
     }
 
     /**
@@ -1637,7 +1835,7 @@ public class DexDiff {
 
         System.out.println("[diff] reading both bodies for the changed and added methods");
         Set<String> wanted = new TreeSet<>(changed);
-        wanted.addAll(ownAdded);
+        wanted.addAll(added);
         Map<String, List<String>> beforeBodies = bodiesOf(clean, changed);
         Map<String, List<String>> afterBodies = bodiesOf(patched, wanted);
 
@@ -1717,9 +1915,11 @@ public class DexDiff {
                 report.println();
             }
 
-            // The bundle's own methods are where registers are chosen by hand rather than reused
-            // from the host, which is exactly where an out-of-range one would come from.
-            for (String s : ownAdded) {
+            // Added methods are where registers are chosen by hand rather than reused from the
+            // host, which is exactly where an out-of-range one would come from: the extension's,
+            // and the helpers a patch adds to one of Facebook's own classes (the story, reel and
+            // video downloads each add one). Only the extension's were read here until 2026-09-26.
+            for (String s : added) {
                 List<String> a = afterBodies.getOrDefault(s, List.of());
                 int regsAfter = registersOf(a);
                 if (a.isEmpty()) continue;

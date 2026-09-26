@@ -3,8 +3,10 @@
 #   first-call <method reference> on <class>
 #   first-call <method reference> on-type-named <GraphQL type>
 #   first-call <method reference> outside <package prefix>
-#   start-call <method reference> holding <string>
+#   start-call <method reference> [in [static|instance] <(parameters)return, * for any run>] holding <string> [<string> ...]
 #   no-call <method reference> outside <package prefix>
+# A start-call rule picks its method by every string it names and its shape, and exactly one of
+# Facebook's methods may answer that; name as much as the patch itself finds the method by.
 # Two feed guards stacked on addNewEdgeToCollection is the shape that broke builds before, and a
 # guard anywhere else filters nothing.
 single-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideEdge(Ljava/lang/Object;Ljava/lang/Object;)Z in addNewEdgeToCollection
@@ -18,9 +20,10 @@ first-call Lapp/morphe/extension/facebook/feed/RecommendationLabel;->recommendat
 # every reel with nothing but a Hook status line to say why.
 first-call Lapp/morphe/extension/facebook/feed/GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside Lapp/morphe/extension/
 # The Stories tray patch asks the extension first thing in both of the feed's tray adapters: the
-# classic one, holding its trace name, and the unified one, holding its create-adapter stop name.
+# classic one, holding its trace name, and the unified one, holding its create-adapter start and stop
+# names and "tofu". The tray controller's constructor holds the start and stop names too.
 start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z holding NewsFeedAdapterConfiguration.addStoriesAdapter
-start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z holding stories_tray_create_adapter_stop
+start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z holding stories_tray_create_adapter_start stories_tray_create_adapter_stop tofu
 # The reels patch fills the showcase stub with the story type accessor of the one class whose
 # getTypeName() answers ShowcaseFeedUnit, a class Redex renames, so the rule names it by that type.
 first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/lang/Object;)Ljava/lang/Object; on-type-named ShowcaseFeedUnit
@@ -28,13 +31,15 @@ first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/la
 # adds its own Reels row at the tail of the feed without passing the feed guard.
 start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hidePreEofReels()Z holding PreEofIfuSectionAdapter
 # The background-return gate starts the controller's resume callback, which is distinct from the
-# NewsFeedFragment swipe-refresh callback. A later call would refresh before asking the switch.
-start-call Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z holding FeedRefreshTriggerController
+# NewsFeedFragment swipe-refresh callback. A later call would refresh before asking the switch. Five
+# methods hold the controller's name on 580 and 577; the callback alone holds "onRefresh" beside it.
+start-call Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z holding FeedRefreshTriggerController onRefresh
 # Clean up Reels asks the extension first thing in Facebook's Follow check, which a reel's author
 # row asks before it builds a Follow button, and which names the two surfaces where Facebook holds
 # the button back for a friend. Left out or put later, the Follow button stays on every reel of an
-# author you don't follow, the Reels tab's among them.
-start-call Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton()Z holding friends_tab_ifu
+# author you don't follow, the Reels tab's among them. Nineteen methods name both surfaces; the check
+# is the one that's static, takes the session first and answers a boolean.
+start-call Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton()Z in static (Lcom/facebook/auth/usersession/FbUserSession;*)Z holding friendly_feed friends_tab_ifu
 # Facebook ranks its own launcher shortcuts ahead of the Hushfacebook one with these calls, so the
 # settings patch sends every one to SettingsEntry, which makes it and puts the Hushfacebook shortcut
 # back in front (#2). One left in Facebook's code would let it drop out of the long-press menu.

@@ -23,7 +23,13 @@
     stub left unfilled, calling another class, or calling a class that isn't the only one
     answering its type name, Clean up Reels' hook deleted from Facebook's Follow check or put
     after a branch there, and the GenAI reel stub left unfilled, filled with a call that stays in
-    the extension, or calling Facebook's finder only after it has returned. Each of the five ShortcutManager calls the settings patch sends to the
+    the extension, or calling Facebook's finder only after it has returned. Each start-call hook is
+    also put first in a method holding part of what its rule picks by (the tray controller, onPause,
+    another method naming both surfaces), and one rule is given two methods to choose from; all
+    four fail naming the method the rule picks. A register out of range fails as its own finding:
+    named by a helper added to a host class, as the upper half of a long read from the last
+    register, as a long an extension method writes there, and in the feed guard. Each of the five
+    ShortcutManager calls the settings patch sends to the
     extension is left in Facebook's code by a build of its own, which has to fail that call's no-call
     rule and no other, and the contract file may hold no no-call rule without such a build. The
     call that gives the Facebook logo its touch listener is left as Facebook makes it, the stand-in
@@ -104,7 +110,7 @@ function Get-Findings {
     param($Result)
     $fails = @($Result.Output | Where-Object { $_ -like '`[diff`] FAIL*' })
     $categories = @($fails | ForEach-Object {
-        if ($_ -match '^\[diff\] FAIL: (branch|invoke|parameter|width|try|result|contract): ') { $Matches[1] } else { '?' }
+        if ($_ -match '^\[diff\] FAIL: (register|branch|invoke|parameter|width|try|result|contract): ') { $Matches[1] } else { '?' }
     })
     [pscustomobject]@{ Fails = $fails; Categories = $categories }
 }
@@ -559,8 +565,11 @@ try {
             'Lcom/facebook/graphql/model/GraphQLStory;->A0X()Lfixture/Model; before its first return'))) `
             "The good build's $stub was not reported calling the story's accessor.`n$($good.Output -join "`n")"
     }
+    # Each start-call rule finds its one method among others holding part of what it names (the
+    # tray controller, the refresh controller's onPause, two other methods naming both surfaces),
+    # and the hook first there.
     foreach ($adapter in @('NewsFeedAdapterConfiguration.addStoriesAdapter: first in Lfixture/Adapters;->addStoriesAdapter(',
-            'stories_tray_create_adapter_stop: first in Lfixture/Adapters;->addUnifiedTray(')) {
+            'stories_tray_create_adapter_start stories_tray_create_adapter_stop tofu: first in Lfixture/Adapters;->addUnifiedTray(')) {
         Assert-True (($good.Output -join "`n") -match [regex]::Escape("hideStoriesTray(I)Z holding $adapter")) `
             "The good build's tray hook was not reported first in its adapter: $adapter`n$($good.Output -join "`n")"
     }
@@ -572,10 +581,11 @@ try {
         'Lfixture/Showcase;->A01()Lfixture/StoryType; before its first return')) `
         "The good build's showcase stub was not reported calling the showcase unit's accessor.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
-        'ReturnRefresh;->skip()Z holding FeedRefreshTriggerController: first in Lfixture/ReturnController;->resumeAfterBackground(')) `
+        'ReturnRefresh;->skip()Z holding FeedRefreshTriggerController onRefresh: first in Lfixture/ReturnController;->resumeAfterBackground(')) `
         "The good build's background-return guard was not first in the resume callback.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
-        'ReelDeclutter;->hideFollowButton()Z holding friends_tab_ifu: first in Lfixture/FollowCheck;->offersFollow(')) `
+        ('ReelDeclutter;->hideFollowButton()Z in static (Lcom/facebook/auth/usersession/FbUserSession;*)Z holding ' +
+            'friendly_feed friends_tab_ifu: first in Lfixture/FollowCheck;->offersFollow('))) `
         "The good build's Follow hook was not first in Facebook's Follow check.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         'GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside ' +
@@ -717,6 +727,14 @@ try {
         'bad-finder-stub-not-filled' = 'contract'
         'bad-finder-stub-extension-call' = 'contract'
         'bad-finder-stub-call-after-return' = 'contract'
+        'bad-tray-hook-wrong-method' = 'contract'
+        'bad-return-refresh-hook-wrong-method' = 'contract'
+        'bad-return-refresh-two-callbacks' = 'contract'
+        'bad-follow-hook-wrong-method' = 'contract'
+        'bad-register-added-helper' = 'register'
+        'bad-register-wide-source' = 'register'
+        'bad-register-own-wide' = 'register'
+        'bad-register-changed' = 'register'
     }
     foreach ($shortcut in $shortcutCalls) { $bad["bad-shortcut-$($shortcut.Case)-left"] = 'contract' }
     $failures = @()
@@ -784,6 +802,48 @@ try {
             "$name did not fail on the GenAI reel stub's rule alone.`nExpected: $expected`nGot:`n$($fails -join "`n")"
     }
 
+    # A hook in the wrong method names the one method its rule picks and where the hook went; a rule
+    # two methods answer names both; a register out of range names the instruction, the register it
+    # reaches and the count, in the method it sits in. Each FAIL line has to be one of these.
+    $wrongPlace = [ordered]@{
+        'bad-tray-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z ' +
+            'is not called in Lfixture/Adapters;->addUnifiedTray(Ljava/lang/Object;)Ljava/lang/Object;, the one method holding ' +
+            '"stories_tray_create_adapter_start", "stories_tray_create_adapter_stop" and "tofu"; the host methods that call it: ' +
+            '*Lfixture/TrayController;->create(Ljava/lang/Object;)Ljava/lang/Object;*'))
+        'bad-return-refresh-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z is not ' +
+            'called in Lfixture/ReturnController;->resumeAfterBackground(Ljava/lang/Object;)V, the one method holding ' +
+            '"FeedRefreshTriggerController" and "onRefresh"; the host methods that call it: Lfixture/ReturnController;->onPause()V'))
+        'bad-follow-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton()Z is not ' +
+            'called in Lfixture/FollowCheck;->offersFollow(Lcom/facebook/auth/usersession/FbUserSession;)Z, the one method holding ' +
+            '"friendly_feed" and "friends_tab_ifu" with the shape static (Lcom/facebook/auth/usersession/FbUserSession;*)Z; the host ' +
+            'methods that call it: Lfixture/FollowCheck;->offersFollowHere(Lcom/facebook/auth/usersession/FbUserSession;)Z'))
+        'bad-return-refresh-two-callbacks' = @(('*contract: 2 methods hold "FeedRefreshTriggerController" and "onRefresh", and exactly ' +
+            'one must, so the rule can''t say which one calls Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z: *' +
+            'Lfixture/ReturnController;->resume*(Ljava/lang/Object;)V, Lfixture/ReturnController;->resume*(Ljava/lang/Object;)V'))
+        'bad-register-added-helper' = @('*register: const/4 at 0 reaches v1, and the method declares 1 register  in Lfixture/Feed;->helper()V')
+        'bad-register-wide-source' = @('*register: move-wide at 0 reaches v2, and the method declares 2 registers  in Lfixture/Feed;->copyWide()V')
+        'bad-register-own-wide' = @(('*register: const-wide/16 at 0 reaches v2, and the method declares 2 registers  in ' +
+            'Lapp/morphe/extension/facebook/feed/Pack;->pack()V'))
+        'bad-register-changed' = @(
+            '*register: move-result at 3 reaches v4, and the method declares 4 registers  in Lfixture/Feed;->addNewEdgeToCollection(*',
+            '*register: if-eqz at 4 reaches v4, and the method declares 4 registers  in Lfixture/Feed;->addNewEdgeToCollection(*')
+    }
+    foreach ($case in $wrongPlace.GetEnumerator()) {
+        $fails = @((Get-Findings $badResults[$case.Key]).Fails)
+        $unmatched = @($fails | Where-Object { $line = $_; @($case.Value | Where-Object { $line -like $_ }).Count -eq 0 })
+        $missing = @($case.Value | Where-Object { $pattern = $_; @($fails | Where-Object { $_ -like $pattern }).Count -eq 0 })
+        Assert-True ($fails.Count -eq $case.Value.Count -and $unmatched.Count -eq 0 -and $missing.Count -eq 0) `
+            "$($case.Key) did not fail with the findings expected.`nExpected:`n$($case.Value -join "`n")`nGot:`n$($fails -join "`n")"
+    }
+    # The added helper is read against its own count in the report too, beside the extension's
+    # methods, which were the only added ones read there before.
+    $helperReport = Get-Content -LiteralPath $badResults['bad-register-added-helper'].Report -Raw
+    Assert-True ($helperReport -match '(?m)^==== added Lfixture/Feed;->helper\(\)V\r?$' -and
+        $helperReport -match 'const/4 v1, #0 \|maxreg=1   <<< REGISTER >= registerCount') `
+        "The report did not hold the helper added to a host class to its register count.`n$helperReport"
+    Assert-True (($badResults['bad-register-added-helper'].Output -join "`n") -match 'injected lines naming an out-of-range register: 1') `
+        "The helper added to a host class was not counted among the out-of-range lines.`n$($badResults['bad-register-added-helper'].Output -join "`n")"
+
     # Without a contract file the structural checks still run; only the call-site rule is off.
     $noContract = Invoke-DexDiff -Clean $cleanApk -Patched (Join-Path $caseRoot 'bad-no-guard.apk') `
         -Allowlist $emptyAllowlist -Name 'no-contract-file'
@@ -806,6 +866,13 @@ try {
             'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z in addStoriesAdapter',
             'start-call hideStoriesTray holding stories_tray_create_adapter_stop',
             'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z holding',
+            'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z holding tofu tofu',
+            'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z in static holding tofu',
+            'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z in (I)Z',
+            'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z in static (I)Z holding',
+            'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z in sometimes (I)Z holding tofu',
+            'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z in static I)Z holding tofu',
+            'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z tofu holding tofu',
             'first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/lang/Object;)Ljava/lang/Object; on-type-named Lfixture/Showcase;',
             'first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/lang/Object;)Ljava/lang/Object; on-type-named',
             'first-call storyType on-type-named ShowcaseFeedUnit',
