@@ -53,7 +53,7 @@ class DownloadReelShapesTest {
                 invoke-static { }, Lfixture/Lists;->buttons()Ljava/util/List;
                 move-result-object v20
                 new-instance v21, Ljava/util/ArrayList;
-                invoke-direct { v21 }, Ljava/util/ArrayList;-><init>()V
+                invoke-direct/range { v21 .. v21 }, Ljava/util/ArrayList;-><init>()V
                 nop
                 const/4 v0, 0x0
                 return-object v0
@@ -124,6 +124,76 @@ class DownloadReelShapesTest {
         assertEquals("the button goes in the button list", 20, (body[adds[0].index - 1] as TwoRegisterInstruction).registerB)
         assertEquals("the marker goes in the marker list", 21, (body[adds[1].index - 1] as TwoRegisterInstruction).registerB)
         assertTrue(body.none { it.call?.startsWith("Ljava/util/AbstractCollection;") == true })
+    }
+
+    /**
+     * A builder shaped like the sidebar's end: the two lists fetched into v20 and v21, three
+     * instructions standing in for the argument moves before the assembly call at index 8, then
+     * [after]. Each names a high register only where its operand reaches it: the patcher's smali
+     * compiler leaves out, without a word, an instruction whose register doesn't fit.
+     */
+    private fun builderEnd(after: String = "", window: String = "nop\nnop\nnop"): MutableMethod = MutableMethod(
+        ImmutableMethod(
+            "Lfixture/Sidebar;", "build", listOf(ImmutableMethodParameter("Lfixture/Scope;", null, null)), "V",
+            AccessFlags.PUBLIC.value or AccessFlags.STATIC.value, null, null,
+            ImmutableMethodImplementation(40, emptyList(), null, null),
+        ),
+    ).apply {
+        addInstructionsWithLabels(
+            0,
+            """
+                const/4 v3, 0x0
+                invoke-static { }, Lfixture/Lists;->buttons()Ljava/util/List;
+                move-result-object v20
+                invoke-static { }, Lfixture/Lists;->markers()Ljava/util/ArrayList;
+                move-result-object v21
+                $window
+                invoke-static/range { v20 .. v21 }, Lfixture/Assembly;->build(Ljava/util/List;Ljava/util/ArrayList;)V
+                $after
+                return-void
+            """,
+        )
+    }
+
+    /** The injection point three instructions before the assembly call, which is at index 8. */
+    private val injectAt = 5
+    private val assemblyAt = 8
+
+    @Test
+    fun `the block's locals are proved free where it goes, not taken on trust`() {
+        // The positive control: nothing reads v0 to v3 after the injection point.
+        builderEnd().requireSidebarBlockFits(injectAt, assemblyAt, SIDEBAR_BLOCK_SCRATCH + 3, reads = listOf(20, 21))
+
+        // v0 is read after the call. The window before the call never names it, which is all the
+        // old check looked at, so the block would have replaced it with the switch's answer.
+        val readsV0 = builderEnd(after = "invoke-static { v0 }, Lfixture/Log;->note(I)V")
+        val refused = assertThrows(PatchException::class.java) {
+            readsV0.requireSidebarBlockFits(injectAt, assemblyAt, SIDEBAR_BLOCK_SCRATCH + 3, reads = listOf(20, 21))
+        }
+        assertTrue(refused.message, refused.message.orEmpty().contains("still reads v0 after instruction 5"))
+    }
+
+    @Test
+    fun `the block may not read a register it borrows, nor one changed before the call`() {
+        val borrowed = assertThrows(PatchException::class.java) {
+            builderEnd().requireSidebarBlockFits(injectAt, assemblyAt, SIDEBAR_BLOCK_SCRATCH + 3, reads = listOf(20, 2))
+        }
+        assertTrue(borrowed.message, borrowed.message.orEmpty().contains("keeps v2 for the assembly call"))
+
+        // The list the block adds to is swapped for another between the block and the call.
+        val swapped = builderEnd(window = "nop\nmove-object/from16 v20, v21\nnop")
+        val stale = assertThrows(PatchException::class.java) {
+            swapped.requireSidebarBlockFits(injectAt, assemblyAt, SIDEBAR_BLOCK_SCRATCH + 3, reads = listOf(20, 21))
+        }
+        assertTrue(stale.message, stale.message.orEmpty().contains("writes v20 at instruction 6"))
+    }
+
+    @Test
+    fun `the story's local is the lowest above v2 that nothing reads and the block doesn't`() {
+        assertEquals(3, builderEnd().storyScratchRegister(injectAt, reads = listOf(20, 21)))
+        // v3 is read after the call, and v4 holds something the block reads.
+        val method = builderEnd(after = "invoke-static { v3 }, Lfixture/Log;->note(I)V")
+        assertEquals(5, method.storyScratchRegister(injectAt, reads = listOf(4, 20, 21)))
     }
 
     private fun field(name: String, type: String) = ImmutableField("Lfixture/Sidebar;", name, type, AccessFlags.PUBLIC.value, null, null, null)

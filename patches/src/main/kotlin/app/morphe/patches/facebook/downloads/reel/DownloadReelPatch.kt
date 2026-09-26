@@ -11,13 +11,15 @@ import app.morphe.patches.facebook.shared.reportedFieldNames
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.liveAcrossInjection
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
+import app.morphe.patches.facebook.misc.extension.requireFreeAt
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.smali.ExternalLabel
-import app.morphe.util.RegisterLiveness
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMutable
 import app.morphe.util.singleOrPatchException
@@ -25,14 +27,12 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.iface.Field
+import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
-import com.android.tools.smali.dexlib2.iface.instruction.ThreeRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
-import com.android.tools.smali.dexlib2.iface.instruction.VariableRegisterInstruction
-import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction35c
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
@@ -429,31 +429,21 @@ val downloadReelPatch = bytecodePatch(
 
         // Three instructions before the call the object moves are done, so v0 to v2 hold nothing
         // that is still wanted. That was true when this was written and it is not self-evident,
-        // so it is checked rather than trusted: an earlier version of this patch read `p0` here,
+        // so it is proved rather than trusted: an earlier version of this patch read `p0` here,
         // which is live nowhere near the end of this method, and the app died with a VerifyError
-        // on every reel. A build that fails with the message below is the same fault found early.
-        //
-        // The window is from the injection to the call. Any touch of one of these registers in it
-        // counts, whether it reads or writes, because that is the cheap and safe way round.
-        val scratch = setOf(0, 1, 2)
+        // on every reel. A build that fails with a message below is the same fault found early.
+        // The story takes a fourth local, found the same way.
         val injectAt = assemblyIndex - 3
-        val window = (injectAt..assemblyIndex).filter { it in instructions.indices }
-        val busy = window.filter { registersTouched(instructions[it]).any(scratch::contains) }
-
-        check(busy.isEmpty()) {
-            "$sidebarName still uses " + scratch.joinToString { "v$it" } +
-                " at instruction(s) ${busy.joinToString()}, so the injection cannot borrow them"
-        }
-
-        // The story needs a fourth 4-bit register, and one that is not only untouched in the
-        // window but dead at the injection point: a register the window leaves alone can still be
-        // read after the call (on 577 one is, on a branch that jumps in past the injection point,
-        // which a read in straight-line order would have counted). The liveness is computed over
-        // the whole method's control flow, so a register it calls dead is dead.
-        val live = RegisterLiveness.of(sidebar).liveInto(injectAt)
-        val touched = window.flatMap { registersTouched(instructions[it]) }.toSet()
-        val storyScratch = (3..15).firstOrNull { it !in live && it !in touched }
-            ?: throw PatchException("$PATCH: $sidebarName has no dead 4-bit register at the injection point for the reel's story")
+        val reads = listOf(
+            argumentRegister(FB_USER_SESSION),
+            argumentRegister(scopedType),
+            playerRegister,
+            argumentRegister(storyType),
+            sourceRegister,
+            markerRegister,
+        )
+        val storyScratch = sidebar.storyScratchRegister(injectAt, reads)
+        sidebar.requireSidebarBlockFits(injectAt, assemblyIndex, SIDEBAR_BLOCK_SCRATCH + storyScratch, reads)
 
         // The switch is asked first, every time a reel's sidebar is built. Off, paused, or before the
         // settings are ready, the branch goes straight to the instruction the block was put in
@@ -483,11 +473,64 @@ val downloadReelPatch = bytecodePatch(
     }
 }
 
+/** The locals [sidebarButtonBlock] writes besides the story's: v0 to v2. */
+internal val SIDEBAR_BLOCK_SCRATCH = listOf(0, 1, 2)
+
+/**
+ * The local the block borrows for the reel's story in front of instruction [index]: the lowest one
+ * above v2, and v15 or below since the helper call names it, that nothing reads from [index] on and
+ * that isn't one of [reads], the registers the block reads.
+ */
+internal fun Method.storyScratchRegister(index: Int, reads: Collection<Int>): Int {
+    val live = liveAcrossInjection(index)
+    return (SIDEBAR_BLOCK_SCRATCH.size until minOf(localRegisterCount(), 16))
+        .firstOrNull { it !in live && it !in reads }
+        ?: throw PatchException(
+            "$PATCH: $definingClass->$name has no local from v3 to v15 that nothing reads after instruction $index, " +
+                "for the reel's story",
+        )
+}
+
+/**
+ * Proves [sidebarButtonBlock] can go in front of instruction [index] of the sidebar builder, whose
+ * assembly call is at [assemblyIndex]. Nothing the builder reads from [index] on may sit in one of
+ * [borrowed], which the block writes. Each of [reads], which the block reads, has to be none of
+ * those, and nothing between [index] and the call may write it, so the block sees the very
+ * session, scoped context, player, story and lists the call gets.
+ */
+internal fun Method.requireSidebarBlockFits(index: Int, assemblyIndex: Int, borrowed: Collection<Int>, reads: Collection<Int>) {
+    requireFreeAt(PATCH, index, borrowed)
+    val clash = reads.filter { it in borrowed }.distinct().sorted()
+    if (clash.isNotEmpty()) {
+        throw PatchException(
+            "$PATCH: $definingClass->$name keeps ${clash.joinToString { "v$it" }} for the assembly call, " +
+                "which the block overwrites before reading",
+        )
+    }
+    val instructions = implementation!!.instructions.toList()
+    for (at in index until assemblyIndex) {
+        val stale = reads.filter { it in writtenRegisters(instructions[at]) }.distinct().sorted()
+        if (stale.isNotEmpty()) {
+            throw PatchException(
+                "$PATCH: $definingClass->$name writes ${stale.joinToString { "v$it" }} at instruction $at, " +
+                    "after the block at $index reads it for the call at $assemblyIndex",
+            )
+        }
+    }
+}
+
+/** The registers [instruction] writes: its destination, and the one above for a wide value. */
+private fun writtenRegisters(instruction: Instruction): Set<Int> {
+    val destination = (instruction as? OneRegisterInstruction)?.registerA
+    if (destination == null || !instruction.opcode.setsRegister()) return emptySet()
+    return if (instruction.opcode.setsWideRegister()) setOf(destination, destination + 1) else setOf(destination)
+}
+
 /**
  * What goes in front of the sidebar assembly: ask the switch, then build the button through the
  * helper and add it to the list of buttons, and its marker to the list of markers. Each number is
- * the register that holds that value at the insertion point; v0 to v2 are free there, and
- * [storyScratch] is a fourth register the liveness of the method says is dead.
+ * the register that holds that value at the insertion point; v0 to v2 are free there, and so is
+ * [storyScratch], a fourth local for the story.
  *
  * Both adds go through [LIST_ADD], an interface call, so they verify whatever List the builder
  * hands the assembly.
@@ -643,38 +686,6 @@ private fun handlers(hd: String, sd: String, manifest: String) = (0..6).joinToSt
         invoke-direct/range { v20 .. v28 }, $HANDLER-><init>($OBJECT${CONTEXT}Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZ$OBJECT)V
         move-object/from16 v${8 + slot}, v20
     """
-}
-
-/**
- * Every register that one instruction names, whether it reads it or writes it.
- *
- * The caller wants to know that a register is free. Telling a read from a write needs a table of
- * every opcode, and the answer to the easier question is enough: an instruction that names the
- * register at all is a reason not to borrow it.
- */
-private fun registersTouched(instruction: Instruction): Set<Int> = buildSet {
-    when (instruction) {
-        is RegisterRangeInstruction ->
-            (0 until instruction.registerCount).forEach { add(instruction.startRegister + it) }
-
-        is Instruction35c -> {
-            val count = (instruction as VariableRegisterInstruction).registerCount
-            val registers = listOf(
-                instruction.registerC,
-                instruction.registerD,
-                instruction.registerE,
-                instruction.registerF,
-                instruction.registerG,
-            )
-            registers.take(count).forEach(::add)
-        }
-
-        else -> {
-            if (instruction is OneRegisterInstruction) add(instruction.registerA)
-            if (instruction is TwoRegisterInstruction) add(instruction.registerB)
-            if (instruction is ThreeRegisterInstruction) add(instruction.registerC)
-        }
-    }
 }
 
 /** The local a call argument was copied from, so adding to it adds to the same object. */
