@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(412);
+        Map<String, String> table = new HashMap<>(418);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -272,6 +272,8 @@ public final class L10nTranslations {
                 "Links");
         table.put("Material You theme",
                 "Material-You-Design");
+        table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
+                "Messenger, Facebook Lite, Business Suite und Workplace lassen sich neben diesem Facebook installieren. Es gibt den zwei Berechtigungen, die sie mit ihm teilen, eigene Namen.");
         table.put("News feed",
                 "Newsfeed");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -294,11 +296,11 @@ public final class L10nTranslations {
                 "Pause, Sicherung und Diagnose");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Beitr\u00e4ge, die Facebook als beworben statt als Anzeige einstuft.");
-        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
-                "Beitr\u00e4ge von Personen und Seiten, denen du nicht folgst, und aus Gruppen, denen du nicht beigetreten bist, die Facebook in deinen Feed schiebt.");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
+                "Beitr\u00e4ge von Personen und Seiten, denen du nicht folgst, und aus Gruppen, denen du nicht beigetreten bist, die Facebook in deinen Feed schiebt.");
         table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
                 "Beitr\u00e4ge, die Facebooks eigene Erkennung als mit KI erstellt markiert. Ein Beitrag, den nur die Person, die ihn erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
@@ -319,6 +321,8 @@ public final class L10nTranslations {
                 "Erneut versuchen");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Wenn du innerhalb von zehn Minuten zu Facebook zur\u00fcckkehrst, bleibst du an derselben Stelle. Zum Aktualisieren kannst du weiter nach unten ziehen.");
+        table.put("Room for Meta's apps",
+                "Platz f\u00fcr Metas Apps");
         table.put("Save",
                 "Speichern");
         table.put("Save any story",
@@ -415,13 +419,13 @@ public final class L10nTranslations {
                 "Die Reihen mit Reels zwischen den Beitr\u00e4gen und die Reels, die Facebook dort anh\u00e4ngt, wo dein Feed endet.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Die Einstellung lie\u00df sich nicht vollst\u00e4ndig aktualisieren. Der gespeicherte Wert wird angezeigt.");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("The switch takes effect when Facebook restarts.",
                 "Der Schalter wirkt, sobald Facebook neu startet.");
         table.put("There's no diagnostic data to clear.",
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("There's no diagnostic data to put back.",
                 "Es gibt keine Diagnosedaten zum Wiederherstellen.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
@@ -474,10 +478,12 @@ public final class L10nTranslations {
                 "der Fix f\u00fcr neu signierte Builds");
         table.put("the recoloured dark mode",
                 "die Umf\u00e4rbung des Dunkelmodus");
+        table.put("the rename of the shared permissions",
+                "die Umbenennung der gemeinsamen Berechtigungen");
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(412);
+        Map<String, String> table = new HashMap<>(418);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -705,6 +711,8 @@ public final class L10nTranslations {
                 "Enlaces");
         table.put("Material You theme",
                 "Tema Material You");
+        table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
+                "Messenger, Facebook Lite, Business Suite y Workplace se instalan junto a este Facebook. Les da nombres propios a los dos permisos que comparten con \u00e9l.");
         table.put("News feed",
                 "Feed");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -727,11 +735,11 @@ public final class L10nTranslations {
                 "Pausa, copia de seguridad y diagn\u00f3stico");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Publicaciones que Facebook clasifica como promociones y no como anuncios.");
-        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
-                "Publicaciones de personas y p\u00e1ginas que no sigues y de grupos a los que no te has unido que Facebook mete en tu feed.");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
+                "Publicaciones de personas y p\u00e1ginas que no sigues y de grupos a los que no te has unido que Facebook mete en tu feed.");
         table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
                 "Publicaciones que la detecci\u00f3n propia de Facebook marca como creadas con IA. Una publicaci\u00f3n que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
@@ -752,6 +760,8 @@ public final class L10nTranslations {
                 "Reintentar");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Si vuelves a Facebook en menos de diez minutos, seguir\u00e1s donde estabas. Puedes deslizar hacia abajo para actualizar.");
+        table.put("Room for Meta's apps",
+                "Espacio para las apps de Meta");
         table.put("Save",
                 "Guardar");
         table.put("Save any story",
@@ -848,13 +858,13 @@ public final class L10nTranslations {
                 "Las filas de reels entre las publicaciones y los reels que Facebook a\u00f1ade donde termina tu feed.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "No se pudo terminar de actualizar el ajuste. Se muestra su valor guardado.");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("The switch takes effect when Facebook restarts.",
                 "El interruptor surte efecto cuando Facebook se reinicie.");
         table.put("There's no diagnostic data to clear.",
                 "No hay datos de diagn\u00f3stico que borrar.");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("There's no diagnostic data to put back.",
                 "No hay datos de diagn\u00f3stico que restaurar.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
@@ -907,10 +917,12 @@ public final class L10nTranslations {
                 "el arreglo para la nueva firma");
         table.put("the recoloured dark mode",
                 "el cambio de colores del modo oscuro");
+        table.put("the rename of the shared permissions",
+                "el cambio de nombre de los permisos compartidos");
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(412);
+        Map<String, String> table = new HashMap<>(418);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1138,6 +1150,8 @@ public final class L10nTranslations {
                 "Tautan");
         table.put("Material You theme",
                 "Tema Material You");
+        table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
+                "Messenger, Facebook Lite, Business Suite, dan Workplace dapat dipasang di samping Facebook ini. Facebook ini memberi nama sendiri pada dua izin yang mereka gunakan bersama dengannya.");
         table.put("News feed",
                 "Kabar Beranda");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -1160,11 +1174,11 @@ public final class L10nTranslations {
                 "Jeda, cadangan, dan diagnostik");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Postingan yang dikategorikan Facebook sebagai promosi, bukan iklan.");
-        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
-                "Postingan dari orang dan Halaman yang tidak Anda ikuti serta dari grup tempat Anda belum bergabung, yang diselipkan Facebook ke Kabar Beranda Anda.");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
+                "Postingan dari orang dan Halaman yang tidak Anda ikuti serta dari grup tempat Anda belum bergabung, yang diselipkan Facebook ke Kabar Beranda Anda.");
         table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
                 "Postingan yang ditandai deteksi Facebook sendiri sebagai buatan AI. Postingan yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
@@ -1185,6 +1199,8 @@ public final class L10nTranslations {
                 "Coba lagi");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Jika kembali ke Facebook dalam sepuluh menit, posisi beranda tetap sama. Tarik ke bawah untuk memuat ulang masih berfungsi.");
+        table.put("Room for Meta's apps",
+                "Ruang untuk aplikasi Meta");
         table.put("Save",
                 "Simpan");
         table.put("Save any story",
@@ -1281,13 +1297,13 @@ public final class L10nTranslations {
                 "Deretan Reels di antara postingan, dan Reels yang ditambahkan Facebook di akhir Kabar Beranda Anda.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Pengaturan ini tidak dapat selesai diperbarui. Nilai yang tersimpan ditampilkan.");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("The switch takes effect when Facebook restarts.",
                 "Sakelar ini berlaku saat Facebook dimulai ulang.");
         table.put("There's no diagnostic data to clear.",
                 "Tidak ada data diagnostik yang dapat dihapus.");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("There's no diagnostic data to put back.",
                 "Tidak ada data diagnostik yang dapat dikembalikan.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
@@ -1340,10 +1356,12 @@ public final class L10nTranslations {
                 "perbaikan build yang ditandatangani ulang");
         table.put("the recoloured dark mode",
                 "mode gelap yang diwarnai ulang");
+        table.put("the rename of the shared permissions",
+                "penggantian nama izin bersama");
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(412);
+        Map<String, String> table = new HashMap<>(418);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1571,6 +1589,8 @@ public final class L10nTranslations {
                 "Links");
         table.put("Material You theme",
                 "Tema Material You");
+        table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
+                "Messenger, Facebook Lite, Business Suite e Workplace se instalam ao lado deste Facebook. Ele d\u00e1 nomes pr\u00f3prios \u00e0s duas permiss\u00f5es que eles compartilham com ele.");
         table.put("News feed",
                 "Feed de not\u00edcias");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -1593,11 +1613,11 @@ public final class L10nTranslations {
                 "Pausa, backup e diagn\u00f3stico");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Posts que o Facebook classifica como promo\u00e7\u00f5es, e n\u00e3o como an\u00fancios.");
-        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
-                "Publica\u00e7\u00f5es de pessoas e P\u00e1ginas que voc\u00ea n\u00e3o segue e de grupos dos quais voc\u00ea n\u00e3o participa, que o Facebook coloca no seu feed.");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
+                "Publica\u00e7\u00f5es de pessoas e P\u00e1ginas que voc\u00ea n\u00e3o segue e de grupos dos quais voc\u00ea n\u00e3o participa, que o Facebook coloca no seu feed.");
         table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
                 "Posts que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como feitos com IA. Um post que s\u00f3 o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desligada porque ainda n\u00e3o foi testada em um feed real.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
@@ -1618,6 +1638,8 @@ public final class L10nTranslations {
                 "Tentar novamente");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Se voc\u00ea voltar ao Facebook em at\u00e9 dez minutos, continuar\u00e1 de onde parou. Puxe para baixo para atualizar quando quiser.");
+        table.put("Room for Meta's apps",
+                "Espa\u00e7o para os apps da Meta");
         table.put("Save",
                 "Salvar");
         table.put("Save any story",
@@ -1714,13 +1736,13 @@ public final class L10nTranslations {
                 "As fileiras de reels entre as publica\u00e7\u00f5es e os reels que o Facebook adiciona onde o seu feed termina.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "N\u00e3o foi poss\u00edvel concluir a atualiza\u00e7\u00e3o da configura\u00e7\u00e3o. O valor salvo est\u00e1 sendo mostrado.");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("The switch takes effect when Facebook restarts.",
                 "A op\u00e7\u00e3o passa a valer quando o Facebook reiniciar.");
         table.put("There's no diagnostic data to clear.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("There's no diagnostic data to put back.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para restaurar.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
@@ -1773,10 +1795,12 @@ public final class L10nTranslations {
                 "a corre\u00e7\u00e3o para vers\u00e3o reassinada");
         table.put("the recoloured dark mode",
                 "a nova colora\u00e7\u00e3o do modo escuro");
+        table.put("the rename of the shared permissions",
+                "a renomea\u00e7\u00e3o das permiss\u00f5es compartilhadas");
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(412);
+        Map<String, String> table = new HashMap<>(418);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2004,6 +2028,8 @@ public final class L10nTranslations {
                 "Ba\u011flant\u0131lar");
         table.put("Material You theme",
                 "Material You temas\u0131");
+        table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
+                "Messenger, Facebook Lite, Business Suite ve Workplace bu Facebook'un yan\u0131na y\u00fcklenebilir. Onlarla payla\u015ft\u0131\u011f\u0131 iki izne kendi adlar\u0131n\u0131 verir.");
         table.put("News feed",
                 "Ak\u0131\u015f");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -2026,11 +2052,11 @@ public final class L10nTranslations {
                 "Duraklatma, yedekleme ve tan\u0131lama");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Facebook'un reklam yerine tan\u0131t\u0131m olarak sayd\u0131\u011f\u0131 g\u00f6nderiler.");
-        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
-                "Takip etmedi\u011fin ki\u015fi ve sayfalardan ve kat\u0131lmad\u0131\u011f\u0131n gruplardan Facebook'un ak\u0131\u015f\u0131na katt\u0131\u011f\u0131 g\u00f6nderiler.");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
+                "Takip etmedi\u011fin ki\u015fi ve sayfalardan ve kat\u0131lmad\u0131\u011f\u0131n gruplardan Facebook'un ak\u0131\u015f\u0131na katt\u0131\u011f\u0131 g\u00f6nderiler.");
         table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
                 "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi g\u00f6nderiler. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir g\u00f6nderi kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
@@ -2051,6 +2077,8 @@ public final class L10nTranslations {
                 "Yeniden dene");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Facebook'a on dakika i\u00e7inde d\u00f6nersen kald\u0131\u011f\u0131n yer korunur. Yenilemek i\u00e7in a\u015fa\u011f\u0131 \u00e7ekmeye devam edebilirsin.");
+        table.put("Room for Meta's apps",
+                "Meta uygulamalar\u0131na yer");
         table.put("Save",
                 "Kaydet");
         table.put("Save any story",
@@ -2147,13 +2175,13 @@ public final class L10nTranslations {
                 "G\u00f6nderilerin aras\u0131ndaki Reels s\u0131ralar\u0131 ve Facebook'un ak\u0131\u015f\u0131n\u0131n bitti\u011fi yere ekledi\u011fi Reels videolar\u0131.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Ayar\u0131n g\u00fcncellenmesi tamamlanamad\u0131. Kay\u0131tl\u0131 de\u011feri g\u00f6steriliyor.");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("The switch takes effect when Facebook restarts.",
                 "Anahtar, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda etkili olur.");
         table.put("There's no diagnostic data to clear.",
                 "Temizlenecek tan\u0131lama verisi yok.");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("There's no diagnostic data to put back.",
                 "Geri getirilecek tan\u0131lama verisi yok.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
@@ -2206,5 +2234,7 @@ public final class L10nTranslations {
                 "yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
         table.put("the recoloured dark mode",
                 "yeniden renklendirilmi\u015f karanl\u0131k mod");
+        table.put("the rename of the shared permissions",
+                "payla\u015f\u0131lan izinlerin yeniden adland\u0131r\u0131lmas\u0131");
     }
 }

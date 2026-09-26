@@ -234,6 +234,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the switch on the batches of watched reels Facebook's Reels viewer sends as FbShortsSeenStateMutation. The patch finds the batcher's flush in Facebook 577 and 580 by the mutation's name, its video_ids input and the Redex name of the runnable it hands its executor, and puts the extension in place of that hand-over. The extension holds a batch back while the switch is on and sends anything it doesn't recognise as Facebook handed it over."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/coexist/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/coexist/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the rename that lets Meta's own apps install beside a re-signed Facebook. It renames the two signature permissions Facebook shares with Messenger, Lite, Business Suite and Workplace, com.facebook.permission.prod.FB_APP_COMMUNICATION and com.facebook.receiver.permission.ACCESS, to app.hushfacebook. names in every place the manifest names them, and hands every literal Facebook's code loads for them to an extension that answers the name the install holds. Messenger-Z's notes on the collision were read for the behavior only; no code came from them."
     }
   ]
 }

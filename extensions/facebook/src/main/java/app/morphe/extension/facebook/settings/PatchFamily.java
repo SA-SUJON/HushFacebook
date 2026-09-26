@@ -78,7 +78,11 @@ public enum PatchFamily {
     AUDIENCE_NETWORK(FamilyNames.AUDIENCE_NETWORK, "audienceNetwork", "the Audience Network block"),
     AMOLED_THEME(FamilyNames.AMOLED_THEME, "amoledTheme", "the black background in dark mode"),
     MATERIAL_YOU_THEME(FamilyNames.MATERIAL_YOU_THEME, "materialYouTheme", "the recoloured dark mode"),
-    RESTORE_TRUST(FamilyNames.RESTORE_TRUST, "restoreTrust", "the re-signed build fix");
+    RESTORE_TRUST(FamilyNames.RESTORE_TRUST, "restoreTrust", "the re-signed build fix"),
+    // A manifest can't be switched at run time: the permissions are renamed in the APK, and Facebook's
+    // code has to keep using the names this install holds whether or not Hushfacebook is paused.
+    INSTALL_BESIDE_META_APPS(FamilyNames.INSTALL_BESIDE_META_APPS, "installBesideMetaApps",
+            "the rename of the shared permissions");
 
     /** The patch's name in Morphe Manager. */
     public final String patchName;

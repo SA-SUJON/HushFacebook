@@ -20,6 +20,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** Export diagnostic report's two choices now show as cards, each with what it does under its name. Both show whole above Cancel at any text size, in right-to-left languages too.
 * **Facebook:** Patches that change code in the middle of a Facebook method now check that the spare registers they use really are spare. If a future Facebook build keeps something in one, the patch stops with a message instead of breaking Facebook quietly. Hide sponsored reels also patches a build whose reel page sits in a higher register, which it used to refuse.
 * **Facebook:** The checks every release goes through got stricter. A patched build's resources and manifest are now compared with Facebook's whole split bundle rather than only its base APK, the injected-code check covers helpers added to Facebook's own classes, and the receipt published with a release has to match the one built here byte for byte.
+* **Facebook:** New patch, Install beside Meta's apps, on by default. The official Messenger, Facebook Lite, Business Suite and Workplace declare two permissions that Facebook declares too, and Android lets only one signing key own a permission, so they couldn't be installed beside a patched Facebook (`INSTALL_FAILED_DUPLICATE_PERMISSION`). The patch gives Facebook's two their own names, everywhere the manifest and Facebook's code use them. If you patched before, patch again and install over the top: it's an ordinary update, so Facebook keeps its data.
 
 ## 0.1.8 (2026-09-26)
 

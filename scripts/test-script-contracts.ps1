@@ -432,10 +432,20 @@ $unchanged = Get-ManifestDelta -Stock $facts -Patched $facts
 Assert-True (@(ConvertTo-ManifestDeltaEntries -Delta $unchanged).Count -eq 0) `
     'An unchanged manifest produced a delta.'
 
-$checkedInAllowlist = Read-ManifestDeltaAllowlist -Path (Join-Path $PSScriptRoot 'manifest-delta-allowlist.txt')
-Assert-True (@($checkedInAllowlist | Where-Object { $_ }).Count -eq 0) `
-    ('The checked-in manifest delta allowlist is no longer empty, so the patches now change the ' +
-     "Android manifest: $(@($checkedInAllowlist) -join ', ')")
+# The checked-in allowlist approves one change and nothing else: Install beside Meta's apps renames
+# the two permissions Facebook shares with Messenger, Lite, Business Suite and Workplace, which the
+# receipt reads as the two new names asked for and the two old ones no longer asked for.
+$checkedInAllowlist = @(Read-ManifestDeltaAllowlist -Path (Join-Path $PSScriptRoot 'manifest-delta-allowlist.txt') |
+    Where-Object { $_ })
+$renameEntries = @(
+    'permission-added app.hushfacebook.permission.prod.FB_APP_COMMUNICATION',
+    'permission-added app.hushfacebook.receiver.permission.ACCESS',
+    'permission-removed com.facebook.permission.prod.FB_APP_COMMUNICATION',
+    'permission-removed com.facebook.receiver.permission.ACCESS')
+Assert-True ((@($checkedInAllowlist | Sort-Object -CaseSensitive) -join "`n") -ceq
+        (@($renameEntries | Sort-Object -CaseSensitive) -join "`n")) `
+    ('The checked-in manifest delta allowlist approves something besides the permission rename, or ' +
+     "less than all of it: $($checkedInAllowlist -join ', ')")
 
 $allowlistRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("receipt-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $allowlistRoot | Out-Null
@@ -764,6 +774,52 @@ try {
     Assert-True (-not $stale.Valid) 'An allowlist entry no patch produces was accepted.'
     Assert-True ($stale.Reason -like '*any more*') `
         "The stale allowlist entry was refused for the wrong reason: $($stale.Reason)"
+
+    # The checked-in allowlist, against receipts that carry the permission rename on both builds.
+    # The rename passes. The rename plus any other change is refused, naming only the other, and a
+    # rename that stopped halfway is refused for the half no patch makes any more.
+    $withRename = {
+        param($r)
+        foreach ($target in $r.targets) {
+            $target.manifestDelta.permissionsAdded = @('app.hushfacebook.permission.prod.FB_APP_COMMUNICATION',
+                'app.hushfacebook.receiver.permission.ACCESS')
+            $target.manifestDelta.permissionsRemoved = @('com.facebook.permission.prod.FB_APP_COMMUNICATION',
+                'com.facebook.receiver.permission.ACCESS')
+        }
+    }
+    $renamed = Test-TestReceipt -Receipt (New-TestReceipt -Mutate $withRename) -Approved $checkedInAllowlist
+    Assert-True $renamed.Valid "A receipt carrying the approved permission rename was refused: $($renamed.Reason)"
+    $unrenamed = Test-TestReceipt -Receipt (New-TestReceipt) -Approved $checkedInAllowlist
+    Assert-True (-not $unrenamed.Valid -and $unrenamed.Reason -like '*any more*') `
+        "A receipt without the rename passed the allowlist that approves it: $($unrenamed.Reason)"
+    foreach ($other in @(
+            @{ Name = 'another permission asked for'; Entry = 'permission-added android.permission.READ_SMS'
+                Change = { param($t) $t.manifestDelta.permissionsAdded = @($t.manifestDelta.permissionsAdded) + 'android.permission.READ_SMS' } },
+            @{ Name = 'a third renamed permission'; Entry = 'permission-added app.hushfacebook.permission.prod.OTHER'
+                Change = { param($t) $t.manifestDelta.permissionsAdded = @($t.manifestDelta.permissionsAdded) + 'app.hushfacebook.permission.prod.OTHER' } },
+            @{ Name = 'another permission dropped'; Entry = 'permission-removed android.permission.CAMERA'
+                Change = { param($t) $t.manifestDelta.permissionsRemoved = @($t.manifestDelta.permissionsRemoved) + 'android.permission.CAMERA' } },
+            @{ Name = 'a component exported'; Entry = 'exported-added receiver:com.facebook.device_id.UniqueIdSupplier'
+                Change = { param($t) $t.manifestDelta.exportedComponentsAdded = @('receiver:com.facebook.device_id.UniqueIdSupplier') } },
+            @{ Name = 'a component no longer exported'; Entry = 'exported-removed activity:com.facebook.katana.ProxyAuth'
+                Change = { param($t) $t.manifestDelta.exportedComponentsRemoved = @('activity:com.facebook.katana.ProxyAuth') } })) {
+        $receipt = New-TestReceipt -Mutate { param($r) & $withRename $r; & $other.Change $r.targets[1] }
+        $result = Test-TestReceipt -Receipt $receipt -Approved $checkedInAllowlist
+        Assert-True (-not $result.Valid) "With the permission rename approved, $($other.Name) was accepted."
+        Assert-True ($result.Reason -like "*nobody reviewed: $($other.Entry)") `
+            "With the permission rename approved, $($other.Name) was refused for the wrong reason: $($result.Reason)"
+    }
+    $halfway = New-TestReceipt -Mutate {
+        param($r)
+        & $withRename $r
+        foreach ($target in $r.targets) {
+            $target.manifestDelta.permissionsAdded = @('app.hushfacebook.permission.prod.FB_APP_COMMUNICATION')
+            $target.manifestDelta.permissionsRemoved = @('com.facebook.permission.prod.FB_APP_COMMUNICATION')
+        }
+    }
+    $half = Test-TestReceipt -Receipt $halfway -Approved $checkedInAllowlist
+    Assert-True (-not $half.Valid -and $half.Reason -like '*any more*receiver.permission.ACCESS*') `
+        "A rename of one permission of the two passed the allowlist of both: $($half.Reason)"
 
     # The SBOM a receipt names. Each refusal has to name the SBOM fact that failed rather than trip
     # over the next field, or a check that went missing would pass unseen behind the one after it.
@@ -3479,9 +3535,21 @@ try {
     $indexVersionHere = [string]($releaseIndexText | ConvertFrom-Json).version
     Invoke-FixtureGit -Root $releaseRepo -Arguments @('tag', "v$indexVersionHere", $releaseCommit) | Out-Null
 
-    # A receipt for this commit with a run of each build given, every patch applied and no
-    # manifest change, written where the release check looks for it. A schema 1 receipt names no
-    # SBOM, as the ones cut before it existed don't.
+    # A receipt for this commit with a run of each build given, every patch applied and the
+    # manifest changes the checked-in allowlist approves, the permission rename, written where the
+    # release check looks for it. A schema 1 receipt names no SBOM, as the ones cut before it
+    # existed don't.
+    $approvedDelta = [ordered]@{ permissionsAdded = @(); permissionsRemoved = @()
+        exportedComponentsAdded = @(); exportedComponentsRemoved = @() }
+    foreach ($entry in $checkedInAllowlist) {
+        $kind, $value = $entry -split ' ', 2
+        switch ($kind) {
+            'permission-added' { $approvedDelta.permissionsAdded += $value }
+            'permission-removed' { $approvedDelta.permissionsRemoved += $value }
+            'exported-added' { $approvedDelta.exportedComponentsAdded += $value }
+            'exported-removed' { $approvedDelta.exportedComponentsRemoved += $value }
+        }
+    }
     function Save-ReleaseReceipt([string[]]$Builds, [string]$Commit = $releaseCommit, [long]$Seconds = $releaseSeconds,
             [int]$Schema = (Get-ReleaseReceiptSchemaVersion)) {
         $targets = @(for ($i = 0; $i -lt $Builds.Count; $i++) {
@@ -3490,8 +3558,7 @@ try {
                     package = $releaseTarget.PackageName; versionName = $Builds[$i]; versionCode = "47500000$i"
                     sha256 = ([string]'ABCDEF'[$i % 6] * 64); forced = $false }
                 patches       = @($releaseNames | ForEach-Object { [ordered]@{ name = $_; applied = $true; reason = $null } })
-                manifestDelta = [ordered]@{ permissionsAdded = @(); permissionsRemoved = @()
-                    exportedComponentsAdded = @(); exportedComponentsRemoved = @() }
+                manifestDelta = $approvedDelta
             }
         })
         $document = [ordered]@{
@@ -3559,8 +3626,8 @@ try {
     # each APK. One .apkm per declared build, and a bundle stamped with the commit's time where
     # buildAndroid leaves it, carrying the classes.dex the published asset check at the end of
     # this section looks for. The merge carries a component the base APK's manifest lacks, so a
-    # delta taken against the base instead of the merge records it as the patches' own and the
-    # empty allowlist refuses the receipt. The JDK also plays ResourceTableCheck.java, keeping a
+    # delta taken against the base instead of the merge records it as the patches' own, and the
+    # allowlist, which approves only the permission rename, refuses the receipt. The JDK also plays ResourceTableCheck.java, keeping a
     # copy of the stock APK it was handed, and DexDiff.java, and an apksigner beside aapt2 names
     # Meta's signer, so verify-all-patches.ps1 runs on the same stand-ins.
     $tools = Join-Path $releaseRoot 'tools'
@@ -3664,7 +3731,12 @@ try {
 
     $androidName = 'http://schemas.android.com/apk/res/android:name(0x01010003)='
     $androidExported = '          A: http://schemas.android.com/apk/res/android:exported(0x01010010)=true'
-    function Get-FixtureManifest([string]$Build, [string]$Code, [switch]$WithSplit, [string]$Package = $releaseTarget.PackageName) {
+    # Facebook asks for the two permissions it shares with Meta's other apps, and the patched build
+    # asks for them under the names Install beside Meta's apps gives them: the change the checked-in
+    # allowlist approves, and the only one the patches make here.
+    function Get-FixtureManifest([string]$Build, [string]$Code, [switch]$WithSplit, [switch]$Renamed,
+            [string]$Package = $releaseTarget.PackageName) {
+        $prefix = if ($Renamed) { 'app.hushfacebook.' } else { 'com.facebook.' }
         $lines = @(
             'N: android=http://schemas.android.com/apk/res/android (line=1)',
             '  E: manifest (line=1)',
@@ -3673,6 +3745,10 @@ try {
             "    A: package=`"$Package`" (Raw: `"$Package`")",
             '      E: uses-permission (line=10)',
             "        A: $androidName`"android.permission.INTERNET`" (Raw: `"android.permission.INTERNET`")",
+            '      E: uses-permission (line=11)',
+            "        A: $androidName`"${prefix}permission.prod.FB_APP_COMMUNICATION`" (Raw: `"${prefix}permission.prod.FB_APP_COMMUNICATION`")",
+            '      E: uses-permission (line=12)',
+            "        A: $androidName`"${prefix}receiver.permission.ACCESS`" (Raw: `"${prefix}receiver.permission.ACCESS`")",
             '      E: application (line=20)',
             '        E: activity (line=21)',
             "          A: $androidName`"com.facebook.katana.LoginActivity`" (Raw: `"com.facebook.katana.LoginActivity`")",
@@ -3699,7 +3775,7 @@ try {
         Set-Content -LiteralPath "$apkm.merged.txt" -Encoding ASCII -NoNewline `
             -Value (Get-FixtureManifest -Build $build -Code "$versionCode" -WithSplit)
         Set-Content -LiteralPath "$apkm.patched.txt" -Encoding ASCII -NoNewline `
-            -Value (Get-FixtureManifest -Build $build -Code "$versionCode" -WithSplit)
+            -Value (Get-FixtureManifest -Build $build -Code "$versionCode" -WithSplit -Renamed)
         # The report the CLI writes: every patch and the internal dependencies applied, one step,
         # and the input's own version, which is what the CLI reports.
         Set-Content -LiteralPath "$apkm.result.json" -Encoding ASCII -Value ([ordered]@{
@@ -3750,8 +3826,8 @@ try {
     }
 
     # A fixture for every declared build and the newer one: one target each, only the newer build
-    # forced, every patch applied, and no manifest change, because the patched manifest is held to
-    # the merge and not to the base.
+    # forced, every patch applied, and no manifest change but the rename, because the patched
+    # manifest is held to the merge and not to the base.
     $builtBuilds = @($releaseTarget.PackageVersions) + @($newerBuild)
     $allFixtures = @($builtBuilds | ForEach-Object { $fixturePaths[$_] })
     try {
@@ -3773,8 +3849,10 @@ try {
             "The receipt does not hash the $label fixture it was given."
         Assert-True (@($builtTarget.patches | Where-Object { $_.applied }).Count -eq $releaseNames.Count) `
             "The receipt does not record every patch applied to $label."
+        # The rename is the patches' change. The split's activity the merge brings in is the merge's.
         $changes = @(ConvertTo-ManifestDeltaEntries -Delta $builtTarget.manifestDelta)
-        Assert-True ($changes.Count -eq 0) "The receipt records the merge's own manifest change for $label as the patches': $($changes -join ', ')"
+        Assert-True (($changes -join "`n") -ceq (@($checkedInAllowlist | Sort-Object -Unique -CaseSensitive) -join "`n")) `
+            "The receipt records other manifest changes for $label than the patches' rename: $($changes -join ', ')"
     }
     # Each fixture merged once, and the CLI handed that merge rather than the bundle: the CLI deletes
     # its own merge, and the manifest delta above is taken against this one.
@@ -3871,10 +3949,10 @@ try {
     Set-Content -LiteralPath $plainFixture -Encoding ASCII -NoNewline `
         -Value (Get-FixtureManifest -Build $releaseTarget.PackageVersion -Code $newestCode)
     Copy-Item -LiteralPath "$newestFixture.result.json" -Destination "$plainFixture.result.json"
-    # Patched from the plain APK itself: its own manifest and no split's component, which
-    # verify-all-patches.ps1 would refuse as a change nobody approved.
+    # Patched from the plain APK itself: its manifest with the patches' change and no split's
+    # component, which verify-all-patches.ps1 would refuse as a change nobody approved.
     Set-Content -LiteralPath "$plainFixture.patched.txt" -Encoding ASCII -NoNewline `
-        -Value (Get-FixtureManifest -Build $releaseTarget.PackageVersion -Code $newestCode)
+        -Value (Get-FixtureManifest -Build $releaseTarget.PackageVersion -Code $newestCode -Renamed)
     try {
         $said = Invoke-VerifyAll -Apk $plainFixture
         Assert-True ($said -like '*success: every requested patch applied*' -and $said -notlike '*into one APK for the CLI*' -and

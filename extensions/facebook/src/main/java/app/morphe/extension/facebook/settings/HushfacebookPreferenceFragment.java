@@ -333,7 +333,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
 
         if (build.contains(PatchFamily.AD_PREFETCH) || build.contains(PatchFamily.AD_TELEMETRY)
                 || build.contains(PatchFamily.AUDIENCE_NETWORK) || build.contains(PatchFamily.AMOLED_THEME)
-                || build.contains(PatchFamily.MATERIAL_YOU_THEME) || build.contains(PatchFamily.RESTORE_TRUST)) {
+                || build.contains(PatchFamily.MATERIAL_YOU_THEME) || build.contains(PatchFamily.RESTORE_TRUST)
+                || build.contains(PatchFamily.INSTALL_BESIDE_META_APPS)) {
             PreferenceCategory patched = category(screen, L10n.t("Set when you patched"));
             if (build.contains(PatchFamily.AD_PREFETCH)) {
                 patched.addPreference(info(context, L10n.t("Background ad prefetch blocked"),
@@ -359,6 +360,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             if (build.contains(PatchFamily.RESTORE_TRUST)) {
                 patched.addPreference(info(context, L10n.t("Re-signed build fix"),
                         L10n.t("Profiles and some Settings pages open again on this re-signed build.")));
+            }
+            if (build.contains(PatchFamily.INSTALL_BESIDE_META_APPS)) {
+                patched.addPreference(info(context, L10n.t("Room for Meta's apps"),
+                        L10n.t("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. "
+                                + "It gives the two permissions they share with it names of its own.")));
             }
             patched.addPreference(info(context, L10n.t("Changing these"),
                     L10n.t("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. "

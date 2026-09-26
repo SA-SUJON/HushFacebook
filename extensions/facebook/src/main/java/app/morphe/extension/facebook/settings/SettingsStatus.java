@@ -94,6 +94,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean installBesideMetaApps() {
+        return false;
+    }
+
     public static boolean amoledTheme() {
         return false;
     }
