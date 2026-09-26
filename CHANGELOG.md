@@ -18,6 +18,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** Copy quick report builds the report in the background now, so the settings screen no longer stalls while a long diagnostic log is filtered. The copy and its message arrive once it's ready.
 * **Facebook:** In Hushfacebook's settings, a row that opens something when you tap it, such as a dialog or the file picker, now ends in a chevron. Its title's colour was the only thing that set it apart from a plain line of text, so Licenses and Version looked alike. The chevron points the other way in right-to-left languages. Switch rows keep their switch, and the two rows that act as soon as they're tapped, Clear diagnostic data and the paused status card, go without one.
 * **Facebook:** Export diagnostic report's two choices now show as cards, each with what it does under its name. Both show whole above Cancel at any text size, in right-to-left languages too.
+* **Facebook:** Patches that change code in the middle of a Facebook method now check that the spare registers they use really are spare. If a future Facebook build keeps something in one, the patch stops with a message instead of breaking Facebook quietly. Hide sponsored reels also patches a build whose reel page sits in a higher register, which it used to refuse.
 
 ## 0.1.8 (2026-09-26)
 
