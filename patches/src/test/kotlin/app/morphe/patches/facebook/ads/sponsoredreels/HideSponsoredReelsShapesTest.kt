@@ -13,6 +13,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
@@ -65,13 +66,28 @@ class HideSponsoredReelsShapesTest {
 
     private val Instruction.call get() = ((this as ReferenceInstruction).reference as MethodReference).toString()
 
-    /** The registers the filter call at [index] passes, and the one the answer is moved into. */
-    private fun MutableMethod.filterAt(index: Int, filter: String): Pair<List<Int>, Int> {
+    /**
+     * The five instructions a page filter puts at the top of the method: the page copied down from
+     * [page] into a local, the class name into a second, the filter call on the two, and its answer
+     * copied back into [page]. Answers the two locals.
+     */
+    private fun MutableMethod.filteredAtTop(filter: String, page: Int, at: Int = 0): Pair<Int, Int> {
         val body = body()
-        assertEquals(filter, body[index].call)
-        val call = body[index] as FiveRegisterInstruction
-        assertEquals(Opcode.MOVE_RESULT_OBJECT, body[index + 1].opcode)
-        return listOf(call.registerC, call.registerD) to (body[index + 1] as OneRegisterInstruction).registerA
+        assertEquals(Opcode.MOVE_OBJECT_FROM16, body[at].opcode)
+        val copy = body[at] as TwoRegisterInstruction
+        assertEquals("the page is copied down from its own register", page, copy.registerB)
+        assertEquals(Opcode.CONST_STRING, body[at + 1].opcode)
+        assertEquals("fixture.AdItem", ((body[at + 1] as ReferenceInstruction).reference as StringReference).string)
+        val label = (body[at + 1] as OneRegisterInstruction).registerA
+        assertEquals(filter, body[at + 2].call)
+        val call = body[at + 2] as FiveRegisterInstruction
+        assertEquals("the filter gets the copy and the name", listOf(copy.registerA, label), listOf(call.registerC, call.registerD))
+        assertEquals(Opcode.MOVE_RESULT_OBJECT, body[at + 3].opcode)
+        assertEquals(copy.registerA, (body[at + 3] as OneRegisterInstruction).registerA)
+        assertEquals(Opcode.MOVE_OBJECT_16, body[at + 4].opcode)
+        val back = body[at + 4] as TwoRegisterInstruction
+        assertEquals("the answer goes back where the method reads its page", listOf(page, copy.registerA), listOf(back.registerA, back.registerB))
+        return copy.registerA to label
     }
 
     /**
@@ -91,43 +107,47 @@ class HideSponsoredReelsShapesTest {
         for (page in cases) {
             val registers = page.implementation!!.registerCount
             page.filterPageFirst("fixture.AdItem")
-            val body = page.body()
-            assertEquals(Opcode.CONST_STRING, body[0].opcode)
-            assertEquals("fixture.AdItem", ((body[0] as ReferenceInstruction).reference as StringReference).string)
-            val (passed, answer) = page.filterAt(1, withoutAds)
             val form = if (AccessFlags.STATIC.isSet(page.accessFlags)) "static" else "instance"
-            assertEquals("$form ${page.name}: the page handed to the filter", listOf(registers - 1, 0), passed)
-            assertEquals("$form ${page.name}: the page the method goes on with", registers - 1, answer)
+            assertEquals("$form ${page.name}: the locals borrowed", 0 to 1, page.filteredAtTop(withoutAds, page = registers - 1))
         }
     }
 
     /**
-     * The filter call names the page in a 4-bit operand. The patcher's smali compiler leaves out a
-     * call whose register doesn't fit, without a word, so a page in v16 or above used to lose its
-     * filter call and keep the move-result after it.
+     * The filter call names its operands in four bits, and the patcher's smali compiler leaves out a
+     * call whose register doesn't fit, without a word. The page used to be named there, so a page
+     * above v15 stopped the patch; 577's controller page method already has 15 registers. The page
+     * is copied down now, so it can sit anywhere.
      */
     @Test
-    fun `a page kept above v15 stops the patch instead of losing its filter call`() {
-        val highest = method("insert", listOf("I", collection), "Z", 16, static = true, smali = "const/4 v0, 0x0\nreturn v0")
-        highest.filterPageFirst("fixture.AdItem")
-        assertEquals("v15 still fits", listOf(15, 0), highest.filterAt(1, withoutAds).first)
-
+    fun `a page kept above v15 is copied down instead of stopping the patch`() {
         val above = method("insert", listOf("I", collection), "Z", 20, static = true, smali = "const/4 v0, 0x0\nreturn v0")
-        val refused = assertThrows(PatchException::class.java) { above.filterPageFirst("fixture.AdItem") }
-        assertTrue(refused.message, refused.message.orEmpty().contains("v19"))
+        above.filterPageFirst("fixture.AdItem")
+        above.filteredAtTop(withoutAds, page = 19)
 
+        // The 577 controller with two registers more: its page in v16.
         val sections = method(
-            "addPage", listOf(list), "Z", 20, static = false,
-            smali = "const/4 v3, 0x0\nreturn v3",
+            "addPage", listOf(list), "Z", 17, static = false,
+            smali = "const/4 v4, 0x0\nreturn v4",
             definingClass = "Lfixture/Controller;",
         )
-        assertThrows(PatchException::class.java) { sections.filterSectionsFirst("fixture.AdItem") }
+        sections.filterSectionsFirst("fixture.AdItem")
+        sections.filteredAtTop(withoutAdSections, page = 16)
     }
 
     @Test
-    fun `a page method with no local to borrow stops the patch`() {
-        val page = method("insert", listOf("I", collection), "Z", 3, static = false, smali = "return p1")
-        assertThrows(PatchException::class.java) { page.filterPageFirst("fixture.AdItem") }
+    fun `a page method without two locals to borrow stops the patch`() {
+        val none = method("insert", listOf("I", collection), "Z", 3, static = false, smali = "return p1")
+        assertThrows(PatchException::class.java) { none.filterPageFirst("fixture.AdItem") }
+
+        val one = method("insert", listOf("I", collection), "Z", 4, static = false, smali = "const/4 v0, 0x0\nreturn v0")
+        val refused = assertThrows(PatchException::class.java) { one.filterPageFirst("fixture.AdItem") }
+        assertTrue(refused.message, refused.message.orEmpty().startsWith("Hide sponsored reels:"))
+        assertTrue(refused.message, refused.message.orEmpty().contains("needs 2"))
+
+        // The positive control: two locals are enough.
+        val two = method("insert", listOf("I", collection), "Z", 5, static = false, smali = "const/4 v0, 0x0\nreturn v0")
+        two.filterPageFirst("fixture.AdItem")
+        two.filteredAtTop(withoutAds, page = 4)
     }
 
     @Test
@@ -140,20 +160,19 @@ class HideSponsoredReelsShapesTest {
                 definingClass = "Lfixture/Controller;",
             )
             add.filterSectionsFirst("fixture.AdItem")
-            val (passed, answer) = add.filterAt(1, withoutAdSections)
-            assertEquals("static=$static: the page handed to the filter", listOf(registers - 1, 3), passed)
-            assertEquals("static=$static: the page the method goes on with", registers - 1, answer)
-            assertEquals("the name goes in the local the method writes first", 3, (add.body()[0] as OneRegisterInstruction).registerA)
+            assertEquals("static=$static: the locals borrowed", 0 to 1, add.filteredAtTop(withoutAdSections, page = registers - 1))
         }
     }
 
     /**
-     * The borrowed register has to be a local the first instruction writes. `if-eqz` only reads its
-     * register, and a `check-cast` of the page reads it and writes it back, so borrowing either
-     * would hand the filter the ad type's name in place of the page.
+     * The borrowed register used to be whichever one the method's first instruction names, as long
+     * as it was a local the instruction wrote. That excluded `if-eqz p1` and `check-cast p1`, whose
+     * register is the page, by refusing the whole patch. Now nothing borrowed is a parameter, so a
+     * method that opens by testing or casting its page gets the filter like any other, and goes on
+     * to test the filtered page.
      */
     @Test
-    fun `the sections method has to start by writing a local`() {
+    fun `a sections method that opens by testing or casting its page still gets the filter`() {
         val reads = method(
             "addPage", listOf(list), "Z", 6, static = false,
             smali = """
@@ -166,7 +185,10 @@ class HideSponsoredReelsShapesTest {
             """,
             definingClass = "Lfixture/Controller;",
         )
-        assertThrows(IllegalStateException::class.java) { reads.filterSectionsFirst("fixture.AdItem") }
+        reads.filterSectionsFirst("fixture.AdItem")
+        assertEquals(0 to 1, reads.filteredAtTop(withoutAdSections, page = 5))
+        assertEquals("the method's own test reads the filtered page", Opcode.IF_EQZ, reads.body()[5].opcode)
+        assertEquals(5, (reads.body()[5] as OneRegisterInstruction).registerA)
 
         val casts = method(
             "addPage", listOf(list), "Z", 6, static = false,
@@ -177,8 +199,25 @@ class HideSponsoredReelsShapesTest {
             """,
             definingClass = "Lfixture/Controller;",
         )
-        assertThrows(IllegalStateException::class.java) { casts.filterSectionsFirst("fixture.AdItem") }
+        casts.filterSectionsFirst("fixture.AdItem")
+        assertEquals(0 to 1, casts.filteredAtTop(withoutAdSections, page = 5))
     }
+
+    /** Hide AI-detected posts puts its own filter in front of this one, on the same three methods. */
+    @Test
+    fun `a filter put in front of another borrows the same two locals`() {
+        val add = method(
+            "addPage", listOf(list), "Z", 6, static = false,
+            smali = "const/4 v3, 0x0\nreturn v3",
+            definingClass = "Lfixture/Controller;",
+        )
+        add.filterSectionsFirst("fixture.AdItem")
+        add.filterSectionsFirst("fixture.AdItem", filter = otherSectionFilter)
+        assertEquals(0 to 1, add.filteredAtTop(otherSectionFilter, page = 5))
+        assertEquals(0 to 1, add.filteredAtTop(withoutAdSections, page = 5, at = 5))
+    }
+
+    private val otherSectionFilter = "Lfixture/OtherFilter;->pages(Ljava/util/List;Ljava/lang/String;)Ljava/util/List;"
 
     private fun idle(smali: String) = method(
         "idle", listOf("Lfixture/Session;", "I"), "V", 6, static = false, smali = smali,

@@ -9,15 +9,11 @@ package app.morphe.patches.facebook.ads.sponsoredreels
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.BytecodePatchContext
-import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.facebook.feed.GRAPHQL_STORY
-import app.morphe.patches.facebook.misc.extension.localRegisterCount
+import app.morphe.patches.facebook.misc.extension.freeLocalsAt
 import app.morphe.patches.facebook.misc.extension.parameterRegister
-import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.util.singleOrPatchException
-import com.android.tools.smali.dexlib2.iface.instruction.Instruction
-import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 internal const val SPONSORED_REELS_PATCH = "Hide sponsored reels"
 
@@ -117,7 +113,7 @@ internal fun BytecodePatchContext.reelPages(patch: String): ReelPages {
 }
 
 /**
- * Sends the page this method receives through [filter] before its own code runs, with [name]
+ * Sends the page this method receives through [filter] before its own code runs, with [className]
  * beside it: the binary name of the class the filter tells its items by. The helper hands back the
  * very same collection when it takes nothing out, so the usual page is untouched and keeps its type.
  *
@@ -126,90 +122,52 @@ internal fun BytecodePatchContext.reelPages(patch: String): ReelPages {
  * next, and a p register written down for one of those would hand the filter the collection
  * object, or `this`, in place of the page.
  */
-internal fun MutableMethod.filterPageFirst(name: String, filter: String = AD_FILTER, patch: String = SPONSORED_REELS_PATCH) {
+internal fun MutableMethod.filterPageFirst(className: String, filter: String = AD_FILTER, patch: String = SPONSORED_REELS_PATCH) {
     val page = parameterTypes.indices.filter { parameterTypes[it].toString() == COLLECTION }
         .singleOrPatchException("$patch: the one Collection parameter of $definingClass->$name")
-    // Index 0: no local holds anything yet, so v0 is free for the name.
-    requireLocals(patch, 1)
-    val register = nibbleParameterRegister(page, patch)
-    addInstructions(
-        0,
-        """
-            const-string v0, "$name"
-            invoke-static { $register, v0 }, $filter
-            move-result-object $register
-        """,
-    )
+    filterParameterFirst(page, className, filter, patch)
 }
 
 /**
  * Sends the page of sections this controller method receives through [filter] before its own code
- * runs, with [name] beside it. The page is its List parameter, found the way [filterPageFirst] finds
- * the page.
+ * runs, with [className] beside it. The page is its List parameter, found the way
+ * [filterPageFirst] finds the page.
  */
-internal fun MutableMethod.filterSectionsFirst(name: String, filter: String = AD_SECTION_FILTER, patch: String = SPONSORED_REELS_PATCH) {
+internal fun MutableMethod.filterSectionsFirst(className: String, filter: String = AD_SECTION_FILTER, patch: String = SPONSORED_REELS_PATCH) {
     val sections = parameterTypes.indices.filter { parameterTypes[it].toString() == LIST }
         .singleOrPatchException("$patch: the one List parameter of $definingClass->$name")
-    val register = nibbleParameterRegister(sections, patch)
-    val scratch = scratch(patch)
+    filterParameterFirst(sections, className, filter, patch)
+}
+
+/**
+ * Sends declared parameter [parameter] through [filter], with [className] beside it, before the
+ * method's own code runs, and goes on with the answer in the parameter's own register.
+ *
+ * The filter call names its operands in four bits, so it never names the parameter: the page is
+ * copied down into a local first and the answer copied back. 577's controller page method already
+ * has 15 registers, and two more would put its page above v15, where the patcher's smali compiler
+ * leaves out a call that names it without a word.
+ *
+ * Both locals come from [freeLocalsAt] at the top of the method, so neither is ever a parameter,
+ * nor a local the method reads before writing. The one the first instruction named used to be
+ * taken, which was the page itself when a method opened by testing or casting it. A filter put in
+ * front of another, as Hide AI-detected posts puts its own, borrows the same two, and the one
+ * after writes them again before reading them.
+ */
+private fun MutableMethod.filterParameterFirst(parameter: Int, className: String, filter: String, patch: String) {
+    val (copy, label) = freeLocalsAt(patch, 0, 2)
+    val register = parameterRegister(parameter)
     addInstructions(
         0,
         """
-            const-string $scratch, "$name"
-            invoke-static { $register, $scratch }, $filter
-            move-result-object $register
+            move-object/from16 v$copy, $register
+            const-string v$label, "$className"
+            invoke-static { v$copy, v$label }, $filter
+            move-result-object v$copy
+            move-object/16 $register, v$copy
         """,
     )
 }
 
-/**
- * Parameter [index]'s register, for a filter call that names it in a 4-bit operand, so it has to be
- * v15 or below. The patcher's smali compiler leaves out an instruction whose register doesn't fit,
- * without a word, which would drop the filter call and leave its move-result reading nothing.
- */
-private fun MutableMethod.nibbleParameterRegister(index: Int, patch: String): String {
-    val register = parameterRegister(index)
-    val number = localRegisterCount() + register.removePrefix("p").toInt()
-    if (number > 15) {
-        throw PatchException(
-            "$patch: $definingClass->$name holds parameter $index in v$number, above the v15 the filter call can name",
-        )
-    }
-    return register
-}
-
-/**
- * A register safe to borrow at the top of the method: the one its own first instruction overwrites.
- *
- * Nothing can read that register before the original code writes it. Thus an injected call can use
- * it and change nothing downstream. The two collection-level injections borrow v0, which is sound
- * because those methods are known to hold locals. The controller page method is not, so this one
- * resolves the register instead of an assumption. A second filter prepended before this one starts
- * the method with its own const-string, which writes a local too, so both borrow the same one.
- *
- * It has to be a local the instruction writes. An instruction that only reads its register, such as
- * `if-eqz` or `monitor-enter`, or one that reads a parameter and writes it back, such as
- * `check-cast`, would read the name the injection put there in place of the parameter.
- */
-private fun MutableMethod.scratch(patch: String): String {
-    val first = instructions().firstOrNull()
-        ?: throw PatchException("$patch: $definingClass->$name has an empty body, so no register to borrow")
-    check(first is OneRegisterInstruction && first.opcode.setsRegister()) {
-        "$definingClass->$name starts with ${first.opcode.name}, which writes no register to borrow"
-    }
-
-    val register = first.registerA
-    check(register < localRegisterCount()) {
-        "$definingClass->$name starts by writing v$register, a parameter, so it has no local to borrow"
-    }
-    check(register < 16) { "$definingClass->$name: scratch register v$register is out of range" }
-
-    return "v$register"
-}
-
 /** `LX/B89;` as the runtime reports it: `X.B89`. */
 internal fun String.toBinaryName() = removePrefix("L").removeSuffix(";").replace('/', '.')
-
-private fun MutableMethod.instructions(): List<Instruction> =
-    implementation?.instructions?.toList()
-        ?: throw IllegalStateException("$definingClass->$name has no body")
