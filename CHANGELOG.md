@@ -15,6 +15,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** New patch, Don't send reel watch history. The Reels viewer sends Facebook the reels you watch in batches, as a list of their ids that Facebook ranks your Reels feed with and nobody else sees. The patch holds each batch back at the moment it would go out, after it has left the queue, so a batch it holds back isn't kept to send later. Reels you've already watched may come back in the feed. The patch starts off in Morphe Manager, and its switch, under Reels and Watch in Hushfacebook's settings, starts on once you pick it.
 * **Facebook:** The diagnostic report now also leaves out a Facebook address with nothing in front of it, like facebook.com/ followed by a profile name. It used to catch one only with www. or another prefix. No line in a report prints such an address today, so this covers the next one that might.
 * **Facebook:** A debug setting stored with the wrong type used to make Facebook crash as it started. Now Hushfacebook clears that value and starts with the default, and the diagnostic report says which setting it was. Nothing writes such a value today, but a hand-edited or restored preferences file could.
+* **Facebook:** Copy quick report builds the report in the background now, so the settings screen no longer stalls while a long diagnostic log is filtered. The copy and its message arrive once it's ready.
 
 ## 0.1.8 (2026-09-26)
 

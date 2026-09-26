@@ -173,9 +173,30 @@ public final class LogBufferManager {
         }
     }
 
+    /**
+     * Copy quick report. The report is built on a worker and only the copy comes back to the main
+     * thread: building it runs the redaction's seven patterns over every buffered event, up to
+     * 250,000 characters, and on the main thread that held up the tap that asked for it.
+     */
     public static void exportToClipboard() {
+        boolean started = Utils.runOnBackgroundThread(() -> {
+            String exportText;
+            try {
+                exportText = clipboardText(CLIPBOARD_MAX_CHARS);
+            } catch (Exception ex) {
+                clipboardFailed(ex);
+                return;
+            }
+            Utils.runOnMainThread(() -> copyToClipboard(exportText));
+        });
+        if (!started) {
+            Utils.showToastLong(say(couldNotStartMessage, L10n.t("Couldn't start the report export. Try again shortly.")));
+        }
+    }
+
+    /** Puts a built report on the clipboard, on the main thread. */
+    private static void copyToClipboard(String exportText) {
         try {
-            String exportText = clipboardText(CLIPBOARD_MAX_CHARS);
             if (exportText.isEmpty()) {
                 Utils.showToastLong(say(nothingToExportMessage, nothingToReport()));
                 return;
@@ -183,11 +204,15 @@ public final class LogBufferManager {
             Utils.setClipboard(exportText);
             Utils.showToastShort(say(copiedMessage, L10n.t("Diagnostic report copied to the clipboard.")));
         } catch (Exception ex) {
-            // The exception's own text stays in the log. It can carry a path or a signed URL,
-            // and a reader on a phone cannot act on it from a toast.
-            Utils.showToastLong(say(exportFailedMessage, L10n.t("The diagnostic report couldn't be saved. Try again.")));
-            Logger.printException(() -> "Failed to export diagnostics", ex);
+            clipboardFailed(ex);
         }
+    }
+
+    private static void clipboardFailed(Exception ex) {
+        // The exception's own text stays in the log. It can carry a path or a signed URL,
+        // and a reader on a phone cannot act on it from a toast.
+        Utils.showToastLong(say(exportFailedMessage, L10n.t("The diagnostic report couldn't be saved. Try again.")));
+        Logger.printException(() -> "Failed to export diagnostics", ex);
     }
 
     public static void exportToFile() {
