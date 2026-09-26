@@ -2,6 +2,7 @@
 #   single-call <method reference> in <caller method name>
 #   first-call <method reference> on <class>
 #   first-call <method reference> on-type-named <GraphQL type>
+#   first-call <method reference> outside <package prefix>
 #   start-call <method reference> holding <string>
 #   no-call <method reference> outside <package prefix>
 # Two feed guards stacked on addNewEdgeToCollection is the shape that broke builds before, and a
@@ -11,6 +12,11 @@ single-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideEdge(Ljava/lang
 # stops filling one leaves the stub answering its marker, and the rule keeps every post.
 first-call Lapp/morphe/extension/facebook/feed/GenAiLabel;->detectedInfo(Ljava/lang/Object;)Ljava/lang/Object; on Lcom/facebook/graphql/model/GraphQLStory;
 first-call Lapp/morphe/extension/facebook/feed/RecommendationLabel;->recommendationContext(Ljava/lang/Object;)Ljava/lang/Object; on Lcom/facebook/graphql/model/GraphQLStory;
+# The GenAI reel stub has to call Facebook's attribution finder before it returns. The finder's
+# class and name are Redex's and it answers no type name, so the rule asks only that the stub's
+# first call leaves the extension. Left unfilled it answers its marker, and the Reels rule keeps
+# every reel with nothing but a Hook status line to say why.
+first-call Lapp/morphe/extension/facebook/feed/GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside Lapp/morphe/extension/
 # The Stories tray patch asks the extension first thing in both of the feed's tray adapters: the
 # classic one, holding its trace name, and the unified one, holding its create-adapter stop name.
 start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z holding NewsFeedAdapterConfiguration.addStoriesAdapter

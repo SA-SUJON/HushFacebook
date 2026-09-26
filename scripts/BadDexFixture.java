@@ -106,6 +106,12 @@ public class BadDexFixture {
     private static final String RETURN_REFRESH = "Lapp/morphe/extension/facebook/feed/ReturnRefresh;";
     private static final ImmutableMethodReference SKIP_RETURN_REFRESH = method(RETURN_REFRESH, "skip", "Z");
 
+    private static final String GENAI_REEL_FILTER = "Lapp/morphe/extension/facebook/feed/GenAiReelFilter;";
+    /** Facebook's attribution finder: a class and name Redex made up, the reel model and a type name in. */
+    private static final String REEL_MODEL = "Lfixture/ReelModel;";
+    private static final ImmutableMethodReference ATTRIBUTION_FINDER =
+            method("Lfixture/Attributions;", "A02", MODEL, REEL_MODEL, "Ljava/lang/String;");
+
     private static final String FOLLOW_CHECK = "Lfixture/FollowCheck;";
     private static final String FB_USER_SESSION = "Lcom/facebook/auth/usersession/FbUserSession;";
     private static final String REEL_DECLUTTER = "Lapp/morphe/extension/facebook/reels/ReelDeclutter;";
@@ -835,7 +841,37 @@ public class BadDexFixture {
             ClassDef adapters, ClassDef showcaseType, ClassDef preEof) {
         return Arrays.asList(host, adapters, filter(), genAiLabel, recommendationLabel, showcaseUnit(), showcaseType,
                 preEof, returnController(returnHook()), returnRefresh(), shortcuts(Collections.<String>emptySet()),
-                settingsEntry(), followCheck(followHook()), reelDeclutter(), topBar(false, true, 1));
+                settingsEntry(), followCheck(followHook()), reelDeclutter(), topBar(false, true, 1),
+                finderStub(FILLED_FINDER_STUB));
+    }
+
+    /**
+     * The GenAI reel stub, {@code static Object transparencyAttribution(Object, String)}: the model
+     * and the type name, and no local, as R8 compiles it.
+     */
+    private static ClassDef finderStub(ImmutableMethodImplementation implementation) {
+        return new ImmutableClassDef(GENAI_REEL_FILTER, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
+                OBJECT, null, null, null, null, Collections.singletonList(define(GENAI_REEL_FILTER,
+                        "transparencyAttribution", OBJECT, true, implementation, OBJECT, "Ljava/lang/String;")));
+    }
+
+    /** What the GenAI patch writes: the model cast, both parameters handed to Facebook's finder as a range. */
+    private static final ImmutableMethodImplementation FILLED_FINDER_STUB = body(2,
+            new ImmutableInstruction21c(Opcode.CHECK_CAST, 0, new ImmutableTypeReference(REEL_MODEL)),
+            new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, 0, 2, ATTRIBUTION_FINDER),
+            op(Opcode.MOVE_RESULT_OBJECT, 0),
+            op(Opcode.RETURN_OBJECT, 0));
+
+    /** The stub as the extension ships it, given a local for its marker: no call at all. */
+    private static final ImmutableMethodImplementation UNFILLED_FINDER_STUB = body(3,
+            new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN_OBJECT, 0));
+
+    /** [classes] with the GenAI reel stub replaced by one of [implementation]. */
+    private static List<ClassDef> withFinderStub(List<ClassDef> classes, ImmutableMethodImplementation implementation) {
+        List<ClassDef> replaced = new ArrayList<>(classes);
+        replaced.removeIf(cd -> cd.getType().equals(GENAI_REEL_FILTER));
+        replaced.add(finderStub(implementation));
+        return replaced;
     }
 
     /** A patched build that breaks only the reels patch's changes, as [showcaseType] and [preEof]. */
@@ -1269,6 +1305,22 @@ public class BadDexFixture {
         lateFollowHook.add(op(Opcode.NOP));                               // 2
         lateFollowHook.addAll(followHook());                              // 3
         dexes.put("bad-follow-hook-late", withFollowCheck(good(), lateFollowHook));
+
+        // contract: the GenAI reel stub left as the extension ships it, answering its marker.
+        dexes.put("bad-finder-stub-not-filled", withFinderStub(good(), UNFILLED_FINDER_STUB));
+        // contract: the stub filled with a call that never leaves the extension, not Facebook's finder.
+        dexes.put("bad-finder-stub-extension-call", withFinderStub(good(), body(3,
+                invoke(method(GENAI_LABEL, "detectedInfo", OBJECT, OBJECT), 1),
+                op(Opcode.MOVE_RESULT_OBJECT, 0),
+                op(Opcode.RETURN_OBJECT, 0))));
+        // contract: Facebook's finder called only after the stub has already returned.
+        dexes.put("bad-finder-stub-call-after-return", withFinderStub(good(), body(3,
+                new ImmutableInstruction11n(Opcode.CONST_4, 0, 0),
+                op(Opcode.RETURN_OBJECT, 0),
+                new ImmutableInstruction21c(Opcode.CHECK_CAST, 1, new ImmutableTypeReference(REEL_MODEL)),
+                new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, 1, 2, ATTRIBUTION_FINDER),
+                op(Opcode.MOVE_RESULT_OBJECT, 1),
+                op(Opcode.RETURN_OBJECT, 1))));
 
         // contract: one of Facebook's shortcut calls left as it was, not sent to the extension's
         // stand-in, one build for each call. The other four go to theirs.

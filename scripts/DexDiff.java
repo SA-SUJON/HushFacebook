@@ -141,6 +141,12 @@ public class DexDiff {
      *       the class is the one whose {@code getTypeName()} answers &lt;GraphQL type&gt; as a
      *       literal. For an accessor on a class Redex renames, which no contract can name, and
      *       exactly one class may answer the type.
+     *   <li>"first-call &lt;method reference&gt; outside &lt;class prefix&gt;": the method calls a
+     *       method of a class whose type doesn't start with &lt;class prefix&gt;, whatever it takes,
+     *       before its first return or throw. For a stub the patch fills with a call to a method it
+     *       found by what the method does, whose class is a Redex name and no model answering a type
+     *       name. A stub still answering its marker makes no call, and one whose only call stays in
+     *       the extension doesn't leave it.
      *   <li>"start-call &lt;method reference&gt; holding &lt;string&gt;": of the method's call sites,
      *       exactly one is in a method that loads &lt;string&gt;, and there nothing comes before it
      *       but plain instructions: no other call, branch, switch, return or throw.
@@ -157,6 +163,8 @@ public class DexDiff {
      */
     /** The kind a first-call rule that names its class by GraphQL type is read into. */
     private static final String TYPED_FIRST_CALL = "first-call-typed";
+    /** The kind a first-call rule that asks only for a call leaving a class prefix is read into. */
+    private static final String OUTSIDE_FIRST_CALL = "first-call-outside";
 
     private static final class Contract {
         final String kind;
@@ -201,19 +209,24 @@ public class DexDiff {
                     && parts[3].startsWith("L") && parts[3].endsWith(";");
             boolean firstCallTyped = parts.length == 4 && parts[0].equals("first-call")
                     && parts[2].equals("on-type-named") && parts[3].matches("[A-Za-z][A-Za-z0-9_]*");
+            boolean firstCallOutside = parts.length == 4 && parts[0].equals("first-call") && parts[2].equals("outside")
+                    && parts[3].startsWith("L") && parts[3].endsWith("/");
             boolean startCall = parts.length == 4 && parts[0].equals("start-call") && parts[2].equals("holding");
             boolean noCall = parts.length == 4 && parts[0].equals("no-call") && parts[2].equals("outside")
                     && parts[3].startsWith("L") && parts[3].endsWith("/");
-            if ((!singleCall && !firstCall && !firstCallTyped && !startCall && !noCall) || !parts[1].contains("->")) {
+            if ((!singleCall && !firstCall && !firstCallTyped && !firstCallOutside && !startCall && !noCall)
+                    || !parts[1].contains("->")) {
                 throw new IllegalArgumentException("Invalid contract line " + lineNumber
                         + ": expected single-call <method reference> in <caller method name>,"
                         + " first-call <method reference> on <class>,"
                         + " first-call <method reference> on-type-named <GraphQL type>,"
+                        + " first-call <method reference> outside <package prefix ending in />,"
                         + " start-call <method reference> holding <string>,"
                         + " no-call <method reference> outside <package prefix ending in />,"
                         + " or next-call <method reference> after <method reference> holding <string>");
             }
-            contracts.add(new Contract(firstCallTyped ? TYPED_FIRST_CALL : parts[0], parts[1], parts[3]));
+            String kind = firstCallTyped ? TYPED_FIRST_CALL : firstCallOutside ? OUTSIDE_FIRST_CALL : parts[0];
+            contracts.add(new Contract(kind, parts[1], parts[3]));
         }
         return contracts;
     }
@@ -1030,6 +1043,8 @@ public class DexDiff {
         // class is held afterwards to the classes whose getTypeName() answers the type.
         Map<String, String> typedFirstCallTargets = new HashMap<>();
         Map<String, Set<String>> typeNamedClasses = new HashMap<>();
+        // first-call outside: the method, and the class prefix its first call has to leave.
+        Map<String, String> outsideFirstCallTargets = new HashMap<>();
         // start-call: every call site of the method, with whether the call comes first there and
         // the strings its method loads.
         Map<String, List<StartSite>> startSites = new LinkedHashMap<>();
@@ -1046,6 +1061,8 @@ public class DexDiff {
             else if (contract.kind.equals(TYPED_FIRST_CALL)) {
                 typedFirstCallTargets.put(contract.callee, contract.target);
                 typeNamedClasses.put(contract.target, new TreeSet<>());
+            } else if (contract.kind.equals(OUTSIDE_FIRST_CALL)) {
+                outsideFirstCallTargets.put(contract.callee, contract.target);
             } else if (contract.kind.equals("no-call")) {
                 noCallInside.put(contract.callee, contract.target);
                 noCallSites.put(contract.callee, new ArrayList<>());
@@ -1066,6 +1083,8 @@ public class DexDiff {
                     String firstCallOn = firstCallTargets.get(s);
                     if (firstCallOn != null) firstCalls.put(s, firstCallBeforeReturn(m, firstCallOn));
                     if (typedFirstCallTargets.containsKey(s)) firstCalls.put(s, firstCallBeforeReturn(m, null));
+                    String leaving = outsideFirstCallTargets.get(s);
+                    if (leaving != null) firstCalls.put(s, firstCallOutside(m, leaving));
                     if (!typeNamedClasses.isEmpty()) recordTypeNamed(cd, m, typeNamedClasses);
                     if (!startSites.isEmpty()) recordStartSites(s, m, startSites);
                     if (!nextSites.isEmpty()) recordNextSites(s, m, nextSites);
@@ -1163,6 +1182,22 @@ public class DexDiff {
                     System.out.println("[diff] " + rule + ": no call on " + contract.target + " before its first return");
                     contractFindings.add("contract: " + contract.callee + " returns before it calls a method of "
                             + contract.target + " that takes no arguments, so the patch didn't fill it");
+                } else {
+                    System.out.println("[diff] " + rule + ": calls " + call + " before its first return");
+                }
+                continue;
+            }
+            if (contract.kind.equals(OUTSIDE_FIRST_CALL)) {
+                String call = firstCalls.get(contract.callee);
+                String rule = "contract first-call " + contract.callee + " outside " + contract.target;
+                if (call == null) {
+                    System.out.println("[diff] " + rule + ": not in the APK");
+                    contractFindings.add("contract: " + contract.callee + " is not in the APK, so nothing outside "
+                            + contract.target + " is called from it");
+                } else if (call.isEmpty()) {
+                    System.out.println("[diff] " + rule + ": no call outside it before its first return");
+                    contractFindings.add("contract: " + contract.callee + " returns before it calls a method outside "
+                            + contract.target + ", so the patch didn't fill it");
                 } else {
                     System.out.println("[diff] " + rule + ": calls " + call + " before its first return");
                 }
@@ -1352,6 +1387,26 @@ public class DexDiff {
             if (r instanceof MethodReference
                     && (owner == null || ((MethodReference) r).getDefiningClass().equals(owner))
                     && ((MethodReference) r).getParameterTypes().isEmpty()) {
+                return r.toString();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * The first call [m] makes, before any return or throw in its instruction order, to a method of
+     * a class whose type doesn't start with [prefix], whatever it takes, or an empty string when
+     * there is none. A call into the extension on the way there doesn't count, and doesn't stop the
+     * search.
+     */
+    private static String firstCallOutside(Method m, String prefix) {
+        if (m.getImplementation() == null) return "";
+        for (Instruction i : m.getImplementation().getInstructions()) {
+            String name = i.getOpcode().name;
+            if (name.startsWith("return") || name.equals("throw")) return "";
+            if (!(i instanceof ReferenceInstruction) || !name.startsWith("invoke")) continue;
+            Reference r = ((ReferenceInstruction) i).getReference();
+            if (r instanceof MethodReference && !((MethodReference) r).getDefiningClass().startsWith(prefix)) {
                 return r.toString();
             }
         }

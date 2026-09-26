@@ -21,8 +21,9 @@
     them), a move-exception the method's entry reaches, the one feed guard doubled, moved or
     missing, the reels hook deleted from the pre-EOF injector or put after a branch, the showcase
     stub left unfilled, calling another class, or calling a class that isn't the only one
-    answering its type name, and Clean up Reels' hook deleted from Facebook's Follow check or put
-    after a branch there. Each of the five ShortcutManager calls the settings patch sends to the
+    answering its type name, Clean up Reels' hook deleted from Facebook's Follow check or put
+    after a branch there, and the GenAI reel stub left unfilled, filled with a call that stays in
+    the extension, or calling Facebook's finder only after it has returned. Each of the five ShortcutManager calls the settings patch sends to the
     extension is left in Facebook's code by a build of its own, which has to fail that call's no-call
     rule and no other, and the contract file may hold no no-call rule without such a build. The
     call that gives the Facebook logo its touch listener is left as Facebook makes it, the stand-in
@@ -576,6 +577,11 @@ try {
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         'ReelDeclutter;->hideFollowButton()Z holding friends_tab_ifu: first in Lfixture/FollowCheck;->offersFollow(')) `
         "The good build's Follow hook was not first in Facebook's Follow check.`n$($good.Output -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        'GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside ' +
+        'Lapp/morphe/extension/: calls Lfixture/Attributions;->A02(Lfixture/ReelModel;Ljava/lang/String;)Lfixture/Model; ' +
+        'before its first return')) `
+        "The good build's GenAI reel stub was not reported calling Facebook's attribution finder.`n$($good.Output -join "`n")"
     # The settings patch sends each of these ShortcutManager calls to SettingsEntry, and the fixture's
     # publisher makes each one from a method of its own (Caller). Every no-call rule in the contract
     # file has to be one of them, or a rule with no bad build below would pass on "0 call sites".
@@ -708,6 +714,9 @@ try {
         'bad-logo-hook-other-call' = 'contract'
         'bad-logo-hook-other-view' = 'contract'
         'bad-logo-hook-twice' = 'contract'
+        'bad-finder-stub-not-filled' = 'contract'
+        'bad-finder-stub-extension-call' = 'contract'
+        'bad-finder-stub-call-after-return' = 'contract'
     }
     foreach ($shortcut in $shortcutCalls) { $bad["bad-shortcut-$($shortcut.Case)-left"] = 'contract' }
     $failures = @()
@@ -764,6 +773,17 @@ try {
             "$($case.Key) did not fail with its own logo finding alone.`nExpected: $($case.Value)`nGot:`n$($fails -join "`n")"
     }
 
+    # The GenAI reel stub's three builds fail on that stub's own rule alone: a call that stays in the
+    # extension, or Facebook's finder reached only after a return, is no fill.
+    $finderStub = 'Lapp/morphe/extension/facebook/feed/GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;'
+    foreach ($name in 'bad-finder-stub-not-filled', 'bad-finder-stub-extension-call', 'bad-finder-stub-call-after-return') {
+        $fails = @((Get-Findings $badResults[$name]).Fails)
+        $expected = "[diff] FAIL: contract: $finderStub returns before it calls a method outside Lapp/morphe/extension/, " +
+            "so the patch didn't fill it"
+        Assert-True ($fails.Count -eq 1 -and $fails[0] -ceq $expected) `
+            "$name did not fail on the GenAI reel stub's rule alone.`nExpected: $expected`nGot:`n$($fails -join "`n")"
+    }
+
     # Without a contract file the structural checks still run; only the call-site rule is off.
     $noContract = Invoke-DexDiff -Clean $cleanApk -Patched (Join-Path $caseRoot 'bad-no-guard.apk') `
         -Allowlist $emptyAllowlist -Name 'no-contract-file'
@@ -789,6 +809,9 @@ try {
             'first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/lang/Object;)Ljava/lang/Object; on-type-named Lfixture/Showcase;',
             'first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/lang/Object;)Ljava/lang/Object; on-type-named',
             'first-call storyType on-type-named ShowcaseFeedUnit',
+            'first-call Lapp/morphe/extension/facebook/feed/GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside Lapp/morphe/extension',
+            'first-call transparencyAttribution outside Lapp/morphe/extension/',
+            'first-call Lapp/morphe/extension/facebook/feed/GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside',
             'no-call Landroid/content/pm/ShortcutManager;->pushDynamicShortcut(Landroid/content/pm/ShortcutInfo;)V in Lapp/morphe/extension/',
             'no-call pushDynamicShortcut outside Lapp/morphe/extension/',
             'no-call Landroid/content/pm/ShortcutManager;->pushDynamicShortcut(Landroid/content/pm/ShortcutInfo;)V outside',
