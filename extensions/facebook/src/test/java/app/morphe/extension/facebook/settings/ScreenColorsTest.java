@@ -82,6 +82,7 @@ public class ScreenColorsTest {
     static Map<String, int[]> pairs(ScreenColors c) {
         Map<String, int[]> text = new LinkedHashMap<>();
         text.put("row title on its card", new int[]{c.title, c.card});
+        text.put("title of a row a tap acts on, on its card", new int[]{c.heading, c.card});
         text.put("row summary on its card", new int[]{c.summary, c.card});
         text.put("section title on the page", new int[]{c.heading, c.background});
         text.put("title bar and back arrow on the page", new int[]{c.title, c.background});
@@ -97,6 +98,7 @@ public class ScreenColorsTest {
         Map<String, int[]> parts = new LinkedHashMap<>();
         parts.put("switch on, against its card", new int[]{c.accent, c.card});
         parts.put("switch off, against its card", new int[]{c.switchOff, c.card});
+        parts.put("chevron of a row a tap opens something from, against its card", new int[]{c.summary, c.card});
         return parts;
     }
 

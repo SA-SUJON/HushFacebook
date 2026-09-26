@@ -64,6 +64,7 @@ import app.morphe.extension.shared.settings.Setting;
 import app.morphe.extension.shared.settings.preference.AbstractPreferenceFragment;
 import app.morphe.extension.shared.settings.preference.ClearLogBufferPreference;
 import app.morphe.extension.shared.settings.preference.ExportDiagnosticReportPreference;
+import app.morphe.extension.shared.settings.preference.ImmediateAction;
 
 /**
  * The preference list, built in code rather than from an XML resource so the bundle adds no
@@ -439,7 +440,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * the marker file, a tap turns it back on from the next start.
      */
     private Preference statusCard(Context context) {
-        Preference card = new Row(context);
+        Row card = new Row(context);
         card.setPersistent(false);
         ScreenColors colors = ScreenColors.shown;
         boolean paused = HushfacebookPause.isPaused();
@@ -479,6 +480,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         }
         card.setTitle(L10n.t("Hushfacebook is paused"));
         showStatus(card, context);
+        // A tap acts at once, taking the pause off the next start, and the card says so in words.
+        card.actsAtOnce = true;
         card.setOnPreferenceClickListener(p -> {
             boolean markerGone = HushfacebookPause.turnBackOn(context);
             Preference pause = findPreference(BaseSettings.PAUSED.key);
@@ -773,9 +776,17 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /** A row of text, which a screen reader calls a button when a tap does something. */
-    static final class Row extends Preference {
+    static final class Row extends Preference implements ImmediateAction {
+        /** Set on a row whose tap does what it says at once, which then goes without a chevron. */
+        boolean actsAtOnce;
+
         Row(Context context) {
             super(context);
+        }
+
+        @Override
+        public boolean actsOnTap() {
+            return actsAtOnce;
         }
 
         @Override

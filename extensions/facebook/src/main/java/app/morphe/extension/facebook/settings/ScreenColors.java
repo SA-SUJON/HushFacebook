@@ -8,7 +8,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -24,12 +30,15 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import app.morphe.extension.facebook.theme.TonePalette;
+import app.morphe.extension.shared.settings.preference.ImmediateAction;
 
 /**
  * The colours of the Hushfacebook screen, its rows and its dialogs when the Material You theme is
@@ -158,7 +167,7 @@ final class ScreenColors {
         return colors == null ? android.R.style.Theme_Material_NoActionBar : colors.theme();
     }
 
-    /** A row's title and summary, and its switch if it has one. */
+    /** A row's title and summary, its switch if it has one, and its chevron if a tap opens something. */
     void paintRow(View row, Preference preference) {
         TextView title = row.findViewById(android.R.id.title);
         if (title != null) {
@@ -175,6 +184,7 @@ final class ScreenColors {
             toggle.setThumbTintList(new ColorStateList(states, new int[]{accent, switchOff}));
             toggle.setTrackTintList(new ColorStateList(states, new int[]{half(accent), half(switchOff)}));
         }
+        paintChevron(row, preference);
         PreferenceGroup parent = preference.getParent();
         boolean grouped = parent instanceof PreferenceCategory;
         boolean first = !grouped || parent.getPreference(0) == preference;
@@ -200,6 +210,150 @@ final class ScreenColors {
         TextView title = row.findViewById(android.R.id.title);
         if (title != null) title.setTextColor(heading);
         row.setPaddingRelative(dp(row, 16), dp(row, 16), dp(row, 16), dp(row, 2));
+    }
+
+    /** Marks the chevron a row was given, so a recycled row's can be found and taken off. */
+    static final String CHEVRON = "hushfacebook_chevron";
+
+    /**
+     * Whether a tap on [preference] opens something: a dialog, a file picker, the browser. A
+     * switch says what a tap does with its switch, and a row that acts the moment it's tapped
+     * goes without a chevron, as the shared ImmediateAction asks, so the chevron keeps one meaning.
+     */
+    static boolean opensSomething(Preference preference) {
+        return preference.isSelectable() && !(preference instanceof TwoStatePreference)
+                && !(preference instanceof ImmediateAction && ((ImmediateAction) preference).actsOnTap());
+    }
+
+    /**
+     * The chevron at the end of every row a tap opens something from. Only its title's colour set
+     * such a row apart before, which is how "Licenses" and "Version" looked alike (WCAG 1.4.1). It
+     * sits in the row's widget frame, where a switch row keeps its switch. Rows are recycled, and
+     * one Row class draws plain lines too, so a row that shouldn't have one has it taken off.
+     */
+    private void paintChevron(View row, Preference preference) {
+        View found = row.findViewById(android.R.id.widget_frame);
+        if (!(found instanceof ViewGroup)) return;
+        ViewGroup frame = (ViewGroup) found;
+        View chevron = frame.findViewWithTag(CHEVRON);
+        if (!opensSomething(preference)) {
+            if (chevron != null) {
+                frame.removeView(chevron);
+                // Preference hides an empty frame only when it builds the row, which a recycled row
+                // skips, and an empty frame still takes its padding's width from the text.
+                if (frame.getChildCount() == 0) frame.setVisibility(View.GONE);
+            }
+            return;
+        }
+        ImageView image;
+        if (chevron instanceof ImageView) {
+            image = (ImageView) chevron;
+        } else {
+            image = new ImageView(row.getContext());
+            image.setTag(CHEVRON);
+            // The row already tells a screen reader it's a button; the shape adds nothing to hear.
+            image.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            frame.addView(image, new LinearLayout.LayoutParams(dp(row, 16), dp(row, 24)));
+        }
+        Drawable drawn = image.getDrawable();
+        if (!(drawn instanceof Chevron) || ((Chevron) drawn).color != summary) {
+            image.setImageDrawable(new Chevron(summary, dp(row, 2)));
+        }
+        image.setEnabled(preference.isEnabled());
+        frame.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * A chevron drawn in code, since Facebook's APK has no resource for one. It points the way
+     * the row reads, so it mirrors in a right-to-left layout, and it dims with its row.
+     */
+    static final class Chevron extends Drawable {
+        /** The colour it's drawn in on a row that can be tapped now. */
+        final int color;
+        private final ColorStateList colors;
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Path path = new Path();
+
+        Chevron(int color, float stroke) {
+            this.color = color;
+            colors = dimmedWhenDisabled(color);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(stroke);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setColor(color);
+        }
+
+        /**
+         * One arm's end, the tip and the other arm's end, as x and y pairs. The tip is at the end
+         * the row reads towards: the right, or the left in a right-to-left layout. Material's own
+         * chevron is 4.6 dp wide and 9.2 dp tall in a 24 dp icon, and this keeps that shape.
+         */
+        float[] points() {
+            Rect bounds = getBounds();
+            float half = bounds.height() * 0.19f;
+            float reach = getLayoutDirection() == View.LAYOUT_DIRECTION_RTL ? -half / 2 : half / 2;
+            float x = bounds.exactCenterX();
+            float y = bounds.exactCenterY();
+            return new float[]{x - reach, y - half, x + reach, y, x - reach, y + half};
+        }
+
+        /** The colour it draws in now, which follows its row's state. */
+        int currentColor() {
+            return paint.getColor();
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            float[] at = points();
+            path.rewind();
+            path.moveTo(at[0], at[1]);
+            path.lineTo(at[2], at[3]);
+            path.lineTo(at[4], at[5]);
+            canvas.drawPath(path, paint);
+        }
+
+        @Override
+        public boolean isAutoMirrored() {
+            return true;
+        }
+
+        @Override
+        public boolean onLayoutDirectionChanged(int layoutDirection) {
+            invalidateSelf();
+            return true;
+        }
+
+        @Override
+        public boolean isStateful() {
+            return true;
+        }
+
+        @Override
+        protected boolean onStateChange(int[] state) {
+            int now = colors.getColorForState(state, color);
+            if (now == paint.getColor()) return false;
+            paint.setColor(now);
+            invalidateSelf();
+            return true;
+        }
+
+        @Override
+        public void setAlpha(int alpha) {
+            paint.setAlpha(alpha);
+            invalidateSelf();
+        }
+
+        @Override
+        public void setColorFilter(@Nullable ColorFilter filter) {
+            paint.setColorFilter(filter);
+            invalidateSelf();
+        }
+
+        @Override
+        public int getOpacity() {
+            return PixelFormat.TRANSLUCENT;
+        }
     }
 
     /** Recovery is a choice, not another pair of settings rows. */
