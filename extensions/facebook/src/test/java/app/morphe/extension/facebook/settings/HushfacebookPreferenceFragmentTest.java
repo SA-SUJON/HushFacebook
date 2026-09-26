@@ -126,6 +126,23 @@ public class HushfacebookPreferenceFragmentTest {
         return -1;
     }
 
+    /**
+     * Facebook builds the feed's adapters once per feed view and the tray is one of them, so the
+     * switch can't act before a restart (an S22 check on 2026-09-26 pulled to refresh and got no
+     * tray back). The row says so, after what the tray is.
+     */
+    @Test
+    public void theStoriesTrayRowSaysTheSwitchWaitsForARestart() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.STORIES_TRAY);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int tray = indexOfKey(rows, Settings.HIDE_STORIES_TRAY.key);
+            assertTrue("the Stories tray row is missing", tray >= 0);
+            assertEquals("The row of stories at the top of the feed, Create story included. "
+                    + "The switch takes effect when Facebook restarts.", String.valueOf(rows.get(tray).getSummary()));
+        }
+    }
+
     @Test
     public void thePausedCardSaysWhatStaysInForEveryReason() {
         for (HushfacebookPause.Reason why : HushfacebookPause.Reason.values()) {

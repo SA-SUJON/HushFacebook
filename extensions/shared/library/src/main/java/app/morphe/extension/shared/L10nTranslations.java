@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(390);
+        Map<String, String> table = new HashMap<>(392);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -399,6 +399,8 @@ public final class L10nTranslations {
                 "Die Reihen mit Reels zwischen den Beitr\u00e4gen und die Reels, die Facebook dort anh\u00e4ngt, wo dein Feed endet.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Die Einstellung lie\u00df sich nicht vollst\u00e4ndig aktualisieren. Der gespeicherte Wert wird angezeigt.");
+        table.put("The switch takes effect when Facebook restarts.",
+                "Der Schalter wirkt, sobald Facebook neu startet.");
         table.put("There's no diagnostic data to clear.",
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
         table.put("There's no diagnostic data to put back.",
@@ -417,11 +419,11 @@ public final class L10nTranslations {
                 "Version %1$s f\u00fcr Facebook %2$s");
         table.put("Video file name",
                 "Dateiname f\u00fcr Videos");
-        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
-                "Videos hei\u00dfen %1$s. Fotos behalten Facebooks eigene Namen mit %2$s.");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
+                "Videos hei\u00dfen %1$s. Fotos behalten Facebooks eigene Namen mit %2$s.");
         table.put("Videos go to %1$s and photos to %2$s.",
                 "Videos landen in %1$s und Fotos in %2$s.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
@@ -455,7 +457,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(390);
+        Map<String, String> table = new HashMap<>(392);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -810,6 +812,8 @@ public final class L10nTranslations {
                 "Las filas de reels entre las publicaciones y los reels que Facebook a\u00f1ade donde termina tu feed.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "No se pudo terminar de actualizar el ajuste. Se muestra su valor guardado.");
+        table.put("The switch takes effect when Facebook restarts.",
+                "El interruptor surte efecto cuando Facebook se reinicie.");
         table.put("There's no diagnostic data to clear.",
                 "No hay datos de diagn\u00f3stico que borrar.");
         table.put("There's no diagnostic data to put back.",
@@ -828,11 +832,11 @@ public final class L10nTranslations {
                 "Versi\u00f3n %1$s para Facebook %2$s");
         table.put("Video file name",
                 "Nombre de archivo de los videos");
-        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
-                "Los videos se llaman %1$s. Las fotos conservan los nombres %2$s propios de Facebook.");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
+                "Los videos se llaman %1$s. Las fotos conservan los nombres %2$s propios de Facebook.");
         table.put("Videos go to %1$s and photos to %2$s.",
                 "Los videos van a %1$s y las fotos a %2$s.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
@@ -866,7 +870,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(390);
+        Map<String, String> table = new HashMap<>(392);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1221,6 +1225,8 @@ public final class L10nTranslations {
                 "Deretan Reels di antara postingan, dan Reels yang ditambahkan Facebook di akhir Kabar Beranda Anda.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Pengaturan ini tidak dapat selesai diperbarui. Nilai yang tersimpan ditampilkan.");
+        table.put("The switch takes effect when Facebook restarts.",
+                "Sakelar ini berlaku saat Facebook dimulai ulang.");
         table.put("There's no diagnostic data to clear.",
                 "Tidak ada data diagnostik yang dapat dihapus.");
         table.put("There's no diagnostic data to put back.",
@@ -1239,11 +1245,11 @@ public final class L10nTranslations {
                 "Versi %1$s untuk Facebook %2$s");
         table.put("Video file name",
                 "Nama file video");
-        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
-                "Video diberi nama %1$s. Foto tetap memakai nama %2$s bawaan Facebook.");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
+                "Video diberi nama %1$s. Foto tetap memakai nama %2$s bawaan Facebook.");
         table.put("Videos go to %1$s and photos to %2$s.",
                 "Video disimpan ke %1$s dan foto ke %2$s.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
@@ -1277,7 +1283,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(390);
+        Map<String, String> table = new HashMap<>(392);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1632,6 +1638,8 @@ public final class L10nTranslations {
                 "As fileiras de reels entre as publica\u00e7\u00f5es e os reels que o Facebook adiciona onde o seu feed termina.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "N\u00e3o foi poss\u00edvel concluir a atualiza\u00e7\u00e3o da configura\u00e7\u00e3o. O valor salvo est\u00e1 sendo mostrado.");
+        table.put("The switch takes effect when Facebook restarts.",
+                "A op\u00e7\u00e3o passa a valer quando o Facebook reiniciar.");
         table.put("There's no diagnostic data to clear.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
         table.put("There's no diagnostic data to put back.",
@@ -1650,11 +1658,11 @@ public final class L10nTranslations {
                 "Vers\u00e3o %1$s para o Facebook %2$s");
         table.put("Video file name",
                 "Nome do arquivo de v\u00eddeo");
-        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
-                "Os v\u00eddeos se chamam %1$s. As fotos mant\u00eam os nomes %2$s do pr\u00f3prio Facebook.");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
+                "Os v\u00eddeos se chamam %1$s. As fotos mant\u00eam os nomes %2$s do pr\u00f3prio Facebook.");
         table.put("Videos go to %1$s and photos to %2$s.",
                 "Os v\u00eddeos v\u00e3o para %1$s e as fotos para %2$s.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
@@ -1688,7 +1696,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(390);
+        Map<String, String> table = new HashMap<>(392);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2043,6 +2051,8 @@ public final class L10nTranslations {
                 "G\u00f6nderilerin aras\u0131ndaki Reels s\u0131ralar\u0131 ve Facebook'un ak\u0131\u015f\u0131n\u0131n bitti\u011fi yere ekledi\u011fi Reels videolar\u0131.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Ayar\u0131n g\u00fcncellenmesi tamamlanamad\u0131. Kay\u0131tl\u0131 de\u011feri g\u00f6steriliyor.");
+        table.put("The switch takes effect when Facebook restarts.",
+                "Anahtar, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda etkili olur.");
         table.put("There's no diagnostic data to clear.",
                 "Temizlenecek tan\u0131lama verisi yok.");
         table.put("There's no diagnostic data to put back.",
@@ -2061,11 +2071,11 @@ public final class L10nTranslations {
                 "Facebook %2$s i\u00e7in %1$s s\u00fcr\u00fcm\u00fc");
         table.put("Video file name",
                 "Video dosya ad\u0131");
-        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
-                "Videolar\u0131n ad\u0131 %1$s olur. Foto\u011fraflar Facebook'un kendi %2$s adlar\u0131n\u0131 korur.");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
+                "Videolar\u0131n ad\u0131 %1$s olur. Foto\u011fraflar Facebook'un kendi %2$s adlar\u0131n\u0131 korur.");
         table.put("Videos go to %1$s and photos to %2$s.",
                 "Videolar %1$s klas\u00f6r\u00fcne, foto\u011fraflar %2$s klas\u00f6r\u00fcne kaydedilir.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",

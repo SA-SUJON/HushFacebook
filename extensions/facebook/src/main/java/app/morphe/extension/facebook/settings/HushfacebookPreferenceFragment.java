@@ -206,8 +206,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("The row of friend suggestions between posts.")));
             }
             if (build.contains(PatchFamily.STORIES_TRAY)) {
+                // Facebook builds the feed's adapters once, when the feed is set up, and the tray is
+                // one of them. The hook is asked then and not again, so a change waits for a restart.
                 feed.addPreference(toggle(context, Settings.HIDE_STORIES_TRAY, L10n.t("Hide the Stories tray"),
-                        L10n.t("The row of stories at the top of the feed, Create story included.")));
+                        L10n.t("The row of stories at the top of the feed, Create story included.") + " "
+                                + L10n.t("The switch takes effect when Facebook restarts.")));
             }
             if (build.contains(PatchFamily.FEED_REELS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_FEED_REELS, L10n.t("Hide Reels in the feed"),

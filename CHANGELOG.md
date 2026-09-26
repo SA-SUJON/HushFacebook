@@ -2,6 +2,10 @@
 
 Every Hushfacebook release, newest first.
 
+## Unreleased
+
+* **Facebook:** The Hide Stories tray switch now says, in its settings row and in the README, that it takes effect when Facebook restarts. Facebook builds the feed's fixed rows once, when the feed is set up, so pulling to refresh or coming back to the feed neither brings the tray back nor takes it away. The README used to say the tray comes or goes the next time the feed is built.
+
 ## 0.1.8 (2026-09-26)
 
 * **Facebook:** Clean up Reels now takes the Follow button off reels on the Reels tab too. It only caught the Following button next to people you already follow, so a reel from anyone else kept its Follow button.
