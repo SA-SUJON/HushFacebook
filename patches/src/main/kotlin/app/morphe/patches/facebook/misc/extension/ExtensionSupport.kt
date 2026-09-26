@@ -63,6 +63,20 @@ internal fun Method.parameterRegisterNumber(index: Int): Int =
 internal fun Method.requireParameterIntact(what: String, parameterIndex: Int, readAt: Collection<Int>) {
     val register = parameterRegisterNumber(parameterIndex)
     val registers = if (parameterTypes[parameterIndex].width() == 2) setOf(register, register + 1) else setOf(register)
+    requireEntryValueAt(what, "parameter $parameterIndex (v$register)", registers, readAt)
+}
+
+/** [requireParameterIntact] for `this`, which an instance method keeps in the register past its locals. */
+internal fun Method.requireThisIntact(what: String, readAt: Collection<Int>) {
+    if (AccessFlags.STATIC.isSet(accessFlags)) {
+        throw PatchException("$what: $definingClass->$name is static, so it has no this for the hook to read")
+    }
+    val register = localRegisterCount()
+    requireEntryValueAt(what, "this (v$register)", setOf(register), readAt)
+}
+
+/** Throws unless nothing that can run before one of [readAt] writes any of [registers], which hold [held] on entry. */
+private fun Method.requireEntryValueAt(what: String, held: String, registers: Set<Int>, readAt: Collection<Int>) {
     val flow = ControlFlow.of(this)
     val writes = flow.instructions.indices.filter { index ->
         val instruction = flow.instructions[index]
@@ -83,7 +97,7 @@ internal fun Method.requireParameterIntact(what: String, parameterIndex: Int, re
     val spoiled = readAt.filter { reached[it] }.sorted()
     if (spoiled.isNotEmpty()) {
         throw PatchException(
-            "$what: $definingClass->$name writes over parameter $parameterIndex (v$register) at instruction(s) " +
+            "$what: $definingClass->$name writes over $held at instruction(s) " +
                 "${writes.joinToString()}, before instruction(s) ${spoiled.joinToString()} where the hook reads it",
         )
     }

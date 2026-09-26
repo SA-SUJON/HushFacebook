@@ -51,6 +51,9 @@ class SystemFontFixtureTest {
         val resolver = resolvers.single()
         assertTrue("${bundle.name}: the resolver needs three free locals", localRegisters(resolver) >= 3)
         assertTrue("${bundle.name}: the resolver returns an object", objectReturns(resolver).isNotEmpty())
+        // At every object return the family and the weight are still in their own registers, and
+        // v0 to v2 hold nothing the resolver reads afterwards.
+        resolver.requireResolverHookFits()
 
         val type = familyType(resolver)
         val family = FixtureDex.classes(bundle, setOf(type)).getValue(type)
@@ -94,6 +97,8 @@ class SystemFontFixtureTest {
             val builds = chain.flatMap(::buildMethods)
             assertTrue("${bundle.name}: $builder builds nothing", builds.isNotEmpty())
             builds.forEach { assertTrue("${bundle.name}: a build needs two free locals", localRegisters(it) >= 2) }
+            // And at each of its object returns `this` is still the builder, and v0 and v1 are free.
+            builds.forEach { it.requireBuilderHookFits() }
             assertTrue("${bundle.name}: $builder takes no variation string", chain.flatMap(::variationSetters).isNotEmpty())
         }
     }

@@ -14,12 +14,16 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.parameterRegister
+import app.morphe.patches.facebook.misc.extension.requireFreeAt
 import app.morphe.patches.facebook.misc.extension.requireLocals
+import app.morphe.patches.facebook.misc.extension.requireParameterIntact
+import app.morphe.patches.facebook.misc.extension.requireThisIntact
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
 import app.morphe.util.superclassChain
+import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private const val PATCH = "Use the system font"
@@ -81,6 +85,7 @@ private fun BytecodePatchContext.hookTypefaceRepository() {
     // so the call reads the same whatever the frame keeps where. The copies read through the
     // 16-bit forms: a parameter above v15 would otherwise be dropped by the assembler unheard.
     mutable.requireLocals(PATCH, 3)
+    mutable.requireResolverHookFits()
     val familyRegister = mutable.parameterRegister(0)
     val weightRegister = mutable.parameterRegister(resolver.parameterTypes.size - 1)
     mutable.forEachObjectReturn { register ->
@@ -120,6 +125,7 @@ private fun BytecodePatchContext.hookVariableFontBuilders() {
         for (build in buildMethods(classDef)) {
             val mutable = mutableClass.findMutableMethodOf(build)
             mutable.requireLocals(PATCH, 2)
+            mutable.requireBuilderHookFits()
             mutable.forEachObjectReturn { register ->
                 listOfNotNull(
                     if (register != 0) "move-object/from16 v0, v$register" else null,
@@ -137,6 +143,34 @@ private fun BytecodePatchContext.hookVariableFontBuilders() {
 }
 
 /** Puts [instructions] in front of each `return-object`, last first, given the register it returns. */
+/**
+ * Proves the resolver's hook can go in at each object return. It reads the family, the first
+ * parameter, and the weight, the last, from their own registers there, so neither may have been
+ * written over on the way; and it copies into v0 to v2, so nothing the method reads afterwards may
+ * sit in them, the answer the return hands back aside, which the hook replaces on purpose.
+ */
+internal fun Method.requireResolverHookFits() {
+    val returns = objectReturns(this)
+    requireParameterIntact(PATCH, 0, returns)
+    requireParameterIntact(PATCH, parameterTypes.size - 1, returns)
+    requireReturnCopiesFree(returns, listOf(0, 1, 2))
+}
+
+/** The same for a builder's build: `this` still in its register at each object return, and v0 and v1 free there. */
+internal fun Method.requireBuilderHookFits() {
+    val returns = objectReturns(this)
+    requireThisIntact(PATCH, returns)
+    requireReturnCopiesFree(returns, listOf(0, 1))
+}
+
+private fun Method.requireReturnCopiesFree(returns: List<Int>, copies: List<Int>) {
+    val instructions = implementation!!.instructions.toList()
+    for (index in returns) {
+        val answer = (instructions[index] as OneRegisterInstruction).registerA
+        requireFreeAt(PATCH, index, copies - answer)
+    }
+}
+
 private fun MutableMethod.forEachObjectReturn(instructions: (register: Int) -> List<String>) {
     objectReturns(this).asReversed().forEach { index ->
         val register = getInstruction<OneRegisterInstruction>(index).registerA
