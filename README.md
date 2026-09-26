@@ -35,7 +35,7 @@ This project has no connection to Meta or to the Morphe project. Neither endorse
 
 1. Install [Morphe Manager](https://github.com/MorpheApp/morphe-manager) 1.32.0 or newer.
 2. Add Hushfacebook as a patch source: https://morphe.software/add-source?github=SysAdminDoc%2FHushfacebook
-3. Get Facebook 580.0.0.51.74 for arm64-v8a from [APKMirror](https://www.apkmirror.com/apk/facebook-2/facebook/). Take the Android 11+ bundle (.apkm). Facebook 577.0.0.50.72 works too.
+3. Get Facebook 580.0.0.51.74 from [APKMirror](https://www.apkmirror.com/apk/facebook-2/facebook/) and take the bundle labelled (arm64-v8a) (240-640dpi) (Android 11+), a .apkm file. That's build 475019344, the one these patches are checked against. APKMirror has several other arm64-v8a builds of the same version, and Morphe Manager warns about those ([Unsupported Version](#unsupported-version) explains why). Facebook 577.0.0.50.72 works too, in its (arm64-v8a) (360-480dpi) (Android 11+) bundle.
 4. In Morphe Manager, pick that file, keep the default patch selection or change it, and patch.
 
 There are 24 patches for `com.facebook.katana`. The arm64-v8a builds are the ones they're checked against. Meta builds the armeabi-v7a and Android 9 variants of each release separately, and those lack code some of the patches need.
@@ -147,9 +147,61 @@ Hushfacebook pauses itself when Facebook crashes or freezes within a minute of s
 - **Other Meta apps.** A patched Facebook is signed with your key, not Meta's. Meta's apps share permissions that Android only lets one signer own, so with a re-signed Facebook installed, the official Messenger, Facebook Lite, Instagram or Threads may refuse to install (`INSTALL_FAILED_DUPLICATE_PERMISSION`), and signing in to one of them through Facebook may fail. Installing through Morphe Manager's Root Mount keeps Meta's signature and avoids both.
 - **Links from other apps.** Android may stop sending facebook.com links to a re-signed Facebook, because the app's link verification is tied to Meta's signature.
 - **Update notices from outside Facebook.** `Stop update prompts` reaches what Facebook's own code shows. Meta App Manager, the updater that ships on Samsung and some other phones, can still post its own notices about a Facebook it can't update, and those come from that app rather than from Facebook. Turn off its notifications in Android's settings, or disable it. Google Play won't update an app signed with another key, so a patched Facebook stays on the version you patched until you patch a newer one.
-- **Two Facebook builds.** Patches are checked on Facebook 580.0.0.51.74 and 577.0.0.50.72. Another build will often work, and Morphe Manager can patch it if you allow other versions, but it hasn't been checked.
+- **Two Facebook builds.** Patches are checked on one build each of Facebook 580.0.0.51.74 and 577.0.0.50.72, the bundles [Install](#install) names. Another build will often work, and Morphe Manager patches it once you tap Proceed anyway at its [Unsupported Version](#unsupported-version) warning, but it hasn't been checked.
 - **System font.** `Use the system font` swaps the typefaces Facebook's own text engine hands out, which is where the feed, comments, menus and Bloks screens get theirs. A screen that loads a font another way keeps Meta's, and so do the icons and the text you add to a story.
 - **Downloads.** A feed or Watch video saves at the quality you set once Facebook has built its player, which happens when it starts playing. Until then Download to phone falls back to the single file the post names. When there's none, it asks you to play the video for a moment and try again. Stories encoded only as VP9 save at 360p, because Android can't join VP9 video with AAC sound in an MP4. Stories Facebook sends only as AV1 save at the lower single-file quality before Android 14, or on a phone that can't decode AV1. And a story that was already open when you turned Save any story on saves at 360p until you open it again.
+
+## Troubleshooting
+
+Morphe Manager does the patching and the install, so most of these messages come from it or from Android. They're the ones people have run into so far. If yours isn't here, see [Getting help](#getting-help).
+
+### Unsupported Version
+
+Manager shows this before it patches, usually with "This is a different build of the same version. The patches require a specific build" and a build number under the version. Facebook 580.0.0.51.74 comes in nine arm64-v8a builds on APKMirror, and Google Play hands each phone the one that fits its screen and Android version. Each build is compiled separately, with code of its own. Hushfacebook declares only the build its patches are checked against, 475019344, and Morphe's format takes one arm64 build per version, so the other eight all get this warning. On 577.0.0.50.72 the declared build is 474426275.
+
+To get rid of it, download the (arm64-v8a) (240-640dpi) (Android 11+) bundle from APKMirror and pick that file. **Proceed anyway** patches the build you have with every patch you chose. One of them, build 475019283, took every patch and worked on a Galaxy S25, but the other builds haven't been tried. If a patch can't find what it changes, patching stops and names it.
+
+The same check is why Manager won't offer the Facebook you installed from Google Play as the app to patch, unless it's that exact build.
+
+### Unexpected end of ZLIB input stream
+
+The full line is `java.io.EOFException: Unexpected end of ZLIB input stream`, with `SplitApkPreparer` a few lines below it. A .apkm is a zip holding several APKs. Manager could read its list of contents, but one of the APKs inside ends before it should, so the file is damaged. An interrupted or half-finished download is the usual cause. Delete the file and download the bundle again, and before you pick it, check that its size matches the one APKMirror's download page gives.
+
+### No space left on device
+
+The log says `ENOSPC (No space left on device)`: the phone ran out of storage part way through. Manager only warns when less than 1 GB is free, and Facebook needs more than that. One patch ran out with 1.08 GB left. Keep at least 2 GB free while you patch. On a computer, patching the 580 bundle with every patch takes about 1.3 GB of working space, and on a phone Manager also keeps its own copies of the bundle.
+
+### Update required
+
+Manager says the Hushfacebook bundle needs a newer patcher version. Your Morphe Manager is older than this bundle can work with, so update it to the version [Install](#install) names and patch again.
+
+### Package conflict
+
+At install, Manager says the Facebook already on your phone has to be uninstalled first ("Package conflict" or "Uninstall required"). Android only installs an update signed with the same key as the app it replaces, and Meta's Facebook carries Meta's key. Uninstalling deletes what Facebook keeps on the phone, so you'll sign in again afterwards. Your account itself isn't touched. A Facebook you patched before with a different key hits the same wall, and [Keep your signing key](#keep-your-signing-key) covers that. A Root Mount install on a rooted phone goes over Meta's app and doesn't ask.
+
+### INSTALL_FAILED_DUPLICATE_PERMISSION
+
+Some of Meta's apps declare permissions under the same names as Facebook, and Android lets only one signing key own each name. So Meta's own Messenger, Facebook Lite, Instagram or Threads may refuse to sit beside a patched Facebook, and whichever of the two is installed second fails. [Known limitations](#known-limitations) has more.
+
+### Patching stops on one patch
+
+A patch couldn't find the code it changes, and the log names the patch and what it looked for. That happens when the file isn't one of the builds Hushfacebook declares, because Facebook moves its code around from one build to the next. Pick the bundle [Install](#install) names, or patch without that one. If it stops on the declared bundle, please [report it](https://github.com/SysAdminDoc/Hushfacebook/issues/new?template=bug_report.yml) and paste the log.
+
+## Your Facebook account
+
+People ask whether a patched Facebook puts their account at risk. Here's what we know.
+
+**Can Meta tell?** Assume it can. A patched Facebook is signed with your key rather than Meta's, and Facebook's own code checks that signature in places, which is why `Restore screens on re-signed builds` exists. Some of what Facebook normally sends home stops too, like the ad reports `Block ad telemetry` turns off and the click tracker on links you open in your browser. Meta could notice those going quiet.
+
+**What stays the same?** Your feed, stories and reels still come from Meta's servers, ads included, and Hushfacebook hides things on your phone after they arrive. It doesn't post, like, follow or message on your behalf, and it doesn't change how you sign in. A video you save comes from the same Meta server the player streams it from, and Hushfacebook itself sends nothing anywhere (see [Privacy](#privacy)).
+
+**Could my account be suspended?** Nobody can promise it won't be. Meta's [Terms of Service](https://www.facebook.com/terms/) ask for its written permission before anyone modifies its apps (section 3.4), and they let Meta suspend or disable an account it decides has seriously or repeatedly broken them (section 4.2). We haven't heard of an account suspended over Hushfacebook. It's a young project, though, so that doesn't prove much.
+
+**Is it safe to make a new account in the patched app?** It carries the same risk as using any account there. The sign-up screens are Facebook's own and no patch changes them, but a brand-new account may be asked to confirm a phone number or who you are, whatever app it's made in. If you'd rather not risk the account you care about, try Hushfacebook with a fresh test account first. That's the safer way to find out.
+
+## Getting help
+
+Questions about setting up or whether a Facebook build works belong in [Discussions](https://github.com/SysAdminDoc/Hushfacebook/discussions), where an answer helps the next person too. For something that's broken, use the [bug form](https://github.com/SysAdminDoc/Hushfacebook/issues/new?template=bug_report.yml) and add the diagnostic report it asks for, since that answers most of what we'd ask. Ideas go on the [feature form](https://github.com/SysAdminDoc/Hushfacebook/issues/new?template=feature_request.yml). When Morphe Manager itself misbehaves with every app, not only Facebook, [Morphe's own tracker](https://github.com/MorpheApp/morphe-manager/issues) is the place. Releases are published here, and the add-source link under [Install](#install) always fetches the newest one.
 
 ## Privacy
 

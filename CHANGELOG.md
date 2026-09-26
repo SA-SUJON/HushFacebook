@@ -9,6 +9,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** New patch, Use the system font. It draws Facebook's text in your phone's font instead of Meta's Optimistic, at the same weight and slant, and leaves the icons and the text you put on a story alone. The patch starts off in Morphe Manager, and its switch, under Appearance in Hushfacebook's settings, starts on once you pick it. Restart Facebook after changing the switch. Asked for in issue #1.
 * **Facebook:** You can now open Hushfacebook's settings from inside Facebook by long-pressing the Facebook logo at the top of your feed, handy on a launcher with no long-press menu (#2). A tap on the logo still does what it always did, and the Hushfacebook item on Facebook's launcher icon stays.
 * **Facebook:** Hide AI-detected posts now reaches Reels and Watch. A new switch under Reels and Watch takes out the reels and videos Facebook's own detection marked as made with AI, going by the same flag the viewer's own AI label reads, so a reel only its creator labelled stays. Like the feed switch it starts off, and a reel whose flag can't be read stays.
+* **Facebook:** The README has a Troubleshooting section for the Morphe Manager messages people have run into: Unsupported Version on another build of 580, a damaged .apkm, running out of storage, an outdated Manager and install conflicts. It also says what Meta can see of a patched Facebook and where to ask for help, and its install steps name the exact APKMirror bundle to take.
 
 ## 0.1.8 (2026-09-26)
 
