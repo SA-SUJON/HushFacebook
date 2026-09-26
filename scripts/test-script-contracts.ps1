@@ -1618,6 +1618,35 @@ try {
     Assert-Throws { Invoke-Facts } '*' 'An index counting patches the catalog does not have was accepted.'
     Reset-FactsFile 'patches-bundle.json'
 
+    # Read one way, all at once: every "N patches" the description says has to be one count and
+    # every "Facebook <build>" one build. The lag check read the first of each and the equality
+    # check any, so a description quoting the catalog's count once and a stale one elsewhere, or
+    # naming another build beside the target, passed the equality check. On both paths now.
+    $indexCount = [regex]::Match([string](Get-Content -LiteralPath (Join-Path $factsRoot 'patches-bundle.json') -Raw |
+        ConvertFrom-Json).description, '(?<![\d.])(\d+) patches\b').Groups[1].Value
+    $indexCounts = [regex]::Matches((Get-Content -LiteralPath (Join-Path $factsRoot 'patches-bundle.json') -Raw), '(?<!\d)\d+ patches\b').Count
+    Assert-True ($indexCounts -ge 2) "The copied description names its patch count once, so the stale-count case would prove nothing."
+    $factsTarget = (Get-PatchTarget -PatchList (Get-Content -LiteralPath (Join-Path $factsRoot 'patches-list.json') -Raw |
+        ConvertFrom-Json)).PackageVersion
+    Assert-True ([regex]::Matches((Get-Content -LiteralPath (Join-Path $factsRoot 'patches-bundle.json') -Raw),
+            "Facebook $([regex]::Escape($factsTarget))(?!\d)").Count -ge 2) `
+        "The copied description names Facebook $factsTarget once, so the other-build case would prove nothing."
+    foreach ($case in @(
+            @{ Name = 'a stale count beside the catalog''s'; Pattern = "*names 3 and $indexCount patches, and it has to name one count*"
+                Edit = { param($text) ([regex]'(?<!\d)\d+ patches\b').Replace($text, '3 patches', 1) } },
+            @{ Name = 'another build beside the target'; Pattern = "*names Facebook $factsTarget and Facebook 9.9.9.9.9, and it has to name one build*"
+                Edit = { param($text) $at = $text.LastIndexOf("Facebook $factsTarget")
+                    $text.Substring(0, $at) + 'Facebook 9.9.9.9.9' + $text.Substring($at + "Facebook $factsTarget".Length) } })) {
+        Set-FactsFile 'patches-bundle.json' $case.Edit
+        try {
+            Assert-Throws { Invoke-Facts } $case.Pattern "An index description naming $($case.Name) was accepted."
+            Assert-Throws { & $factsScript -Root $factsRoot -SkipDescriptionTestCount -AllowPublishedIndexLag -SkipUrlCheck 6> $null } `
+                $case.Pattern "The lenient check read an index description naming $($case.Name) as one fact."
+        } finally {
+            Reset-FactsFile 'patches-bundle.json'
+        }
+    }
+
     # The same number in the README, which is the other half of the same promise.
     Set-FactsFile 'README.md' {
         param($text) $text -replace '(?<!\d)\d+ patches\b', '3 patches'
