@@ -11,6 +11,7 @@ import android.app.Application;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
@@ -22,6 +23,10 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.view.HapticFeedbackConstants;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -35,12 +40,15 @@ import app.morphe.extension.facebook.feed.ReturnRefresh;
 /**
  * How the Hushfacebook screen is reached.
  *
- * <p>A long-press shortcut on Facebook's launcher icon opens Facebook's launcher entry with
- * {@link #EXTRA_OPEN_SETTINGS}. Every Facebook activity reports its intent here from
- * {@code onCreate} and {@code onNewIntent}, and the next Facebook activity to resume shows the
- * screen as a full screen dialog. Nothing is added to Facebook's manifest, so no resource has to
- * be rebuilt to get here. The shortcut is kept first among Facebook's own, because a launcher
- * shows only the first few.
+ * <p>Inside Facebook, a long press on the Facebook logo at the top of the home feed opens it over
+ * that screen (see {@link #setLogoTouchListener}).
+ *
+ * <p>From the home screen, a long-press shortcut on Facebook's launcher icon opens Facebook's
+ * launcher entry with {@link #EXTRA_OPEN_SETTINGS}. Every Facebook activity reports its intent
+ * here from {@code onCreate} and {@code onNewIntent}, and the next Facebook activity to resume
+ * shows the screen as a full screen dialog. Nothing is added to Facebook's manifest, so no resource
+ * has to be rebuilt to get here. The shortcut is kept first among Facebook's own, because a
+ * launcher shows only the first few, and some launchers have no shortcut menu at all (#2).
  */
 @SuppressWarnings("unused")
 public final class SettingsEntry {
@@ -253,6 +261,150 @@ public final class SettingsEntry {
         } catch (Exception ex) {
             Logger.printException(() -> "Settings entry: onNewIntent failure", ex);
         }
+    }
+
+    /**
+     * Facebook's call that gives the Facebook logo at the top of the home feed its touch listener
+     * comes here instead. The patch sends the one right after the logo gets its tap, in the method
+     * that builds the logo, with the same registers.
+     *
+     * <p>Facebook passes no listener for a plain logo, and the logo gets one that opens this
+     * screen on a long press. When Facebook passes its own, Facebook reads the logo's gestures
+     * itself (its World Cup mode takes a double tap there, and a long press that opens its game),
+     * so its listener goes on as it was and the long press stays Facebook's.
+     *
+     * <p>No switch reads this, so Pause leaves it working: it's the way back to the switch that
+     * resumes Hushfacebook. Anything that goes wrong leaves the logo with Facebook's listener.
+     */
+    public static void setLogoTouchListener(View logo, View.OnTouchListener facebooks) {
+        View.OnTouchListener listener = facebooks;
+        if (facebooks == null) {
+            try {
+                listener = new LogoPress();
+                Logger.printInfo(() -> "Settings entry: a long press on the Facebook logo opens the settings");
+            } catch (Throwable failure) {
+                Logger.printException(() -> "Settings entry: could not watch the Facebook logo", failure);
+            }
+        } else {
+            Logger.printInfo(() -> "Settings entry: Facebook reads the logo's long press itself here, so it stays Facebook's");
+        }
+        // Facebook's own call, with Facebook's listener or the one above.
+        logo.setOnTouchListener(listener);
+    }
+
+    /**
+     * Times a press on the Facebook logo. Every touch still reaches the logo as it did, so a tap
+     * is Facebook's. A press held for the phone's long-press time opens this screen, with the
+     * same vibration a long press gives, and the rest of that touch is kept from the logo, so
+     * letting go isn't also a tap.
+     *
+     * <p>It doesn't use the logo's own long-press handling. Facebook gives the logo an
+     * accessibility delegate that puts back the long-press state it saw before the logo had any
+     * listeners, and it does that each time an accessibility service reads the screen: after one
+     * read by TalkBack, a password manager or a UI dump, a long-click listener would stop firing.
+     */
+    static final class LogoPress implements View.OnTouchListener {
+        private final Runnable fire = this::fire;
+        /** The logo while a press on it is being timed. */
+        private View pressed;
+        private float downX;
+        private float downY;
+        /** This touch opened the screen, so the rest of it isn't the logo's. */
+        private boolean opened;
+
+        @Override
+        public boolean onTouch(View logo, MotionEvent event) {
+            try {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        stop();
+                        opened = false;
+                        // A long press Facebook gave the logo itself stays Facebook's.
+                        if (logo.isLongClickable()) return false;
+                        pressed = logo;
+                        downX = event.getX();
+                        downY = event.getY();
+                        logo.postDelayed(fire, ViewConfiguration.getLongPressTimeout());
+                        return false;
+                    case MotionEvent.ACTION_MOVE:
+                        // The same leeway the logo gives its own press before it lets go.
+                        if (pressed != null && !within(logo, event)) stop();
+                        return opened;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        stop();
+                        boolean ours = opened;
+                        opened = false;
+                        return ours;
+                    default:
+                        return opened;
+                }
+            } catch (Throwable failure) {
+                Logger.printException(() -> "Settings entry: could not follow a press on the Facebook logo", failure);
+                return false;
+            }
+        }
+
+        private static boolean within(View logo, MotionEvent event) {
+            float slop = ViewConfiguration.get(logo.getContext()).getScaledTouchSlop();
+            float x = event.getX();
+            float y = event.getY();
+            return x >= -slop && y >= -slop && x < logo.getWidth() + slop && y < logo.getHeight() + slop;
+        }
+
+        private void stop() {
+            View logo = pressed;
+            pressed = null;
+            if (logo != null) logo.removeCallbacks(fire);
+        }
+
+        private void fire() {
+            View logo = pressed;
+            pressed = null;
+            if (logo == null || !logo.isAttachedToWindow()) return;
+            try {
+                // Not asked for, and letting go is Facebook's tap, as it is on a Facebook without this.
+                if (!requestFromLogo(logo)) return;
+                opened = true;
+                logo.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                // The logo lets go of its press here, so letting go of the screen isn't a tap on it.
+                long now = SystemClock.uptimeMillis();
+                MotionEvent cancel = MotionEvent.obtain(now, now, MotionEvent.ACTION_CANCEL, downX, downY, 0);
+                logo.onTouchEvent(cancel);
+                cancel.recycle();
+            } catch (Throwable failure) {
+                Logger.printException(() -> "Settings entry: the long press on the Facebook logo failed", failure);
+            }
+        }
+    }
+
+    /**
+     * Asks for the screen over the logo's activity, the way the launcher shortcut does, so it
+     * waits for the activity to settle and follows it to the next screen if it goes away.
+     *
+     * @return whether the request was made.
+     */
+    static boolean requestFromLogo(View logo) {
+        Activity activity = activityOf(logo.getContext());
+        if (activity == null) {
+            Logger.printInfo(() -> "Settings entry: the Facebook logo isn't in an activity, so its long press is Facebook's");
+            return false;
+        }
+        requestedAt = SystemClock.elapsedRealtime();
+        openPending = true;
+        Logger.printInfo(() -> "Settings requested by a long press on the Facebook logo");
+        OpenWhenResumed.openWhenSettled(activity);
+        return true;
+    }
+
+    /** The activity a view's context wraps, or null. The depth guards against a wrapper that wraps itself. */
+    private static Activity activityOf(Context context) {
+        for (int depth = 0; context != null && depth < 20; depth++) {
+            if (context instanceof Activity) return (Activity) context;
+            if (!(context instanceof ContextWrapper)) return null;
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+        return null;
     }
 
     static final class OpenWhenResumed implements Application.ActivityLifecycleCallbacks {

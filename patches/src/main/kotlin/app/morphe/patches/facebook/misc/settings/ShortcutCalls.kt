@@ -54,30 +54,37 @@ internal fun standIn(call: MethodReference): String =
  * Sends each of this method's [SHORTCUT_CALLS] to SettingsEntry. Answers how many it sent.
  *
  * The stand-in reads the same registers in the same order, the manager first, so a `move-result`
- * after it stays right. A range call stays a range call, because its registers can be above v15.
+ * after it stays right.
  */
 internal fun MutableMethod.rerouteShortcutCalls(): Int {
     val sites = (implementation ?: return 0).instructions.withIndex().mapNotNull { (index, instruction) ->
-        instruction.shortcutCall()?.let { Triple(index, instruction, it) }
+        instruction.shortcutCall()?.let { index to it }
     }
-    sites.asReversed().forEach { (index, instruction, call) ->
-        val invoke = when (instruction) {
-            is RegisterRangeInstruction -> {
-                val last = instruction.startRegister + instruction.registerCount - 1
-                "invoke-static/range { v${instruction.startRegister} .. v$last }, ${standIn(call)}"
-            }
-            is FiveRegisterInstruction -> {
-                val registers = listOf(
-                    instruction.registerC, instruction.registerD, instruction.registerE,
-                    instruction.registerF, instruction.registerG,
-                ).take(instruction.registerCount)
-                "invoke-static { ${registers.joinToString { "v$it" }} }, ${standIn(call)}"
-            }
-            else -> error("$definingClass->$name: unexpected call form ${instruction.opcode}")
-        }
-        replaceInstruction(index, invoke)
-    }
+    sites.asReversed().forEach { (index, call) -> sendToStandIn(index, standIn(call)) }
     return sites.size
+}
+
+/**
+ * Replaces the call at [index] with a static call to [standIn] on the same registers in the same
+ * order, so a `move-result` after it stays right. A range call stays a range call, because its
+ * registers can be above v15, and a five-register call keeps the registers it had, which fit.
+ */
+internal fun MutableMethod.sendToStandIn(index: Int, standIn: String) {
+    val invoke = when (val instruction = implementation!!.instructions[index]) {
+        is RegisterRangeInstruction -> {
+            val last = instruction.startRegister + instruction.registerCount - 1
+            "invoke-static/range { v${instruction.startRegister} .. v$last }, $standIn"
+        }
+        is FiveRegisterInstruction -> {
+            val registers = listOf(
+                instruction.registerC, instruction.registerD, instruction.registerE,
+                instruction.registerF, instruction.registerG,
+            ).take(instruction.registerCount)
+            "invoke-static { ${registers.joinToString { "v$it" }} }, $standIn"
+        }
+        else -> error("$definingClass->$name: unexpected call form ${instruction.opcode}")
+    }
+    replaceInstruction(index, invoke)
 }
 
 /** True when this method makes one of [SHORTCUT_CALLS]. It only reads, so it needs no proxy. */

@@ -41,17 +41,19 @@ private fun BytecodePatchContext.declaredInHierarchy(
     } ?: throw PatchException("No class of $type's hierarchy declares $name(${parameters.joinToString("")})V")
 
 /**
- * Makes the Hushfacebook screen reachable: a long-press shortcut on Facebook's launcher icon opens
- * Facebook with an extra, the activity reports it, and the screen opens over the next Facebook
- * activity to resume. Every name used here is a manifest component or a framework override, which
- * the obfuscator keeps. Nothing is added to the manifest.
+ * Makes the Hushfacebook screen reachable two ways. Inside Facebook, a long press on the Facebook
+ * logo at the top of the home feed opens it. From the home screen, a long-press shortcut on
+ * Facebook's launcher icon opens Facebook with an extra, the activity reports it, and the screen
+ * opens over the next Facebook activity to resume. Every name used here is a manifest component,
+ * a framework override or call, or a class name and trace string Facebook keeps. Nothing is added
+ * to the manifest.
  */
 @Suppress("unused")
 val settingsPatch = bytecodePatch(
     name = "Hushfacebook settings",
-    description = "Adds Hushfacebook settings to Facebook's launcher icon. Long-press the icon to turn " +
-        "features on or off, pause Hushfacebook, save your switches to a file or load them, and export " +
-        "diagnostics. The licenses are there too.",
+    description = "Adds Hushfacebook settings to Facebook. Long-press the Facebook logo at the top of " +
+        "your feed, or Facebook's launcher icon, to turn features on or off, pause Hushfacebook, save your " +
+        "switches to a file or load them, and export diagnostics. The licenses are there too.",
     default = true,
 ) {
     category("Settings")
@@ -88,5 +90,10 @@ val settingsPatch = bytecodePatch(
         // only a few cut it off. Each of those calls now goes through the extension, which puts it
         // back in front afterwards. Framework names only, which the obfuscator keeps.
         rerouteShortcutCalls()
+
+        // Some launchers have no shortcut menu at all (#2), so there's a way in from inside
+        // Facebook too: the call that gives the feed's Facebook logo its touch listener goes
+        // through the extension, which gives the logo a long press that opens the screen.
+        hookLogoLongPress()
     }
 }

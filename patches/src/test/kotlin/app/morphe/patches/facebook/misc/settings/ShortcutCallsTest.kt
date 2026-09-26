@@ -10,7 +10,6 @@ import app.morphe.PatchContexts
 import app.morphe.RepoFiles
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.facebook.feed.FixtureDex
-import app.morphe.patches.facebook.misc.extension.FACEBOOK_APPLICATION
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
@@ -186,15 +185,15 @@ class ShortcutCallsTest {
     }
 
     /**
-     * The settings patch itself, run over an application, a main activity and two classes that make
-     * all five calls: Facebook's, where every call goes to its stand-in, and the extension's, whose
-     * calls are the real ones the stand-ins make and stay. Sending those would make each stand-in
-     * call itself.
+     * The settings patch itself, run over an application, a main activity, a top bar and two classes
+     * that make all five calls: Facebook's, where every call goes to its stand-in, and the
+     * extension's, whose calls are the real ones the stand-ins make and stay. Sending those would
+     * make each stand-in call itself.
      */
     @Test
     fun theSettingsPatchSendsEveryCallOutsideTheExtension() {
         val facebook = "Lfixture/ShortcutPublisher;"
-        val context = PatchContexts.of(hosts() + publisher(facebook) + publisher(ENTRY))
+        val context = PatchContexts.of(SettingsPatchHosts.all() + publisher(facebook) + publisher(ENTRY))
 
         settingsPatch.execute(context)
 
@@ -210,8 +209,8 @@ class ShortcutCallsTest {
      * Both declared builds push through the AndroidX helper and the Messenger chat shortcuts, and
      * update through the helper and two account switcher paths. The settings patch, run over each
      * build's classes that make those calls, sends every one to its stand-in with the registers it
-     * had, the instruction count unchanged, and leaves none behind. The application and main
-     * activity the patch's other hooks go into are stand-ins here, since this reads only the
+     * had, the instruction count unchanged, and leaves none behind. The application, main activity
+     * and top bar the patch's other hooks go into are stand-ins here, since this reads only the
      * shortcut calls. A whole patching run is out of a unit test's reach: there the receipt's
      * no-call rules read the patched APK.
      */
@@ -239,7 +238,7 @@ class ShortcutCallsTest {
                     mapOf("pushDynamicShortcut" to 2, "updateShortcuts" to 3),
                     found,
                 )
-                val hosts = hosts()
+                val hosts = SettingsPatchHosts.all()
                 assertTrue(
                     "${bundle.name}: a class making the calls is one the test stands in for",
                     callers.none { caller -> hosts.any { it.type == caller.type } },
@@ -312,25 +311,6 @@ class ShortcutCallsTest {
 
     private fun body(registers: Int, vararg instructions: Instruction) =
         ImmutableMethodImplementation(registers, instructions.toList(), null, null)
-
-    /** The application and the main activity, each with the method one of the settings patch's other hooks goes into. */
-    private fun hosts(): List<ClassDef> {
-        val mainTab = "Lcom/facebook/katana/activity/FbMainTabActivity;"
-        val returns = ImmutableInstruction10x(Opcode.RETURN_VOID)
-        return listOf(
-            ImmutableClassDef(
-                FACEBOOK_APPLICATION, AccessFlags.PUBLIC.value, "Landroid/app/Application;", null, null, null, null,
-                listOf(ImmutableMethod(FACEBOOK_APPLICATION, "onCreate", parameters(), "V", AccessFlags.PUBLIC.value, null, null, body(1, returns))),
-            ),
-            ImmutableClassDef(
-                mainTab, AccessFlags.PUBLIC.value, "Landroid/app/Activity;", null, null, null, null,
-                listOf(
-                    ImmutableMethod(mainTab, "onCreate", parameters("Landroid/os/Bundle;"), "V", AccessFlags.PUBLIC.value, null, null, body(2, returns)),
-                    ImmutableMethod(mainTab, "onNewIntent", parameters("Landroid/content/Intent;"), "V", AccessFlags.PUBLIC.value, null, null, body(2, returns)),
-                ),
-            ),
-        )
-    }
 
     /**
      * A class of [type] whose one static method makes all five calls the way Facebook's code does:
