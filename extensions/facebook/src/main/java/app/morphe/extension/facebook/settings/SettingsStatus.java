@@ -58,6 +58,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean reelWatchHistory() {
+        return false;
+    }
+
     public static boolean systemFont() {
         return false;
     }

@@ -38,7 +38,7 @@ This project has no connection to Meta or to the Morphe project. Neither endorse
 3. Get Facebook 580.0.0.51.74 from [APKMirror](https://www.apkmirror.com/apk/facebook-2/facebook/) and take the bundle labelled (arm64-v8a) (240-640dpi) (Android 11+), a .apkm file. That's build 475019344, the one these patches are checked against. APKMirror has several other arm64-v8a builds of the same version, and Morphe Manager warns about those ([Unsupported Version](#unsupported-version) explains why). Facebook 577.0.0.50.72 works too, in its (arm64-v8a) (360-480dpi) (Android 11+) bundle.
 4. In Morphe Manager, pick that file, keep the default patch selection or change it, and patch.
 
-There are 24 patches for `com.facebook.katana`. The arm64-v8a builds are the ones they're checked against. Meta builds the armeabi-v7a and Android 9 variants of each release separately, and those lack code some of the patches need.
+There are 25 patches for `com.facebook.katana`. The arm64-v8a builds are the ones they're checked against. Meta builds the armeabi-v7a and Android 9 variants of each release separately, and those lack code some of the patches need.
 
 Facebook releases a new version about once a week, and each one renames most of its code. Every patch here finds what it changes by names Facebook keeps (its GraphQL model classes, log strings, enum names, manifest components) rather than by the names that change, which is why most of them carry over from one build to the next. When one doesn't, patching stops with a message naming what it couldn't find, instead of producing an app that quietly does nothing. Four patches work down a list of separate targets instead: Block background ad prefetch, Block ad telemetry, Disable Audience Network and Hide suggested and promoted posts. They stop only when a build has none of the list. If it has some, they apply to what's there and name each missing target in the patch log. Facebook 580 dropped six of the feed units the suggested posts patch looks for, so patching 580 lists those six. Please report a stop, or a missing target beyond those six.
 
@@ -73,6 +73,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `Block background-return feed refresh` | Keeps your feed position when you return to Facebook within ten minutes. Pull to refresh and a fresh launch still work. |
 | `Clean up Reels` | Hides the Follow button on reels and the comment and reaction previews under them. Buttons such as Remix, Use template, Add yours and Stars go too, and each part has its own switch. |
 | `Disable Audience Network` | Stops Facebook serving ads to other apps. Those apps then show their own ads or none, and rewarded ads can fail. |
+| `Don't send reel watch history` | Stops sending Facebook the list of reels you've watched. It's used to rank your Reels feed, and nobody else sees it. Reels you've already watched may come back in the feed. |
 | `Download any reel` | Adds a Download button beside every reel. Videos save at the Download quality you set, best by default. |
 | `Download any video` | Adds Download to phone to the menu of videos in the feed and in Watch, below Facebook's own items. Videos save at the Download quality you set, best by default. |
 | `Download any story` | Adds Save to the menu of any story, including stories with music. Videos save at the Download quality you set, best by default. |
@@ -92,7 +93,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `Stop update prompts` | Stops Facebook's own update prompts on a patched build, which can't install Meta's updates anyway. Meta App Manager's update promotions and the push message that has it look for an update go, and so do chat promotions aimed at older versions. |
 | `Use the system font` | Draws Facebook's own text in your phone's font instead of Meta's Optimistic typeface. Icons and emoji keep their fonts, and so does the text you put on a story. Restart Facebook after changing the switch. |
 
-`Download any video`, `AMOLED black theme`, `Material You theme`, `Hide Stories tray`, `Hide Reels in the feed`, `Block background-return feed refresh`, `Stop Story auto-advance`, `Clean up Reels` and `Use the system font` are off by default. Everything else is on, though `Hide AI-detected posts` goes in with both its switches off. Nobody has checked either on a signed-in account yet, so each waits until you turn it on in Hushfacebook's settings: the feed one under News feed, the reels one under Reels and Watch.
+`Download any video`, `AMOLED black theme`, `Material You theme`, `Hide Stories tray`, `Hide Reels in the feed`, `Block background-return feed refresh`, `Stop Story auto-advance`, `Clean up Reels`, `Don't send reel watch history` and `Use the system font` are off by default. Everything else is on, though `Hide AI-detected posts` goes in with both its switches off. Nobody has checked either on a signed-in account yet, so each waits until you turn it on in Hushfacebook's settings: the feed one under News feed, the reels one under Reels and Watch.
 
 ### Dark mode themes
 
@@ -133,6 +134,7 @@ Hushfacebook pauses itself when Facebook crashes or freezes within a minute of s
 | Stop Story auto-advance | Off. Stories use Facebook's timing. |
 | Hide sponsored reels | Partly. Ads inside a page of reels come back. Banners over a reel and mid-roll ads stay blocked, and so do ads the app adds on its own. |
 | Clean up Reels | Off. Reels look the way Facebook draws them. |
+| Don't send reel watch history | Off. Facebook gets the list of reels you watch again. |
 | Use the system font | Off. Text goes back to Meta's font once Facebook restarts. |
 | Open links in external browser | Off. Links open in Facebook's own browser. |
 | Sanitize sharing links | Off. Links you share keep Facebook's tracking tags. |
@@ -195,7 +197,7 @@ A line like `WARNING: Block ad telemetry: com.facebook.ads.AdsScreenshotDetector
 
 People ask whether a patched Facebook puts their account at risk. Here's what we know.
 
-**Can Meta tell?** Assume it can. A patched Facebook is signed with your key rather than Meta's, and Facebook's own code checks that signature in places, which is why `Restore screens on re-signed builds` exists. Some of what Facebook normally sends home stops too, like the ad reports `Block ad telemetry` turns off and the click tracker on links you open in your browser. Meta could notice those going quiet.
+**Can Meta tell?** Assume it can. A patched Facebook is signed with your key rather than Meta's, and Facebook's own code checks that signature in places, which is why `Restore screens on re-signed builds` exists. Some of what Facebook normally sends home stops too, like the ad reports `Block ad telemetry` turns off and the click tracker on links you open in your browser. Pick `Don't send reel watch history` and the list of reels you've watched stops as well. Meta could notice those going quiet.
 
 **What stays the same?** Your feed, stories and reels still come from Meta's servers, ads included, and Hushfacebook hides things on your phone after they arrive. It doesn't post, like, follow or message on your behalf, and it doesn't change how you sign in. A video you save comes from the same Meta server the player streams it from, and Hushfacebook itself sends nothing anywhere (see [Privacy](#privacy)).
 
@@ -215,7 +217,7 @@ Hushfacebook doesn't collect anything and has no server. The only time the patch
 
 | Source | What came from it |
 |---|---|
-| [andrewliang25/morphe-patches](https://github.com/andrewliang25/morphe-patches) at `5db2e57` | Every Facebook patch here, from the ad filters to the story and reel downloads, except Sanitize sharing links, Hide Stories tray, Hide Reels in the feed, Clean up Reels, Hide AI-detected posts, Download any video, Material You theme, Block background-return feed refresh, Stop Story auto-advance, Stop update prompts, Use the system font and Hushfacebook settings, which were written here. The ported ones were rewritten rather than copied commit by commit, and the fixes are listed in the [changelog](CHANGELOG.md). |
+| [andrewliang25/morphe-patches](https://github.com/andrewliang25/morphe-patches) at `5db2e57` | Every Facebook patch here, from the ad filters to the story and reel downloads, except Sanitize sharing links, Hide Stories tray, Hide Reels in the feed, Clean up Reels, Hide AI-detected posts, Download any video, Material You theme, Block background-return feed refresh, Stop Story auto-advance, Stop update prompts, Use the system font, Don't send reel watch history and Hushfacebook settings, which were written here. The ported ones were rewritten rather than copied commit by commit, and the fixes are listed in the [changelog](CHANGELOG.md). |
 | [SapitoSucio/FroggoMorphePatches](https://github.com/SapitoSucio/FroggoMorphePatches) | The idea of dropping promoted posts beside sponsored ones, and of hiding posts Facebook detected as AI, which its 573 filter reads from the same flag. Andrew Liang credits it for some ideas and implementations too. |
 | [SysAdminDoc/hushfeed](https://github.com/SysAdminDoc/hushfeed) at `1f1f81a` | The Gradle build, the shared extension library with its settings screen and diagnostics, the pause, the bytecode helpers, and the checks that apply every patch to real Facebook builds before a release. The settings export and import came later, from `bcc57ee`. |
 | [Morphe](https://github.com/MorpheApp) and [ReVanced](https://gitlab.com/ReVanced/revanced-patches) | The patcher and the patch template. Both of the above grew from their code. |

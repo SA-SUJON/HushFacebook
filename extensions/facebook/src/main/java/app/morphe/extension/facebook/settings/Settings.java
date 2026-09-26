@@ -120,6 +120,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reel_social_footer", TRUE);
 
     /**
+     * The batches of watched reels the Reels viewer sends as FbShortsSeenStateMutation: only their
+     * ids, the record Facebook ranks the Reels feed with, which nobody else sees. Held back, reels
+     * already watched may come back in the feed.
+     */
+    public static final BooleanSetting DONT_SEND_REEL_WATCH_HISTORY =
+            new BooleanSetting("hushfacebook_dont_send_reel_watch_history", TRUE);
+
+    /**
      * Facebook's own text drawn in the phone's font instead of Meta's Optimistic, at the same
      * weight and slant. A typeface already on screen keeps its font until Facebook restarts.
      */

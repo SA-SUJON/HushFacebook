@@ -250,7 +250,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         }
 
         if (build.contains(PatchFamily.SPONSORED_REELS) || build.contains(PatchFamily.AI_DETECTED_POSTS)
-                || build.contains(PatchFamily.REEL_DECLUTTER) || build.contains(PatchFamily.REEL_DOWNLOAD)) {
+                || build.contains(PatchFamily.REEL_DECLUTTER) || build.contains(PatchFamily.REEL_WATCH_HISTORY)
+                || build.contains(PatchFamily.REEL_DOWNLOAD)) {
             PreferenceCategory reels = category(screen, L10n.t("Reels and Watch"));
             if (build.contains(PatchFamily.SPONSORED_REELS)) {
                 reels.addPreference(toggle(context, Settings.HIDE_SPONSORED_REELS, L10n.t("Hide sponsored reels"),
@@ -275,6 +276,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("Hide comment and reaction previews"),
                         L10n.t("The comment Facebook previews under a reel and the bubbles of friends who reacted. "
                                 + "Open the comments to see them all.")));
+            }
+            if (build.contains(PatchFamily.REEL_WATCH_HISTORY)) {
+                reels.addPreference(toggle(context, Settings.DONT_SEND_REEL_WATCH_HISTORY,
+                        L10n.t("Don't send reel watch history"),
+                        L10n.t("Facebook stops getting the list of reels you've watched, which it uses to rank your "
+                                + "Reels feed. Nobody else sees that list. Reels you've already watched may come back "
+                                + "in the feed.")));
             }
             if (build.contains(PatchFamily.REEL_DOWNLOAD)) {
                 reels.addPreference(toggle(context, Settings.DOWNLOAD_REELS, L10n.t("Download button on reels"),
