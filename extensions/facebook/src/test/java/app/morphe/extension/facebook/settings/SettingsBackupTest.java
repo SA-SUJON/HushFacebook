@@ -70,6 +70,7 @@ import java.util.function.BooleanSupplier;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.WorkerPoolForTests;
 import app.morphe.extension.shared.diagnostics.HookStatus;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
@@ -1218,11 +1219,10 @@ public class SettingsBackupTest {
     /**
      * A full worker queue runs nothing, says so, and leaves the rows usable for another try.
      *
-     * <p>The pool is one static executor for every test in the JVM, so the fill below can only
-     * hold if nothing else is on a worker: a task left by an earlier test that finishes between
-     * the fill and the answer hands its worker a queued filler, which frees a queue slot, and the
-     * read is accepted with no toast (the full suite saw exactly that on 2026-09-26). So the pool
-     * is drained first, and each filler holds its slot until the test lets go, not for a while.
+     * <p>The pool is one static executor for every test in the JVM, and a worker left finishing
+     * something else when the fill stops hands its slot to the read (the full suite saw that on
+     * 2026-09-26, with the pool drained first). WorkerPoolForTests holds it full until every worker
+     * holds a filler.
      */
     @Test
     public void aFullWorkerQueueLeavesTheRowsUsable() throws Exception {
@@ -1235,41 +1235,14 @@ public class SettingsBackupTest {
             shadowOf(RuntimeEnvironment.getApplication().getContentResolver()).registerInputStream(uri, input);
             ShadowActivity.IntentForResult started = tap(activity, page, IMPORT_ROW);
 
-            // Nothing may be on a worker or in the queue but the fillers: see above.
-            Utils.awaitBackgroundTasksForTests();
-            CountDownLatch release = new CountDownLatch(1);
-            // The tasks filling the queue, until each has run: the queue is full until they have.
-            AtomicInteger filling = new AtomicInteger();
-            try {
-                while (true) {
-                    filling.incrementAndGet();
-                    boolean accepted = Utils.runOnBackgroundThread(() -> {
-                        try {
-                            release.await();
-                        } catch (InterruptedException interrupted) {
-                            Thread.currentThread().interrupt();
-                        } finally {
-                            filling.decrementAndGet();
-                        }
-                    });
-                    if (!accepted) {
-                        filling.decrementAndGet();
-                        break;
-                    }
-                    assertTrue("the worker queue never filled", filling.get() < 1000);
-                }
+            try (WorkerPoolForTests full = WorkerPoolForTests.fill()) {
                 shadowOf(activity).receiveResult(started.intent, Activity.RESULT_OK, new Intent().setData(uri));
                 ShadowLooper.idleMainLooper();
                 assertEquals("Couldn't start that. Try again in a moment.", ShadowToast.getTextOfLatestToast());
                 assertEquals("the file was read anyway", bytes.length, input.available());
                 assertTrue(page.findPreference(IMPORT_ROW).isEnabled());
                 assertTrue(page.findPreference(EXPORT_ROW).isEnabled());
-            } finally {
-                release.countDown();
-                long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-                while (filling.get() > 0 && System.nanoTime() < deadline) Thread.sleep(10);
             }
-            assertEquals("the tasks filling the queue never finished", 0, filling.get());
             settle();
             // And it works once the queue has room.
             deliver(activity, tap(activity, page, IMPORT_ROW), fileWith(Settings.HIDE_SPONSORED_POSTS, false));
