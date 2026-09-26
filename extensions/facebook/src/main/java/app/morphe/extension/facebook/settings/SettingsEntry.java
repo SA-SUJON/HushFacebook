@@ -80,9 +80,10 @@ public final class SettingsEntry {
     }
 
     /**
-     * Injected at the start of the application's {@code onCreate}, after the context is set.
-     * Watches every Facebook activity, so a pending open lands on whichever one resumes next:
-     * signed out, the launcher hands straight over to the login screen.
+     * Injected before each return of the application's {@code onCreate}, after Facebook's own
+     * startup. Watches every Facebook activity, so a pending open lands on whichever one resumes next:
+     * signed out, the launcher hands straight over to the login screen. Also where the release
+     * check, when it's on, asks at most once a day, on a worker.
      */
     public static void onApplicationCreate(Context context) {
         try {
@@ -95,6 +96,7 @@ public final class SettingsEntry {
         } catch (Exception ex) {
             Logger.printException(() -> "Settings entry: could not watch activities", ex);
         }
+        ReleaseCheck.onFacebookStart();
         publishShortcut(context);
     }
 

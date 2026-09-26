@@ -94,6 +94,8 @@ public class HushfacebookPreferenceFragmentTest {
             for (PatchFamily family : PatchFamily.values()) {
                 for (BooleanSetting setting : family.switches) switchKeys.add(setting.key);
             }
+            // The settings entry's own switches are Pause's to turn off too.
+            for (BooleanSetting setting : PatchFamily.ENTRY_SWITCHES) switchKeys.add(setting.key);
             Set<String> shown = new HashSet<>();
             Preference stays = null;
             for (Preference row : rows) {

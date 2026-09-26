@@ -117,8 +117,9 @@ public class RowChevronTest {
     }
 
     /**
-     * Two rows act the moment they're tapped: the paused card turns Hushfacebook back on for the next
-     * start, and Clear diagnostic data clears it. A chevron there would promise something opens.
+     * Three rows act the moment they're tapped: the paused card turns Hushfacebook back on for the
+     * next start, Clear diagnostic data clears it, and Check now asks GitHub and says how that went
+     * in its own summary. A chevron there would promise something opens.
      */
     @Test
     public void thePausedCardAndClearActAtOnceAndWearNone() {
@@ -129,6 +130,9 @@ public class RowChevronTest {
         assertNotNull(item(card).getOnPreferenceClickListener());
         assertNull("the paused card wears a chevron", chevronOf(card));
         assertNull("Clear diagnostic data wears a chevron", chevronOf(rowTitled(rows, "Clear diagnostic data")));
+        View checkNow = rowTitled(rows, "Check now");
+        assertNotNull(item(checkNow).getOnPreferenceClickListener());
+        assertNull("Check now wears a chevron", chevronOf(checkNow));
         assertNotNull("Licenses lost its chevron while paused", chevronOf(rowTitled(rows, "Licenses")));
     }
 

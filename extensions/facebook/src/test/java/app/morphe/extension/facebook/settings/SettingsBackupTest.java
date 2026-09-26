@@ -93,10 +93,16 @@ public class SettingsBackupTest {
 
     /**
      * Switches in {@link Settings} that are meant to stay out of a settings file, each with the
-     * reason. None today. A switch that shows up in neither this nor the list fails the test
-     * below, so it's a decision someone makes rather than one that happens.
+     * reason. A switch that shows up in neither this nor the list fails the test below, so it's a
+     * decision someone makes rather than one that happens. Keyed by the switch's key as text: a
+     * static that loads Settings here would load it before the rule sets a context, and that
+     * poisons the sandbox for every class after this one (SettingsContextRule).
      */
-    private static final Map<String, String> STAYS_OUT = Collections.emptyMap();
+    private static final Map<String, String> STAYS_OUT = Collections.singletonMap(
+            "hushfacebook_check_releases",
+            "It puts the phone online, and the import preview gives only a count of the switches it "
+                    + "changes, so a file someone shared could turn it on unseen. It's switched on from the "
+                    + "phone's own screen.");
 
     /** Hushfacebook's own state and its diagnostics. None of them is ever in a file. */
     private static List<Setting<?>> neverInAFile() {

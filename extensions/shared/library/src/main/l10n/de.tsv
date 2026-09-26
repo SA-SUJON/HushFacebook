@@ -112,7 +112,21 @@ Save full report	Vollständigen Bericht speichern
 Saved to %1$s	Gespeichert unter %1$s
 Saved to the gallery	In der Galerie gespeichert
 Saved. Restart Facebook to apply this change.	Gespeichert. Starte Facebook neu, um diese Änderung zu übernehmen.
-Save your switches and download settings to a file. Pause and Debug logging aren't included.	Speichert deine Schalter und die Download-Einstellungen in einer Datei. Pause und Debug-Protokollierung sind nicht enthalten.
+Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.	Speichert deine Schalter und die Download-Einstellungen in einer Datei. Pause und Debug-Protokollierung sind nicht enthalten, die Suche nach neuen Versionen auch nicht.
+# The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.
+Check for new Hushfacebook releases	Nach neuen Hushfacebook-Versionen suchen
+Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.	Einmal am Tag fragt Hushfacebook beim Start von Facebook bei GitHub nach der neuesten Version und zeigt sie oben auf dieser Seite, wenn sie neuer ist. Nur dafür geht Hushfacebook von sich aus online, deshalb bleibt das aus, bis du es einschaltest. Heruntergeladen wird nichts.
+Check now	Jetzt prüfen
+Asks GitHub for the newest release right now, even with the switch above off.	Fragt GitHub sofort nach der neuesten Version, auch wenn der Schalter darüber aus ist.
+Checking GitHub now.	GitHub wird gerade gefragt.
+Hushfacebook %1$s is out. Update it in Morphe Manager.	Hushfacebook %1$s ist erschienen. Aktualisiere es im Morphe Manager.
+It targets Facebook %1$s.	Es ist für Facebook %1$s gedacht.
+Hushfacebook %1$s targets Facebook %2$s.	Hushfacebook %1$s ist für Facebook %2$s gedacht.
+You have the newest Hushfacebook release.	Du hast die neueste Version von Hushfacebook.
+The newest Hushfacebook release is %1$s.	Die neueste Version von Hushfacebook ist %1$s.
+Couldn't reach GitHub. Try again later.	GitHub war nicht erreichbar. Versuche es später noch einmal.
+GitHub is turning away checks from this network for now. Try again later.	GitHub weist Anfragen aus diesem Netz gerade ab. Versuche es später noch einmal.
+GitHub's answer couldn't be used. Try again later.	Mit der Antwort von GitHub ließ sich nichts anfangen. Versuche es später noch einmal.
 Saves will go to a folder named %1$s.	Was du speicherst, landet dann in einem Ordner namens %1$s.
 Saving a photo	Foto wird gespeichert
 Saving a video	Video wird gespeichert

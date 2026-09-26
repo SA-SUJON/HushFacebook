@@ -105,6 +105,13 @@ public enum PatchFamily {
     /** The switches Pause turns off for this patch. Empty when it has none. */
     public final List<BooleanSetting> switches;
 
+    /**
+     * The switches of the settings entry itself, which no family owns: every build with this screen
+     * carries them. Today that's the release check. Pause turns them off like a family's switches,
+     * so the screen draws them above the Pause row with the rest.
+     */
+    static final List<BooleanSetting> ENTRY_SWITCHES = Collections.singletonList(Settings.CHECK_FOR_RELEASES);
+
     /** The families a test says this build carries, instead of asking {@link SettingsStatus}. */
     @Nullable
     static volatile Set<PatchFamily> inBuildForTests;

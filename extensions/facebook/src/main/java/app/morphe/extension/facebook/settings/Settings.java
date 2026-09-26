@@ -20,11 +20,12 @@ import app.morphe.extension.shared.settings.StringSetting;
 /**
  * The switches behind the hooks that ask before they act.
  *
- * <p>All but two of them are on by default. Picking a patch in Morphe Manager is the choice to use
+ * <p>All but three of them are on by default. Picking a patch in Morphe Manager is the choice to use
  * it, and the switch is the way to turn it off again without patching a second time. The two GenAI
- * switches are the exception: each starts off until its rule has been checked on a signed-in feed. While
- * Hushfacebook is paused, or in safe mode after three crashed starts, each switch answers off
- * and the hook behind it takes Facebook's own path.
+ * switches start off until each rule has been checked on a signed-in feed, and the release check
+ * starts off because it's the only request Hushfacebook makes for itself. While Hushfacebook is
+ * paused, or in safe mode after three crashed starts, each switch answers off and the hook behind
+ * it takes Facebook's own path.
  */
 @SuppressWarnings("unused")
 public class Settings extends BaseSettings {
@@ -149,6 +150,16 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting STOP_UPDATE_PROMPTS =
             new BooleanSetting("hushfacebook_stop_update_prompts", TRUE);
+
+    /**
+     * Once a day, when Facebook starts, ask api.github.com whether a newer Hushfacebook release is
+     * out, and say so on the settings screen ({@link ReleaseCheck}). It's the settings entry's own
+     * switch rather than a patch's, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off
+     * by default, and a settings file never carries it: a file shouldn't be able to put a phone
+     * online.
+     */
+    public static final BooleanSetting CHECK_FOR_RELEASES =
+            new BooleanSetting("hushfacebook_check_releases", FALSE);
 
     /**
      * The story viewer's menu offers Save on anyone's story, and Save runs Hushfacebook's own

@@ -33,6 +33,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -126,6 +128,31 @@ public class PausedHooksTest {
         PauseForTests.resume();
         for (BooleanSetting setting : settingsSwitches()) setting.resetToDefault();
         FeedFilterCounters.clear();
+        ReleaseCheckForTests.forget();
+    }
+
+    /**
+     * The settings entry's own switches, which no family owns, one probe each, held to the same
+     * promise as a family's: paused, or before the settings are ready, a start makes no request.
+     */
+    private static Map<BooleanSetting, Probe> entryProbes() {
+        Map<BooleanSetting, Probe> probes = new LinkedHashMap<>();
+        // Loads the check's own settings here, with the context, so a probe run without one reads
+        // them rather than loading them.
+        ReleaseCheck.Stored.CHECKED_AT.savedValue();
+        // A Facebook start a day after the last try asks GitHub for the newest release.
+        probes.put(Settings.CHECK_FOR_RELEASES, ReleaseCheckForTests::aStartAsksGitHub);
+        return probes;
+    }
+
+    /** Adds a line to [wrong] for every entry probe that didn't answer [changes]. */
+    private static void everyEntryProbe(Map<BooleanSetting, Probe> probes, boolean changes, String when,
+                                        List<String> wrong) {
+        for (Map.Entry<BooleanSetting, Probe> entry : probes.entrySet()) {
+            if (entry.getValue().changedFacebook() != changes) {
+                wrong.add(entry.getKey().key + ", " + when + (changes ? ": left Facebook alone" : ": still changed Facebook"));
+            }
+        }
     }
 
     private static Map<PatchFamily, List<Probe>> probes() {
@@ -273,20 +300,26 @@ public class PausedHooksTest {
         for (BooleanSetting setting : settingsSwitches()) setting.save(true);
         Map<PatchFamily, List<Probe>> probes = probes();
         assertEquals("every family with a switch needs a probe here", switched(), probes.keySet());
+        Map<BooleanSetting, Probe> entry = entryProbes();
+        assertEquals("every switch of the settings entry needs a probe here",
+                new HashSet<>(PatchFamily.ENTRY_SWITCHES), entry.keySet());
 
         // Every hook is asked every time, so one run names every hook that broke the promise.
         List<String> wrong = new ArrayList<>();
         everyProbe(probes, true, "running", wrong);
+        everyEntryProbe(entry, true, "running", wrong);
 
         for (HushfacebookPause.Reason why : new HushfacebookPause.Reason[]{
                 HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP,
                 HushfacebookPause.Reason.MARKER_FILE}) {
             PauseForTests.pause(why);
             everyProbe(probes, false, "paused by " + why, wrong);
+            everyEntryProbe(entry, false, "paused by " + why, wrong);
         }
 
         PauseForTests.resume();
         everyProbe(probes, true, "running again", wrong);
+        everyEntryProbe(entry, true, "running again", wrong);
         assertEquals(Collections.emptyList(), wrong);
     }
 
@@ -303,18 +336,25 @@ public class PausedHooksTest {
         for (BooleanSetting setting : settingsSwitches()) setting.save(true);
         Map<PatchFamily, List<Probe>> probes = probes();
         assertEquals("every family with a switch needs a probe here", switched(), probes.keySet());
+        Map<BooleanSetting, Probe> entry = entryProbes();
 
         List<String> wrong = new ArrayList<>();
-        SettingsContextRule.withoutContext(() -> everyProbe(probes, false, "before the context is set", wrong));
+        SettingsContextRule.withoutContext(() -> {
+            everyProbe(probes, false, "before the context is set", wrong);
+            everyEntryProbe(entry, false, "before the context is set", wrong);
+        });
         // Safe mode on, as after three crashed starts: the context is set and the pause undecided.
         BaseSettings.SAFE_MODE.save(true);
         try {
-            SettingsContextRule.beforeThePauseIsDecided(
-                    () -> everyProbe(probes, false, "before the pause is decided", wrong));
+            SettingsContextRule.beforeThePauseIsDecided(() -> {
+                everyProbe(probes, false, "before the pause is decided", wrong);
+                everyEntryProbe(entry, false, "before the pause is decided", wrong);
+            });
         } finally {
             BaseSettings.SAFE_MODE.resetToDefault();
         }
         everyProbe(probes, true, "once they're ready", wrong);
+        everyEntryProbe(entry, true, "once they're ready", wrong);
         assertEquals(Collections.emptyList(), wrong);
     }
 

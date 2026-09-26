@@ -112,7 +112,21 @@ Save full report	Salvar relatório completo
 Saved to %1$s	Salvo em %1$s
 Saved to the gallery	Salvo na galeria
 Saved. Restart Facebook to apply this change.	Salvo. Reinicie o Facebook para aplicar esta alteração.
-Save your switches and download settings to a file. Pause and Debug logging aren't included.	Salve suas opções e as configurações de download em um arquivo. A pausa e o Registro de depuração não são incluídos.
+Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.	Salve suas opções e as configurações de download em um arquivo. A pausa e o Registro de depuração não são incluídos, nem a busca por novas versões.
+# The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.
+Check for new Hushfacebook releases	Procurar novas versões do Hushfacebook
+Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.	Uma vez por dia, quando o Facebook abre, o Hushfacebook pergunta ao GitHub qual é a versão mais recente e a mostra no topo desta tela se for mais nova. É a única vez que o Hushfacebook se conecta por conta própria, por isso fica desligado até você ligar. Nada é baixado.
+Check now	Verificar agora
+Asks GitHub for the newest release right now, even with the switch above off.	Pergunta agora mesmo ao GitHub qual é a versão mais recente, mesmo com a opção acima desligada.
+Checking GitHub now.	Consultando o GitHub agora.
+Hushfacebook %1$s is out. Update it in Morphe Manager.	O Hushfacebook %1$s saiu. Atualize pelo Morphe Manager.
+It targets Facebook %1$s.	Ele é feito para o Facebook %1$s.
+Hushfacebook %1$s targets Facebook %2$s.	O Hushfacebook %1$s é feito para o Facebook %2$s.
+You have the newest Hushfacebook release.	Você já tem a versão mais recente do Hushfacebook.
+The newest Hushfacebook release is %1$s.	A versão mais recente do Hushfacebook é a %1$s.
+Couldn't reach GitHub. Try again later.	Não foi possível falar com o GitHub. Tente de novo mais tarde.
+GitHub is turning away checks from this network for now. Try again later.	O GitHub está recusando consultas desta rede por enquanto. Tente de novo mais tarde.
+GitHub's answer couldn't be used. Try again later.	Não deu para usar a resposta do GitHub. Tente de novo mais tarde.
 Saves will go to a folder named %1$s.	O que você salvar vai para uma pasta chamada %1$s.
 Saving a photo	Salvando uma foto
 Saving a video	Salvando um vídeo

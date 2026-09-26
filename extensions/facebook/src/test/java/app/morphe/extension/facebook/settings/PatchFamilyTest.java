@@ -60,16 +60,26 @@ public class PatchFamilyTest {
         HookStatus.clear();
     }
 
+    /**
+     * A switch is a family's, or the settings entry's own (the release check), and never both: a
+     * switch in neither list goes unmentioned by the screen and the tests that hold Pause to it.
+     */
     @Test
     public void everySwitchBelongsToExactlyOneFamily() {
-        Map<BooleanSetting, PatchFamily> owners = new HashMap<>();
+        Map<BooleanSetting, String> owners = new HashMap<>();
         for (PatchFamily family : PatchFamily.values()) {
             for (BooleanSetting setting : family.switches) {
-                PatchFamily earlier = owners.put(setting, family);
+                String earlier = owners.put(setting, family.name());
                 assertNull(setting.key + " belongs to " + earlier + " and to " + family, earlier);
             }
         }
+        for (BooleanSetting setting : PatchFamily.ENTRY_SWITCHES) {
+            String earlier = owners.put(setting, "the settings entry");
+            assertNull(setting.key + " belongs to " + earlier + " and to the settings entry", earlier);
+        }
         assertEquals(new HashSet<>(PausedHooksTest.settingsSwitches()), owners.keySet());
+        assertTrue("the release check is the settings entry's own",
+                PatchFamily.ENTRY_SWITCHES.contains(Settings.CHECK_FOR_RELEASES));
     }
 
     @Test

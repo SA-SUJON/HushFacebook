@@ -49,7 +49,8 @@ import app.morphe.extension.shared.settings.StringSetting;
  *
  * <p>Only the switches in {@link #ALLOWLIST} and the download settings in {@link #VALUES} (the
  * save folder, the save quality and the video file name) go out or come in. Pause, safe mode, the debug settings, the
- * app language and the counters Hushfacebook keeps for itself stay out, and so do the log, the
+ * app language and the counters Hushfacebook keeps for itself stay out. So does the release check: it puts
+ * the phone online, so it's switched on from the phone's own screen, never by a file. So do the log, the
  * diagnostic data and anything about the person or the phone: a file is a format name, a version
  * number, one true or false per switch, one folder name, one quality and one file name template.
  * An import applies what it read in one preference commit. A file that is too large, isn't JSON,

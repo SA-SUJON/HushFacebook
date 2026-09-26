@@ -63,22 +63,27 @@ import app.morphe.extension.shared.settings.preference.AbstractPreferenceFragmen
 import app.morphe.extension.shared.settings.preference.ClearLogBufferPreference;
 import app.morphe.extension.shared.settings.preference.ExportDiagnosticReportPreference;
 import app.morphe.extension.shared.settings.preference.ImmediateAction;
+import app.morphe.extension.shared.settings.preference.LogBufferManager;
 
 /**
  * The preference list, built in code rather than from an XML resource so the bundle adds no
  * resources to Facebook. A switch appears only when its patch is in this build
- * ({@link PatchFamily}); a patch that works entirely at patch time gets a line saying so, and
+ * ({@link PatchFamily}), but for the settings entry's own ({@link PatchFamily#ENTRY_SWITCHES}),
+ * which every build has; a patch that works entirely at patch time gets a line saying so, and
  * what Pause can't reach is listed under the Pause switch. Switches are keyed by their setting,
  * which is how the shared fragment keeps them in sync with stored values. Every word is read from
  * {@link L10n} in the phone's language; the product names and the address stay as they are.
  */
 @SuppressWarnings("deprecation")
-public final class HushfacebookPreferenceFragment extends AbstractPreferenceFragment {
+public final class HushfacebookPreferenceFragment extends AbstractPreferenceFragment
+        implements ReleaseCheck.Listener {
     /** The repository as a link, and as a person reads it. ExtensionHostsTest reads the link. */
     static final String SOURCE_URL = "https://github.com/SysAdminDoc/Hushfacebook";
     static final String SOURCE_ADDRESS = SOURCE_URL.substring(SOURCE_URL.indexOf("://") + 3);
     /** The English of the row listing what Pause can't reach, and its key in {@link L10n}. */
     static final String STAYS_WHILE_PAUSED = "Stays in while paused";
+    /** The Check now row's key. It stores nothing: no setting has this name. */
+    static final String CHECK_NOW = "action_check_for_release";
 
     /** Thrown by the next initialize() and then cleared: how a test reaches the recovery page. */
     static volatile RuntimeException failNextInitialization;
@@ -86,6 +91,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     /** The first row, which says whether Hushfacebook runs now and whether the next start changes that. */
     @Nullable
     private Preference statusCard;
+
+    /** The row that asks GitHub for the newest release now, and says what the last try found. */
+    @Nullable
+    private Preference checkNowRow;
 
     /** Where a settings file waiting on the person's answer is kept across the page being rebuilt. */
     static final String PENDING_IMPORT_STATE = "hushfacebook_pending_import";
@@ -139,7 +148,17 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         // The preview is drawn over this page's window. It stays unanswered, and the page that
         // replaces this one shows it again.
         SettingsBackupPreference.closePreview(this);
+        ReleaseCheck.unwatch(this);
         super.onDestroyView();
+    }
+
+    /** A release check ended: the card and the Check now row say what it found. */
+    @Override
+    public void releaseCheckFinished() {
+        Context context = getContext();
+        if (context == null) return;
+        if (statusCard != null) showStatus(statusCard, context);
+        if (checkNowRow != null) checkNowRow.setSummary(ReleaseCheck.checkNowSummary());
     }
 
     /**
@@ -179,6 +198,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         screen.addPreference(statusCard(context));
         // The export row below reads these; registering twice keeps one.
         PatchFamily.registerDiagnostics();
+        LogBufferManager.registerReportSection(ReleaseCheck.REPORT);
         Set<PatchFamily> build = PatchFamily.inThisBuild();
 
         if (build.contains(PatchFamily.SPONSORED_POSTS) || build.contains(PatchFamily.SUGGESTED_POSTS)
@@ -317,12 +337,20 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
         }
 
+        // In every build: the release check is the settings entry's own, not a patch's. Its switch
+        // is one Pause turns off, so it sits above the Pause row with the rest.
+        PreferenceCategory updates = category(screen, L10n.t("Updates"));
         if (build.contains(PatchFamily.UPDATE_PROMPTS)) {
-            PreferenceCategory updates = category(screen, L10n.t("Updates"));
             updates.addPreference(toggle(context, Settings.STOP_UPDATE_PROMPTS, L10n.t("Stop update prompts"),
                     L10n.t("Facebook stops asking you to update through Meta App Manager and stops having it look for one. "
                             + "Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.")));
         }
+        updates.addPreference(toggle(context, Settings.CHECK_FOR_RELEASES, L10n.t("Check for new Hushfacebook releases"),
+                L10n.t("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it "
+                        + "at the top of this screen if it's newer. It's the only time Hushfacebook goes online for "
+                        + "itself, so it's off until you turn it on. Nothing gets downloaded.")));
+        updates.addPreference(checkNowRow(context));
+        ReleaseCheck.watch(this);
 
         if (build.contains(PatchFamily.SYSTEM_FONT)) {
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
@@ -381,7 +409,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         // Morphe Manager can export the patch choices and the signing key, not these switches.
         hushfacebook.addPreference(new BackupRow(this, context, SettingsBackupPreference.EXPORT,
                 L10n.t("Export settings"),
-                L10n.t("Save your switches and download settings to a file. Pause and Debug logging aren't included.")));
+                L10n.t("Save your switches and download settings to a file. Pause and Debug logging aren't included, "
+                        + "and neither is the release check.")));
         // The preview gives a count of the switches and the download settings' new values, not
         // each switch by name.
         hushfacebook.addPreference(new BackupRow(this, context, SettingsBackupPreference.IMPORT,
@@ -506,19 +535,45 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * The card's line under its title: this start's state, and the next start's when a change on
      * this screen makes it differ. Pause switched on said "Hushfacebook is on" and nothing more,
      * and Pause switched back on after a tap on the card still said it turns back on at restart.
+     * A newer release the release check found goes on a line of its own under that, paused or
+     * not: a newer release can be the fix for what a pause is working around.
      */
     private void showStatus(Preference card, Context context) {
         boolean pausedNext = HushfacebookPause.pausesNextStart(context);
+        String status;
         if (!HushfacebookPause.isPaused()) {
             String version = L10n.f("Version %1$s for Facebook %2$s",
                     L10n.isolate(Utils.getPatchesReleaseVersion()), L10n.isolate(Utils.getAppVersionName()));
-            card.setSummary(pausedNext ? version + " " + L10n.t("Hushfacebook pauses when Facebook restarts.") : version);
+            status = pausedNext ? version + " " + L10n.t("Hushfacebook pauses when Facebook restarts.") : version;
         } else if (pausedNext) {
-            card.setSummary(pausedSummary(HushfacebookPause.reason(), context.getPackageName())
-                    + " " + L10n.t("Tap to turn it back on."));
+            status = pausedSummary(HushfacebookPause.reason(), context.getPackageName())
+                    + " " + L10n.t("Tap to turn it back on.");
         } else {
-            card.setSummary(L10n.t("Hushfacebook turns back on when Facebook restarts."));
+            status = L10n.t("Hushfacebook turns back on when Facebook restarts.");
         }
+        String release = ReleaseCheck.statusLine();
+        card.setSummary(release == null ? status : status + "\n" + release);
+    }
+
+    /**
+     * Asks GitHub for the newest release now, and says what the last try found. The tap is the
+     * request for that one check, so it runs with the switch off too.
+     */
+    private Preference checkNowRow(Context context) {
+        Row row = new Row(context);
+        row.setKey(CHECK_NOW);
+        row.setTitle(L10n.t("Check now"));
+        row.setPersistent(false);
+        // The tap starts the check and the row says how it went: nothing opens, so no chevron.
+        row.actsAtOnce = true;
+        row.setSummary(ReleaseCheck.checkNowSummary());
+        row.setOnPreferenceClickListener(p -> {
+            if (!ReleaseCheck.checkNow()) Utils.showToastLong(L10n.t("Couldn't start that. Try again in a moment."));
+            p.setSummary(ReleaseCheck.checkNowSummary());
+            return true;
+        });
+        checkNowRow = row;
+        return row;
     }
 
     @Override

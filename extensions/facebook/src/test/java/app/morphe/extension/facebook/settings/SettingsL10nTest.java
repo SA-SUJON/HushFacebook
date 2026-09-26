@@ -362,6 +362,7 @@ public class SettingsL10nTest {
             addSettingsFileText(activity, rows, shown);
             addDownloadSettingsText(shown);
             addTypedNameToasts(rows, shown);
+            addReleaseCheckText(shown);
 
             // What the diagnostics rows say in a toast, with nothing to export or clear. The quick
             // report is built on a worker and answers on the main thread.
@@ -498,6 +499,23 @@ public class SettingsL10nTest {
         }
         Settings.SAVE_FOLDER.resetToDefault();
         Settings.FILENAME_TEMPLATE.resetToDefault();
+    }
+
+    /**
+     * What the release check can say, not only what it says now: the status card's line for a newer
+     * release and for another Facebook target, and the Check now row on its way and for every way a
+     * try can end.
+     */
+    private static void addReleaseCheckText(Set<String> shown) {
+        shown.add(ReleaseCheck.statusLine("0.2.0", "582.0.0.40.70", "0.1.8", "580.0.0.51.74"));
+        shown.add(ReleaseCheck.statusLine("0.1.8", "580.0.0.51.74", "0.1.8", "577.0.0.50.72"));
+        shown.add(ReleaseCheck.checkingSummary());
+        shown.add(ReleaseCheck.idleSummary());
+        for (ReleaseCheck.Result result : ReleaseCheck.Result.values()) {
+            shown.add(ReleaseCheck.resultLine(result, "0.2.0", "0.1.8"));
+            shown.add(ReleaseCheck.resultLine(result, "0.1.8", "0.1.8"));
+            shown.add(ReleaseCheck.resultLine(result, "0.2.0", ""));
+        }
     }
 
     private static AlertDialog importPreview(Activity activity, List<Preference> rows, String file) throws Exception {
