@@ -1215,7 +1215,15 @@ public class SettingsBackupTest {
         }
     }
 
-    /** A full worker queue runs nothing, says so, and leaves the rows usable for another try. */
+    /**
+     * A full worker queue runs nothing, says so, and leaves the rows usable for another try.
+     *
+     * <p>The pool is one static executor for every test in the JVM, so the fill below can only
+     * hold if nothing else is on a worker: a task left by an earlier test that finishes between
+     * the fill and the answer hands its worker a queued filler, which frees a queue slot, and the
+     * read is accepted with no toast (the full suite saw exactly that on 2026-09-26). So the pool
+     * is drained first, and each filler holds its slot until the test lets go, not for a while.
+     */
     @Test
     public void aFullWorkerQueueLeavesTheRowsUsable() throws Exception {
         try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
@@ -1227,6 +1235,8 @@ public class SettingsBackupTest {
             shadowOf(RuntimeEnvironment.getApplication().getContentResolver()).registerInputStream(uri, input);
             ShadowActivity.IntentForResult started = tap(activity, page, IMPORT_ROW);
 
+            // Nothing may be on a worker or in the queue but the fillers: see above.
+            Utils.awaitBackgroundTasksForTests();
             CountDownLatch release = new CountDownLatch(1);
             // The tasks filling the queue, until each has run: the queue is full until they have.
             AtomicInteger filling = new AtomicInteger();
@@ -1235,7 +1245,7 @@ public class SettingsBackupTest {
                     filling.incrementAndGet();
                     boolean accepted = Utils.runOnBackgroundThread(() -> {
                         try {
-                            release.await(10, TimeUnit.SECONDS);
+                            release.await();
                         } catch (InterruptedException interrupted) {
                             Thread.currentThread().interrupt();
                         } finally {
