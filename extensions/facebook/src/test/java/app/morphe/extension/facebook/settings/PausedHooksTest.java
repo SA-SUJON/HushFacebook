@@ -190,6 +190,7 @@ public class PausedHooksTest {
                 () -> FeedGuardForTests.hidesRecommended(Category.ORGANIC, new GraphQLStory(),
                         FeedGuardForTests.recommendationContext(true)),
                 () -> FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow()),
+                () -> FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.suggestedGroups()),
                 // Your own profile's People you may know carousel builds nothing.
                 ProfileSuggestionsForTests::hidesTheCarousel));
         // Each of the feed's two Stories tray adapters returns nothing.

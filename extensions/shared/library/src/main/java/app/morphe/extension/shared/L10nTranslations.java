@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(578);
+        Map<String, String> table = new HashMap<>(582);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -316,6 +316,8 @@ public final class L10nTranslations {
                 "Gesponserte Suchergebnisse ausblenden");
         table.put("Hide sponsored stories",
                 "Gesponserte Stories ausblenden");
+        table.put("Hide suggested groups",
+                "Gruppenvorschl\u00e4ge ausblenden");
         table.put("Hide the Follow button on reels",
                 "Folgen-Button bei Reels ausblenden");
         table.put("Hide the Get Messenger card",
@@ -418,11 +420,11 @@ public final class L10nTranslations {
                 "Beitr\u00e4ge, die Facebook als beworben statt als Anzeige einstuft.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Beitr\u00e4ge von Personen und Seiten, denen du nicht folgst, und aus Gruppen, denen du nicht beigetreten bist, die Facebook in deinen Feed schiebt.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Beitr\u00e4ge, die Facebooks eigene Erkennung als mit KI erstellt markiert. Ein Beitrag, den nur die Person, die ihn erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Beitr\u00e4ge, die Facebooks eigene Erkennung als mit KI erstellt markiert. Ein Beitrag, den nur die Person, die ihn erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profile und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
         table.put("Re-signed build fix",
@@ -541,11 +543,11 @@ public final class L10nTranslations {
                 "Diese Einstellungsdatei ist besch\u00e4digt oder nur teilweise heruntergeladen. Es wurde nichts ge\u00e4ndert.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
                 "Diese Einstellungsdatei stammt aus einer neueren Hushfacebook-Version als dieser. Es wurde nichts ge\u00e4ndert.");
-        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
-                "Der Bereich \u201eAuch von Meta\u201c verschwindet aus dem Facebook-Men\u00fc, mit seinen Links zu Metas anderen Apps und seiner Werbung f\u00fcr Metas Ger\u00e4te. Deine eigenen Verkn\u00fcpfungen bleiben.");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
+                "Der Bereich \u201eAuch von Meta\u201c verschwindet aus dem Facebook-Men\u00fc, mit seinen Links zu Metas anderen Apps und seiner Werbung f\u00fcr Metas Ger\u00e4te. Deine eigenen Verkn\u00fcpfungen bleiben.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "Der Folgen-Button neben der Person, die das Reel gepostet hat. \u00dcber ihr Profil kannst du ihr weiterhin folgen.");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
@@ -564,6 +566,8 @@ public final class L10nTranslations {
                 "Die neueste Version von Hushfacebook ist %1$s.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen und die auf deinem eigenen Profil.");
+        table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
+                "Die Reihe mit Gruppen zum Beitreten zwischen den Beitr\u00e4gen, samt ihrem Button \u201eWeitere Gruppen entdecken\u201c. Beitr\u00e4ge aus deinen Gruppen bleiben.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Die Reihe mit Stories oben im Feed, \u201eStory erstellen\u201c eingeschlossen.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -647,7 +651,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(578);
+        Map<String, String> table = new HashMap<>(582);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -919,6 +923,8 @@ public final class L10nTranslations {
                 "Ocultar resultados de b\u00fasqueda publicitarios");
         table.put("Hide sponsored stories",
                 "Ocultar historias publicitarias");
+        table.put("Hide suggested groups",
+                "Ocultar grupos sugeridos");
         table.put("Hide the Follow button on reels",
                 "Ocultar el bot\u00f3n Seguir en los reels");
         table.put("Hide the Get Messenger card",
@@ -1021,11 +1027,11 @@ public final class L10nTranslations {
                 "Publicaciones que Facebook clasifica como promociones y no como anuncios.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Publicaciones de personas y p\u00e1ginas que no sigues y de grupos a los que no te has unido que Facebook mete en tu feed.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Publicaciones que la detecci\u00f3n propia de Facebook marca como creadas con IA. Una publicaci\u00f3n que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Publicaciones que la detecci\u00f3n propia de Facebook marca como creadas con IA. Una publicaci\u00f3n que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
         table.put("Re-signed build fix",
@@ -1144,11 +1150,11 @@ public final class L10nTranslations {
                 "Ese archivo de configuraci\u00f3n est\u00e1 da\u00f1ado o solo se descarg\u00f3 en parte. No se cambi\u00f3 nada.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
                 "Ese archivo de configuraci\u00f3n lo escribi\u00f3 una versi\u00f3n de Hushfacebook m\u00e1s reciente que esta. No se cambi\u00f3 nada.");
-        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
-                "La secci\u00f3n \u201cTambi\u00e9n de Meta\u201d desaparece del men\u00fa de Facebook, con sus enlaces a las otras apps de Meta y sus anuncios de dispositivos de Meta. Tus propios accesos directos se quedan.");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
+                "La secci\u00f3n \u201cTambi\u00e9n de Meta\u201d desaparece del men\u00fa de Facebook, con sus enlaces a las otras apps de Meta y sus anuncios de dispositivos de Meta. Tus propios accesos directos se quedan.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "El bot\u00f3n Seguir junto a quien public\u00f3 el reel. Puedes seguir a esa persona desde su perfil.");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
@@ -1167,6 +1173,8 @@ public final class L10nTranslations {
                 "La versi\u00f3n m\u00e1s reciente de Hushfacebook es la %1$s.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "La fila de sugerencias de amistad entre las publicaciones y la de tu propio perfil.");
+        table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
+                "La fila de grupos para unirte entre las publicaciones, con su bot\u00f3n Descubrir m\u00e1s grupos. Las publicaciones de tus grupos se quedan.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "La fila de historias en la parte superior del feed, con \u201cCrear historia\u201d incluida.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -1250,7 +1258,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(578);
+        Map<String, String> table = new HashMap<>(582);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1522,6 +1530,8 @@ public final class L10nTranslations {
                 "Sembunyikan hasil pencarian bersponsor");
         table.put("Hide sponsored stories",
                 "Sembunyikan cerita bersponsor");
+        table.put("Hide suggested groups",
+                "Sembunyikan grup yang disarankan");
         table.put("Hide the Follow button on reels",
                 "Sembunyikan tombol Ikuti di reel");
         table.put("Hide the Get Messenger card",
@@ -1624,11 +1634,11 @@ public final class L10nTranslations {
                 "Postingan yang dikategorikan Facebook sebagai promosi, bukan iklan.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Postingan dari orang dan Halaman yang tidak Anda ikuti serta dari grup tempat Anda belum bergabung, yang diselipkan Facebook ke Kabar Beranda Anda.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Postingan yang ditandai deteksi Facebook sendiri sebagai buatan AI. Postingan yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Postingan yang ditandai deteksi Facebook sendiri sebagai buatan AI. Postingan yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
         table.put("Re-signed build fix",
@@ -1747,11 +1757,11 @@ public final class L10nTranslations {
                 "File pengaturan itu rusak atau hanya terunduh sebagian. Tidak ada yang diubah.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
                 "File pengaturan itu dibuat oleh versi Hushfacebook yang lebih baru daripada versi ini. Tidak ada yang diubah.");
-        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
-                "Bagian \u201cJuga dari Meta\u201d hilang dari Menu Facebook, beserta tautannya ke aplikasi Meta lainnya dan iklannya untuk perangkat Meta. Pintasanmu sendiri tetap ada.");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
+                "Bagian \u201cJuga dari Meta\u201d hilang dari Menu Facebook, beserta tautannya ke aplikasi Meta lainnya dan iklannya untuk perangkat Meta. Pintasanmu sendiri tetap ada.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "Tombol Ikuti di samping nama pembuat reel. Anda tetap bisa mengikutinya dari profilnya.");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
@@ -1770,6 +1780,8 @@ public final class L10nTranslations {
                 "Rilis Hushfacebook terbaru adalah %1$s.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "Deretan saran pertemanan di antara postingan, dan deretan di profilmu sendiri.");
+        table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
+                "Deretan grup untuk diikuti di antara postingan, beserta tombol Temukan grup lainnya. Postingan dari grup tempat Anda bergabung tetap ada.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Deretan cerita di bagian atas Kabar Beranda, termasuk \u201cBuat cerita\u201d.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -1853,7 +1865,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(578);
+        Map<String, String> table = new HashMap<>(582);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -2125,6 +2137,8 @@ public final class L10nTranslations {
                 "Ocultar resultados de pesquisa patrocinados");
         table.put("Hide sponsored stories",
                 "Ocultar stories patrocinados");
+        table.put("Hide suggested groups",
+                "Ocultar grupos sugeridos");
         table.put("Hide the Follow button on reels",
                 "Ocultar o bot\u00e3o Seguir nos reels");
         table.put("Hide the Get Messenger card",
@@ -2227,11 +2241,11 @@ public final class L10nTranslations {
                 "Posts que o Facebook classifica como promo\u00e7\u00f5es, e n\u00e3o como an\u00fancios.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Publica\u00e7\u00f5es de pessoas e P\u00e1ginas que voc\u00ea n\u00e3o segue e de grupos dos quais voc\u00ea n\u00e3o participa, que o Facebook coloca no seu feed.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Posts que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como feitos com IA. Um post que s\u00f3 o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desligada porque ainda n\u00e3o foi testada em um feed real.");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Posts que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como feitos com IA. Um post que s\u00f3 o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desligada porque ainda n\u00e3o foi testada em um feed real.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o reassinada.");
         table.put("Re-signed build fix",
@@ -2350,11 +2364,11 @@ public final class L10nTranslations {
                 "Esse arquivo de configura\u00e7\u00f5es est\u00e1 danificado ou s\u00f3 foi baixado em parte. Nada foi alterado.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
                 "Esse arquivo de configura\u00e7\u00f5es foi criado por uma vers\u00e3o do Hushfacebook mais recente que esta. Nada foi alterado.");
-        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
-                "A se\u00e7\u00e3o \u201cTamb\u00e9m da Meta\u201d sai do Menu do Facebook, com os links para os outros apps da Meta e os an\u00fancios de dispositivos da Meta. Seus pr\u00f3prios atalhos continuam.");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
+                "A se\u00e7\u00e3o \u201cTamb\u00e9m da Meta\u201d sai do Menu do Facebook, com os links para os outros apps da Meta e os an\u00fancios de dispositivos da Meta. Seus pr\u00f3prios atalhos continuam.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "O bot\u00e3o Seguir ao lado de quem publicou o reel. Voc\u00ea ainda pode seguir a pessoa pelo perfil dela.");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
@@ -2373,6 +2387,8 @@ public final class L10nTranslations {
                 "A vers\u00e3o mais recente do Hushfacebook \u00e9 a %1$s.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "A fileira de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es e a do seu pr\u00f3prio perfil.");
+        table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
+                "A fileira de grupos para participar entre as publica\u00e7\u00f5es, com o bot\u00e3o Descobrir mais grupos. As publica\u00e7\u00f5es dos grupos dos quais voc\u00ea participa continuam.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "A fileira de stories no topo do feed, incluindo \u201cCriar story\u201d.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -2456,7 +2472,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(578);
+        Map<String, String> table = new HashMap<>(582);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2728,6 +2744,8 @@ public final class L10nTranslations {
                 "Sponsorlu arama sonu\u00e7lar\u0131n\u0131 gizle");
         table.put("Hide sponsored stories",
                 "Sponsorlu hikayeleri gizle");
+        table.put("Hide suggested groups",
+                "\u00d6nerilen gruplar\u0131 gizle");
         table.put("Hide the Follow button on reels",
                 "Reels videolar\u0131ndaki Takip Et d\u00fc\u011fmesini gizle");
         table.put("Hide the Get Messenger card",
@@ -2830,11 +2848,11 @@ public final class L10nTranslations {
                 "Facebook'un reklam yerine tan\u0131t\u0131m olarak sayd\u0131\u011f\u0131 g\u00f6nderiler.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Takip etmedi\u011fin ki\u015fi ve sayfalardan ve kat\u0131lmad\u0131\u011f\u0131n gruplardan Facebook'un ak\u0131\u015f\u0131na katt\u0131\u011f\u0131 g\u00f6nderiler.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi g\u00f6nderiler. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir g\u00f6nderi kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi g\u00f6nderiler. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir g\u00f6nderi kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
         table.put("Re-signed build fix",
@@ -2953,11 +2971,11 @@ public final class L10nTranslations {
                 "Bu ayar dosyas\u0131 hasarl\u0131 ya da yaln\u0131zca bir k\u0131sm\u0131 indirilmi\u015f. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
                 "Bu ayar dosyas\u0131, Hushfacebook'un bu s\u00fcr\u00fcm\u00fcnden daha yeni bir s\u00fcr\u00fcm\u00fcyle olu\u015fturulmu\u015f. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
-        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
-                "\u201cMeta'dan di\u011ferleri\u201d b\u00f6l\u00fcm\u00fc, Meta'n\u0131n di\u011fer uygulamalar\u0131na giden ba\u011flant\u0131lar\u0131 ve Meta cihazlar\u0131n\u0131n reklamlar\u0131yla birlikte Facebook men\u00fcs\u00fcnden kalkar. Kendi k\u0131sayollar\u0131n yerinde kal\u0131r.");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
+                "\u201cMeta'dan di\u011ferleri\u201d b\u00f6l\u00fcm\u00fc, Meta'n\u0131n di\u011fer uygulamalar\u0131na giden ba\u011flant\u0131lar\u0131 ve Meta cihazlar\u0131n\u0131n reklamlar\u0131yla birlikte Facebook men\u00fcs\u00fcnden kalkar. Kendi k\u0131sayollar\u0131n yerinde kal\u0131r.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "Reels videosunu payla\u015fan ki\u015finin ad\u0131n\u0131n yan\u0131ndaki Takip Et d\u00fc\u011fmesi. Onu profilinden yine takip edebilirsin.");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
@@ -2976,6 +2994,8 @@ public final class L10nTranslations {
                 "En yeni Hushfacebook s\u00fcr\u00fcm\u00fc %1$s.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131 ve kendi profilindeki sat\u0131r.");
+        table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
+                "G\u00f6nderilerin aras\u0131ndaki kat\u0131labilece\u011fin gruplar sat\u0131r\u0131 ve Daha fazla grup ke\u015ffet d\u00fc\u011fmesi. \u00dcyesi oldu\u011fun gruplar\u0131n g\u00f6nderileri kal\u0131r.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Ak\u0131\u015f\u0131n en \u00fcst\u00fcndeki hikaye \u015feridi, \u201cHikaye olu\u015ftur\u201d da dahil.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",

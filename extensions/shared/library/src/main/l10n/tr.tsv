@@ -331,3 +331,7 @@ Ads between the posts on someone's profile or a Page. Their own posts stay.	Biri
 the settings row in Facebook's Menu	Facebook menüsündeki ayarlar satırı
 # context: a short message when the Hushfacebook row in Facebook's Menu couldn't open the settings
 Hushfacebook settings can't open here. Long-press the Facebook logo instead.	Hushfacebook ayarları burada açılamıyor. Bunun yerine Facebook logosuna basılı tut.
+# context: switch title under News feed; the row of groups Facebook suggests joining, shown between posts
+Hide suggested groups	Önerilen grupları gizle
+# context: summary of that switch; Discover more groups is the label of Facebook's own button under that row
+The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.	Gönderilerin arasındaki katılabileceğin gruplar satırı ve Daha fazla grup keşfet düğmesi. Üyesi olduğun grupların gönderileri kalır.

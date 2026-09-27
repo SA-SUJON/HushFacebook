@@ -263,6 +263,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 feed.addPreference(toggle(context, Settings.HIDE_PEOPLE_YOU_MAY_KNOW,
                         L10n.t("Hide \"People you may know\""),
                         L10n.t("The row of friend suggestions between posts, and the one on your own profile.")));
+                feed.addPreference(toggle(context, Settings.HIDE_SUGGESTED_GROUPS,
+                        L10n.t("Hide suggested groups"),
+                        L10n.t("The row of groups to join between posts, with its Discover more groups button. "
+                                + "Posts from groups you're in stay.")));
             }
             if (build.contains(PatchFamily.STORIES_TRAY)) {
                 // Facebook builds the feed's adapters once, when the feed is set up, and the tray is

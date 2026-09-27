@@ -331,3 +331,7 @@ Ads between the posts on someone's profile or a Page. Their own posts stay.	Anun
 the settings row in Facebook's Menu	la fila de configuración en el menú de Facebook
 # context: a short message when the Hushfacebook row in Facebook's Menu couldn't open the settings
 Hushfacebook settings can't open here. Long-press the Facebook logo instead.	La configuración de Hushfacebook no se puede abrir aquí. Mantén pulsado el logotipo de Facebook.
+# context: switch title under News feed; the row of groups Facebook suggests joining, shown between posts
+Hide suggested groups	Ocultar grupos sugeridos
+# context: summary of that switch; Discover more groups is the label of Facebook's own button under that row
+The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.	La fila de grupos para unirte entre las publicaciones, con su botón Descubrir más grupos. Las publicaciones de tus grupos se quedan.

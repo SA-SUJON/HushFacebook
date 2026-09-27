@@ -45,6 +45,15 @@ public final class FeedFilter {
      */
     static final String PEOPLE_YOU_MAY_KNOW_TYPE = "PaginatedPeopleYouMayKnowFeedUnit";
 
+    /**
+     * The GraphQL type the suggested groups row answers: groups to join, under a "Suggested for
+     * you" header, with a "Discover more groups" button. Its model is the People you may know one,
+     * whose {@code getTypeName()} answers this name for its own type tag in 577 and 580. A post
+     * from a group you're in is a Story, and friend requests answer FriendRequestsFeedUnit, so
+     * neither matches.
+     */
+    static final String GROUPS_YOU_SHOULD_JOIN_TYPE = "GroupsYouShouldJoinFeedUnit";
+
     /** The diagnostic counter routes. Each news feed edge counts as a list of one post. */
     static final String FEED_ROUTE = "News feed posts";
     static final String STORY_ROUTE = "Story ad sources";
@@ -91,8 +100,9 @@ public final class FeedFilter {
      * keeps its real name through Meta's obfuscator, so the check needs no obfuscated identifier.
      *
      * <p>Left out on purpose: {@code GraphQLFriendsLocationsFeedUnit}, a real feature. People You
-     * May Know isn't here either: its unit class is Redex-renamed and shared with other rows, so its
-     * own rule reads the GraphQL type name the unit answers ({@link #PEOPLE_YOU_MAY_KNOW_TYPE}).
+     * May Know and suggested groups aren't here either: their unit class is Redex-renamed and
+     * shared with other rows, so their own rules read the GraphQL type name the unit answers
+     * ({@link #PEOPLE_YOU_MAY_KNOW_TYPE}, {@link #GROUPS_YOU_SHOULD_JOIN_TYPE}).
      */
     private static final String[] SUGGESTED_UNITS = {
             // "Pages you may like" and its variants.
@@ -213,9 +223,9 @@ public final class FeedFilter {
                 if (reason == null && Settings.HIDE_SUGGESTED_FOR_YOU.get()) {
                     reason = flagReason(RecommendationLabel.FLAG, RECOMMENDATION_ROUTE, feedUnit, recommendationAccessor);
                 }
-                if (reason == null && Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get()
-                        && PEOPLE_YOU_MAY_KNOW_TYPE.equals(typeName(feedUnit))) {
-                    reason = PEOPLE_YOU_MAY_KNOW_TYPE;
+                if (reason == null
+                        && (Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get() || Settings.HIDE_SUGGESTED_GROUPS.get())) {
+                    reason = suggestedTypeReason(typeName(feedUnit));
                 }
             }
             if (reason == null && aiPatched && Settings.HIDE_AI_DETECTED_POSTS.get()) {
@@ -250,6 +260,21 @@ public final class FeedFilter {
         if (!outcome.hides) return null;
         FeedFilterCounters.removed(route, 1, why);
         return flag.flag;
+    }
+
+    /**
+     * The rules built on a unit's GraphQL type name: the name, when it's People you may know or
+     * suggested groups and that row's switch is on, otherwise null. A name that couldn't be read
+     * is null, so the unit stays.
+     */
+    private static String suggestedTypeReason(String type) {
+        if (PEOPLE_YOU_MAY_KNOW_TYPE.equals(type)) {
+            return Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get() ? PEOPLE_YOU_MAY_KNOW_TYPE : null;
+        }
+        if (GROUPS_YOU_SHOULD_JOIN_TYPE.equals(type)) {
+            return Settings.HIDE_SUGGESTED_GROUPS.get() ? GROUPS_YOU_SHOULD_JOIN_TYPE : null;
+        }
+        return null;
     }
 
     /**

@@ -26,6 +26,14 @@ public class TypedFeedUnit {
         return new TypedFeedUnit("PaginatedPeopleYouMayKnowFeedUnit");
     }
 
+    /**
+     * The suggested groups row. Its class is the People you may know one, which answers this name
+     * for the row's own type tag.
+     */
+    public static TypedFeedUnit suggestedGroups() {
+        return new TypedFeedUnit("GroupsYouShouldJoinFeedUnit");
+    }
+
     /** The row of stories at the top of the feed. */
     public static TypedFeedUnit storiesTray() {
         return new TypedFeedUnit("StoriesTrayFeedUnit");

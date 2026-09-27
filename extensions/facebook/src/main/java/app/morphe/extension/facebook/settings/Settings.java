@@ -59,6 +59,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_people_you_may_know", TRUE);
 
     /**
+     * The row of groups to join that Facebook puts between posts, found by its GraphQL type name.
+     * Posts from groups you're in are stories of their own and stay.
+     */
+    public static final BooleanSetting HIDE_SUGGESTED_GROUPS =
+            new BooleanSetting("hushfacebook_hide_suggested_groups", TRUE);
+
+    /**
      * The row of stories at the top of the feed. The feed's adapter list builds it as an adapter of
      * its own, and the patch has both tray adapters return nothing while this is on.
      */

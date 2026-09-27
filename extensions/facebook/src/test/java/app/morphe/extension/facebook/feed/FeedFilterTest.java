@@ -44,6 +44,7 @@ public class FeedFilterTest {
         Settings.HIDE_SUGGESTED_POSTS.resetToDefault();
         Settings.HIDE_SUGGESTED_FOR_YOU.resetToDefault();
         Settings.HIDE_PEOPLE_YOU_MAY_KNOW.resetToDefault();
+        Settings.HIDE_SUGGESTED_GROUPS.resetToDefault();
         Settings.HIDE_STORIES_TRAY.resetToDefault();
         Settings.HIDE_FEED_REELS.resetToDefault();
         FeedFilterCounters.clear();
@@ -212,6 +213,54 @@ public class FeedFilterTest {
         assertFalse(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow(), true, false));
         Settings.HIDE_PEOPLE_YOU_MAY_KNOW.save(false);
         assertFalse(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow(), false, true));
+    }
+
+    /**
+     * The suggested groups row goes by the type name its shared model answers, with its own
+     * switch. What sits near it stays: a group's post (a Story), the row's own items, friend
+     * requests, which the same model answers for another tag, and People you may know once its
+     * switch is off. Each switch works without the other.
+     */
+    @Test
+    public void suggestedGroupsGoByTheirTypeName() {
+        assertTrue(Settings.HIDE_SUGGESTED_GROUPS.defaultValue);
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.suggestedGroups(), false, true));
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, new TypedFeedUnit("Story"), false, true));
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC,
+                new TypedFeedUnit("GroupsYouShouldJoinFeedUnitItem"), false, true));
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, new TypedFeedUnit("FriendRequestsFeedUnit"), false, true));
+        // Without the patch the rule never runs.
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.suggestedGroups(), true, false));
+
+        Settings.HIDE_PEOPLE_YOU_MAY_KNOW.save(false);
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.suggestedGroups(), false, true));
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow(), false, true));
+
+        Settings.HIDE_PEOPLE_YOU_MAY_KNOW.save(true);
+        Settings.HIDE_SUGGESTED_GROUPS.save(false);
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.suggestedGroups(), false, true));
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow(), false, true));
+    }
+
+    /**
+     * The groups rule fails open: a unit whose type name can't be read, or whose tree Facebook
+     * already released, stays, and the live control with the same name goes. What it hid is
+     * counted under the type name, on the feed's own route.
+     */
+    @Test
+    public void suggestedGroupsFailOpenAndCountWhatTheyHid() {
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, new TypedFeedUnit.Unreadable(), true, true));
+        BaseModelWithTree released = new BaseModelWithTree("GroupsYouShouldJoinFeedUnit") { }.released();
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, released, true, true));
+        assertFalse("the guard asked a released tree its type name", released.readAfterRelease);
+
+        FeedFilterCounters.clear();
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, new BaseModelWithTree("GroupsYouShouldJoinFeedUnit") { },
+                true, true));
+        FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.suggestedGroups(), true, true);
+        String report = String.join("\n", FeedFilterCounters.report());
+        assertTrue(report, report.contains(FeedFilter.FEED_ROUTE + ": 2 lists, 2 items, 2 removed. "
+                + "Last reason: GroupsYouShouldJoinFeedUnit. Removed: GroupsYouShouldJoinFeedUnit 2."));
     }
 
     /**

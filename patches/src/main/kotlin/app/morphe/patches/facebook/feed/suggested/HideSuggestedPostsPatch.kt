@@ -7,9 +7,9 @@
  * feed filter, behind the shared feed hook. The patch still refuses a build that carries none of
  * the unit classes, so a rename fails at patch time instead of filtering nothing, and names each
  * one a build lacks in the patch log. It also finds the
- * story's recommendation flag, held to Facebook's own filter, and the People you may know type
- * name, which two more switches read. The People you may know switch also reaches the carousel on
- * your own profile, through a hook in that section's children builder.
+ * story's recommendation flag, held to Facebook's own filter, and the People you may know and
+ * suggested groups type names, which three more switches read. The People you may know switch
+ * also reaches the carousel on your own profile, through a hook in that section's children builder.
  */
 package app.morphe.patches.facebook.feed.suggested
 
@@ -34,6 +34,7 @@ import app.morphe.patches.facebook.feed.methodsHolding
 import app.morphe.patches.facebook.feed.readsRecommendedFlag
 import app.morphe.patches.facebook.feed.recommendationContextAccessors
 import app.morphe.patches.facebook.feed.requireFeedTypeName
+import app.morphe.patches.facebook.feed.requireTaggedFeedTypeName
 import app.morphe.patches.facebook.feed.requireStoryFlagReaders
 import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
@@ -81,6 +82,17 @@ internal val SUGGESTED_FEED_UNITS = listOf(
  */
 internal const val PEOPLE_YOU_MAY_KNOW_TYPE = "PaginatedPeopleYouMayKnowFeedUnit"
 
+/**
+ * The type name the suggested groups row ("Suggested for you" groups to join, with its "Discover
+ * more groups" button) answers. The extension's `FeedFilter.GROUPS_YOU_SHOULD_JOIN_TYPE` matches it.
+ *
+ * Its model is the People you may know one (`LX/3zk;` in 580, `LX/3zc;` in 577), which answers
+ * three type tags: its own literal for People you may know, and a string table entry for this one
+ * (tag 0x363babe0, `LX/18Z;->A00(266)` in 580, `LX/19t;->A00(223)` in 577) and for
+ * `FriendRequestsFeedUnit`. So the literal alone isn't evidence here; the tag's branch is.
+ */
+internal const val GROUPS_YOU_SHOULD_JOIN_TYPE = "GroupsYouShouldJoinFeedUnit"
+
 /** The extension class that reads the recommendation flag, and its accessor this patch fills in. */
 internal const val RECOMMENDATION_LABEL = "$EXTENSION_PACKAGE/feed/RecommendationLabel;"
 internal const val RECOMMENDATION_CONTEXT_STUB = "recommendationContext"
@@ -93,7 +105,7 @@ internal const val HIDE_PROFILE_SECTION =
 val hideSuggestedPostsPatch = bytecodePatch(
     name = "Hide suggested and promoted posts",
     description = "Removes what Facebook adds to the feed besides ads: \"Suggested for you\" posts, \"People " +
-        "you may know\", \"Pages you may like\" and its own upsells. In-feed surveys go too, and so does the " +
+        "you may know\", suggested groups, \"Pages you may like\" and its own upsells. In-feed surveys go too, and so does the " +
         "\"People you may know\" row on your own profile. Each kind has its own switch.",
     default = true,
 ) {
@@ -105,6 +117,7 @@ val hideSuggestedPostsPatch = bytecodePatch(
     execute {
         requireSuggestedUnits()
         requireFeedTypeName(PEOPLE_YOU_MAY_KNOW_TYPE)
+        requireTaggedFeedTypeName(GROUPS_YOU_SHOULD_JOIN_TYPE)
 
         // A "Suggested for you" post is an ordinary story on the wire (ENGAGEMENT, like a friend's),
         // so the rule reads the story's recommendation flag through GraphQLStory's accessor.
