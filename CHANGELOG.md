@@ -2,7 +2,7 @@
 
 Every Hushfacebook release, newest first.
 
-## Unreleased
+## 0.2.0 (2026-09-26)
 
 * **Facebook:** New patch, Use the phone's emoji. Facebook draws the emoji in its text with Meta's own emoji font, which it downloads to your phone. This patch has it use your phone's emoji font instead, so emoji in posts and comments look like the ones on your keyboard, and so do the smileys Facebook makes from text like :). Reactions and stickers are pictures rather than text, so they stay as they are. The patch starts off in Morphe Manager, and its switch, under Appearance in Hushfacebook's settings, starts on once you pick it. Restart Facebook after changing the switch. Asked for on the r/MorpheApp thread.
 * **Facebook:** The Video file name setting takes two more tokens. `{owner}` becomes the name of whoever posted the video and `{posted}` the day it went up, so `{owner}_{posted}` names a saved video `Some Page_20260925.mp4`, whether it came from Reels, Stories, the feed or Watch. Both are left out when a save doesn't know them, the way `{video_id}` is, and the settings dialog names all four (issue #6).
@@ -23,6 +23,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** The checks every release goes through got stricter. A patched build's resources and manifest are now compared with Facebook's whole split bundle rather than only its base APK, the injected-code check covers helpers added to Facebook's own classes, and the receipt published with a release has to match the one built here byte for byte.
 * **Facebook:** New patch, Install beside Meta's apps, on by default. The official Messenger, Facebook Lite, Business Suite and Workplace declare two permissions that Facebook declares too, and Android lets only one signing key own a permission, so they couldn't be installed beside a patched Facebook (`INSTALL_FAILED_DUPLICATE_PERMISSION`). The patch gives Facebook's two their own names, everywhere the manifest and Facebook's code use them. If you patched before, patch again and install over the top: it's an ordinary update, so Facebook keeps its data.
 * **Facebook:** Hushfacebook can now tell you when a new release is out. Turn on Check for new Hushfacebook releases, under Updates in Hushfacebook's settings, and once a day, when Facebook starts, it asks GitHub for the latest release. When that's newer than yours, the status card at the top of the screen says so, along with the Facebook version it targets if yours is a different one. Check now asks straight away. The switch starts off, since it's the only time Hushfacebook goes online for itself. Pause stops it, and a settings file can't turn it on. It never downloads anything or posts a notification. Asked for on r/MorpheApp.
+* **Facebook:** The 27 patches target Facebook 580.0.0.51.74 and 577.0.0.50.72. Morphe Manager 1.32.0 or newer is required.
 
 ## 0.1.8 (2026-09-26)
 
