@@ -78,6 +78,8 @@ public enum PatchFamily {
             Settings.TAP_TO_PLAY),
     RESUME_LONG_VIDEOS(FamilyNames.RESUME_LONG_VIDEOS, "resumeLongVideos", null,
             Settings.RESUME_LONG_VIDEOS),
+    BACKGROUND_PLAY(FamilyNames.BACKGROUND_PLAY, "backgroundPlay", null,
+            Settings.KEEP_PLAYING_IN_BACKGROUND),
     SYSTEM_FONT(FamilyNames.SYSTEM_FONT, "systemFont", null,
             Settings.USE_SYSTEM_FONT),
     SYSTEM_EMOJI(FamilyNames.SYSTEM_EMOJI, "systemEmoji", null,

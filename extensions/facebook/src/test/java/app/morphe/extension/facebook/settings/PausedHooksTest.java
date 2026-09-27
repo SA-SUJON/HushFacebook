@@ -58,6 +58,7 @@ import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
 import app.morphe.extension.facebook.composer.TagSuggestionsForTests;
+import app.morphe.extension.facebook.media.BackgroundPlayForTests;
 import app.morphe.extension.facebook.media.ResumePlaybackForTests;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
@@ -283,6 +284,8 @@ public class PausedHooksTest {
                 () -> TapToPlay.showReelPlayButton(false)));
         // A long video left at 5:00 is saved, and its next start seeks back there.
         probes.put(PatchFamily.RESUME_LONG_VIDEOS, Collections.singletonList(ResumePlaybackForTests::resumesALongVideo));
+        // Facebook's background handler takes on a video you started, past Facebook's own checks.
+        probes.put(PatchFamily.BACKGROUND_PLAY, Collections.singletonList(BackgroundPlayForTests::continuesAVideoYouStarted));
         // The repository's answer for one of Meta's families, a variable-font builder's, and React
         // Native's for a family Facebook registered there.
         probes.put(PatchFamily.SYSTEM_FONT, Arrays.asList(

@@ -277,6 +277,12 @@ Playback	Reproducción
 Tap to play	Toca para reproducir
 # context: summary of that switch; Autoplay and Off are the name and value of Facebook's own setting, as Facebook shows them in this language
 Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.	Los videos, reels, historias y la música esperan a que toques antes de reproducirse. La opción de reproducción automática de Facebook aparece como desactivada mientras esto está activado y vuelve a lo que elegiste cuando lo desactivas.
+# context: switch title under Playback; on, a video you started keeps its sound after you leave Facebook
+Keep playing in the background	Seguir reproduciendo en segundo plano
+# context: summary of that switch; the notification is the one Facebook shows with the video's play and pause buttons
+A video you started with a tap keeps its sound after you leave Facebook, and its notification can pause it. Swiping the notification away or taking a call stops it.	Un video que iniciaste con un toque sigue sonando cuando sales de Facebook, y su notificación permite pausarlo. Deslizar la notificación o atender una llamada lo detiene.
+# context: title of that notification when the video has none of its own
+Facebook video	Video de Facebook
 # context: switch title under Opening Facebook; Marketplace is Facebook's tab and keeps its name
 Marketplace only	Solo Marketplace
 # context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them

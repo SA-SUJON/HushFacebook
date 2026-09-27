@@ -41,6 +41,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *       given a new video since. That keeps what a tap started going through Facebook's own
  *       restarts, such as a play it replays once the video is bound.</li>
  *   <li>The trigger is one only something you did sends: {@link #CONTROLS}.</li>
+ *   <li>Keep playing in the background is carrying on a video you started, and this is Facebook's
+ *       background player or its notification starting it ({@link BackgroundPlay#allowsStart}).</li>
  *   <li>A tap ended no more than {@link #TAP_WINDOW_MS} ago ({@link TapClock}) and the trigger isn't
  *       one Facebook sends because something came into view or came back ({@link #visibilityDriven}).
  *       BY_AUTOPLAY is let through here, since the Story you tap starts with it.</li>
@@ -207,12 +209,17 @@ public final class TapToPlay {
         return Utils.settingsReady() && Settings.TAP_TO_PLAY.get();
     }
 
-    /** The rule, with the clock passed in. Arms the player when it lets the start through. */
+    /**
+     * The rule, with the clock passed in. Arms the player when it lets the start through. A start
+     * Keep playing in the background asked for goes ahead too: Facebook's background player
+     * carrying on a video you started, or its notification's play ({@link BackgroundPlay#allowsStart}).
+     */
     static boolean decide(Object player, @Nullable String trigger, long now, String path) {
         boolean armed = ARMED.armed(player);
         long sinceTap = TapClock.msSinceTap(now);
         boolean allowed = armed
                 || (trigger != null && CONTROLS.contains(trigger))
+                || BackgroundPlay.allowsStart(trigger)
                 || (sinceTap >= 0 && sinceTap <= TAP_WINDOW_MS && !visibilityDriven(trigger));
         if (allowed && !armed) ARMED.arm(player, now);
         logDecision(allowed, trigger, sinceTap, armed, path);

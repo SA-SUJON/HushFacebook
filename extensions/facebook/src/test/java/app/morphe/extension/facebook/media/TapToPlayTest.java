@@ -74,6 +74,29 @@ public class TapToPlayTest {
     }
 
     @Test
+    public void facebooksBackgroundPlayerGoesAheadOnlyForAVideoKeepPlayingCarriesOn() {
+        Object player = new Object();
+        assertFalse("with nothing carried on", decide(player, "BY_BACKGROUND_PLAY", SystemClock.uptimeMillis()));
+        BackgroundPlay.carrying = true;
+        try {
+            assertTrue("Facebook's background player", decide(new Object(), "BY_BACKGROUND_PLAY", SystemClock.uptimeMillis()));
+            assertFalse("another trigger", decide(new Object(), "BY_AUTOPLAY", SystemClock.uptimeMillis()));
+        } finally {
+            BackgroundPlay.forget();
+        }
+        BackgroundPlay.session = true;
+        try {
+            assertTrue("its notification's play", decide(new Object(), "BY_BACKGROUND_PLAY", SystemClock.uptimeMillis()));
+        } finally {
+            BackgroundPlay.forget();
+        }
+    }
+
+    private static boolean decide(Object player, String trigger, long now) {
+        return TapToPlay.decide(player, trigger, now, "");
+    }
+
+    @Test
     public void theSwitchStartsOn() {
         assertTrue("picking the patch is the choice to use it", Settings.TAP_TO_PLAY.get());
     }

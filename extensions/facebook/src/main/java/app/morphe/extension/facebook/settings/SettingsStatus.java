@@ -94,6 +94,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean backgroundPlay() {
+        return false;
+    }
+
     public static boolean systemFont() {
         return false;
     }

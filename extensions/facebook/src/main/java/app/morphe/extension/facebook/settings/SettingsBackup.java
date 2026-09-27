@@ -113,6 +113,7 @@ public final class SettingsBackup {
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
             Settings.TAP_TO_PLAY,
             Settings.RESUME_LONG_VIDEOS,
+            Settings.KEEP_PLAYING_IN_BACKGROUND,
             Settings.USE_SYSTEM_FONT,
             Settings.USE_SYSTEM_EMOJI,
             Settings.OPEN_LINKS_EXTERNALLY,

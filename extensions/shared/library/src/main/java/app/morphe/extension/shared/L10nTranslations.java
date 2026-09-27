@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(684);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -97,6 +97,8 @@ public final class L10nTranslations {
                 "Die Kommentare eines Beitrags \u00f6ffnen sich mit %1$s als Auswahl im Sortiermen\u00fc, wenn der Beitrag das anbietet.");
         table.put("A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.",
                 "Ein Video \u00fcber zwei Minuten, das du mittendrin verlassen hast, l\u00e4uft beim n\u00e4chsten Abspielen dort weiter, wo du aufgeh\u00f6rt hast. Zieh die Zeitleiste, um woanders anzufangen. Reels, Live-Videos und Werbung starten wie gewohnt.");
+        table.put("A video you started with a tap keeps its sound after you leave Facebook, and its notification can pause it. Swiping the notification away or taking a call stops it.",
+                "Ein Video, das du mit einem Tippen gestartet hast, beh\u00e4lt seinen Ton, wenn du Facebook verl\u00e4sst, und \u00fcber seine Benachrichtigung kannst du es pausieren. Wenn du die Benachrichtigung wegwischst oder einen Anruf annimmst, stoppt es.");
         table.put("AMOLED black theme",
                 "Schwarzes AMOLED-Design");
         table.put("About",
@@ -173,11 +175,11 @@ public final class L10nTranslations {
                 "Reihenfolge der Kommentare");
         table.put("Comments",
                 "Kommentare");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Kommentare \u00f6ffnen sich in der Reihenfolge, die Facebook ausw\u00e4hlt, meist \u201eRelevanteste\u201c.");
     }
 
     private static void fillDe1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Kommentare \u00f6ffnen sich in der Reihenfolge, die Facebook ausw\u00e4hlt, meist \u201eRelevanteste\u201c.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Kommentare \u00f6ffnen sich in der unten gew\u00e4hlten Reihenfolge statt in der, die Facebook ausw\u00e4hlt. Eine Reihenfolge, die du in den Kommentaren eines Beitrags w\u00e4hlst, bleibt f\u00fcr diesen Beitrag, bis Facebook neu startet, und Links zu einem Kommentar behalten die Reihenfolge von Facebook.");
         table.put("Comments will open in the order Facebook picks.",
@@ -280,6 +282,8 @@ public final class L10nTranslations {
                 "Facebook erh\u00e4lt nicht mehr die Liste der Reels, die du angesehen hast, mit der es deinen Reels-Feed sortiert. Niemand sonst sieht diese Liste. Bereits angesehene Reels k\u00f6nnen im Feed wieder auftauchen.");
         table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
                 "Facebook schl\u00e4gt keine Personen zum Markieren mehr vor, w\u00e4hrend du in Beitr\u00e4gen und Kommentaren normale W\u00f6rter tippst. Mit @ erscheint die Liste weiterhin, und dein Text wird nie ver\u00e4ndert.");
+        table.put("Facebook video",
+                "Facebook-Video");
         table.put("Facebook will open on %1$s.",
                 "Facebook startet dann mit %1$s.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -294,13 +298,13 @@ public final class L10nTranslations {
                 "Dateiname");
         table.put("File name set to %1$s.",
                 "Dateiname auf %1$s gesetzt.");
+    }
+
+    private static void fillDe2(Map<String, String> table) {
         table.put("Folder name",
                 "Ordnername");
         table.put("Folder set to %1$s.",
                 "Ordner auf %1$s gesetzt.");
-    }
-
-    private static void fillDe2(Map<String, String> table) {
         table.put("Font file",
                 "Schriftdatei");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -415,15 +419,17 @@ public final class L10nTranslations {
                 "Zu einem Abschnitt springen");
         table.put("Keep feed position on return",
                 "Feedposition beim Zur\u00fcckkehren beibehalten");
+        table.put("Keep playing in the background",
+                "Im Hintergrund weiterspielen");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("Licenses",
                 "Lizenzen");
         table.put("Link expired. Reopen the item and try again",
                 "Link abgelaufen. \u00d6ffne den Inhalt neu und versuche es noch einmal");
         table.put("Links",
                 "Links");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
         table.put("Marketplace only",
@@ -538,15 +544,15 @@ public final class L10nTranslations {
                 "Gespeicherte Videos hei\u00dfen dann %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Gespeichert. Starte Facebook neu, um diese \u00c4nderung zu \u00fcbernehmen.");
+    }
+
+    private static void fillDe4(Map<String, String> table) {
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Speichert Videos im Format H.264 mit AAC-Ton, das Apps wie WhatsApp annehmen. Die sch\u00e4rfste Version bei Facebook ist oft AV1, und das lehnen manche Apps ab. Deshalb kann ein Video in niedrigerer Qualit\u00e4t gespeichert werden. Hat ein Video keine solche Version, wird es wie gewohnt gespeichert.");
         table.put("Saves will go to a folder named %1$s.",
                 "Was du speicherst, landet dann in einem Ordner namens %1$s.");
         table.put("Saving a photo",
                 "Foto wird gespeichert");
-    }
-
-    private static void fillDe4(Map<String, String> table) {
         table.put("Saving a video",
                 "Video wird gespeichert");
         table.put("Saving the settings file",
@@ -661,15 +667,15 @@ public final class L10nTranslations {
                 "Noch nichts zu berichten. Schalte die Debug-Protokollierung ein, wiederhole, was schiefgelaufen ist, und exportiere dann erneut.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Diese werden beim Patchen in Morphe Manager ausgew\u00e4hlt, und die Pause schaltet sie nicht aus. Patche erneut, um sie zu \u00e4ndern.");
+    }
+
+    private static void fillDe5(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Dieses Handy hat keine Dateiauswahl, hier l\u00e4sst sich also keine Datei w\u00e4hlen.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Trend-Videos und die Reels, die Facebook f\u00fcr dich ausgew\u00e4hlt hat, tauchen nicht mehr in deinen Benachrichtigungen auf.");
         table.put("Try again, or go back to Facebook.",
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
-    }
-
-    private static void fillDe5(Map<String, String> table) {
         table.put("Updates",
                 "Updates");
         table.put("Use the phone's emoji",
@@ -751,7 +757,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(684);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -804,6 +810,8 @@ public final class L10nTranslations {
                 "Los comentarios de una publicaci\u00f3n se abren con %1$s elegido en su men\u00fa de orden, si la publicaci\u00f3n lo ofrece.");
         table.put("A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.",
                 "Un video de m\u00e1s de dos minutos que dejaste a medias sigue donde lo dejaste la pr\u00f3xima vez que se reproduce. Arrastra la barra de progreso para empezar en otro punto. Los reels, los videos en vivo y los anuncios empiezan como siempre.");
+        table.put("A video you started with a tap keeps its sound after you leave Facebook, and its notification can pause it. Swiping the notification away or taking a call stops it.",
+                "Un video que iniciaste con un toque sigue sonando cuando sales de Facebook, y su notificaci\u00f3n permite pausarlo. Deslizar la notificaci\u00f3n o atender una llamada lo detiene.");
         table.put("AMOLED black theme",
                 "Tema negro AMOLED");
         table.put("About",
@@ -880,11 +888,11 @@ public final class L10nTranslations {
                 "Orden de los comentarios");
         table.put("Comments",
                 "Comentarios");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Los comentarios se abren en el orden que elige Facebook, que suele ser M\u00e1s relevantes.");
     }
 
     private static void fillEs1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Los comentarios se abren en el orden que elige Facebook, que suele ser M\u00e1s relevantes.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Los comentarios se abren en el orden elegido abajo en lugar del que elige Facebook. El orden que elijas en los comentarios de una publicaci\u00f3n se mantiene para esa publicaci\u00f3n hasta que Facebook se reinicie, y los enlaces a un comentario conservan el orden de Facebook.");
         table.put("Comments will open in the order Facebook picks.",
@@ -987,6 +995,8 @@ public final class L10nTranslations {
                 "Facebook deja de recibir la lista de reels que has visto, que usa para ordenar tu feed de Reels. Nadie m\u00e1s ve esa lista. Los reels que ya has visto pueden volver a aparecer en el feed.");
         table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
                 "Facebook deja de ofrecerte personas para etiquetar mientras escribes palabras normales en publicaciones y comentarios. Si escribes @, la lista sigue apareciendo, y lo que escribiste nunca cambia.");
+        table.put("Facebook video",
+                "Video de Facebook");
         table.put("Facebook will open on %1$s.",
                 "Facebook se abrir\u00e1 en %1$s.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -1001,13 +1011,13 @@ public final class L10nTranslations {
                 "Nombre de archivo");
         table.put("File name set to %1$s.",
                 "Nombre de archivo establecido en %1$s.");
+    }
+
+    private static void fillEs2(Map<String, String> table) {
         table.put("Folder name",
                 "Nombre de carpeta");
         table.put("Folder set to %1$s.",
                 "Carpeta establecida en %1$s.");
-    }
-
-    private static void fillEs2(Map<String, String> table) {
         table.put("Font file",
                 "Archivo de fuente");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -1122,15 +1132,17 @@ public final class L10nTranslations {
                 "Ir a una secci\u00f3n");
         table.put("Keep feed position on return",
                 "Mantener la posici\u00f3n del feed al volver");
+        table.put("Keep playing in the background",
+                "Seguir reproduciendo en segundo plano");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("Licenses",
                 "Licencias");
         table.put("Link expired. Reopen the item and try again",
                 "El enlace expir\u00f3. Vuelve a abrir el contenido e int\u00e9ntalo de nuevo");
         table.put("Links",
                 "Enlaces");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
         table.put("Marketplace only",
@@ -1245,15 +1257,15 @@ public final class L10nTranslations {
                 "Los videos guardados se llamar\u00e1n %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Guardado. Reinicia Facebook para aplicar este cambio.");
+    }
+
+    private static void fillEs4(Map<String, String> table) {
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Guarda los videos en H.264 con sonido AAC, el formato que aceptan apps como WhatsApp. La versi\u00f3n m\u00e1s n\u00edtida de Facebook suele ser AV1, que algunas apps rechazan, as\u00ed que un video puede guardarse con menor calidad. Un video sin esa versi\u00f3n se guarda como siempre.");
         table.put("Saves will go to a folder named %1$s.",
                 "Lo que guardes ir\u00e1 a una carpeta llamada %1$s.");
         table.put("Saving a photo",
                 "Guardando una foto");
-    }
-
-    private static void fillEs4(Map<String, String> table) {
         table.put("Saving a video",
                 "Guardando un video");
         table.put("Saving the settings file",
@@ -1368,15 +1380,15 @@ public final class L10nTranslations {
                 "Todav\u00eda no hay nada que informar. Activa el Registro de depuraci\u00f3n, repite lo que fall\u00f3 y vuelve a exportar.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Se eligen en Morphe Manager al parchear, y Pausar no los desactiva. Vuelve a parchear para cambiarlos.");
+    }
+
+    private static void fillEs5(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este tel\u00e9fono no tiene selector de archivos, as\u00ed que aqu\u00ed no hay forma de elegir un archivo.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Los videos en tendencia y los reels que Facebook eligi\u00f3 para ti dejan de aparecer en tus notificaciones.");
         table.put("Try again, or go back to Facebook.",
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
-    }
-
-    private static void fillEs5(Map<String, String> table) {
         table.put("Updates",
                 "Actualizaciones");
         table.put("Use the phone's emoji",
@@ -1458,7 +1470,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(684);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1511,6 +1523,8 @@ public final class L10nTranslations {
                 "Komentar sebuah postingan dibuka dengan %1$s terpilih di menu urutannya, jika postingan itu menyediakannya.");
         table.put("A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.",
                 "Video berdurasi lebih dari dua menit yang Anda tinggalkan di tengah jalan akan berlanjut dari tempat Anda berhenti saat diputar lagi. Geser bilah progres untuk mulai dari bagian lain. Reel, video siaran langsung, dan iklan mulai seperti biasa.");
+        table.put("A video you started with a tap keeps its sound after you leave Facebook, and its notification can pause it. Swiping the notification away or taking a call stops it.",
+                "Video yang Anda mulai dengan ketukan tetap bersuara setelah Anda keluar dari Facebook, dan notifikasinya bisa menjedanya. Menggeser notifikasi atau menerima panggilan akan menghentikannya.");
         table.put("AMOLED black theme",
                 "Tema hitam AMOLED");
         table.put("About",
@@ -1587,11 +1601,11 @@ public final class L10nTranslations {
                 "Urutan komentar");
         table.put("Comments",
                 "Komentar");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Komentar dibuka dengan urutan yang dipilih Facebook, biasanya Paling relevan.");
     }
 
     private static void fillIn1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Komentar dibuka dengan urutan yang dipilih Facebook, biasanya Paling relevan.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Komentar dibuka dengan urutan yang dipilih di bawah, bukan urutan yang dipilih Facebook. Urutan yang kamu pilih di komentar sebuah postingan tetap berlaku untuk postingan itu sampai Facebook dimulai ulang, dan tautan ke sebuah komentar tetap memakai urutan Facebook.");
         table.put("Comments will open in the order Facebook picks.",
@@ -1694,6 +1708,8 @@ public final class L10nTranslations {
                 "Facebook tidak lagi menerima daftar reel yang sudah Anda tonton, yang dipakainya untuk menyusun urutan feed Reels Anda. Tidak ada orang lain yang melihat daftar itu. Reel yang sudah Anda tonton mungkin muncul lagi di feed.");
         table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
                 "Facebook berhenti menawarkan orang untuk ditandai saat Anda mengetik kata biasa di postingan dan komentar. Mengetik @ tetap memunculkan daftarnya, dan tulisan Anda tidak pernah diubah.");
+        table.put("Facebook video",
+                "Video Facebook");
         table.put("Facebook will open on %1$s.",
                 "Facebook akan terbuka di %1$s.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -1708,13 +1724,13 @@ public final class L10nTranslations {
                 "Nama file");
         table.put("File name set to %1$s.",
                 "Nama file diatur menjadi %1$s.");
+    }
+
+    private static void fillIn2(Map<String, String> table) {
         table.put("Folder name",
                 "Nama folder");
         table.put("Folder set to %1$s.",
                 "Folder diatur menjadi %1$s.");
-    }
-
-    private static void fillIn2(Map<String, String> table) {
         table.put("Font file",
                 "File font");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -1829,15 +1845,17 @@ public final class L10nTranslations {
                 "Lompat ke bagian");
         table.put("Keep feed position on return",
                 "Pertahankan posisi beranda saat kembali");
+        table.put("Keep playing in the background",
+                "Tetap putar di latar belakang");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("Licenses",
                 "Lisensi");
         table.put("Link expired. Reopen the item and try again",
                 "Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi");
         table.put("Links",
                 "Tautan");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
         table.put("Marketplace only",
@@ -1952,15 +1970,15 @@ public final class L10nTranslations {
                 "Video yang disimpan akan diberi nama %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Tersimpan. Mulai ulang Facebook untuk menerapkan perubahan ini.");
+    }
+
+    private static void fillIn4(Map<String, String> table) {
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Menyimpan video dalam format H.264 dengan suara AAC, yang diterima aplikasi seperti WhatsApp. Versi tertajam di Facebook sering kali AV1, yang ditolak sebagian aplikasi, jadi video bisa tersimpan dengan kualitas lebih rendah. Video yang tidak punya versi seperti itu disimpan seperti biasa.");
         table.put("Saves will go to a folder named %1$s.",
                 "Semua yang Anda simpan akan masuk ke folder bernama %1$s.");
         table.put("Saving a photo",
                 "Menyimpan foto");
-    }
-
-    private static void fillIn4(Map<String, String> table) {
         table.put("Saving a video",
                 "Menyimpan video");
         table.put("Saving the settings file",
@@ -2075,15 +2093,15 @@ public final class L10nTranslations {
                 "Belum ada yang bisa dilaporkan. Aktifkan Pencatatan debug, ulangi hal yang bermasalah, lalu ekspor lagi.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Semua ini dipilih di Morphe Manager saat Anda menambal, dan Jeda tidak mematikannya. Tambal ulang untuk mengubahnya.");
+    }
+
+    private static void fillIn5(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Ponsel ini tidak memiliki pemilih file, jadi file tidak dapat dipilih di sini.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Video yang sedang tren dan reel yang dipilihkan Facebook untuk Anda tidak lagi muncul di notifikasi Anda.");
         table.put("Try again, or go back to Facebook.",
                 "Coba lagi, atau kembali ke Facebook.");
-    }
-
-    private static void fillIn5(Map<String, String> table) {
         table.put("Updates",
                 "Pembaruan");
         table.put("Use the phone's emoji",
@@ -2165,7 +2183,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(684);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -2218,6 +2236,8 @@ public final class L10nTranslations {
                 "Os coment\u00e1rios de uma publica\u00e7\u00e3o abrem com %1$s escolhido no menu de ordena\u00e7\u00e3o, quando a publica\u00e7\u00e3o oferece essa op\u00e7\u00e3o.");
         table.put("A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.",
                 "Um v\u00eddeo com mais de dois minutos que voc\u00ea deixou pela metade continua de onde voc\u00ea parou na pr\u00f3xima vez que for reproduzido. Arraste a barra de progresso para come\u00e7ar em outro ponto. Reels, v\u00eddeos ao vivo e an\u00fancios come\u00e7am como sempre.");
+        table.put("A video you started with a tap keeps its sound after you leave Facebook, and its notification can pause it. Swiping the notification away or taking a call stops it.",
+                "Um v\u00eddeo que voc\u00ea come\u00e7ou com um toque continua com som depois que voc\u00ea sai do Facebook, e a notifica\u00e7\u00e3o dele pode paus\u00e1-lo. Arrastar a notifica\u00e7\u00e3o para fora ou atender uma liga\u00e7\u00e3o interrompe o v\u00eddeo.");
         table.put("AMOLED black theme",
                 "Tema preto AMOLED");
         table.put("About",
@@ -2294,11 +2314,11 @@ public final class L10nTranslations {
                 "Ordem dos coment\u00e1rios");
         table.put("Comments",
                 "Coment\u00e1rios");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Os coment\u00e1rios abrem na ordem que o Facebook escolhe, que costuma ser Mais relevantes.");
     }
 
     private static void fillPt_rBR1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Os coment\u00e1rios abrem na ordem que o Facebook escolhe, que costuma ser Mais relevantes.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Os coment\u00e1rios abrem na ordem escolhida abaixo, e n\u00e3o na que o Facebook escolhe. A ordem que voc\u00ea escolher nos coment\u00e1rios de uma publica\u00e7\u00e3o continua valendo para ela at\u00e9 o Facebook reiniciar, e links para um coment\u00e1rio mant\u00eam a ordem do Facebook.");
         table.put("Comments will open in the order Facebook picks.",
@@ -2401,6 +2421,8 @@ public final class L10nTranslations {
                 "O Facebook para de receber a lista de reels que voc\u00ea assistiu, que ele usa para ordenar seu feed do Reels. Ningu\u00e9m mais v\u00ea essa lista. Reels que voc\u00ea j\u00e1 assistiu podem voltar a aparecer no feed.");
         table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
                 "O Facebook para de sugerir pessoas para marcar enquanto voc\u00ea digita palavras comuns em posts e coment\u00e1rios. Digitar @ ainda mostra a lista, e o que voc\u00ea escreveu nunca \u00e9 alterado.");
+        table.put("Facebook video",
+                "V\u00eddeo do Facebook");
         table.put("Facebook will open on %1$s.",
                 "O Facebook vai abrir em %1$s.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -2415,13 +2437,13 @@ public final class L10nTranslations {
                 "Nome do arquivo");
         table.put("File name set to %1$s.",
                 "Nome do arquivo definido como %1$s.");
+    }
+
+    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Folder name",
                 "Nome da pasta");
         table.put("Folder set to %1$s.",
                 "Pasta definida como %1$s.");
-    }
-
-    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Font file",
                 "Arquivo de fonte");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -2536,15 +2558,17 @@ public final class L10nTranslations {
                 "Ir para uma se\u00e7\u00e3o");
         table.put("Keep feed position on return",
                 "Manter a posi\u00e7\u00e3o no feed ao voltar");
+        table.put("Keep playing in the background",
+                "Continuar tocando em segundo plano");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Licenses",
                 "Licen\u00e7as");
         table.put("Link expired. Reopen the item and try again",
                 "Link expirado. Reabra o item e tente de novo");
         table.put("Links",
                 "Links");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
         table.put("Marketplace only",
@@ -2659,15 +2683,15 @@ public final class L10nTranslations {
                 "Os v\u00eddeos salvos v\u00e3o se chamar %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Salvo. Reinicie o Facebook para aplicar esta altera\u00e7\u00e3o.");
+    }
+
+    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Salva os v\u00eddeos em H.264 com som AAC, o formato que apps como o WhatsApp aceitam. A vers\u00e3o mais n\u00edtida do Facebook costuma ser AV1, que alguns apps recusam, ent\u00e3o um v\u00eddeo pode ser salvo em qualidade menor. Um v\u00eddeo sem essa vers\u00e3o \u00e9 salvo como sempre.");
         table.put("Saves will go to a folder named %1$s.",
                 "O que voc\u00ea salvar vai para uma pasta chamada %1$s.");
         table.put("Saving a photo",
                 "Salvando uma foto");
-    }
-
-    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Saving a video",
                 "Salvando um v\u00eddeo");
         table.put("Saving the settings file",
@@ -2782,15 +2806,15 @@ public final class L10nTranslations {
                 "Ainda n\u00e3o h\u00e1 nada para relatar. Ative o Registro de depura\u00e7\u00e3o, repita o que deu errado e exporte de novo.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Eles s\u00e3o escolhidos no Morphe Manager quando voc\u00ea aplica os patches, e a pausa n\u00e3o os desliga. Aplique os patches de novo para mud\u00e1-los.");
+    }
+
+    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este celular n\u00e3o tem seletor de arquivos, ent\u00e3o n\u00e3o d\u00e1 para escolher um arquivo aqui.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "V\u00eddeos em alta e os reels que o Facebook escolheu para voc\u00ea deixam de aparecer nas suas notifica\u00e7\u00f5es.");
         table.put("Try again, or go back to Facebook.",
                 "Tente de novo ou volte para o Facebook.");
-    }
-
-    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Updates",
                 "Atualiza\u00e7\u00f5es");
         table.put("Use the phone's emoji",
@@ -2872,7 +2896,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(684);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2925,6 +2949,8 @@ public final class L10nTranslations {
                 "Bir g\u00f6nderinin yorumlar\u0131, g\u00f6nderi bunu sunuyorsa s\u0131ralama men\u00fcs\u00fcnde %1$s se\u00e7ili olarak a\u00e7\u0131l\u0131r.");
         table.put("A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.",
                 "Yar\u0131da b\u0131rakt\u0131\u011f\u0131n, iki dakikadan uzun bir video bir sonraki oynat\u0131l\u0131\u015f\u0131nda kald\u0131\u011f\u0131n yerden devam eder. Ba\u015fka bir yerden ba\u015flamak i\u00e7in ilerleme \u00e7ubu\u011funu s\u00fcr\u00fckle. Reels videolar\u0131, canl\u0131 videolar ve reklamlar her zamanki gibi ba\u015flar.");
+        table.put("A video you started with a tap keeps its sound after you leave Facebook, and its notification can pause it. Swiping the notification away or taking a call stops it.",
+                "Bir dokunu\u015fla ba\u015flatt\u0131\u011f\u0131n video, Facebook'tan \u00e7\u0131kt\u0131ktan sonra da sesini s\u00fcrd\u00fcr\u00fcr ve bildirimi onu duraklatabilir. Bildirimi kayd\u0131r\u0131p kapatmak ya da bir aramay\u0131 yan\u0131tlamak onu durdurur.");
         table.put("AMOLED black theme",
                 "AMOLED siyah tema");
         table.put("About",
@@ -3001,11 +3027,11 @@ public final class L10nTranslations {
                 "Yorum s\u0131ras\u0131");
         table.put("Comments",
                 "Yorumlar");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Yorumlar Facebook'un se\u00e7ti\u011fi s\u0131rayla a\u00e7\u0131l\u0131r. Bu genellikle En alakal\u0131 s\u0131ralamas\u0131d\u0131r.");
     }
 
     private static void fillTr1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Yorumlar Facebook'un se\u00e7ti\u011fi s\u0131rayla a\u00e7\u0131l\u0131r. Bu genellikle En alakal\u0131 s\u0131ralamas\u0131d\u0131r.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Yorumlar, Facebook'un se\u00e7ti\u011fi s\u0131ra yerine a\u015fa\u011f\u0131da se\u00e7ilen s\u0131rayla a\u00e7\u0131l\u0131r. Bir g\u00f6nderinin yorumlar\u0131nda se\u00e7ti\u011fin s\u0131ra, Facebook yeniden ba\u015flayana kadar o g\u00f6nderi i\u00e7in kal\u0131r ve bir yoruma giden ba\u011flant\u0131lar Facebook'un s\u0131ras\u0131n\u0131 korur.");
         table.put("Comments will open in the order Facebook picks.",
@@ -3108,6 +3134,8 @@ public final class L10nTranslations {
                 "Facebook, Reels ak\u0131\u015f\u0131n\u0131 s\u0131ralamak i\u00e7in kulland\u0131\u011f\u0131, izledi\u011fin Reels videolar\u0131n\u0131n listesini art\u0131k almaz. Bu listeyi ba\u015fka kimse g\u00f6rmez. Daha \u00f6nce izledi\u011fin Reels videolar\u0131 ak\u0131\u015fta yeniden \u00e7\u0131kabilir.");
         table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
                 "Facebook, g\u00f6nderilerde ve yorumlarda s\u0131radan kelimeler yazarken etiketlemen i\u00e7in ki\u015fi \u00f6nermeyi b\u0131rak\u0131r. @ yaz\u0131nca liste yine a\u00e7\u0131l\u0131r ve yazd\u0131\u011f\u0131n metin hi\u00e7 de\u011fi\u015fmez.");
+        table.put("Facebook video",
+                "Facebook videosu");
         table.put("Facebook will open on %1$s.",
                 "Facebook %1$s sekmesinde a\u00e7\u0131lacak.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -3122,13 +3150,13 @@ public final class L10nTranslations {
                 "Dosya ad\u0131");
         table.put("File name set to %1$s.",
                 "Dosya ad\u0131 %1$s olarak ayarland\u0131.");
+    }
+
+    private static void fillTr2(Map<String, String> table) {
         table.put("Folder name",
                 "Klas\u00f6r ad\u0131");
         table.put("Folder set to %1$s.",
                 "Klas\u00f6r %1$s olarak ayarland\u0131.");
-    }
-
-    private static void fillTr2(Map<String, String> table) {
         table.put("Font file",
                 "Yaz\u0131 tipi dosyas\u0131");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -3243,15 +3271,17 @@ public final class L10nTranslations {
                 "Bir b\u00f6l\u00fcme git");
         table.put("Keep feed position on return",
                 "Geri d\u00f6n\u00fcnce ak\u0131\u015f konumunu koru");
+        table.put("Keep playing in the background",
+                "Arka planda \u00e7almaya devam et");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("Licenses",
                 "Lisanslar");
         table.put("Link expired. Reopen the item and try again",
                 "Ba\u011flant\u0131n\u0131n s\u00fcresi doldu. \u00d6\u011feyi yeniden a\u00e7\u0131p tekrar dene");
         table.put("Links",
                 "Ba\u011flant\u0131lar");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
         table.put("Marketplace only",
@@ -3366,15 +3396,15 @@ public final class L10nTranslations {
                 "Kaydedilen videolar\u0131n ad\u0131 %1$s olacak.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Kaydedildi. Bu de\u011fi\u015fikli\u011fi uygulamak i\u00e7in Facebook'u yeniden ba\u015flat.");
+    }
+
+    private static void fillTr4(Map<String, String> table) {
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Videolar\u0131, WhatsApp gibi uygulamalar\u0131n kabul etti\u011fi AAC sesli H.264 bi\u00e7iminde kaydeder. Facebook'un en net s\u00fcr\u00fcm\u00fc \u00e7o\u011fu zaman AV1'dir ve baz\u0131 uygulamalar bunu reddeder, bu y\u00fczden bir video daha d\u00fc\u015f\u00fck kalitede kaydedilebilir. B\u00f6yle bir s\u00fcr\u00fcm\u00fc olmayan video her zamanki gibi kaydedilir.");
         table.put("Saves will go to a folder named %1$s.",
                 "Kaydettiklerin %1$s adl\u0131 bir klas\u00f6re gidecek.");
         table.put("Saving a photo",
                 "Foto\u011fraf kaydediliyor");
-    }
-
-    private static void fillTr4(Map<String, String> table) {
         table.put("Saving a video",
                 "Video kaydediliyor");
         table.put("Saving the settings file",
@@ -3489,15 +3519,15 @@ public final class L10nTranslations {
                 "Hen\u00fcz raporlanacak bir \u015fey yok. Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fcn\u00fc a\u00e7, sorunu yeniden olu\u015ftur, sonra tekrar d\u0131\u015fa aktar.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Bunlar yamalarken Morphe Manager'da se\u00e7ilir ve Duraklatma bunlar\u0131 kapatmaz. De\u011fi\u015ftirmek i\u00e7in yeniden yamala.");
+    }
+
+    private static void fillTr5(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Bu telefonda dosya se\u00e7ici yok, bu y\u00fczden burada dosya se\u00e7menin bir yolu yok.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Trend videolar ve Facebook'un senin i\u00e7in se\u00e7ti\u011fi reels videolar\u0131 art\u0131k bildirimlerinde g\u00f6r\u00fcnmez.");
         table.put("Try again, or go back to Facebook.",
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
-    }
-
-    private static void fillTr5(Map<String, String> table) {
         table.put("Updates",
                 "G\u00fcncellemeler");
         table.put("Use the phone's emoji",

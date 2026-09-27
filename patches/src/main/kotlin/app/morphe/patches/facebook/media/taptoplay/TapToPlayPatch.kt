@@ -48,7 +48,7 @@ val tapToPlayPatch = bytecodePatch(
         hookLegacyPlayer(trigger)
         val checker = hookAutoplaySetting()
         hookReelPlayButton(checker)
-        hookTouches()
+        hookTouches(PATCH)
         enableStatus("tapToPlay")
     }
 }
@@ -169,18 +169,23 @@ private fun BytecodePatchContext.hookReelPlayButton(checker: String) {
     )
 }
 
-/** Every touch on a Facebook screen goes to the tap clock before Facebook sees it. */
-private fun BytecodePatchContext.hookTouches() {
+/**
+ * Every touch on a Facebook screen goes to the tap clock before Facebook sees it. Tap to play and
+ * Keep playing in the background both read the clock, so each asks for this hook and it goes in
+ * once: a dispatch that already starts with it is left as it is. [patch] names the patch asking.
+ */
+internal fun BytecodePatchContext.hookTouches(patch: String) {
     val activity = classDefByOrNull(FRAGMENT_ACTIVITY)
-        ?: throw PatchException("$PATCH: this build has no $FRAGMENT_ACTIVITY")
+        ?: throw PatchException("$patch: this build has no $FRAGMENT_ACTIVITY")
     val dispatches = touchDispatches(activity)
     val dispatch = dispatches.singleOrNull() ?: throw PatchException(
-        "$PATCH: expected $FRAGMENT_ACTIVITY to declare one dispatchTouchEvent($MOTION_EVENT)Z, found ${dispatches.size}",
+        "$patch: expected $FRAGMENT_ACTIVITY to declare one dispatchTouchEvent($MOTION_EVENT)Z, found ${dispatches.size}",
     )
+    val mutable = mutableClassDefBy(FRAGMENT_ACTIVITY).findMutableMethodOf(dispatch)
+    if (startsWithTouchHook(mutable)) return
     // The screen and the event are p0 and p1, next to each other, so the range form passes both
     // without borrowing a register.
-    mutableClassDefBy(FRAGMENT_ACTIVITY).findMutableMethodOf(dispatch)
-        .addInstruction(0, "invoke-static/range { p0 .. p1 }, $TOUCH")
+    mutable.addInstruction(0, "invoke-static/range { p0 .. p1 }, $TOUCH")
 }
 
 private fun BytecodePatchContext.requireTriggerEnum(type: String) {

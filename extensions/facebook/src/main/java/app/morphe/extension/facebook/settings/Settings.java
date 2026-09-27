@@ -243,6 +243,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_resume_long_videos", FALSE);
 
     /**
+     * A video you started keeps its sound after you leave Facebook, in Facebook's own background
+     * player with its notification ({@link app.morphe.extension.facebook.media.BackgroundPlay}). Off
+     * by default: it keeps a player going once Facebook is out of sight, which not everyone wants.
+     */
+    public static final BooleanSetting KEEP_PLAYING_IN_BACKGROUND =
+            new BooleanSetting("hushfacebook_keep_playing_in_background", FALSE);
+
+    /**
      * Facebook's own text, React Native screens' included, drawn in the font {@link #FONT_SOURCE}
      * names instead of Meta's Optimistic, at the same weight and slant. A typeface already on
      * screen keeps its font until Facebook restarts.

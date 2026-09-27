@@ -150,6 +150,13 @@ internal fun touchDispatches(activity: ClassDef): List<Method> = activity.method
         !it.isStatic() && it.implementation != null
 }
 
+/** Whether [method]'s first instruction is already the call that hands a touch to the tap clock. */
+internal fun startsWithTouchHook(method: Method): Boolean {
+    val first = method.implementation?.instructions?.firstOrNull() ?: return false
+    val call = (first as? ReferenceInstruction)?.reference as? MethodReference ?: return false
+    return "${call.definingClass}->${call.name}(${call.parameterTypes.joinToString("")})${call.returnType}" == TOUCH
+}
+
 /** Whether [caller] invokes [callee]. */
 internal fun calls(caller: Method, callee: Method): Boolean =
     caller.implementation?.instructions?.any { instruction ->

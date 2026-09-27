@@ -409,7 +409,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                             + "comments. Typing @ still brings up the list, and what you wrote is never changed.")));
         }
 
-        if (build.contains(PatchFamily.TAP_TO_PLAY) || build.contains(PatchFamily.RESUME_LONG_VIDEOS)) {
+        if (build.contains(PatchFamily.TAP_TO_PLAY) || build.contains(PatchFamily.RESUME_LONG_VIDEOS)
+                || build.contains(PatchFamily.BACKGROUND_PLAY)) {
             PreferenceCategory playback = category(screen, L10n.t("Playback"));
             if (build.contains(PatchFamily.TAP_TO_PLAY)) {
                 playback.addPreference(toggle(context, Settings.TAP_TO_PLAY, L10n.t("Tap to play"),
@@ -422,6 +423,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("A video over two minutes long that you left partway picks up where you left it "
                                 + "the next time it plays. Drag the seek bar to start somewhere else. Reels, live "
                                 + "videos and ads start as usual.")));
+            }
+            if (build.contains(PatchFamily.BACKGROUND_PLAY)) {
+                playback.addPreference(toggle(context, Settings.KEEP_PLAYING_IN_BACKGROUND,
+                        L10n.t("Keep playing in the background"),
+                        L10n.t("A video you started with a tap keeps its sound after you leave Facebook, and its "
+                                + "notification can pause it. Swiping the notification away or taking a call stops it.")));
             }
         }
 
