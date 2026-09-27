@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(614);
+        Map<String, String> table = new HashMap<>(618);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -341,6 +341,8 @@ public final class L10nTranslations {
                 "Gesponserte Stories ausblenden");
         table.put("Hide suggested groups",
                 "Gruppenvorschl\u00e4ge ausblenden");
+        table.put("Hide suggested stories",
+                "Vorgeschlagene Stories ausblenden");
         table.put("Hide the Follow button on reels",
                 "Folgen-Button bei Reels ausblenden");
         table.put("Hide the Get Messenger card",
@@ -419,11 +421,11 @@ public final class L10nTranslations {
                 "Keine Screenshot-Erkennung bei Werbung und keine Meldungen dar\u00fcber, welche Apps du installierst.");
         table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
                 "Keine gew\u00e4hlt, deshalb wird die Schriftart deines Handys verwendet. W\u00e4hle eine TrueType- oder OpenType-Datei mit bis zu %1$d MB.");
-        table.put("Not saved: that isn't a Facebook photo or video",
-                "Nicht gespeichert: Das ist kein Foto oder Video von Facebook");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Not saved: that isn't a Facebook photo or video",
+                "Nicht gespeichert: Das ist kein Foto oder Video von Facebook");
         table.put("Not saved: the file is over 512 MB",
                 "Nicht gespeichert: Die Datei ist \u00fcber 512 MB gro\u00df");
         table.put("Notifications",
@@ -542,11 +544,13 @@ public final class L10nTranslations {
                 "Update-Aufforderungen stoppen");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Verwendet die Schriftdatei nicht mehr und kehrt zur Schriftart deines Handys zur\u00fcck.");
-        table.put("Stories",
-                "Stories");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("Stories",
+                "Stories");
+        table.put("Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.",
+                "Stories in der Leiste von Personen und Seiten, denen du nicht folgst, also die als \u201eVorgeschlagen\u201c markierten. Die Stories deiner Freunde und der Seiten, denen du folgst, bleiben. Eine \u00c4nderung wirkt, sobald Facebook die Leiste das n\u00e4chste Mal l\u00e4dt.");
         table.put("Tab to open on",
                 "Tab beim Start");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -663,13 +667,13 @@ public final class L10nTranslations {
                 "Du hast Hushfacebook pausiert.");
         table.put("Your switches already match that file, so nothing will change.",
                 "Deine Schalter entsprechen bereits dieser Datei, es \u00e4ndert sich also nichts.");
+    }
+
+    private static void fillDe5(Map<String, String> table) {
         table.put("the Audience Network block",
                 "die Sperre f\u00fcr das Audience Network");
         table.put("the black background in dark mode",
                 "der schwarze Hintergrund im Dunkelmodus");
-    }
-
-    private static void fillDe5(Map<String, String> table) {
         table.put("the block on downloading ads in the background",
                 "die Sperre f\u00fcr das Herunterladen von Werbung im Hintergrund");
         table.put("the block on reports of ad screenshots and app installs",
@@ -687,7 +691,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(614);
+        Map<String, String> table = new HashMap<>(618);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -984,6 +988,8 @@ public final class L10nTranslations {
                 "Ocultar historias publicitarias");
         table.put("Hide suggested groups",
                 "Ocultar grupos sugeridos");
+        table.put("Hide suggested stories",
+                "Ocultar historias sugeridas");
         table.put("Hide the Follow button on reels",
                 "Ocultar el bot\u00f3n Seguir en los reels");
         table.put("Hide the Get Messenger card",
@@ -1062,11 +1068,11 @@ public final class L10nTranslations {
                 "Sin vigilancia de capturas de pantalla para anuncios ni informes sobre las apps que instalas.");
         table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
                 "No hay ninguno, as\u00ed que se usa la fuente de tu tel\u00e9fono. Elige un archivo TrueType u OpenType de hasta %1$d MB.");
-        table.put("Not saved: that isn't a Facebook photo or video",
-                "No se guard\u00f3: no es una foto ni un video de Facebook");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Not saved: that isn't a Facebook photo or video",
+                "No se guard\u00f3: no es una foto ni un video de Facebook");
         table.put("Not saved: the file is over 512 MB",
                 "No se guard\u00f3: el archivo supera los 512 MB");
         table.put("Notifications",
@@ -1185,11 +1191,13 @@ public final class L10nTranslations {
                 "Detener los avisos de actualizaci\u00f3n");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Deja de usar el archivo de fuente y vuelve a la fuente de tu tel\u00e9fono.");
-        table.put("Stories",
-                "Historias");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("Stories",
+                "Historias");
+        table.put("Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.",
+                "Historias de la bandeja de personas y p\u00e1ginas que no sigues, las marcadas como sugeridas. Las historias de tus amigos y de las p\u00e1ginas que sigues se quedan. Un cambio se ve la pr\u00f3xima vez que Facebook carga la bandeja.");
         table.put("Tab to open on",
                 "Pesta\u00f1a al abrir");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -1306,13 +1314,13 @@ public final class L10nTranslations {
                 "Pausaste Hushfacebook.");
         table.put("Your switches already match that file, so nothing will change.",
                 "Tus interruptores ya coinciden con ese archivo, as\u00ed que no cambiar\u00e1 nada.");
+    }
+
+    private static void fillEs5(Map<String, String> table) {
         table.put("the Audience Network block",
                 "el bloqueo de Audience Network");
         table.put("the black background in dark mode",
                 "el fondo negro del modo oscuro");
-    }
-
-    private static void fillEs5(Map<String, String> table) {
         table.put("the block on downloading ads in the background",
                 "el bloqueo de la descarga de anuncios en segundo plano");
         table.put("the block on reports of ad screenshots and app installs",
@@ -1330,7 +1338,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(614);
+        Map<String, String> table = new HashMap<>(618);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1627,6 +1635,8 @@ public final class L10nTranslations {
                 "Sembunyikan cerita bersponsor");
         table.put("Hide suggested groups",
                 "Sembunyikan grup yang disarankan");
+        table.put("Hide suggested stories",
+                "Sembunyikan cerita yang disarankan");
         table.put("Hide the Follow button on reels",
                 "Sembunyikan tombol Ikuti di reel");
         table.put("Hide the Get Messenger card",
@@ -1705,11 +1715,11 @@ public final class L10nTranslations {
                 "Tangkapan layar iklan tidak dipantau, dan aplikasi yang Anda pasang tidak dilaporkan.");
         table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
                 "Belum ada yang dipilih, jadi font ponsel Anda yang dipakai. Pilih file TrueType atau OpenType hingga %1$d MB.");
-        table.put("Not saved: that isn't a Facebook photo or video",
-                "Tidak disimpan: itu bukan foto atau video Facebook");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Not saved: that isn't a Facebook photo or video",
+                "Tidak disimpan: itu bukan foto atau video Facebook");
         table.put("Not saved: the file is over 512 MB",
                 "Tidak disimpan: file lebih dari 512 MB");
         table.put("Notifications",
@@ -1828,11 +1838,13 @@ public final class L10nTranslations {
                 "Hentikan permintaan pembaruan");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Berhenti memakai file font dan kembali ke font ponsel Anda.");
-        table.put("Stories",
-                "Cerita");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("Stories",
+                "Cerita");
+        table.put("Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.",
+                "Cerita di deretan dari orang dan Halaman yang tidak Anda ikuti, yang ditandai sebagai disarankan. Cerita teman Anda dan Halaman yang Anda ikuti tetap ada. Perubahan terlihat saat Facebook memuat deretan itu lagi.");
         table.put("Tab to open on",
                 "Tab saat dibuka");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -1949,13 +1961,13 @@ public final class L10nTranslations {
                 "Anda menjeda Hushfacebook.");
         table.put("Your switches already match that file, so nothing will change.",
                 "Sakelar Anda sudah sesuai dengan file itu, jadi tidak ada yang akan berubah.");
+    }
+
+    private static void fillIn5(Map<String, String> table) {
         table.put("the Audience Network block",
                 "pemblokir Audience Network");
         table.put("the black background in dark mode",
                 "latar belakang hitam dalam mode gelap");
-    }
-
-    private static void fillIn5(Map<String, String> table) {
         table.put("the block on downloading ads in the background",
                 "pemblokir unduhan iklan di latar belakang");
         table.put("the block on reports of ad screenshots and app installs",
@@ -1973,7 +1985,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(614);
+        Map<String, String> table = new HashMap<>(618);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -2270,6 +2282,8 @@ public final class L10nTranslations {
                 "Ocultar stories patrocinados");
         table.put("Hide suggested groups",
                 "Ocultar grupos sugeridos");
+        table.put("Hide suggested stories",
+                "Ocultar stories sugeridos");
         table.put("Hide the Follow button on reels",
                 "Ocultar o bot\u00e3o Seguir nos reels");
         table.put("Hide the Get Messenger card",
@@ -2348,11 +2362,11 @@ public final class L10nTranslations {
                 "Sem monitoramento de capturas de tela de an\u00fancios e sem relat\u00f3rios sobre quais apps voc\u00ea instala.");
         table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
                 "Nenhum escolhido, ent\u00e3o a fonte do seu celular \u00e9 usada. Escolha um arquivo TrueType ou OpenType de at\u00e9 %1$d MB.");
-        table.put("Not saved: that isn't a Facebook photo or video",
-                "N\u00e3o foi salvo: isso n\u00e3o \u00e9 uma foto nem um v\u00eddeo do Facebook");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Not saved: that isn't a Facebook photo or video",
+                "N\u00e3o foi salvo: isso n\u00e3o \u00e9 uma foto nem um v\u00eddeo do Facebook");
         table.put("Not saved: the file is over 512 MB",
                 "N\u00e3o foi salvo: o arquivo tem mais de 512 MB");
         table.put("Notifications",
@@ -2471,11 +2485,13 @@ public final class L10nTranslations {
                 "Parar os avisos de atualiza\u00e7\u00e3o");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Deixa de usar o arquivo de fonte e volta para a fonte do seu celular.");
-        table.put("Stories",
-                "Stories");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("Stories",
+                "Stories");
+        table.put("Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.",
+                "Stories da bandeja de pessoas e P\u00e1ginas que voc\u00ea n\u00e3o segue, os marcados como sugeridos. Os stories dos seus amigos e das P\u00e1ginas que voc\u00ea segue ficam. Uma mudan\u00e7a aparece na pr\u00f3xima vez que o Facebook carregar a bandeja.");
         table.put("Tab to open on",
                 "Aba ao abrir");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -2592,13 +2608,13 @@ public final class L10nTranslations {
                 "Voc\u00ea pausou o Hushfacebook.");
         table.put("Your switches already match that file, so nothing will change.",
                 "Suas op\u00e7\u00f5es j\u00e1 correspondem a esse arquivo, ent\u00e3o nada vai mudar.");
+    }
+
+    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("the Audience Network block",
                 "o bloqueio do Audience Network");
         table.put("the black background in dark mode",
                 "o fundo preto do modo escuro");
-    }
-
-    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("the block on downloading ads in the background",
                 "o bloqueio do download de an\u00fancios em segundo plano");
         table.put("the block on reports of ad screenshots and app installs",
@@ -2616,7 +2632,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(614);
+        Map<String, String> table = new HashMap<>(618);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2913,6 +2929,8 @@ public final class L10nTranslations {
                 "Sponsorlu hikayeleri gizle");
         table.put("Hide suggested groups",
                 "\u00d6nerilen gruplar\u0131 gizle");
+        table.put("Hide suggested stories",
+                "\u00d6nerilen hikayeleri gizle");
         table.put("Hide the Follow button on reels",
                 "Reels videolar\u0131ndaki Takip Et d\u00fc\u011fmesini gizle");
         table.put("Hide the Get Messenger card",
@@ -2991,11 +3009,11 @@ public final class L10nTranslations {
                 "Reklamlarda ekran g\u00f6r\u00fcnt\u00fcs\u00fc takibi yok, hangi uygulamalar\u0131 y\u00fckledi\u011fine dair rapor da yok.");
         table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
                 "Hi\u00e7biri se\u00e7ilmedi, bu y\u00fczden telefonunun yaz\u0131 tipi kullan\u0131l\u0131yor. En fazla %1$d MB boyutunda bir TrueType veya OpenType dosyas\u0131 se\u00e7.");
-        table.put("Not saved: that isn't a Facebook photo or video",
-                "Kaydedilmedi: Bu bir Facebook foto\u011fraf\u0131 veya videosu de\u011fil");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Not saved: that isn't a Facebook photo or video",
+                "Kaydedilmedi: Bu bir Facebook foto\u011fraf\u0131 veya videosu de\u011fil");
         table.put("Not saved: the file is over 512 MB",
                 "Kaydedilmedi: Dosya 512 MB'tan b\u00fcy\u00fck");
         table.put("Notifications",
@@ -3114,11 +3132,13 @@ public final class L10nTranslations {
                 "G\u00fcncelleme uyar\u0131lar\u0131n\u0131 durdur");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Yaz\u0131 tipi dosyas\u0131n\u0131 b\u0131rak\u0131r ve telefonunun yaz\u0131 tipine geri d\u00f6ner.");
-        table.put("Stories",
-                "Hikayeler");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("Stories",
+                "Hikayeler");
+        table.put("Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.",
+                "\u015eeritte takip etmedi\u011fin ki\u015fi ve sayfalardan gelen, \u00f6nerilen olarak i\u015faretli hikayeler. Arkada\u015flar\u0131n\u0131n ve takip etti\u011fin sayfalar\u0131n hikayeleri kal\u0131r. Bir de\u011fi\u015fiklik, Facebook \u015feridi bir sonraki y\u00fckledi\u011finde g\u00f6r\u00fcn\u00fcr.");
         table.put("Tab to open on",
                 "A\u00e7\u0131l\u0131\u015fta g\u00f6sterilecek sekme");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
@@ -3235,13 +3255,13 @@ public final class L10nTranslations {
                 "Hushfacebook'u duraklatt\u0131n.");
         table.put("Your switches already match that file, so nothing will change.",
                 "Anahtarlar\u0131n zaten o dosyayla ayn\u0131, bu y\u00fczden hi\u00e7bir \u015fey de\u011fi\u015fmeyecek.");
+    }
+
+    private static void fillTr5(Map<String, String> table) {
         table.put("the Audience Network block",
                 "Audience Network engeli");
         table.put("the black background in dark mode",
                 "karanl\u0131k moddaki siyah arka plan");
-    }
-
-    private static void fillTr5(Map<String, String> table) {
         table.put("the block on downloading ads in the background",
                 "arka planda reklam indirme engeli");
         table.put("the block on reports of ad screenshots and app installs",

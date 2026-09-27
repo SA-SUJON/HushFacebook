@@ -110,6 +110,15 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_SPONSORED_STORIES =
             new BooleanSetting("hushfacebook_hide_sponsored_stories", TRUE);
 
+    /**
+     * The buckets of the Stories tray that Facebook suggests from people and Pages you don't
+     * follow: a bucket whose is_story_bucket_suggested flag is true or whose first label is
+     * SUGGESTED, the two things the tray's card reads before it says "Suggested". Friends' stories,
+     * Pages you follow and your own story stay.
+     */
+    public static final BooleanSetting HIDE_SUGGESTED_STORIES =
+            new BooleanSetting("hushfacebook_hide_suggested_stories", TRUE);
+
     /** Keep a finished Story visible until the user navigates. */
     public static final BooleanSetting BLOCK_STORY_AUTO_ADVANCE =
             new BooleanSetting("hushfacebook_block_story_auto_advance", TRUE);

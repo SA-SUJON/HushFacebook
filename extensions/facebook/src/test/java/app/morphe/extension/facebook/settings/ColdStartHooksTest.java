@@ -58,6 +58,7 @@ import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
+import app.morphe.extension.facebook.stories.SuggestedStoriesForTests;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.PauseForTests;
 
@@ -137,6 +138,8 @@ public class ColdStartHooksTest {
         assertTrue(reelSection.items.contains(flaggedReel));
         assertFalse(FeedFilter.hideEdge(Category.SPONSORED, new Object()));
         assertFalse(FeedFilter.hideSponsoredStories());
+        assertFalse("a Stories tray fetched before the context lost its suggestions",
+                SuggestedStoriesForTests.hidesSuggestions());
         VideoAd reelAd = new VideoAd();
         assertTrue(ReelsAdFilter.withoutAds(Arrays.asList(new Reel(), reelAd), ad).contains(reelAd));
         VideoAd sectionAd = new VideoAd();

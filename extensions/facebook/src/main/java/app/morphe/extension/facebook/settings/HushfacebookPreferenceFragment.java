@@ -296,12 +296,21 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
         }
 
-        if (build.contains(PatchFamily.SPONSORED_STORIES) || build.contains(PatchFamily.STORY_AUTO_ADVANCE)
-                || build.contains(PatchFamily.STORY_DOWNLOAD)) {
+        if (build.contains(PatchFamily.SPONSORED_STORIES) || build.contains(PatchFamily.SUGGESTED_STORIES)
+                || build.contains(PatchFamily.STORY_AUTO_ADVANCE) || build.contains(PatchFamily.STORY_DOWNLOAD)) {
             PreferenceCategory stories = category(screen, L10n.t("Stories"));
             if (build.contains(PatchFamily.SPONSORED_STORIES)) {
                 stories.addPreference(toggle(context, Settings.HIDE_SPONSORED_STORIES, L10n.t("Hide sponsored stories"),
                         L10n.t("Ad cards between the stories people posted.")));
+            }
+            if (build.contains(PatchFamily.SUGGESTED_STORIES)) {
+                // The tray's buckets are filtered as each answer of its fetch comes in, so a change
+                // shows when Facebook next loads the tray, not on the tray already drawn.
+                stories.addPreference(toggle(context, Settings.HIDE_SUGGESTED_STORIES,
+                        L10n.t("Hide suggested stories"),
+                        L10n.t("Stories in the tray from people and Pages you don't follow, the ones marked Suggested. "
+                                + "Your friends' stories and the Pages you follow stay. A change shows the next time "
+                                + "Facebook loads the tray.")));
             }
             if (build.contains(PatchFamily.STORY_AUTO_ADVANCE)) {
                 stories.addPreference(toggle(context, Settings.BLOCK_STORY_AUTO_ADVANCE,

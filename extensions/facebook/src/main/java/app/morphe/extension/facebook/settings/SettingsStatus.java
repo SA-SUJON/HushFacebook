@@ -46,6 +46,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean suggestedStories() {
+        return false;
+    }
+
     public static boolean storyAutoAdvance() {
         return false;
     }
