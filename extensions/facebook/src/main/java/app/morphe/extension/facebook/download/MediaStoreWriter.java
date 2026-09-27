@@ -10,6 +10,7 @@ package app.morphe.extension.facebook.download;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -87,16 +88,16 @@ final class MediaStoreWriter implements Downloader.Sink {
         // setting can't turn this into a path of the setting's choosing.
         location = directory + "/" + SaveFolder.leaf();
 
+        Uri collection = video
+            ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
         ContentValues values = new ContentValues();
-        values.put(MediaStore.MediaColumns.DISPLAY_NAME, name(mime));
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, name(mime, collection));
         values.put(MediaStore.MediaColumns.MIME_TYPE, mime);
         // No leading slash. MediaStore checks this against its own directory names.
         values.put(MediaStore.MediaColumns.RELATIVE_PATH, location);
         values.put(MediaStore.MediaColumns.IS_PENDING, 1);
-
-        Uri collection = video
-            ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-            : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         ContentResolver resolver = context.getContentResolver();
         item = resolver.insert(collection, values);
@@ -176,7 +177,7 @@ final class MediaStoreWriter implements Downloader.Sink {
         return video ? "video/mp4" : "image/jpeg";
     }
 
-    private String name(String mime) {
+    private String name(String mime, Uri collection) {
         String suffix = EXTENSIONS.get(mime);
         if (suffix == null) suffix = video ? ".mp4" : ".jpg";
 
@@ -186,13 +187,48 @@ final class MediaStoreWriter implements Downloader.Sink {
             // ships it's Facebook's own FB_VID_ name.
             String template = FileNameTemplate.current();
             reportMissingTokens(template);
-            return FileNameTemplate.videoName(template, now, details) + suffix;
+            String name = FileNameTemplate.videoName(template, now, details) + suffix;
+            if (!inSaveFolder(collection, name)) return name;
+            // MediaStore would number it, up to (31), and then refuse the save.
+            String taken = FileNameTemplate.takenVideoName(template, now, details);
+            if (taken == null) return name;
+            Logger.diagnosticInfo(DiagnosticCategory.DOWNLOADS, SOURCE,
+                    () -> "the file name was already in the save folder, so the time of the save went on the end");
+            return taken + suffix;
         }
 
         // Facebook's own naming, so that files from this patch and from Facebook sit together.
         // The locale has to be fixed. Under a Thai or an Arabic locale the default calendar
         // writes Buddhist years or Eastern Arabic digits into the file name.
         return FileNameTemplate.PHOTO_PREFIX + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(now) + suffix;
+    }
+
+    /**
+     * What {@link #inSaveFolder} asks MediaStore: a file of one name in one folder. MediaStore keeps
+     * a folder with a slash on the end, so both spellings are asked for. Package-private so a test
+     * gallery can answer exactly this and nothing else.
+     */
+    static final String SAME_NAME_IN_FOLDER = MediaStore.MediaColumns.DISPLAY_NAME + " = ? AND ("
+            + MediaStore.MediaColumns.RELATIVE_PATH + " = ? OR " + MediaStore.MediaColumns.RELATIVE_PATH + " = ?)";
+
+    /**
+     * Whether a file named [displayName] is already in the save folder of [collection]. Only
+     * published files count, as MediaStore leaves pending and trashed ones out of a query unless
+     * asked: their files carry other names until they're published. A file this app can't see, or a
+     * lookup MediaStore refuses, counts as not there, and MediaStore's own numbering still keeps the
+     * save. The report gets the kind of failure only, never the name, which can hold the poster's.
+     */
+    private boolean inSaveFolder(Uri collection, String displayName) {
+        try (Cursor cursor = context.getContentResolver().query(collection,
+                new String[] { MediaStore.MediaColumns._ID }, SAME_NAME_IN_FOLDER,
+                new String[] { displayName, location + "/", location }, null)) {
+            return cursor != null && cursor.moveToFirst();
+        } catch (Throwable t) {
+            String kind = t.getClass().getSimpleName();
+            Logger.diagnosticInfo(DiagnosticCategory.DOWNLOADS, SOURCE,
+                    () -> "could not look for the file name in the save folder (" + kind + ")");
+            return false;
+        }
     }
 
     /**

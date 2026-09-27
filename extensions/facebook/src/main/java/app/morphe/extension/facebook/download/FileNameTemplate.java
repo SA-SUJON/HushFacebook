@@ -44,10 +44,12 @@ import app.morphe.extension.shared.Utils;
  * room for the extension and the number MediaStore adds, inside the 255 bytes a name can have. The
  * poster's name is cut first, to what the rest of the name leaves room for, so a token at the end
  * of the template is never what gets cut. A name keeps saves apart when it has the date and time,
- * a video id the save knows, or a poster and a post day the save knows; the last names every video
- * one person posted on one day the same, which MediaStore numbers. When a template counts on
+ * a video id the save knows, or a poster and a post day the save knows. When a template counts on
  * something this save doesn't know, the date and time go on the end, so two such saves still get
- * two names.
+ * two names. A name made of what the post is comes out the same for the same post, and for every
+ * video one person posted on one day under {@code {owner}_{posted}}: when it's already in the save
+ * folder, the writer takes {@link #takenVideoName} instead, the same name with the time of the save
+ * on the end, before MediaStore's numbering can run out.
  *
  * <p>Photos keep Facebook's own {@code FB_IMG_} names. A photo has no video id, and one template
  * for both would name every photo a video.
@@ -202,6 +204,24 @@ public final class FileNameTemplate {
      * every save, because something it counts on is missing, gets the date and time on the end.
      */
     public static String videoName(String template, Date when, PostDetails details) {
+        return videoName(template, when, details, false);
+    }
+
+    /**
+     * The name, without its extension, for a video saved at [when] under [template] whose
+     * {@link #videoName} is already in the save folder: that name with the time of the save,
+     * {@code HHmmss}, on the end. MediaStore would number the repeat instead, (1) to (31), and then
+     * refuse the save, and a name made of what the post is, like {@code {owner}_{posted}} for a
+     * poster who posts a lot, gets there. Null when the name already carries the date and time of
+     * the save: only a save in the same second can have taken it, and MediaStore's numbering covers
+     * that. The poster's name is what gets shorter to make room, as it is for the first name.
+     */
+    public static String takenVideoName(String template, Date when, PostDetails details) {
+        return videoName(template, when, details, true);
+    }
+
+    /** {@link #videoName} or, when [taken], {@link #takenVideoName}. */
+    private static String videoName(String template, Date when, PostDetails details, boolean taken) {
         if (details == null) details = PostDetails.NONE;
         String stamp = stamp(when);
         String clean = sanitize(template);
@@ -209,21 +229,38 @@ public final class FileNameTemplate {
         String rest = clean.replace(DATE, stamp)
             .replace(VIDEO_ID, hasId ? details.videoId : "")
             .replace(POSTED, details.hasPosted() ? postedStamp(details.posted) : "");
-        String owner = ownerFor(rest, details);
-        String filled = rest.replace(OWNER, owner);
-        String name = asVideo(SaveFolder.clean(filled, Integer.MAX_VALUE));
+        String owner = ownerFor(rest, details, MAX_NAME_BYTES);
+        String name = filledIn(rest, owner);
         // Nothing left but the separators typed between tokens the save didn't know ({owner}_{posted}
         // with neither) is nothing.
-        if (!hasLetterOrDigit(name)) return VIDEO_PREFIX + stamp;
+        if (!hasLetterOrDigit(name)) return taken ? null : VIDEO_PREFIX + stamp;
 
-        if (keepsApart(clean, hasId, !owner.isEmpty(), details.hasPosted())) return cut(name, MAX_NAME_BYTES);
-        // Something this template counts on is missing, so the date and time keep the name apart.
-        return joined(cut(name, MAX_NAME_BYTES - 1 - stamp.length()), stamp);
+        if (!keepsApart(clean, hasId, !owner.isEmpty(), details.hasPosted())) {
+            // Something this template counts on is missing, so the date and time keep the name apart.
+            return taken ? null : joined(cut(name, MAX_NAME_BYTES - 1 - stamp.length()), stamp);
+        }
+        if (!taken) return cut(name, MAX_NAME_BYTES);
+        if (usesDate(clean)) return null;
+
+        // Already in the folder: the time of the save goes on the end, and the poster's name makes room.
+        String time = clock(when);
+        int room = MAX_NAME_BYTES - 1 - time.length();
+        return joined(cut(filledIn(rest, ownerFor(rest, details, room)), room), time);
+    }
+
+    /** [rest] with [owner] where {@link #OWNER} stands, cleaned the way the whole name is. */
+    private static String filledIn(String rest, String owner) {
+        return asVideo(SaveFolder.clean(rest.replace(OWNER, owner), Integer.MAX_VALUE));
     }
 
     /** The date and time of a save, in Western digits and the Gregorian calendar whatever the locale. */
     static String stamp(Date when) {
         return new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(when);
+    }
+
+    /** The time of a save, {@code HHmmss}, for a name already in the folder. Western digits the same way. */
+    static String clock(Date when) {
+        return new SimpleDateFormat("HHmmss", Locale.US).format(when);
     }
 
     /** The day a post went up, in the phone's time zone, the same way. */
@@ -233,15 +270,15 @@ public final class FileNameTemplate {
 
     /**
      * The poster's name as [rest], the name with every other token filled in and {@link #OWNER}
-     * still in it, leaves room for: the bytes up to {@link #MAX_NAME_BYTES} that the rest doesn't
-     * take, shared between the places the token stands. So the poster's name is what gets cut,
-     * never a date at the end of the template.
+     * still in it, leaves room for: the bytes up to [budget] that the rest doesn't take, shared
+     * between the places the token stands. So the poster's name is what gets cut, never a date at
+     * the end of the template.
      */
-    private static String ownerFor(String rest, PostDetails details) {
+    private static String ownerFor(String rest, PostDetails details, int budget) {
         if (!details.hasOwner() || !rest.contains(OWNER)) return "";
         int places = 0;
         for (int at = rest.indexOf(OWNER); at >= 0; at = rest.indexOf(OWNER, at + OWNER.length())) places++;
-        int room = MAX_NAME_BYTES - (rest.getBytes(StandardCharsets.UTF_8).length - places * OWNER.length());
+        int room = budget - (rest.getBytes(StandardCharsets.UTF_8).length - places * OWNER.length());
         return cut(details.owner, Math.max(0, room / places));
     }
 

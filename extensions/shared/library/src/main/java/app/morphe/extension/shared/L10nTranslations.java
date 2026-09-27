@@ -63,8 +63,8 @@ public final class L10nTranslations {
                 "%1$d Schalter wird ge\u00e4ndert.");
         table.put("%1$d switches will change.",
                 "%1$d Schalter werden ge\u00e4ndert.");
-        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
-                "%1$s wird zu Datum und Uhrzeit des Speicherns, %2$s zur Nummer des Videos auf Facebook, %3$s zum Namen dessen, der es gepostet hat, und %4$s zum Tag der Ver\u00f6ffentlichung. Was beim Speichern nicht bekannt ist, wird weggelassen, und ein Name ohne eines davon bekommt das Datum angeh\u00e4ngt. Ung\u00fcltige Zeichen werden zu Unterstrichen. Lass das Feld leer, um den Standardnamen %5$s zu verwenden.");
+        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
+                "%1$s wird zu Datum und Uhrzeit des Speicherns, %2$s zur Nummer des Videos auf Facebook, %3$s zum Namen dessen, der es gepostet hat, und %4$s zum Tag der Ver\u00f6ffentlichung. Was beim Speichern nicht bekannt ist, wird weggelassen, und ein Name ohne eines davon bekommt das Datum angeh\u00e4ngt. Gibt es den Namen im Ordner schon, wird die Uhrzeit des Speicherns angeh\u00e4ngt. Ung\u00fcltige Zeichen werden zu Unterstrichen. Lass das Feld leer, um den Standardnamen %5$s zu verwenden.");
         table.put("%1$s of %2$s",
                 "%1$s von %2$s");
         table.put("%1$s so far",
@@ -532,8 +532,8 @@ public final class L10nTranslations {
                 "Cambiar\u00e1 %1$d interruptor.");
         table.put("%1$d switches will change.",
                 "Cambiar\u00e1n %1$d interruptores.");
-        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
-                "%1$s se convierte en la fecha y la hora del guardado, %2$s en el n\u00famero del video en Facebook, %3$s en quien lo public\u00f3 y %4$s en el d\u00eda en que se public\u00f3. Lo que el guardado no sabe se omite, y a un nombre sin ninguno de ellos se le a\u00f1ade la fecha. Los caracteres no v\u00e1lidos se convierten en guiones bajos. D\u00e9jalo vac\u00edo para usar el nombre predeterminado, %5$s.");
+        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
+                "%1$s se convierte en la fecha y la hora del guardado, %2$s en el n\u00famero del video en Facebook, %3$s en quien lo public\u00f3 y %4$s en el d\u00eda en que se public\u00f3. Lo que el guardado no sabe se omite, y a un nombre sin ninguno de ellos se le a\u00f1ade la fecha. Si el nombre ya est\u00e1 en la carpeta, se le a\u00f1ade al final la hora del guardado. Los caracteres no v\u00e1lidos se convierten en guiones bajos. D\u00e9jalo vac\u00edo para usar el nombre predeterminado, %5$s.");
         table.put("%1$s of %2$s",
                 "%1$s de %2$s");
         table.put("%1$s so far",
@@ -1001,8 +1001,8 @@ public final class L10nTranslations {
                 "%1$d sakelar akan berubah.");
         table.put("%1$d switches will change.",
                 "%1$d sakelar akan berubah.");
-        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
-                "%1$s diganti dengan tanggal dan waktu penyimpanan, %2$s dengan nomor video di Facebook, %3$s dengan nama pengunggahnya, dan %4$s dengan tanggal unggahnya. Yang tidak diketahui saat menyimpan akan dihilangkan, dan nama tanpa satu pun di antaranya akan ditambahi tanggal. Karakter yang tidak valid menjadi garis bawah. Kosongkan untuk memakai nama bawaan, %5$s.");
+        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
+                "%1$s diganti dengan tanggal dan waktu penyimpanan, %2$s dengan nomor video di Facebook, %3$s dengan nama pengunggahnya, dan %4$s dengan tanggal unggahnya. Yang tidak diketahui saat menyimpan akan dihilangkan, dan nama tanpa satu pun di antaranya akan ditambahi tanggal. Jika nama itu sudah ada di folder, waktu penyimpanan ditambahkan di akhir. Karakter yang tidak valid menjadi garis bawah. Kosongkan untuk memakai nama bawaan, %5$s.");
         table.put("%1$s of %2$s",
                 "%1$s dari %2$s");
         table.put("%1$s so far",
@@ -1470,8 +1470,8 @@ public final class L10nTranslations {
                 "%1$d op\u00e7\u00e3o vai mudar.");
         table.put("%1$d switches will change.",
                 "%1$d op\u00e7\u00f5es v\u00e3o mudar.");
-        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
-                "%1$s vira a data e a hora em que o v\u00eddeo foi salvo, %2$s vira o n\u00famero do v\u00eddeo no Facebook, %3$s vira quem publicou e %4$s vira o dia da publica\u00e7\u00e3o. O que n\u00e3o se sabe na hora de salvar fica de fora, e um nome sem nenhum deles recebe a data. Caracteres inv\u00e1lidos viram sublinhados. Deixe em branco para usar o nome padr\u00e3o, %5$s.");
+        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
+                "%1$s vira a data e a hora em que o v\u00eddeo foi salvo, %2$s vira o n\u00famero do v\u00eddeo no Facebook, %3$s vira quem publicou e %4$s vira o dia da publica\u00e7\u00e3o. O que n\u00e3o se sabe na hora de salvar fica de fora, e um nome sem nenhum deles recebe a data. Se o nome j\u00e1 estiver na pasta, a hora em que o v\u00eddeo foi salvo vai no final. Caracteres inv\u00e1lidos viram sublinhados. Deixe em branco para usar o nome padr\u00e3o, %5$s.");
         table.put("%1$s of %2$s",
                 "%1$s de %2$s");
         table.put("%1$s so far",
@@ -1939,8 +1939,8 @@ public final class L10nTranslations {
                 "%1$d anahtar de\u011fi\u015fecek.");
         table.put("%1$d switches will change.",
                 "%1$d anahtar de\u011fi\u015fecek.");
-        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
-                "%1$s kaydetme tarihine ve saatine, %2$s videonun Facebook'taki numaras\u0131na, %3$s payla\u015fan ki\u015finin ad\u0131na, %4$s ise payla\u015f\u0131ld\u0131\u011f\u0131 g\u00fcne d\u00f6n\u00fc\u015f\u00fcr. Kaydederken bilinmeyenler d\u0131\u015far\u0131da b\u0131rak\u0131l\u0131r ve bunlar\u0131n hi\u00e7birini i\u00e7ermeyen bir ada tarih eklenir. Ge\u00e7ersiz karakterler alt \u00e7izgiye d\u00f6n\u00fc\u015f\u00fcr. Varsay\u0131lan %5$s ad\u0131n\u0131 kullanmak i\u00e7in bo\u015f b\u0131rak.");
+        table.put("%1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %5$s.",
+                "%1$s kaydetme tarihine ve saatine, %2$s videonun Facebook'taki numaras\u0131na, %3$s payla\u015fan ki\u015finin ad\u0131na, %4$s ise payla\u015f\u0131ld\u0131\u011f\u0131 g\u00fcne d\u00f6n\u00fc\u015f\u00fcr. Kaydederken bilinmeyenler d\u0131\u015far\u0131da b\u0131rak\u0131l\u0131r ve bunlar\u0131n hi\u00e7birini i\u00e7ermeyen bir ada tarih eklenir. Ad klas\u00f6rde zaten varsa sonuna kaydetme saati eklenir. Ge\u00e7ersiz karakterler alt \u00e7izgiye d\u00f6n\u00fc\u015f\u00fcr. Varsay\u0131lan %5$s ad\u0131n\u0131 kullanmak i\u00e7in bo\u015f b\u0131rak.");
         table.put("%1$s of %2$s",
                 "%1$s / %2$s");
         table.put("%1$s so far",

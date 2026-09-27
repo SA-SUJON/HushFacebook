@@ -10,8 +10,13 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.net.Uri;
 import android.os.Looper;
 import android.provider.MediaStore;
 
@@ -31,6 +36,7 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -40,6 +46,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -169,8 +176,9 @@ public class FileNameTemplateTest {
      * saves a second apart may get one name: a template without any token gets the date, and one
      * that counts on something the save doesn't know, the id, the poster or the post day, gets the
      * date and time on the end. Known, the poster and the day stand on their own: every video one
-     * person posted on one day gets one name, which MediaStore numbers, as it numbers two saves of
-     * one video named by its id.
+     * person posted on one day gets one name, as two saves of one video named by its id do, and
+     * the writer puts the time on the end when the folder has it already
+     * ({@link #aTakenNameGetsTheTimeOfTheSaveOnTheEnd}).
      */
     @Test
     public void noTemplateNamesEverySaveTheSame() {
@@ -242,6 +250,60 @@ public class FileNameTemplateTest {
         assertTrue(twice, twice.getBytes(StandardCharsets.UTF_8).length <= FileNameTemplate.MAX_NAME_BYTES);
         assertTrue(twice, twice.startsWith(emoji) && twice.contains("_" + emoji));
         assertTrue(twice, twice.getBytes(StandardCharsets.UTF_8).length > FileNameTemplate.MAX_NAME_BYTES - 8);
+    }
+
+    /**
+     * A name the save folder already has gets the time of the save on the end, before MediaStore's
+     * numbering runs out at (31). Only a name without the date and time of the save needs it: one
+     * with them can only be taken by a save in the same second, which MediaStore numbers, so there
+     * the answer is null. That covers a name that counts on something the save doesn't know too,
+     * since the date and time went on its end already.
+     */
+    @Test
+    public void aTakenNameGetsTheTimeOfTheSaveOnTheEnd() {
+        assertEquals("Stevi Ous_" + DAY + "_143005", FileNameTemplate.takenVideoName("{owner}_{posted}", when(), full()));
+        assertEquals(ID + "_143005", FileNameTemplate.takenVideoName("{video_id}", when(), PostDetails.of(ID)));
+        assertEquals("Reel " + ID + "_143006", FileNameTemplate.takenVideoName("Reel {video_id}", at(6), PostDetails.of(ID)));
+        assertEquals("Stevi Ous_143005", FileNameTemplate.takenVideoName("{owner}", when(), full()));
+        assertEquals(DAY + "_143005", FileNameTemplate.takenVideoName("{posted}", when(), full()));
+        // A separator the name already ends with isn't doubled.
+        assertEquals("Stevi Ous_143005", FileNameTemplate.takenVideoName("{owner}_", when(), full()));
+        assertEquals("Stevi Ous-143005", FileNameTemplate.takenVideoName("{owner}-", when(), full()));
+        // Photos' prefix stays out of it, as it does of the first name.
+        assertEquals("FB_VID_Stevi Ous_143005", FileNameTemplate.takenVideoName("FB_IMG_{owner}", when(), full()));
+
+        for (String template : new String[]{FileNameTemplate.DEFAULT, "{date}", "{owner}_{date}", "{video_id} {date}",
+                "{posted}{date}"}) {
+            assertNull(template, FileNameTemplate.takenVideoName(template, when(), full()));
+        }
+        assertNull(FileNameTemplate.takenVideoName("Reel {video_id}", when(), PostDetails.NONE));
+        assertNull(FileNameTemplate.takenVideoName("{owner}_{posted}", when(), new PostDetails(null, "Stevi Ous", null)));
+        assertNull(FileNameTemplate.takenVideoName("{owner}_{posted}", when(), PostDetails.NONE));
+        assertNull(FileNameTemplate.takenVideoName("{video_id}", when(), (PostDetails) null));
+
+        // Western digits whatever the locale, like the date.
+        Locale saved = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("th-TH-u-ca-buddhist-nu-thai"));
+            assertEquals(ID + "_143005", FileNameTemplate.takenVideoName("{video_id}", when(), PostDetails.of(ID)));
+        } finally {
+            Locale.setDefault(saved);
+        }
+    }
+
+    /** The time takes its room from the poster's name, so the end of the template stays whole. */
+    @Test
+    public void aTakenNameShortensThePosterNotTheEnd() {
+        String emoji = new String(Character.toChars(0x1F3AC));
+        PostDetails longName = new PostDetails(null, repeat(emoji, 80), posted());
+        String template = repeat("x", 30) + "{owner}_{posted}";
+
+        // 30 bytes of x and 9 of "_" and the day leave 161 for the poster: 40 four-byte characters.
+        assertEquals(repeat("x", 30) + repeat(emoji, 40) + "_" + DAY, FileNameTemplate.videoName(template, when(), longName));
+        // Seven more go to "_143005": 38 characters.
+        String taken = FileNameTemplate.takenVideoName(template, when(), longName);
+        assertEquals(repeat("x", 30) + repeat(emoji, 38) + "_" + DAY + "_143005", taken);
+        assertTrue(taken, taken.getBytes(StandardCharsets.UTF_8).length <= FileNameTemplate.MAX_NAME_BYTES);
     }
 
     /** The post day is the phone's day: the same moment is one day in New York and the next in Tokyo. */
@@ -369,6 +431,18 @@ public class FileNameTemplateTest {
             assertFalse(template + " -> " + name, name.regionMatches(true, 0, "FB_IMG_", 0, 7));
             assertTrue(template + " -> " + name,
                     name.getBytes(StandardCharsets.UTF_8).length <= FileNameTemplate.MAX_NAME_BYTES);
+            // The name for a folder that has this one already: none when the date and time are in
+            // it, and otherwise one file name the same way, with the time of the save on the end.
+            String taken = FileNameTemplate.takenVideoName(template.toString(), when(), details);
+            assertEquals(template + " -> " + name + ", taken " + taken, name.contains(STAMP), taken == null);
+            if (taken != null) {
+                assertFalse(template + " -> " + taken, taken.isEmpty() || bad.matcher(taken).find()
+                        || taken.startsWith(".") || taken.endsWith(".") || taken.startsWith(" "));
+                assertFalse(template + " -> " + taken, taken.regionMatches(true, 0, "FB_IMG_", 0, 7));
+                assertTrue(template + " -> " + taken, taken.endsWith("143005"));
+                assertTrue(template + " -> " + taken,
+                        taken.getBytes(StandardCharsets.UTF_8).length <= FileNameTemplate.MAX_NAME_BYTES);
+            }
             String once = FileNameTemplate.sanitize(template.toString());
             assertEquals(template.toString(), once, FileNameTemplate.sanitize(once));
             boolean tokened = false;
@@ -522,6 +596,254 @@ public class FileNameTemplateTest {
             String name = nameOf(gallery.rows.get(1L));
             assertTrue(name, name.matches(ID + "_\\d{8}_\\d{6}\\.mp4"));
             assertEquals(Integer.valueOf(0), gallery.rows.get(1L).getAsInteger(MediaStore.MediaColumns.IS_PENDING));
+        }
+    }
+
+    // ---- A name the folder already has ------------------------------------------------------------
+
+    private static final Uri VIDEOS = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+
+    private FolderGallery folderGallery() {
+        return Robolectric.setupContentProvider(FolderGallery.class, MediaStore.AUTHORITY);
+    }
+
+    private void writableVideos(long... ids) {
+        for (long id : ids) {
+            Shadows.shadowOf(context.getContentResolver()).registerOutputStream(
+                    ContentUris.withAppendedId(VIDEOS, id), new ByteArrayOutputStream());
+        }
+    }
+
+    /** A video save through to the gallery's publish, as a finished download makes it. */
+    private static void save(MediaStoreWriter writer) throws IOException {
+        writer.open("video/mp4").write(new byte[] {0, 0, 0, 0x18});
+        writer.commit();
+    }
+
+    private static int count(String text, String of) {
+        int count = 0;
+        for (int at = text.indexOf(of); at >= 0; at = text.indexOf(of, at + 1)) count++;
+        return count;
+    }
+
+    private static final String TIME_WENT_ON = "the file name was already in the save folder, so the time of the save went on the end";
+
+    /**
+     * Issue #6's {owner}_{posted} gives every video one person posted on one day the same name.
+     * The second one's save finds it in the folder and takes the time of the save on the end,
+     * where MediaStore would have numbered it. Another poster's video that day keeps its name, and
+     * the report says what happened without naming anyone.
+     */
+    @Test
+    public void aNameAlreadyInTheFolderGetsTheTimeOfTheSave() throws Exception {
+        Settings.FILENAME_TEMPLATE.save("{owner}_{posted}");
+        FolderGallery gallery = folderGallery();
+        writableVideos(1, 2, 3);
+        save(new MediaStoreWriter(context, true, full()));
+        save(new MediaStoreWriter(context, true, full()));
+        save(new MediaStoreWriter(context, true, new PostDetails(ID, "Someone Else", posted())));
+
+        assertEquals("Stevi Ous_" + DAY + ".mp4", nameOf(gallery.rows.get(1L)));
+        String second = nameOf(gallery.rows.get(2L));
+        assertTrue(second, second.matches("Stevi Ous_" + DAY + "_\\d{6}\\.mp4"));
+        assertEquals("Someone Else_" + DAY + ".mp4", nameOf(gallery.rows.get(3L)));
+        assertEquals(Arrays.asList("Stevi Ous_" + DAY + ".mp4", "Stevi Ous_" + DAY + ".mp4", "Someone Else_" + DAY + ".mp4"),
+                gallery.lookedUp);
+
+        String report = LogBufferManager.buildExportText();
+        assertEquals(report, 1, count(report, TIME_WENT_ON));
+        assertFalse(report, report.contains("Stevi"));
+        assertFalse(report, report.contains("Someone"));
+    }
+
+    /** Saving one video twice under a name made of its id is the same case. */
+    @Test
+    public void aVideoSavedTwiceUnderItsIdGetsTheTimeTheSecondTime() throws Exception {
+        Settings.FILENAME_TEMPLATE.save("HF_{video_id}");
+        FolderGallery gallery = folderGallery();
+        writableVideos(1, 2);
+        save(new MediaStoreWriter(context, true, ID));
+        save(new MediaStoreWriter(context, true, ID));
+
+        assertEquals("HF_" + ID + ".mp4", nameOf(gallery.rows.get(1L)));
+        String second = nameOf(gallery.rows.get(2L));
+        assertTrue(second, second.matches("HF_" + ID + "_\\d{6}\\.mp4"));
+    }
+
+    /**
+     * Only a published video of that name in the same folder takes it. Not one in another folder,
+     * not one still pending, whose file has another name until it's published, and not a picture.
+     */
+    @Test
+    public void onlyAPublishedVideoInTheSameFolderTakesAName() throws Exception {
+        Settings.FILENAME_TEMPLATE.save("{owner}_{posted}");
+        FolderGallery gallery = folderGallery();
+        String name = "Stevi Ous_" + DAY + ".mp4";
+        gallery.put(VIDEOS, "Movies/Other", name, false);
+        gallery.put(VIDEOS, "Movies/Facebook", name, true);
+        gallery.put(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "Movies/Facebook", name, false);
+        writableVideos(4);
+        save(new MediaStoreWriter(context, true, full()));
+
+        assertEquals(name, nameOf(gallery.rows.get(4L)));
+        assertEquals(Collections.singletonList(name), gallery.lookedUp);
+        assertFalse(LogBufferManager.buildExportText().contains(TIME_WENT_ON));
+    }
+
+    /**
+     * The case this is for. With the name and (1) to (31) in the folder, MediaStore refuses the
+     * next save of that name, which the control shows; the writer's save still goes in.
+     */
+    @Test
+    public void aFolderWhoseNumberingRanOutStillTakesTheNextSave() throws Exception {
+        Settings.FILENAME_TEMPLATE.save("{owner}_{posted}");
+        FolderGallery gallery = folderGallery();
+        String base = "Stevi Ous_" + DAY;
+        gallery.put(VIDEOS, "Movies/Facebook", base + ".mp4", false);
+        for (int n = 1; n <= 31; n++) gallery.put(VIDEOS, "Movies/Facebook", base + " (" + n + ").mp4", false);
+        ContentValues plain = new ContentValues();
+        plain.put(MediaStore.MediaColumns.DISPLAY_NAME, base + ".mp4");
+        plain.put(MediaStore.MediaColumns.RELATIVE_PATH, "Movies/Facebook");
+        plain.put(MediaStore.MediaColumns.IS_PENDING, 1);
+        assertNull("the gallery took a 33rd video of one name", context.getContentResolver().insert(VIDEOS, plain));
+
+        writableVideos(33);
+        save(new MediaStoreWriter(context, true, full()));
+        String name = nameOf(gallery.rows.get(33L));
+        assertTrue(name, name.matches(base + "_\\d{6}\\.mp4"));
+    }
+
+    /**
+     * A name with the date and time of the save in it can only be taken by a save in the same
+     * second. The writer leaves that to MediaStore's numbering rather than put the time on twice.
+     */
+    @Test
+    public void aNameWithTheDateAndTimeIsLeftToMediaStore() throws Exception {
+        Settings.FILENAME_TEMPLATE.save("{owner}_{date}");
+        FolderGallery gallery = folderGallery();
+        gallery.everyNameTaken = true;
+        writableVideos(1);
+        save(new MediaStoreWriter(context, true, full()));
+
+        String name = nameOf(gallery.rows.get(1L));
+        assertTrue(name, name.matches("Stevi Ous_\\d{8}_\\d{6}\\.mp4"));
+        assertEquals(1, gallery.lookedUp.size());
+        assertFalse(LogBufferManager.buildExportText().contains(TIME_WENT_ON));
+    }
+
+    /**
+     * A lookup MediaStore refuses leaves the name as it was, and MediaStore numbers it as before.
+     * The report names the kind of failure, never the name.
+     */
+    @Test
+    public void aLookupMediaStoreRefusesLeavesTheNameToItsNumbering() throws Exception {
+        Settings.FILENAME_TEMPLATE.save("{owner}_{posted}");
+        FolderGallery gallery = folderGallery();
+        gallery.put(VIDEOS, "Movies/Facebook", "Stevi Ous_" + DAY + ".mp4", false);
+        gallery.refuseLookups = true;
+        writableVideos(2);
+        save(new MediaStoreWriter(context, true, full()));
+
+        assertEquals("Stevi Ous_" + DAY + " (1).mp4", nameOf(gallery.rows.get(2L)));
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("could not look for the file name in the save folder (IllegalArgumentException)"));
+        assertFalse(report, report.contains("Stevi"));
+        assertFalse(report, report.contains(TIME_WENT_ON));
+    }
+
+    /**
+     * MediaStore's video and image tables as a save meets them in a folder that already holds
+     * files. A name stays unique in its folder: the next one is numbered (1) to (31), and after that
+     * the insert is refused. A folder is kept with a slash on the end. The writer's lookup of a name
+     * in a folder finds only published rows of the table it asks, as MediaStore's own query does
+     * unless told to include pending and trashed ones.
+     */
+    public static final class FolderGallery extends ContentProvider {
+        final Map<Long, ContentValues> rows = new LinkedHashMap<>();
+        private final Map<Long, Uri> tables = new HashMap<>();
+        final List<String> lookedUp = new ArrayList<>();
+        boolean refuseLookups;
+        boolean everyNameTaken;
+        private long nextId = 1;
+
+        /** A row already in [table], in [folder] and named [name], published or still [pending]. */
+        void put(Uri table, String folder, String name, boolean pending) {
+            ContentValues row = new ContentValues();
+            row.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+            row.put(MediaStore.MediaColumns.RELATIVE_PATH, folder);
+            row.put(MediaStore.MediaColumns.IS_PENDING, pending ? 1 : 0);
+            add(table, row);
+        }
+
+        private long add(Uri table, ContentValues row) {
+            String folder = row.getAsString(MediaStore.MediaColumns.RELATIVE_PATH);
+            if (!folder.endsWith("/")) row.put(MediaStore.MediaColumns.RELATIVE_PATH, folder + "/");
+            long id = nextId++;
+            rows.put(id, row);
+            tables.put(id, table);
+            return id;
+        }
+
+        private boolean published(Uri table, String folder, String name) {
+            for (Map.Entry<Long, ContentValues> entry : rows.entrySet()) {
+                ContentValues row = entry.getValue();
+                if (table.equals(tables.get(entry.getKey()))
+                        && folder.equals(row.getAsString(MediaStore.MediaColumns.RELATIVE_PATH))
+                        && name.equals(row.getAsString(MediaStore.MediaColumns.DISPLAY_NAME))
+                        && !Integer.valueOf(1).equals(row.getAsInteger(MediaStore.MediaColumns.IS_PENDING))) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override public boolean onCreate() {
+            return true;
+        }
+
+        @Override public Uri insert(Uri table, ContentValues values) {
+            ContentValues row = new ContentValues(values);
+            String name = row.getAsString(MediaStore.MediaColumns.DISPLAY_NAME);
+            String folder = row.getAsString(MediaStore.MediaColumns.RELATIVE_PATH);
+            if (!folder.endsWith("/")) folder += "/";
+            int dot = name.lastIndexOf('.');
+            String unique = name;
+            for (int n = 1; published(table, folder, unique); n++) {
+                if (n > 31) return null;
+                unique = name.substring(0, dot) + " (" + n + ")" + name.substring(dot);
+            }
+            row.put(MediaStore.MediaColumns.DISPLAY_NAME, unique);
+            return ContentUris.withAppendedId(table, add(table, row));
+        }
+
+        /** Answers the writer's lookup and nothing else, the way MediaStore would. */
+        @Override public Cursor query(Uri uri, String[] projection, String selection,
+                String[] selectionArgs, String sortOrder) {
+            MatrixCursor cursor = new MatrixCursor(projection == null ? new String[0] : projection);
+            if (!MediaStoreWriter.SAME_NAME_IN_FOLDER.equals(selection)) return cursor;
+            if (refuseLookups) throw new IllegalArgumentException("Invalid token");
+            lookedUp.add(selectionArgs[0]);
+            boolean found = everyNameTaken;
+            for (String folder : new String[] {selectionArgs[1], selectionArgs[2]}) {
+                found |= published(uri, folder, selectionArgs[0]);
+            }
+            if (found) cursor.addRow(new Object[] {1L});
+            return cursor;
+        }
+
+        @Override public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+            ContentValues row = rows.get(ContentUris.parseId(uri));
+            if (row == null) return 0;
+            row.putAll(values);
+            return 1;
+        }
+
+        @Override public int delete(Uri uri, String selection, String[] selectionArgs) {
+            return rows.remove(ContentUris.parseId(uri)) == null ? 0 : 1;
+        }
+
+        @Override public String getType(Uri uri) {
+            return "video/mp4";
         }
     }
 

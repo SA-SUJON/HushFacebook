@@ -766,8 +766,9 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setDialogTitle(L10n.t("Video file name"));
         row.setDialogMessage(L10n.f("%1$s becomes the date and time of the save, %2$s the video's number on "
                         + "Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is "
-                        + "left out, and a name with none of these gets the date added. Invalid characters become "
-                        + "underscores. Leave it blank to use the default, %5$s.",
+                        + "left out, and a name with none of these gets the date added. When the name is already in "
+                        + "the folder, the time of the save goes on the end. Invalid characters become underscores. "
+                        + "Leave it blank to use the default, %5$s.",
                 L10n.isolate(FileNameTemplate.DATE), L10n.isolate(FileNameTemplate.VIDEO_ID),
                 L10n.isolate(FileNameTemplate.OWNER), L10n.isolate(FileNameTemplate.POSTED),
                 L10n.isolate(FileNameTemplate.DEFAULT)));
