@@ -47,6 +47,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import app.morphe.extension.facebook.download.DownloadQuality;
@@ -110,6 +112,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     /** The preview of {@link #pendingImport} while it's on screen. */
     @Nullable
     AlertDialog importPreview;
+
+    /**
+     * Where the list was before the last section jump, as its first visible position and that row's
+     * top, which Back goes back to once; null when there's been no jump since.
+     */
+    @Nullable
+    int[] beforeJump;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -197,6 +206,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         setPreferenceScreen(screen);
 
         screen.addPreference(statusCard(context));
+        screen.addPreference(jumpRow(context));
         // The export row below reads these; registering twice keeps one.
         PatchFamily.registerDiagnostics();
         LogBufferManager.registerReportSection(ReleaseCheck.REPORT);
@@ -487,6 +497,81 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             return true;
         });
         about.addPreference(licenses);
+    }
+
+    /**
+     * Straight to one section. The page is long enough that reaching Downloads took several screens
+     * of swiping on a phone (2026-09-26), so two taps reach any section from the top, and Back goes
+     * back once to where the list was.
+     */
+    private Preference jumpRow(Context context) {
+        Row row = new Row(context);
+        row.setKey("action_jump_to_section");
+        row.setPersistent(false);
+        row.setTitle(L10n.t("Jump to a section"));
+        row.setSummary(L10n.t("Go straight to one group of settings. Back returns to where you were."));
+        row.setOnPreferenceClickListener(p -> {
+            showSections(context);
+            return true;
+        });
+        return row;
+    }
+
+    /** The page's section titles in the order they're on the page; a tap on one goes there. */
+    void showSections(Context context) {
+        List<Preference> sections = sections();
+        CharSequence[] titles = new CharSequence[sections.size()];
+        for (int i = 0; i < titles.length; i++) titles[i] = sections.get(i).getTitle();
+        ScreenColors.dialog(new AlertDialog.Builder(context)
+                .setTitle(L10n.t("Jump to a section"))
+                .setItems(titles, (dialog, which) -> jumpTo(sections.get(which)))
+                .setNegativeButton(L10n.t("Cancel"), null)
+                .show());
+    }
+
+    /** The section headings on the page, in order. */
+    List<Preference> sections() {
+        List<Preference> sections = new ArrayList<>();
+        PreferenceScreen screen = getPreferenceScreen();
+        for (int i = 0; screen != null && i < screen.getPreferenceCount(); i++) {
+            Preference preference = screen.getPreference(i);
+            if (preference instanceof PreferenceCategory) sections.add(preference);
+        }
+        return sections;
+    }
+
+    /**
+     * Scrolls [section]'s heading to the top of the list, and remembers where the list was for
+     * Back. Looked up in the list's own adapter, so it lands right however the page is flattened.
+     */
+    boolean jumpTo(Preference section) {
+        ListView list = listView();
+        if (list == null || list.getAdapter() == null) return false;
+        for (int position = 0; position < list.getAdapter().getCount(); position++) {
+            if (list.getAdapter().getItem(position) != section) continue;
+            View first = list.getChildAt(0);
+            beforeJump = new int[] {list.getFirstVisiblePosition(), first == null ? 0 : first.getTop()};
+            list.setSelectionFromTop(position, 0);
+            return true;
+        }
+        return false;
+    }
+
+    /** Back after a jump: the list goes back to where it was, once, and the page stays open. */
+    boolean backFromJump() {
+        int[] before = beforeJump;
+        if (before == null) return false;
+        beforeJump = null;
+        ListView list = listView();
+        if (list == null) return false;
+        list.setSelectionFromTop(before[0], before[1]);
+        return true;
+    }
+
+    @Nullable
+    private ListView listView() {
+        View view = getView();
+        return view == null ? null : view.findViewById(android.R.id.list);
     }
 
     /**

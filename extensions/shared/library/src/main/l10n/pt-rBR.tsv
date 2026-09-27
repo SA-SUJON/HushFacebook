@@ -244,3 +244,5 @@ Menu	Menu
 Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.	O Facebook abre em %1$s. Se a sua barra de abas não tiver essa aba, o Facebook abre na Página inicial.
 # context: a sentence in the settings import preview and its toast; %1$s is a tab name
 Facebook will open on %1$s.	O Facebook vai abrir em %1$s.
+Jump to a section	Ir para uma seção
+Go straight to one group of settings. Back returns to where you were.	Vá direto a um grupo de configurações. Voltar leva você de volta aonde estava.

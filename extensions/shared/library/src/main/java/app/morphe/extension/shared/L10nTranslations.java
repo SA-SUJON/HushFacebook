@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(474);
+        Map<String, String> table = new HashMap<>(478);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -234,6 +234,8 @@ public final class L10nTranslations {
                 "GitHub weist Anfragen aus diesem Netz gerade ab. Versuche es sp\u00e4ter noch einmal.");
         table.put("GitHub's answer couldn't be used. Try again later.",
                 "Mit der Antwort von GitHub lie\u00df sich nichts anfangen. Versuche es sp\u00e4ter noch einmal.");
+        table.put("Go straight to one group of settings. Back returns to where you were.",
+                "Direkt zu einer Gruppe von Einstellungen. Zur\u00fcck bringt dich dorthin, wo du warst.");
         table.put("Hide \"People you may know\"",
                 "\u201ePersonen, die du kennen k\u00f6nntest\u201c ausblenden");
         table.put("Hide \"Suggested for you\" posts",
@@ -294,11 +296,13 @@ public final class L10nTranslations {
                 "Einstellungen werden importiert");
         table.put("It targets Facebook %1$s.",
                 "Es ist f\u00fcr Facebook %1$s gedacht.");
-        table.put("Keep feed position on return",
-                "Feedposition beim Zur\u00fcckkehren beibehalten");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Jump to a section",
+                "Zu einem Abschnitt springen");
+        table.put("Keep feed position on return",
+                "Feedposition beim Zur\u00fcckkehren beibehalten");
         table.put("Licenses",
                 "Lizenzen");
         table.put("Link expired. Reopen the item and try again",
@@ -415,13 +419,13 @@ public final class L10nTranslations {
                 "Einstellungen importiert. %1$d Schalter wurden ge\u00e4ndert.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Einstellungen importiert. Was du speicherst, landet jetzt in einem Ordner namens %1$s.");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("Smallest",
                 "Kleinste");
         table.put("Source code and issues",
                 "Quellcode und Issues");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
                 "Wenn du Facebook \u00fcber sein Symbol startest, \u00f6ffnet sich statt des \u00fcblichen Tabs der unten gew\u00e4hlte. Benachrichtigungen und Links \u00f6ffnen weiterhin dort, wohin sie f\u00fchren.");
         table.put("Stays in while paused",
@@ -539,7 +543,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(474);
+        Map<String, String> table = new HashMap<>(478);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -729,6 +733,8 @@ public final class L10nTranslations {
                 "GitHub est\u00e1 rechazando por ahora las consultas desde esta red. Int\u00e9ntalo de nuevo m\u00e1s tarde.");
         table.put("GitHub's answer couldn't be used. Try again later.",
                 "No se pudo usar la respuesta de GitHub. Int\u00e9ntalo de nuevo m\u00e1s tarde.");
+        table.put("Go straight to one group of settings. Back returns to where you were.",
+                "Ve directo a un grupo de ajustes. Atr\u00e1s te devuelve a donde estabas.");
         table.put("Hide \"People you may know\"",
                 "Ocultar \u201cPersonas que quiz\u00e1 conozcas\u201d");
         table.put("Hide \"Suggested for you\" posts",
@@ -789,11 +795,13 @@ public final class L10nTranslations {
                 "Importando la configuraci\u00f3n");
         table.put("It targets Facebook %1$s.",
                 "Est\u00e1 pensado para Facebook %1$s.");
-        table.put("Keep feed position on return",
-                "Mantener la posici\u00f3n del feed al volver");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Jump to a section",
+                "Ir a una secci\u00f3n");
+        table.put("Keep feed position on return",
+                "Mantener la posici\u00f3n del feed al volver");
         table.put("Licenses",
                 "Licencias");
         table.put("Link expired. Reopen the item and try again",
@@ -910,13 +918,13 @@ public final class L10nTranslations {
                 "Configuraci\u00f3n importada. Cambiaron %1$d interruptores.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Configuraci\u00f3n importada. Lo que guardes ir\u00e1 a una carpeta llamada %1$s.");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("Smallest",
                 "La m\u00e1s peque\u00f1a");
         table.put("Source code and issues",
                 "C\u00f3digo fuente e incidencias");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
                 "Al abrir Facebook desde su icono, se abre la pesta\u00f1a elegida abajo en lugar de la habitual. Las notificaciones y los enlaces siguen abri\u00e9ndose donde apuntan.");
         table.put("Stays in while paused",
@@ -1034,7 +1042,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(474);
+        Map<String, String> table = new HashMap<>(478);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1224,6 +1232,8 @@ public final class L10nTranslations {
                 "GitHub sedang menolak pemeriksaan dari jaringan ini. Coba lagi nanti.");
         table.put("GitHub's answer couldn't be used. Try again later.",
                 "Jawaban GitHub tidak dapat digunakan. Coba lagi nanti.");
+        table.put("Go straight to one group of settings. Back returns to where you were.",
+                "Langsung ke satu kelompok setelan. Kembali membawamu ke tempat semula.");
         table.put("Hide \"People you may know\"",
                 "Sembunyikan \u201cOrang yang Mungkin Anda Kenal\u201d");
         table.put("Hide \"Suggested for you\" posts",
@@ -1284,11 +1294,13 @@ public final class L10nTranslations {
                 "Mengimpor pengaturan");
         table.put("It targets Facebook %1$s.",
                 "Rilis ini ditujukan untuk Facebook %1$s.");
-        table.put("Keep feed position on return",
-                "Pertahankan posisi beranda saat kembali");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Jump to a section",
+                "Lompat ke bagian");
+        table.put("Keep feed position on return",
+                "Pertahankan posisi beranda saat kembali");
         table.put("Licenses",
                 "Lisensi");
         table.put("Link expired. Reopen the item and try again",
@@ -1405,13 +1417,13 @@ public final class L10nTranslations {
                 "Pengaturan diimpor. %1$d sakelar berubah.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Pengaturan diimpor. Semua yang Anda simpan akan masuk ke folder bernama %1$s.");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("Smallest",
                 "Terkecil");
         table.put("Source code and issues",
                 "Kode sumber dan laporan masalah");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
                 "Membuka Facebook dari ikonnya akan membuka tab yang dipilih di bawah, bukan tab yang biasa. Notifikasi dan tautan tetap terbuka ke tujuannya.");
         table.put("Stays in while paused",
@@ -1529,7 +1541,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(474);
+        Map<String, String> table = new HashMap<>(478);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1719,6 +1731,8 @@ public final class L10nTranslations {
                 "O GitHub est\u00e1 recusando consultas desta rede por enquanto. Tente de novo mais tarde.");
         table.put("GitHub's answer couldn't be used. Try again later.",
                 "N\u00e3o deu para usar a resposta do GitHub. Tente de novo mais tarde.");
+        table.put("Go straight to one group of settings. Back returns to where you were.",
+                "V\u00e1 direto a um grupo de configura\u00e7\u00f5es. Voltar leva voc\u00ea de volta aonde estava.");
         table.put("Hide \"People you may know\"",
                 "Ocultar \u201cPessoas que voc\u00ea talvez conhe\u00e7a\u201d");
         table.put("Hide \"Suggested for you\" posts",
@@ -1779,11 +1793,13 @@ public final class L10nTranslations {
                 "Importando as configura\u00e7\u00f5es");
         table.put("It targets Facebook %1$s.",
                 "Ele \u00e9 feito para o Facebook %1$s.");
-        table.put("Keep feed position on return",
-                "Manter a posi\u00e7\u00e3o no feed ao voltar");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Jump to a section",
+                "Ir para uma se\u00e7\u00e3o");
+        table.put("Keep feed position on return",
+                "Manter a posi\u00e7\u00e3o no feed ao voltar");
         table.put("Licenses",
                 "Licen\u00e7as");
         table.put("Link expired. Reopen the item and try again",
@@ -1900,13 +1916,13 @@ public final class L10nTranslations {
                 "Configura\u00e7\u00f5es importadas. %1$d op\u00e7\u00f5es mudaram.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Configura\u00e7\u00f5es importadas. O que voc\u00ea salvar vai para uma pasta chamada %1$s.");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Smallest",
                 "A menor");
         table.put("Source code and issues",
                 "C\u00f3digo-fonte e relatos de problemas");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
                 "Abrir o Facebook pelo \u00edcone abre a aba escolhida abaixo em vez da de costume. Notifica\u00e7\u00f5es e links continuam abrindo onde levam.");
         table.put("Stays in while paused",
@@ -2024,7 +2040,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(474);
+        Map<String, String> table = new HashMap<>(478);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2214,6 +2230,8 @@ public final class L10nTranslations {
                 "GitHub \u015fu an bu a\u011fdan gelen sorgular\u0131 geri \u00e7eviriyor. Daha sonra tekrar dene.");
         table.put("GitHub's answer couldn't be used. Try again later.",
                 "GitHub'\u0131n yan\u0131t\u0131 kullan\u0131lamad\u0131. Daha sonra tekrar dene.");
+        table.put("Go straight to one group of settings. Back returns to where you were.",
+                "Do\u011frudan bir ayar grubuna git. Geri, bulundu\u011fun yere d\u00f6nd\u00fcr\u00fcr.");
         table.put("Hide \"People you may know\"",
                 "\u201cTan\u0131yor olabilece\u011fin ki\u015filer\u201d b\u00f6l\u00fcm\u00fcn\u00fc gizle");
         table.put("Hide \"Suggested for you\" posts",
@@ -2274,11 +2292,13 @@ public final class L10nTranslations {
                 "Ayarlar i\u00e7e aktar\u0131l\u0131yor");
         table.put("It targets Facebook %1$s.",
                 "Facebook %1$s i\u00e7in haz\u0131rland\u0131.");
-        table.put("Keep feed position on return",
-                "Geri d\u00f6n\u00fcnce ak\u0131\u015f konumunu koru");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Jump to a section",
+                "Bir b\u00f6l\u00fcme git");
+        table.put("Keep feed position on return",
+                "Geri d\u00f6n\u00fcnce ak\u0131\u015f konumunu koru");
         table.put("Licenses",
                 "Lisanslar");
         table.put("Link expired. Reopen the item and try again",
@@ -2395,13 +2415,13 @@ public final class L10nTranslations {
                 "Ayarlar i\u00e7e aktar\u0131ld\u0131. %1$d anahtar de\u011fi\u015fti.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Ayarlar i\u00e7e aktar\u0131ld\u0131. Kaydettiklerin %1$s adl\u0131 bir klas\u00f6re gidecek.");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("Smallest",
                 "En k\u00fc\u00e7\u00fck");
         table.put("Source code and issues",
                 "Kaynak kodu ve sorunlar");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
                 "Facebook'u simgesinden ba\u015flatmak, her zamanki sekme yerine a\u015fa\u011f\u0131da se\u00e7ilen sekmeyi a\u00e7ar. Bildirimler ve ba\u011flant\u0131lar yine gittikleri yerde a\u00e7\u0131l\u0131r.");
         table.put("Stays in while paused",

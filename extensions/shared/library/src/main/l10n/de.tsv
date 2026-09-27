@@ -244,3 +244,5 @@ Menu	Menü
 Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.	Facebook startet mit %1$s. Fehlt dieser Tab in deiner Tab-Leiste, startet Facebook mit der Startseite.
 # context: a sentence in the settings import preview and its toast; %1$s is a tab name
 Facebook will open on %1$s.	Facebook startet dann mit %1$s.
+Jump to a section	Zu einem Abschnitt springen
+Go straight to one group of settings. Back returns to where you were.	Direkt zu einer Gruppe von Einstellungen. Zurück bringt dich dorthin, wo du warst.

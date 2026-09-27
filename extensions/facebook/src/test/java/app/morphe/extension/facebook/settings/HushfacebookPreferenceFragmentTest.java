@@ -355,12 +355,13 @@ public class HushfacebookPreferenceFragmentTest {
             controller.get().getFragmentManager().beginTransaction().add(android.R.id.content, page).commitNow();
             List<Preference> rows = new ArrayList<>();
             collect(page.getPreferenceScreen(), rows);
-            // Right under the status card: the heading, the switch, then the list.
-            assertEquals("Opening Facebook", String.valueOf(page.getPreferenceScreen().getPreference(1).getTitle()));
-            assertEquals(Settings.OPEN_ON_CHOSEN_TAB.key, rows.get(1).getKey());
-            assertEquals("Open on a chosen tab", String.valueOf(rows.get(1).getTitle()));
-            assertTrue(rows.get(2) instanceof HushfacebookPreferenceFragment.StartTabRow);
-            HushfacebookPreferenceFragment.StartTabRow start = (HushfacebookPreferenceFragment.StartTabRow) rows.get(2);
+            // Right under the status card and the section jump: the heading, the switch, then the list.
+            assertEquals("Jump to a section", String.valueOf(page.getPreferenceScreen().getPreference(1).getTitle()));
+            assertEquals("Opening Facebook", String.valueOf(page.getPreferenceScreen().getPreference(2).getTitle()));
+            assertEquals(Settings.OPEN_ON_CHOSEN_TAB.key, rows.get(2).getKey());
+            assertEquals("Open on a chosen tab", String.valueOf(rows.get(2).getTitle()));
+            assertTrue(rows.get(3) instanceof HushfacebookPreferenceFragment.StartTabRow);
+            HushfacebookPreferenceFragment.StartTabRow start = (HushfacebookPreferenceFragment.StartTabRow) rows.get(3);
             assertEquals(Settings.START_TAB.key, start.getKey());
             assertEquals("Tab to open on", String.valueOf(start.getTitle()));
 
