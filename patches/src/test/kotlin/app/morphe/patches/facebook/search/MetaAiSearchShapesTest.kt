@@ -289,9 +289,9 @@ class MetaAiSearchShapesTest {
     fun `the page hands its modules to the extension first, and keeps a copy of what comes back`() {
         val constructor = MutableMethod(pageConstructorMethod())
         val own = constructor.implementation!!.instructions.count()
-        constructor.filterPageModulesFirst()
+        constructor.filterPageModulesFirst(PATCH)
         val calls = listOf(0, 3).map { ((constructor.at(it) as ReferenceInstruction).reference as MethodReference).toString() }
-        assertEquals(listOf(KEPT_RESULTS, COPY_OF), calls)
+        assertEquals(listOf(KEPT_MODULES, COPY_OF), calls)
         assertEquals(listOf(Opcode.INVOKE_STATIC, Opcode.MOVE_RESULT_OBJECT, Opcode.IF_EQZ, Opcode.INVOKE_STATIC,
             Opcode.MOVE_RESULT_OBJECT), (0..4).map { constructor.at(it).opcode })
         // The modules are p2, v3 here, and the page's name p6, v7: both read first, and the copy
@@ -310,16 +310,16 @@ class MetaAiSearchShapesTest {
     @Test
     fun `a page with no local, or its modules past v15, stops the patch`() {
         val tight = MutableMethod(pageConstructorMethod(registers = 11))
-        assertTrue(assertThrows(PatchException::class.java) { tight.filterPageModulesFirst() }.message!!.contains(PATCH))
+        assertTrue(assertThrows(PatchException::class.java) { tight.filterPageModulesFirst(PATCH) }.message!!.contains(PATCH))
         val far = MutableMethod(bareConstructor(registers = 25))
-        val refusal = assertThrows(PatchException::class.java) { far.filterPageModulesFirst() }
+        val refusal = assertThrows(PatchException::class.java) { far.filterPageModulesFirst(PATCH) }
         assertTrue(refusal.message, refusal.message!!.contains("v16"))
         assertEquals(1, far.implementation!!.instructions.count())
         // The modules in v12, but the name in v16.
         val farName = MutableMethod(bareConstructor(registers = 21))
-        assertTrue(assertThrows(PatchException::class.java) { farName.filterPageModulesFirst() }.message!!.contains("v16"))
+        assertTrue(assertThrows(PatchException::class.java) { farName.filterPageModulesFirst(PATCH) }.message!!.contains("v16"))
         // Both in reach: v15 is the last register an invoke's four bits name.
-        MutableMethod(bareConstructor(registers = 20)).filterPageModulesFirst()
+        MutableMethod(bareConstructor(registers = 20)).filterPageModulesFirst(PATCH)
     }
 
     // ------------------------------------------------------------------ the suggestion route

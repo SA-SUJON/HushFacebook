@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(566);
+        Map<String, String> table = new HashMap<>(574);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -96,6 +96,10 @@ public final class L10nTranslations {
                 "F\u00fcgt den Video-Men\u00fcs im Feed und in Watch \u201eAufs Handy herunterladen\u201c hinzu. Speichert in der Qualit\u00e4t, die weiter unten eingestellt ist. Ausgeschaltet oder pausiert erscheint wieder Facebooks Men\u00fc.");
         table.put("Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.",
                 "F\u00fcgt \u201eSpeichern\u201c zum Men\u00fc jeder Story hinzu, egal von wem, und speichert sie in der Qualit\u00e4t, die unter \u201eDownloads\u201c eingestellt ist. Ist der Schalter aus oder Hushfacebook pausiert, gibt es \u201eSpeichern\u201c nur bei deinen eigenen Stories, und dort l\u00e4uft Facebooks eigene Speicherfunktion.");
+        table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
+                "Werbung zwischen den Beitr\u00e4gen auf einem Profil oder einer Seite. Deren eigene Beitr\u00e4ge bleiben.");
+        table.put("Ads between the results when you search Facebook. What you searched for stays.",
+                "Werbung zwischen den Ergebnissen, wenn du auf Facebook suchst. Was du gesucht hast, bleibt.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Anzeigen in Reels, ab den n\u00e4chsten Reels, die Facebook l\u00e4dt. Banner, Werbeunterbrechungen und von der App eingef\u00fcgte Anzeigen bleiben auch w\u00e4hrend einer Pause blockiert.");
         table.put("All comments",
@@ -170,13 +174,13 @@ public final class L10nTranslations {
                 "Die Diagnosedaten lie\u00dfen sich nicht wiederherstellen. Versuche es noch einmal.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "GitHub war nicht erreichbar. Versuche es sp\u00e4ter noch einmal.");
+    }
+
+    private static void fillDe1(Map<String, String> table) {
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "Eine Kopie dieser Schriftart lie\u00df sich nicht speichern. Pr\u00fcfe, ob auf dem Handy Platz ist, und versuche es noch einmal.");
         table.put("Couldn't save the settings file. Try again.",
                 "Die Einstellungsdatei lie\u00df sich nicht speichern. Versuche es noch einmal.");
-    }
-
-    private static void fillDe1(Map<String, String> table) {
         table.put("Couldn't save this video. Play it for a moment, then try again.",
                 "Dieses Video lie\u00df sich nicht speichern. Spiel es kurz ab und versuche es dann noch einmal.");
         table.put("Couldn't start that. Try again in a moment.",
@@ -293,19 +297,23 @@ public final class L10nTranslations {
                 "\u201eUpgrades\u201c ausblenden");
         table.put("Hide comment and reaction previews",
                 "Vorschau von Kommentaren und Reaktionen ausblenden");
+    }
+
+    private static void fillDe2(Map<String, String> table) {
         table.put("Hide page suggestions and Facebook's own promos",
                 "Seitenvorschl\u00e4ge und Facebooks Eigenwerbung ausblenden");
         table.put("Hide promoted posts",
                 "Beworbene Beitr\u00e4ge ausblenden");
-    }
-
-    private static void fillDe2(Map<String, String> table) {
         table.put("Hide prompts and promos under reels",
                 "Aufforderungen und Werbung unter Reels ausblenden");
         table.put("Hide sponsored posts",
                 "Gesponserte Beitr\u00e4ge ausblenden");
+        table.put("Hide sponsored profile posts",
+                "Gesponserte Beitr\u00e4ge auf Profilen ausblenden");
         table.put("Hide sponsored reels",
                 "Gesponserte Reels ausblenden");
+        table.put("Hide sponsored search results",
+                "Gesponserte Suchergebnisse ausblenden");
         table.put("Hide sponsored stories",
                 "Gesponserte Stories ausblenden");
         table.put("Hide the Follow button on reels",
@@ -412,6 +420,9 @@ public final class L10nTranslations {
                 "Beitr\u00e4ge, die Facebooks eigene Erkennung als mit KI erstellt markiert. Ein Beitrag, den nur die Person, die ihn erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profile und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("Re-signed build fix",
                 "Fix f\u00fcr neu signierte Builds");
         table.put("Reading the settings file",
@@ -420,9 +431,6 @@ public final class L10nTranslations {
                 "Reels und Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
                 "Reels und Watch-Videos, die Facebooks eigene Erkennung als mit KI erstellt markiert, ab den n\u00e4chsten, die Facebook l\u00e4dt. Eines, das nur die Person, die es erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht mit einem echten Konto getestet wurde.");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Die Buttons Remix, Vorlage verwenden, \u201eDu bist dran\u201c und Edits sowie die f\u00fcr Sterne, Spiele, Partner-Apps und externe Links. Der Song und andere Hinweise bleiben.");
         table.put("Remove tracking from shared links",
@@ -535,6 +543,9 @@ public final class L10nTranslations {
                 "Der Bereich \u201eAuch von Meta\u201c verschwindet aus dem Facebook-Men\u00fc, mit seinen Links zu Metas anderen Apps und seiner Werbung f\u00fcr Metas Ger\u00e4te. Deine eigenen Verkn\u00fcpfungen bleiben.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "Der Folgen-Button neben der Person, die das Reel gepostet hat. \u00dcber ihr Profil kannst du ihr weiterhin folgen.");
+    }
+
+    private static void fillDe4(Map<String, String> table) {
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "Der Bereich \u201eUpgrades\u201c mit seinen Angeboten verschwindet aus dem Facebook-Men\u00fc. Einstellungen, Hilfe und Support und der Rest des Men\u00fcs bleiben.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
@@ -543,9 +554,6 @@ public final class L10nTranslations {
                 "Der Kommentar, den Facebook unter einem Reel als Vorschau zeigt, und die Blasen der Freunde, die reagiert haben. \u00d6ffne die Kommentare, um alle zu sehen.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "Der Diagnosebericht lie\u00df sich noch nicht speichern. Versuche es gleich noch einmal.");
-    }
-
-    private static void fillDe4(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Der Diagnosebericht lie\u00df sich nicht speichern. Versuche es noch einmal.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -635,7 +643,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(566);
+        Map<String, String> table = new HashMap<>(574);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -687,6 +695,10 @@ public final class L10nTranslations {
                 "A\u00f1ade \u201cDescargar en el tel\u00e9fono\u201d a los men\u00fas de videos del feed y Watch. Guarda con la calidad elegida m\u00e1s abajo. Si est\u00e1 desactivado o en pausa, vuelve el men\u00fa de Facebook.");
         table.put("Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.",
                 "Agrega la opci\u00f3n Guardar al men\u00fa de cualquier historia, sea de quien sea, y la guarda con la calidad elegida en Descargas. Con este interruptor desactivado o Hushfacebook en pausa, solo tus propias historias tienen la opci\u00f3n Guardar, y se usa el guardado propio de Facebook.");
+        table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
+                "Anuncios entre las publicaciones del perfil de alguien o de una p\u00e1gina. Sus propias publicaciones se quedan.");
+        table.put("Ads between the results when you search Facebook. What you searched for stays.",
+                "Anuncios entre los resultados cuando buscas en Facebook. Lo que buscaste se queda.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Anuncios dentro de Reels, a partir de la pr\u00f3xima tanda que cargue Facebook. Los banners, los anuncios a mitad de video y los que inserta la app siguen bloqueados incluso en pausa.");
         table.put("All comments",
@@ -761,13 +773,13 @@ public final class L10nTranslations {
                 "No se pudieron restaurar los datos de diagn\u00f3stico. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "No se pudo contactar con GitHub. Int\u00e9ntalo de nuevo m\u00e1s tarde.");
+    }
+
+    private static void fillEs1(Map<String, String> table) {
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "No se pudo guardar una copia de esa fuente. Comprueba que el tel\u00e9fono tenga espacio y vuelve a intentarlo.");
         table.put("Couldn't save the settings file. Try again.",
                 "No se pudo guardar el archivo de configuraci\u00f3n. Int\u00e9ntalo de nuevo.");
-    }
-
-    private static void fillEs1(Map<String, String> table) {
         table.put("Couldn't save this video. Play it for a moment, then try again.",
                 "No se pudo guardar este video. Reprod\u00facelo un momento y vuelve a intentarlo.");
         table.put("Couldn't start that. Try again in a moment.",
@@ -884,19 +896,23 @@ public final class L10nTranslations {
                 "Ocultar \u201cMejoras\u201d");
         table.put("Hide comment and reaction previews",
                 "Ocultar las vistas previas de comentarios y reacciones");
+    }
+
+    private static void fillEs2(Map<String, String> table) {
         table.put("Hide page suggestions and Facebook's own promos",
                 "Ocultar sugerencias de p\u00e1ginas y autopromociones de Facebook");
         table.put("Hide promoted posts",
                 "Ocultar publicaciones promocionadas");
-    }
-
-    private static void fillEs2(Map<String, String> table) {
         table.put("Hide prompts and promos under reels",
                 "Ocultar invitaciones y promociones en los reels");
         table.put("Hide sponsored posts",
                 "Ocultar publicaciones publicitarias");
+        table.put("Hide sponsored profile posts",
+                "Ocultar publicaciones publicitarias en perfiles");
         table.put("Hide sponsored reels",
                 "Ocultar reels publicitarios");
+        table.put("Hide sponsored search results",
+                "Ocultar resultados de b\u00fasqueda publicitarios");
         table.put("Hide sponsored stories",
                 "Ocultar historias publicitarias");
         table.put("Hide the Follow button on reels",
@@ -1003,6 +1019,9 @@ public final class L10nTranslations {
                 "Publicaciones que la detecci\u00f3n propia de Facebook marca como creadas con IA. Una publicaci\u00f3n que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("Re-signed build fix",
                 "Arreglo para la nueva firma");
         table.put("Reading the settings file",
@@ -1011,9 +1030,6 @@ public final class L10nTranslations {
                 "Reels y Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
                 "Reels y videos de Watch que la detecci\u00f3n propia de Facebook marca como creados con IA, a partir de la pr\u00f3xima tanda que cargue Facebook. Uno que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 con una cuenta real.");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Los botones para hacer un remix, usar la plantilla, sumar el tuyo o abrir Edits, y los de estrellas, juegos, apps asociadas y enlaces externos. La canci\u00f3n y las dem\u00e1s etiquetas se quedan.");
         table.put("Remove tracking from shared links",
@@ -1126,6 +1142,9 @@ public final class L10nTranslations {
                 "La secci\u00f3n \u201cTambi\u00e9n de Meta\u201d desaparece del men\u00fa de Facebook, con sus enlaces a las otras apps de Meta y sus anuncios de dispositivos de Meta. Tus propios accesos directos se quedan.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "El bot\u00f3n Seguir junto a quien public\u00f3 el reel. Puedes seguir a esa persona desde su perfil.");
+    }
+
+    private static void fillEs4(Map<String, String> table) {
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "La secci\u00f3n \u201cMejoras\u201d y sus ofertas desaparecen del men\u00fa de Facebook. Configuraci\u00f3n, Ayuda y soporte t\u00e9cnico y el resto del men\u00fa se quedan.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
@@ -1134,9 +1153,6 @@ public final class L10nTranslations {
                 "El comentario que Facebook muestra como vista previa debajo de un reel y las burbujas de los amigos que reaccionaron. Abre los comentarios para verlos todos.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "Todav\u00eda no se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo en un momento.");
-    }
-
-    private static void fillEs4(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "No se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -1226,7 +1242,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(566);
+        Map<String, String> table = new HashMap<>(574);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1278,6 +1294,10 @@ public final class L10nTranslations {
                 "Menambahkan \u201cUnduh ke ponsel\u201d ke menu video Kabar Beranda dan Watch. Menyimpan dengan kualitas yang diatur di bawah. Jika nonaktif atau dijeda, menu Facebook kembali.");
         table.put("Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.",
                 "Menambahkan opsi Simpan ke menu cerita siapa pun dan menyimpannya dengan kualitas yang diatur di bagian Unduhan. Jika nonaktif atau dijeda, opsi Simpan hanya ada di cerita Anda sendiri dan memakai fitur simpan bawaan Facebook.");
+        table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
+                "Iklan di antara postingan di profil seseorang atau Halaman. Postingan milik mereka sendiri tetap ada.");
+        table.put("Ads between the results when you search Facebook. What you searched for stays.",
+                "Iklan di antara hasil saat Anda mencari di Facebook. Yang Anda cari tetap ada.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Iklan di dalam Reels, mulai dari kumpulan berikutnya yang dimuat Facebook. Banner, iklan di tengah video, dan iklan yang disisipkan aplikasi tetap diblokir saat dijeda.");
         table.put("All comments",
@@ -1352,13 +1372,13 @@ public final class L10nTranslations {
                 "Data diagnostik tidak dapat dikembalikan. Coba lagi.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "GitHub tidak dapat dihubungi. Coba lagi nanti.");
+    }
+
+    private static void fillIn1(Map<String, String> table) {
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "Salinan font itu tidak dapat disimpan. Pastikan ponsel masih punya ruang, lalu coba lagi.");
         table.put("Couldn't save the settings file. Try again.",
                 "File pengaturan tidak dapat disimpan. Coba lagi.");
-    }
-
-    private static void fillIn1(Map<String, String> table) {
         table.put("Couldn't save this video. Play it for a moment, then try again.",
                 "Video ini tidak dapat disimpan. Putar sebentar, lalu coba lagi.");
         table.put("Couldn't start that. Try again in a moment.",
@@ -1475,19 +1495,23 @@ public final class L10nTranslations {
                 "Sembunyikan \u201cUpgrade\u201d");
         table.put("Hide comment and reaction previews",
                 "Sembunyikan pratinjau komentar dan reaksi");
+    }
+
+    private static void fillIn2(Map<String, String> table) {
         table.put("Hide page suggestions and Facebook's own promos",
                 "Sembunyikan saran Halaman dan promosi Facebook sendiri");
         table.put("Hide promoted posts",
                 "Sembunyikan postingan promosi");
-    }
-
-    private static void fillIn2(Map<String, String> table) {
         table.put("Hide prompts and promos under reels",
                 "Sembunyikan ajakan dan promosi di bawah reel");
         table.put("Hide sponsored posts",
                 "Sembunyikan postingan bersponsor");
+        table.put("Hide sponsored profile posts",
+                "Sembunyikan postingan bersponsor di profil");
         table.put("Hide sponsored reels",
                 "Sembunyikan Reels bersponsor");
+        table.put("Hide sponsored search results",
+                "Sembunyikan hasil pencarian bersponsor");
         table.put("Hide sponsored stories",
                 "Sembunyikan cerita bersponsor");
         table.put("Hide the Follow button on reels",
@@ -1594,6 +1618,9 @@ public final class L10nTranslations {
                 "Postingan yang ditandai deteksi Facebook sendiri sebagai buatan AI. Postingan yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("Re-signed build fix",
                 "Perbaikan build yang ditandatangani ulang");
         table.put("Reading the settings file",
@@ -1602,9 +1629,6 @@ public final class L10nTranslations {
                 "Reels dan Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
                 "Reel dan video Watch yang ditandai deteksi Facebook sendiri sebagai buatan AI, mulai dari kumpulan berikutnya yang dimuat Facebook. Yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji dengan akun sungguhan.");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Tombol untuk Remix, memakai templat, menambahkan milik Anda, dan Edits, serta tombol Bintang, game, aplikasi mitra, dan tautan eksternal. Lagu dan label lainnya tetap ada.");
         table.put("Remove tracking from shared links",
@@ -1717,6 +1741,9 @@ public final class L10nTranslations {
                 "Bagian \u201cJuga dari Meta\u201d hilang dari Menu Facebook, beserta tautannya ke aplikasi Meta lainnya dan iklannya untuk perangkat Meta. Pintasanmu sendiri tetap ada.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "Tombol Ikuti di samping nama pembuat reel. Anda tetap bisa mengikutinya dari profilnya.");
+    }
+
+    private static void fillIn4(Map<String, String> table) {
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "Bagian \u201cUpgrade\u201d dan penawarannya hilang dari Menu Facebook. Pengaturan, Bantuan & dukungan, dan bagian Menu lainnya tetap ada.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
@@ -1725,9 +1752,6 @@ public final class L10nTranslations {
                 "Komentar yang ditampilkan Facebook sebagai pratinjau di bawah reel, dan gelembung teman yang memberi reaksi. Buka komentar untuk melihat semuanya.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "Laporan diagnostik belum dapat disimpan. Coba lagi dalam beberapa saat.");
-    }
-
-    private static void fillIn4(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Laporan diagnostik tidak dapat disimpan. Coba lagi.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -1817,7 +1841,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(566);
+        Map<String, String> table = new HashMap<>(574);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1869,6 +1893,10 @@ public final class L10nTranslations {
                 "Adiciona \u201cBaixar no celular\u201d aos menus de v\u00eddeo do feed e do Watch. Salva na qualidade definida abaixo. Desligado ou em pausa, o menu do Facebook volta.");
         table.put("Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.",
                 "Adiciona o item Salvar ao menu do story de qualquer pessoa e salva na qualidade definida em Downloads. Com esta op\u00e7\u00e3o desligada ou durante a pausa, o item Salvar s\u00f3 aparece nos seus pr\u00f3prios stories, e quem salva \u00e9 o pr\u00f3prio Facebook.");
+        table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
+                "An\u00fancios entre os posts no perfil de algu\u00e9m ou em uma P\u00e1gina. Os posts da pr\u00f3pria pessoa continuam.");
+        table.put("Ads between the results when you search Facebook. What you searched for stays.",
+                "An\u00fancios entre os resultados quando voc\u00ea pesquisa no Facebook. O que voc\u00ea pesquisou continua l\u00e1.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "An\u00fancios dentro dos Reels, a partir do pr\u00f3ximo lote que o Facebook carregar. Banners, an\u00fancios no meio do v\u00eddeo e an\u00fancios inseridos pelo app continuam bloqueados mesmo durante a pausa.");
         table.put("All comments",
@@ -1943,13 +1971,13 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel restaurar os dados de diagn\u00f3stico. Tente de novo.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "N\u00e3o foi poss\u00edvel falar com o GitHub. Tente de novo mais tarde.");
+    }
+
+    private static void fillPt_rBR1(Map<String, String> table) {
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "N\u00e3o foi poss\u00edvel salvar uma c\u00f3pia dessa fonte. Veja se o celular tem espa\u00e7o e tente de novo.");
         table.put("Couldn't save the settings file. Try again.",
                 "N\u00e3o foi poss\u00edvel salvar o arquivo de configura\u00e7\u00f5es. Tente de novo.");
-    }
-
-    private static void fillPt_rBR1(Map<String, String> table) {
         table.put("Couldn't save this video. Play it for a moment, then try again.",
                 "N\u00e3o foi poss\u00edvel salvar este v\u00eddeo. Reproduza por alguns instantes e tente de novo.");
         table.put("Couldn't start that. Try again in a moment.",
@@ -2066,19 +2094,23 @@ public final class L10nTranslations {
                 "Ocultar \u201cUpgrades\u201d");
         table.put("Hide comment and reaction previews",
                 "Ocultar pr\u00e9vias de coment\u00e1rios e rea\u00e7\u00f5es");
+    }
+
+    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Hide page suggestions and Facebook's own promos",
                 "Ocultar sugest\u00f5es de p\u00e1ginas e autopromo\u00e7\u00f5es do Facebook");
         table.put("Hide promoted posts",
                 "Ocultar posts promovidos");
-    }
-
-    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Hide prompts and promos under reels",
                 "Ocultar convites e promo\u00e7\u00f5es nos reels");
         table.put("Hide sponsored posts",
                 "Ocultar posts patrocinados");
+        table.put("Hide sponsored profile posts",
+                "Ocultar posts patrocinados em perfis");
         table.put("Hide sponsored reels",
                 "Ocultar reels patrocinados");
+        table.put("Hide sponsored search results",
+                "Ocultar resultados de pesquisa patrocinados");
         table.put("Hide sponsored stories",
                 "Ocultar stories patrocinados");
         table.put("Hide the Follow button on reels",
@@ -2185,6 +2217,9 @@ public final class L10nTranslations {
                 "Posts que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como feitos com IA. Um post que s\u00f3 o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desligada porque ainda n\u00e3o foi testada em um feed real.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o reassinada.");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Re-signed build fix",
                 "Corre\u00e7\u00e3o para vers\u00e3o reassinada");
         table.put("Reading the settings file",
@@ -2193,9 +2228,6 @@ public final class L10nTranslations {
                 "Reels e Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
                 "Reels e v\u00eddeos do Watch que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como feitos com IA, a partir do pr\u00f3ximo lote que o Facebook carregar. Um que s\u00f3 o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desligada porque ainda n\u00e3o foi testada com uma conta real.");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Os bot\u00f5es de remix, usar modelo, adicionar o seu e Edits, e os de estrelas, jogos, apps parceiros e links externos. A m\u00fasica e as outras etiquetas continuam.");
         table.put("Remove tracking from shared links",
@@ -2308,6 +2340,9 @@ public final class L10nTranslations {
                 "A se\u00e7\u00e3o \u201cTamb\u00e9m da Meta\u201d sai do Menu do Facebook, com os links para os outros apps da Meta e os an\u00fancios de dispositivos da Meta. Seus pr\u00f3prios atalhos continuam.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "O bot\u00e3o Seguir ao lado de quem publicou o reel. Voc\u00ea ainda pode seguir a pessoa pelo perfil dela.");
+    }
+
+    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "A se\u00e7\u00e3o \u201cUpgrades\u201d e suas ofertas saem do Menu do Facebook. Configura\u00e7\u00f5es, Ajuda e suporte e o resto do Menu continuam.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
@@ -2316,9 +2351,6 @@ public final class L10nTranslations {
                 "O coment\u00e1rio que o Facebook mostra como pr\u00e9via abaixo de um reel e as bolhas dos amigos que reagiram. Abra os coment\u00e1rios para ver todos.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "O relat\u00f3rio de diagn\u00f3stico ainda n\u00e3o p\u00f4de ser salvo. Tente de novo em instantes.");
-    }
-
-    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "N\u00e3o foi poss\u00edvel salvar o relat\u00f3rio de diagn\u00f3stico. Tente de novo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -2408,7 +2440,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(566);
+        Map<String, String> table = new HashMap<>(574);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2460,6 +2492,10 @@ public final class L10nTranslations {
                 "Ak\u0131\u015f ve Watch video men\u00fclerine \u201cTelefona indir\u201d se\u00e7ene\u011fini ekler. A\u015fa\u011f\u0131da se\u00e7ilen kalitede kaydeder. Kapal\u0131yken veya duraklat\u0131ld\u0131\u011f\u0131nda Facebook men\u00fcs\u00fc geri gelir.");
         table.put("Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.",
                 "Kimin olursa olsun her hikayenin men\u00fcs\u00fcne Kaydet se\u00e7ene\u011fini ekler ve hikayeyi \u0130ndirmeler b\u00f6l\u00fcm\u00fcnde se\u00e7ilen kalitede kaydeder. Kapal\u0131yken veya duraklat\u0131lm\u0131\u015fken Kaydet se\u00e7ene\u011fi yaln\u0131zca kendi hikayelerinde bulunur ve Facebook'un kendi kaydetme i\u015flevini \u00e7al\u0131\u015ft\u0131r\u0131r.");
+        table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
+                "Birinin profilindeki ya da bir Sayfadaki g\u00f6nderilerin aras\u0131ndaki reklamlar. Kendi g\u00f6nderileri kal\u0131r.");
+        table.put("Ads between the results when you search Facebook. What you searched for stays.",
+                "Facebook'ta arama yapt\u0131\u011f\u0131nda sonu\u00e7lar\u0131n aras\u0131ndaki reklamlar. Arad\u0131\u011f\u0131n \u015fey kal\u0131r.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Reels i\u00e7indeki reklamlar, Facebook'un y\u00fckledi\u011fi bir sonraki gruptan itibaren. Banner'lar, video ortas\u0131 reklamlar ve uygulaman\u0131n ekledi\u011fi reklamlar duraklat\u0131ld\u0131\u011f\u0131nda da engellenir.");
         table.put("All comments",
@@ -2534,13 +2570,13 @@ public final class L10nTranslations {
                 "Tan\u0131lama verileri geri getirilemedi. Tekrar dene.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "GitHub'a ula\u015f\u0131lamad\u0131. Daha sonra tekrar dene.");
+    }
+
+    private static void fillTr1(Map<String, String> table) {
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "Bu yaz\u0131 tipinin kopyas\u0131 kaydedilemedi. Telefonda yer olup olmad\u0131\u011f\u0131n\u0131 kontrol et, sonra tekrar dene.");
         table.put("Couldn't save the settings file. Try again.",
                 "Ayar dosyas\u0131 kaydedilemedi. Tekrar dene.");
-    }
-
-    private static void fillTr1(Map<String, String> table) {
         table.put("Couldn't save this video. Play it for a moment, then try again.",
                 "Bu video kaydedilemedi. Biraz oynat, sonra tekrar dene.");
         table.put("Couldn't start that. Try again in a moment.",
@@ -2657,19 +2693,23 @@ public final class L10nTranslations {
                 "\u201cY\u00fckseltmeler\u201d b\u00f6l\u00fcm\u00fcn\u00fc gizle");
         table.put("Hide comment and reaction previews",
                 "Yorum ve tepki \u00f6nizlemelerini gizle");
+    }
+
+    private static void fillTr2(Map<String, String> table) {
         table.put("Hide page suggestions and Facebook's own promos",
                 "Sayfa \u00f6nerilerini ve Facebook'un kendi tan\u0131t\u0131mlar\u0131n\u0131 gizle");
         table.put("Hide promoted posts",
                 "Tan\u0131t\u0131lan g\u00f6nderileri gizle");
-    }
-
-    private static void fillTr2(Map<String, String> table) {
         table.put("Hide prompts and promos under reels",
                 "Reels videolar\u0131n\u0131n alt\u0131ndaki davetleri ve tan\u0131t\u0131mlar\u0131 gizle");
         table.put("Hide sponsored posts",
                 "Sponsorlu g\u00f6nderileri gizle");
+        table.put("Hide sponsored profile posts",
+                "Profillerdeki sponsorlu g\u00f6nderileri gizle");
         table.put("Hide sponsored reels",
                 "Sponsorlu Reels videolar\u0131n\u0131 gizle");
+        table.put("Hide sponsored search results",
+                "Sponsorlu arama sonu\u00e7lar\u0131n\u0131 gizle");
         table.put("Hide sponsored stories",
                 "Sponsorlu hikayeleri gizle");
         table.put("Hide the Follow button on reels",
@@ -2776,6 +2816,9 @@ public final class L10nTranslations {
                 "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi g\u00f6nderiler. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir g\u00f6nderi kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("Re-signed build fix",
                 "Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
         table.put("Reading the settings file",
@@ -2784,9 +2827,6 @@ public final class L10nTranslations {
                 "Reels ve Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
                 "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi reels ve Watch videolar\u0131, Facebook'un y\u00fckledi\u011fi bir sonraki gruptan itibaren. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir video kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir hesapla test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Remix, \u015fablon kullanma, kendi videonu ekleme ve Edits d\u00fc\u011fmeleri ile y\u0131ld\u0131z, oyun, i\u015f orta\u011f\u0131 uygulamas\u0131 ve d\u0131\u015f ba\u011flant\u0131 d\u00fc\u011fmeleri. \u015eark\u0131 ve di\u011fer etiketler kal\u0131r.");
         table.put("Remove tracking from shared links",
@@ -2899,6 +2939,9 @@ public final class L10nTranslations {
                 "\u201cMeta'dan di\u011ferleri\u201d b\u00f6l\u00fcm\u00fc, Meta'n\u0131n di\u011fer uygulamalar\u0131na giden ba\u011flant\u0131lar\u0131 ve Meta cihazlar\u0131n\u0131n reklamlar\u0131yla birlikte Facebook men\u00fcs\u00fcnden kalkar. Kendi k\u0131sayollar\u0131n yerinde kal\u0131r.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
                 "Reels videosunu payla\u015fan ki\u015finin ad\u0131n\u0131n yan\u0131ndaki Takip Et d\u00fc\u011fmesi. Onu profilinden yine takip edebilirsin.");
+    }
+
+    private static void fillTr4(Map<String, String> table) {
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "\u201cY\u00fckseltmeler\u201d b\u00f6l\u00fcm\u00fc ve teklifleri Facebook men\u00fcs\u00fcnden kalkar. Ayarlar, Yard\u0131m ve destek ve men\u00fcn\u00fcn geri kalan\u0131 yerinde kal\u0131r.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
@@ -2907,9 +2950,6 @@ public final class L10nTranslations {
                 "Facebook'un bir Reels videosunun alt\u0131nda \u00f6nizleme olarak g\u00f6sterdi\u011fi yorum ve tepki veren arkada\u015flar\u0131n\u0131n baloncuklar\u0131. Hepsini g\u00f6rmek i\u00e7in yorumlar\u0131 a\u00e7.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "Tan\u0131lama raporu hen\u00fcz kaydedilemedi. Birazdan tekrar dene.");
-    }
-
-    private static void fillTr4(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Tan\u0131lama raporu kaydedilemedi. Tekrar dene.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",

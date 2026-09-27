@@ -100,6 +100,14 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_SPONSORED_REELS =
             new BooleanSetting("hushfacebook_hide_sponsored_reels", TRUE);
 
+    /** The modules of a page of search results that Facebook's search result role marks as ads. */
+    public static final BooleanSetting HIDE_SPONSORED_SEARCH_RESULTS =
+            new BooleanSetting("hushfacebook_hide_sponsored_search_results", TRUE);
+
+    /** The posts on a profile or Page timeline that carry Facebook's sponsored data. */
+    public static final BooleanSetting HIDE_SPONSORED_PROFILE_POSTS =
+            new BooleanSetting("hushfacebook_hide_sponsored_profile_posts", TRUE);
+
     /**
      * The chips under a reel that prompt you to make something (Remix, Use template, Add yours,
      * Edits) or promote something (Stars, games, a partner app, a link out of Facebook). A chip of

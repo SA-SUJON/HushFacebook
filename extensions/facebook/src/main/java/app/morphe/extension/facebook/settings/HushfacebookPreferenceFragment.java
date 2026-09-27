@@ -237,13 +237,20 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (build.contains(PatchFamily.SPONSORED_POSTS) || build.contains(PatchFamily.SUGGESTED_POSTS)
                 || build.contains(PatchFamily.STORIES_TRAY) || build.contains(PatchFamily.FEED_REELS)
                 || build.contains(PatchFamily.RETURN_REFRESH)
-                || build.contains(PatchFamily.AI_DETECTED_POSTS)) {
+                || build.contains(PatchFamily.AI_DETECTED_POSTS)
+                || build.contains(PatchFamily.SPONSORED_PROFILE_POSTS)) {
             PreferenceCategory feed = category(screen, L10n.t("News feed"));
             if (build.contains(PatchFamily.SPONSORED_POSTS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_SPONSORED_POSTS, L10n.t("Hide sponsored posts"),
                         L10n.t("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.")));
                 feed.addPreference(toggle(context, Settings.HIDE_PROMOTED_POSTS, L10n.t("Hide promoted posts"),
                         L10n.t("Posts Facebook files as promotions rather than as ads.")));
+            }
+            // Profiles have no section of their own; their ads sit with the feed's.
+            if (build.contains(PatchFamily.SPONSORED_PROFILE_POSTS)) {
+                feed.addPreference(toggle(context, Settings.HIDE_SPONSORED_PROFILE_POSTS,
+                        L10n.t("Hide sponsored profile posts"),
+                        L10n.t("Ads between the posts on someone's profile or a Page. Their own posts stay.")));
             }
             if (build.contains(PatchFamily.SUGGESTED_POSTS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_SUGGESTED_POSTS,
@@ -399,12 +406,19 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                             + "and its ads for Meta's devices. Your own shortcuts stay.")));
         }
 
-        if (build.contains(PatchFamily.META_AI_SEARCH)) {
+        if (build.contains(PatchFamily.META_AI_SEARCH) || build.contains(PatchFamily.SPONSORED_SEARCH)) {
             PreferenceCategory search = category(screen, L10n.t("Search"));
-            search.addPreference(toggle(context, Settings.HIDE_META_AI_IN_SEARCH, L10n.t("Hide Meta AI in search"),
-                    L10n.t("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no "
-                            + "longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta "
-                            + "AI button still opens Meta AI.")));
+            if (build.contains(PatchFamily.META_AI_SEARCH)) {
+                search.addPreference(toggle(context, Settings.HIDE_META_AI_IN_SEARCH, L10n.t("Hide Meta AI in search"),
+                        L10n.t("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no "
+                                + "longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta "
+                                + "AI button still opens Meta AI.")));
+            }
+            if (build.contains(PatchFamily.SPONSORED_SEARCH)) {
+                search.addPreference(toggle(context, Settings.HIDE_SPONSORED_SEARCH_RESULTS,
+                        L10n.t("Hide sponsored search results"),
+                        L10n.t("Ads between the results when you search Facebook. What you searched for stays.")));
+            }
         }
 
         if (build.contains(PatchFamily.EXTERNAL_BROWSER) || build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {

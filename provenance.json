@@ -314,6 +314,20 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the order comments open in. Facebook 577 and 580 build every request for a post's comments from FetchFeedbackParams, and the request's builder sets comment_rendering_intent_token from one of its strings only when it isn't empty, so an ordinary comment sheet leaves the order to Facebook's servers. The patch finds that builder by the three variable names it reads from the params (comment_rendering_intent_token, feedback_id and focused_comment_id), finds the one params constructor that stores those three from its own parameters, and asks the extension first there. It also tells the extension first in the comment sheet's pick handler, the one method taking the session and a token that fetches UpdateCommentOrderType_FetchFeedbackQuery. The extension fills in RANKED_FILTERED_INTENT_V1, RECENT_ACTIVITY_INTENT_V1 or RANKED_UNFILTERED_CHRONOLOGICAL_REPLIES_INTENT_V1 only for a request that names no order and no focused comment, and asks again for the order picked in a post's menu until Facebook restarts."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/ads/ProfileAdFilter.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/ads/SearchAdFilter.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredprofile/HideSponsoredProfilePostsPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredprofile/ProfilePostAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredsearch/HideSponsoredSearchResultsPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredsearch/SearchResultAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the ads in search results and on profiles. In Facebook 577 and 580 every page of search results is built by one constructor from the two builders that take a GraphQLResult and the search's SearchResultsMutableContext, and its module list is the parameter they fill with the module class's own list converter. The module class is the one holding the search result role enum it reads from result_role, and its static initializer keeps the enum's SEARCH_ADS, DEPENDENT_SEARCH_ADS, LATE_DEPENDENT_SEARCH_ADS and TOP_POSITION_SEARCH_ADS as its ads. The extension leaves a module out of the page when its role is one of those or one of the five other roles the enum names after ads. On a profile, the one method holding sponsored_timeline_stories_test_key is the timeline story component's render, which asks GraphQLStory for its sponsored_data; the extension has it draw nothing for a story that carries it."
     }
   ]
 }

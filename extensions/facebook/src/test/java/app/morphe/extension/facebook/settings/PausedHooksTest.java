@@ -39,7 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
+import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
@@ -225,6 +227,11 @@ public class PausedHooksTest {
                     ReelsAdFilter.withoutAdSections(Collections.singletonList(section), AD);
                     return !section.items.contains(ad);
                 }));
+        // A search results page leaves its SEARCH_ADS module out.
+        probes.put(PatchFamily.SPONSORED_SEARCH, Collections.singletonList(SearchAdFilterForTests::dropsAnAd));
+        // A timeline story with sponsored data isn't drawn on a profile.
+        probes.put(PatchFamily.SPONSORED_PROFILE_POSTS,
+                Collections.singletonList(ProfileAdFilterForTests::hidesASponsoredStory));
         // A Remix chip under a reel, the Follow and Following buttons beside its author, and both
         // footer queries.
         probes.put(PatchFamily.REEL_DECLUTTER, Arrays.asList(

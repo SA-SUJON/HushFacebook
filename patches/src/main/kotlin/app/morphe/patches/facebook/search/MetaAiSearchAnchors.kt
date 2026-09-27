@@ -67,7 +67,6 @@ internal const val PATCH = "Hide Meta AI in search"
 /** The extension class the hooks call, and its stub for a module's role. */
 internal const val META_AI_SEARCH = "$EXTENSION_PACKAGE/search/MetaAiSearch;"
 internal const val HIDE_ANSWER = "$META_AI_SEARCH->hideAnswer()Z"
-internal const val KEPT_RESULTS = "$META_AI_SEARCH->keptResults(Ljava/util/List;Ljava/lang/String;)Ljava/util/List;"
 internal const val OPENS_META_AI = "$META_AI_SEARCH->opensMetaAi(Z)Z"
 internal const val ROLE_STUB = "unitRole"
 

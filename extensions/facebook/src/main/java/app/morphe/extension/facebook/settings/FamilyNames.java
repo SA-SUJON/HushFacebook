@@ -28,6 +28,8 @@ public final class FamilyNames {
     public static final String SPONSORED_STORIES = "Hide sponsored stories";
     public static final String STORY_AUTO_ADVANCE = "Stop Story auto-advance";
     public static final String SPONSORED_REELS = "Hide sponsored reels";
+    public static final String SPONSORED_SEARCH = "Hide sponsored search results";
+    public static final String SPONSORED_PROFILE_POSTS = "Hide sponsored profile posts";
     public static final String REEL_DECLUTTER = "Clean up Reels";
     public static final String REEL_WATCH_HISTORY = "Don't send reel watch history";
     public static final String DEFAULT_COMMENT_ORDER = "Default comment order";

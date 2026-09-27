@@ -319,3 +319,11 @@ A post's comments open with %1$s picked in their sort menu, where the post offer
 Comments will open in the order Facebook picks.	Os comentários vão abrir na ordem que o Facebook escolher.
 # context: sentence in the import preview and the toast after an import that sets the comment order; %1$s is one of the order names above
 Comments will open with %1$s picked in their sort menu.	Os comentários vão abrir com %1$s escolhido no menu de ordenação.
+# context: switch title under Search; the ads Facebook puts between search results
+Hide sponsored search results	Ocultar resultados de pesquisa patrocinados
+# context: summary of that switch
+Ads between the results when you search Facebook. What you searched for stays.	Anúncios entre os resultados quando você pesquisa no Facebook. O que você pesquisou continua lá.
+# context: switch title under News feed; the ads between the posts on a person's profile or a Page
+Hide sponsored profile posts	Ocultar posts patrocinados em perfis
+# context: summary of that switch; Page is Facebook's name for a business or public figure's page
+Ads between the posts on someone's profile or a Page. Their own posts stay.	Anúncios entre os posts no perfil de alguém ou em uma Página. Os posts da própria pessoa continuam.

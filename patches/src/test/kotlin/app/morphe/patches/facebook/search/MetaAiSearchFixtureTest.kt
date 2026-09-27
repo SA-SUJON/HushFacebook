@@ -204,7 +204,7 @@ class MetaAiSearchFixtureTest {
                     gate.implementation!!.instructions.count() + 5, asked.size)
 
                 val built = patched(pageConstructor).implementation!!.instructions.toList()
-                assertEquals("$name: the page's hook", listOf(KEPT_RESULTS, COPY_OF), listOf(built[0], built[3]).map { it.call.toString() })
+                assertEquals("$name: the page's hook", listOf(KEPT_MODULES, COPY_OF), listOf(built[0], built[3]).map { it.call.toString() })
                 assertEquals("$name: the modules and the name read",
                     listOf(PAGE_MODULES, PAGE_NAME).map { pageConstructor.parameterRegisterNumber(it) }, built[0].callArguments())
                 assertEquals("$name: the copy goes back to the modules", pageConstructor.parameterRegisterNumber(1),

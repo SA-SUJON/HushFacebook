@@ -54,6 +54,14 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean sponsoredSearch() {
+        return false;
+    }
+
+    public static boolean sponsoredProfilePosts() {
+        return false;
+    }
+
     public static boolean reelDeclutter() {
         return false;
     }

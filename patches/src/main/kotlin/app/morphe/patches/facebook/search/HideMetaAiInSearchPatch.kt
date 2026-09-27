@@ -18,8 +18,6 @@ import app.morphe.patches.facebook.feed.methodsHolding
 import app.morphe.patches.facebook.feed.reels.callsMethod
 import app.morphe.patches.facebook.feed.reels.categoryNames
 import app.morphe.patches.facebook.misc.extension.enableStatus
-import app.morphe.patches.facebook.misc.extension.parameterRegister
-import app.morphe.patches.facebook.misc.extension.parameterRegisterNumber
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -38,7 +36,8 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  *
  * Three hooks, each at Facebook's own decision: first thing in the answer question (answer no),
  * first thing in the constructor of a page of results (hand the extension the page's modules, keep
- * its list or take a copy without the Meta AI ones), and where the suggestion parser stores a
+ * its list or take a copy without the Meta AI ones; the hook is shared with Hide sponsored search
+ * results, see SearchResultsPageHook.kt), and where the suggestion parser stores a
  * suggestion's open-in-Meta-AI flag (store the extension's answer). The Meta AI button and the
  * results page's own Meta AI tab go around all three, so they still open Meta AI.
  *
@@ -97,7 +96,7 @@ val hideMetaAiInSearchPatch = bytecodePatch(
         mutableClassDefBy(question.definingClass).methods.single { isAnswerQuestion(it, question) }
             .answerNoWhileMetaAiHidden()
         fillStoryModelStub(META_AI_SEARCH, ROLE_STUB, accessor)
-        mutableClassDefBy(page.definingClass).methods.single { isConstructor(it, page) }.filterPageModulesFirst()
+        mutableClassDefBy(page.definingClass).methods.single { isConstructor(it, page) }.filterPageModulesFirst(PATCH)
         val (parser, store) = routeStore
         mutableClassDefBy(parser.definingClass).methods.single {
             it.name == parser.name && it.returnType == parser.returnType &&
@@ -220,34 +219,6 @@ internal fun MutableMethod.answerNoWhileMetaAiHidden() {
             if-eqz v0, :facebook
             const/4 v0, 0x0
             return v0
-        """,
-        ExternalLabel("facebook", getInstruction(0)),
-    )
-}
-
-/**
- * First thing in a results page's constructor: hand the extension the page's modules, its second
- * argument, and its name, its sixth. When it answers a list, copy it into an ImmutableList and put
- * that where the modules were, so the constructor keeps it. When it answers null, the constructor
- * runs as Facebook wrote it. Nothing has run yet, so v0 is free, and `this` isn't touched before its
- * own constructor call.
- */
-internal fun MutableMethod.filterPageModulesFirst() {
-    requireLocals(PATCH, 1)
-    val modules = parameterRegister(PAGE_MODULES)
-    val name = parameterRegister(PAGE_NAME)
-    // invoke-static names its registers in four bits each.
-    listOf(PAGE_MODULES, PAGE_NAME).map(::parameterRegisterNumber).filter { it > 15 }.firstOrNull()?.let {
-        throw PatchException("$PATCH: $definingClass-><init> keeps its modules or its name in v$it, past v15")
-    }
-    addInstructionsWithLabels(
-        0,
-        """
-            invoke-static { $modules, $name }, $KEPT_RESULTS
-            move-result-object v0
-            if-eqz v0, :facebook
-            invoke-static { v0 }, $COPY_OF
-            move-result-object $modules
         """,
         ExternalLabel("facebook", getInstruction(0)),
     )

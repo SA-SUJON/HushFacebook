@@ -31,7 +31,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
+import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
@@ -136,6 +138,8 @@ public class ColdStartHooksTest {
         Section section = new Section(new ArrayList<>(Arrays.asList(new Reel(), sectionAd)));
         ReelsAdFilter.withoutAdSections(Collections.singletonList(section), ad);
         assertTrue(section.items.contains(sectionAd));
+        assertFalse("a search page built before the context lost its ad", SearchAdFilterForTests.dropsAnAd());
+        assertFalse("a profile row drawn before the context was left out", ProfileAdFilterForTests.hidesASponsoredStory());
         Activity browser = Robolectric.buildActivity(Activity.class,
                 new Intent(Intent.ACTION_VIEW, Uri.parse("https://example.org/"))).create().get();
         assertFalse(ExternalBrowser.redirect(browser, browser.getIntent()));

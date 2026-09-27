@@ -138,9 +138,10 @@ public final class MetaAiSearch {
     }
 
     /**
-     * Injection point, first thing in the constructor of a page of search results, with the page's
-     * result modules and its name. Null leaves Facebook's list as it is; otherwise the modules to
-     * keep, in their order, which the patch copies into a list of Facebook's own kind. Never throws.
+     * Called by the page hook first in the constructor of a page of search results
+     * ({@link SearchResultsPage}), with the page's result modules and its name. Null leaves the list
+     * as it is; otherwise the modules to keep, in their order, which the patch copies into a list of
+     * Facebook's own kind. Never throws.
      */
     @Nullable
     public static List<Object> keptResults(List<?> modules, @Nullable String page) {
