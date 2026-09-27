@@ -228,6 +228,52 @@ public class DownloadQualityTest {
         assertEquals(HD, RenditionPicker.bestVideo(Arrays.asList(PLAIN, HD), DownloadQuality.P360));
     }
 
+    // ---- The efg parameter Facebook packs a file's variant into ---------------------------------
+
+    /** A file whose only word on its quality is inside its efg, shaped the way Facebook writes it. */
+    private static String withEfg(String json) {
+        String efg = java.util.Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        return "https://video-iad3-1.xx.fbcdn.net/o1/v/t2/f2/m69/AQN.mp4?efg=" + efg + "&oh=1&oe=2";
+    }
+
+    /**
+     * The S22 diagnostic on 2026-09-26 called a 640x360 progressive MP4 "1485p": the file ran
+     * 1485.47 seconds, and the efg's duration_s was read as a height. Its numeric fields are never
+     * a quality, only the tag's text is.
+     */
+    @Test
+    public void anEfgDurationIsNotAHeight() {
+        String untagged = withEfg("{\"vencode_tag\":\"xpv_progressive.FACEBOOK..C3.dash_baseline_1_v1\","
+                + "\"xpv_asset_id\":1234567890,\"vi_usecase_id\":10107,\"duration_s\":1485,\"urlgen_source\":\"www\"}");
+        assertEquals(0, RenditionPicker.qualityOf(untagged));
+        assertEquals("mp4 (unknown)", MediaDownload.describe(untagged));
+
+        String tagged = withEfg("{\"vencode_tag\":\"xpv_progressive.FACEBOOK..C3.360.sve_sd\","
+                + "\"xpv_asset_id\":1234567890,\"duration_s\":1485,\"urlgen_source\":\"www\"}");
+        assertEquals(360, RenditionPicker.qualityOf(tagged));
+        assertEquals("mp4 (360p)", MediaDownload.describe(tagged));
+
+        // A duration that happens to be a real height is still a duration. (A tag ending in the
+        // word sd would read 480 through the crude fallback; this one names no size at all.)
+        String minutes = withEfg("{\"vencode_tag\":\"xpv_progressive.FACEBOOK..C3.dash_baseline_1_v1\",\"duration_s\":720}");
+        assertEquals(0, RenditionPicker.qualityOf(minutes));
+        // And the long file doesn't outrank a real 720p because of its length.
+        assertEquals(HD, RenditionPicker.bestVideo(Arrays.asList(untagged, HD), DownloadQuality.BEST));
+    }
+
+    /** A width in the tag, such as the 640 of a 640x360 encode, isn't read as a height either. */
+    @Test
+    public void onlyAHeightFacebookEncodesAtIsReadBare() {
+        assertEquals(0, RenditionPicker.qualityOf(withEfg("{\"vencode_tag\":\"xpv_progressive.FACEBOOK..C3.640.dash_baseline_1_v1\"}")));
+        assertEquals(720, RenditionPicker.qualityOf(withEfg("{\"vencode_tag\":\"xpv_progressive.FACEBOOK..C3.720.dash_high_1_v1\"}")));
+        // A marker anywhere in the efg still counts as measured.
+        assertEquals(1080, RenditionPicker.qualityOf(withEfg("{\"vencode_tag\":\"clip_1080p\",\"duration_s\":1485}")));
+        // An efg that isn't JSON is read whole, as before.
+        assertEquals(480, RenditionPicker.qualityOf(withEfg("xpv_progressive.C3.480.sve_sd")));
+        assertEquals("xpv 360 ", RenditionPicker.tagTextOf("{\"vencode_tag\":\"xpv 360\",\"n\":1485,\"other\":\"999\"}"));
+    }
+
     /** A single file still beats an address that only might be one, whatever quality it states. */
     @Test
     public void aSingleFileBeatsAPlausibleAddressFirst() {

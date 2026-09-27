@@ -610,6 +610,7 @@ public final class MediaDownload {
         String extension = dot < 0 ? "" : file.substring(dot + 1).toLowerCase(Locale.US);
         if (!extension.matches("[a-z0-9]{1,5}")) extension = "file";
 
-        return extension + " (" + RenditionPicker.qualityOf(url) + "p)";
+        int quality = RenditionPicker.qualityOf(url);
+        return extension + " (" + (quality > 0 ? quality + "p" : "unknown") + ")";
     }
 }
