@@ -19,6 +19,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** In Hushfacebook's settings, a row that opens something when you tap it, such as a dialog or the file picker, now ends in a chevron. Its title's colour was the only thing that set it apart from a plain line of text, so Licenses and Version looked alike. The chevron points the other way in right-to-left languages. Switch rows keep their switch, and the two rows that act as soon as they're tapped, Clear diagnostic data and the paused status card, go without one.
 * **Facebook:** Export diagnostic report's two choices now show as cards, each with what it does under its name. Both show whole above Cancel at any text size, in right-to-left languages too.
 * **Facebook:** Patches that change code in the middle of a Facebook method now check that the spare registers they use really are spare. If a future Facebook build keeps something in one, the patch stops with a message instead of breaking Facebook quietly. Hide sponsored reels also patches a build whose reel page sits in a higher register, which it used to refuse.
+* **Facebook:** The checks every release goes through got stricter. A patched build's resources and manifest are now compared with Facebook's whole split bundle rather than only its base APK, the injected-code check covers helpers added to Facebook's own classes, and the receipt published with a release has to match the one built here byte for byte.
 
 ## 0.1.8 (2026-09-26)
 
