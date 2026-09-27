@@ -378,17 +378,25 @@ public final class StartTabRoute {
     /**
      * The landing check, once Facebook has built the main screen. Behind a splash screen Facebook can
      * build it well after it first shows, and until then the screen has no current tab to read, so
-     * it's tried again [attempts] times at most before the check goes ahead. A screen with a tab to
-     * read has had its start decided, so the start being built ends there.
+     * it's tried again [attempts] times at most before the check goes ahead. The start being built
+     * ends there either way. A screen with a tab to read has had its start decided. One still
+     * without a tab after the last try is given up on, so a tab bar Facebook builds later, or builds
+     * again when it reloads its tabs, gets Facebook's own answers rather than the asked tab.
      */
     static void land(WeakReference<Activity> screen, StartTab asked, int attempts) {
         Activity activity = screen.get();
         boolean built = activity != null && TabBar.currentTab(activity) != null;
-        if (!built && attempts > 1 && activity != null && !activity.isFinishing() && !activity.isDestroyed()) {
+        boolean live = activity != null && !activity.isFinishing() && !activity.isDestroyed();
+        if (!built && attempts > 1 && live) {
             Utils.runOnMainThreadDelayed(() -> land(screen, asked, attempts - 1), LANDING_CHECK_MS);
             return;
         }
-        if (built) settled(activity);
+        if (!built && live) {
+            debug(() -> "gave up waiting for the main screen to be built after " + LANDING_ATTEMPTS
+                    + " tries; Facebook's start-up keeps its own answers from here on.");
+        }
+        // Only this screen's start: a later main screen's is its own to end.
+        if (activity != null) settled(activity);
         check(activity, asked);
     }
 
@@ -396,16 +404,23 @@ public final class StartTabRoute {
      * Compares the tab the main screen shows with the one it was asked for. The same tab is the
      * route working. A tab bar without the asked tab is the account's, not a fault: Facebook
      * opened Home, as it does for a notification about such a tab. Another tab while the bar has
-     * the asked one is a route Facebook didn't take, or a tap in those two seconds.
+     * the asked one is a route Facebook didn't take, or a tap in those two seconds. A screen that
+     * shows no tab has no tab bar to read yet, and the check says nothing about one.
      */
     static void check(@Nullable Activity activity, StartTab asked) {
         try {
             if (activity == null || activity.isFinishing() || activity.isDestroyed()) return;
             Object current = TabBar.currentTab(activity);
+            if (current == null) {
+                HookStatus.missingMember(FamilyNames.START_TAB, "start on tab", FacebookTabs.MAIN_TAB_ACTIVITY,
+                        asked.fileValue);
+                debug(() -> "asked for " + asked.fileValue + ", and the main screen shows no tab yet.");
+                return;
+            }
             List<Object> tabs = TabBar.tabs(activity);
             String opened = TabBar.name(current);
             String bar = TabBar.describe(tabs);
-            if (current != null && asked.isTab(current.getClass().getName())) {
+            if (asked.isTab(current.getClass().getName())) {
                 HookStatus.bound(FamilyNames.START_TAB, asked.fileValue + " tab");
                 debug(() -> "Facebook opened " + opened + ", as asked. Tab bar: " + bar);
             } else if (tabs != null && !TabBar.has(tabs, asked)) {
@@ -426,10 +441,11 @@ public final class StartTabRoute {
      * {@code getCurrentTab()}, its delegate's lazy tab bar state, the {@code TabTag} class and its
      * one long, the tab's id. Every read answers null rather than throw.
      *
-     * <p>The lazy value resolves the account's one tab bar state, which the main screen built before
-     * it first showed. The delegate itself only asks for it when a start carries a tab, a shortcut or
-     * a new intent, so after a plain start from the launcher icon the lazy value is unasked, not
-     * unbuilt, and reading it hands back the state the tab bar was built from.
+     * <p>The lazy value resolves the account's one tab bar state. The delegate itself only asks for
+     * it when a start carries a tab, a shortcut or a new intent, so after a plain start from the
+     * launcher icon the lazy value is unasked, and asking it can build that state. So it's asked only
+     * once the main screen shows a tab, when Facebook has built its tab bar from that state, and
+     * never ahead of Facebook.
      */
     static final class TabBar {
         private TabBar() {
@@ -445,10 +461,11 @@ public final class StartTabRoute {
         /**
          * The tabs the tab bar shows, in order: the tab bar state's own list, which leaves out the
          * tabs hidden in Facebook's settings, or else its configuration's. Null when neither can
-         * be read.
+         * be read, and null without a read while the main screen shows no tab.
          */
         @Nullable
         static List<Object> tabs(Activity activity) {
+            if (currentTab(activity) == null) return null;
             Object delegate = mainTabDelegate(activity);
             if (delegate == null) return null;
             Object lazy = field(delegate, FacebookTabs.TAB_BAR_STATE);

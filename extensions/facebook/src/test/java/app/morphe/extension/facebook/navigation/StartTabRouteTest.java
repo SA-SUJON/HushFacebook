@@ -348,21 +348,46 @@ public class StartTabRouteTest {
         assertFalse(startUpAsksForTheTab());
     }
 
-    /** A screen Facebook never builds is checked all the same after the last try, and is no fault of the route. */
+    /**
+     * A screen Facebook never builds is checked all the same after the last try, and the help ends
+     * there: a tab bar Facebook builds later, or builds again when it reloads its tabs, gets
+     * Facebook's own answers. With no tab on the screen, the tab bar state is left for Facebook to
+     * ask for first.
+     */
     @Test
-    public void theLandingCheckStopsWaitingForAScreenThatIsNeverBuilt() {
+    public void theLandingCheckGivesUpOnAScreenThatIsNeverBuilt() {
+        BaseSettings.DEBUG.save(true);
+        LogBufferManager.clearLogBuffer();
         ActivityController<FbMainTabActivity> controller =
                 Robolectric.buildActivity(FbMainTabActivity.class, StartTabRouteForTests.launcherStart());
-        StartTabRoute.onActivityCreate(controller.get(), null);
+        FbMainTabActivity screen = controller.get();
+        StartTabRoute.onActivityCreate(screen, null);
+        StartTabRouteForTests.TabBarState state = new StartTabRouteForTests.TabBarState();
+        state.shown = new java.util.ArrayList<>(StartTabRouteForTests.tabs(new FeedTab(), new MarketplaceTab()));
+        StartTabRouteForTests.Lazy unasked = new StartTabRouteForTests.Lazy(state, false);
+        FbMainTabActivityDelegate delegate = new FbMainTabActivityDelegate();
+        delegate.tabBarStateManager$delegate = unasked;
+        screen.delegate = delegate;
+
         controller.create().start().resume().visible();
         shadowOf(Looper.getMainLooper()).idleFor(
                 Duration.ofMillis(StartTabRoute.LANDING_CHECK_MS * (StartTabRoute.LANDING_ATTEMPTS - 1)));
         assertEquals("it stopped waiting early", FamilyNames.START_TAB + ": invoked 1, 0 found, 0 missing", statusLine());
+        assertTrue("the help ended before the last try", startUpAsksForTheTab());
+
         shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(StartTabRoute.LANDING_CHECK_MS));
         String line = statusLine();
         assertTrue(line, line.contains("1 missing"));
-        // Still unbuilt, so Facebook's own start-up can still be helped when it gets there.
-        assertTrue(startUpAsksForTheTab());
+        assertFalse("the help outlived the last try", startUpAsksForTheTab());
+        Intent sanitized = sanitizedCopy(screen.getIntent());
+        assertSame("the screen didn't get Facebook's copy", sanitized, handedOver(screen, sanitized));
+        assertFalse("the landing check built the tab bar state ahead of Facebook", unasked.isInitialized());
+
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("Start tab: gave up waiting for the main screen to be built after "
+                + StartTabRoute.LANDING_ATTEMPTS + " tries; Facebook's start-up keeps its own answers from here on."));
+        assertTrue(report, report.contains("Start tab: asked for marketplace, and the main screen shows no tab yet."));
+        assertFalse(report, report.contains("Tab bar:"));
     }
 
     /** With Debug logging on, each start-up hook says once per start whether it had anything to do. */
@@ -537,6 +562,7 @@ public class StartTabRouteTest {
     @Test
     public void theTabBarIsReadThroughTheNamesFacebookKeeps() {
         FbMainTabActivity screen = StartTabRouteForTests.screen(StartTabRouteForTests.launcherStart());
+        screen.currentTab = new FeedTab();
         assertNull("no delegate, no tab bar", StartTabRoute.TabBar.tabs(screen));
 
         // The shown list first: it leaves out the tabs hidden in Facebook's settings.
@@ -554,13 +580,21 @@ public class StartTabRouteTest {
         screen.delegate = new StartTabRouteForTests.DelegateWrapper(delegate);
         assertEquals(Arrays.asList("FeedTab", "MarketplaceTab"), names(StartTabRoute.TabBar.tabs(screen)));
 
-        // After a plain start the delegate hasn't asked for the state yet. It's the account's one
-        // tab bar state, which the tab bar was built from, so it's read all the same.
+        // After a plain start the delegate hasn't asked for the state yet. While the screen shows
+        // no tab, the reader doesn't ask either: asking could build the state ahead of Facebook.
         StartTabRouteForTests.TabBarState unasked = new StartTabRouteForTests.TabBarState();
         unasked.shown = new java.util.ArrayList<>(shown);
+        StartTabRouteForTests.Lazy early = new StartTabRouteForTests.Lazy(unasked, false);
+        delegate.tabBarStateManager$delegate = early;
+        screen.delegate = delegate;
+        screen.currentTab = null;
+        assertNull("the tab bar was read before the screen showed a tab", StartTabRoute.TabBar.tabs(screen));
+        assertFalse("the reader built the tab bar state ahead of Facebook", early.isInitialized());
+
+        // Once the screen shows a tab, the tab bar was built from that state, so it's read.
+        screen.currentTab = new FeedTab();
         StartTabRouteForTests.Lazy lazy = new StartTabRouteForTests.Lazy(unasked, false);
         delegate.tabBarStateManager$delegate = lazy;
-        screen.delegate = delegate;
         assertEquals(Arrays.asList("FeedTab", "MarketplaceTab"), names(StartTabRoute.TabBar.tabs(screen)));
         assertTrue(lazy.isInitialized());
 
