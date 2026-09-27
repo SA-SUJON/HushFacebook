@@ -32,6 +32,7 @@ public class TreeJNI {
     private final String typeName;
     private boolean valid = true;
     public int booleanReads;
+    public int treeReads;
 
     /**
      * Whether one of the file name's readers asked the tree after it was released. On a phone that
@@ -118,8 +119,13 @@ public class TreeJNI {
         return strings.get(field);
     }
 
-    /** Facebook's returns its Tree interface; the object behind it is a tree like this one. */
-    public final TreeJNI getTree(int field) {
+    /**
+     * Facebook's returns its Tree interface; the object behind it is a tree like this one. Every
+     * read is counted, so a test can show a switched-off rule asks no tree. Facebook's is final;
+     * this one isn't, so a test tree can make the read fail.
+     */
+    public TreeJNI getTree(int field) {
+        treeReads++;
         nativeRead();
         return trees.get(field);
     }

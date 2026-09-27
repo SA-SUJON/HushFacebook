@@ -299,14 +299,14 @@ public class GenAiReelFilterTest {
         filter(page(reel(attribution(false))));
         List<String> found = HookStatus.report();
         assertTrue(String.join("\n", found),
-                found.contains(FamilyNames.AI_DETECTED_REELS + ": invoked 1, 3 found, 0 missing"));
+                found.contains(FamilyNames.AI_DETECTED_REELS + ": invoked 1, 4 found, 0 missing"));
 
         HookStatus.clear();
         FeedFilterCounters.clear();
         List<Object> page = Collections.singletonList(reel(attribution(true)));
         assertSame(page, GenAiReelFilter.withoutAiReels(page, "no.such.ReelModel", FINDER, NO_STORY_INFO));
         String report = String.join("\n", HookStatus.report());
-        assertTrue(report, report.contains(FamilyNames.AI_DETECTED_REELS + ": invoked 1, 2 found, 1 missing. "
+        assertTrue(report, report.contains(FamilyNames.AI_DETECTED_REELS + ": invoked 1, 3 found, 1 missing. "
                 + "First missing: class no.such.ReelModel#reel model"));
         assertEquals(GenAiReelFilter.ITEMS_ROUTE + ": 1 lists, 1 items, 0 removed. Kinds: model class missing 1",
                 line(GenAiReelFilter.ITEMS_ROUTE));

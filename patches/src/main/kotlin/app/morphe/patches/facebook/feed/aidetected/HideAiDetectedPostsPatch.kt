@@ -52,7 +52,10 @@ private const val PATCH = "Hide AI-detected posts"
  * attribution the Reels viewer draws its AI label from, found by the type name literal it is
  * handed (see ReelLabel.kt) and written into `GenAiReelFilter.transparencyAttribution`. The flag
  * on that attribution the extension reads through `TreeJNI.getBooleanValue`, the kept reader the
- * viewer's own label decision calls, and the patch stops if that decision no longer does.
+ * viewer's own label decision calls, and the patch stops if that decision no longer does. The
+ * Reels tab's own items keep the model and the story in a holder rather than a field of their
+ * own, and for those the extension reads `ai_generated_detected_info` by its key through
+ * `TreeJNI.getTree(int)`, which the patch requires too (see ReelLabel.kt).
  *
  * Both switches start off. Nobody has yet recorded a signed-in feed with one AI-labeled post and
  * one ordinary post beside it, nor a Reels feed with an AI-labelled reel, and until someone does,

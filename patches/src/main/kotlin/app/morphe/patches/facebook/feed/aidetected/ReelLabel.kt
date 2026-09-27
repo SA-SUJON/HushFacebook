@@ -42,9 +42,19 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
  *   build to that decision, so it stops if the flag's home moves.
  * - The label's text comes from gen_ai_transparency_label_info { zero_click_transparency_label }
  *   on the attribution. The rule doesn't read it: a self-labelled reel has a label too.
- * - The Reels tab's items hold the model in a field of that type (580 LX/5qk and LX/TKN, built by
- *   the VideoHome controller); a Watch video built from a post holds a GraphQLStory instead, and
- *   the extension reads the feed's flag on it. Items holding neither stay.
+ * - Some items hold the model in a field of that type (580 LX/5qk and LX/TKN); a Watch video built
+ *   from a post can hold a GraphQLStory instead, and the extension reads the feed's flag on it.
+ * - The Reels tab's own items hold neither (read from 577 and 580, 2026-09-27, after the S22
+ *   counted "no model" for all 20). The class VideoHomeMutableDataHelper builds them with (580
+ *   LX/857, 577 LX/71s) keeps three raw trees of its own (580 LX/3SN, 577 LX/1vG) and one holder
+ *   (580 LX/7bV, 577 LX/7Z9) declaring a field of the model's type and one of GraphQLStory's,
+ *   which the Reels viewer takes the model out of. Facebook's Reels menu decides its "AI info" row
+ *   (the method logging "GenAI info NFX action was sent for reel", 580 LX/TVi;->A00, 577
+ *   LX/Tka;->A00, handed the model and that holder) by the attribution first, then by the model's
+ *   own ai_generated_detected_info (0xb4f9e684) and its was_detected_as_ai_generated, read as
+ *   trees. So for such an item the extension reads that field by its key through
+ *   TreeJNI.getTree(int), on the holder's model and story and on the item's own trees. Items
+ *   holding no tree at all stay.
  */
 
 /** Kept literal. The GraphQL type of the attribution the Reels viewer's AI label is built from. */
@@ -53,6 +63,9 @@ internal const val TRANSPARENCY_ATTRIBUTION = "XFBFBShortsGenAITransparencyAttri
 /** The kept readers on TreeJNI the extension reads the attribution's flag through. */
 internal const val TREE_BOOLEAN_READER = "getBooleanValue"
 internal const val TREE_FIELD_CHECK = "hasFieldValue"
+
+/** The kept reader of a nested tree by its field's key, which the Reels tab's items are read through. */
+internal const val TREE_READER = "getTree"
 
 private const val STRING = "Ljava/lang/String;"
 private const val OBJECT = "Ljava/lang/Object;"
@@ -179,7 +192,19 @@ internal fun hasPublicIntReader(tree: ClassDef, name: String): Boolean = tree.me
         AccessFlags.PUBLIC.isSet(it.accessFlags) && !AccessFlags.STATIC.isSet(it.accessFlags)
 }
 
-/** Stops the patch unless TreeJNI keeps the public readers the attribution's flag is read through. */
+/**
+ * Whether [tree] has the public instance `[name](int)` answering an object, the way `getTree(int)`
+ * answers Facebook's Tree interface, that the extension reads a nested tree with.
+ */
+internal fun hasPublicTreeReader(tree: ClassDef, name: String): Boolean = tree.methods.any {
+    it.name == name && it.returnType.startsWith("L") && it.parameterTypes.map { p -> p.toString() } == listOf("I") &&
+        AccessFlags.PUBLIC.isSet(it.accessFlags) && !AccessFlags.STATIC.isSet(it.accessFlags)
+}
+
+/**
+ * Stops the patch unless TreeJNI keeps the public readers the attribution's flag is read through,
+ * and the one the Reels tab's items are read through.
+ */
 internal fun BytecodePatchContext.requireTreeReaders() {
     val tree = classDefBy(TREE_JNI)
     if (!hasPublicIntReader(tree, TREE_BOOLEAN_READER)) {
@@ -187,6 +212,9 @@ internal fun BytecodePatchContext.requireTreeReaders() {
     }
     if (!hasPublicIntReader(tree, TREE_FIELD_CHECK)) {
         throw PatchException("TreeJNI has no public $TREE_FIELD_CHECK(int)")
+    }
+    if (!hasPublicTreeReader(tree, TREE_READER)) {
+        throw PatchException("TreeJNI has no public $TREE_READER(int)")
     }
 }
 

@@ -39,10 +39,20 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * decision calls on the same attribution. A Watch video that comes as a GraphQLStory carries the
  * feed's flag instead, and it is read the way the feed rule reads it ({@link GenAiLabel}).
  *
+ * <p>The Reels tab's own items hold neither in a field of their own (the S22 counted "no model" for
+ * every one of 20). Each keeps the reel's model and its story together in a holder object, beside
+ * raw trees of its own (580 {@code LX/857} with holder {@code LX/7bV}, 577 {@code LX/71s} with
+ * {@code LX/7Z9}; the Reels viewer takes its model out of that holder). For such an item a second
+ * reader takes over: it reads {@code ai_generated_detected_info.was_detected_as_ai_generated} by
+ * the fields' keys, through {@code TreeJNI.getTree(int)} and the same kept readers, on the model
+ * and story the holder keeps and on the item's own trees. That is the field Facebook's Reels menu
+ * reads on the reel's model to offer its "AI info" row, and the one the feed rule reads on a post.
+ * Its kinds start with {@link #TREE}.
+ *
  * <p>Only a definite true hides anything. A reel with no such attribution, one whose flag is unset
- * or false, an item holding neither a reel model nor a story, and anything this can't read all
- * stay, each counted under its own reason so a report says why. A reel only its creator labelled
- * as AI has the attribution with the flag false, and stays too.
+ * or false, an item holding neither a reel model nor a story nor a tree, and anything this can't
+ * read all stay, each counted under its own reason so a report says why. A reel only its creator
+ * labelled as AI has the attribution with the flag false, and stays too.
  */
 public final class GenAiReelFilter {
     /** The GraphQL type of the attribution the Reels viewer's AI label is built from. */
@@ -57,6 +67,12 @@ public final class GenAiReelFilter {
     static final String BOOLEAN_READER = "getBooleanValue";
     static final String FIELD_CHECK = "hasFieldValue";
     static final String VALIDITY_CHECK = "isValidGraphServicesJNIModel";
+    /** The kept reader of a nested tree by its field's key, the one the file name reads a poster with. */
+    static final String TREE_READER = "getTree";
+
+    /** The field a reel's story holds Facebook's detection under, the one the feed rule reads, and its key. */
+    static final String DETECTED_INFO_FIELD = GenAiLabel.DETECTED_INFO_FIELD;
+    static final int DETECTED_INFO_KEY = DETECTED_INFO_FIELD.hashCode();
 
     /** What the stub answers until its patch fills it in. */
     static final Object NOT_PATCHED = new Object();
@@ -90,6 +106,15 @@ public final class GenAiReelFilter {
     /** A story-backed item's kinds are the feed rule's reasons behind this. */
     static final String STORY = "story ";
     static final String STORY_FLAGGED = STORY + "flag true";
+    /** What the tree reader found on an item holding no model or story of its own. */
+    static final String TREE = "tree ";
+    static final String TREE_FLAGGED = TREE + "flag true";
+    static final String TREE_NOT_FLAGGED = TREE + "flag false";
+    static final String TREE_UNSET = TREE + "flag unset";
+    static final String TREE_NO_INFO = TREE + "no AI info";
+    static final String TREE_RELEASED = TREE + "released";
+    static final String TREE_READ_FAILED = TREE + "read failed";
+    static final String TREE_NO_READER = TREE + "reader missing";
 
     /** The attribution finder, however it's read: the stub the patch filled in, or a stand-in in a test. */
     interface Finder {
@@ -211,7 +236,7 @@ public final class GenAiReelFilter {
         String why = read(item, readers, finder, storyAccessor);
         FeedFilterCounters.sawList(ITEMS_ROUTE, 1);
         FeedFilterCounters.sawKind(ITEMS_ROUTE, why);
-        if (!FLAGGED.equals(why) && !STORY_FLAGGED.equals(why)) return false;
+        if (!FLAGGED.equals(why) && !STORY_FLAGGED.equals(why) && !TREE_FLAGGED.equals(why)) return false;
         FeedFilterCounters.removed(ITEMS_ROUTE, 1, why);
         Logger.printDebug(() -> "GenAI reels: hid a reel (" + why + ")");
         return true;
@@ -229,6 +254,8 @@ public final class GenAiReelFilter {
                 StoryFlag flag = GenAiLabel.FLAG;
                 return STORY + flag.reason(flag.read(story, storyAccessor));
             }
+            List<Object> trees = trees(item, readers);
+            if (!trees.isEmpty()) return treeKind(trees, readers);
             return readers.model == null ? MODEL_CLASS_MISSING : NO_MODEL;
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.AI_DETECTED_REELS, "reel item reader", failure);
@@ -273,6 +300,89 @@ public final class GenAiReelFilter {
         }
     }
 
+    /**
+     * What the trees of an item say, read by key: its detected info's flag on the first tree that
+     * answers true, otherwise the most telling of what the others answered. A tree whose native side
+     * is gone is left unread. Never throws.
+     */
+    private static String treeKind(List<Object> trees, Readers readers) {
+        if (readers.treeValue == null) return TREE_NO_READER;
+        boolean live = false;
+        boolean unset = false;
+        boolean notFlagged = false;
+        boolean failed = false;
+        for (Object tree : trees) {
+            try {
+                if (!isLive(tree, readers)) continue;
+                live = true;
+                Object info = readers.treeValue.invoke(tree, DETECTED_INFO_KEY);
+                if (info == null || !readers.tree.isInstance(info) || !isLive(info, readers)) continue;
+                if (readers.hasField != null && !Boolean.TRUE.equals(readers.hasField.invoke(info, DETECTED_FLAG_KEY))) {
+                    unset = true;
+                    continue;
+                }
+                Object value = readers.booleanValue.invoke(info, DETECTED_FLAG_KEY);
+                if (!(value instanceof Boolean)) {
+                    failed = true;
+                } else if ((Boolean) value) {
+                    return TREE_FLAGGED;
+                } else {
+                    notFlagged = true;
+                }
+            } catch (InvocationTargetException failure) {
+                HookStatus.threw(FamilyNames.AI_DETECTED_REELS, "GenAI reel tree reader", failure.getCause());
+                failed = true;
+            } catch (ReflectiveOperationException | RuntimeException failure) {
+                HookStatus.threw(FamilyNames.AI_DETECTED_REELS, "GenAI reel tree reader", failure);
+                failed = true;
+            }
+        }
+        if (notFlagged) return TREE_NOT_FLAGGED;
+        if (unset) return TREE_UNSET;
+        if (failed) return TREE_READ_FAILED;
+        return live ? TREE_NO_INFO : TREE_RELEASED;
+    }
+
+    /** Whether the tree's native side is still there. Without the check the tree is taken as live. */
+    private static boolean isLive(Object tree, Readers readers) throws ReflectiveOperationException {
+        return readers.valid == null || Boolean.TRUE.equals(readers.valid.invoke(tree));
+    }
+
+    /**
+     * The trees an item holds that may carry the reel's detected info: first the reel model and
+     * story its holder keeps, then the trees in its own fields. A holder is an object in one of the
+     * item's fields whose class declares both a field of the reel model's type and one of
+     * GraphQLStory's, the pair Facebook keeps a reel's video and post in. Nothing else the item
+     * points at is looked into, so a shared object that happens to hold some other story is never
+     * read for this item.
+     */
+    private static List<Object> trees(Object item, Readers readers) throws IllegalAccessException {
+        List<Object> found = new ArrayList<>();
+        List<Object> own = new ArrayList<>();
+        for (Field field : FIELDS.computeIfAbsent(item.getClass(), GenAiReelFilter::instanceFields)) {
+            Object value = field.get(item);
+            if (value == null) continue;
+            if (readers.tree.isInstance(value)) {
+                addOnce(own, value);
+                continue;
+            }
+            for (Field view : readers.holderViews(value.getClass())) {
+                Object held = view.get(value);
+                if (readers.tree.isInstance(held)) addOnce(found, held);
+            }
+        }
+        if (!found.isEmpty()) HookStatus.bound(FamilyNames.AI_DETECTED_REELS, "reel item holder");
+        for (Object tree : own) addOnce(found, tree);
+        return found;
+    }
+
+    private static void addOnce(List<Object> trees, Object tree) {
+        for (Object known : trees) {
+            if (known == tree) return;
+        }
+        trees.add(tree);
+    }
+
     /** The fields of each item class, looked up once: an item holds its model or its story in one of them. */
     private static final ConcurrentHashMap<Class<?>, Field[]> FIELDS = new ConcurrentHashMap<>();
 
@@ -310,7 +420,7 @@ public final class GenAiReelFilter {
      * The kept members the flag is read through, looked up once per reel model name. A member this
      * build doesn't have is null, and the rule then keeps every item while the report names what's
      * missing. The field check and the validity check are optional: without them the flag is read
-     * as it is.
+     * as it is. The tree reader is only needed for items holding no model or story of their own.
      */
     static final class Readers {
         @Nullable final Class<?> model;
@@ -319,19 +429,59 @@ public final class GenAiReelFilter {
         @Nullable final Method booleanValue;
         @Nullable final Method hasField;
         @Nullable final Method valid;
+        @Nullable final Method treeValue;
+
+        /** The model and story fields of each holder class, looked up once; none for a class that isn't one. */
+        private final ConcurrentHashMap<Class<?>, Field[]> views = new ConcurrentHashMap<>();
 
         Readers(@Nullable Class<?> model, @Nullable Class<?> story, @Nullable Class<?> tree,
-                @Nullable Method booleanValue, @Nullable Method hasField, @Nullable Method valid) {
+                @Nullable Method booleanValue, @Nullable Method hasField, @Nullable Method valid,
+                @Nullable Method treeValue) {
             this.model = model;
             this.story = story;
             this.tree = tree;
             this.booleanValue = booleanValue;
             this.hasField = hasField;
             this.valid = valid;
+            this.treeValue = treeValue;
         }
 
         boolean complete() {
             return tree != null && booleanValue != null;
+        }
+
+        /**
+         * The fields of [type] that hold a reel's model and its story, when [type] declares both
+         * (its superclasses' fields included), or none. Read by declared type, never by name.
+         */
+        Field[] holderViews(Class<?> type) {
+            return views.computeIfAbsent(type, this::findViews);
+        }
+
+        private Field[] findViews(Class<?> type) {
+            if (model == null || story == null) return new Field[0];
+            List<Field> found = new ArrayList<>();
+            boolean holdsModel = false;
+            boolean holdsStory = false;
+            try {
+                for (Class<?> at = type; at != null && at != Object.class; at = at.getSuperclass()) {
+                    for (Field field : at.getDeclaredFields()) {
+                        if (Modifier.isStatic(field.getModifiers())) continue;
+                        boolean isModel = model.isAssignableFrom(field.getType());
+                        boolean isStory = story.isAssignableFrom(field.getType());
+                        if (!isModel && !isStory) continue;
+                        holdsModel |= isModel;
+                        holdsStory |= isStory;
+                        found.add(field);
+                    }
+                }
+                if (!holdsModel || !holdsStory) return new Field[0];
+                for (Field field : found) field.setAccessible(true);
+                return found.toArray(new Field[0]);
+            } catch (Throwable unreadable) {
+                // A class whose fields can't be listed or opened is no holder the rule can read.
+                return new Field[0];
+            }
         }
 
         static Readers lookUp(String modelClassName, ClassLoader loader) {
@@ -341,12 +491,14 @@ public final class GenAiReelFilter {
             Method booleanValue = null;
             Method hasField = null;
             Method valid = null;
+            Method treeValue = null;
             if (tree != null) {
                 booleanValue = publicMethod(tree, BOOLEAN_READER, boolean.class, int.class);
                 hasField = publicMethod(tree, FIELD_CHECK, boolean.class, int.class);
                 valid = publicMethod(tree, VALIDITY_CHECK, boolean.class);
+                treeValue = publicObjectMethod(tree, TREE_READER, int.class);
             }
-            return new Readers(model, story, tree, booleanValue, hasField, valid);
+            return new Readers(model, story, tree, booleanValue, hasField, valid, treeValue);
         }
 
         /** What was found and what wasn't, into the reels row of Hook status. */
@@ -357,6 +509,8 @@ public final class GenAiReelFilter {
             else HookStatus.missingMember(family, "method", TREE_CLASS, BOOLEAN_READER + "(int)");
             if (hasField != null) HookStatus.bound(family, "TreeJNI#" + FIELD_CHECK);
             else HookStatus.missingMember(family, "method", TREE_CLASS, FIELD_CHECK + "(int)");
+            if (treeValue != null) HookStatus.bound(family, "TreeJNI#" + TREE_READER);
+            else HookStatus.missingMember(family, "method", TREE_CLASS, TREE_READER + "(int)");
         }
 
         @Nullable
@@ -373,6 +527,17 @@ public final class GenAiReelFilter {
             try {
                 Method found = type.getMethod(name, parameters);
                 return found.getReturnType() == returns ? found : null;
+            } catch (NoSuchMethodException | RuntimeException missing) {
+                return null;
+            }
+        }
+
+        /** A public method answering an object: Facebook's getTree(int) answers its Tree interface. */
+        @Nullable
+        private static Method publicObjectMethod(Class<?> type, String name, Class<?>... parameters) {
+            try {
+                Method found = type.getMethod(name, parameters);
+                return found.getReturnType().isPrimitive() ? null : found;
             } catch (NoSuchMethodException | RuntimeException missing) {
                 return null;
             }
