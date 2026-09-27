@@ -8,6 +8,7 @@ import app.morphe.ExtensionDex
 import app.morphe.Fixtures
 import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
+import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.facebook.misc.settings.MAIN_TAB_ACTIVITY
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -23,6 +24,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstructio
 import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -32,9 +34,10 @@ import org.junit.Test
  * picks the main screen's start tab from an intent's "target_tab_id", checks the tab bar has it
  * and otherwise answers a tab of the bar's own; the kept start-up router asks it about the main
  * screen; each tab the extension offers is the kept TabTag subclass whose constructor hands TabTag
- * the id the extension asks for; and what the landing check reads is there under the names it
- * reads. Then the patch itself, run on the build's own main screen classes. Reads the fixture
- * bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
+ * the id the extension asks for; each of the three start-up steps the patch hooks is there once,
+ * in the shape it's found by; and what the landing check reads is there under the names it reads.
+ * Then the patch itself, run on the build's own main screen classes and start-up steps, with each
+ * call where it belongs. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class StartTabFixtureTest {
     private val facebookTabs = "Lapp/morphe/extension/facebook/navigation/FacebookTabs;"
@@ -42,6 +45,9 @@ class StartTabFixtureTest {
     private val delegate = "Lcom/facebook/katana/activity/FbMainTabActivityDelegate;"
     private val navigationConfig = "Lcom/facebook/navigation/tabbar/state/model/NavigationConfig;"
     private val bundle = "Landroid/os/Bundle;"
+
+    /** The marker a queueing stand-in delegate sets as it queues a call of the main screen's. */
+    private val queuedDelegateWork = "product_delegate_enqueued_"
     private val wideConstants = setOf(Opcode.CONST_WIDE, Opcode.CONST_WIDE_16, Opcode.CONST_WIDE_32, Opcode.CONST_WIDE_HIGH16)
 
     /** The tabs the extension offers, by the class Facebook keeps, with the id it asks for. */
@@ -119,8 +125,40 @@ class StartTabFixtureTest {
                     },
                 )
 
+                // The three start-up steps the patch hooks, one of each, found in one pass.
+                val handOvers = mutableListOf<Pair<Method, Int>>()
+                val gates = mutableListOf<Pair<Method, Int>>()
+                val checks = mutableListOf<Method>()
+                val queues = mutableSetOf<String>()
+                FixtureDex.forEach(fixture) { dex ->
+                    val strings = dex.stringSection.toHashSet()
+                    val sanitizes = SANITIZE_INTENT in strings
+                    val traces = START_POSITION in strings
+                    val targets = TARGET_TAB_ID in strings
+                    val queued = queuedDelegateWork in strings
+                    if (!sanitizes && !traces && !targets && !queued) return@forEach
+                    for (classDef in dex.classes) {
+                        if (queued && classDef.methods.any { holdsString(it, queuedDelegateWork) }) queues += classDef.type
+                        for (method in classDef.methods) {
+                            if (sanitizes) sanitizedIntentHandOver(method)?.let { handOvers += ImmutableMethod.of(method) to it }
+                            if (traces) startPositionGate(method)?.let { gates += ImmutableMethod.of(method) to it }
+                            if (targets && keepsAskedStartTab(method)) checks += ImmutableMethod.of(method)
+                        }
+                    }
+                }
+                assertEquals("$name: start-up steps that sanitize the main screen's intent", 1, handOvers.size)
+                assertEquals("$name: tab bar start position gates", 1, gates.size)
+                assertEquals("$name: main screen checks that it keeps its start tab", 1, checks.size)
+                val (sanitizer, handOver) = handOvers.single()
+                val (position, gate) = gates.single()
+                val check = checks.single()
+                val handedOverRegisters = code(sanitizer)[handOver].registers()
+                val gateRegister = (code(position)[gate] as OneRegisterInstruction).registerA
+                val returns = code(check).count { it.opcode == Opcode.RETURN }
+
                 val kept = setOf(MAIN_TAB_ACTIVITY, fragmentActivity, delegate, navigationConfig, TAB_TAG,
-                    STARTUP_DESTINATION_ROUTER, picker.definingClass) + offered.keys
+                    STARTUP_DESTINATION_ROUTER, picker.definingClass, sanitizer.definingClass, position.definingClass,
+                    check.definingClass) + offered.keys
                 val classes = FixtureDex.classes(fixture, kept)
                 assertEquals("$name: classes missing", emptySet<String>(), kept - classes.keys)
 
@@ -158,15 +196,69 @@ class StartTabFixtureTest {
                     classes.getValue(navigationConfig).fields.any { it.type == "Lcom/google/common/collect/ImmutableList;" },
                 )
 
-                // The patch, on this build's main screen classes and picker.
+                // The patch, on this build's main screen classes, picker and start-up steps.
                 val context = PatchContexts.of(
-                    listOf(classes.getValue(MAIN_TAB_ACTIVITY), classes.getValue(fragmentActivity),
-                        classes.getValue(picker.definingClass), ExtensionDex.classDef(SETTINGS_STATUS)),
+                    listOf(MAIN_TAB_ACTIVITY, fragmentActivity, picker.definingClass, sanitizer.definingClass,
+                        position.definingClass, check.definingClass).distinct().map(classes::getValue) +
+                        ExtensionDex.classDef(SETTINGS_STATUS),
                 )
                 openOnChosenTabPatch.execute(context)
+                fun patched(method: Method) = code(context.mutableClassDefBy(method.definingClass).methods.single {
+                    it.name == method.name && it.parameterTypes.map(CharSequence::toString) ==
+                        method.parameterTypes.map(CharSequence::toString) && it.returnType == method.returnType
+                })
+
+                // The sanitizing step hands the screen and the copy to the extension instead of setIntent.
+                val handedOver = patched(sanitizer)[handOver]
+                assertEquals("$name: the sanitizing step's call", SET_SANITIZED_INTENT, handedOver.call.toString())
+                assertEquals("$name: what the sanitizing step hands over", handedOverRegisters, handedOver.registers())
+
+                // The extension answers right after the gate's read, into the register the branch reads.
+                val gated = patched(position)
+                val asks = gated[gate + 1]
+                assertEquals("$name: the gate's call", START_ON_ASKED_TAB, asks.call.toString())
+                assertEquals("$name: what the gate's call reads", listOf(gateRegister), asks.registers())
+                listOf(gate + 2, gate + 3).forEach {
+                    assertEquals("$name: ${gated[it].opcode} after the gate's call", gateRegister,
+                        (gated[it] as OneRegisterInstruction).registerA)
+                }
+                assertEquals(Opcode.MOVE_RESULT, gated[gate + 2].opcode)
+                assertEquals(Opcode.IF_EQZ, gated[gate + 3].opcode)
+
+                // Every answer the check returns goes through the extension first.
+                val guarded = patched(check)
+                val answers = guarded.withIndex().filter { it.value.opcode == Opcode.RETURN }
+                assertEquals("$name: the check's returns", returns, answers.size)
+                answers.forEach { (index, answer) ->
+                    val register = (answer as OneRegisterInstruction).registerA
+                    assertEquals("$name: the check's call", KEEP_ASKED_START_TAB, guarded[index - 2].call.toString())
+                    assertEquals("$name: what the check's call reads", listOf(register), guarded[index - 2].registers())
+                    assertEquals(Opcode.MOVE_RESULT, guarded[index - 1].opcode)
+                    assertEquals(register, (guarded[index - 1] as OneRegisterInstruction).registerA)
+                }
+
                 assertTrue(
                     "$name: the main screen declares an onCreate of its own",
                     classes.getValue(MAIN_TAB_ACTIVITY).methods.none { it.name == "onCreate" },
+                )
+
+                // Why the extension's help can't end when the screen first shows: the main screen
+                // can hand its work to a stand-in delegate that queues it, Facebook's start-up
+                // steps included, until the app is ready. The onCreate the route hook goes first
+                // in hands on to whichever delegate the screen got.
+                assertEquals("$name: delegates that queue their work", 1, queues.size)
+                val instantiate = classes.getValue(MAIN_TAB_ACTIVITY).methods.single { it.name == "instantiateDelegateImpl" }
+                assertTrue(
+                    "$name: the main screen never hands its work to the queueing stand-in",
+                    code(instantiate).any {
+                        it.opcode == Opcode.NEW_INSTANCE && (it as ReferenceInstruction).reference.toString() == queues.single()
+                    },
+                )
+                assertTrue(
+                    "$name: the base onCreate doesn't hand on to the screen's delegate",
+                    code(classes.getValue(fragmentActivity).methods.single {
+                        it.name == "onCreate" && it.parameterTypes.map(CharSequence::toString) == listOf(bundle)
+                    }).any { it.call?.let { c -> c.name == "getFragmentActivityDelegate" } == true },
                 )
                 val onCreate = context.mutableClassDefBy(fragmentActivity).methods.single {
                     it.name == "onCreate" && it.parameterTypes.map(CharSequence::toString) == listOf(bundle)

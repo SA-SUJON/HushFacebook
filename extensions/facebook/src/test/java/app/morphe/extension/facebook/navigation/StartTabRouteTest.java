@@ -60,6 +60,8 @@ public class StartTabRouteTest {
 
     @After
     public void restore() {
+        StartTabRoute.settled();
+        StartTabRoute.failNextStartUpHook = null;
         PauseForTests.resume();
         Settings.OPEN_ON_CHOSEN_TAB.resetToDefault();
         Settings.START_TAB.resetToDefault();
@@ -209,6 +211,239 @@ public class StartTabRouteTest {
         assertTrue(line, line.contains("'start tab' hook (it threw java.lang.IllegalStateException)"));
     }
 
+    /** Whether Facebook's start-up would be told to use the tab a start asked for, at both of its checks. */
+    private static boolean startUpAsksForTheTab() {
+        boolean position = StartTabRoute.startOnAskedTab(false);
+        boolean kept = StartTabRoute.keepAskedStartTab(false);
+        assertEquals("the two checks disagree", position, kept);
+        return position;
+    }
+
+    /**
+     * Facebook's start-up hands the screen a sanitized copy of its intent; what the screen ends up
+     * with once the hook has handed it over.
+     */
+    private static Intent handedOver(Activity screen, Intent sanitized) {
+        StartTabRoute.setSanitizedIntent(screen, sanitized);
+        return screen.getIntent();
+    }
+
+    /** What Facebook's sanitizing step builds for a start from another app: the action and the link. */
+    private static Intent sanitizedCopy(Intent intent) {
+        return new Intent(intent.getAction(), intent.getData());
+    }
+
+    @Test
+    public void aStartFromTheLauncherIconIsHelpedThroughFacebooksStartUp() {
+        FbMainTabActivity screen = created(StartTabRouteForTests.launcherStart(), null);
+        assertTrue(startUpAsksForTheTab());
+
+        // The step drops every extra of a start another app sent; the tab goes back in.
+        Intent sanitized = sanitizedCopy(screen.getIntent());
+        Intent kept = handedOver(screen, sanitized);
+        assertNotSame(sanitized, kept);
+        assertEquals(FacebookTabs.MARKETPLACE_ID, kept.getLongExtra(FacebookTabs.TARGET_TAB_ID, -1));
+        assertEquals("marketplace", kept.getStringExtra(StartTabRoute.ROUTED));
+        assertEquals(Intent.ACTION_MAIN, kept.getAction());
+        assertFalse("Facebook's own copy was changed", sanitized.hasExtra(FacebookTabs.TARGET_TAB_ID));
+
+        // A copy that still carries a tab is Facebook's to keep.
+        Intent carries = sanitizedCopy(screen.getIntent()).putExtra(FacebookTabs.TARGET_TAB_ID, FacebookTabs.MENU_ID);
+        assertSame(carries, handedOver(screen, carries));
+
+        // Each check that helped, once, as found; the screen's creation, once, as invoked.
+        assertEquals(FamilyNames.START_TAB + ": invoked 1, 3 found, 0 missing", statusLine());
+    }
+
+    @Test
+    public void facebooksOwnAnswersPassThroughWhenNoStartIsBeingHelped() {
+        assertFalse(StartTabRoute.startOnAskedTab(false));
+        assertTrue(StartTabRoute.startOnAskedTab(true));
+        assertFalse(StartTabRoute.keepAskedStartTab(false));
+        assertTrue(StartTabRoute.keepAskedStartTab(true));
+        FbMainTabActivity screen = StartTabRouteForTests.screen(StartTabRouteForTests.launcherStart());
+        Intent sanitized = sanitizedCopy(screen.getIntent());
+        assertSame(sanitized, handedOver(screen, sanitized));
+        assertNull("a check that changed nothing was counted", statusLine());
+
+        // While a start is helped, Facebook's yes stays yes.
+        created(StartTabRouteForTests.launcherStart(), null);
+        assertTrue(StartTabRoute.startOnAskedTab(true));
+        assertTrue(StartTabRoute.keepAskedStartTab(true));
+    }
+
+    /** Links, notifications, shortcuts, restored screens, the switch off and a pause: Facebook's start-up is left alone. */
+    @Test
+    public void onlyAPlainLauncherStartIsHelped() {
+        Intent[] others = {
+                new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/marketplace/item/1/")),
+                StartTabRouteForTests.launcherStart().putExtra(FacebookTabs.TARGET_TAB_ID, FacebookTabs.NOTIFICATIONS_ID),
+                StartTabRouteForTests.launcherStart().putExtra("tabbar_target_intent", new Intent()),
+                StartTabRouteForTests.launcherStart().setData(Uri.parse("fb://feed")),
+        };
+        for (Intent intent : others) {
+            FbMainTabActivity screen = created(intent, null);
+            assertFalse(intent.toString(), startUpAsksForTheTab());
+            Intent sanitized = sanitizedCopy(intent);
+            assertSame(intent.toString(), sanitized, handedOver(screen, sanitized));
+        }
+        created(StartTabRouteForTests.launcherStart(), new Bundle());
+        assertFalse("a restored screen", startUpAsksForTheTab());
+
+        Settings.OPEN_ON_CHOSEN_TAB.save(false);
+        created(StartTabRouteForTests.launcherStart(), null);
+        assertFalse("the switch is off", startUpAsksForTheTab());
+        Settings.OPEN_ON_CHOSEN_TAB.save(true);
+
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        created(StartTabRouteForTests.launcherStart(), null);
+        assertFalse("paused", startUpAsksForTheTab());
+        PauseForTests.resume();
+
+        SettingsContextRule.withoutContext(() -> created(StartTabRouteForTests.launcherStart(), null));
+        assertFalse("before the settings are ready", startUpAsksForTheTab());
+
+        // Another activity isn't a main screen, and the step only hands the main screen its intent.
+        created(StartTabRouteForTests.launcherStart(), null);
+        Activity other = Robolectric.buildActivity(Activity.class, StartTabRouteForTests.launcherStart()).get();
+        Intent sanitized = sanitizedCopy(other.getIntent());
+        assertSame(sanitized, handedOver(other, sanitized));
+    }
+
+    /** A later main screen that isn't helped ends the help an earlier one was waiting on. */
+    @Test
+    public void aNewMainScreenEndsTheStartBefore() {
+        created(StartTabRouteForTests.launcherStart(), null);
+        assertTrue(startUpAsksForTheTab());
+        created(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/")), null);
+        assertFalse(startUpAsksForTheTab());
+    }
+
+    /**
+     * A cold start as Facebook runs it: the main screen's onCreate goes to a stand-in that queues
+     * Facebook's own creation behind a splash screen, so Android creates and resumes the screen
+     * first, and the start-up steps run later, once the app is ready. The help lasts until then.
+     */
+    @Test
+    public void theHelpOutlastsTheSplashScreen() {
+        ActivityController<FbMainTabActivity> controller =
+                Robolectric.buildActivity(FbMainTabActivity.class, StartTabRouteForTests.launcherStart());
+        FbMainTabActivity screen = controller.get();
+        StartTabRoute.onActivityCreate(screen, null);
+        // Android shows the splash: created, started, resumed, and the landing check's first try.
+        controller.create().start().resume().visible();
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(StartTabRoute.LANDING_CHECK_MS));
+        assertNull("the landing check read a screen Facebook hadn't built", foundLine());
+
+        // Then Facebook's queued creation: the sanitizing step, the tab bar, the check.
+        Intent kept = handedOver(screen, sanitizedCopy(screen.getIntent()));
+        assertEquals(FacebookTabs.MARKETPLACE_ID, kept.getLongExtra(FacebookTabs.TARGET_TAB_ID, -1));
+        assertTrue("the help ended when the splash showed", startUpAsksForTheTab());
+
+        // Built, the landing check reads it and the help ends.
+        StartTabRouteForTests.tabBar(screen, StartTabRouteForTests.tabs(new FeedTab(), new MarketplaceTab()), null);
+        screen.currentTab = new MarketplaceTab();
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(StartTabRoute.LANDING_CHECK_MS));
+        assertEquals(FamilyNames.START_TAB + ": invoked 1, 4 found, 0 missing", statusLine());
+        assertFalse(startUpAsksForTheTab());
+    }
+
+    /** A screen Facebook never builds is checked all the same after the last try, and is no fault of the route. */
+    @Test
+    public void theLandingCheckStopsWaitingForAScreenThatIsNeverBuilt() {
+        ActivityController<FbMainTabActivity> controller =
+                Robolectric.buildActivity(FbMainTabActivity.class, StartTabRouteForTests.launcherStart());
+        StartTabRoute.onActivityCreate(controller.get(), null);
+        controller.create().start().resume().visible();
+        shadowOf(Looper.getMainLooper()).idleFor(
+                Duration.ofMillis(StartTabRoute.LANDING_CHECK_MS * (StartTabRoute.LANDING_ATTEMPTS - 1)));
+        assertEquals("it stopped waiting early", FamilyNames.START_TAB + ": invoked 1, 0 found, 0 missing", statusLine());
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(StartTabRoute.LANDING_CHECK_MS));
+        String line = statusLine();
+        assertTrue(line, line.contains("1 missing"));
+        // Still unbuilt, so Facebook's own start-up can still be helped when it gets there.
+        assertTrue(startUpAsksForTheTab());
+    }
+
+    /** With Debug logging on, each start-up hook says once per start whether it had anything to do. */
+    @Test
+    public void eachStartUpHookLogsOneLinePerStart() {
+        BaseSettings.DEBUG.save(true);
+        LogBufferManager.clearLogBuffer();
+        Settings.OPEN_ON_CHOSEN_TAB.save(false);
+        FbMainTabActivity plain = created(StartTabRouteForTests.launcherStart(), null);
+        for (int i = 0; i < 2; i++) {
+            handedOver(plain, sanitizedCopy(plain.getIntent()));
+            StartTabRoute.startOnAskedTab(false);
+            StartTabRoute.keepAskedStartTab(true);
+        }
+        Settings.OPEN_ON_CHOSEN_TAB.save(true);
+        FbMainTabActivity routed = created(StartTabRouteForTests.launcherStart(), null);
+        for (int i = 0; i < 2; i++) {
+            handedOver(routed, sanitizedCopy(routed.getIntent()));
+            StartTabRoute.startOnAskedTab(false);
+            StartTabRoute.keepAskedStartTab(true);
+        }
+
+        String report = LogBufferManager.buildExportText();
+        String[] lines = {
+                "Start tab: sanitize hook: nothing pending.",
+                "Start tab: tab bar start position hook: nothing pending; Facebook's no stands.",
+                "Start tab: main screen start tab hook: nothing pending; Facebook's yes stands.",
+                "Start tab: sanitize hook: Facebook's start-up kept no tab in the screen's intent; asked again for marketplace.",
+                "Start tab: tab bar start position hook: Facebook said no; asked it to use marketplace.",
+                "Start tab: main screen start tab hook: Facebook already said yes for marketplace.",
+        };
+        for (String line : lines) {
+            assertEquals(line + " in\n" + report, 1, occurrences(report, line));
+        }
+        assertTrue("the route came after the lines of the start before it",
+                report.indexOf("asked Facebook to open on marketplace") > report.indexOf(lines[2]));
+        assertEquals(6, occurrences(report, " hook: "));
+    }
+
+    private static int occurrences(String text, String part) {
+        int count = 0;
+        for (int at = text.indexOf(part); at >= 0; at = text.indexOf(part, at + part.length())) count++;
+        return count;
+    }
+
+    @Test
+    public void theHelpEndsWhenTheScreenGoesAwayUnshown() {
+        ActivityController<FbMainTabActivity> controller =
+                Robolectric.buildActivity(FbMainTabActivity.class, StartTabRouteForTests.launcherStart());
+        StartTabRoute.onActivityCreate(controller.get(), null);
+        controller.create();
+        assertTrue(startUpAsksForTheTab());
+        controller.destroy();
+        assertFalse(startUpAsksForTheTab());
+    }
+
+    /** A failure in a start-up hook gives Facebook its own answer and intent, and says so in Hook status. */
+    @Test
+    public void aFailureInTheStartUpHooksLeavesFacebooksStartUpAlone() {
+        FbMainTabActivity screen = created(StartTabRouteForTests.launcherStart(), null);
+
+        StartTabRoute.failNextStartUpHook = new IllegalStateException("for this test");
+        assertFalse(StartTabRoute.startOnAskedTab(false));
+        StartTabRoute.failNextStartUpHook = new IllegalStateException("for this test");
+        assertTrue(StartTabRoute.keepAskedStartTab(true));
+        // One failure at a time: the next start-up check is helped again.
+        assertTrue(StartTabRoute.keepAskedStartTab(false));
+
+        StartTabRoute.failNextStartUpHook = new IllegalStateException("for this test");
+        Intent sanitized = sanitizedCopy(screen.getIntent());
+        assertSame("the screen didn't get Facebook's copy", sanitized, handedOver(screen, sanitized));
+
+        String line = statusLine();
+        assertNotNull(line);
+        assertTrue(line, line.startsWith(FamilyNames.START_TAB + ": invoked 1, 1 found, 3 missing"));
+        assertTrue(line, line.contains("'tab bar start position' hook (it threw java.lang.IllegalStateException)"));
+
+        // Facebook's copy no longer asks for the tab, so its later checks are its own.
+        assertFalse(StartTabRoute.startOnAskedTab(false));
+    }
+
     /** The log names what a start carried, never the link or a value, which can name a person. */
     @Test
     public void theLogNamesWhatAStartCarriedButNotItsValues() {
@@ -319,9 +554,20 @@ public class StartTabRouteTest {
         screen.delegate = new StartTabRouteForTests.DelegateWrapper(delegate);
         assertEquals(Arrays.asList("FeedTab", "MarketplaceTab"), names(StartTabRoute.TabBar.tabs(screen)));
 
-        // A tab bar state not built yet is left unbuilt.
-        delegate.tabBarStateManager$delegate = new StartTabRouteForTests.Lazy(null, false);
+        // After a plain start the delegate hasn't asked for the state yet. It's the account's one
+        // tab bar state, which the tab bar was built from, so it's read all the same.
+        StartTabRouteForTests.TabBarState unasked = new StartTabRouteForTests.TabBarState();
+        unasked.shown = new java.util.ArrayList<>(shown);
+        StartTabRouteForTests.Lazy lazy = new StartTabRouteForTests.Lazy(unasked, false);
+        delegate.tabBarStateManager$delegate = lazy;
         screen.delegate = delegate;
+        assertEquals(Arrays.asList("FeedTab", "MarketplaceTab"), names(StartTabRoute.TabBar.tabs(screen)));
+        assertTrue(lazy.isInitialized());
+
+        // A lazy value that can't hand one over is no tab bar, and no failure.
+        StartTabRouteForTests.Lazy broken = new StartTabRouteForTests.Lazy(unasked, false);
+        broken.failure = new IllegalStateException("no session yet");
+        delegate.tabBarStateManager$delegate = broken;
         assertNull(StartTabRoute.TabBar.tabs(screen));
 
         assertEquals(FacebookTabs.MARKETPLACE_ID, StartTabRoute.TabBar.tabId(new MarketplaceTab()));

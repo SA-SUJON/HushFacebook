@@ -43,13 +43,19 @@ public final class StartTabRouteForTests {
     public static boolean routes() {
         FbMainTabActivity screen = screen(launcherStart());
         StartTabRoute.onActivityCreate(screen, null);
+        // The screen is never built here, so nothing would end the start the hook now waits on.
+        StartTabRoute.settled();
         return screen.getIntent().hasExtra(FacebookTabs.TARGET_TAB_ID);
     }
 
-    /** Stands in for Kotlin's lazy value as Redex leaves it: the two method names are kept. */
+    /**
+     * Stands in for Kotlin's lazy value as Redex leaves it: the two method names are kept. Like the
+     * real one, the first getValue() makes it initialized. A test can make getValue() throw.
+     */
     public static final class Lazy {
         private final Object value;
-        private final boolean initialized;
+        private boolean initialized;
+        public RuntimeException failure;
 
         public Lazy(Object value, boolean initialized) {
             this.value = value;
@@ -61,7 +67,8 @@ public final class StartTabRouteForTests {
         }
 
         public Object getValue() {
-            if (!initialized) throw new AssertionError("the hook built the tab bar state itself");
+            if (failure != null) throw failure;
+            initialized = true;
             return value;
         }
     }

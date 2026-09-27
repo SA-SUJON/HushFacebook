@@ -6,9 +6,19 @@ package app.morphe.patches.facebook.navigation.starttab
 
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
+import app.morphe.patches.facebook.misc.settings.MAIN_TAB_ACTIVITY
+import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 /*
  * How Facebook picks the tab its main screen opens on, on the 577 and 580 builds.
@@ -19,20 +29,45 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  * and more), names Redex keeps, and each hands TabTag's constructor a long: the tab's bookmark id,
  * 1606854132932955 for Marketplace on both builds. The extension's FacebookTabs holds the ids.
  *
- * One method picks the start tab from the launching intent. It takes the context, the intent and
- * the user session and answers a tab id. When the intent carries the extra "target_tab_id" and the
- * tab bar has that tab, that's the answer. When the bar doesn't have it, the answer is the bar's
- * first tab, Home. With no such extra, the answer comes from Facebook's own rules (Home, or the
- * last tab under some configurations). Facebook's start-up code asks it about the main screen's
- * own intent, and so does the kept com.facebook.startup.destination.StartupDestinationRouter, which
- * predicts the destination to fetch for early. Facebook's own tab shortcuts and notifications reach
- * a tab by putting its id in that extra, and a link or notification also carries the extras
- * "tabbar_target_intent" or "extra_launch_uri" the main screen routes by.
+ * One method picks the start tab from an intent. It takes the context, the intent and the user
+ * session and answers a tab id. When the intent carries the extra "target_tab_id" and the tab bar
+ * has that tab, that's the answer. When the bar doesn't have it, the answer is the bar's first
+ * tab, Home. With no such extra, the answer comes from Facebook's own rules. The kept
+ * com.facebook.startup.destination.StartupDestinationRouter and several warm-up jobs ask it too,
+ * but only to decide what to fetch early.
  *
- * So the patch never touches the picker. It checks that the picker is still there, and gives the
- * main screen, as it's created from the launcher icon, a copy of its intent asking for the chosen
- * tab. Everything that picks a tab after that point sees the request, and Facebook's own check
- * that the tab bar has the tab stays in charge.
+ * The picker's answer doesn't decide the tab on a cold start by itself. The main screen's
+ * creation runs a list of named start-up steps, and three of them stand between the launcher's
+ * intent and the tab that shows:
+ *
+ * 1. "sanitize_intent" replaces the intent of a start another app sent with a new one that keeps
+ *    only its action, its link and three extras, unless it carries a PendingIntent Facebook made or
+ *    has no extras. A launcher is another app, so the tab asked for goes with the rest. Facebook's
+ *    own tab shortcuts put the tab in a link for that reason, and its notifications carry the
+ *    PendingIntent. The patch hands the step's copy to the extension, which asks for the tab
+ *    again when it asked for one in the first place.
+ * 2. "setup_main_view_controllers" asks the picker about the (now sanitized) intent, keeps the
+ *    answer as the main screen's start tab and gives it to the tab bar. The tab bar's
+ *    "TabBarController.determineStartingTabPosition" then uses it only when one of Facebook's
+ *    MobileConfig booleans says so, and otherwise opens on the configuration's own first tab. On
+ *    an account where that setting is off, a notification or shortcut that reaches a tab does it
+ *    later, through the same deep link route onNewIntent takes. The patch puts the extension after
+ *    that boolean read, which answers yes for a start it asked a tab for.
+ * 3. After the tab bar is set up, the main screen puts its own start tab back to the default
+ *    unless a static check agrees the intent asked for exactly that tab (and two more of
+ *    Facebook's settings allow it). The patch passes that check's answer through the extension
+ *    the same way, so the screen's idea of its start tab matches the tab that shows.
+ *
+ * None of this necessarily runs inside Android's onCreate. FbFragmentActivity.onCreate, where the
+ * route hook goes first, hands on to the screen's delegate, and on a cold start the main screen's
+ * instantiateDelegateImpl can hand out a stand-in that queues every call ("product_delegate_enqueued_")
+ * behind a splash screen until the app is ready. Android then creates and resumes the screen, and
+ * the queue replays the real delegate's onCreate, with the three steps above, afterwards.
+ *
+ * Every other start keeps Facebook's own answers: the extension says yes only while the main
+ * screen it asked a tab for is being built, decided from that screen's own intent, and only for a
+ * plain start from the launcher icon. The MobileConfig ids differ between builds, so no hook
+ * anchors on one.
  */
 internal const val PATCH = "Open on a chosen tab"
 
@@ -51,12 +86,64 @@ internal const val TAB_TAG = "Lcom/facebook/navigation/tabbar/state/model/TabTag
 /** The router that predicts a start's destination, and asks the picker about the main screen's. */
 internal const val STARTUP_DESTINATION_ROUTER = "Lcom/facebook/startup/destination/StartupDestinationRouter;"
 
+/** The trace section the tab bar opens while it works out the position its main screen starts on. */
+internal const val START_POSITION = "TabBarController.determineStartingTabPosition"
+
+/** Facebook's MobileConfig reader. The class keeps its name; its methods are renamed, so a call is told by its shape. */
+internal const val MOBILE_CONFIG = "Lcom/facebook/mobileconfig/factory/MobileConfigUnsafeContext;"
+
+/** The name of the start-up step that sanitizes the main screen's intent. */
+internal const val SANITIZE_INTENT = "sanitize_intent"
+
+/** The last of the three extras the sanitizing step copies over, right before it hands the copy over. */
+internal const val KEPT_EXTRA = "app_switch_source_account"
+
+/** The extension's answer at the tab bar's start position gate. */
+internal const val START_ON_ASKED_TAB = "$EXTENSION_PACKAGE/navigation/StartTabRoute;->startOnAskedTab(Z)Z"
+
+/** The extension's answer at the main screen's check that it keeps its start tab. */
+internal const val KEEP_ASKED_START_TAB = "$EXTENSION_PACKAGE/navigation/StartTabRoute;->keepAskedStartTab(Z)Z"
+
+/** The extension's stand-in for the sanitizing step's Activity.setIntent. */
+internal const val SET_SANITIZED_INTENT =
+    "$EXTENSION_PACKAGE/navigation/StartTabRoute;->setSanitizedIntent(Landroid/app/Activity;Landroid/content/Intent;)V"
+
+/** How far past the gate's branch the start tab lookup may sit: the long, the tab bar state, its cast, the lookup. */
+private const val LOOKUP_WINDOW = 8
+
+/** How far past the last kept extra the sanitizing step hands the copy over. */
+private const val HAND_OVER_WINDOW = 8
+
+/** How far before the kept extras the copy is built: action, link, the copy, and the first two extras. */
+private const val COPY_WINDOW = 24
+
+private const val ACTIVITY = "Landroid/app/Activity;"
+
+private val Instruction.call: MethodReference?
+    get() = (this as? ReferenceInstruction)?.reference as? MethodReference
+
+private fun MethodReference.parameters() = parameterTypes.map { it.toString() }
+
+/** The registers a call reads, in order, whether it's written as a range or not. */
+internal fun Instruction.callRegisters(): List<Int> = when (this) {
+    is RegisterRangeInstruction -> (startRegister until startRegister + registerCount).toList()
+    is FiveRegisterInstruction -> listOf(registerC, registerD, registerE, registerF, registerG).take(registerCount)
+    else -> emptyList()
+}
+
 private fun Method.calls(definingClass: String, name: String, parameters: List<String>, returnType: String) =
     implementation?.instructions?.any { instruction ->
-        val call = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: return@any false
+        val call = instruction.call ?: return@any false
         call.definingClass == definingClass && call.name == name && call.returnType == returnType &&
-            call.parameterTypes.map { it.toString() } == parameters
+            call.parameters() == parameters
     } == true
+
+/** Whether [method] reads a long field of its own class. */
+private fun readsOwnLong(method: Method) = method.implementation?.instructions?.any {
+    it.opcode == Opcode.IGET_WIDE && ((it as ReferenceInstruction).reference as FieldReference).let { field ->
+        field.definingClass == method.definingClass && field.type == "J"
+    }
+} == true
 
 /**
  * Whether [method] is Facebook's start tab picker: it answers a long, takes an intent, loads
@@ -70,3 +157,87 @@ internal fun picksStartTab(method: Method): Boolean =
         holdsString(method, TARGET_TAB_ID) &&
         method.calls(INTENT, "hasExtra", listOf("Ljava/lang/String;"), "Z") &&
         method.calls(INTENT, "getLongExtra", listOf("Ljava/lang/String;", "J"), "J")
+
+/** Whether [instruction] is a static read of one of Facebook's MobileConfig booleans: (Object, long) -> boolean. */
+private fun readsMobileConfigBoolean(instruction: Instruction): Boolean {
+    if (instruction.opcode != Opcode.INVOKE_STATIC && instruction.opcode != Opcode.INVOKE_STATIC_RANGE) return false
+    val call = instruction.call ?: return false
+    return call.definingClass == MOBILE_CONFIG && call.returnType == "Z" &&
+        call.parameters() == listOf("Ljava/lang/Object;", "J")
+}
+
+/**
+ * Where [method] is the tab bar's start position gate, the index of the `move-result` that keeps
+ * the gate's answer, or null when it isn't.
+ *
+ * The method takes one boolean, returns nothing and opens the trace section [START_POSITION]. The
+ * gate is its first static MobileConfig boolean read. Its answer goes into a register the next
+ * instruction branches on, and when the answer is yes, the code reads the start tab its own class
+ * was built with, a long, and hands that long to a lookup that answers the tab's position as an
+ * Integer. That's what the extension's yes turns on.
+ */
+internal fun startPositionGate(method: Method): Int? {
+    if (method.returnType != "V" || method.parameterTypes.map { it.toString() } != listOf("Z")) return null
+    if (!holdsString(method, START_POSITION)) return null
+    val code = method.implementation?.instructions?.toList() ?: return null
+    val call = code.indexOfFirst(::readsMobileConfigBoolean)
+    if (call < 0) return null
+    val result = code.getOrNull(call + 1)
+    if (result?.opcode != Opcode.MOVE_RESULT) return null
+    val answer = (result as OneRegisterInstruction).registerA
+    val branch = code.getOrNull(call + 2)
+    if (branch?.opcode != Opcode.IF_EQZ || (branch as OneRegisterInstruction).registerA != answer) return null
+    val read = code.getOrNull(call + 3)
+    if (read?.opcode != Opcode.IGET_WIDE) return null
+    val field = (read as ReferenceInstruction).reference as FieldReference
+    if (field.definingClass != method.definingClass || field.type != "J") return null
+    val startTab = (read as TwoRegisterInstruction).registerA
+    val lookup = code.subList(call + 4, minOf(code.size, call + 4 + LOOKUP_WINDOW)).firstOrNull {
+        val target = it.call
+        target != null && target.parameters() == listOf("J") && target.returnType == "Ljava/lang/Integer;"
+    } ?: return null
+    val receiver = if (lookup.opcode == Opcode.INVOKE_STATIC || lookup.opcode == Opcode.INVOKE_STATIC_RANGE) 0 else 1
+    if (lookup.callRegisters().getOrNull(receiver) != startTab) return null
+    return call + 1
+}
+
+/**
+ * Whether [method] is the main screen's check that it keeps the start tab it picked: static,
+ * answers a boolean, takes the main screen and its own class, reads the long the intent's
+ * "target_tab_id" holds and a long its own class keeps.
+ */
+internal fun keepsAskedStartTab(method: Method): Boolean =
+    AccessFlags.STATIC.isSet(method.accessFlags) && method.returnType == "Z" &&
+        method.parameterTypes.map { it.toString() } == listOf(MAIN_TAB_ACTIVITY, method.definingClass) &&
+        holdsString(method, TARGET_TAB_ID) &&
+        method.calls(INTENT, "getLongExtra", listOf("Ljava/lang/String;", "J"), "J") &&
+        readsOwnLong(method)
+
+/**
+ * Where [method] runs the start-up step [SANITIZE_INTENT], the index of the `Activity.setIntent`
+ * that hands the main screen the sanitized copy of its intent, or null when it doesn't.
+ *
+ * The step builds the copy as a new Intent from an action and a link, copies over three extras,
+ * [KEPT_EXTRA] last, and then hands it over: the first `setIntent` after that extra is loaded, on
+ * the register the copy was built in.
+ */
+internal fun sanitizedIntentHandOver(method: Method): Int? {
+    if (!holdsString(method, SANITIZE_INTENT)) return null
+    val code = method.implementation?.instructions?.toList() ?: return null
+    val kept = code.indexOfFirst { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string == KEPT_EXTRA }
+    if (kept < 0) return null
+    val set = (kept + 1 until minOf(code.size, kept + 1 + HAND_OVER_WINDOW)).firstOrNull { index ->
+        val call = code[index].call
+        (code[index].opcode == Opcode.INVOKE_VIRTUAL || code[index].opcode == Opcode.INVOKE_VIRTUAL_RANGE) &&
+            call != null && call.definingClass == ACTIVITY && call.name == "setIntent" &&
+            call.parameters() == listOf(INTENT) && call.returnType == "V"
+    } ?: return null
+    val copy = code[set].callRegisters().getOrNull(1) ?: return null
+    val built = (maxOf(0, kept - COPY_WINDOW) until kept).any { index ->
+        val call = code[index].call
+        code[index].opcode == Opcode.INVOKE_DIRECT && call != null && call.definingClass == INTENT &&
+            call.name == "<init>" && call.parameters() == listOf("Ljava/lang/String;", "Landroid/net/Uri;") &&
+            code[index].callRegisters().firstOrNull() == copy
+    }
+    return if (built) set else null
+}

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
@@ -43,15 +44,26 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * it. The intent it was started with isn't touched, since Facebook's start-up prediction can be
  * reading it on another thread; all that prediction decides is what to fetch early.
  *
+ * <p>On a cold start Facebook's own start-up would still drop the request twice. It replaces the
+ * intent of a start another app sent, a launcher included, with a copy that keeps no tab, and its
+ * tab bar only uses the tab a start asked for when one of Facebook's server-side settings says so.
+ * Three hooks in that start-up ask this class while the screen it asked a tab for is being built:
+ * {@link #setSanitizedIntent} puts the tab back in Facebook's copy, and {@link #startOnAskedTab} and
+ * {@link #keepAskedStartTab} answer yes where Facebook asks whether to use it. Outside that window
+ * they pass Facebook's own intent and answers through. On a cold start Facebook builds the screen
+ * behind a splash, after Android has already created and resumed it, so the window lasts until the
+ * screen is built rather than until it first shows.
+ *
  * <p>Everything else keeps its own destination: a link, a notification, a shortcut or anything else
  * that carries one of Facebook's routes, and a screen restored after Android put it away. Nothing
- * here runs after the main screen is created, so tapping another tab, leaving Facebook and coming
- * back all stay as they were. It fails open: with the switch off, Hushfacebook paused, the
+ * here acts once Facebook has built the main screen, so tapping another tab, leaving Facebook and
+ * coming back all stay as they were. It fails open: with the switch off, Hushfacebook paused, the
  * settings not ready yet, or a failure in here, the start is Facebook's own.
  *
- * <p>With Debug logging on it logs the start it saw and the tab it asked for, and two seconds after
- * the screen first shows, the tab Facebook opened and the tabs in its tab bar, read through names
- * Facebook keeps. A tab this account's tab bar hasn't got is logged too, as Facebook opening Home.
+ * <p>With Debug logging on it logs the start it saw and the tab it asked for, one line per start
+ * from each start-up hook, and a moment after the screen first shows and is built, the tab
+ * Facebook opened and the tabs in its tab bar, read through names Facebook keeps. A tab this
+ * account's tab bar hasn't got is logged too, as Facebook opening Home.
  */
 public final class StartTabRoute {
     /**
@@ -74,6 +86,50 @@ public final class StartTabRoute {
     /** What every line of this hook starts with, for a person reading the log. */
     static final String PREFIX = "Start tab: ";
 
+    /** How many more times the landing check waits for a main screen Facebook hasn't built yet. */
+    static final int LANDING_ATTEMPTS = 6;
+
+    /** The start-up hooks, by the index their log lines are counted under. */
+    static final int SANITIZE_HOOK = 0, POSITION_HOOK = 1, KEEP_HOOK = 2;
+
+    /** What each start-up hook's log line starts with. */
+    private static final String[] HOOK_NAMES = {"sanitize hook", "tab bar start position hook", "main screen start tab hook"};
+
+    /** A start this asked a tab for: the main screen and the tab. */
+    private static final class Routed {
+        final WeakReference<Activity> screen;
+        final StartTab tab;
+
+        Routed(Activity screen, StartTab tab) {
+            this.screen = new WeakReference<>(screen);
+            this.tab = tab;
+        }
+    }
+
+    /**
+     * The start this asked a tab for while Facebook builds its main screen: set once the screen's
+     * intent asks for the tab, and cleared when the landing check has read the built tab bar, when
+     * the screen goes away, and whenever another main screen starts being created. Null the rest of
+     * the time. Only the start-up hooks read it, through {@link #pending()}.
+     *
+     * <p>It doesn't end when the screen first shows. On a cold start Facebook's main screen hands
+     * its onCreate to a stand-in that queues the work behind a splash screen until the app is ready,
+     * so Android creates and resumes the screen first, and Facebook's own start-up steps, the three
+     * hooks included, run from that queue afterwards.
+     */
+    @Nullable
+    private static volatile Routed pending;
+
+    /** How many main screens have started being created; each start-up hook logs one line per one. */
+    private static volatile int starts;
+
+    /** The start each start-up hook last logged a line for, by hook. */
+    private static final AtomicIntegerArray loggedFor = new AtomicIntegerArray(new int[]{-1, -1, -1});
+
+    /** Thrown by the next start-up hook that reads {@link #pending}, then cleared: how a test reaches the fail-open path. */
+    @Nullable
+    static volatile RuntimeException failNextStartUpHook;
+
     private StartTabRoute() {
     }
 
@@ -85,6 +141,9 @@ public final class StartTabRoute {
     public static void onActivityCreate(@Nullable Activity activity, @Nullable Bundle savedState) {
         try {
             if (activity == null || !FacebookTabs.MAIN_TAB_ACTIVITY.equals(activity.getClass().getName())) return;
+            // A new main screen: whatever an earlier one asked for isn't this one's.
+            starts++;
+            settled();
             HookStatus.invoked(FamilyNames.START_TAB);
             // Settings first: before the context is set, reading a switch would break Facebook's start.
             if (!Utils.settingsReady() || !Settings.OPEN_ON_CHOSEN_TAB.get()) return;
@@ -97,9 +156,118 @@ public final class StartTabRoute {
             }
             activity.setIntent(routed(intent, tab));
             debug(() -> "asked Facebook to open on " + tab.fileValue + " (tab " + tab.tabId + "). " + describe(intent));
+            // Only once something will clear it again, when the screen is built or goes away.
             Landing.watch(activity, tab);
+            pending = new Routed(activity, tab);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.START_TAB, "start tab", failure);
+        }
+    }
+
+    /** Forgets the start being built. Nothing asks Facebook for a tab after this until the next one. */
+    static void settled() {
+        pending = null;
+    }
+
+    /** Forgets the start being built when it's [screen]'s, and leaves a later main screen's alone. */
+    static void settled(@Nullable Activity screen) {
+        Routed routed = pending;
+        if (routed != null && screen != null && routed.screen.get() == screen) pending = null;
+    }
+
+    /**
+     * The start the main screen being built asked a tab for, or null: while that screen is there,
+     * not destroyed, and its intent still asks for the tab. Decided from the screen itself each
+     * time, since Facebook can build it well after Android created and resumed it.
+     */
+    @Nullable
+    private static Routed pending() {
+        RuntimeException failure = failNextStartUpHook;
+        if (failure != null) {
+            failNextStartUpHook = null;
+            throw failure;
+        }
+        Routed routed = pending;
+        if (routed == null) return null;
+        Activity screen = routed.screen.get();
+        if (screen == null || screen.isDestroyed()) return null;
+        Intent intent = screen.getIntent();
+        return intent != null && routed.tab.fileValue.equals(intent.getStringExtra(ROUTED)) ? routed : null;
+    }
+
+    /** Logs [message] under [hook]'s name, once per main screen start. */
+    private static void once(int hook, Logger.LogMessage message) {
+        int start = starts;
+        if (loggedFor.getAndSet(hook, start) != start) {
+            debug(() -> HOOK_NAMES[hook] + ": " + message.buildMessageString());
+        }
+    }
+
+    /**
+     * Injection point in place of the {@code Activity.setIntent} of Facebook's start-up step that
+     * sanitizes the main screen's intent. For a start another app sent, which a launcher is, the step
+     * builds a new intent that keeps only the action, the link and three extras, so the tab this
+     * asked for goes with everything else. While the screen it asked a tab for is being built, the
+     * copy gets the tab back. Every other start gets Facebook's copy as it is. The screen always gets
+     * an intent, and this never throws where Facebook's own call wouldn't.
+     */
+    public static void setSanitizedIntent(Activity activity, Intent sanitized) {
+        Intent intent = sanitized;
+        try {
+            Routed routed = pending();
+            if (routed == null || routed.screen.get() != activity) {
+                once(SANITIZE_HOOK, () -> "nothing pending.");
+            } else if (sanitized == null || sanitized.hasExtra(FacebookTabs.TARGET_TAB_ID)) {
+                once(SANITIZE_HOOK, () -> "Facebook's copy already asks for a tab; left it as it is.");
+            } else {
+                StartTab tab = routed.tab;
+                intent = routed(sanitized, tab);
+                HookStatus.bound(FamilyNames.START_TAB, "sanitized start intent");
+                once(SANITIZE_HOOK, () -> "Facebook's start-up kept no tab in the screen's intent; asked again for "
+                        + tab.fileValue + ".");
+            }
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.START_TAB, "start tab intent", failure);
+            intent = sanitized;
+        }
+        activity.setIntent(intent);
+    }
+
+    /**
+     * Injection point after the tab bar reads the server-side setting that decides whether it opens
+     * on the tab its start asked for. [original] is that setting. On an account where it's off the
+     * tab bar opens on its first tab whatever the start asked for. While the screen this asked a tab
+     * for is being built, the answer is yes, and Facebook goes on to its own lookup of the tab in the
+     * tab bar, which still falls back to the first tab when the bar hasn't got it. Never throws.
+     */
+    public static boolean startOnAskedTab(boolean original) {
+        return answer(original, POSITION_HOOK, "tab bar start position");
+    }
+
+    /**
+     * Injection point at the return of the main screen's check that it keeps the start tab its
+     * intent asked for as the tab it started on. Answered like {@link #startOnAskedTab}, so the
+     * screen's idea of where it started matches the tab its tab bar shows. Never throws.
+     */
+    public static boolean keepAskedStartTab(boolean original) {
+        return answer(original, KEEP_HOOK, "main screen start tab");
+    }
+
+    private static boolean answer(boolean original, int hook, String gate) {
+        try {
+            Routed routed = pending();
+            if (routed == null) {
+                once(hook, () -> "nothing pending; Facebook's " + (original ? "yes" : "no") + " stands.");
+                return original;
+            }
+            HookStatus.bound(FamilyNames.START_TAB, gate);
+            String tab = routed.tab.fileValue;
+            once(hook, () -> original ? "Facebook already said yes for " + tab + "."
+                    : "Facebook said no; asked it to use " + tab + ".");
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.START_TAB, gate, failure);
+            return original;
         }
     }
 
@@ -152,11 +320,13 @@ public final class StartTabRoute {
     }
 
     /**
-     * Reads which tab the main screen opened on, once, a moment after it first shows. What it
-     * finds only goes to the log and Hook status; it changes nothing on screen.
+     * Reads which tab the main screen opened on, once, a moment after it first shows and Facebook
+     * has built it, which ends the start being built; and ends it too when the screen goes away. What
+     * it reads only goes to the log and Hook status; it changes nothing on screen.
      */
     static final class Landing implements Application.ActivityLifecycleCallbacks {
         private final StartTab asked;
+        private boolean shown;
 
         private Landing(StartTab asked) {
             this.asked = asked;
@@ -168,14 +338,16 @@ public final class StartTabRoute {
 
         @Override
         public void onActivityPostResumed(@NonNull Activity activity) {
-            activity.unregisterActivityLifecycleCallbacks(this);
+            if (shown) return;
+            shown = true;
             WeakReference<Activity> screen = new WeakReference<>(activity);
-            Utils.runOnMainThreadDelayed(() -> check(screen.get(), asked), LANDING_CHECK_MS);
+            Utils.runOnMainThreadDelayed(() -> land(screen, asked, LANDING_ATTEMPTS), LANDING_CHECK_MS);
         }
 
         @Override
         public void onActivityDestroyed(@NonNull Activity activity) {
             activity.unregisterActivityLifecycleCallbacks(this);
+            settled(activity);
         }
 
         @Override
@@ -201,6 +373,23 @@ public final class StartTabRoute {
         @Override
         public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
         }
+    }
+
+    /**
+     * The landing check, once Facebook has built the main screen. Behind a splash screen Facebook can
+     * build it well after it first shows, and until then the screen has no current tab to read, so
+     * it's tried again [attempts] times at most before the check goes ahead. A screen with a tab to
+     * read has had its start decided, so the start being built ends there.
+     */
+    static void land(WeakReference<Activity> screen, StartTab asked, int attempts) {
+        Activity activity = screen.get();
+        boolean built = activity != null && TabBar.currentTab(activity) != null;
+        if (!built && attempts > 1 && activity != null && !activity.isFinishing() && !activity.isDestroyed()) {
+            Utils.runOnMainThreadDelayed(() -> land(screen, asked, attempts - 1), LANDING_CHECK_MS);
+            return;
+        }
+        if (built) settled(activity);
+        check(activity, asked);
     }
 
     /**
@@ -235,8 +424,12 @@ public final class StartTabRoute {
     /**
      * Facebook's tab bar, read through the names Redex keeps: the main screen's
      * {@code getCurrentTab()}, its delegate's lazy tab bar state, the {@code TabTag} class and its
-     * one long, the tab's id. Every read answers null rather than throw, and reads only what
-     * Facebook has already built.
+     * one long, the tab's id. Every read answers null rather than throw.
+     *
+     * <p>The lazy value resolves the account's one tab bar state, which the main screen built before
+     * it first showed. The delegate itself only asks for it when a start carries a tab, a shortcut or
+     * a new intent, so after a plain start from the launcher icon the lazy value is unasked, not
+     * unbuilt, and reading it hands back the state the tab bar was built from.
      */
     static final class TabBar {
         private TabBar() {
@@ -252,14 +445,14 @@ public final class StartTabRoute {
         /**
          * The tabs the tab bar shows, in order: the tab bar state's own list, which leaves out the
          * tabs hidden in Facebook's settings, or else its configuration's. Null when neither can
-         * be read, or the state hasn't been built yet.
+         * be read.
          */
         @Nullable
         static List<Object> tabs(Activity activity) {
             Object delegate = mainTabDelegate(activity);
             if (delegate == null) return null;
             Object lazy = field(delegate, FacebookTabs.TAB_BAR_STATE);
-            if (lazy == null || !Boolean.TRUE.equals(call(lazy, "isInitialized"))) return null;
+            if (lazy == null) return null;
             Object state = call(lazy, "getValue");
             if (state == null) return null;
             List<Object> shown = tabList(state);
