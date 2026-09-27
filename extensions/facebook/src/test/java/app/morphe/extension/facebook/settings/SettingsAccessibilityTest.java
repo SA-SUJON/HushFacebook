@@ -166,8 +166,9 @@ public class SettingsAccessibilityTest {
             if (preference instanceof PreferenceCategory || preference instanceof SwitchPreference) continue;
             if (preference.isSelectable()) {
                 assertEquals(preference.getTitle() + " role", Button.class.getName(), String.valueOf(info.getClassName()));
-                assertTrue(preference.getTitle() + " can't be double tapped", info.getActionList().contains(
-                        AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK));
+                assertEquals(preference.getTitle() + " click availability", preference.isEnabled(),
+                        info.getActionList().contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK));
+                assertEquals(preference.getTitle() + " enabled state", preference.isEnabled(), info.isEnabled());
             } else {
                 assertNotEquals(preference.getTitle() + " is only text", Button.class.getName(),
                         String.valueOf(info.getClassName()));

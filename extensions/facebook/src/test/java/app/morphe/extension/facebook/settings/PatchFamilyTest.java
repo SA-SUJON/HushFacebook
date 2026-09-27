@@ -120,6 +120,24 @@ public class PatchFamilyTest {
     }
 
     @Test
+    public void marketplaceExtrasDoNotClaimTheDisabledModeIsOn() {
+        try {
+            Settings.MARKETPLACE_ONLY.save(false);
+            Settings.MARKETPLACE_QUIET_NOTIFICATIONS.save(true);
+            Settings.MARKETPLACE_SKIP_FEED_PREFETCH.save(true);
+            String line = PatchFamily.reportLines(EnumSet.of(PatchFamily.MARKETPLACE_ONLY), false).get(0);
+            assertTrue(line, line.startsWith("Marketplace only: disabled by its switch ("));
+            Settings.MARKETPLACE_ONLY.save(true);
+            assertTrue(PatchFamily.reportLines(EnumSet.of(PatchFamily.MARKETPLACE_ONLY), false).get(0)
+                    .startsWith("Marketplace only: on ("));
+        } finally {
+            Settings.MARKETPLACE_ONLY.resetToDefault();
+            Settings.MARKETPLACE_QUIET_NOTIFICATIONS.resetToDefault();
+            Settings.MARKETPLACE_SKIP_FEED_PREFETCH.resetToDefault();
+        }
+    }
+
+    @Test
     public void everyStatusFlagBelongsToExactlyOneFamily() {
         Set<String> flags = new TreeSet<>();
         for (Method method : SettingsStatus.class.getDeclaredMethods()) {
@@ -148,6 +166,23 @@ public class PatchFamilyTest {
         Set<String> families = new TreeSet<>();
         for (PatchFamily family : PatchFamily.values()) families.add(family.patchName);
         assertEquals(listed, families);
+    }
+
+    @Test
+    public void marketplaceIsIncludedByDefaultWithItsSettingsAndNotificationHooks() throws Exception {
+        JSONArray patches = new JSONObject(new String(Files.readAllBytes(patchesList().toPath()), StandardCharsets.UTF_8))
+                .getJSONArray("patches");
+        JSONObject mode = null;
+        for (int i = 0; i < patches.length(); i++) {
+            if ("Marketplace only".equals(patches.getJSONObject(i).getString("name"))) mode = patches.getJSONObject(i);
+        }
+        assertNotNull(mode);
+        assertTrue(mode.getBoolean("use"));
+        JSONArray required = mode.getJSONArray("dependencies");
+        Set<String> dependencies = new HashSet<>();
+        for (int i = 0; i < required.length(); i++) dependencies.add(required.getString(i));
+        assertTrue(dependencies.containsAll(Arrays.asList("Hushfacebook settings", "Hushfacebook in the Menu",
+                "Open on a chosen tab", "Block promotional notifications")));
     }
 
     @Test

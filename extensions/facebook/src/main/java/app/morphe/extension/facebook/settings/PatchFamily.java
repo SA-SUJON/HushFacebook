@@ -97,7 +97,7 @@ public enum PatchFamily {
     START_TAB(FamilyNames.START_TAB, "startTab", null,
             Settings.OPEN_ON_CHOSEN_TAB),
     MARKETPLACE_ONLY(FamilyNames.MARKETPLACE_ONLY, "marketplaceOnly", null,
-            Settings.MARKETPLACE_ONLY),
+            Settings.MARKETPLACE_ONLY, Settings.MARKETPLACE_QUIET_NOTIFICATIONS, Settings.MARKETPLACE_SKIP_FEED_PREFETCH),
     MESSENGER_CARD(FamilyNames.MESSENGER_CARD, "messengerCard", null,
             Settings.HIDE_GET_MESSENGER_CARD),
     MENU_PROMOTIONS(FamilyNames.MENU_PROMOTIONS, "menuPromotions", null,
@@ -265,6 +265,8 @@ public enum PatchFamily {
         }
         boolean anyOn = false;
         for (BooleanSetting setting : switches) anyOn |= setting.savedValue();
+        // Marketplace's extra switches need its main mode; they cannot enable the family alone.
+        if (this == MARKETPLACE_ONLY) anyOn = Settings.MARKETPLACE_ONLY.savedValue();
         line.append(paused ? "disabled while paused (saved " : anyOn ? "on (" : "disabled by its switch (");
         for (int i = 0; i < switches.size(); i++) {
             if (i > 0) line.append(", ");

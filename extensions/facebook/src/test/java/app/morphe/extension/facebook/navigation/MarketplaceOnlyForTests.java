@@ -21,6 +21,32 @@ public final class MarketplaceOnlyForTests {
         MarketplaceOnly.inBuildForTests = inBuild;
     }
 
+    public static void resetState() {
+        MarketplaceOnly.forgetLogged();
+    }
+
+    public static boolean quietsNotifications() {
+        Boolean before = MarketplaceOnly.inBuildForTests;
+        MarketplaceOnly.inBuildForTests = Boolean.TRUE;
+        try {
+            return MarketplaceOnly.quietNotifications();
+        } finally {
+            MarketplaceOnly.inBuildForTests = before;
+        }
+    }
+
+    public static boolean skipsFeedPrefetch() {
+        Boolean before = MarketplaceOnly.inBuildForTests;
+        MarketplaceOnly.inBuildForTests = Boolean.TRUE;
+        try {
+            hidesHome();
+            return MarketplaceOnly.skipFeedPrefetch();
+        } finally {
+            MarketplaceOnly.inBuildForTests = before;
+            MarketplaceOnly.forgetLogged();
+        }
+    }
+
     /**
      * Asks the hook about Home on a tab bar configured with Home, Marketplace and Notifications,
      * nothing hidden, with the patch in the build. True when it takes Home off, which is the switch

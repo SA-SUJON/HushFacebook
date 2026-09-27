@@ -325,7 +325,9 @@ public class PausedHooksTest {
         // A start from the launcher icon asks Facebook for the chosen tab.
         probes.put(PatchFamily.START_TAB, Collections.singletonList(StartTabRouteForTests::routes));
         // The tab bar builder is told to leave Home out.
-        probes.put(PatchFamily.MARKETPLACE_ONLY, Collections.singletonList(MarketplaceOnlyForTests::hidesHome));
+        probes.put(PatchFamily.MARKETPLACE_ONLY, Arrays.asList(
+                MarketplaceOnlyForTests::hidesHome, MarketplaceOnlyForTests::quietsNotifications,
+                MarketplaceOnlyForTests::skipsFeedPrefetch));
         // A request for a post's comments that names no order asks for the chosen one.
         probes.put(PatchFamily.DEFAULT_COMMENT_ORDER,
                 Collections.singletonList(DefaultCommentOrderForTests::asksForTheChosenOrder));

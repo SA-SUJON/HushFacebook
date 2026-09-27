@@ -10,6 +10,8 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.settings.settingsPatch
+import app.morphe.patches.facebook.menu.hushfacebookInTheMenuPatch
+import app.morphe.patches.facebook.notifications.blockPromotionalNotificationsPatch
 import app.morphe.patches.facebook.navigation.starttab.openOnChosenTabPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.builder.BuilderInstruction
@@ -23,7 +25,7 @@ import com.android.tools.smali.dexlib2.iface.Method
  * It brings Open on a chosen tab with it: the start from the launcher icon goes to Marketplace
  * through that patch's route, which also gets Facebook's own start-up to use the tab.
  *
- * Off in the default selection: it changes what Facebook is. Picked, its switch starts on.
+ * Included in the default selection, with its runtime switch off until the person opts in.
  */
 @Suppress("unused")
 val marketplaceOnlyPatch = bytecodePatch(
@@ -31,10 +33,11 @@ val marketplaceOnlyPatch = bytecodePatch(
     description = "Leaves only Marketplace, Notifications and your profile or Menu in the tab bar, and opens " +
         "Facebook on Marketplace. Home with the news feed, Video, Friends, Feeds, Groups, Gaming and Events " +
         "go. Notifications and links still open where they lead.",
-    default = false,
+    default = true,
 ) {
     category("Interface")
-    dependsOn(settingsPatch, openOnChosenTabPatch)
+    dependsOn(settingsPatch, openOnChosenTabPatch, hushfacebookInTheMenuPatch,
+        blockPromotionalNotificationsPatch, marketplaceFeedPrefetchPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {

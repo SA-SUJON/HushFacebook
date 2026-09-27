@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
+import app.morphe.extension.facebook.navigation.MarketplaceOnly;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.diagnostics.FeedFilterCounters;
@@ -148,7 +149,10 @@ public final class NotificationKinds {
             if (kind == null) return false;
             Group group = KINDS.get(kind);
             // Ready first: Settings loads every switch, and it can't before the context is set.
-            boolean block = group != null && Utils.settingsReady() && group.setting().get();
+            // Digests and nearby-place alerts can be useful to someone buying or selling. The
+            // mode only quiets entertainment, memories, birthdays and friend suggestions.
+            boolean block = group != null && Utils.settingsReady() && (group.setting().get()
+                    || (group != Group.HIGHLIGHTS && group != Group.NEARBY && MarketplaceOnly.quietNotifications()));
             if (block) FeedFilterCounters.removed(ROUTE, 1, group.counted);
             log(kind, block);
             return block;

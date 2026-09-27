@@ -62,6 +62,7 @@ public class MarketplaceOnlyTest {
     public void inBuild() {
         MarketplaceOnlyForTests.inBuild(Boolean.TRUE);
         MarketplaceOnly.forgetLogged();
+        Settings.MARKETPLACE_ONLY.save(true);
     }
 
     @After
@@ -71,6 +72,7 @@ public class MarketplaceOnlyTest {
         StartTabRoute.settled();
         PauseForTests.resume();
         Settings.MARKETPLACE_ONLY.resetToDefault();
+        Settings.MARKETPLACE_SKIP_FEED_PREFETCH.resetToDefault();
         Settings.OPEN_ON_CHOSEN_TAB.resetToDefault();
         Settings.START_TAB.resetToDefault();
         BaseSettings.DEBUG.resetToDefault();
@@ -97,7 +99,7 @@ public class MarketplaceOnlyTest {
 
     @Test
     public void theTabBarKeepsMarketplaceNotificationsAndTheProfile() {
-        assertTrue("the switch starts on", Settings.MARKETPLACE_ONLY.get());
+        assertTrue("the person opted in", Settings.MARKETPLACE_ONLY.get());
         assertEquals(Arrays.asList("MarketplaceTab", "NotificationsTab", "TimelineTab"),
                 shown(configured, Collections.emptySet()));
         assertTrue(statusLine(), statusLine().startsWith(FamilyNames.MARKETPLACE_ONLY + ": invoked 6, 1 found, 0 missing"));
@@ -209,6 +211,114 @@ public class MarketplaceOnlyTest {
             assertEquals(tab, 1, occurrences(report, "Marketplace only: took " + tab + " off the tab bar."));
         }
         assertEquals(0, occurrences(report, "took MarketplaceTab"));
+    }
+
+    @Test
+    public void theStatusTracksTheBuiltBarAndBothDirectionsOfARestart() {
+        assertEquals(MarketplaceOnly.State.WAITING, MarketplaceOnly.state());
+        shown(configured, Collections.emptySet());
+        assertEquals(MarketplaceOnly.State.ACTIVE, MarketplaceOnly.state());
+        Settings.MARKETPLACE_ONLY.save(false);
+        assertEquals(MarketplaceOnly.State.RESTART_NEEDED, MarketplaceOnly.state());
+        Settings.MARKETPLACE_ONLY.save(true);
+        assertEquals(MarketplaceOnly.State.ACTIVE, MarketplaceOnly.state());
+
+        Settings.MARKETPLACE_ONLY.save(false);
+        MarketplaceOnly.forgetLogged();
+        shown(configured, Collections.emptySet());
+        assertEquals(MarketplaceOnly.State.OFF, MarketplaceOnly.state());
+        Settings.MARKETPLACE_ONLY.save(true);
+        assertEquals(MarketplaceOnly.State.RESTART_NEEDED, MarketplaceOnly.state());
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertEquals(MarketplaceOnly.State.PAUSED, MarketplaceOnly.state());
+    }
+
+    @Test
+    public void unavailableAndUnreadableTabBarsNeverClaimTheModeIsActive() {
+        shown(configured, Collections.singleton(String.valueOf(FacebookTabs.MARKETPLACE_ID)));
+        assertEquals(MarketplaceOnly.State.HIDDEN, MarketplaceOnly.state());
+        shown(Arrays.asList(new FeedTab(), new NotificationsTab()), Collections.emptySet());
+        assertEquals(MarketplaceOnly.State.MISSING, MarketplaceOnly.state());
+        assertFalse(MarketplaceOnly.hidesTab(false, new FeedTab(), null, null));
+        assertEquals(MarketplaceOnly.State.UNREADABLE, MarketplaceOnly.state());
+    }
+
+    @Test
+    public void disablingAnUnavailableModeDoesNotAskToRestoreTabsItNeverRemoved() {
+        for (int unavailable = 0; unavailable < 3; unavailable++) {
+            Settings.MARKETPLACE_ONLY.save(true);
+            if (unavailable == 0) {
+                shown(configured, Collections.singleton(String.valueOf(FacebookTabs.MARKETPLACE_ID)));
+            } else if (unavailable == 1) {
+                shown(Arrays.asList(new FeedTab(), new NotificationsTab()), Collections.emptySet());
+            } else {
+                MarketplaceOnly.hidesTab(false, new FeedTab(), null, null);
+            }
+            Settings.MARKETPLACE_ONLY.save(false);
+            assertEquals(MarketplaceOnly.State.OFF, MarketplaceOnly.state());
+        }
+    }
+
+    @Test
+    public void returningToRegularFacebookWhilePausedStillNeedsToRestoreTheBuiltBar() {
+        shown(configured, Collections.emptySet());
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        Settings.MARKETPLACE_ONLY.save(false);
+        assertEquals(MarketplaceOnly.State.RESTART_NEEDED, MarketplaceOnly.state());
+    }
+
+    @Test
+    public void aBarBuiltBeforeSettingsAreReadyNeedsARestartWhenTheModeWasSelected() {
+        SettingsContextRule.withoutContext(() -> assertFalse(MarketplaceOnlyForTests.hidesHome()));
+        assertEquals(MarketplaceOnly.State.RESTART_NEEDED, MarketplaceOnly.state());
+    }
+
+    @Test
+    public void onlyAnOptedInActiveModeCanSkipFeedWarmups() {
+        assertFalse(Settings.MARKETPLACE_SKIP_FEED_PREFETCH.defaultValue);
+        Settings.MARKETPLACE_SKIP_FEED_PREFETCH.save(true);
+        assertFalse("startup before the tab bar", MarketplaceOnly.skipFeedPrefetch());
+        shown(configured, Collections.emptySet());
+        assertTrue(MarketplaceOnly.skipFeedPrefetch());
+        Settings.MARKETPLACE_SKIP_FEED_PREFETCH.save(false);
+        assertFalse(MarketplaceOnly.skipFeedPrefetch());
+        Settings.MARKETPLACE_SKIP_FEED_PREFETCH.save(true);
+        Settings.MARKETPLACE_ONLY.save(false);
+        assertFalse("returning to normal mode", MarketplaceOnly.skipFeedPrefetch());
+        Settings.MARKETPLACE_ONLY.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertFalse("paused", MarketplaceOnly.skipFeedPrefetch());
+        PauseForTests.resume();
+        shown(configured, Collections.singleton(String.valueOf(FacebookTabs.MARKETPLACE_ID)));
+        assertFalse("hidden Marketplace", MarketplaceOnly.skipFeedPrefetch());
+        shown(Arrays.asList(new FeedTab()), Collections.emptySet());
+        assertFalse("no Marketplace", MarketplaceOnly.skipFeedPrefetch());
+        MarketplaceOnly.hidesTab(false, new FeedTab(), null, null);
+        assertFalse("unreadable tabs", MarketplaceOnly.skipFeedPrefetch());
+        shown(configured, Collections.emptySet());
+        MarketplaceOnlyForTests.inBuild(false);
+        assertFalse("patch absent", MarketplaceOnly.skipFeedPrefetch());
+        MarketplaceOnlyForTests.inBuild(true);
+        SettingsContextRule.withoutContext(() -> assertFalse(MarketplaceOnly.skipFeedPrefetch()));
+    }
+
+    @Test
+    public void marketplaceLinksProfilesAndConversationsKeepTheirOwnIntent() {
+        for (boolean enabled : new boolean[]{false, true}) {
+            Settings.MARKETPLACE_ONLY.save(enabled);
+            for (String address : Arrays.asList("https://www.facebook.com/marketplace/item/123/",
+                    "https://www.facebook.com/profile.php?id=123", "fb-messenger://user-thread/123",
+                    "https://www.facebook.com/share/example/")) {
+                android.content.Intent link = new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse(address)).putExtra("notification_id", "test-notification");
+                FbMainTabActivity screen = StartTabRouteForTests.screen(link);
+                StartTabRoute.onActivityCreate(screen, null);
+                assertTrue("the incoming link was replaced", screen.getIntent() == link);
+                assertEquals(address, screen.getIntent().getDataString());
+                assertFalse(screen.getIntent().hasExtra(StartTabRoute.ROUTED));
+                assertFalse(StartTabRoute.startOnAskedTab(false));
+            }
+        }
     }
 
     /** While it's on, a start from the launcher icon opens Marketplace, whatever tab is chosen. */

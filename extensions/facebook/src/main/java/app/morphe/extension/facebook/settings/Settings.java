@@ -371,7 +371,7 @@ public class Settings extends BaseSettings {
      * Facebook would choose. Notifications, links and shortcuts keep their own destination.
      */
     public static final BooleanSetting OPEN_ON_CHOSEN_TAB =
-            new BooleanSetting("hushfacebook_open_on_chosen_tab", TRUE);
+            new BooleanSetting("hushfacebook_open_on_chosen_tab", FALSE);
 
     /**
      * The tab bar keeps Marketplace, Notifications and the profile or Menu tab, and a start from
@@ -380,7 +380,15 @@ public class Settings extends BaseSettings {
      * shows when it restarts.
      */
     public static final BooleanSetting MARKETPLACE_ONLY =
-            new BooleanSetting("hushfacebook_marketplace_only", TRUE);
+            new BooleanSetting("hushfacebook_marketplace_only", FALSE, true);
+
+    /** Silences only recognized social promotions while Marketplace mode is selected. */
+    public static final BooleanSetting MARKETPLACE_QUIET_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_marketplace_quiet_notifications", FALSE);
+
+    /** Skip only confirmed feed warm-ups once the tab bar has applied Marketplace mode. */
+    public static final BooleanSetting MARKETPLACE_SKIP_FEED_PREFETCH =
+            new BooleanSetting("hushfacebook_marketplace_skip_feed_prefetch", FALSE);
 
     /**
      * The folder every save goes to, under Movies for a video and Pictures for a photo. The

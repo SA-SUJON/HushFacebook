@@ -27,6 +27,7 @@ import java.util.Set;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.PatchFamily;
 import app.morphe.extension.facebook.settings.Settings;
+import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.diagnostics.FeedFilterCounters;
 import app.morphe.extension.shared.diagnostics.HookStatus;
@@ -78,6 +79,9 @@ public class NotificationKindsTest {
     @After
     public void restore() {
         PauseForTests.resume();
+        MarketplaceOnlyForTests.inBuild(null);
+        Settings.MARKETPLACE_ONLY.resetToDefault();
+        Settings.MARKETPLACE_QUIET_NOTIFICATIONS.resetToDefault();
         for (BooleanSetting setting : switches()) setting.resetToDefault();
         NotificationKindsForTests.newProcess();
         FeedFilterCounters.clear();
@@ -128,6 +132,37 @@ public class NotificationKindsTest {
         Settings.BLOCK_MEMORY_NOTIFICATIONS.save(false);
         assertTrue(NotificationKindsForTests.blocksBirthday());
         assertFalse(NotificationKindsForTests.blocksMemory());
+    }
+
+    @Test
+    public void marketplaceQuietIsOptionalAndNeverRewritesTheIndividualChoices() {
+        MarketplaceOnlyForTests.inBuild(true);
+        Settings.MARKETPLACE_ONLY.save(true);
+        assertFalse(NotificationKinds.block("TOP_TRENDING_VIDEO"));
+        Settings.MARKETPLACE_QUIET_NOTIFICATIONS.save(true);
+        for (String kind : Arrays.asList("TOP_TRENDING_VIDEO", "PERSONALIZED_REELS", "ONTHISDAY",
+                "BIRTHDAY_REMINDER", "PYMK_EMAIL")) {
+            assertTrue(kind, NotificationKinds.block(kind));
+        }
+        for (String kind : ALWAYS_POST) assertFalse(kind, NotificationKinds.block(kind));
+        for (String kind : Arrays.asList("GROUP_HIGHLIGHTS", "PAGE_HIGHLIGHTS", "NEAR_SAVED_PLACE",
+                "MARKETPLACE_MESSAGE", "MARKETPLACE_ORDER_UPDATE", "SOME_FUTURE_KIND")) {
+            assertFalse(kind, NotificationKinds.block(kind));
+        }
+        for (BooleanSetting setting : switches()) assertFalse(setting.key, setting.savedValue());
+
+        Settings.BLOCK_MEMORY_NOTIFICATIONS.save(true);
+        Settings.MARKETPLACE_ONLY.save(false);
+        assertFalse(NotificationKinds.block("TOP_TRENDING_VIDEO"));
+        assertTrue(NotificationKinds.block("ONTHISDAY"));
+        assertTrue(Settings.MARKETPLACE_QUIET_NOTIFICATIONS.savedValue());
+        Settings.MARKETPLACE_ONLY.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertFalse(NotificationKinds.block("ONTHISDAY"));
+        assertFalse(NotificationKinds.block("TOP_TRENDING_VIDEO"));
+        PauseForTests.resume();
+        MarketplaceOnlyForTests.inBuild(false);
+        assertFalse(NotificationKinds.block("TOP_TRENDING_VIDEO"));
     }
 
     /** With every switch on, what people rely on still posts, and none of it is a kind with a switch. */

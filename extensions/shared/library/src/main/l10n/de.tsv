@@ -280,7 +280,6 @@ Videos, reels, stories and music wait for your tap before they play. Facebook's 
 # context: switch title under Opening Facebook; Marketplace is Facebook's tab and keeps its name
 Marketplace only	Nur Marketplace
 # context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
-The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.	Die Tab-Leiste behält Marketplace, Benachrichtigungen und dein Profil oder das Menü, und Facebook öffnet sich im Marketplace. Die Startseite mit dem Newsfeed, Video, Freunde und die übrigen Tabs verschwinden. Benachrichtigungen und Links öffnen weiterhin dort, wohin sie führen.
 # context: switch title under Menu; Upgrades is the name of a section in Facebook's own Menu
 Hide Upgrades	„Upgrades“ ausblenden
 # context: summary of that switch; Settings and Help and support are Facebook's own Menu sections
@@ -431,3 +430,22 @@ A video over two minutes long that you left partway picks up where you left it t
 Also hide posts labelled as AI	Auch als KI gekennzeichnete Beiträge ausblenden
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
 Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Beiträge, die die Person, die sie erstellt hat, als mit KI erstellt gekennzeichnet hat. Facebook zeigt sein KI-Label neben dem Namen bei diesen wie auch bei den Beiträgen, die seine Erkennung gefunden hat, und mit diesem Schalter verschwinden beide. Der Schalter ist standardmäßig aus, weil er noch nicht in einem echten Feed getestet wurde.
+Return to regular Facebook	Zurück zum normalen Facebook
+Restore the normal tabs at the next restart. Your other settings stay saved.	Beim nächsten Neustart werden die normalen Tabs wiederhergestellt. Deine anderen Einstellungen bleiben gespeichert.
+Marketplace mode is off. Restart Facebook to restore its normal tabs.	Marketplace-Modus ist aus. Starte Facebook neu, um die normalen Tabs wiederherzustellen.
+Couldn't save the change. Try again.	Die Änderung konnte nicht gespeichert werden. Versuch es erneut.
+Marketplace mode chooses the opening tab. Your previous choice stays saved.	Der Marketplace-Modus bestimmt den Start-Tab. Deine bisherige Auswahl bleibt gespeichert.
+Restart needed. Marketplace mode will turn on the next time Facebook starts.	Neustart erforderlich. Der Marketplace-Modus wird beim nächsten Start von Facebook aktiviert.
+Restart needed. The normal tabs will return the next time Facebook starts.	Neustart erforderlich. Die normalen Tabs kehren beim nächsten Start von Facebook zurück.
+Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.	Marketplace ist in Facebooks Tab-Einstellungen ausgeblendet. Blende es unter Einstellungen, Tab-Leiste, Leiste anpassen ein. Deine normalen Tabs bleiben verfügbar.
+Marketplace unavailable. Facebook hasn't supplied a Marketplace tab for this account. Your normal tabs stay available.	Marketplace nicht verfügbar. Facebook hat für dieses Konto keinen Marketplace-Tab bereitgestellt. Deine normalen Tabs bleiben verfügbar.
+Couldn't check the tab bar. Your normal tabs stay available. Restart Facebook to try again.	Die Tab-Leiste konnte nicht geprüft werden. Deine normalen Tabs bleiben verfügbar. Starte Facebook neu, um es erneut zu versuchen.
+Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.	Warten auf Facebooks Tab-Leiste. Der Marketplace-Modus wird angewendet, sobald Facebook sie erstellt.
+Off. Turn on to open Marketplace and hide the feed and other social tabs after restarting Facebook.	Aus. Aktiviere den Modus, um nach einem Neustart von Facebook Marketplace zu öffnen und den Feed sowie andere soziale Tabs auszublenden.
+Quiet social notifications	Soziale Benachrichtigungen stummschalten
+Skip feed preloading	Feed-Vorladen überspringen
+Marketplace mode is off.	Marketplace-Modus ist aus.
+Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.	Mit Hushfacebook pausiert. Deine Marketplace-Auswahl bleibt gespeichert. Bereits ausgeblendete Tabs kehren nach einem Neustart zurück, solange Hushfacebook pausiert ist.
+Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.	Schaltet Videovorschläge, Erinnerungen, Geburtstage und Freundschaftsvorschläge stumm, solange dieser Modus aktiv ist. Nachrichten und Updates zu Käufen und Verkäufen bleiben erhalten. Deine anderen Benachrichtigungseinstellungen bleiben gespeichert.
+Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.	Verringert das Laden des Feeds im Hintergrund, solange der Marketplace-Modus aktiv ist. Beim Start können weiterhin Daten geladen werden.
+Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.	Aktiv. Marketplace, Benachrichtigungen und Profil/Menü bleiben erhalten. Die Hushfacebook-Einstellungen findest du im Menü unter Einstellungen und Privatsphäre.

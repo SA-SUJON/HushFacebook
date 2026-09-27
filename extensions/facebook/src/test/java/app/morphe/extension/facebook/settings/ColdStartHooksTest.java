@@ -177,6 +177,8 @@ public class ColdStartHooksTest {
         assertFalse(PlayerSourcesForTests.recordsAVideoPlayer());
         assertFalse("a start before the context asked Facebook for a tab", StartTabRouteForTests.routes());
         assertFalse("a tab bar built before the context lost Home", MarketplaceOnlyForTests.hidesHome());
+        assertFalse("a feed warm-up before the context was skipped", MarketplaceOnlyForTests.skipsFeedPrefetch());
+        assertFalse("notifications before the context were muted", MarketplaceOnlyForTests.quietsNotifications());
         assertFalse("a comment request built before the context was given an order",
                 DefaultCommentOrderForTests.asksForTheChosenOrder());
         assertFalse("a word typed before the context lost its tag suggestions", TagSuggestionsForTests.skipsAPlainWord());

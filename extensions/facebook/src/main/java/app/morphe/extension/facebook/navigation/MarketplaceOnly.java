@@ -19,6 +19,7 @@ import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
 import app.morphe.extension.shared.diagnostics.HookStatus;
+import app.morphe.extension.shared.settings.Setting;
 
 /**
  * What Marketplace only does to Facebook's tab bar: it takes off Home with the news feed, Video,
@@ -62,6 +63,13 @@ public final class MarketplaceOnly {
     /** The tab classes a line has been logged for, so a rebuilt tab bar doesn't log them again. */
     private static final Set<String> logged = Collections.synchronizedSet(new HashSet<>());
 
+    public enum State { OFF, WAITING, ACTIVE, RESTART_NEEDED, PAUSED, MISSING, HIDDEN, UNREADABLE }
+
+    /** What the last tab-bar build actually used, not merely what its switch now asks for. */
+    @Nullable
+    private static volatile Boolean appliedChoice;
+    private static volatile State availability = State.WAITING;
+
     private MarketplaceOnly() {
     }
 
@@ -84,6 +92,43 @@ public final class MarketplaceOnly {
         }
     }
 
+    /** State for settings, based on the tab list the hook has seen in this process. */
+    public static State state() {
+        if (!inBuild()) return State.OFF;
+        if (!Utils.settingsReady()) return State.WAITING;
+        boolean wanted = Settings.MARKETPLACE_ONLY.savedValue();
+        Boolean applied = appliedChoice;
+        // Pausing cannot put back tabs already removed from Facebook's cached bar.
+        if (Boolean.TRUE.equals(applied) && !wanted) return State.RESTART_NEEDED;
+        if (Setting.isPaused()) return wanted ? State.PAUSED : State.OFF;
+        if (!wanted) return State.OFF;
+        if (availability == State.MISSING || availability == State.HIDDEN || availability == State.UNREADABLE) {
+            return availability;
+        }
+        if (Boolean.FALSE.equals(applied)) return State.RESTART_NEEDED;
+        return availability;
+    }
+
+    /** An optional overlay. The six independent notification switches are never rewritten. */
+    public static boolean quietNotifications() {
+        return on() && Settings.MARKETPLACE_QUIET_NOTIFICATIONS.get();
+    }
+
+    /** Only background feed warm-ups ask this. Early startup and uncertain tab state fail open. */
+    public static boolean skipFeedPrefetch() {
+        try {
+            if (!on() || !Settings.MARKETPLACE_SKIP_FEED_PREFETCH.get() || state() != State.ACTIVE) return false;
+            if (logged.add("prefetch")) {
+                Logger.diagnosticInfo(DiagnosticCategory.FEED_AND_NAVIGATION, SOURCE,
+                        () -> PREFIX + "skipped a background feed warm-up while Marketplace is active.");
+            }
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.MARKETPLACE_ONLY, "feed prefetch", failure);
+            return false;
+        }
+    }
+
     /**
      * Injection point in Facebook's tab bar list builder, right after its set of hidden tab ids
      * answered [hidden] for [tab]. [configured] is the list of tabs the account is configured with
@@ -93,13 +138,21 @@ public final class MarketplaceOnly {
      */
     public static boolean hidesTab(boolean hidden, @Nullable Object tab, @Nullable List<?> configured,
                                    @Nullable Set<?> hiddenIds) {
-        if (hidden) return true;
         try {
-            if (tab == null || !inBuild()) return false;
+            if (tab == null || !inBuild()) return hidden;
+            if (!Utils.settingsReady()) {
+                appliedChoice = false;
+                availability = State.WAITING;
+                return hidden;
+            }
+            boolean wanted = on();
+            availability = marketplaceAvailability(configured, hiddenIds);
+            appliedChoice = wanted && availability == State.ACTIVE;
+            if (hidden) return true;
             HookStatus.invoked(FamilyNames.MARKETPLACE_ONLY);
             String name = tab.getClass().getName();
-            if (!DROPPED_TABS.contains(name) || !on()) return false;
-            if (!keepsMarketplace(configured, hiddenIds)) {
+            if (!DROPPED_TABS.contains(name) || !wanted) return false;
+            if (availability != State.ACTIVE) {
                 if (logged.add("")) {
                     Logger.diagnosticInfo(DiagnosticCategory.FEED_AND_NAVIGATION, SOURCE, () -> PREFIX
                             + "this tab bar has no Marketplace to open, so it stays as Facebook built it.");
@@ -113,8 +166,9 @@ public final class MarketplaceOnly {
             }
             return true;
         } catch (Throwable failure) {
+            availability = State.UNREADABLE;
             HookStatus.threw(FamilyNames.MARKETPLACE_ONLY, "tab bar", failure);
-            return false;
+            return hidden;
         }
     }
 
@@ -123,18 +177,21 @@ public final class MarketplaceOnly {
      * among the tabs hidden in Facebook's own editor. Without it there'd be nothing to open, so the
      * bar stays as Facebook built it.
      */
-    static boolean keepsMarketplace(@Nullable List<?> configured, @Nullable Set<?> hiddenIds) {
-        if (configured == null) return false;
+    private static State marketplaceAvailability(@Nullable List<?> configured, @Nullable Set<?> hiddenIds) {
+        if (configured == null) return State.UNREADABLE;
         for (Object each : configured) {
             if (each == null || !StartTab.MARKETPLACE.isTab(each.getClass().getName())) continue;
             long id = StartTabRoute.TabBar.tabId(each);
-            return id != -1 && (hiddenIds == null || !hiddenIds.contains(String.valueOf(id)));
+            if (id == -1) return State.UNREADABLE;
+            return hiddenIds != null && hiddenIds.contains(String.valueOf(id)) ? State.HIDDEN : State.ACTIVE;
         }
-        return false;
+        return State.MISSING;
     }
 
     /** Forgets which lines were logged, as a new process would. */
     static void forgetLogged() {
         logged.clear();
+        appliedChoice = null;
+        availability = State.WAITING;
     }
 }

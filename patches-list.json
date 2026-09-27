@@ -1,5 +1,5 @@
 {
-  "version": "v0.3.1",
+  "version": "v0.3.2",
   "appNames": {
     "com.facebook.katana": "Facebook"
   },
@@ -1351,8 +1351,11 @@
       "name": "Marketplace only",
       "description": "Leaves only Marketplace, Notifications and your profile or Menu in the tab bar, and opens Facebook on Marketplace. Home with the news feed, Video, Friends, Feeds, Groups, Gaming and Events go. Notifications and links still open where they lead.",
       "category": "Interface",
-      "use": false,
+      "use": true,
       "dependencies": [
+        "Block promotional notifications",
+        "BytecodePatch",
+        "Hushfacebook in the Menu",
         "Hushfacebook settings",
         "Open on a chosen tab"
       ],

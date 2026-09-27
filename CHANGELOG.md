@@ -2,18 +2,24 @@
 
 Every Hushfacebook release, newest first.
 
-## Unreleased
+## 0.3.2 (2026-09-27)
+
+* **Facebook:** Marketplace only is now included in the default patch selection. Its switch and Open on a chosen tab start off, so a normal installation keeps Facebook's navigation. Stored values are kept; older development builds that never stored their default-on choice need the switch enabled once after upgrading.
+* **Facebook:** Marketplace settings now show the mode's actual state, explain a missing or hidden Marketplace tab, and disable the startup choices the mode overrides. Return to regular Facebook restores normal navigation at the next restart without resetting other settings. The Menu settings entry is included with the mode.
+* **Facebook:** Quiet social notifications can silence entertainment suggestions, memories, birthdays and friend suggestions while Marketplace mode is selected. It starts off and preserves the individual notification settings. Messages, trading updates and unknown types pass through.
+* **Facebook:** Skip feed preloading can hold back two feed warm-ups once Marketplace mode is active. It starts off, preserves the screen-on scheduler cleanup and leaves early startup fetching alone. No data or battery reduction has been measured.
+* **Facebook:** The new controls and status messages are translated into all five supported languages. Offscreen Android view captures cover the active and regular modes; live listing, messaging and notification checks remain pending.
 
 ## 0.3.1 (2026-09-27)
 
 * **Facebook:** Compatible video saves now keep a known H.264/AAC pair even when an unchecked single MP4 has the same or higher resolution. Previously that file could take priority and bring back the sharing problem reported in #11.
 * **Facebook:** Normal video saves prefer AAC-LC or HE-AAC sound when available, while keeping the selected video resolution. A manifest with sound in an unsupported format now falls back to the complete MP4 instead of producing a silent video. These changes address download paths relevant to #14; Xiaomi Gallery playback and WhatsApp import still need confirmation on the affected apps.
-* **Facebook - Tooling:** The stale-save test now uses a retired notification ID. Its fixed ID could collide with the next save after other tests ran, making a correct cleanup fail the test.
+* **Tooling:** The stale-save test now uses a retired notification ID. Its fixed ID could collide with the next save after other tests ran, making a correct cleanup fail the test.
 
 ## 0.3.0 (2026-09-27)
 
 * **Facebook:** This is a development build. The published bundle is still v0.2.0 while the remaining phone checks and reported failures are investigated. The README now records the Media settings and Xiaomi Gallery reports and removes stale notes for checks already recorded below.
-* **Facebook - Tooling:** A first push of a feature branch now checks its code without treating the branch's copy of `patches-bundle.json` as a new release. The old hook compared unreleased patch counts with v0.2.0 and blocked the push.
+* **Tooling:** A first push of a feature branch now checks its code without treating the branch's copy of `patches-bundle.json` as a new release. The old hook compared unreleased patch counts with v0.2.0 and blocked the push.
 * **Facebook:** New patch, Marketplace only, for people who open Facebook just for Marketplace. The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed goes, and so do Video, Friends, Feeds, Groups, Gaming and Events, the same way a tab you hide in Facebook's own tab bar settings goes. It's off in Morphe Manager, and once it's in, its switch sits under Opening Facebook in Hushfacebook's settings and takes effect when Facebook restarts. Notifications and links to posts still open, and a tab bar without Marketplace is left as it is.
 * **Facebook:** Choosing a font file can no longer leave Hushfacebook's settings naming one font while Facebook draws in another. The file's name is saved before its copy takes the old one's place, and if either step fails, the font you had stays, name and all. The old copy is never deleted before the new one is in place, so a failed pick can't lose both. Use your phone's font also shows up whenever a copy is left over with no font named, so there's always a way to remove it.
 * **Facebook:** Open on a chosen tab now stops asking for the tab if Facebook still hasn't built its main screen about 12 seconds after the screen first shows. From then on Facebook's own start decides, so a tab bar it builds late or reloads later can't be pushed onto the chosen tab. The diagnostic report's tab bar reading also waits until the screen shows a tab, so Hushfacebook never sets up Facebook's tab bar data before Facebook does.

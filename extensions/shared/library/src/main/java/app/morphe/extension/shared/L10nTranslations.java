@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(714);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -101,6 +101,8 @@ public final class L10nTranslations {
                 "Schwarzes AMOLED-Design");
         table.put("About",
                 "Info");
+        table.put("Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.",
+                "Aktiv. Marketplace, Benachrichtigungen und Profil/Men\u00fc bleiben erhalten. Die Hushfacebook-Einstellungen findest du im Men\u00fc unter Einstellungen und Privatsph\u00e4re.");
         table.put("Ad cards between the stories people posted.",
                 "Werbekarten zwischen den Stories, die Leute gepostet haben.");
         table.put("Ad telemetry blocked",
@@ -173,11 +175,11 @@ public final class L10nTranslations {
                 "Reihenfolge der Kommentare");
         table.put("Comments",
                 "Kommentare");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Kommentare \u00f6ffnen sich in der Reihenfolge, die Facebook ausw\u00e4hlt, meist \u201eRelevanteste\u201c.");
     }
 
     private static void fillDe1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Kommentare \u00f6ffnen sich in der Reihenfolge, die Facebook ausw\u00e4hlt, meist \u201eRelevanteste\u201c.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Kommentare \u00f6ffnen sich in der unten gew\u00e4hlten Reihenfolge statt in der, die Facebook ausw\u00e4hlt. Eine Reihenfolge, die du in den Kommentaren eines Beitrags w\u00e4hlst, bleibt f\u00fcr diesen Beitrag, bis Facebook neu startet, und Links zu einem Kommentar behalten die Reihenfolge von Facebook.");
         table.put("Comments will open in the order Facebook picks.",
@@ -192,6 +194,8 @@ public final class L10nTranslations {
                 "Kurzbericht kopieren");
         table.put("Copying the font file",
                 "Schriftdatei wird kopiert");
+        table.put("Couldn't check the tab bar. Your normal tabs stay available. Restart Facebook to try again.",
+                "Die Tab-Leiste konnte nicht gepr\u00fcft werden. Deine normalen Tabs bleiben verf\u00fcgbar. Starte Facebook neu, um es erneut zu versuchen.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "Die R\u00fcckkehr zur Schriftart deines Handys hat nicht geklappt. Versuche es noch einmal.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
@@ -210,6 +214,8 @@ public final class L10nTranslations {
                 "GitHub war nicht erreichbar. Versuche es sp\u00e4ter noch einmal.");
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "Eine Kopie dieser Schriftart lie\u00df sich nicht speichern. Pr\u00fcfe, ob auf dem Handy Platz ist, und versuche es noch einmal.");
+        table.put("Couldn't save the change. Try again.",
+                "Die \u00c4nderung konnte nicht gespeichert werden. Versuch es erneut.");
         table.put("Couldn't save the settings file. Try again.",
                 "Die Einstellungsdatei lie\u00df sich nicht speichern. Versuche es noch einmal.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -292,15 +298,15 @@ public final class L10nTranslations {
                 "Feeds");
         table.put("File name",
                 "Dateiname");
+    }
+
+    private static void fillDe2(Map<String, String> table) {
         table.put("File name set to %1$s.",
                 "Dateiname auf %1$s gesetzt.");
         table.put("Folder name",
                 "Ordnername");
         table.put("Folder set to %1$s.",
                 "Ordner auf %1$s gesetzt.");
-    }
-
-    private static void fillDe2(Map<String, String> table) {
         table.put("Font file",
                 "Schriftdatei");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -415,19 +421,29 @@ public final class L10nTranslations {
                 "Zu einem Abschnitt springen");
         table.put("Keep feed position on return",
                 "Feedposition beim Zur\u00fcckkehren beibehalten");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("Licenses",
                 "Lizenzen");
         table.put("Link expired. Reopen the item and try again",
                 "Link abgelaufen. \u00d6ffne den Inhalt neu und versuche es noch einmal");
         table.put("Links",
                 "Links");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
+                "Marketplace ist in Facebooks Tab-Einstellungen ausgeblendet. Blende es unter Einstellungen, Tab-Leiste, Leiste anpassen ein. Deine normalen Tabs bleiben verf\u00fcgbar.");
+        table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
+                "Der Marketplace-Modus bestimmt den Start-Tab. Deine bisherige Auswahl bleibt gespeichert.");
+        table.put("Marketplace mode is off.",
+                "Marketplace-Modus ist aus.");
+        table.put("Marketplace mode is off. Restart Facebook to restore its normal tabs.",
+                "Marketplace-Modus ist aus. Starte Facebook neu, um die normalen Tabs wiederherzustellen.");
         table.put("Marketplace only",
                 "Nur Marketplace");
+        table.put("Marketplace unavailable. Facebook hasn't supplied a Marketplace tab for this account. Your normal tabs stay available.",
+                "Marketplace nicht verf\u00fcgbar. Facebook hat f\u00fcr dieses Konto keinen Marketplace-Tab bereitgestellt. Deine normalen Tabs bleiben verf\u00fcgbar.");
         table.put("Material You theme",
                 "Material-You-Design");
         table.put("Menu",
@@ -462,6 +478,8 @@ public final class L10nTranslations {
                 "Benachrichtigungen");
         table.put("OK",
                 "OK");
+        table.put("Off. Turn on to open Marketplace and hide the feed and other social tabs after restarting Facebook.",
+                "Aus. Aktiviere den Modus, um nach einem Neustart von Facebook Marketplace zu \u00f6ffnen und den Feed sowie andere soziale Tabs auszublenden.");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Einmal am Tag fragt Hushfacebook beim Start von Facebook bei GitHub nach der neuesten Version und zeigt sie oben auf dieser Seite, wenn sie neuer ist. Nur daf\u00fcr geht Hushfacebook von sich aus online, deshalb bleibt das aus, bis du es einschaltest. Heruntergeladen wird nichts.");
         table.put("One word or phrase per line",
@@ -480,6 +498,8 @@ public final class L10nTranslations {
                 "Hushfacebook pausieren");
         table.put("Pause, backup and diagnostics",
                 "Pause, Sicherung und Diagnose");
+        table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
+                "Mit Hushfacebook pausiert. Deine Marketplace-Auswahl bleibt gespeichert. Bereits ausgeblendete Tabs kehren nach einem Neustart zur\u00fcck, solange Hushfacebook pausiert ist.");
         table.put("Playback",
                 "Wiedergabe");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -494,10 +514,14 @@ public final class L10nTranslations {
                 "Beitr\u00e4ge, deren Text ein Wort oder eine Wortfolge aus deiner Liste unten enth\u00e4lt. Ein Beitrag mit einem Wort aus deiner Liste zum Behalten bleibt, ebenso ein Beitrag ohne Text. Deine W\u00f6rter verlassen das Handy nur in einer Einstellungsdatei, die du exportierst.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profile und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
+        table.put("Quiet social notifications",
+                "Soziale Benachrichtigungen stummschalten");
         table.put("Re-signed build fix",
                 "Fix f\u00fcr neu signierte Builds");
         table.put("Reading the settings file",
                 "Einstellungsdatei wird gelesen");
+        table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
+                "Verringert das Laden des Feeds im Hintergrund, solange der Marketplace-Modus aktiv ist. Beim Start k\u00f6nnen weiterhin Daten geladen werden.");
         table.put("Reels and Watch",
                 "Reels und Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
@@ -506,12 +530,23 @@ public final class L10nTranslations {
                 "Die Buttons Remix, Vorlage verwenden, \u201eDu bist dran\u201c und Edits sowie die f\u00fcr Sterne, Spiele, Partner-Apps und externe Links. Der Song und andere Hinweise bleiben.");
         table.put("Remove tracking from shared links",
                 "Tracking aus geteilten Links entfernen");
+        table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
+                "Neustart erforderlich. Der Marketplace-Modus wird beim n\u00e4chsten Start von Facebook aktiviert.");
+        table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
+                "Neustart erforderlich. Die normalen Tabs kehren beim n\u00e4chsten Start von Facebook zur\u00fcck.");
+        table.put("Restore the normal tabs at the next restart. Your other settings stay saved.",
+                "Beim n\u00e4chsten Neustart werden die normalen Tabs wiederhergestellt. Deine anderen Einstellungen bleiben gespeichert.");
         table.put("Resume long videos",
                 "Lange Videos fortsetzen");
         table.put("Retry",
                 "Erneut versuchen");
+        table.put("Return to regular Facebook",
+                "Zur\u00fcck zum normalen Facebook");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Wenn du innerhalb von zehn Minuten zu Facebook zur\u00fcckkehrst, bleibst du an derselben Stelle. Zum Aktualisieren kannst du weiter nach unten ziehen.");
+    }
+
+    private static void fillDe4(Map<String, String> table) {
         table.put("Room for Meta's apps",
                 "Platz f\u00fcr Metas Apps");
         table.put("Save",
@@ -544,9 +579,6 @@ public final class L10nTranslations {
                 "Was du speicherst, landet dann in einem Ordner namens %1$s.");
         table.put("Saving a photo",
                 "Foto wird gespeichert");
-    }
-
-    private static void fillDe4(Map<String, String> table) {
         table.put("Saving a video",
                 "Video wird gespeichert");
         table.put("Saving the settings file",
@@ -573,6 +605,10 @@ public final class L10nTranslations {
                 "Einstellungen importiert. %1$d Schalter wurden ge\u00e4ndert.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Einstellungen importiert. Was du speicherst, landet jetzt in einem Ordner namens %1$s.");
+        table.put("Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.",
+                "Schaltet Videovorschl\u00e4ge, Erinnerungen, Geburtstage und Freundschaftsvorschl\u00e4ge stumm, solange dieser Modus aktiv ist. Nachrichten und Updates zu K\u00e4ufen und Verk\u00e4ufen bleiben erhalten. Deine anderen Benachrichtigungseinstellungen bleiben gespeichert.");
+        table.put("Skip feed preloading",
+                "Feed-Vorladen \u00fcberspringen");
         table.put("Smallest",
                 "Kleinste");
         table.put("Source code and issues",
@@ -631,6 +667,9 @@ public final class L10nTranslations {
                 "Der Kommentar, den Facebook unter einem Reel als Vorschau zeigt, und die Blasen der Freunde, die reagiert haben. \u00d6ffne die Kommentare, um alle zu sehen.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "Der Diagnosebericht lie\u00df sich noch nicht speichern. Versuche es gleich noch einmal.");
+    }
+
+    private static void fillDe5(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Der Diagnosebericht lie\u00df sich nicht speichern. Versuche es noch einmal.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -651,8 +690,6 @@ public final class L10nTranslations {
                 "Die Einstellung lie\u00df sich nicht vollst\u00e4ndig aktualisieren. Der gespeicherte Wert wird angezeigt.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Der Schalter wirkt, sobald Facebook neu startet.");
-        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
-                "Die Tab-Leiste beh\u00e4lt Marketplace, Benachrichtigungen und dein Profil oder das Men\u00fc, und Facebook \u00f6ffnet sich im Marketplace. Die Startseite mit dem Newsfeed, Video, Freunde und die \u00fcbrigen Tabs verschwinden. Benachrichtigungen und Links \u00f6ffnen weiterhin dort, wohin sie f\u00fchren.");
         table.put("There's no diagnostic data to clear.",
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
         table.put("There's no diagnostic data to put back.",
@@ -667,9 +704,6 @@ public final class L10nTranslations {
                 "Trend-Videos und die Reels, die Facebook f\u00fcr dich ausgew\u00e4hlt hat, tauchen nicht mehr in deinen Benachrichtigungen auf.");
         table.put("Try again, or go back to Facebook.",
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
-    }
-
-    private static void fillDe5(Map<String, String> table) {
         table.put("Updates",
                 "Updates");
         table.put("Use the phone's emoji",
@@ -700,6 +734,8 @@ public final class L10nTranslations {
                 "Videos werden dann in ihrer niedrigsten Qualit\u00e4t gespeichert, damit die Dateien so klein wie m\u00f6glich sind.");
         table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
                 "Videos, Reels, Stories und Musik warten auf dein Tippen, bevor sie abgespielt werden. Facebooks eigene Einstellung \u201eAutomatische Wiedergabe\u201c steht auf Aus, solange dies an ist, und kehrt zu deiner Wahl zur\u00fcck, wenn es aus ist.");
+        table.put("Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.",
+                "Warten auf Facebooks Tab-Leiste. Der Marketplace-Modus wird angewendet, sobald Facebook sie erstellt.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Weblinks \u00f6ffnen sich nicht mehr im In-App-Browser von Facebook. Facebooks eigene Seiten \u00f6ffnen sich weiterhin in der App.");
         table.put("What always comes through",
@@ -751,7 +787,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(714);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -808,6 +844,8 @@ public final class L10nTranslations {
                 "Tema negro AMOLED");
         table.put("About",
                 "Acerca de");
+        table.put("Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.",
+                "Activo. Se conservan Marketplace, Notificaciones y Perfil/Men\u00fa. Los ajustes de Hushfacebook est\u00e1n en Men\u00fa, en Configuraci\u00f3n y privacidad.");
         table.put("Ad cards between the stories people posted.",
                 "Tarjetas de anuncios entre las historias que public\u00f3 la gente.");
         table.put("Ad telemetry blocked",
@@ -880,11 +918,11 @@ public final class L10nTranslations {
                 "Orden de los comentarios");
         table.put("Comments",
                 "Comentarios");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Los comentarios se abren en el orden que elige Facebook, que suele ser M\u00e1s relevantes.");
     }
 
     private static void fillEs1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Los comentarios se abren en el orden que elige Facebook, que suele ser M\u00e1s relevantes.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Los comentarios se abren en el orden elegido abajo en lugar del que elige Facebook. El orden que elijas en los comentarios de una publicaci\u00f3n se mantiene para esa publicaci\u00f3n hasta que Facebook se reinicie, y los enlaces a un comentario conservan el orden de Facebook.");
         table.put("Comments will open in the order Facebook picks.",
@@ -899,6 +937,8 @@ public final class L10nTranslations {
                 "Copiar informe r\u00e1pido");
         table.put("Copying the font file",
                 "Copiando el archivo de fuente");
+        table.put("Couldn't check the tab bar. Your normal tabs stay available. Restart Facebook to try again.",
+                "No se pudo comprobar la barra de pesta\u00f1as. Tus pesta\u00f1as normales siguen disponibles. Reinicia Facebook para volver a intentarlo.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "No se pudo volver a la fuente de tu tel\u00e9fono. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
@@ -917,6 +957,8 @@ public final class L10nTranslations {
                 "No se pudo contactar con GitHub. Int\u00e9ntalo de nuevo m\u00e1s tarde.");
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "No se pudo guardar una copia de esa fuente. Comprueba que el tel\u00e9fono tenga espacio y vuelve a intentarlo.");
+        table.put("Couldn't save the change. Try again.",
+                "No se pudo guardar el cambio. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't save the settings file. Try again.",
                 "No se pudo guardar el archivo de configuraci\u00f3n. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -999,15 +1041,15 @@ public final class L10nTranslations {
                 "Feeds");
         table.put("File name",
                 "Nombre de archivo");
+    }
+
+    private static void fillEs2(Map<String, String> table) {
         table.put("File name set to %1$s.",
                 "Nombre de archivo establecido en %1$s.");
         table.put("Folder name",
                 "Nombre de carpeta");
         table.put("Folder set to %1$s.",
                 "Carpeta establecida en %1$s.");
-    }
-
-    private static void fillEs2(Map<String, String> table) {
         table.put("Font file",
                 "Archivo de fuente");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -1122,19 +1164,29 @@ public final class L10nTranslations {
                 "Ir a una secci\u00f3n");
         table.put("Keep feed position on return",
                 "Mantener la posici\u00f3n del feed al volver");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("Licenses",
                 "Licencias");
         table.put("Link expired. Reopen the item and try again",
                 "El enlace expir\u00f3. Vuelve a abrir el contenido e int\u00e9ntalo de nuevo");
         table.put("Links",
                 "Enlaces");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
+                "Marketplace est\u00e1 oculto en los ajustes de pesta\u00f1as de Facebook. Mu\u00e9stralo en Configuraci\u00f3n, Barra de pesta\u00f1as, Personalizar la barra. Tus pesta\u00f1as normales siguen disponibles.");
+        table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
+                "El modo Marketplace elige la pesta\u00f1a de inicio. Tu selecci\u00f3n anterior se conserva.");
+        table.put("Marketplace mode is off.",
+                "El modo Marketplace est\u00e1 desactivado.");
+        table.put("Marketplace mode is off. Restart Facebook to restore its normal tabs.",
+                "El modo Marketplace est\u00e1 desactivado. Reinicia Facebook para restaurar sus pesta\u00f1as normales.");
         table.put("Marketplace only",
                 "Solo Marketplace");
+        table.put("Marketplace unavailable. Facebook hasn't supplied a Marketplace tab for this account. Your normal tabs stay available.",
+                "Marketplace no est\u00e1 disponible. Facebook no ha proporcionado una pesta\u00f1a de Marketplace para esta cuenta. Tus pesta\u00f1as normales siguen disponibles.");
         table.put("Material You theme",
                 "Tema Material You");
         table.put("Menu",
@@ -1169,6 +1221,8 @@ public final class L10nTranslations {
                 "Notificaciones");
         table.put("OK",
                 "Aceptar");
+        table.put("Off. Turn on to open Marketplace and hide the feed and other social tabs after restarting Facebook.",
+                "Desactivado. Act\u00edvalo para abrir Marketplace y ocultar el feed y otras pesta\u00f1as sociales despu\u00e9s de reiniciar Facebook.");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Una vez al d\u00eda, al iniciarse Facebook, Hushfacebook pregunta a GitHub por su versi\u00f3n m\u00e1s reciente y la muestra arriba en esta pantalla si es m\u00e1s nueva. Es la \u00fanica vez que Hushfacebook se conecta por su cuenta, as\u00ed que est\u00e1 desactivado hasta que lo actives. No se descarga nada.");
         table.put("One word or phrase per line",
@@ -1187,6 +1241,8 @@ public final class L10nTranslations {
                 "Pausar Hushfacebook");
         table.put("Pause, backup and diagnostics",
                 "Pausa, copia de seguridad y diagn\u00f3stico");
+        table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
+                "En pausa junto con Hushfacebook. Tu elecci\u00f3n de Marketplace se conserva. Las pesta\u00f1as ocultas vuelven al reiniciar mientras Hushfacebook sigue en pausa.");
         table.put("Playback",
                 "Reproducci\u00f3n");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -1201,10 +1257,14 @@ public final class L10nTranslations {
                 "Publicaciones cuyo texto tiene una palabra o frase de tu lista de abajo. Una publicaci\u00f3n con una palabra de tu lista para conservar se mantiene, igual que una publicaci\u00f3n sin texto. Tus palabras solo salen del tel\u00e9fono en un archivo de configuraci\u00f3n que exportes.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
+        table.put("Quiet social notifications",
+                "Silenciar notificaciones sociales");
         table.put("Re-signed build fix",
                 "Arreglo para la nueva firma");
         table.put("Reading the settings file",
                 "Leyendo el archivo de configuraci\u00f3n");
+        table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
+                "Reduce la carga del feed en segundo plano mientras el modo Marketplace est\u00e1 activo. A\u00fan pueden cargarse algunos datos al iniciar.");
         table.put("Reels and Watch",
                 "Reels y Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
@@ -1213,12 +1273,23 @@ public final class L10nTranslations {
                 "Los botones para hacer un remix, usar la plantilla, sumar el tuyo o abrir Edits, y los de estrellas, juegos, apps asociadas y enlaces externos. La canci\u00f3n y las dem\u00e1s etiquetas se quedan.");
         table.put("Remove tracking from shared links",
                 "Quitar el seguimiento de los enlaces compartidos");
+        table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
+                "Es necesario reiniciar. El modo Marketplace se activar\u00e1 la pr\u00f3xima vez que se inicie Facebook.");
+        table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
+                "Es necesario reiniciar. Las pesta\u00f1as normales volver\u00e1n la pr\u00f3xima vez que se inicie Facebook.");
+        table.put("Restore the normal tabs at the next restart. Your other settings stay saved.",
+                "Restaura las pesta\u00f1as normales al reiniciar. Tus otros ajustes se conservan.");
         table.put("Resume long videos",
                 "Reanudar videos largos");
         table.put("Retry",
                 "Reintentar");
+        table.put("Return to regular Facebook",
+                "Volver a Facebook normal");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Si vuelves a Facebook en menos de diez minutos, seguir\u00e1s donde estabas. Puedes deslizar hacia abajo para actualizar.");
+    }
+
+    private static void fillEs4(Map<String, String> table) {
         table.put("Room for Meta's apps",
                 "Espacio para las apps de Meta");
         table.put("Save",
@@ -1251,9 +1322,6 @@ public final class L10nTranslations {
                 "Lo que guardes ir\u00e1 a una carpeta llamada %1$s.");
         table.put("Saving a photo",
                 "Guardando una foto");
-    }
-
-    private static void fillEs4(Map<String, String> table) {
         table.put("Saving a video",
                 "Guardando un video");
         table.put("Saving the settings file",
@@ -1280,6 +1348,10 @@ public final class L10nTranslations {
                 "Configuraci\u00f3n importada. Cambiaron %1$d interruptores.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Configuraci\u00f3n importada. Lo que guardes ir\u00e1 a una carpeta llamada %1$s.");
+        table.put("Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.",
+                "Silencia sugerencias de videos, recuerdos, cumplea\u00f1os y sugerencias de amistad mientras este modo est\u00e1 activado. Se conservan los mensajes y las novedades de compras y ventas. Tus otros ajustes de notificaciones se mantienen.");
+        table.put("Skip feed preloading",
+                "Omitir la precarga del feed");
         table.put("Smallest",
                 "La m\u00e1s peque\u00f1a");
         table.put("Source code and issues",
@@ -1338,6 +1410,9 @@ public final class L10nTranslations {
                 "El comentario que Facebook muestra como vista previa debajo de un reel y las burbujas de los amigos que reaccionaron. Abre los comentarios para verlos todos.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "Todav\u00eda no se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo en un momento.");
+    }
+
+    private static void fillEs5(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "No se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -1358,8 +1433,6 @@ public final class L10nTranslations {
                 "No se pudo terminar de actualizar el ajuste. Se muestra su valor guardado.");
         table.put("The switch takes effect when Facebook restarts.",
                 "El interruptor surte efecto cuando Facebook se reinicie.");
-        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
-                "La barra de pesta\u00f1as conserva Marketplace, Notificaciones y tu perfil o el Men\u00fa, y Facebook se abre en Marketplace. Inicio con el feed, Video, Amigos y las dem\u00e1s pesta\u00f1as desaparecen. Las notificaciones y los enlaces siguen abri\u00e9ndose donde apuntan.");
         table.put("There's no diagnostic data to clear.",
                 "No hay datos de diagn\u00f3stico que borrar.");
         table.put("There's no diagnostic data to put back.",
@@ -1374,9 +1447,6 @@ public final class L10nTranslations {
                 "Los videos en tendencia y los reels que Facebook eligi\u00f3 para ti dejan de aparecer en tus notificaciones.");
         table.put("Try again, or go back to Facebook.",
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
-    }
-
-    private static void fillEs5(Map<String, String> table) {
         table.put("Updates",
                 "Actualizaciones");
         table.put("Use the phone's emoji",
@@ -1407,6 +1477,8 @@ public final class L10nTranslations {
                 "Los videos se guardar\u00e1n con su calidad m\u00e1s baja, para que los archivos sean lo m\u00e1s peque\u00f1os posible.");
         table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
                 "Los videos, reels, historias y la m\u00fasica esperan a que toques antes de reproducirse. La opci\u00f3n de reproducci\u00f3n autom\u00e1tica de Facebook aparece como desactivada mientras esto est\u00e1 activado y vuelve a lo que elegiste cuando lo desactivas.");
+        table.put("Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.",
+                "Esperando la barra de pesta\u00f1as de Facebook. El modo Marketplace se aplicar\u00e1 cuando Facebook la cree.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Los enlaces web ya no se abren en el navegador integrado de Facebook. Las p\u00e1ginas del propio Facebook se siguen abriendo en la app.");
         table.put("What always comes through",
@@ -1458,7 +1530,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(714);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1515,6 +1587,8 @@ public final class L10nTranslations {
                 "Tema hitam AMOLED");
         table.put("About",
                 "Tentang");
+        table.put("Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.",
+                "Aktif. Marketplace, Notifikasi, dan Profil/Menu tetap ada. Setelan Hushfacebook ada di Menu, pada Pengaturan dan privasi.");
         table.put("Ad cards between the stories people posted.",
                 "Kartu iklan di antara cerita yang diposting orang.");
         table.put("Ad telemetry blocked",
@@ -1587,11 +1661,11 @@ public final class L10nTranslations {
                 "Urutan komentar");
         table.put("Comments",
                 "Komentar");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Komentar dibuka dengan urutan yang dipilih Facebook, biasanya Paling relevan.");
     }
 
     private static void fillIn1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Komentar dibuka dengan urutan yang dipilih Facebook, biasanya Paling relevan.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Komentar dibuka dengan urutan yang dipilih di bawah, bukan urutan yang dipilih Facebook. Urutan yang kamu pilih di komentar sebuah postingan tetap berlaku untuk postingan itu sampai Facebook dimulai ulang, dan tautan ke sebuah komentar tetap memakai urutan Facebook.");
         table.put("Comments will open in the order Facebook picks.",
@@ -1606,6 +1680,8 @@ public final class L10nTranslations {
                 "Salin laporan singkat");
         table.put("Copying the font file",
                 "Menyalin file font");
+        table.put("Couldn't check the tab bar. Your normal tabs stay available. Restart Facebook to try again.",
+                "Bilah tab tidak dapat diperiksa. Tab biasa tetap tersedia. Mulai ulang Facebook untuk mencoba lagi.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "Tidak dapat kembali ke font ponsel Anda. Coba lagi.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
@@ -1624,6 +1700,8 @@ public final class L10nTranslations {
                 "GitHub tidak dapat dihubungi. Coba lagi nanti.");
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "Salinan font itu tidak dapat disimpan. Pastikan ponsel masih punya ruang, lalu coba lagi.");
+        table.put("Couldn't save the change. Try again.",
+                "Perubahan tidak dapat disimpan. Coba lagi.");
         table.put("Couldn't save the settings file. Try again.",
                 "File pengaturan tidak dapat disimpan. Coba lagi.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -1706,15 +1784,15 @@ public final class L10nTranslations {
                 "Feed");
         table.put("File name",
                 "Nama file");
+    }
+
+    private static void fillIn2(Map<String, String> table) {
         table.put("File name set to %1$s.",
                 "Nama file diatur menjadi %1$s.");
         table.put("Folder name",
                 "Nama folder");
         table.put("Folder set to %1$s.",
                 "Folder diatur menjadi %1$s.");
-    }
-
-    private static void fillIn2(Map<String, String> table) {
         table.put("Font file",
                 "File font");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -1829,19 +1907,29 @@ public final class L10nTranslations {
                 "Lompat ke bagian");
         table.put("Keep feed position on return",
                 "Pertahankan posisi beranda saat kembali");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("Licenses",
                 "Lisensi");
         table.put("Link expired. Reopen the item and try again",
                 "Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi");
         table.put("Links",
                 "Tautan");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
+                "Marketplace disembunyikan di pengaturan tab Facebook. Tampilkan melalui Pengaturan, Bilah tab, Sesuaikan bilah. Tab biasa tetap tersedia.");
+        table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
+                "Mode Marketplace menentukan tab awal. Pilihan sebelumnya tetap tersimpan.");
+        table.put("Marketplace mode is off.",
+                "Mode Marketplace nonaktif.");
+        table.put("Marketplace mode is off. Restart Facebook to restore its normal tabs.",
+                "Mode Marketplace nonaktif. Mulai ulang Facebook untuk memulihkan tab biasa.");
         table.put("Marketplace only",
                 "Hanya Marketplace");
+        table.put("Marketplace unavailable. Facebook hasn't supplied a Marketplace tab for this account. Your normal tabs stay available.",
+                "Marketplace tidak tersedia. Facebook belum menyediakan tab Marketplace untuk akun ini. Tab biasa tetap tersedia.");
         table.put("Material You theme",
                 "Tema Material You");
         table.put("Menu",
@@ -1876,6 +1964,8 @@ public final class L10nTranslations {
                 "Notifikasi");
         table.put("OK",
                 "Oke");
+        table.put("Off. Turn on to open Marketplace and hide the feed and other social tabs after restarting Facebook.",
+                "Nonaktif. Aktifkan untuk membuka Marketplace dan menyembunyikan beranda serta tab sosial lainnya setelah Facebook dimulai ulang.");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Sekali sehari, saat Facebook dibuka, Hushfacebook menanyakan rilis terbarunya ke GitHub dan menampilkannya di bagian atas layar ini jika lebih baru. Hanya pada saat inilah Hushfacebook terhubung ke internet atas kemauannya sendiri, jadi fitur ini mati sampai Anda menyalakannya. Tidak ada yang diunduh.");
         table.put("One word or phrase per line",
@@ -1894,6 +1984,8 @@ public final class L10nTranslations {
                 "Jeda Hushfacebook");
         table.put("Pause, backup and diagnostics",
                 "Jeda, cadangan, dan diagnostik");
+        table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
+                "Dijeda bersama Hushfacebook. Pilihan Marketplace tetap tersimpan. Tab yang sudah disembunyikan kembali setelah aplikasi dimulai ulang saat masih dijeda.");
         table.put("Playback",
                 "Pemutaran");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -1908,10 +2000,14 @@ public final class L10nTranslations {
                 "Postingan yang teksnya berisi kata atau frasa dari daftar Anda di bawah. Postingan dengan kata dari daftar pertahankan Anda tetap ada, begitu juga postingan tanpa teks. Kata-kata Anda hanya keluar dari ponsel dalam file pengaturan yang Anda ekspor.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
+        table.put("Quiet social notifications",
+                "Senyapkan notifikasi sosial");
         table.put("Re-signed build fix",
                 "Perbaikan build yang ditandatangani ulang");
         table.put("Reading the settings file",
                 "Membaca file pengaturan");
+        table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
+                "Kurangi pemuatan beranda di latar belakang saat mode Marketplace aktif. Sebagian data masih bisa dimuat saat aplikasi mulai.");
         table.put("Reels and Watch",
                 "Reels dan Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
@@ -1920,12 +2016,23 @@ public final class L10nTranslations {
                 "Tombol untuk Remix, memakai templat, menambahkan milik Anda, dan Edits, serta tombol Bintang, game, aplikasi mitra, dan tautan eksternal. Lagu dan label lainnya tetap ada.");
         table.put("Remove tracking from shared links",
                 "Hapus pelacakan dari tautan yang dibagikan");
+        table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
+                "Perlu dimulai ulang. Mode Marketplace akan aktif saat Facebook dimulai lagi.");
+        table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
+                "Perlu dimulai ulang. Tab biasa akan kembali saat Facebook dimulai lagi.");
+        table.put("Restore the normal tabs at the next restart. Your other settings stay saved.",
+                "Pulihkan tab biasa saat aplikasi dimulai ulang. Setelan lainnya tetap tersimpan.");
         table.put("Resume long videos",
                 "Lanjutkan video panjang");
         table.put("Retry",
                 "Coba lagi");
+        table.put("Return to regular Facebook",
+                "Kembali ke Facebook biasa");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Jika kembali ke Facebook dalam sepuluh menit, posisi beranda tetap sama. Tarik ke bawah untuk memuat ulang masih berfungsi.");
+    }
+
+    private static void fillIn4(Map<String, String> table) {
         table.put("Room for Meta's apps",
                 "Ruang untuk aplikasi Meta");
         table.put("Save",
@@ -1958,9 +2065,6 @@ public final class L10nTranslations {
                 "Semua yang Anda simpan akan masuk ke folder bernama %1$s.");
         table.put("Saving a photo",
                 "Menyimpan foto");
-    }
-
-    private static void fillIn4(Map<String, String> table) {
         table.put("Saving a video",
                 "Menyimpan video");
         table.put("Saving the settings file",
@@ -1987,6 +2091,10 @@ public final class L10nTranslations {
                 "Pengaturan diimpor. %1$d sakelar berubah.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Pengaturan diimpor. Semua yang Anda simpan akan masuk ke folder bernama %1$s.");
+        table.put("Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.",
+                "Senyapkan saran video, kenangan, ulang tahun, dan saran teman saat mode ini aktif. Pesan dan pembaruan jual beli tetap masuk. Pilihan notifikasi lainnya tetap tersimpan.");
+        table.put("Skip feed preloading",
+                "Lewati pramuat beranda");
         table.put("Smallest",
                 "Terkecil");
         table.put("Source code and issues",
@@ -2045,6 +2153,9 @@ public final class L10nTranslations {
                 "Komentar yang ditampilkan Facebook sebagai pratinjau di bawah reel, dan gelembung teman yang memberi reaksi. Buka komentar untuk melihat semuanya.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "Laporan diagnostik belum dapat disimpan. Coba lagi dalam beberapa saat.");
+    }
+
+    private static void fillIn5(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Laporan diagnostik tidak dapat disimpan. Coba lagi.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -2065,8 +2176,6 @@ public final class L10nTranslations {
                 "Pengaturan ini tidak dapat selesai diperbarui. Nilai yang tersimpan ditampilkan.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Sakelar ini berlaku saat Facebook dimulai ulang.");
-        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
-                "Bilah tab hanya menyisakan Marketplace, Notifikasi, dan profil Anda atau Menu, lalu Facebook terbuka di Marketplace. Beranda beserta Kabar Beranda, Video, Teman, dan tab lainnya dihilangkan. Notifikasi dan tautan tetap terbuka ke tujuannya.");
         table.put("There's no diagnostic data to clear.",
                 "Tidak ada data diagnostik yang dapat dihapus.");
         table.put("There's no diagnostic data to put back.",
@@ -2081,9 +2190,6 @@ public final class L10nTranslations {
                 "Video yang sedang tren dan reel yang dipilihkan Facebook untuk Anda tidak lagi muncul di notifikasi Anda.");
         table.put("Try again, or go back to Facebook.",
                 "Coba lagi, atau kembali ke Facebook.");
-    }
-
-    private static void fillIn5(Map<String, String> table) {
         table.put("Updates",
                 "Pembaruan");
         table.put("Use the phone's emoji",
@@ -2114,6 +2220,8 @@ public final class L10nTranslations {
                 "Video akan disimpan dengan kualitas terendahnya, agar ukuran filenya sekecil mungkin.");
         table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
                 "Video, reel, cerita, dan musik menunggu ketukan Anda sebelum diputar. Pengaturan Putar Otomatis milik Facebook terbaca Nonaktif selama ini aktif, dan kembali ke pilihan Anda saat ini dimatikan.");
+        table.put("Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.",
+                "Menunggu bilah tab Facebook. Mode Marketplace akan diterapkan saat Facebook membuatnya.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Tautan web tidak lagi dibuka di browser dalam aplikasi Facebook. Tautan ke Facebook sendiri tetap dibuka di aplikasi.");
         table.put("What always comes through",
@@ -2165,7 +2273,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(714);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -2222,6 +2330,8 @@ public final class L10nTranslations {
                 "Tema preto AMOLED");
         table.put("About",
                 "Sobre");
+        table.put("Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.",
+                "Ativo. Marketplace, Notifica\u00e7\u00f5es e Perfil/Menu s\u00e3o mantidos. As configura\u00e7\u00f5es do Hushfacebook ficam no Menu, em Configura\u00e7\u00f5es e privacidade.");
         table.put("Ad cards between the stories people posted.",
                 "An\u00fancios entre os stories que as pessoas postaram.");
         table.put("Ad telemetry blocked",
@@ -2294,11 +2404,11 @@ public final class L10nTranslations {
                 "Ordem dos coment\u00e1rios");
         table.put("Comments",
                 "Coment\u00e1rios");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Os coment\u00e1rios abrem na ordem que o Facebook escolhe, que costuma ser Mais relevantes.");
     }
 
     private static void fillPt_rBR1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Os coment\u00e1rios abrem na ordem que o Facebook escolhe, que costuma ser Mais relevantes.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Os coment\u00e1rios abrem na ordem escolhida abaixo, e n\u00e3o na que o Facebook escolhe. A ordem que voc\u00ea escolher nos coment\u00e1rios de uma publica\u00e7\u00e3o continua valendo para ela at\u00e9 o Facebook reiniciar, e links para um coment\u00e1rio mant\u00eam a ordem do Facebook.");
         table.put("Comments will open in the order Facebook picks.",
@@ -2313,6 +2423,8 @@ public final class L10nTranslations {
                 "Copiar relat\u00f3rio r\u00e1pido");
         table.put("Copying the font file",
                 "Copiando o arquivo de fonte");
+        table.put("Couldn't check the tab bar. Your normal tabs stay available. Restart Facebook to try again.",
+                "N\u00e3o foi poss\u00edvel verificar a barra de abas. Suas abas normais continuam dispon\u00edveis. Reinicie o Facebook para tentar novamente.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "N\u00e3o foi poss\u00edvel voltar para a fonte do seu celular. Tente de novo.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
@@ -2331,6 +2443,8 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel falar com o GitHub. Tente de novo mais tarde.");
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "N\u00e3o foi poss\u00edvel salvar uma c\u00f3pia dessa fonte. Veja se o celular tem espa\u00e7o e tente de novo.");
+        table.put("Couldn't save the change. Try again.",
+                "N\u00e3o foi poss\u00edvel salvar a altera\u00e7\u00e3o. Tente novamente.");
         table.put("Couldn't save the settings file. Try again.",
                 "N\u00e3o foi poss\u00edvel salvar o arquivo de configura\u00e7\u00f5es. Tente de novo.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -2413,15 +2527,15 @@ public final class L10nTranslations {
                 "Feeds");
         table.put("File name",
                 "Nome do arquivo");
+    }
+
+    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("File name set to %1$s.",
                 "Nome do arquivo definido como %1$s.");
         table.put("Folder name",
                 "Nome da pasta");
         table.put("Folder set to %1$s.",
                 "Pasta definida como %1$s.");
-    }
-
-    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Font file",
                 "Arquivo de fonte");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -2536,19 +2650,29 @@ public final class L10nTranslations {
                 "Ir para uma se\u00e7\u00e3o");
         table.put("Keep feed position on return",
                 "Manter a posi\u00e7\u00e3o no feed ao voltar");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Licenses",
                 "Licen\u00e7as");
         table.put("Link expired. Reopen the item and try again",
                 "Link expirado. Reabra o item e tente de novo");
         table.put("Links",
                 "Links");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
+                "O Marketplace est\u00e1 oculto nas configura\u00e7\u00f5es de abas do Facebook. Exiba em Configura\u00e7\u00f5es, Barra de abas, Personalizar a barra. Suas abas normais continuam dispon\u00edveis.");
+        table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
+                "O modo Marketplace define a aba inicial. Sua escolha anterior \u00e9 mantida.");
+        table.put("Marketplace mode is off.",
+                "O modo Marketplace est\u00e1 desativado.");
+        table.put("Marketplace mode is off. Restart Facebook to restore its normal tabs.",
+                "O modo Marketplace est\u00e1 desativado. Reinicie o Facebook para restaurar as abas normais.");
         table.put("Marketplace only",
                 "S\u00f3 Marketplace");
+        table.put("Marketplace unavailable. Facebook hasn't supplied a Marketplace tab for this account. Your normal tabs stay available.",
+                "Marketplace indispon\u00edvel. O Facebook n\u00e3o forneceu uma aba do Marketplace para esta conta. Suas abas normais continuam dispon\u00edveis.");
         table.put("Material You theme",
                 "Tema Material You");
         table.put("Menu",
@@ -2583,6 +2707,8 @@ public final class L10nTranslations {
                 "Notifica\u00e7\u00f5es");
         table.put("OK",
                 "OK");
+        table.put("Off. Turn on to open Marketplace and hide the feed and other social tabs after restarting Facebook.",
+                "Desativado. Ative para abrir o Marketplace e ocultar o feed e outras abas sociais ap\u00f3s reiniciar o Facebook.");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Uma vez por dia, quando o Facebook abre, o Hushfacebook pergunta ao GitHub qual \u00e9 a vers\u00e3o mais recente e a mostra no topo desta tela se for mais nova. \u00c9 a \u00fanica vez que o Hushfacebook se conecta por conta pr\u00f3pria, por isso fica desligado at\u00e9 voc\u00ea ligar. Nada \u00e9 baixado.");
         table.put("One word or phrase per line",
@@ -2601,6 +2727,8 @@ public final class L10nTranslations {
                 "Pausar o Hushfacebook");
         table.put("Pause, backup and diagnostics",
                 "Pausa, backup e diagn\u00f3stico");
+        table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
+                "Pausado com o Hushfacebook. Sua escolha do Marketplace \u00e9 mantida. As abas ocultas voltam ap\u00f3s reiniciar enquanto o Hushfacebook estiver pausado.");
         table.put("Playback",
                 "Reprodu\u00e7\u00e3o");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -2615,10 +2743,14 @@ public final class L10nTranslations {
                 "Posts cujo texto tem uma palavra ou frase da sua lista abaixo. Um post com uma palavra da sua lista para manter continua aparecendo, e um post sem texto tamb\u00e9m. Suas palavras s\u00f3 saem do celular em um arquivo de configura\u00e7\u00f5es que voc\u00ea exportar.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o reassinada.");
+        table.put("Quiet social notifications",
+                "Silenciar notifica\u00e7\u00f5es sociais");
         table.put("Re-signed build fix",
                 "Corre\u00e7\u00e3o para vers\u00e3o reassinada");
         table.put("Reading the settings file",
                 "Lendo o arquivo de configura\u00e7\u00f5es");
+        table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
+                "Reduz o carregamento do feed em segundo plano enquanto o modo Marketplace est\u00e1 ativo. Alguns dados ainda podem ser carregados ao iniciar.");
         table.put("Reels and Watch",
                 "Reels e Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
@@ -2627,12 +2759,23 @@ public final class L10nTranslations {
                 "Os bot\u00f5es de remix, usar modelo, adicionar o seu e Edits, e os de estrelas, jogos, apps parceiros e links externos. A m\u00fasica e as outras etiquetas continuam.");
         table.put("Remove tracking from shared links",
                 "Remover o rastreamento dos links compartilhados");
+        table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
+                "\u00c9 preciso reiniciar. O modo Marketplace ser\u00e1 ativado na pr\u00f3xima vez que o Facebook iniciar.");
+        table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
+                "\u00c9 preciso reiniciar. As abas normais voltar\u00e3o na pr\u00f3xima vez que o Facebook iniciar.");
+        table.put("Restore the normal tabs at the next restart. Your other settings stay saved.",
+                "Restaura as abas normais ao reiniciar. Suas outras configura\u00e7\u00f5es s\u00e3o mantidas.");
         table.put("Resume long videos",
                 "Retomar v\u00eddeos longos");
         table.put("Retry",
                 "Tentar novamente");
+        table.put("Return to regular Facebook",
+                "Voltar ao Facebook normal");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Se voc\u00ea voltar ao Facebook em at\u00e9 dez minutos, continuar\u00e1 de onde parou. Puxe para baixo para atualizar quando quiser.");
+    }
+
+    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Room for Meta's apps",
                 "Espa\u00e7o para os apps da Meta");
         table.put("Save",
@@ -2665,9 +2808,6 @@ public final class L10nTranslations {
                 "O que voc\u00ea salvar vai para uma pasta chamada %1$s.");
         table.put("Saving a photo",
                 "Salvando uma foto");
-    }
-
-    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Saving a video",
                 "Salvando um v\u00eddeo");
         table.put("Saving the settings file",
@@ -2694,6 +2834,10 @@ public final class L10nTranslations {
                 "Configura\u00e7\u00f5es importadas. %1$d op\u00e7\u00f5es mudaram.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Configura\u00e7\u00f5es importadas. O que voc\u00ea salvar vai para uma pasta chamada %1$s.");
+        table.put("Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.",
+                "Silencia sugest\u00f5es de v\u00eddeos, lembran\u00e7as, anivers\u00e1rios e sugest\u00f5es de amizade enquanto este modo est\u00e1 ativo. Mensagens e atualiza\u00e7\u00f5es de compras e vendas s\u00e3o mantidas. Suas outras op\u00e7\u00f5es de notifica\u00e7\u00f5es ficam salvas.");
+        table.put("Skip feed preloading",
+                "Ignorar o pr\u00e9-carregamento do feed");
         table.put("Smallest",
                 "A menor");
         table.put("Source code and issues",
@@ -2752,6 +2896,9 @@ public final class L10nTranslations {
                 "O coment\u00e1rio que o Facebook mostra como pr\u00e9via abaixo de um reel e as bolhas dos amigos que reagiram. Abra os coment\u00e1rios para ver todos.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "O relat\u00f3rio de diagn\u00f3stico ainda n\u00e3o p\u00f4de ser salvo. Tente de novo em instantes.");
+    }
+
+    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "N\u00e3o foi poss\u00edvel salvar o relat\u00f3rio de diagn\u00f3stico. Tente de novo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -2772,8 +2919,6 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel concluir a atualiza\u00e7\u00e3o da configura\u00e7\u00e3o. O valor salvo est\u00e1 sendo mostrado.");
         table.put("The switch takes effect when Facebook restarts.",
                 "A op\u00e7\u00e3o passa a valer quando o Facebook reiniciar.");
-        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
-                "A barra de abas mant\u00e9m Marketplace, Notifica\u00e7\u00f5es e seu perfil ou o Menu, e o Facebook abre no Marketplace. A P\u00e1gina inicial com o feed de not\u00edcias, V\u00eddeo, Amigos e as outras abas somem. Notifica\u00e7\u00f5es e links continuam abrindo onde levam.");
         table.put("There's no diagnostic data to clear.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
         table.put("There's no diagnostic data to put back.",
@@ -2788,9 +2933,6 @@ public final class L10nTranslations {
                 "V\u00eddeos em alta e os reels que o Facebook escolheu para voc\u00ea deixam de aparecer nas suas notifica\u00e7\u00f5es.");
         table.put("Try again, or go back to Facebook.",
                 "Tente de novo ou volte para o Facebook.");
-    }
-
-    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Updates",
                 "Atualiza\u00e7\u00f5es");
         table.put("Use the phone's emoji",
@@ -2821,6 +2963,8 @@ public final class L10nTranslations {
                 "Os v\u00eddeos v\u00e3o ser salvos na qualidade mais baixa deles, para os arquivos ficarem os menores poss\u00edveis.");
         table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
                 "V\u00eddeos, reels, stories e m\u00fasicas esperam voc\u00ea tocar antes de come\u00e7ar. A configura\u00e7\u00e3o de reprodu\u00e7\u00e3o autom\u00e1tica do pr\u00f3prio Facebook fica como Desativada enquanto isto estiver ativado e volta para o que voc\u00ea escolheu quando for desativado.");
+        table.put("Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.",
+                "Aguardando a barra de abas do Facebook. O modo Marketplace ser\u00e1 aplicado quando o Facebook a criar.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Os links da web deixam de abrir no navegador interno do Facebook. As p\u00e1ginas do pr\u00f3prio Facebook continuam abrindo no app.");
         table.put("What always comes through",
@@ -2872,7 +3016,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(678);
+        Map<String, String> table = new HashMap<>(714);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2929,6 +3073,8 @@ public final class L10nTranslations {
                 "AMOLED siyah tema");
         table.put("About",
                 "Hakk\u0131nda");
+        table.put("Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.",
+                "Etkin. Marketplace, Bildirimler ve Profil/Men\u00fc kal\u0131r. Hushfacebook ayarlar\u0131 Men\u00fc i\u00e7indeki Ayarlar ve gizlilik b\u00f6l\u00fcm\u00fcndedir.");
         table.put("Ad cards between the stories people posted.",
                 "\u0130nsanlar\u0131n payla\u015ft\u0131\u011f\u0131 hikayeler aras\u0131ndaki reklam kartlar\u0131.");
         table.put("Ad telemetry blocked",
@@ -3001,11 +3147,11 @@ public final class L10nTranslations {
                 "Yorum s\u0131ras\u0131");
         table.put("Comments",
                 "Yorumlar");
-        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
-                "Yorumlar Facebook'un se\u00e7ti\u011fi s\u0131rayla a\u00e7\u0131l\u0131r. Bu genellikle En alakal\u0131 s\u0131ralamas\u0131d\u0131r.");
     }
 
     private static void fillTr1(Map<String, String> table) {
+        table.put("Comments open in the order Facebook picks, which is usually Most relevant.",
+                "Yorumlar Facebook'un se\u00e7ti\u011fi s\u0131rayla a\u00e7\u0131l\u0131r. Bu genellikle En alakal\u0131 s\u0131ralamas\u0131d\u0131r.");
         table.put("Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.",
                 "Yorumlar, Facebook'un se\u00e7ti\u011fi s\u0131ra yerine a\u015fa\u011f\u0131da se\u00e7ilen s\u0131rayla a\u00e7\u0131l\u0131r. Bir g\u00f6nderinin yorumlar\u0131nda se\u00e7ti\u011fin s\u0131ra, Facebook yeniden ba\u015flayana kadar o g\u00f6nderi i\u00e7in kal\u0131r ve bir yoruma giden ba\u011flant\u0131lar Facebook'un s\u0131ras\u0131n\u0131 korur.");
         table.put("Comments will open in the order Facebook picks.",
@@ -3020,6 +3166,8 @@ public final class L10nTranslations {
                 "H\u0131zl\u0131 raporu kopyala");
         table.put("Copying the font file",
                 "Yaz\u0131 tipi dosyas\u0131 kopyalan\u0131yor");
+        table.put("Couldn't check the tab bar. Your normal tabs stay available. Restart Facebook to try again.",
+                "Sekme \u00e7ubu\u011fu kontrol edilemedi. Normal sekmeleriniz kullan\u0131labilir. Tekrar denemek i\u00e7in Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "Telefonunun yaz\u0131 tipine geri d\u00f6n\u00fclemedi. Tekrar dene.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
@@ -3038,6 +3186,8 @@ public final class L10nTranslations {
                 "GitHub'a ula\u015f\u0131lamad\u0131. Daha sonra tekrar dene.");
         table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
                 "Bu yaz\u0131 tipinin kopyas\u0131 kaydedilemedi. Telefonda yer olup olmad\u0131\u011f\u0131n\u0131 kontrol et, sonra tekrar dene.");
+        table.put("Couldn't save the change. Try again.",
+                "De\u011fi\u015fiklik kaydedilemedi. Tekrar deneyin.");
         table.put("Couldn't save the settings file. Try again.",
                 "Ayar dosyas\u0131 kaydedilemedi. Tekrar dene.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -3120,15 +3270,15 @@ public final class L10nTranslations {
                 "Ak\u0131\u015flar");
         table.put("File name",
                 "Dosya ad\u0131");
+    }
+
+    private static void fillTr2(Map<String, String> table) {
         table.put("File name set to %1$s.",
                 "Dosya ad\u0131 %1$s olarak ayarland\u0131.");
         table.put("Folder name",
                 "Klas\u00f6r ad\u0131");
         table.put("Folder set to %1$s.",
                 "Klas\u00f6r %1$s olarak ayarland\u0131.");
-    }
-
-    private static void fillTr2(Map<String, String> table) {
         table.put("Font file",
                 "Yaz\u0131 tipi dosyas\u0131");
         table.put("Font set to %1$s. Restart Facebook to see it.",
@@ -3243,19 +3393,29 @@ public final class L10nTranslations {
                 "Bir b\u00f6l\u00fcme git");
         table.put("Keep feed position on return",
                 "Geri d\u00f6n\u00fcnce ak\u0131\u015f konumunu koru");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("Licenses",
                 "Lisanslar");
         table.put("Link expired. Reopen the item and try again",
                 "Ba\u011flant\u0131n\u0131n s\u00fcresi doldu. \u00d6\u011feyi yeniden a\u00e7\u0131p tekrar dene");
         table.put("Links",
                 "Ba\u011flant\u0131lar");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
+                "Marketplace, Facebook'un sekme ayarlar\u0131nda gizli. Ayarlar, Sekme \u00e7ubu\u011fu, \u00c7ubu\u011fu \u00f6zelle\u015ftir b\u00f6l\u00fcm\u00fcnden g\u00f6sterin. Normal sekmeleriniz kullan\u0131labilir.");
+        table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
+                "A\u00e7\u0131l\u0131\u015f sekmesini Marketplace modu belirler. \u00d6nceki se\u00e7iminiz kay\u0131tl\u0131 kal\u0131r.");
+        table.put("Marketplace mode is off.",
+                "Marketplace modu kapal\u0131.");
+        table.put("Marketplace mode is off. Restart Facebook to restore its normal tabs.",
+                "Marketplace modu kapal\u0131. Normal sekmeleri geri getirmek i\u00e7in Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Marketplace only",
                 "Yaln\u0131zca Marketplace");
+        table.put("Marketplace unavailable. Facebook hasn't supplied a Marketplace tab for this account. Your normal tabs stay available.",
+                "Marketplace kullan\u0131lam\u0131yor. Facebook bu hesap i\u00e7in bir Marketplace sekmesi sa\u011flamad\u0131. Normal sekmeleriniz kullan\u0131labilir.");
         table.put("Material You theme",
                 "Material You temas\u0131");
         table.put("Menu",
@@ -3290,6 +3450,8 @@ public final class L10nTranslations {
                 "Bildirimler");
         table.put("OK",
                 "Tamam");
+        table.put("Off. Turn on to open Marketplace and hide the feed and other social tabs after restarting Facebook.",
+                "Kapal\u0131. Facebook'u yeniden ba\u015flatt\u0131ktan sonra Marketplace'i a\u00e7mak ve ak\u0131\u015f\u0131 ve di\u011fer sosyal sekmeleri gizlemek i\u00e7in etkinle\u015ftirin.");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Hushfacebook, Facebook a\u00e7\u0131ld\u0131\u011f\u0131nda g\u00fcnde bir kez GitHub'a en yeni s\u00fcr\u00fcm\u00fcn\u00fc sorar ve daha yeniyse bu ekran\u0131n \u00fcst\u00fcnde g\u00f6sterir. Hushfacebook'un kendi ba\u015f\u0131na internete ba\u011fland\u0131\u011f\u0131 tek durum budur, bu y\u00fczden sen a\u00e7ana kadar kapal\u0131d\u0131r. Hi\u00e7bir \u015fey indirilmez.");
         table.put("One word or phrase per line",
@@ -3308,6 +3470,8 @@ public final class L10nTranslations {
                 "Hushfacebook'u duraklat");
         table.put("Pause, backup and diagnostics",
                 "Duraklatma, yedekleme ve tan\u0131lama");
+        table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
+                "Hushfacebook ile duraklat\u0131ld\u0131. Marketplace se\u00e7iminiz kay\u0131tl\u0131 kal\u0131r. Gizlenen sekmeler, duraklatma s\u00fcrerken yeniden ba\u015flatt\u0131\u011f\u0131n\u0131zda geri gelir.");
         table.put("Playback",
                 "Oynatma");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -3322,10 +3486,14 @@ public final class L10nTranslations {
                 "Metninde a\u015fa\u011f\u0131daki listenden bir kelime veya ifade ge\u00e7en g\u00f6nderiler. Tutma listendeki bir kelimeyi i\u00e7eren g\u00f6nderi kal\u0131r, metni olmayan g\u00f6nderi de kal\u0131r. Kelimelerin telefondan yaln\u0131zca d\u0131\u015fa aktard\u0131\u011f\u0131n bir ayar dosyas\u0131yla \u00e7\u0131kar.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
+        table.put("Quiet social notifications",
+                "Sosyal bildirimleri sustur");
         table.put("Re-signed build fix",
                 "Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
         table.put("Reading the settings file",
                 "Ayar dosyas\u0131 okunuyor");
+        table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
+                "Marketplace modu etkinken arka planda ak\u0131\u015f y\u00fcklemesini azalt\u0131r. Ba\u015flang\u0131\u00e7ta baz\u0131 veriler yine y\u00fcklenebilir.");
         table.put("Reels and Watch",
                 "Reels ve Watch");
         table.put("Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.",
@@ -3334,12 +3502,23 @@ public final class L10nTranslations {
                 "Remix, \u015fablon kullanma, kendi videonu ekleme ve Edits d\u00fc\u011fmeleri ile y\u0131ld\u0131z, oyun, i\u015f orta\u011f\u0131 uygulamas\u0131 ve d\u0131\u015f ba\u011flant\u0131 d\u00fc\u011fmeleri. \u015eark\u0131 ve di\u011fer etiketler kal\u0131r.");
         table.put("Remove tracking from shared links",
                 "Payla\u015f\u0131lan ba\u011flant\u0131lardan izlemeyi kald\u0131r");
+        table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
+                "Yeniden ba\u015flatma gerekiyor. Marketplace modu, Facebook bir sonraki a\u00e7\u0131l\u0131\u015f\u0131nda etkinle\u015fecek.");
+        table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
+                "Yeniden ba\u015flatma gerekiyor. Normal sekmeler, Facebook bir sonraki a\u00e7\u0131l\u0131\u015f\u0131nda geri gelecek.");
+        table.put("Restore the normal tabs at the next restart. Your other settings stay saved.",
+                "Bir sonraki yeniden ba\u015flatmada normal sekmeleri geri getirir. Di\u011fer ayarlar\u0131n\u0131z kay\u0131tl\u0131 kal\u0131r.");
         table.put("Resume long videos",
                 "Uzun videolara kald\u0131\u011f\u0131n yerden devam et");
         table.put("Retry",
                 "Yeniden dene");
+        table.put("Return to regular Facebook",
+                "Normal Facebook'a d\u00f6n");
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Facebook'a on dakika i\u00e7inde d\u00f6nersen kald\u0131\u011f\u0131n yer korunur. Yenilemek i\u00e7in a\u015fa\u011f\u0131 \u00e7ekmeye devam edebilirsin.");
+    }
+
+    private static void fillTr4(Map<String, String> table) {
         table.put("Room for Meta's apps",
                 "Meta uygulamalar\u0131na yer");
         table.put("Save",
@@ -3372,9 +3551,6 @@ public final class L10nTranslations {
                 "Kaydettiklerin %1$s adl\u0131 bir klas\u00f6re gidecek.");
         table.put("Saving a photo",
                 "Foto\u011fraf kaydediliyor");
-    }
-
-    private static void fillTr4(Map<String, String> table) {
         table.put("Saving a video",
                 "Video kaydediliyor");
         table.put("Saving the settings file",
@@ -3401,6 +3577,10 @@ public final class L10nTranslations {
                 "Ayarlar i\u00e7e aktar\u0131ld\u0131. %1$d anahtar de\u011fi\u015fti.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Ayarlar i\u00e7e aktar\u0131ld\u0131. Kaydettiklerin %1$s adl\u0131 bir klas\u00f6re gidecek.");
+        table.put("Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.",
+                "Bu mod a\u00e7\u0131kken video \u00f6nerilerini, an\u0131lar\u0131, do\u011fum g\u00fcnlerini ve arkada\u015f \u00f6nerilerini susturur. Mesajlar ve al\u0131m sat\u0131m g\u00fcncellemeleri gelmeye devam eder. Di\u011fer bildirim tercihleriniz kay\u0131tl\u0131 kal\u0131r.");
+        table.put("Skip feed preloading",
+                "Ak\u0131\u015f \u00f6n y\u00fcklemesini atla");
         table.put("Smallest",
                 "En k\u00fc\u00e7\u00fck");
         table.put("Source code and issues",
@@ -3459,6 +3639,9 @@ public final class L10nTranslations {
                 "Facebook'un bir Reels videosunun alt\u0131nda \u00f6nizleme olarak g\u00f6sterdi\u011fi yorum ve tepki veren arkada\u015flar\u0131n\u0131n baloncuklar\u0131. Hepsini g\u00f6rmek i\u00e7in yorumlar\u0131 a\u00e7.");
         table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
                 "Tan\u0131lama raporu hen\u00fcz kaydedilemedi. Birazdan tekrar dene.");
+    }
+
+    private static void fillTr5(Map<String, String> table) {
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Tan\u0131lama raporu kaydedilemedi. Tekrar dene.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -3479,8 +3662,6 @@ public final class L10nTranslations {
                 "Ayar\u0131n g\u00fcncellenmesi tamamlanamad\u0131. Kay\u0131tl\u0131 de\u011feri g\u00f6steriliyor.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Anahtar, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda etkili olur.");
-        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
-                "Sekme \u00e7ubu\u011funda Marketplace, Bildirimler ve profilin ya da Men\u00fc kal\u0131r, Facebook da Marketplace'te a\u00e7\u0131l\u0131r. Ak\u0131\u015f\u0131yla birlikte Ana Sayfa, Video, Arkada\u015flar ve di\u011fer sekmeler kalkar. Bildirimler ve ba\u011flant\u0131lar yine gittikleri yerde a\u00e7\u0131l\u0131r.");
         table.put("There's no diagnostic data to clear.",
                 "Temizlenecek tan\u0131lama verisi yok.");
         table.put("There's no diagnostic data to put back.",
@@ -3495,9 +3676,6 @@ public final class L10nTranslations {
                 "Trend videolar ve Facebook'un senin i\u00e7in se\u00e7ti\u011fi reels videolar\u0131 art\u0131k bildirimlerinde g\u00f6r\u00fcnmez.");
         table.put("Try again, or go back to Facebook.",
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
-    }
-
-    private static void fillTr5(Map<String, String> table) {
         table.put("Updates",
                 "G\u00fcncellemeler");
         table.put("Use the phone's emoji",
@@ -3528,6 +3706,8 @@ public final class L10nTranslations {
                 "Videolar en d\u00fc\u015f\u00fck kalitelerinde kaydedilecek, b\u00f6ylece dosyalar en k\u00fc\u00e7\u00fck olur.");
         table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
                 "Videolar, reels videolar\u0131, hikayeler ve m\u00fczik oynat\u0131lmadan \u00f6nce dokunman\u0131 bekler. Bu a\u00e7\u0131kken Facebook'un kendi Otomatik Oynatma ayar\u0131 Kapal\u0131 g\u00f6r\u00fcn\u00fcr, kapatt\u0131\u011f\u0131nda se\u00e7ti\u011fin de\u011fere d\u00f6ner.");
+        table.put("Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.",
+                "Facebook'un sekme \u00e7ubu\u011fu bekleniyor. Facebook \u00e7ubu\u011fu olu\u015fturdu\u011funda Marketplace modu uygulanacak.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Web ba\u011flant\u0131lar\u0131 Facebook'un uygulama i\u00e7i taray\u0131c\u0131s\u0131nda a\u00e7\u0131lmaz. Facebook'un kendi sayfalar\u0131 yine uygulamada a\u00e7\u0131l\u0131r.");
         table.put("What always comes through",

@@ -280,7 +280,6 @@ Videos, reels, stories and music wait for your tap before they play. Facebook's 
 # context: switch title under Opening Facebook; Marketplace is Facebook's tab and keeps its name
 Marketplace only	Yalnızca Marketplace
 # context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
-The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.	Sekme çubuğunda Marketplace, Bildirimler ve profilin ya da Menü kalır, Facebook da Marketplace'te açılır. Akışıyla birlikte Ana Sayfa, Video, Arkadaşlar ve diğer sekmeler kalkar. Bildirimler ve bağlantılar yine gittikleri yerde açılır.
 # context: switch title under Menu; Upgrades is the name of a section in Facebook's own Menu
 Hide Upgrades	“Yükseltmeler” bölümünü gizle
 # context: summary of that switch; Settings and Help and support are Facebook's own Menu sections
@@ -431,3 +430,22 @@ A video over two minutes long that you left partway picks up where you left it t
 Also hide posts labelled as AI	Yapay zekâ olarak etiketlenen gönderileri de gizle
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
 Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Oluşturan kişinin yapay zekâ ile üretildiğini belirttiği gönderiler. Facebook, yapay zekâ etiketini hem bunlarda hem de kendi tespitinin bulduğu gönderilerde adın yanına koyar ve bu anahtar açıkken ikisi de gizlenir. Henüz gerçek bir akışta test edilmediği için varsayılan olarak kapalıdır.
+Return to regular Facebook	Normal Facebook'a dön
+Restore the normal tabs at the next restart. Your other settings stay saved.	Bir sonraki yeniden başlatmada normal sekmeleri geri getirir. Diğer ayarlarınız kayıtlı kalır.
+Marketplace mode is off. Restart Facebook to restore its normal tabs.	Marketplace modu kapalı. Normal sekmeleri geri getirmek için Facebook'u yeniden başlatın.
+Couldn't save the change. Try again.	Değişiklik kaydedilemedi. Tekrar deneyin.
+Marketplace mode chooses the opening tab. Your previous choice stays saved.	Açılış sekmesini Marketplace modu belirler. Önceki seçiminiz kayıtlı kalır.
+Restart needed. Marketplace mode will turn on the next time Facebook starts.	Yeniden başlatma gerekiyor. Marketplace modu, Facebook bir sonraki açılışında etkinleşecek.
+Restart needed. The normal tabs will return the next time Facebook starts.	Yeniden başlatma gerekiyor. Normal sekmeler, Facebook bir sonraki açılışında geri gelecek.
+Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.	Marketplace, Facebook'un sekme ayarlarında gizli. Ayarlar, Sekme çubuğu, Çubuğu özelleştir bölümünden gösterin. Normal sekmeleriniz kullanılabilir.
+Marketplace unavailable. Facebook hasn't supplied a Marketplace tab for this account. Your normal tabs stay available.	Marketplace kullanılamıyor. Facebook bu hesap için bir Marketplace sekmesi sağlamadı. Normal sekmeleriniz kullanılabilir.
+Couldn't check the tab bar. Your normal tabs stay available. Restart Facebook to try again.	Sekme çubuğu kontrol edilemedi. Normal sekmeleriniz kullanılabilir. Tekrar denemek için Facebook'u yeniden başlatın.
+Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.	Facebook'un sekme çubuğu bekleniyor. Facebook çubuğu oluşturduğunda Marketplace modu uygulanacak.
+Off. Turn on to open Marketplace and hide the feed and other social tabs after restarting Facebook.	Kapalı. Facebook'u yeniden başlattıktan sonra Marketplace'i açmak ve akışı ve diğer sosyal sekmeleri gizlemek için etkinleştirin.
+Quiet social notifications	Sosyal bildirimleri sustur
+Skip feed preloading	Akış ön yüklemesini atla
+Marketplace mode is off.	Marketplace modu kapalı.
+Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.	Hushfacebook ile duraklatıldı. Marketplace seçiminiz kayıtlı kalır. Gizlenen sekmeler, duraklatma sürerken yeniden başlattığınızda geri gelir.
+Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.	Bu mod açıkken video önerilerini, anıları, doğum günlerini ve arkadaş önerilerini susturur. Mesajlar ve alım satım güncellemeleri gelmeye devam eder. Diğer bildirim tercihleriniz kayıtlı kalır.
+Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.	Marketplace modu etkinken arka planda akış yüklemesini azaltır. Başlangıçta bazı veriler yine yüklenebilir.
+Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.	Etkin. Marketplace, Bildirimler ve Profil/Menü kalır. Hushfacebook ayarları Menü içindeki Ayarlar ve gizlilik bölümündedir.

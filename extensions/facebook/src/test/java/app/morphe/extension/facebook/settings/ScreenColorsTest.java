@@ -249,13 +249,19 @@ public class ScreenColorsTest {
                 TextView title = row.findViewById(android.R.id.title);
                 if (title == null) continue;
                 int drawn = title.getCurrentTextColor();
+                int enabledColor = drawn | 0xFF000000;
                 assertTrue("\"" + title.getText() + "\" is " + Integer.toHexString(drawn),
-                        drawn == colors.title || drawn == colors.heading);
-                assertTrue(contrast(drawn, colors.background) >= TEXT);
+                        enabledColor == colors.title || enabledColor == colors.heading);
+                // Disabled Marketplace options use the existing 38% Material tint. The old
+                // assertion assumed every row on a newly opened page could be tapped.
+                assertEquals(title.getText().toString(),
+                        title.isEnabled() || !title.getTextColors().isStateful() ? 255 : 0x61, Color.alpha(drawn));
+                assertTrue(contrast(enabledColor, colors.background) >= TEXT);
                 titles++;
                 TextView summary = row.findViewById(android.R.id.summary);
                 if (summary != null && summary.getVisibility() == View.VISIBLE) {
-                    assertEquals(colors.summary, summary.getCurrentTextColor());
+                    int expected = summary.isEnabled() ? colors.summary : (colors.summary & 0x00FFFFFF) | 0x61000000;
+                    assertEquals(expected, summary.getCurrentTextColor());
                 }
                 View widget = row.findViewById(android.R.id.switch_widget);
                 if (widget instanceof Switch) {

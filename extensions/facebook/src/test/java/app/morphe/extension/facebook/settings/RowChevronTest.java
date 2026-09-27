@@ -140,6 +140,7 @@ public class RowChevronTest {
         assertNotNull(item(checkNow).getOnPreferenceClickListener());
         assertNull("Check now wears a chevron", chevronOf(checkNow));
         assertNull("Use your phone's font wears a chevron", chevronOf(rowTitled(rows, "Use your phone's font")));
+        assertNull("Return to regular Facebook wears a chevron", chevronOf(rowTitled(rows, "Return to regular Facebook")));
         assertNotNull("Licenses lost its chevron while paused", chevronOf(rowTitled(rows, "Licenses")));
     }
 

@@ -61,6 +61,7 @@ import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.navigation.StartTab;
+import app.morphe.extension.facebook.navigation.MarketplaceOnly;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
@@ -153,6 +154,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     public void onResume() {
         super.onResume();
         SettingsBackupPreference.onPageResumed(this);
+        showMarketplaceSettings();
     }
 
     @Override
@@ -226,11 +228,30 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             PreferenceCategory opening = category(screen, L10n.t("Opening Facebook"));
             if (build.contains(PatchFamily.MARKETPLACE_ONLY)) {
                 // Facebook builds the tab bar once, and the hook is asked then and not again.
-                opening.addPreference(toggle(context, Settings.MARKETPLACE_ONLY, L10n.t("Marketplace only"),
-                        L10n.t("The tab bar keeps Marketplace, Notifications and your profile or Menu, and "
-                                + "Facebook opens on Marketplace. Home with the news feed, Video, Friends and the "
-                                + "other tabs go. Notifications and links still open where they lead.") + " "
-                                + L10n.t("The switch takes effect when Facebook restarts.")));
+                opening.addPreference(toggle(context, Settings.MARKETPLACE_ONLY, L10n.t("Marketplace only"), ""));
+                opening.addPreference(toggle(context, Settings.MARKETPLACE_QUIET_NOTIFICATIONS,
+                        L10n.t("Quiet social notifications"),
+                        L10n.t("Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.")));
+                Row regular = new Row(context);
+                regular.actsAtOnce = true;
+                regular.setKey("action_regular_facebook");
+                regular.setTitle(L10n.t("Return to regular Facebook"));
+                regular.setSummary(L10n.t("Restore the normal tabs at the next restart. Your other settings stay saved."));
+                regular.setOnPreferenceClickListener(ignored -> {
+                    if (Settings.MARKETPLACE_ONLY.save(false)) {
+                        refreshSwitches();
+                        Utils.showToastLong(MarketplaceOnly.state() == MarketplaceOnly.State.RESTART_NEEDED
+                                ? L10n.t("Marketplace mode is off. Restart Facebook to restore its normal tabs.")
+                                : L10n.t("Marketplace mode is off."));
+                    } else {
+                        Utils.showToastLong(L10n.t("Couldn't save the change. Try again."));
+                    }
+                    return true;
+                });
+                opening.addPreference(regular);
+                opening.addPreference(toggle(context, Settings.MARKETPLACE_SKIP_FEED_PREFETCH,
+                        L10n.t("Skip feed preloading"),
+                        L10n.t("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.")));
             }
             if (build.contains(PatchFamily.START_TAB)) {
                 opening.addPreference(toggle(context, Settings.OPEN_ON_CHOSEN_TAB, L10n.t("Open on a chosen tab"),
@@ -859,10 +880,86 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     @Override
+    protected boolean noteRestartPending(Setting<?> setting, Object valueBefore) {
+        if (setting != Settings.MARKETPLACE_ONLY) return super.noteRestartPending(setting, valueBefore);
+        // This mode can leave the bar unchanged when Marketplace is unavailable. Its observed
+        // result, rather than the previous saved switch, decides whether restarting is useful.
+        boolean pending = MarketplaceOnly.state() == MarketplaceOnly.State.RESTART_NEEDED;
+        if (pending) restartPending.add(setting.key);
+        else restartPending.remove(setting.key);
+        onRestartPendingChanged();
+        return pending;
+    }
+
+    @Override
     protected void onRestartPendingChanged() {
         Preference card = statusCard;
         Context context = getContext();
         if (card != null && context != null) showStatus(card, context);
+        showMarketplaceSettings();
+    }
+
+    @Override
+    protected void updateUIAvailability() {
+        super.updateUIAvailability();
+        showMarketplaceSettings();
+    }
+
+    @Override
+    protected void updateUIToSettingValues() {
+        super.updateUIToSettingValues();
+        showMarketplaceSettings();
+    }
+
+    /** Recomputed after a tap, an import or a resumed page; no saved start-tab choice is changed. */
+    private void showMarketplaceSettings() {
+        if (getPreferenceScreen() == null) return;
+        Preference mode = findPreference(Settings.MARKETPLACE_ONLY.key);
+        if (mode == null) return;
+        boolean selected = Settings.MARKETPLACE_ONLY.savedValue();
+        mode.setSummary(marketplaceSummary());
+        Preference regular = findPreference("action_regular_facebook");
+        if (regular != null) regular.setEnabled(selected);
+        Preference quiet = findPreference(Settings.MARKETPLACE_QUIET_NOTIFICATIONS.key);
+        if (quiet != null) quiet.setEnabled(selected);
+        Preference prefetch = findPreference(Settings.MARKETPLACE_SKIP_FEED_PREFETCH.key);
+        if (prefetch != null) prefetch.setEnabled(selected);
+        Preference chosen = findPreference(Settings.OPEN_ON_CHOSEN_TAB.key);
+        if (chosen != null) {
+            chosen.setEnabled(!selected);
+            chosen.setSummary(selected ? L10n.t("Marketplace mode chooses the opening tab. Your previous choice stays saved.")
+                    : L10n.t("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual "
+                            + "one. Notifications and links still open where they lead."));
+        }
+        Preference tab = findPreference(Settings.START_TAB.key);
+        if (tab != null) {
+            tab.setEnabled(!selected);
+            tab.setSummary(selected ? L10n.t("Marketplace mode chooses the opening tab. Your previous choice stays saved.")
+                    : startTabSummary(Settings.START_TAB.savedValue()));
+        }
+    }
+
+    static String marketplaceSummary() {
+        switch (MarketplaceOnly.state()) {
+            case ACTIVE:
+                return L10n.t("Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.");
+            case RESTART_NEEDED:
+                return Settings.MARKETPLACE_ONLY.savedValue()
+                        ? L10n.t("Restart needed. Marketplace mode will turn on the next time Facebook starts.")
+                        : L10n.t("Restart needed. The normal tabs will return the next time Facebook starts.");
+            case PAUSED:
+                return L10n.t("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.");
+            case HIDDEN:
+                return L10n.t("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.");
+            case MISSING:
+                return L10n.t("Marketplace unavailable. Facebook hasn't supplied a Marketplace tab for this account. Your normal tabs stay available.");
+            case UNREADABLE:
+                return L10n.t("Couldn't check the tab bar. Your normal tabs stay available. Restart Facebook to try again.");
+            case WAITING:
+                return L10n.t("Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.");
+            default:
+                return L10n.t("Off. Turn on to open Marketplace and hide the feed and other social tabs after restarting Facebook.");
+        }
     }
 
     /**

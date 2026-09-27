@@ -124,6 +124,8 @@ public final class SettingsBackup {
             Settings.DOWNLOAD_COMPATIBLE,
             Settings.OPEN_ON_CHOSEN_TAB,
             Settings.MARKETPLACE_ONLY,
+            Settings.MARKETPLACE_QUIET_NOTIFICATIONS,
+            Settings.MARKETPLACE_SKIP_FEED_PREFETCH,
             Settings.HIDE_GET_MESSENGER_CARD,
             Settings.HIDE_MENU_UPGRADES,
             Settings.HIDE_MENU_ALSO_FROM_META,

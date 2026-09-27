@@ -26,6 +26,7 @@ import com.facebook.katana.activity.FbMainTabActivityDelegate;
 import com.facebook.marketplace.tab.MarketplaceTab;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,6 +59,11 @@ import app.morphe.extension.shared.settings.preference.LogBufferManager;
 public class StartTabRouteTest {
     @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
 
+    @Before
+    public void optIn() {
+        Settings.OPEN_ON_CHOSEN_TAB.save(true);
+    }
+
     @After
     public void restore() {
         StartTabRoute.settled();
@@ -85,8 +91,8 @@ public class StartTabRouteTest {
     }
 
     @Test
-    public void aStartFromTheLauncherIconAsksForMarketplaceByDefault() {
-        assertTrue("the switch starts off", Settings.OPEN_ON_CHOSEN_TAB.get());
+    public void anOptedInLauncherStartAsksForTheChosenMarketplaceTab() {
+        assertTrue("the person opted in", Settings.OPEN_ON_CHOSEN_TAB.get());
         assertEquals(StartTab.MARKETPLACE, Settings.START_TAB.get());
         FbMainTabActivity screen = StartTabRouteForTests.screen(StartTabRouteForTests.launcherStart());
         Intent launched = screen.getIntent();
