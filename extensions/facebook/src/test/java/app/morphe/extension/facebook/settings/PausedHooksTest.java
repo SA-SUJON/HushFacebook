@@ -61,6 +61,7 @@ import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
+import app.morphe.extension.facebook.search.MetaAiSearchForTests;
 import app.morphe.extension.facebook.stories.StoryAdvance;
 import app.morphe.extension.facebook.updates.UpdatePrompts;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -294,6 +295,12 @@ public class PausedHooksTest {
                 MenuSectionsForTests::hidesAlsoFromMeta,
                 MenuSectionsForTests::hidesServerUpgrades,
                 MenuSectionsForTests::hidesServerAlsoFromMeta));
+        // Search leaves out its Meta AI answer and its prompt modules, and a suggestion set to open
+        // Meta AI opens the results.
+        probes.put(PatchFamily.META_AI_SEARCH, Arrays.asList(
+                MetaAiSearchForTests::hidesAnswer,
+                MetaAiSearchForTests::dropsPrompts,
+                MetaAiSearchForTests::stopsSuggestionRoute));
         // A shared link loses what the app added to it.
         probes.put(PatchFamily.SANITIZE_SHARING_LINKS, Collections.singletonList(() -> {
             String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";

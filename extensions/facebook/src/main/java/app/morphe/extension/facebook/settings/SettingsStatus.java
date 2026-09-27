@@ -141,4 +141,8 @@ public final class SettingsStatus {
     public static boolean menuPromotions() {
         return false;
     }
+
+    public static boolean metaAiSearch() {
+        return false;
+    }
 }

@@ -289,3 +289,9 @@ The Upgrades section and its offers leave Facebook's Menu. Settings, Help and su
 Hide Also from Meta	Ocultar “Também da Meta”
 # context: summary of that switch; the section links to Meta's other apps and shows ads for its devices
 The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.	A seção “Também da Meta” sai do Menu do Facebook, com os links para os outros apps da Meta e os anúncios de dispositivos da Meta. Seus próprios atalhos continuam.
+# context: section title for the search settings, named like Facebook's own search
+Search	Pesquisa
+# context: switch title under Search; Meta AI is Meta's assistant and keeps its name
+Hide Meta AI in search	Ocultar a Meta AI na pesquisa
+# context: summary of that switch; Meta AI and Ask Meta AI are Meta's own names, as Facebook shows them
+Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.	Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugestões para perguntar à Meta AI, e uma sugestão não envia mais sua pesquisa para a Meta AI. Pessoas, grupos, páginas e publicações continuam, e o botão da Meta AI ainda abre a Meta AI.

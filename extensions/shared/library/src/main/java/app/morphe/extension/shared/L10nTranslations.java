@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(536);
+        Map<String, String> table = new HashMap<>(542);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -265,6 +265,8 @@ public final class L10nTranslations {
                 "Als KI erkannte Reels und Videos ausblenden");
         table.put("Hide Also from Meta",
                 "\u201eAuch von Meta\u201c ausblenden");
+        table.put("Hide Meta AI in search",
+                "Meta AI in der Suche ausblenden");
         table.put("Hide Reels in the feed",
                 "Reels im Feed ausblenden");
         table.put("Hide Upgrades",
@@ -295,11 +297,11 @@ public final class L10nTranslations {
                 "Fortschritt beim Speichern eines Fotos oder Videos, mit einem Button zum Abbrechen");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s ist erschienen. Aktualisiere es im Morphe Manager.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Hushfacebook %1$s auf Facebook %2$s");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Hushfacebook %1$s auf Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "Hushfacebook %1$s ist f\u00fcr Facebook %2$s gedacht.");
         table.put("Hushfacebook is on",
@@ -418,11 +420,11 @@ public final class L10nTranslations {
                 "Vollst\u00e4ndigen Bericht unter Download/Morphe speichern.");
         table.put("Save videos other apps can open",
                 "Videos speichern, die andere Apps \u00f6ffnen k\u00f6nnen");
-        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
-                "Speichert deine Schalter und die Download-Einstellungen in einer Datei. Pause und Debug-Protokollierung sind nicht enthalten, die Suche nach neuen Versionen auch nicht.");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
+                "Speichert deine Schalter und die Download-Einstellungen in einer Datei. Pause und Debug-Protokollierung sind nicht enthalten, die Suche nach neuen Versionen auch nicht.");
         table.put("Saved to %1$s",
                 "Gespeichert unter %1$s");
         table.put("Saved to the gallery",
@@ -443,6 +445,10 @@ public final class L10nTranslations {
                 "Einstellungsdatei wird gespeichert");
         table.put("Saving...",
                 "Wird gespeichert \u2026");
+        table.put("Search",
+                "Suche");
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschl\u00e4ge \u201eMeta AI fragen\u201c mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beitr\u00e4ge bleiben, und die Meta AI-Schaltfl\u00e4che \u00f6ffnet Meta AI weiterhin.");
         table.put("Set when you patched",
                 "Beim Patchen festgelegt");
         table.put("Settings couldn't open",
@@ -537,15 +543,15 @@ public final class L10nTranslations {
                 "Es gibt keine Diagnosedaten zum Wiederherstellen.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Noch nichts zu berichten. Schalte die Debug-Protokollierung ein, wiederhole, was schiefgelaufen ist, und exportiere dann erneut.");
+    }
+
+    private static void fillDe4(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Diese werden beim Patchen in Morphe Manager ausgew\u00e4hlt, und die Pause schaltet sie nicht aus. Patche erneut, um sie zu \u00e4ndern.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Dieses Handy hat keine Dateiauswahl, hier l\u00e4sst sich also keine Datei w\u00e4hlen.");
         table.put("Try again, or go back to Facebook.",
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
-    }
-
-    private static void fillDe4(Map<String, String> table) {
         table.put("Updates",
                 "Updates");
         table.put("Use the phone's emoji",
@@ -605,7 +611,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(536);
+        Map<String, String> table = new HashMap<>(542);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -826,6 +832,8 @@ public final class L10nTranslations {
                 "Ocultar reels y videos detectados como IA");
         table.put("Hide Also from Meta",
                 "Ocultar \u201cTambi\u00e9n de Meta\u201d");
+        table.put("Hide Meta AI in search",
+                "Ocultar Meta AI en la b\u00fasqueda");
         table.put("Hide Reels in the feed",
                 "Ocultar reels en el feed");
         table.put("Hide Upgrades",
@@ -856,11 +864,11 @@ public final class L10nTranslations {
                 "El progreso de la foto o el video que est\u00e1s guardando, con un bot\u00f3n para cancelar");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Ya sali\u00f3 Hushfacebook %1$s. Actual\u00edzalo en Morphe Manager.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Hushfacebook %1$s en Facebook %2$s");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Hushfacebook %1$s en Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "Hushfacebook %1$s est\u00e1 pensado para Facebook %2$s.");
         table.put("Hushfacebook is on",
@@ -979,11 +987,11 @@ public final class L10nTranslations {
                 "Guarda el informe completo en Download/Morphe.");
         table.put("Save videos other apps can open",
                 "Guardar videos que otras apps puedan abrir");
-        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
-                "Guarda tus interruptores y los ajustes de descarga en un archivo. La pausa y el Registro de depuraci\u00f3n no se incluyen, y la b\u00fasqueda de nuevas versiones tampoco.");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
+                "Guarda tus interruptores y los ajustes de descarga en un archivo. La pausa y el Registro de depuraci\u00f3n no se incluyen, y la b\u00fasqueda de nuevas versiones tampoco.");
         table.put("Saved to %1$s",
                 "Se guard\u00f3 en %1$s");
         table.put("Saved to the gallery",
@@ -1004,6 +1012,10 @@ public final class L10nTranslations {
                 "Guardando el archivo de configuraci\u00f3n");
         table.put("Saving...",
                 "Guardando...");
+        table.put("Search",
+                "B\u00fasqueda");
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Los resultados de b\u00fasqueda ya no muestran la respuesta de Meta AI ni las sugerencias para preguntarle a Meta AI, y una sugerencia ya no env\u00eda tu b\u00fasqueda a Meta AI. Las personas, los grupos, las p\u00e1ginas y las publicaciones se mantienen, y el bot\u00f3n de Meta AI sigue abriendo Meta AI.");
         table.put("Set when you patched",
                 "Aplicado al parchear");
         table.put("Settings couldn't open",
@@ -1098,15 +1110,15 @@ public final class L10nTranslations {
                 "No hay datos de diagn\u00f3stico que restaurar.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Todav\u00eda no hay nada que informar. Activa el Registro de depuraci\u00f3n, repite lo que fall\u00f3 y vuelve a exportar.");
+    }
+
+    private static void fillEs4(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Se eligen en Morphe Manager al parchear, y Pausar no los desactiva. Vuelve a parchear para cambiarlos.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este tel\u00e9fono no tiene selector de archivos, as\u00ed que aqu\u00ed no hay forma de elegir un archivo.");
         table.put("Try again, or go back to Facebook.",
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
-    }
-
-    private static void fillEs4(Map<String, String> table) {
         table.put("Updates",
                 "Actualizaciones");
         table.put("Use the phone's emoji",
@@ -1166,7 +1178,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(536);
+        Map<String, String> table = new HashMap<>(542);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1387,6 +1399,8 @@ public final class L10nTranslations {
                 "Sembunyikan reel dan video yang terdeteksi dibuat dengan AI");
         table.put("Hide Also from Meta",
                 "Sembunyikan \u201cJuga dari Meta\u201d");
+        table.put("Hide Meta AI in search",
+                "Sembunyikan Meta AI di pencarian");
         table.put("Hide Reels in the feed",
                 "Sembunyikan Reels di Kabar Beranda");
         table.put("Hide Upgrades",
@@ -1417,11 +1431,11 @@ public final class L10nTranslations {
                 "Progres foto atau video yang sedang Anda simpan, dengan tombol untuk membatalkannya");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s sudah dirilis. Perbarui di Morphe Manager.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Hushfacebook %1$s di Facebook %2$s");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Hushfacebook %1$s di Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "Hushfacebook %1$s ditujukan untuk Facebook %2$s.");
         table.put("Hushfacebook is on",
@@ -1540,11 +1554,11 @@ public final class L10nTranslations {
                 "Simpan laporan lengkap di Download/Morphe.");
         table.put("Save videos other apps can open",
                 "Simpan video yang bisa dibuka aplikasi lain");
-        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
-                "Simpan sakelar dan pengaturan unduhan Anda ke sebuah file. Jeda dan Pencatatan debug tidak disertakan, begitu pula pemeriksaan rilis.");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
+                "Simpan sakelar dan pengaturan unduhan Anda ke sebuah file. Jeda dan Pencatatan debug tidak disertakan, begitu pula pemeriksaan rilis.");
         table.put("Saved to %1$s",
                 "Disimpan ke %1$s");
         table.put("Saved to the gallery",
@@ -1565,6 +1579,10 @@ public final class L10nTranslations {
                 "Menyimpan file pengaturan");
         table.put("Saving...",
                 "Menyimpan...");
+        table.put("Search",
+                "Pencarian");
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.");
         table.put("Set when you patched",
                 "Diatur saat Anda menambal");
         table.put("Settings couldn't open",
@@ -1659,15 +1677,15 @@ public final class L10nTranslations {
                 "Tidak ada data diagnostik yang dapat dikembalikan.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Belum ada yang bisa dilaporkan. Aktifkan Pencatatan debug, ulangi hal yang bermasalah, lalu ekspor lagi.");
+    }
+
+    private static void fillIn4(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Semua ini dipilih di Morphe Manager saat Anda menambal, dan Jeda tidak mematikannya. Tambal ulang untuk mengubahnya.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Ponsel ini tidak memiliki pemilih file, jadi file tidak dapat dipilih di sini.");
         table.put("Try again, or go back to Facebook.",
                 "Coba lagi, atau kembali ke Facebook.");
-    }
-
-    private static void fillIn4(Map<String, String> table) {
         table.put("Updates",
                 "Pembaruan");
         table.put("Use the phone's emoji",
@@ -1727,7 +1745,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(536);
+        Map<String, String> table = new HashMap<>(542);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1948,6 +1966,8 @@ public final class L10nTranslations {
                 "Ocultar reels e v\u00eddeos detectados como IA");
         table.put("Hide Also from Meta",
                 "Ocultar \u201cTamb\u00e9m da Meta\u201d");
+        table.put("Hide Meta AI in search",
+                "Ocultar a Meta AI na pesquisa");
         table.put("Hide Reels in the feed",
                 "Ocultar reels no feed");
         table.put("Hide Upgrades",
@@ -1978,11 +1998,11 @@ public final class L10nTranslations {
                 "O progresso da foto ou do v\u00eddeo que voc\u00ea est\u00e1 salvando, com um bot\u00e3o para cancelar");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "O Hushfacebook %1$s saiu. Atualize pelo Morphe Manager.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Hushfacebook %1$s no Facebook %2$s");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Hushfacebook %1$s no Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "O Hushfacebook %1$s \u00e9 feito para o Facebook %2$s.");
         table.put("Hushfacebook is on",
@@ -2101,11 +2121,11 @@ public final class L10nTranslations {
                 "Salve o relat\u00f3rio completo em Download/Morphe.");
         table.put("Save videos other apps can open",
                 "Salvar v\u00eddeos que outros apps conseguem abrir");
-        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
-                "Salve suas op\u00e7\u00f5es e as configura\u00e7\u00f5es de download em um arquivo. A pausa e o Registro de depura\u00e7\u00e3o n\u00e3o s\u00e3o inclu\u00eddos, nem a busca por novas vers\u00f5es.");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
+                "Salve suas op\u00e7\u00f5es e as configura\u00e7\u00f5es de download em um arquivo. A pausa e o Registro de depura\u00e7\u00e3o n\u00e3o s\u00e3o inclu\u00eddos, nem a busca por novas vers\u00f5es.");
         table.put("Saved to %1$s",
                 "Salvo em %1$s");
         table.put("Saved to the gallery",
@@ -2126,6 +2146,10 @@ public final class L10nTranslations {
                 "Salvando o arquivo de configura\u00e7\u00f5es");
         table.put("Saving...",
                 "Salvando...");
+        table.put("Search",
+                "Pesquisa");
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugest\u00f5es para perguntar \u00e0 Meta AI, e uma sugest\u00e3o n\u00e3o envia mais sua pesquisa para a Meta AI. Pessoas, grupos, p\u00e1ginas e publica\u00e7\u00f5es continuam, e o bot\u00e3o da Meta AI ainda abre a Meta AI.");
         table.put("Set when you patched",
                 "Definido ao aplicar os patches");
         table.put("Settings couldn't open",
@@ -2220,15 +2244,15 @@ public final class L10nTranslations {
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para restaurar.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Ainda n\u00e3o h\u00e1 nada para relatar. Ative o Registro de depura\u00e7\u00e3o, repita o que deu errado e exporte de novo.");
+    }
+
+    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Eles s\u00e3o escolhidos no Morphe Manager quando voc\u00ea aplica os patches, e a pausa n\u00e3o os desliga. Aplique os patches de novo para mud\u00e1-los.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este celular n\u00e3o tem seletor de arquivos, ent\u00e3o n\u00e3o d\u00e1 para escolher um arquivo aqui.");
         table.put("Try again, or go back to Facebook.",
                 "Tente de novo ou volte para o Facebook.");
-    }
-
-    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Updates",
                 "Atualiza\u00e7\u00f5es");
         table.put("Use the phone's emoji",
@@ -2288,7 +2312,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(536);
+        Map<String, String> table = new HashMap<>(542);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2509,6 +2533,8 @@ public final class L10nTranslations {
                 "Yapay zek\u00e2 ile \u00fcretildi\u011fi tespit edilen reels ve videolar\u0131 gizle");
         table.put("Hide Also from Meta",
                 "\u201cMeta'dan di\u011ferleri\u201d b\u00f6l\u00fcm\u00fcn\u00fc gizle");
+        table.put("Hide Meta AI in search",
+                "Aramada Meta AI'\u0131 gizle");
         table.put("Hide Reels in the feed",
                 "Ak\u0131\u015ftaki Reels videolar\u0131n\u0131 gizle");
         table.put("Hide Upgrades",
@@ -2539,11 +2565,11 @@ public final class L10nTranslations {
                 "Kaydetti\u011fin foto\u011fraf veya videonun ilerleme durumu ve iptal etmek i\u00e7in bir d\u00fc\u011fme");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s \u00e7\u0131kt\u0131. Morphe Manager'da g\u00fcncelle.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Facebook %2$s \u00fczerinde Hushfacebook %1$s");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Facebook %2$s \u00fczerinde Hushfacebook %1$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "Hushfacebook %1$s, Facebook %2$s i\u00e7in haz\u0131rland\u0131.");
         table.put("Hushfacebook is on",
@@ -2662,11 +2688,11 @@ public final class L10nTranslations {
                 "Tam raporu Download/Morphe konumuna kaydeder.");
         table.put("Save videos other apps can open",
                 "Videolar\u0131 di\u011fer uygulamalar\u0131n a\u00e7abilece\u011fi bi\u00e7imde kaydet");
-        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
-                "Anahtarlar\u0131n\u0131 ve indirme ayarlar\u0131n\u0131 bir dosyaya kaydet. Duraklatma ve Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc dahil edilmez, s\u00fcr\u00fcm denetimi de edilmez.");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
+                "Anahtarlar\u0131n\u0131 ve indirme ayarlar\u0131n\u0131 bir dosyaya kaydet. Duraklatma ve Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc dahil edilmez, s\u00fcr\u00fcm denetimi de edilmez.");
         table.put("Saved to %1$s",
                 "\u015euraya kaydedildi: %1$s");
         table.put("Saved to the gallery",
@@ -2687,6 +2713,10 @@ public final class L10nTranslations {
                 "Ayar dosyas\u0131 kaydediliyor");
         table.put("Saving...",
                 "Kaydediliyor...");
+        table.put("Search",
+                "Arama");
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Arama sonu\u00e7lar\u0131nda art\u0131k Meta AI yan\u0131t\u0131 ve Meta AI'a sor \u00f6nerileri g\u00f6r\u00fcnmez, bir \u00f6neri de araman\u0131 art\u0131k Meta AI'a g\u00f6ndermez. Ki\u015filer, gruplar, sayfalar ve g\u00f6nderiler kal\u0131r ve Meta AI d\u00fc\u011fmesi yine Meta AI'\u0131 a\u00e7ar.");
         table.put("Set when you patched",
                 "Yamalad\u0131\u011f\u0131nda ayarlananlar");
         table.put("Settings couldn't open",
@@ -2781,15 +2811,15 @@ public final class L10nTranslations {
                 "Geri getirilecek tan\u0131lama verisi yok.");
         table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
                 "Hen\u00fcz raporlanacak bir \u015fey yok. Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fcn\u00fc a\u00e7, sorunu yeniden olu\u015ftur, sonra tekrar d\u0131\u015fa aktar.");
+    }
+
+    private static void fillTr4(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Bunlar yamalarken Morphe Manager'da se\u00e7ilir ve Duraklatma bunlar\u0131 kapatmaz. De\u011fi\u015ftirmek i\u00e7in yeniden yamala.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Bu telefonda dosya se\u00e7ici yok, bu y\u00fczden burada dosya se\u00e7menin bir yolu yok.");
         table.put("Try again, or go back to Facebook.",
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
-    }
-
-    private static void fillTr4(Map<String, String> table) {
         table.put("Updates",
                 "G\u00fcncellemeler");
         table.put("Use the phone's emoji",

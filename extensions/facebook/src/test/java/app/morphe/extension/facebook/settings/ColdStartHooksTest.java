@@ -51,6 +51,7 @@ import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
+import app.morphe.extension.facebook.search.MetaAiSearchForTests;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.PauseForTests;
 
@@ -156,6 +157,10 @@ public class ColdStartHooksTest {
                 MessengerCardForTests.hidesWithMessenger());
         assertFalse("a Menu built before the context lost its Upgrades", MenuSectionsForTests.hidesUpgrades());
         assertFalse("a Menu built before the context lost Also from Meta", MenuSectionsForTests.hidesServerAlsoFromMeta());
+        assertFalse("a results page built before the context lost its Meta AI answer", MetaAiSearchForTests.hidesAnswer());
+        assertFalse("a results page built before the context lost its Meta AI prompts", MetaAiSearchForTests.dropsPrompts());
+        assertFalse("a suggestion parsed before the context lost its Meta AI route",
+                MetaAiSearchForTests.stopsSuggestionRoute());
         assertTrue("a player start before the context was held",
                 TapToPlay.allowStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY));
         assertTrue("an older player start before the context was held",

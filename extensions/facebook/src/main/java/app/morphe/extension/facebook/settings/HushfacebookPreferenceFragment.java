@@ -389,6 +389,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                             + "and its ads for Meta's devices. Your own shortcuts stay.")));
         }
 
+        if (build.contains(PatchFamily.META_AI_SEARCH)) {
+            PreferenceCategory search = category(screen, L10n.t("Search"));
+            search.addPreference(toggle(context, Settings.HIDE_META_AI_IN_SEARCH, L10n.t("Hide Meta AI in search"),
+                    L10n.t("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no "
+                            + "longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta "
+                            + "AI button still opens Meta AI.")));
+        }
+
         if (build.contains(PatchFamily.EXTERNAL_BROWSER) || build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {
             PreferenceCategory links = category(screen, L10n.t("Links"));
             if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {

@@ -85,6 +85,8 @@ public enum PatchFamily {
             Settings.HIDE_GET_MESSENGER_CARD),
     MENU_PROMOTIONS(FamilyNames.MENU_PROMOTIONS, "menuPromotions", null,
             Settings.HIDE_MENU_UPGRADES, Settings.HIDE_MENU_ALSO_FROM_META),
+    META_AI_SEARCH(FamilyNames.META_AI_SEARCH, "metaAiSearch", null,
+            Settings.HIDE_META_AI_IN_SEARCH),
     AD_PREFETCH(FamilyNames.AD_PREFETCH, "adPrefetch", "the block on downloading ads in the background"),
     AD_TELEMETRY(FamilyNames.AD_TELEMETRY, "adTelemetry", "the block on reports of ad screenshots and app installs"),
     AUDIENCE_NETWORK(FamilyNames.AUDIENCE_NETWORK, "audienceNetwork", "the Audience Network block"),

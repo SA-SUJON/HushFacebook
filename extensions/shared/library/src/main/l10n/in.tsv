@@ -289,3 +289,9 @@ The Upgrades section and its offers leave Facebook's Menu. Settings, Help and su
 Hide Also from Meta	Sembunyikan “Juga dari Meta”
 # context: summary of that switch; the section links to Meta's other apps and shows ads for its devices
 The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.	Bagian “Juga dari Meta” hilang dari Menu Facebook, beserta tautannya ke aplikasi Meta lainnya dan iklannya untuk perangkat Meta. Pintasanmu sendiri tetap ada.
+# context: section title for the search settings, named like Facebook's own search
+Search	Pencarian
+# context: switch title under Search; Meta AI is Meta's assistant and keeps its name
+Hide Meta AI in search	Sembunyikan Meta AI di pencarian
+# context: summary of that switch; Meta AI and Ask Meta AI are Meta's own names, as Facebook shows them
+Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.	Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.

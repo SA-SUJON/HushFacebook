@@ -195,6 +195,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_menu_also_from_meta", TRUE);
 
     /**
+     * Meta AI in Facebook's search: the answer a results page adds on top, the Meta AI modules and
+     * "Ask Meta AI" prompts among the results, and the suggestions Facebook's server sets to open in
+     * Meta AI. People, groups, pages and posts stay, and so do the Meta AI button and the results
+     * page's own Meta AI tab.
+     */
+    public static final BooleanSetting HIDE_META_AI_IN_SEARCH =
+            new BooleanSetting("hushfacebook_hide_meta_ai_in_search", TRUE);
+
+    /**
      * Once a day, when Facebook starts, ask api.github.com whether a newer Hushfacebook release is
      * out, and say so on the settings screen ({@link ReleaseCheck}). It's the settings entry's own
      * switch rather than a patch's, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off

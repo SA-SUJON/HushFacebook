@@ -294,6 +294,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the Upgrades and Also from Meta sections of Facebook's Menu. Facebook 577 and 580 type each Menu group with one enum under kept names, UPSELL and PRODUCTS_FROM_FACEBOOK among them, and build every group from a native section and a section for what the server sends with it. The patch finds the first by the one children builder loading upsell_bookmarks_key and the second by the one loading ABOVE_NATIVE, REPLACE_NATIVE and BELOW_NATIVE, and asks the extension about the group right after each reads it. A yes hands back an empty list of children, built the way the section builds its own. Each group has its own switch, and every other group is left as Facebook built it."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/search/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/search/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Meta AI in Facebook's search. On Facebook 577 and 580 the patch finds three of Facebook's own decisions from kept names and literals. The results page's question of whether to add a Meta AI answer is the one boolean over FbUserSession and SearchResultsMutableContext that both callers of the meta_ai_answer_entities page builder ask first, and the patch answers no there. A page of results is built by one constructor from a list of result modules, whose role is a constant of the enum Facebook loads where it logs a failed GraphQLGraphSearchResultRole parse, and the extension leaves out Meta AI's answer and prompt roles (SEARCH_META_AI_ANSWER with its body, full body and loading state, HCM_SEARCH_META_AI_ANSWER, HCM_RELATED_META_AI_PROMPTS with its loading state, and HCM_SEARCH_AI_MODE) and keeps every other role. The page's name comes along, so the Meta AI tab's own page, the one its builder names search_meta_ai_answer_module, keeps its answer. A suggestion's flag to open Meta AI is the boolean the results router asks GraphSearchQuerySpec before it sends a search to META_AI_TAB, and the patch hands it to the extension where the suggestion parser stores it from the server's reply. The Meta AI button and the results page's Meta AI tab go around all three."
     }
   ]
 }
