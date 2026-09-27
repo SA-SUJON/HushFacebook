@@ -261,3 +261,7 @@ Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.
 Facebook will open on %1$s.	Facebook %1$s sekmesinde açılacak.
 Jump to a section	Bir bölüme git
 Go straight to one group of settings. Back returns to where you were.	Doğrudan bir ayar grubuna git. Geri, bulunduğun yere döndürür.
+# context: switch title under Downloads; on, every video save keeps to formats other apps accept
+Save videos other apps can open	Videoları diğer uygulamaların açabileceği biçimde kaydet
+# context: summary of that switch; H.264, AAC, AV1 and WhatsApp are names and stay as they are
+Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.	Videoları, WhatsApp gibi uygulamaların kabul ettiği AAC sesli H.264 biçiminde kaydeder. Facebook'un en net sürümü çoğu zaman AV1'dir ve bazı uygulamalar bunu reddeder, bu yüzden bir video daha düşük kalitede kaydedilebilir. Böyle bir sürümü olmayan video her zamanki gibi kaydedilir.

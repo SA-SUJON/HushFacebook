@@ -338,7 +338,7 @@ public final class MediaDownload {
         info(() -> "saving " + (isVideo ? "video" : "image")
             + " " + describe(chosen)
             + " from " + candidates + " candidate(s): " + all
-            + (isVideo ? qualityNote(quality) : ""));
+            + (isVideo ? qualityNote(quality) + compatibleNote(compatibleSaves()) : ""));
 
         Downloader.Kind kind = isVideo ? Downloader.Kind.VIDEO : Downloader.Kind.IMAGE;
         start(safe, isVideo, details, fileJob(safe, chosen, kind));
@@ -363,6 +363,25 @@ public final class MediaDownload {
     /** What the report adds to a save line for a quality below the best. */
     private static String qualityNote(DownloadQuality quality) {
         return quality == DownloadQuality.BEST ? "" : ", quality setting " + quality.fileValue;
+    }
+
+    /**
+     * Whether the save starting now keeps to files other apps can open
+     * ({@link Settings#DOWNLOAD_COMPATIBLE}). Read when the save starts, like the quality. Never
+     * throws: before the settings are ready, or when they can't be read, it's off, as every save
+     * was before the switch existed.
+     */
+    static boolean compatibleSaves() {
+        try {
+            return Utils.settingsReady() && Settings.DOWNLOAD_COMPATIBLE.get();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** What the report adds to a save line that kept to files other apps can open. */
+    private static String compatibleNote(boolean compatible) {
+        return compatible ? ", kept to files other apps can open" : "";
     }
 
     /** The save of one single file at [url]: the job every save of a single file runs. */
@@ -430,6 +449,12 @@ public final class MediaDownload {
      * is used only when its track suits it better than the file does. On a tie the single file
      * wins: one fetch and no join.
      *
+     * <p>With saves other apps can open on ({@link #compatibleSaves}), the track is H.264 and its
+     * sound AAC-LC or HE-AAC ({@link DashManifest#pick}). A manifest with no such pair leaves the
+     * save to the single file, which is Facebook's H.264 and AAC-LC MP4. With no single file either,
+     * the save takes the tracks it would take with the switch off and the report says so, since a
+     * file some apps turn down beats no file.
+     *
      * @return whether a download started. {@code false} lets the caller save a single file.
      */
     private static boolean beginDash(Context context, String label, String manifest, List<String> urls,
@@ -440,16 +465,44 @@ public final class MediaDownload {
         }
         urls = metaOnly(urls);
         DownloadQuality quality = quality();
-        DashManifest.Track video = DashManifest.pickVideo(tracks, DashSave.canWriteAv1(), quality);
+        boolean compatible = compatibleSaves();
+        boolean allowAv1 = DashSave.canWriteAv1();
 
-        if (video == null) {
+        // What the pick below chose from, as each track's type, codec, size and bitrate. Never its
+        // address: the report is pasted into public issues.
+        if (manifest != null) {
+            Logger.diagnosticDebug(DiagnosticCategory.DOWNLOADS, SOURCE,
+                () -> "the manifest of " + label + " offers " + tracks.size() + " track(s): " + tracks);
+        }
+
+        String fallback = RenditionPicker.bestVideo(urls, quality);
+        DashManifest.Pick kept = DashManifest.pick(tracks, allowAv1, quality, compatible);
+        DashManifest.Pick pick = kept;
+
+        if (kept == null && compatible) {
+            DashManifest.Pick usual = DashManifest.pick(tracks, allowAv1, quality, false);
+            if (usual != null && fallback != null) {
+                info(() -> "the manifest of " + label + " has no H.264 video with AAC-LC or HE-AAC sound, "
+                    + "saving the single file instead");
+                return false;
+            }
+            if (usual != null) {
+                info(() -> "nothing of " + label + " is in a format other apps can open, saving it as the switch "
+                    + "off would: " + usual.video + (usual.audio == null ? "" : " + " + usual.audio));
+                pick = usual;
+            }
+        }
+
+        if (pick == null) {
             if (manifest != null) {
                 info(() -> "the manifest of " + label + " has no track to save: " + tracks);
             }
             return false;
         }
 
-        String fallback = RenditionPicker.bestVideo(urls, quality);
+        DashManifest.Track video = pick.video;
+        DashManifest.Track audio = pick.audio;
+        boolean keptCompatible = kept != null && compatible;
         int fallbackQuality = fallback == null ? 0 : RenditionPicker.qualityOf(fallback);
 
         if (quality == DownloadQuality.BEST) {
@@ -461,12 +514,10 @@ public final class MediaDownload {
         Context safe = ready(context);
         if (safe == null) return false;
 
-        DashManifest.Track audio = DashManifest.bestAudio(tracks);
-
         info(() -> "saving " + label + " from its DASH manifest: " + video
             + (audio == null ? ", no sound track" : " + " + audio)
             + ", instead of " + (fallback == null ? "nothing" : describe(fallback))
-            + qualityNote(quality));
+            + qualityNote(quality) + compatibleNote(keptCompatible));
 
         start(safe, true, details, dashJob(safe, video, audio, fallback));
         return true;

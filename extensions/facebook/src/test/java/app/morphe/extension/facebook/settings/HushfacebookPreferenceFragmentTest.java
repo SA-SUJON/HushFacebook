@@ -95,8 +95,10 @@ public class HushfacebookPreferenceFragmentTest {
             for (PatchFamily family : PatchFamily.values()) {
                 for (BooleanSetting setting : family.switches) switchKeys.add(setting.key);
             }
-            // The settings entry's own switches are Pause's to turn off too.
+            // The settings entry's own switches are Pause's to turn off too, and so are the ones
+            // the downloads share.
             for (BooleanSetting setting : PatchFamily.ENTRY_SWITCHES) switchKeys.add(setting.key);
+            for (BooleanSetting setting : PatchFamily.DOWNLOAD_SWITCHES) switchKeys.add(setting.key);
             Set<String> shown = new HashSet<>();
             Preference stays = null;
             for (Preference row : rows) {
@@ -339,6 +341,38 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse("a quality row with no download in the build",
                         row instanceof HushfacebookPreferenceFragment.QualityRow);
             }
+        }
+    }
+
+    /**
+     * Saves other apps can open (issue #11) is a switch every save reads, so it's under Downloads
+     * with any one download patch in, right above the quality it keeps within, and starts off. Its
+     * summary names WhatsApp, the app that turned an AV1 reel down.
+     */
+    @Test
+    public void theCompatibleSwitchSitsAboveTheQualityWithAnyDownloadIn() {
+        for (PatchFamily download : new PatchFamily[]{PatchFamily.STORY_DOWNLOAD, PatchFamily.REEL_DOWNLOAD,
+                PatchFamily.VIDEO_DOWNLOAD}) {
+            PatchFamily.inBuildForTests = EnumSet.of(download);
+            try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+                List<Preference> rows = rowsOf(controller);
+                int compatible = indexOfKey(rows, Settings.DOWNLOAD_COMPATIBLE.key);
+                assertTrue(download + ": no row for saves other apps can open", compatible >= 0);
+                Preference row = rows.get(compatible);
+                assertTrue(row instanceof SwitchPreference);
+                assertFalse(((SwitchPreference) row).isChecked());
+                assertEquals(indexOfKey(rows, Settings.DOWNLOAD_QUALITY.key) - 1, compatible);
+                assertEquals("Save videos other apps can open", String.valueOf(row.getTitle()));
+                assertEquals("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's "
+                        + "sharpest version is often AV1, which some apps turn down, so a video can save at a lower "
+                        + "quality. A video with no such version saves as usual.", String.valueOf(row.getSummary()));
+            }
+        }
+
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            assertEquals("a compatible-saves row with no download in the build",
+                    -1, indexOfKey(rowsOf(controller), Settings.DOWNLOAD_COMPATIBLE.key));
         }
     }
 

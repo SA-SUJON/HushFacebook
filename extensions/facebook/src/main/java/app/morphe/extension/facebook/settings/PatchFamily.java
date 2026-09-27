@@ -116,6 +116,18 @@ public enum PatchFamily {
      */
     static final List<BooleanSetting> ENTRY_SWITCHES = Collections.singletonList(Settings.CHECK_FOR_RELEASES);
 
+    /**
+     * The switches the three download patches share and none of them owns: each shapes what every
+     * save picks, a story's, a reel's or a feed video's, so it's on the screen under Downloads
+     * whenever one of them is in the build. Today that's saves other apps can open. Pause turns
+     * them off like a family's switches, and a paused Facebook makes no Hushfacebook saves anyway.
+     */
+    static final List<BooleanSetting> DOWNLOAD_SWITCHES = Collections.singletonList(Settings.DOWNLOAD_COMPATIBLE);
+
+    /** The families whose saves read {@link #DOWNLOAD_SWITCHES}. */
+    static final Set<PatchFamily> DOWNLOADS = Collections.unmodifiableSet(
+            EnumSet.of(STORY_DOWNLOAD, REEL_DOWNLOAD, VIDEO_DOWNLOAD));
+
     /** The families a test says this build carries, instead of asking {@link SettingsStatus}. */
     @Nullable
     static volatile Set<PatchFamily> inBuildForTests;
@@ -177,7 +189,8 @@ public enum PatchFamily {
 
     /**
      * One line per family in this build, saying whether a switch runs it, what the switch is set
-     * to and what stays in while paused, then the families this build doesn't carry.
+     * to and what stays in while paused, then the switches every download shares when a download
+     * patch is in, then the families this build doesn't carry.
      */
     static List<String> reportLines(Set<PatchFamily> inBuild, boolean paused) {
         List<String> lines = new ArrayList<>();
@@ -186,8 +199,25 @@ public enum PatchFamily {
             if (inBuild.contains(family)) lines.add(family.reportLine(paused));
             else absent.add(family.patchName);
         }
+        if (!Collections.disjoint(inBuild, DOWNLOADS)) lines.add(downloadSwitchesLine(paused));
         if (!absent.isEmpty()) lines.add("not in this build: " + String.join(", ", absent));
         return lines;
+    }
+
+    /**
+     * The shared download switches as saved. They shape a save rather than run a hook, so the line
+     * says what each is set to and never that downloads are off.
+     */
+    private static String downloadSwitchesLine(boolean paused) {
+        StringBuilder line = new StringBuilder("Every download patch: ");
+        if (paused) line.append("off while paused (saved ");
+        for (int i = 0; i < DOWNLOAD_SWITCHES.size(); i++) {
+            if (i > 0) line.append(", ");
+            BooleanSetting setting = DOWNLOAD_SWITCHES.get(i);
+            line.append(setting.key).append(setting.savedValue() ? "=on" : "=off");
+        }
+        if (paused) line.append(')');
+        return line.toString();
     }
 
     /**

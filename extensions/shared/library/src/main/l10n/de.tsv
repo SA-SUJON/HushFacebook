@@ -261,3 +261,7 @@ Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.
 Facebook will open on %1$s.	Facebook startet dann mit %1$s.
 Jump to a section	Zu einem Abschnitt springen
 Go straight to one group of settings. Back returns to where you were.	Direkt zu einer Gruppe von Einstellungen. Zurück bringt dich dorthin, wo du warst.
+# context: switch title under Downloads; on, every video save keeps to formats other apps accept
+Save videos other apps can open	Videos speichern, die andere Apps öffnen können
+# context: summary of that switch; H.264, AAC, AV1 and WhatsApp are names and stay as they are
+Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.	Speichert Videos im Format H.264 mit AAC-Ton, das Apps wie WhatsApp annehmen. Die schärfste Version bei Facebook ist oft AV1, und das lehnen manche Apps ab. Deshalb kann ein Video in niedrigerer Qualität gespeichert werden. Hat ein Video keine solche Version, wird es wie gewohnt gespeichert.

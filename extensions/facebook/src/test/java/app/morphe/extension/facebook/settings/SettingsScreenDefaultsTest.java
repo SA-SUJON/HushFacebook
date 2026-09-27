@@ -5,6 +5,7 @@
 package app.morphe.extension.facebook.settings;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -70,12 +71,17 @@ public class SettingsScreenDefaultsTest {
         PatchFamily.inBuildForTests = EnumSet.allOf(PatchFamily.class);
         Set<String> before = new HashSet<>(store().getAll().keySet());
         try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
-            open(controller);
+            HushfacebookPreferenceFragment fragment = open(controller);
             ShadowLooper.idleMainLooper();
 
             Set<String> added = new HashSet<>(store().getAll().keySet());
             added.removeAll(before);
             assertEquals("opening the screen stored " + added, Collections.emptySet(), added);
+            // Saves other apps can open start off, and a later default change has to reach
+            // everyone who only looked (issue #11's switch).
+            assertNotNull("no row for saves other apps can open",
+                    find(fragment.getPreferenceScreen(), Settings.DOWNLOAD_COMPATIBLE.key));
+            assertFalse(added.contains(Settings.DOWNLOAD_COMPATIBLE.key));
         }
     }
 

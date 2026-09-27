@@ -21,10 +21,11 @@ import app.morphe.extension.shared.settings.StringSetting;
 /**
  * The switches behind the hooks that ask before they act.
  *
- * <p>All but three of them are on by default. Picking a patch in Morphe Manager is the choice to use
+ * <p>All but four of them are on by default. Picking a patch in Morphe Manager is the choice to use
  * it, and the switch is the way to turn it off again without patching a second time. The two GenAI
- * switches start off until each rule has been checked on a signed-in feed, and the release check
- * starts off because it's the only request Hushfacebook makes for itself. While Hushfacebook is
+ * switches start off until each rule has been checked on a signed-in feed, the release check
+ * starts off because it's the only request Hushfacebook makes for itself, and saves other apps can
+ * open start off because they can come out below the sharpest version. While Hushfacebook is
  * paused, or in safe mode after three crashed starts, each switch answers off and the hook behind
  * it takes Facebook's own path.
  */
@@ -213,6 +214,17 @@ public class Settings extends BaseSettings {
      */
     public static final EnumSetting<DownloadQuality> DOWNLOAD_QUALITY =
             new EnumSetting<>("hushfacebook_download_quality", DownloadQuality.BEST);
+
+    /**
+     * Video saves keep to what other apps open: H.264 video with AAC-LC or HE-AAC sound, within
+     * {@link #DOWNLOAD_QUALITY}, or Facebook's single MP4 file when the manifest has no such pair.
+     * The sharpest version Facebook streams is often AV1 with xHE-AAC sound, which Gallery and VLC
+     * play and WhatsApp turns down (issue #11). Off by default, so a save keeps the sharpest. Every
+     * download patch reads it ({@link PatchFamily#DOWNLOAD_SWITCHES}), and a paused Facebook makes
+     * no Hushfacebook saves for it to steer.
+     */
+    public static final BooleanSetting DOWNLOAD_COMPATIBLE =
+            new BooleanSetting("hushfacebook_download_compatible", FALSE);
 
     /**
      * The name a saved video gets: {date}, {video_id}, {owner} and {posted} fill in per save, the

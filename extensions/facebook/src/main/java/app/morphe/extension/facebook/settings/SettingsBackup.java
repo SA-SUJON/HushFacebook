@@ -104,6 +104,7 @@ public final class SettingsBackup {
             Settings.DOWNLOAD_STORIES,
             Settings.DOWNLOAD_REELS,
             Settings.DOWNLOAD_VIDEOS,
+            Settings.DOWNLOAD_COMPATIBLE,
             Settings.OPEN_ON_CHOSEN_TAB));
 
     /**

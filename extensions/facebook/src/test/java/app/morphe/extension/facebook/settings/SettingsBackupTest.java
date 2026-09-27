@@ -310,6 +310,21 @@ public class SettingsBackupTest {
         }
     }
 
+    /** Saves other apps can open travel with the other download settings, both ways (issue #11). */
+    @Test
+    public void theCompatibleSavesSwitchGoesOutAndComesBack() throws Exception {
+        assertFalse("the switch doesn't start off", Settings.DOWNLOAD_COMPATIBLE.savedValue());
+        Settings.DOWNLOAD_COMPATIBLE.save(true);
+        JSONObject exported = new JSONObject(SettingsBackup.create()).getJSONObject("settings");
+        assertTrue(exported.toString(), exported.getBoolean(Settings.DOWNLOAD_COMPATIBLE.key));
+
+        Settings.DOWNLOAD_COMPATIBLE.save(false);
+        SettingsBackup.Snapshot snapshot = SettingsBackup.parse(fileWith(Settings.DOWNLOAD_COMPATIBLE, true));
+        assertEquals(0, snapshot.unknown);
+        assertEquals(1, SettingsBackup.apply(snapshot));
+        assertTrue(Settings.DOWNLOAD_COMPATIBLE.savedValue());
+    }
+
     // ---- Writing ---------------------------------------------------------------------------
 
     @Test

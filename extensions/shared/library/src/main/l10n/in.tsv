@@ -261,3 +261,7 @@ Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.
 Facebook will open on %1$s.	Facebook akan terbuka di %1$s.
 Jump to a section	Lompat ke bagian
 Go straight to one group of settings. Back returns to where you were.	Langsung ke satu kelompok setelan. Kembali membawamu ke tempat semula.
+# context: switch title under Downloads; on, every video save keeps to formats other apps accept
+Save videos other apps can open	Simpan video yang bisa dibuka aplikasi lain
+# context: summary of that switch; H.264, AAC, AV1 and WhatsApp are names and stay as they are
+Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.	Menyimpan video dalam format H.264 dengan suara AAC, yang diterima aplikasi seperti WhatsApp. Versi tertajam di Facebook sering kali AV1, yang ditolak sebagian aplikasi, jadi video bisa tersimpan dengan kualitas lebih rendah. Video yang tidak punya versi seperti itu disimpan seperti biasa.

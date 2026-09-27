@@ -72,7 +72,8 @@ import app.morphe.extension.shared.settings.preference.LogBufferManager;
  * The preference list, built in code rather than from an XML resource so the bundle adds no
  * resources to Facebook. A switch appears only when its patch is in this build
  * ({@link PatchFamily}), but for the settings entry's own ({@link PatchFamily#ENTRY_SWITCHES}),
- * which every build has; a patch that works entirely at patch time gets a line saying so, and
+ * which every build has, and the ones the downloads share ({@link PatchFamily#DOWNLOAD_SWITCHES}),
+ * which any download patch brings; a patch that works entirely at patch time gets a line saying so, and
  * what Pause can't reach is listed under the Pause switch. Switches are keyed by their setting,
  * which is how the shared fragment keeps them in sync with stored values. Every word is read from
  * {@link L10n} in the phone's language; the product names and the address stay as they are.
@@ -342,6 +343,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("Adds \"Download to phone\" to feed and Watch video menus. Saves at the quality set "
                                 + "below. Off or paused, Facebook's menu returns.")));
             }
+            // Every save reads it, a story's and a reel's as much as a feed video's, so it's here
+            // whichever download patch is in, above the quality it keeps within.
+            downloads.addPreference(toggle(context, Settings.DOWNLOAD_COMPATIBLE, L10n.t("Save videos other apps can open"),
+                    L10n.t("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest "
+                            + "version is often AV1, which some apps turn down, so a video can save at a lower quality. "
+                            + "A video with no such version saves as usual.")));
             downloads.addPreference(qualityRow(context));
             downloads.addPreference(folderRow(context));
             downloads.addPreference(fileNameRow(context));

@@ -216,6 +216,107 @@ final class DashManifest {
         return best;
     }
 
+    // ---------------------------------------------------------------- files other apps can open
+
+    /**
+     * Whether a video track is H.264 ({@code avc1} or {@code avc3}), the one video format every app
+     * that takes an MP4 plays. WhatsApp names H.264 with AAC sound as what it sends, and turned
+     * down a reel saved as AV1 with xHE-AAC sound that Gallery and VLC played (issue #11).
+     */
+    static boolean isCompatibleVideo(Track track) {
+        return track.isVideo() && (track.codecs.startsWith("avc1") || track.codecs.startsWith("avc3"));
+    }
+
+    /**
+     * How widely an audio track plays: 2 for AAC-LC ({@code mp4a.40.2}), 1 for HE-AAC and HE-AAC v2
+     * ({@code mp4a.40.5}, {@code mp4a.40.29}), which carry an AAC-LC core, and 0 for anything else.
+     * xHE-AAC ({@code mp4a.40.42}, USAC) is a different codec under the same {@code mp4a.40} name,
+     * and apps that take AAC refuse it.
+     */
+    static int compatibleAudioRank(Track track) {
+        if (!track.isAudio() || !track.codecs.startsWith("mp4a.40.")) return 0;
+        int objectType;
+        try {
+            objectType = Integer.parseInt(track.codecs.substring("mp4a.40.".length()).trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+        if (objectType == 2) return 2;
+        if (objectType == 5 || objectType == 29) return 1;
+        return 0;
+    }
+
+    /** The H.264 track that suits [quality] best, by the rules of {@link #pickVideo}, or null. */
+    static Track pickCompatibleVideo(List<Track> tracks, DownloadQuality quality) {
+        List<Track> h264 = new ArrayList<>();
+        for (Track track : tracks) {
+            if (isCompatibleVideo(track)) h264.add(track);
+        }
+        return pickVideo(h264, false, quality);
+    }
+
+    /**
+     * The AAC-LC track with the highest bitrate, else the HE-AAC track with the highest, else
+     * {@code null}. Never xHE-AAC or any other profile.
+     */
+    static Track bestCompatibleAudio(List<Track> tracks) {
+        Track best = null;
+        int bestRank = 0;
+
+        for (Track track : tracks) {
+            int rank = compatibleAudioRank(track);
+            if (rank == 0) continue;
+            if (best == null || rank > bestRank || (rank == bestRank && track.bandwidth > best.bandwidth)) {
+                best = track;
+                bestRank = rank;
+            }
+        }
+
+        return best;
+    }
+
+    /** A video track and the audio track to join it with, or no audio for a video with no sound. */
+    static final class Pick {
+        final Track video;
+        final Track audio;
+
+        Pick(Track video, Track audio) {
+            this.video = video;
+            this.audio = audio;
+        }
+    }
+
+    /**
+     * The tracks a save of this manifest joins, or {@code null} when it has none to offer.
+     *
+     * <p>Not [compatible], that's {@link #pickVideo} and {@link #bestAudio}, as every save made
+     * before the switch existed. [compatible] holds both to what other apps open: an H.264 track
+     * ({@link #pickCompatibleVideo}) and an AAC-LC or HE-AAC one ({@link #bestCompatibleAudio}).
+     * A manifest that has sound but none of it in those profiles has no pick, rather than a silent
+     * one: the caller saves the single file instead.
+     */
+    static Pick pick(List<Track> tracks, boolean allowAv1, DownloadQuality quality, boolean compatible) {
+        if (!compatible) {
+            Track video = pickVideo(tracks, allowAv1, quality);
+            return video == null ? null : new Pick(video, bestAudio(tracks));
+        }
+
+        Track video = pickCompatibleVideo(tracks, quality);
+        if (video == null) return null;
+
+        Track audio = bestCompatibleAudio(tracks);
+        if (audio == null && hasSound(tracks)) return null;
+        return new Pick(video, audio);
+    }
+
+    /** Whether the manifest lists any sound at all, whatever its codec. */
+    static boolean hasSound(List<Track> tracks) {
+        for (Track track : tracks) {
+            if (track.isAudio()) return true;
+        }
+        return false;
+    }
+
     // ---------------------------------------------------------------- internals
 
     /** A higher number is a better choice: 3 for H.264, 2 for H.265, 1 for AV1, 0 for not used. */

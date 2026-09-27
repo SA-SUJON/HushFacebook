@@ -43,6 +43,7 @@ import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
 import app.morphe.extension.facebook.download.ReelDownload;
+import app.morphe.extension.facebook.download.SaveRulesForTests;
 import app.morphe.extension.facebook.download.VideoMenuItemForTests;
 import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.FeedFilter;
@@ -144,6 +145,17 @@ public class PausedHooksTest {
         ReleaseCheck.Stored.CHECKED_AT.savedValue();
         // A Facebook start a day after the last try asks GitHub for the newest release.
         probes.put(Settings.CHECK_FOR_RELEASES, ReleaseCheckForTests::aStartAsksGitHub);
+        return probes;
+    }
+
+    /**
+     * The switches the download patches share, one probe each, held to the same promise: paused,
+     * or before the settings are ready, a save picks what it would with the switch off.
+     */
+    private static Map<BooleanSetting, Probe> downloadProbes() {
+        Map<BooleanSetting, Probe> probes = new LinkedHashMap<>();
+        // A save takes the H.264 picture over the sharper AV1 one.
+        probes.put(Settings.DOWNLOAD_COMPATIBLE, SaveRulesForTests::picksAFileOtherAppsOpen);
         return probes;
     }
 
@@ -311,11 +323,15 @@ public class PausedHooksTest {
         Map<BooleanSetting, Probe> entry = entryProbes();
         assertEquals("every switch of the settings entry needs a probe here",
                 new HashSet<>(PatchFamily.ENTRY_SWITCHES), entry.keySet());
+        Map<BooleanSetting, Probe> downloads = downloadProbes();
+        assertEquals("every switch the downloads share needs a probe here",
+                new HashSet<>(PatchFamily.DOWNLOAD_SWITCHES), downloads.keySet());
 
         // Every hook is asked every time, so one run names every hook that broke the promise.
         List<String> wrong = new ArrayList<>();
         everyProbe(probes, true, "running", wrong);
         everyEntryProbe(entry, true, "running", wrong);
+        everyEntryProbe(downloads, true, "running", wrong);
 
         for (HushfacebookPause.Reason why : new HushfacebookPause.Reason[]{
                 HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP,
@@ -323,11 +339,13 @@ public class PausedHooksTest {
             PauseForTests.pause(why);
             everyProbe(probes, false, "paused by " + why, wrong);
             everyEntryProbe(entry, false, "paused by " + why, wrong);
+            everyEntryProbe(downloads, false, "paused by " + why, wrong);
         }
 
         PauseForTests.resume();
         everyProbe(probes, true, "running again", wrong);
         everyEntryProbe(entry, true, "running again", wrong);
+        everyEntryProbe(downloads, true, "running again", wrong);
         assertEquals(Collections.emptyList(), wrong);
     }
 
@@ -345,11 +363,13 @@ public class PausedHooksTest {
         Map<PatchFamily, List<Probe>> probes = probes();
         assertEquals("every family with a switch needs a probe here", switched(), probes.keySet());
         Map<BooleanSetting, Probe> entry = entryProbes();
+        Map<BooleanSetting, Probe> downloads = downloadProbes();
 
         List<String> wrong = new ArrayList<>();
         SettingsContextRule.withoutContext(() -> {
             everyProbe(probes, false, "before the context is set", wrong);
             everyEntryProbe(entry, false, "before the context is set", wrong);
+            everyEntryProbe(downloads, false, "before the context is set", wrong);
         });
         // Safe mode on, as after three crashed starts: the context is set and the pause undecided.
         BaseSettings.SAFE_MODE.save(true);
@@ -357,12 +377,14 @@ public class PausedHooksTest {
             SettingsContextRule.beforeThePauseIsDecided(() -> {
                 everyProbe(probes, false, "before the pause is decided", wrong);
                 everyEntryProbe(entry, false, "before the pause is decided", wrong);
+                everyEntryProbe(downloads, false, "before the pause is decided", wrong);
             });
         } finally {
             BaseSettings.SAFE_MODE.resetToDefault();
         }
         everyProbe(probes, true, "once they're ready", wrong);
         everyEntryProbe(entry, true, "once they're ready", wrong);
+        everyEntryProbe(downloads, true, "once they're ready", wrong);
         assertEquals(Collections.emptyList(), wrong);
     }
 

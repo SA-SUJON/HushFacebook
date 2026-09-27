@@ -5,6 +5,7 @@
 package app.morphe.extension.facebook.settings;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -77,9 +78,44 @@ public class PatchFamilyTest {
             String earlier = owners.put(setting, "the settings entry");
             assertNull(setting.key + " belongs to " + earlier + " and to the settings entry", earlier);
         }
+        for (BooleanSetting setting : PatchFamily.DOWNLOAD_SWITCHES) {
+            String earlier = owners.put(setting, "the download patches");
+            assertNull(setting.key + " belongs to " + earlier + " and to the download patches", earlier);
+        }
         assertEquals(new HashSet<>(PausedHooksTest.settingsSwitches()), owners.keySet());
         assertTrue("the release check is the settings entry's own",
                 PatchFamily.ENTRY_SWITCHES.contains(Settings.CHECK_FOR_RELEASES));
+        assertTrue("saves other apps can open are every download's",
+                PatchFamily.DOWNLOAD_SWITCHES.contains(Settings.DOWNLOAD_COMPATIBLE));
+        assertEquals(EnumSet.of(PatchFamily.STORY_DOWNLOAD, PatchFamily.REEL_DOWNLOAD, PatchFamily.VIDEO_DOWNLOAD),
+                PatchFamily.DOWNLOADS);
+    }
+
+    /**
+     * The switches every download shares get one line of their own when a download patch is in:
+     * what each is set to, and never that downloads are off, since they shape a save rather than
+     * run a hook. A build with no download patch has no such line.
+     */
+    @Test
+    public void theReportSaysWhatTheSharedDownloadSwitchesAreSetTo() {
+        try {
+            List<String> lines = PatchFamily.reportLines(EnumSet.of(PatchFamily.STORY_DOWNLOAD), false);
+            assertEquals("Download any story: on (hushfacebook_download_stories=on)", lines.get(0));
+            assertEquals("Every download patch: hushfacebook_download_compatible=off", lines.get(1));
+            assertTrue(lines.get(2), lines.get(2).startsWith("not in this build: "));
+
+            Settings.DOWNLOAD_COMPATIBLE.save(true);
+            assertEquals("Every download patch: hushfacebook_download_compatible=on",
+                    PatchFamily.reportLines(EnumSet.of(PatchFamily.VIDEO_DOWNLOAD), false).get(1));
+            assertEquals("Every download patch: off while paused (saved hushfacebook_download_compatible=on)",
+                    PatchFamily.reportLines(EnumSet.of(PatchFamily.REEL_DOWNLOAD), true).get(1));
+
+            for (String line : PatchFamily.reportLines(EnumSet.of(PatchFamily.SPONSORED_POSTS), false)) {
+                assertFalse(line, line.contains("hushfacebook_download_compatible"));
+            }
+        } finally {
+            Settings.DOWNLOAD_COMPATIBLE.resetToDefault();
+        }
     }
 
     @Test
