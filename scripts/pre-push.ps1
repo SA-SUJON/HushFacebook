@@ -65,6 +65,9 @@ $script:pushedCommits = New-Object System.Collections.Generic.List[string]
 $script:publishedCommits = New-Object System.Collections.Generic.List[string]
 # What the remote advertises, read once by Get-RemoteHeld.
 $script:remoteHeld = $null
+# A full-tree gate on a new feature branch still needs to distinguish it from an index push.
+# -ChangedPaths is used by the routing contracts to stand in for a published-file push.
+$script:publishesIndexRef = $PSBoundParameters.ContainsKey('ChangedPaths')
 
 function Write-Step {
     param([string]$Message)
@@ -91,6 +94,9 @@ function Get-PushedPaths {
         $localSha = $parts[1]
         $remoteSha = $parts[3]
         if ($localSha -eq $zeroObject) { continue }
+        if ($parts[2] -eq 'refs/heads/main' -or $parts[2] -like 'refs/tags/*') {
+            $script:publishesIndexRef = $true
+        }
 
         if ($remoteSha -eq $zeroObject) {
             # A new tag of an already hosted branch adds no files. In particular it does not
@@ -726,7 +732,8 @@ try {
         # The description's test count belongs to the release it describes. Holding this tree to
         # it only means something while the description is being rewritten, which is when
         # patches-bundle.json is one of the files that moved.
-        $describesThisTree = @($paths | Where-Object { $_ -eq 'patches-bundle.json' }).Count -gt 0
+        $describesThisTree = $script:publishesIndexRef -and
+            @($paths | Where-Object { $_ -eq 'patches-bundle.json' }).Count -gt 0
         $factsFailed = 'The release facts do not agree. Fix them or push with HUSHFACEBOOK_SKIP_PRE_PUSH=1.'
         if ($describesThisTree) {
             # The index push holds the bundle and the test results this checkout built to the new

@@ -2002,7 +2002,7 @@ try {
         'param([string]$Root, [switch]$SkipDescriptionTestCount, [switch]$AllowPublishedIndexLag,',
         '    [switch]$VerifyPublishedAsset, [string]$ArtifactPath, [switch]$ArtifactIsHosted)',
         ("Set-Content -LiteralPath '$factsMarker' -Value " +
-            "`"lag=`$AllowPublishedIndexLag verify=`$VerifyPublishedAsset artifact=`$ArtifactPath hosted=`$ArtifactIsHosted`""),
+            "`"lag=`$AllowPublishedIndexLag skip=`$SkipDescriptionTestCount verify=`$VerifyPublishedAsset artifact=`$ArtifactPath hosted=`$ArtifactIsHosted`""),
         'exit 0')
     Set-Content -LiteralPath (Join-Path $hookRoot 'scripts/test-script-contracts.ps1') -Encoding UTF8 -Value @(
         'param([string]$Root)',
@@ -2254,8 +2254,13 @@ try {
         }
         foreach ($stub in $listingStubs.Keys) {
             $ranFile = Join-Path $listingRan ([IO.Path]::GetFileNameWithoutExtension($stub) + '.txt')
+            $markerValue = if ($stub -eq 'scripts/validate-release-facts.ps1') {
+                "Set-Content -LiteralPath '$ranFile' -Value `"lag=`$AllowPublishedIndexLag skip=`$SkipDescriptionTestCount`""
+            } else {
+                "Set-Content -LiteralPath '$ranFile' -Value 'ran'"
+            }
             Set-Content -LiteralPath (Join-Path $listingRepo $stub) -Encoding UTF8 -Value @(
-                $listingStubs[$stub], "Set-Content -LiteralPath '$ranFile' -Value 'ran'", 'exit 0')
+                $listingStubs[$stub], $markerValue, 'exit 0')
         }
         # Commits what -Change leaves, pushes it the way git hands the hook a push, and answers
         # with what ran: the stubs by name, and build for the runtime tests.
@@ -2287,6 +2292,14 @@ try {
             Set-Content -LiteralPath (Join-Path $javaFolder 'Moved.java') -Encoding ASCII -Value 'final class Moved {}'
         }
         Assert-True ($ran -eq 'build, validate-release-facts') "A push adding the index and a source ran [$ran]."
+        $featureTip = (& git -C $listingRepo rev-parse HEAD).Trim()
+        Remove-Item -Path (Join-Path $listingRan '*') -Force -ErrorAction SilentlyContinue
+        $global:LASTEXITCODE = 0
+        & $prePushScript -Root $listingRepo -PushedRefs "refs/heads/feature $featureTip refs/heads/feature $('0' * 40)" 6> $null
+        Assert-True ($LASTEXITCODE -eq 0) 'A new feature branch with an index file failed its push gate.'
+        $featureFacts = Get-Content -LiteralPath (Join-Path $listingRan 'validate-release-facts.txt') -Raw
+        Assert-True ($featureFacts -like 'lag=True skip=True*') `
+            'A new feature branch was checked as if it published the index.'
 
         # Each end of a move counts where it is.
         $ran = Push-ListingChange {
@@ -2358,6 +2371,7 @@ try {
         $env:GITHUB_ACTOR = $savedNewBranchActor
         $env:GITHUB_TOKEN = $savedNewBranchToken
     }
+
 
     # A release tag can name the exact tree already on a remote branch. It adds a pointer,
     # not a new index: treating it as a first branch push creates a publication deadlock.
