@@ -201,10 +201,13 @@ final class DashManifest {
     }
 
     /**
-     * The AAC track with the highest bitrate, or {@code null}. All AAC profiles are permitted.
-     * Stories list xHE-AAC ({@code mp4a.40.42}).
+     * Prefer AAC-LC or HE-AAC sound that gallery players can open, without lowering the video's
+     * resolution. Use another AAC profile only when neither is offered. Stories can list only
+     * xHE-AAC ({@code mp4a.40.42}), so discarding it would lose their sound.
      */
     static Track bestAudio(List<Track> tracks) {
+        Track compatible = bestCompatibleAudio(tracks);
+        if (compatible != null) return compatible;
         Track best = null;
 
         for (Track track : tracks) {
@@ -289,8 +292,8 @@ final class DashManifest {
     /**
      * The tracks a save of this manifest joins, or {@code null} when it has none to offer.
      *
-     * <p>Not [compatible], that's {@link #pickVideo} and {@link #bestAudio}, as every save made
-     * before the switch existed. [compatible] holds both to what other apps open: an H.264 track
+     * <p>Not [compatible], that's {@link #pickVideo} and {@link #bestAudio}. [compatible] holds
+     * both to what other apps open: an H.264 track
      * ({@link #pickCompatibleVideo}) and an AAC-LC or HE-AAC one ({@link #bestCompatibleAudio}).
      * A manifest that has sound but none of it in those profiles has no pick, rather than a silent
      * one: the caller saves the single file instead.
@@ -298,7 +301,10 @@ final class DashManifest {
     static Pick pick(List<Track> tracks, boolean allowAv1, DownloadQuality quality, boolean compatible) {
         if (!compatible) {
             Track video = pickVideo(tracks, allowAv1, quality);
-            return video == null ? null : new Pick(video, bestAudio(tracks));
+            Track audio = bestAudio(tracks);
+            // A supported picture beside unsupported sound must not become a silent save.
+            if (video == null || (audio == null && hasSound(tracks))) return null;
+            return new Pick(video, audio);
         }
 
         Track video = pickCompatibleVideo(tracks, quality);

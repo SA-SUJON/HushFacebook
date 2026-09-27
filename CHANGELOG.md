@@ -4,6 +4,12 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+## 0.3.1 (2026-09-27)
+
+* **Facebook:** Compatible video saves now keep a known H.264/AAC pair even when an unchecked single MP4 has the same or higher resolution. Previously that file could take priority and bring back the sharing problem reported in #11.
+* **Facebook:** Normal video saves prefer AAC-LC or HE-AAC sound when available, while keeping the selected video resolution. A manifest with sound in an unsupported format now falls back to the complete MP4 instead of producing a silent video. These changes address download paths relevant to #14; Xiaomi Gallery playback and WhatsApp import still need confirmation on the affected apps.
+* **Facebook - Tooling:** The stale-save test now uses a retired notification ID. Its fixed ID could collide with the next save after other tests ran, making a correct cleanup fail the test.
+
 ## 0.3.0 (2026-09-27)
 
 * **Facebook:** This is a development build. The published bundle is still v0.2.0 while the remaining phone checks and reported failures are investigated. The README now records the Media settings and Xiaomi Gallery reports and removes stale notes for checks already recorded below.

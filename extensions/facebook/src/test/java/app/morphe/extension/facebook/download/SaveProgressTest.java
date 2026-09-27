@@ -342,12 +342,17 @@ public class SaveProgressTest {
         Uri finished = row(0);
         SaveLeftovers.pending(context, pending);
         SaveLeftovers.pending(context, finished);
+        // Retire an allocated id so it cannot be reused by the next save. A hard-coded 42 can
+        // equal the process counter after other tests, replacing this notice before the sweep.
+        SaveControl.Save stopped = SaveControl.begin(context, true);
+        int stoppedId = stopped.id;
+        stopped.end();
         // The stopped save's notification, which Android leaves up when it ends the process, and
         // one of Facebook's own under another tag, which isn't this sweep's to touch.
-        notifications().notify(SaveControl.TAG, 42, new Notification.Builder(context, SaveControl.CHANNEL)
+        notifications().notify(SaveControl.TAG, stoppedId, new Notification.Builder(context, SaveControl.CHANNEL)
                 .setSmallIcon(android.R.drawable.stat_sys_download).setContentTitle("Saving a video")
                 .setOngoing(true).build());
-        notifications().notify("facebook", 42, new Notification.Builder(context, "facebook")
+        notifications().notify("facebook", stoppedId, new Notification.Builder(context, "facebook")
                 .setSmallIcon(android.R.drawable.stat_notify_chat).setContentTitle("A message").build());
 
         server.serveGenerated("/next.mp4", "video/mp4", MP4_HEAD, 64 * 1024, Long.MAX_VALUE, null);
@@ -358,8 +363,8 @@ public class SaveProgressTest {
         assertTrue("a finished file was taken for a leftover", gallery.rows.containsKey(ContentUris.parseId(finished)));
         assertEquals(0, workFiles());
         assertTrue(pendingList().isEmpty());
-        assertFalse("the stopped save's notification is still up", shown(SaveControl.TAG, 42));
-        assertTrue("Facebook's own notification was taken down", shown("facebook", 42));
+        assertFalse("the stopped save's notification is still up", shown(SaveControl.TAG, stoppedId));
+        assertTrue("Facebook's own notification was taken down", shown("facebook", stoppedId));
         String report = LogBufferManager.buildExportText();
         assertTrue(report, report.contains("removed what a stopped save left: 2 work file(s), 1 pending gallery "
                 + "row(s), 1 notification(s)"));

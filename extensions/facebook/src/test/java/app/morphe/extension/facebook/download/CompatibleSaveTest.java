@@ -71,7 +71,7 @@ public class CompatibleSaveTest {
             sound("mp4a.40.42", 84_000, "xhe") + sound("mp4a.40.5", 48_000, "he"));
 
     private static final String ISSUE_11_OFF = "video/mp4 " + AV1 + " 1080x1920 1525kbps 1080p"
-            + " + audio/mp4 mp4a.40.42 0x0 84kbps";
+            + " + audio/mp4 mp4a.40.2 0x0 64kbps";
     private static final String ISSUE_11_ON = "video/mp4 avc1.64001f 720x1280 1200kbps 720p"
             + " + audio/mp4 mp4a.40.2 0x0 64kbps";
     private static final String KEPT = ", kept to files other apps can open";
@@ -160,10 +160,10 @@ public class CompatibleSaveTest {
     }
 
     @Test
-    public void theSwitchStartsOffAndOffSavesWhatItAlwaysDid() throws Exception {
+    public void theSwitchStartsOffAndKeepsTheBestPictureWithSaferSound() throws Exception {
         assertFalse("the switch doesn't start off", Settings.DOWNLOAD_COMPATIBLE.get());
         assertFalse(MediaDownload.compatibleSaves());
-        // The S22's line in issue #11, word for word.
+        // Keep the S22's 1080p picture, but take AAC-LC when the manifest offers it.
         String report = reelSave(false, new ReelSource(HD, null, MANIFEST));
         assertTrue(report, report.contains("saving the reel from its DASH manifest: " + ISSUE_11_OFF
                 + ", instead of mp4 (720p)\n"));
@@ -176,28 +176,41 @@ public class CompatibleSaveTest {
         assertTrue(report, report.contains("saving the reel from its DASH manifest: " + ISSUE_11_ON
                 + ", instead of mp4 (360p)" + KEPT));
 
-        // The single 720p file ties the H.264 track, and a tie goes to the single file, as it
-        // always has: one fetch and no join.
-        report = reelSave(true, new ReelSource(HD, null, MANIFEST));
-        assertFalse(report, report.contains("DASH manifest"));
-        assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)" + TAKEN + "\n"));
-        assertFalse("the single file's formats were claimed as checked", report.contains(KEPT));
+    }
+
+    /** A file URL says nothing about its audio/video codecs, even when its quality is higher. */
+    @Test
+    public void aKnownCompatiblePairWinsOverAnUncheckedSingleFile() throws Exception {
+        for (String file : new String[]{HD, HD.replace("720p", "1080p")}) {
+            String report = reelSave(true, new ReelSource(file, null, MANIFEST));
+            assertTrue(report, report.contains("saving the reel from its DASH manifest: " + ISSUE_11_ON));
+            assertTrue(report, report.contains(KEPT));
+        }
+    }
+
+    @Test
+    public void unsupportedManifestAudioUsesTheCompleteSingleFile() throws Exception {
+        String opus = manifest(representation("avc1.640028", 1080, 1920, 2_000_000, "1080p", "v1080"),
+                sound("opus", 96_000, "opus"));
+        String report = reelSave(false, new ReelSource(HD, null, opus));
+        assertFalse(report, report.contains("saving the reel from its DASH manifest"));
+        assertTrue(report, report.contains("saving video mp4 (720p)"));
     }
 
     /**
-     * A single file the save would take with the switch off too says nothing about other apps: no
-     * manifest at all, or a manifest whose best tracks don't beat the file.
+     * A save with no manifest cannot claim checked codecs. When a compatible pair exists, its
+     * known formats take priority over the unchecked file's larger dimensions.
      */
     @Test
-    public void aSingleFileTakenForItsOwnSakeSaysNothingOfOtherApps() throws Exception {
+    public void checkedFormatsTakePriorityOverTheSingleFilesResolution() throws Exception {
         String report = reelSave(true, new ReelSource(HD, null, null));
         assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)\n"));
 
         String small = manifest(representation("avc1.64001e", 360, 640, 400_000, "360p", "h360"),
                 sound("mp4a.40.2", 64_000, "lc"));
         report = reelSave(true, new ReelSource(HD, null, small));
-        assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)\n"));
-        assertFalse(report, report.contains("other apps"));
+        assertTrue(report, report.contains("saving the reel from its DASH manifest: video/mp4 avc1.64001e 360x640"));
+        assertTrue(report, report.contains(KEPT));
         assertFalse(report, report.contains(TAKEN));
     }
 
@@ -249,7 +262,7 @@ public class CompatibleSaveTest {
 
         report = reelSave(false, new ReelSource(null, null, LADDER));
         assertTrue(report, report.contains("saving the reel from its DASH manifest: video/mp4 " + AV1 + " 720x1280 "
-                + "500kbps 480p + audio/mp4 mp4a.40.42 0x0 84kbps, instead of nothing, quality setting 480p\n"));
+                + "500kbps 480p + audio/mp4 mp4a.40.5 0x0 48kbps, instead of nothing, quality setting 480p\n"));
 
         Settings.DOWNLOAD_QUALITY.save(DownloadQuality.SMALLEST);
         report = reelSave(true, new ReelSource(null, null, LADDER));

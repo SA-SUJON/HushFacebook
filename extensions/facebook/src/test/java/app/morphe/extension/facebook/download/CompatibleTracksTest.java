@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Which DASH tracks a save takes with saves other apps can open on, and that it takes what it
- * always did with the switch off (issue #11). A reel saved at Best came out as 1080p AV1 with
+ * Which DASH tracks a save takes with saves other apps can open on, and how ordinary saves keep
+ * their resolution while preferring widely supported sound (issues #11 and #14). A reel saved as 1080p AV1 with
  * xHE-AAC sound: Gallery and VLC played it, WhatsApp said "Can't send this video". Plain JUnit, as
  * the ranking holds no Android type.
  */
@@ -49,6 +49,33 @@ public class CompatibleTracksTest {
 
     private static final List<DashManifest.Track> ISSUE_11 = Arrays.asList(AV1_1080, H264_720, XHE_84, LC_64);
 
+    /** Safer sound must not cost the requested picture resolution (silent Gallery report #14). */
+    @Test
+    public void ordinarySavesPreferWidelySupportedAudioWithoutLoweringTheVideo() {
+        DashManifest.Track he = audio("mp4a.40.5", 48_000);
+        for (DownloadQuality quality : DownloadQuality.values()) {
+            List<DashManifest.Track> tracks = Arrays.asList(AV1_1080, XHE_84, he);
+            DashManifest.Pick picked = DashManifest.pick(tracks, true, quality, false);
+            assertSame(quality.toString(), AV1_1080, picked.video);
+            assertSame(quality.toString(), he, picked.audio);
+            assertSame(LC_64, DashManifest.pick(ISSUE_11, true, quality, false).audio);
+        }
+        // If xHE-AAC is the only sound, retain it instead of discarding the audio.
+        assertSame(XHE_84, DashManifest.pick(Arrays.asList(AV1_1080, XHE_84), true,
+                DownloadQuality.BEST, false).audio);
+    }
+
+    @Test
+    public void unsupportedSoundFallsBackToTheSingleFileInsteadOfMakingASilentVideo() {
+        for (DownloadQuality quality : DownloadQuality.values()) {
+            assertNull(quality.toString(), DashManifest.pick(Arrays.asList(H264_720, audio("opus", 96_000)),
+                    true, quality, false));
+            assertNull(quality.toString(), DashManifest.pick(Arrays.asList(H264_720, audio("", 96_000)),
+                    true, quality, false));
+            assertNull(DashManifest.pick(Collections.singletonList(H264_720), true, quality, false).audio);
+        }
+    }
+
     @Test
     public void theIssue11ManifestTakesH264AndAacLcWithTheSwitchOn() {
         DashManifest.Pick on = DashManifest.pick(ISSUE_11, true, DownloadQuality.BEST, true);
@@ -59,8 +86,8 @@ public class CompatibleTracksTest {
         DashManifest.Pick off = DashManifest.pick(ISSUE_11, true, DownloadQuality.BEST, false);
         assertNotNull(off);
         assertSame(AV1_1080, off.video);
-        assertSame(XHE_84, off.audio);
-        // Off is the pick every save made before the switch existed.
+        assertSame(LC_64, off.audio);
+        // Off keeps the higher-resolution picture with the safer sound.
         assertSame(DashManifest.bestVideo(ISSUE_11, true), off.video);
         assertSame(DashManifest.bestAudio(ISSUE_11), off.audio);
 
@@ -115,8 +142,8 @@ public class CompatibleTracksTest {
         assertSame("AAC-LC lost to a higher HE-AAC bitrate", lc32,
                 DashManifest.bestCompatibleAudio(Arrays.asList(he48, XHE_84, lc32, heV2_32)));
         assertSame(LC_64, DashManifest.bestCompatibleAudio(Arrays.asList(lc32, LC_64)));
-        // Off, the highest bitrate of any AAC profile, xHE-AAC included, as before.
-        assertSame(XHE_84, DashManifest.bestAudio(Arrays.asList(he48, XHE_84, lc32)));
+        // The ordinary save also prefers widely supported sound.
+        assertSame(lc32, DashManifest.bestAudio(Arrays.asList(he48, XHE_84, lc32)));
     }
 
     @Test

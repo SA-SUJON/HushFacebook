@@ -476,8 +476,9 @@ public final class MediaDownload {
      * is used only when its track suits it better than the file does. On a tie the single file
      * wins: one fetch and no join.
      *
-     * <p>With saves other apps can open on ({@link #compatibleSaves}), the track is H.264 and its
-     * sound AAC-LC or HE-AAC ({@link DashManifest#pick}). A manifest with no such pair leaves the
+     * <p>With saves other apps can open on ({@link #compatibleSaves}), a known H.264 and AAC-LC or
+     * HE-AAC pair ({@link DashManifest#pick}) wins over the unchecked single file, even if that
+     * file has a higher quality label. A manifest with no such pair leaves the
      * save to the single file, Facebook's own MP4, whose formats aren't read here. With no single
      * file either, the save takes the tracks it would take with the switch off and the report says
      * so, since a file some apps turn down beats no file.
@@ -538,7 +539,7 @@ public final class MediaDownload {
         DashManifest.Track audio = pick.audio;
         boolean keptCompatible = kept != null && compatible;
 
-        if (!beatsFile(video, fallback, fallbackQuality, quality)) return keptCompatible ? leftToFile : Dash.SINGLE_FILE;
+        if (!keptCompatible && !beatsFile(video, fallback, fallbackQuality, quality)) return Dash.SINGLE_FILE;
 
         Context safe = ready(context);
         if (safe == null) return Dash.SINGLE_FILE;
