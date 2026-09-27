@@ -274,6 +274,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the Get Messenger card in Facebook's own Chats. Facebook 577 and 580 build the rows above the chat list from plugins that each answer whether they show, and the card's plugin is found by the one builder that tags its banner mib-native-dismissible-top-banner. Facebook already leaves the card out when Messenger is installed, but only for a Messenger isSameSignature matches with its own key, which a re-signed build never does. The patch asks the extension first in that plugin's show question, and the extension answers no while the switch is on and com.facebook.orca is installed and enabled, whatever key signed it."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: tap to play. The patch finds FbGrootPlayer's play, its inner pause and its bind in Facebook 577 and 580 by the trace strings they keep, the older Rich Video Player's playback controller by its play and pause log lines, Facebook's Autoplay settings checker by the refusal its constructor names it in, and FbFragmentActivity's touch dispatch by its framework name. The extension holds a start unless the player is already playing something a tap started, the start's EventTriggerType is one only something you did sends, or a tap ended within a second and the trigger isn't one Facebook sends because something came into view or came back. The Autoplay setting reads Off while the switch is on, and nothing is written to it."
     }
   ]
 }

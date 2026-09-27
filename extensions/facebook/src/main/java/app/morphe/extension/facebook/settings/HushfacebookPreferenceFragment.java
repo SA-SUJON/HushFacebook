@@ -335,6 +335,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
         }
 
+        if (build.contains(PatchFamily.TAP_TO_PLAY)) {
+            PreferenceCategory playback = category(screen, L10n.t("Playback"));
+            playback.addPreference(toggle(context, Settings.TAP_TO_PLAY, L10n.t("Tap to play"),
+                    L10n.t("Videos, reels, stories and music wait for your tap before they play. Facebook's own "
+                            + "Autoplay setting reads Off while this is on, and goes back to what you chose when "
+                            + "it's off.")));
+        }
+
         if (build.contains(PatchFamily.STORY_DOWNLOAD) || build.contains(PatchFamily.REEL_DOWNLOAD)
                 || build.contains(PatchFamily.VIDEO_DOWNLOAD)) {
             PreferenceCategory downloads = category(screen, L10n.t("Downloads"));

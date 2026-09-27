@@ -271,3 +271,9 @@ Chats	Conversas
 Hide the Get Messenger card	Ocultar o cartão Baixar o Messenger
 # context: summary of that switch; Messenger is the app's name and stays as it is
 The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	O cartão no topo das Conversas que pede para você baixar o app Messenger some enquanto o Messenger estiver instalado. Sem o Messenger, ele continua lá para você ainda poder instalá-lo por ele.
+# context: settings section heading for the Tap to play switch
+Playback	Reprodução
+# context: switch title; on, videos and music wait for a tap before they play
+Tap to play	Tocar para reproduzir
+# context: summary of that switch; Autoplay and Off are the name and value of Facebook's own setting, as Facebook shows them in this language
+Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.	Vídeos, reels, stories e músicas esperam você tocar antes de começar. A configuração de reprodução automática do próprio Facebook fica como Desativada enquanto isto estiver ativado e volta para o que você escolheu quando for desativado.

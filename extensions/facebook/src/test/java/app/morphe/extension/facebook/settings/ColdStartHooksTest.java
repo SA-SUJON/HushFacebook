@@ -42,6 +42,8 @@ import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
+import app.morphe.extension.facebook.media.TapToPlay;
+import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
@@ -149,6 +151,12 @@ public class ColdStartHooksTest {
         assertFalse("a start before the context asked Facebook for a tab", StartTabRouteForTests.routes());
         assertFalse("a Chats list built before the context lost the Get Messenger card",
                 MessengerCardForTests.hidesWithMessenger());
+        assertTrue("a player start before the context was held",
+                TapToPlay.allowStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY));
+        assertTrue("an older player start before the context was held",
+                TapToPlay.allowLegacyStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY));
+        assertSame("the Autoplay setting read before the context was changed", TapToPlayForTests.Autoplay.ON,
+                TapToPlay.autoplaySetting(TapToPlayForTests.Autoplay.ON));
         String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
         assertEquals("a link shared before the context was cleaned", shared, LinkCleaner.sanitizeShared(shared));
         assertSame("a typeface resolved before the context was swapped", Typeface.SERIF,

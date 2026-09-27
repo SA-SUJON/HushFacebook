@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(518);
+        Map<String, String> table = new HashMap<>(524);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -370,6 +370,8 @@ public final class L10nTranslations {
                 "Hushfacebook pausieren");
         table.put("Pause, backup and diagnostics",
                 "Pause, Sicherung und Diagnose");
+        table.put("Playback",
+                "Wiedergabe");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Beitr\u00e4ge, die Facebook als beworben statt als Anzeige einstuft.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
@@ -418,11 +420,11 @@ public final class L10nTranslations {
                 "In der Galerie gespeichert");
         table.put("Saved videos will be named %1$s.",
                 "Gespeicherte Videos hei\u00dfen dann %1$s.");
-        table.put("Saved. Restart Facebook to apply this change.",
-                "Gespeichert. Starte Facebook neu, um diese \u00c4nderung zu \u00fcbernehmen.");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Saved. Restart Facebook to apply this change.",
+                "Gespeichert. Starte Facebook neu, um diese \u00c4nderung zu \u00fcbernehmen.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Speichert Videos im Format H.264 mit AAC-Ton, das Apps wie WhatsApp annehmen. Die sch\u00e4rfste Version bei Facebook ist oft AV1, und das lehnen manche Apps ab. Deshalb kann ein Video in niedrigerer Qualit\u00e4t gespeichert werden. Hat ein Video keine solche Version, wird es wie gewohnt gespeichert.");
         table.put("Saves will go to a folder named %1$s.",
@@ -471,6 +473,8 @@ public final class L10nTranslations {
                 "Tab beim Start");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Entfernt Tracking-Tags wie mibextid aus den Links, die du teilst oder kopierst. Ein Link zu facebook.com/share/ wird f\u00fcr ein einzelnes Teilen erstellt, deshalb kann Facebook ihn trotzdem auf dich zur\u00fcckf\u00fchren.");
+        table.put("Tap to play",
+                "Zum Abspielen tippen");
         table.put("Tap to turn it back on.",
                 "Zum Wiedereinschalten tippen.");
         table.put("That file is too large to be a settings file. Nothing was changed.",
@@ -539,13 +543,13 @@ public final class L10nTranslations {
                 "%1$s wird verwendet. W\u00e4hle eine andere Datei, um sie zu ersetzen.");
         table.put("Version",
                 "Version");
+    }
+
+    private static void fillDe4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Version %1$s f\u00fcr Facebook %2$s");
         table.put("Video",
                 "Video");
-    }
-
-    private static void fillDe4(Map<String, String> table) {
         table.put("Video file name",
                 "Dateiname f\u00fcr Videos");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -558,6 +562,8 @@ public final class L10nTranslations {
                 "Videos werden dann in der besten Qualit\u00e4t gespeichert.");
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Videos werden dann in ihrer niedrigsten Qualit\u00e4t gespeichert, damit die Dateien so klein wie m\u00f6glich sind.");
+        table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
+                "Videos, Reels, Stories und Musik warten auf dein Tippen, bevor sie abgespielt werden. Facebooks eigene Einstellung \u201eAutomatische Wiedergabe\u201c steht auf Aus, solange dies an ist, und kehrt zu deiner Wahl zur\u00fcck, wenn es aus ist.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Weblinks \u00f6ffnen sich nicht mehr im In-App-Browser von Facebook. Facebooks eigene Seiten \u00f6ffnen sich weiterhin in der App.");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
@@ -587,7 +593,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(518);
+        Map<String, String> table = new HashMap<>(524);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -913,6 +919,8 @@ public final class L10nTranslations {
                 "Pausar Hushfacebook");
         table.put("Pause, backup and diagnostics",
                 "Pausa, copia de seguridad y diagn\u00f3stico");
+        table.put("Playback",
+                "Reproducci\u00f3n");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Publicaciones que Facebook clasifica como promociones y no como anuncios.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
@@ -961,11 +969,11 @@ public final class L10nTranslations {
                 "Se guard\u00f3 en la galer\u00eda");
         table.put("Saved videos will be named %1$s.",
                 "Los videos guardados se llamar\u00e1n %1$s.");
-        table.put("Saved. Restart Facebook to apply this change.",
-                "Guardado. Reinicia Facebook para aplicar este cambio.");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Saved. Restart Facebook to apply this change.",
+                "Guardado. Reinicia Facebook para aplicar este cambio.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Guarda los videos en H.264 con sonido AAC, el formato que aceptan apps como WhatsApp. La versi\u00f3n m\u00e1s n\u00edtida de Facebook suele ser AV1, que algunas apps rechazan, as\u00ed que un video puede guardarse con menor calidad. Un video sin esa versi\u00f3n se guarda como siempre.");
         table.put("Saves will go to a folder named %1$s.",
@@ -1014,6 +1022,8 @@ public final class L10nTranslations {
                 "Pesta\u00f1a al abrir");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Quita las etiquetas de seguimiento, como mibextid, de los enlaces que compartes o copias. Un enlace de facebook.com/share/ se crea para una sola acci\u00f3n de compartir, as\u00ed que Facebook puede vincularlo contigo de todos modos.");
+        table.put("Tap to play",
+                "Toca para reproducir");
         table.put("Tap to turn it back on.",
                 "Toca para volver a activarlo.");
         table.put("That file is too large to be a settings file. Nothing was changed.",
@@ -1082,13 +1092,13 @@ public final class L10nTranslations {
                 "Usando %1$s. Elige otro archivo para reemplazarlo.");
         table.put("Version",
                 "Versi\u00f3n");
+    }
+
+    private static void fillEs4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Versi\u00f3n %1$s para Facebook %2$s");
         table.put("Video",
                 "Video");
-    }
-
-    private static void fillEs4(Map<String, String> table) {
         table.put("Video file name",
                 "Nombre de archivo de los videos");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -1101,6 +1111,8 @@ public final class L10nTranslations {
                 "Los videos se guardar\u00e1n con la mejor calidad.");
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Los videos se guardar\u00e1n con su calidad m\u00e1s baja, para que los archivos sean lo m\u00e1s peque\u00f1os posible.");
+        table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
+                "Los videos, reels, historias y la m\u00fasica esperan a que toques antes de reproducirse. La opci\u00f3n de reproducci\u00f3n autom\u00e1tica de Facebook aparece como desactivada mientras esto est\u00e1 activado y vuelve a lo que elegiste cuando lo desactivas.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Los enlaces web ya no se abren en el navegador integrado de Facebook. Las p\u00e1ginas del propio Facebook se siguen abriendo en la app.");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
@@ -1130,7 +1142,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(518);
+        Map<String, String> table = new HashMap<>(524);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1456,6 +1468,8 @@ public final class L10nTranslations {
                 "Jeda Hushfacebook");
         table.put("Pause, backup and diagnostics",
                 "Jeda, cadangan, dan diagnostik");
+        table.put("Playback",
+                "Pemutaran");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Postingan yang dikategorikan Facebook sebagai promosi, bukan iklan.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
@@ -1504,11 +1518,11 @@ public final class L10nTranslations {
                 "Disimpan ke galeri");
         table.put("Saved videos will be named %1$s.",
                 "Video yang disimpan akan diberi nama %1$s.");
-        table.put("Saved. Restart Facebook to apply this change.",
-                "Tersimpan. Mulai ulang Facebook untuk menerapkan perubahan ini.");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Saved. Restart Facebook to apply this change.",
+                "Tersimpan. Mulai ulang Facebook untuk menerapkan perubahan ini.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Menyimpan video dalam format H.264 dengan suara AAC, yang diterima aplikasi seperti WhatsApp. Versi tertajam di Facebook sering kali AV1, yang ditolak sebagian aplikasi, jadi video bisa tersimpan dengan kualitas lebih rendah. Video yang tidak punya versi seperti itu disimpan seperti biasa.");
         table.put("Saves will go to a folder named %1$s.",
@@ -1557,6 +1571,8 @@ public final class L10nTranslations {
                 "Tab saat dibuka");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Menghapus tag pelacakan seperti mibextid dari tautan yang Anda bagikan atau salin. Tautan facebook.com/share/ dibuat khusus untuk satu kali berbagi, jadi Facebook tetap dapat mengaitkannya dengan Anda.");
+        table.put("Tap to play",
+                "Ketuk untuk memutar");
         table.put("Tap to turn it back on.",
                 "Ketuk untuk mengaktifkan Hushfacebook lagi.");
         table.put("That file is too large to be a settings file. Nothing was changed.",
@@ -1625,13 +1641,13 @@ public final class L10nTranslations {
                 "Memakai %1$s. Pilih file lain untuk menggantinya.");
         table.put("Version",
                 "Versi");
+    }
+
+    private static void fillIn4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Versi %1$s untuk Facebook %2$s");
         table.put("Video",
                 "Video");
-    }
-
-    private static void fillIn4(Map<String, String> table) {
         table.put("Video file name",
                 "Nama file video");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -1644,6 +1660,8 @@ public final class L10nTranslations {
                 "Video akan disimpan dengan kualitas terbaik.");
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Video akan disimpan dengan kualitas terendahnya, agar ukuran filenya sekecil mungkin.");
+        table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
+                "Video, reel, cerita, dan musik menunggu ketukan Anda sebelum diputar. Pengaturan Putar Otomatis milik Facebook terbaca Nonaktif selama ini aktif, dan kembali ke pilihan Anda saat ini dimatikan.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Tautan web tidak lagi dibuka di browser dalam aplikasi Facebook. Tautan ke Facebook sendiri tetap dibuka di aplikasi.");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
@@ -1673,7 +1691,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(518);
+        Map<String, String> table = new HashMap<>(524);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1999,6 +2017,8 @@ public final class L10nTranslations {
                 "Pausar o Hushfacebook");
         table.put("Pause, backup and diagnostics",
                 "Pausa, backup e diagn\u00f3stico");
+        table.put("Playback",
+                "Reprodu\u00e7\u00e3o");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Posts que o Facebook classifica como promo\u00e7\u00f5es, e n\u00e3o como an\u00fancios.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
@@ -2047,11 +2067,11 @@ public final class L10nTranslations {
                 "Salvo na galeria");
         table.put("Saved videos will be named %1$s.",
                 "Os v\u00eddeos salvos v\u00e3o se chamar %1$s.");
-        table.put("Saved. Restart Facebook to apply this change.",
-                "Salvo. Reinicie o Facebook para aplicar esta altera\u00e7\u00e3o.");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Saved. Restart Facebook to apply this change.",
+                "Salvo. Reinicie o Facebook para aplicar esta altera\u00e7\u00e3o.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Salva os v\u00eddeos em H.264 com som AAC, o formato que apps como o WhatsApp aceitam. A vers\u00e3o mais n\u00edtida do Facebook costuma ser AV1, que alguns apps recusam, ent\u00e3o um v\u00eddeo pode ser salvo em qualidade menor. Um v\u00eddeo sem essa vers\u00e3o \u00e9 salvo como sempre.");
         table.put("Saves will go to a folder named %1$s.",
@@ -2100,6 +2120,8 @@ public final class L10nTranslations {
                 "Aba ao abrir");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Remove as tags de rastreamento, como mibextid, dos links que voc\u00ea compartilha ou copia. Um link facebook.com/share/ \u00e9 criado para um \u00fanico compartilhamento, ent\u00e3o o Facebook ainda consegue associ\u00e1-lo a voc\u00ea.");
+        table.put("Tap to play",
+                "Tocar para reproduzir");
         table.put("Tap to turn it back on.",
                 "Toque para reativar.");
         table.put("That file is too large to be a settings file. Nothing was changed.",
@@ -2168,13 +2190,13 @@ public final class L10nTranslations {
                 "Usando %1$s. Escolha outro arquivo para substitu\u00ed-lo.");
         table.put("Version",
                 "Vers\u00e3o");
+    }
+
+    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Vers\u00e3o %1$s para o Facebook %2$s");
         table.put("Video",
                 "V\u00eddeo");
-    }
-
-    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Video file name",
                 "Nome do arquivo de v\u00eddeo");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -2187,6 +2209,8 @@ public final class L10nTranslations {
                 "Os v\u00eddeos v\u00e3o ser salvos na melhor qualidade.");
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Os v\u00eddeos v\u00e3o ser salvos na qualidade mais baixa deles, para os arquivos ficarem os menores poss\u00edveis.");
+        table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
+                "V\u00eddeos, reels, stories e m\u00fasicas esperam voc\u00ea tocar antes de come\u00e7ar. A configura\u00e7\u00e3o de reprodu\u00e7\u00e3o autom\u00e1tica do pr\u00f3prio Facebook fica como Desativada enquanto isto estiver ativado e volta para o que voc\u00ea escolheu quando for desativado.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Os links da web deixam de abrir no navegador interno do Facebook. As p\u00e1ginas do pr\u00f3prio Facebook continuam abrindo no app.");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
@@ -2216,7 +2240,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(518);
+        Map<String, String> table = new HashMap<>(524);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2542,6 +2566,8 @@ public final class L10nTranslations {
                 "Hushfacebook'u duraklat");
         table.put("Pause, backup and diagnostics",
                 "Duraklatma, yedekleme ve tan\u0131lama");
+        table.put("Playback",
+                "Oynatma");
         table.put("Posts Facebook files as promotions rather than as ads.",
                 "Facebook'un reklam yerine tan\u0131t\u0131m olarak sayd\u0131\u011f\u0131 g\u00f6nderiler.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
@@ -2590,11 +2616,11 @@ public final class L10nTranslations {
                 "Galeriye kaydedildi");
         table.put("Saved videos will be named %1$s.",
                 "Kaydedilen videolar\u0131n ad\u0131 %1$s olacak.");
-        table.put("Saved. Restart Facebook to apply this change.",
-                "Kaydedildi. Bu de\u011fi\u015fikli\u011fi uygulamak i\u00e7in Facebook'u yeniden ba\u015flat.");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Saved. Restart Facebook to apply this change.",
+                "Kaydedildi. Bu de\u011fi\u015fikli\u011fi uygulamak i\u00e7in Facebook'u yeniden ba\u015flat.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
                 "Videolar\u0131, WhatsApp gibi uygulamalar\u0131n kabul etti\u011fi AAC sesli H.264 bi\u00e7iminde kaydeder. Facebook'un en net s\u00fcr\u00fcm\u00fc \u00e7o\u011fu zaman AV1'dir ve baz\u0131 uygulamalar bunu reddeder, bu y\u00fczden bir video daha d\u00fc\u015f\u00fck kalitede kaydedilebilir. B\u00f6yle bir s\u00fcr\u00fcm\u00fc olmayan video her zamanki gibi kaydedilir.");
         table.put("Saves will go to a folder named %1$s.",
@@ -2643,6 +2669,8 @@ public final class L10nTranslations {
                 "A\u00e7\u0131l\u0131\u015fta g\u00f6sterilecek sekme");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Payla\u015ft\u0131\u011f\u0131n veya kopyalad\u0131\u011f\u0131n ba\u011flant\u0131lardan mibextid gibi izleme etiketlerini kald\u0131r\u0131r. Bir facebook.com/share/ ba\u011flant\u0131s\u0131 tek bir payla\u015f\u0131m i\u00e7in olu\u015fturulur, bu y\u00fczden Facebook onu yine de seninle ili\u015fkilendirebilir.");
+        table.put("Tap to play",
+                "Oynatmak i\u00e7in dokun");
         table.put("Tap to turn it back on.",
                 "Yeniden a\u00e7mak i\u00e7in dokun.");
         table.put("That file is too large to be a settings file. Nothing was changed.",
@@ -2711,13 +2739,13 @@ public final class L10nTranslations {
                 "%1$s kullan\u0131l\u0131yor. De\u011fi\u015ftirmek i\u00e7in ba\u015fka bir dosya se\u00e7.");
         table.put("Version",
                 "S\u00fcr\u00fcm");
+    }
+
+    private static void fillTr4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Facebook %2$s i\u00e7in %1$s s\u00fcr\u00fcm\u00fc");
         table.put("Video",
                 "Video");
-    }
-
-    private static void fillTr4(Map<String, String> table) {
         table.put("Video file name",
                 "Video dosya ad\u0131");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -2730,6 +2758,8 @@ public final class L10nTranslations {
                 "Videolar en iyi kalitede kaydedilecek.");
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Videolar en d\u00fc\u015f\u00fck kalitelerinde kaydedilecek, b\u00f6ylece dosyalar en k\u00fc\u00e7\u00fck olur.");
+        table.put("Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.",
+                "Videolar, reels videolar\u0131, hikayeler ve m\u00fczik oynat\u0131lmadan \u00f6nce dokunman\u0131 bekler. Bu a\u00e7\u0131kken Facebook'un kendi Otomatik Oynatma ayar\u0131 Kapal\u0131 g\u00f6r\u00fcn\u00fcr, kapatt\u0131\u011f\u0131nda se\u00e7ti\u011fin de\u011fere d\u00f6ner.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
                 "Web ba\u011flant\u0131lar\u0131 Facebook'un uygulama i\u00e7i taray\u0131c\u0131s\u0131nda a\u00e7\u0131lmaz. Facebook'un kendi sayfalar\u0131 yine uygulamada a\u00e7\u0131l\u0131r.");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",

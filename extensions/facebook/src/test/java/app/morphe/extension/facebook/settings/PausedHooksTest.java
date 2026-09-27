@@ -52,6 +52,8 @@ import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
+import app.morphe.extension.facebook.media.TapToPlay;
+import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
@@ -229,6 +231,17 @@ public class PausedHooksTest {
                 ReelDeclutter::skipSocialBubbles));
         // The Reels batcher's send of the reels you watched never reaches its executor.
         probes.put(PatchFamily.REEL_WATCH_HISTORY, Collections.singletonList(SeenStateSendForTests::heldBack));
+        // A player's start with no tap before it is held, and Facebook's Autoplay setting reads Off.
+        probes.put(PatchFamily.TAP_TO_PLAY, Arrays.asList(
+                () -> {
+                    TapToPlayForTests.forget();
+                    return !TapToPlay.allowStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY);
+                },
+                () -> {
+                    TapToPlayForTests.forget();
+                    return !TapToPlay.allowLegacyStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY);
+                },
+                () -> TapToPlay.autoplaySetting(TapToPlayForTests.Autoplay.ON) != TapToPlayForTests.Autoplay.ON));
         // The repository's answer for one of Meta's families, a variable-font builder's, and React
         // Native's for a family Facebook registered there.
         probes.put(PatchFamily.SYSTEM_FONT, Arrays.asList(

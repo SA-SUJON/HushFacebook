@@ -131,6 +131,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_dont_send_reel_watch_history", TRUE);
 
     /**
+     * Videos, reels, stories and songs start only after a tap: a player's start goes ahead when a
+     * tap has just ended, and Facebook's own Autoplay setting reads Off
+     * ({@link app.morphe.extension.facebook.media.TapToPlay}). The stored Autoplay setting is never
+     * written, so off or paused, Facebook plays as you set it.
+     */
+    public static final BooleanSetting TAP_TO_PLAY =
+            new BooleanSetting("hushfacebook_tap_to_play", TRUE);
+
+    /**
      * Facebook's own text, React Native screens' included, drawn in the font {@link #FONT_SOURCE}
      * names instead of Meta's Optimistic, at the same weight and slant. A typeface already on
      * screen keeps its font until Facebook restarts.

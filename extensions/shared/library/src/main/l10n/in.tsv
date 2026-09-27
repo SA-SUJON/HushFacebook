@@ -271,3 +271,9 @@ Chats	Chat
 Hide the Get Messenger card	Sembunyikan kartu Dapatkan Messenger
 # context: summary of that switch; Messenger is the app's name and stays as it is
 The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	Kartu di bagian atas Chat yang memintamu mendapatkan aplikasi Messenger akan hilang selama Messenger terinstal. Tanpa Messenger, kartu itu tetap ada agar kamu masih bisa menginstalnya dari sana.
+# context: settings section heading for the Tap to play switch
+Playback	Pemutaran
+# context: switch title; on, videos and music wait for a tap before they play
+Tap to play	Ketuk untuk memutar
+# context: summary of that switch; Autoplay and Off are the name and value of Facebook's own setting, as Facebook shows them in this language
+Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.	Video, reel, cerita, dan musik menunggu ketukan Anda sebelum diputar. Pengaturan Putar Otomatis milik Facebook terbaca Nonaktif selama ini aktif, dan kembali ke pilihan Anda saat ini dimatikan.
