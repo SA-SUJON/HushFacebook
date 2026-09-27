@@ -69,6 +69,7 @@ public class ScreenColorsTest {
     public void restore() {
         PatchFamily.inBuildForTests = null;
         ScreenColors.shown = null;
+        Settings.FONT_SOURCE.resetToDefault();
     }
 
     /** The WCAG contrast ratio of two opaque colours, 1 to 21. */
@@ -228,6 +229,8 @@ public class ScreenColorsTest {
 
     private void assertScreenPainted(boolean light) {
         PatchFamily.inBuildForTests = EnumSet.allOf(PatchFamily.class);
+        // A picked font puts the way back to the phone's font on the page, so its row is painted too.
+        Settings.FONT_SOURCE.save("Inter.ttf");
         try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
             SettingsDialog dialog = show(controller.get());
             ScreenColors colors = ScreenColors.shown;

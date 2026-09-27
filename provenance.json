@@ -222,7 +222,7 @@
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: the system font swap. It stands at the exit of the typeface repository's resolver, found in Facebook 577 and 580 by the refusal it throws for a family with no source, and at the exit of the variable-font builders the kept com.meta.foa.typefacebuilder.ApiUtils makes, and answers the phone's default font at the same weight and slant for Meta's interface families only, by the enum constant names Redex keeps."
+      "changes": "Written for Hushfacebook: the font swap. It stands at the exit of the typeface repository's resolver, found in Facebook 577 and 580 by the refusal it throws for a family with no source, at the exit of the variable-font builders the kept com.meta.foa.typefacebuilder.ApiUtils makes, and at the exit of React Native's typeface resolver, found by the variation settings refusal its utilities log. It answers the phone's default font, or a font file picked in the settings and copied into Facebook's files after a check, at the same weight and slant, for Meta's interface families only, which it knows by the enum constant names Redex keeps and by the family names React Native screens ask for."
     },
     {
       "paths": [

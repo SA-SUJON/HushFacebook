@@ -57,8 +57,23 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook lädt im Hintergrund weder Werbung noch sein Werbemodell herunter.
 Facebook doesn't serve ads to other apps on this phone.	Facebook liefert keine Werbung an andere Apps auf diesem Handy aus.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebooks Dunkelmodus und diese Seite nutzen die Farben deines Hintergrundbilds. Android 11 nutzt stattdessen Blau. Aktiviere Facebooks Dunkelmodus, um es zu sehen.
-Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.	Facebooks Text wird in der Schriftart deines Handys statt in Metas eigener gezeichnet. Starte Facebook nach dem Ändern neu.
 Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Emojis werden mit der Emoji-Schriftart deines Handys statt mit der von Meta gezeichnet. Reaktionen und Sticker bleiben, wie sie sind. Starte Facebook nach dem Ändern neu.
+Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.	Facebooks Text wird in der Schriftart deines Handys oder in einer Schriftdatei, die du unten wählst, statt in Metas eigener gezeichnet. Starte Facebook nach dem Ändern neu.
+Font file	Schriftdatei
+Use your phone's font	Schriftart des Handys verwenden
+Stops using the font file and goes back to your phone's font.	Verwendet die Schriftdatei nicht mehr und kehrt zur Schriftart deines Handys zurück.
+None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.	Keine gewählt, deshalb wird die Schriftart deines Handys verwendet. Wähle eine TrueType- oder OpenType-Datei mit bis zu %1$d MB.
+Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.	Hushfacebooks Kopie von %1$s fehlt, deshalb wird die Schriftart deines Handys verwendet. Wähle die Datei noch einmal.
+Using %1$s. Choose another file to replace it.	%1$s wird verwendet. Wähle eine andere Datei, um sie zu ersetzen.
+Copying the font file	Schriftdatei wird kopiert
+Font set to %1$s. Restart Facebook to see it.	Schriftart auf %1$s gesetzt. Starte Facebook neu, um sie zu sehen.
+That isn't a TrueType or OpenType font file. Your font didn't change.	Das ist keine TrueType- oder OpenType-Schriftdatei. Deine Schriftart wurde nicht geändert.
+That font file is over %1$d MB. Your font didn't change.	Diese Schriftdatei ist größer als %1$d MB. Deine Schriftart wurde nicht geändert.
+Android couldn't draw with that font file. Your font didn't change.	Android konnte mit dieser Schriftdatei nicht zeichnen. Deine Schriftart wurde nicht geändert.
+Couldn't save a copy of that font. Check that the phone has room, then try again.	Eine Kopie dieser Schriftart ließ sich nicht speichern. Prüfe, ob auf dem Handy Platz ist, und versuche es noch einmal.
+Couldn't open that file. Your font didn't change.	Diese Datei ließ sich nicht öffnen. Deine Schriftart wurde nicht geändert.
+Back to your phone's font. Restart Facebook to see it.	Zurück zur Schriftart deines Handys. Starte Facebook neu, um sie zu sehen.
+Couldn't go back to your phone's font. Try again.	Die Rückkehr zur Schriftart deines Handys hat nicht geklappt. Versuche es noch einmal.
 From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Ab dem nächsten Start wirken die obigen Schalter nicht mehr und Facebooks eigenes Verhalten kehrt zurück. Die Debug-Protokollierung läuft weiter, und deine Auswahl bleibt erhalten.
 Full report saved to %1$s	Vollständiger Bericht gespeichert unter %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, mit den Hinweisen der Projekte, auf denen es aufbaut

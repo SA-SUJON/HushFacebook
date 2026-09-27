@@ -44,11 +44,12 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(478);
+        Map<String, String> table = new HashMap<>(508);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
         fillDe3(table);
+        fillDe4(table);
         return table;
     }
 
@@ -95,6 +96,8 @@ public final class L10nTranslations {
                 "F\u00fcgt \u201eSpeichern\u201c zum Men\u00fc jeder Story hinzu, egal von wem, und speichert sie in der Qualit\u00e4t, die unter \u201eDownloads\u201c eingestellt ist. Ist der Schalter aus oder Hushfacebook pausiert, gibt es \u201eSpeichern\u201c nur bei deinen eigenen Stories, und dort l\u00e4uft Facebooks eigene Speicherfunktion.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Anzeigen in Reels, ab den n\u00e4chsten Reels, die Facebook l\u00e4dt. Banner, Werbeunterbrechungen und von der App eingef\u00fcgte Anzeigen bleiben auch w\u00e4hrend einer Pause blockiert.");
+        table.put("Android couldn't draw with that font file. Your font didn't change.",
+                "Android konnte mit dieser Schriftdatei nicht zeichnen. Deine Schriftart wurde nicht ge\u00e4ndert.");
         table.put("Appearance",
                 "Darstellung");
         table.put("Asks GitHub for the newest release right now, even with the switch above off.",
@@ -103,6 +106,8 @@ public final class L10nTranslations {
                 "Audience Network aus");
         table.put("Back",
                 "Zur\u00fcck");
+        table.put("Back to your phone's font. Restart Facebook to see it.",
+                "Zur\u00fcck zur Schriftart deines Handys. Starte Facebook neu, um sie zu sehen.");
         table.put("Background ad prefetch blocked",
                 "Vorabladen von Werbung im Hintergrund blockiert");
         table.put("Best",
@@ -129,18 +134,26 @@ public final class L10nTranslations {
                 "Kurzen Bericht in die Zwischenablage kopieren.");
         table.put("Copy quick report",
                 "Kurzbericht kopieren");
+        table.put("Copying the font file",
+                "Schriftdatei wird kopiert");
+        table.put("Couldn't go back to your phone's font. Try again.",
+                "Die R\u00fcckkehr zur Schriftart deines Handys hat nicht geklappt. Versuche es noch einmal.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
                 "Nicht alle Einstellungen lie\u00dfen sich importieren. Pr\u00fcfe die Schalter auf diesem Bildschirm.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "Die Einstellungen lie\u00dfen sich nicht importieren. Es wurde nichts ge\u00e4ndert.");
         table.put("Couldn't open that file. Nothing was changed.",
                 "Diese Datei lie\u00df sich nicht \u00f6ffnen. Es wurde nichts ge\u00e4ndert.");
+        table.put("Couldn't open that file. Your font didn't change.",
+                "Diese Datei lie\u00df sich nicht \u00f6ffnen. Deine Schriftart wurde nicht ge\u00e4ndert.");
         table.put("Couldn't open the file picker. Try again.",
                 "Die Dateiauswahl lie\u00df sich nicht \u00f6ffnen. Versuche es noch einmal.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "Die Diagnosedaten lie\u00dfen sich nicht wiederherstellen. Versuche es noch einmal.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "GitHub war nicht erreichbar. Versuche es sp\u00e4ter noch einmal.");
+        table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
+                "Eine Kopie dieser Schriftart lie\u00df sich nicht speichern. Pr\u00fcfe, ob auf dem Handy Platz ist, und versuche es noch einmal.");
         table.put("Couldn't save the settings file. Try again.",
                 "Die Einstellungsdatei lie\u00df sich nicht speichern. Versuche es noch einmal.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -161,6 +174,9 @@ public final class L10nTranslations {
                 "Diagnosebericht in die Zwischenablage kopiert.");
         table.put("Don't send reel watch history",
                 "Reel-Wiedergabeverlauf nicht senden");
+    }
+
+    private static void fillDe1(Map<String, String> table) {
         table.put("Download",
                 "Download");
         table.put("Download button on reels",
@@ -173,9 +189,6 @@ public final class L10nTranslations {
                 "Download-Qualit\u00e4t");
         table.put("Download to phone",
                 "Aufs Handy herunterladen");
-    }
-
-    private static void fillDe1(Map<String, String> table) {
         table.put("Downloads",
                 "Downloads");
         table.put("Each video saves at %1$s or the closest quality below it. A video with nothing that low saves at the closest quality above.",
@@ -210,8 +223,8 @@ public final class L10nTranslations {
                 "Facebook erh\u00e4lt nicht mehr die Liste der Reels, die du angesehen hast, mit der es deinen Reels-Feed sortiert. Niemand sonst sieht diese Liste. Bereits angesehene Reels k\u00f6nnen im Feed wieder auftauchen.");
         table.put("Facebook will open on %1$s.",
                 "Facebook startet dann mit %1$s.");
-        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
-                "Facebooks Text wird in der Schriftart deines Handys statt in Metas eigener gezeichnet. Starte Facebook nach dem \u00c4ndern neu.");
+        table.put("Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.",
+                "Facebooks Text wird in der Schriftart deines Handys oder in einer Schriftdatei, die du unten w\u00e4hlst, statt in Metas eigener gezeichnet. Starte Facebook nach dem \u00c4ndern neu.");
         table.put("Feeds",
                 "Feeds");
         table.put("File name",
@@ -222,6 +235,10 @@ public final class L10nTranslations {
                 "Ordnername");
         table.put("Folder set to %1$s.",
                 "Ordner auf %1$s gesetzt.");
+        table.put("Font file",
+                "Schriftdatei");
+        table.put("Font set to %1$s. Restart Facebook to see it.",
+                "Schriftart auf %1$s gesetzt. Starte Facebook neu, um sie zu sehen.");
         table.put("Friends",
                 "Freunde");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -280,6 +297,9 @@ public final class L10nTranslations {
                 "Hushfacebook ist pausiert");
         table.put("Hushfacebook pauses when Facebook restarts.",
                 "Hushfacebook pausiert, sobald Facebook neu startet.");
+    }
+
+    private static void fillDe2(Map<String, String> table) {
         table.put("Hushfacebook saves",
                 "Speichern mit Hushfacebook");
         table.put("Hushfacebook settings",
@@ -288,6 +308,8 @@ public final class L10nTranslations {
                 "Hushfacebook-Einstellungen lie\u00dfen sich nicht \u00f6ffnen");
         table.put("Hushfacebook turns back on when Facebook restarts.",
                 "Hushfacebook ist wieder aktiv, sobald Facebook neu startet.");
+        table.put("Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.",
+                "Hushfacebooks Kopie von %1$s fehlt, deshalb wird die Schriftart deines Handys verwendet. W\u00e4hle die Datei noch einmal.");
         table.put("Import",
                 "Importieren");
         table.put("Import settings",
@@ -296,9 +318,6 @@ public final class L10nTranslations {
                 "Einstellungen werden importiert");
         table.put("It targets Facebook %1$s.",
                 "Es ist f\u00fcr Facebook %1$s gedacht.");
-    }
-
-    private static void fillDe2(Map<String, String> table) {
         table.put("Jump to a section",
                 "Zu einem Abschnitt springen");
         table.put("Keep feed position on return",
@@ -323,6 +342,8 @@ public final class L10nTranslations {
                 "Keine App auf diesem Handy kann den Link \u00f6ffnen. Die Adresse ist %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
                 "Keine Screenshot-Erkennung bei Werbung und keine Meldungen dar\u00fcber, welche Apps du installierst.");
+        table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
+                "Keine gew\u00e4hlt, deshalb wird die Schriftart deines Handys verwendet. W\u00e4hle eine TrueType- oder OpenType-Datei mit bis zu %1$d MB.");
         table.put("Not saved: that isn't a Facebook photo or video",
                 "Nicht gespeichert: Das ist kein Foto oder Video von Facebook");
         table.put("Not saved: the file is over 512 MB",
@@ -399,6 +420,9 @@ public final class L10nTranslations {
                 "Foto wird gespeichert");
         table.put("Saving a video",
                 "Video wird gespeichert");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Einstellungsdatei wird gespeichert");
         table.put("Saving...",
@@ -419,9 +443,6 @@ public final class L10nTranslations {
                 "Einstellungen importiert. %1$d Schalter wurden ge\u00e4ndert.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Einstellungen importiert. Was du speicherst, landet jetzt in einem Ordner namens %1$s.");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("Smallest",
                 "Kleinste");
         table.put("Source code and issues",
@@ -434,6 +455,8 @@ public final class L10nTranslations {
                 "Automatisches Weiterspringen bei Stories stoppen");
         table.put("Stop update prompts",
                 "Update-Aufforderungen stoppen");
+        table.put("Stops using the font file and goes back to your phone's font.",
+                "Verwendet die Schriftdatei nicht mehr und kehrt zur Schriftart deines Handys zur\u00fcck.");
         table.put("Stories",
                 "Stories");
         table.put("Tab to open on",
@@ -448,8 +471,12 @@ public final class L10nTranslations {
                 "Diese Datei ist kein lesbarer Text, sie wurde also wom\u00f6glich bei der \u00dcbertragung besch\u00e4digt. Es wurde nichts ge\u00e4ndert.");
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "Diese Datei f\u00fchrt eine Einstellung zweimal auf, daher ist unklar, welcher Wert gilt. Es wurde nichts ge\u00e4ndert.");
+        table.put("That font file is over %1$d MB. Your font didn't change.",
+                "Diese Schriftdatei ist gr\u00f6\u00dfer als %1$d MB. Deine Schriftart wurde nicht ge\u00e4ndert.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Das ist keine Hushfacebook-Einstellungsdatei. Es wurde nichts ge\u00e4ndert.");
+        table.put("That isn't a TrueType or OpenType font file. Your font didn't change.",
+                "Das ist keine TrueType- oder OpenType-Schriftdatei. Deine Schriftart wurde nicht ge\u00e4ndert.");
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "Diese Einstellungsdatei enth\u00e4lt einen Wert, den Hushfacebook nicht lesen kann. Es wurde nichts ge\u00e4ndert.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -496,6 +523,10 @@ public final class L10nTranslations {
                 "Emojis des Handys verwenden");
         table.put("Use the system font",
                 "Systemschriftart verwenden");
+        table.put("Use your phone's font",
+                "Schriftart des Handys verwenden");
+        table.put("Using %1$s. Choose another file to replace it.",
+                "%1$s wird verwendet. W\u00e4hle eine andere Datei, um sie zu ersetzen.");
         table.put("Version",
                 "Version");
         table.put("Version %1$s for Facebook %2$s",
@@ -512,6 +543,9 @@ public final class L10nTranslations {
                 "Videos werden dann in %1$s oder der n\u00e4chstniedrigeren Qualit\u00e4t gespeichert. Hat ein Video keine so niedrige Qualit\u00e4t, wird es in der n\u00e4chsth\u00f6heren gespeichert.");
         table.put("Videos will save at the best quality.",
                 "Videos werden dann in der besten Qualit\u00e4t gespeichert.");
+    }
+
+    private static void fillDe4(Map<String, String> table) {
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Videos werden dann in ihrer niedrigsten Qualit\u00e4t gespeichert, damit die Dateien so klein wie m\u00f6glich sind.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
@@ -543,11 +577,12 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(478);
+        Map<String, String> table = new HashMap<>(508);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
         fillEs3(table);
+        fillEs4(table);
         return table;
     }
 
@@ -594,6 +629,8 @@ public final class L10nTranslations {
                 "Agrega la opci\u00f3n Guardar al men\u00fa de cualquier historia, sea de quien sea, y la guarda con la calidad elegida en Descargas. Con este interruptor desactivado o Hushfacebook en pausa, solo tus propias historias tienen la opci\u00f3n Guardar, y se usa el guardado propio de Facebook.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Anuncios dentro de Reels, a partir de la pr\u00f3xima tanda que cargue Facebook. Los banners, los anuncios a mitad de video y los que inserta la app siguen bloqueados incluso en pausa.");
+        table.put("Android couldn't draw with that font file. Your font didn't change.",
+                "Android no pudo dibujar con ese archivo de fuente. Tu fuente no cambi\u00f3.");
         table.put("Appearance",
                 "Apariencia");
         table.put("Asks GitHub for the newest release right now, even with the switch above off.",
@@ -602,6 +639,8 @@ public final class L10nTranslations {
                 "Sin Audience Network");
         table.put("Back",
                 "Atr\u00e1s");
+        table.put("Back to your phone's font. Restart Facebook to see it.",
+                "Se volvi\u00f3 a la fuente de tu tel\u00e9fono. Reinicia Facebook para verla.");
         table.put("Background ad prefetch blocked",
                 "Precarga de anuncios en segundo plano bloqueada");
         table.put("Best",
@@ -628,18 +667,26 @@ public final class L10nTranslations {
                 "Copia un informe breve en el portapapeles.");
         table.put("Copy quick report",
                 "Copiar informe r\u00e1pido");
+        table.put("Copying the font file",
+                "Copiando el archivo de fuente");
+        table.put("Couldn't go back to your phone's font. Try again.",
+                "No se pudo volver a la fuente de tu tel\u00e9fono. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
                 "No se pudieron importar todos los ajustes. Revisa los interruptores de esta pantalla.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "No se pudo importar la configuraci\u00f3n. No se cambi\u00f3 nada.");
         table.put("Couldn't open that file. Nothing was changed.",
                 "No se pudo abrir ese archivo. No se cambi\u00f3 nada.");
+        table.put("Couldn't open that file. Your font didn't change.",
+                "No se pudo abrir ese archivo. Tu fuente no cambi\u00f3.");
         table.put("Couldn't open the file picker. Try again.",
                 "No se pudo abrir el selector de archivos. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "No se pudieron restaurar los datos de diagn\u00f3stico. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "No se pudo contactar con GitHub. Int\u00e9ntalo de nuevo m\u00e1s tarde.");
+        table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
+                "No se pudo guardar una copia de esa fuente. Comprueba que el tel\u00e9fono tenga espacio y vuelve a intentarlo.");
         table.put("Couldn't save the settings file. Try again.",
                 "No se pudo guardar el archivo de configuraci\u00f3n. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -660,6 +707,9 @@ public final class L10nTranslations {
                 "Informe de diagn\u00f3stico copiado en el portapapeles.");
         table.put("Don't send reel watch history",
                 "No enviar el historial de reels vistos");
+    }
+
+    private static void fillEs1(Map<String, String> table) {
         table.put("Download",
                 "Descargar");
         table.put("Download button on reels",
@@ -672,9 +722,6 @@ public final class L10nTranslations {
                 "Calidad de descarga");
         table.put("Download to phone",
                 "Descargar en el tel\u00e9fono");
-    }
-
-    private static void fillEs1(Map<String, String> table) {
         table.put("Downloads",
                 "Descargas");
         table.put("Each video saves at %1$s or the closest quality below it. A video with nothing that low saves at the closest quality above.",
@@ -709,8 +756,8 @@ public final class L10nTranslations {
                 "Facebook deja de recibir la lista de reels que has visto, que usa para ordenar tu feed de Reels. Nadie m\u00e1s ve esa lista. Los reels que ya has visto pueden volver a aparecer en el feed.");
         table.put("Facebook will open on %1$s.",
                 "Facebook se abrir\u00e1 en %1$s.");
-        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
-                "El texto de Facebook se dibuja con la fuente de tu tel\u00e9fono en lugar de la propia de Meta. Reinicia Facebook despu\u00e9s de cambiar esto.");
+        table.put("Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.",
+                "El texto de Facebook se dibuja con la fuente de tu tel\u00e9fono, o con un archivo de fuente que elijas abajo, en lugar de la propia de Meta. Reinicia Facebook despu\u00e9s de cambiar esto.");
         table.put("Feeds",
                 "Feeds");
         table.put("File name",
@@ -721,6 +768,10 @@ public final class L10nTranslations {
                 "Nombre de carpeta");
         table.put("Folder set to %1$s.",
                 "Carpeta establecida en %1$s.");
+        table.put("Font file",
+                "Archivo de fuente");
+        table.put("Font set to %1$s. Restart Facebook to see it.",
+                "Fuente establecida en %1$s. Reinicia Facebook para verla.");
         table.put("Friends",
                 "Amigos");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -779,6 +830,9 @@ public final class L10nTranslations {
                 "Hushfacebook est\u00e1 en pausa");
         table.put("Hushfacebook pauses when Facebook restarts.",
                 "Hushfacebook se pausa cuando Facebook se reinicie.");
+    }
+
+    private static void fillEs2(Map<String, String> table) {
         table.put("Hushfacebook saves",
                 "Descargas de Hushfacebook");
         table.put("Hushfacebook settings",
@@ -787,6 +841,8 @@ public final class L10nTranslations {
                 "No se pudo abrir la configuraci\u00f3n de Hushfacebook");
         table.put("Hushfacebook turns back on when Facebook restarts.",
                 "Hushfacebook vuelve a activarse cuando Facebook se reinicie.");
+        table.put("Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.",
+                "La copia de %1$s que guardaba Hushfacebook ya no est\u00e1, as\u00ed que se usa la fuente de tu tel\u00e9fono. Vuelve a elegir el archivo.");
         table.put("Import",
                 "Importar");
         table.put("Import settings",
@@ -795,9 +851,6 @@ public final class L10nTranslations {
                 "Importando la configuraci\u00f3n");
         table.put("It targets Facebook %1$s.",
                 "Est\u00e1 pensado para Facebook %1$s.");
-    }
-
-    private static void fillEs2(Map<String, String> table) {
         table.put("Jump to a section",
                 "Ir a una secci\u00f3n");
         table.put("Keep feed position on return",
@@ -822,6 +875,8 @@ public final class L10nTranslations {
                 "Ninguna app de este tel\u00e9fono puede abrir el enlace. La direcci\u00f3n es %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
                 "Sin vigilancia de capturas de pantalla para anuncios ni informes sobre las apps que instalas.");
+        table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
+                "No hay ninguno, as\u00ed que se usa la fuente de tu tel\u00e9fono. Elige un archivo TrueType u OpenType de hasta %1$d MB.");
         table.put("Not saved: that isn't a Facebook photo or video",
                 "No se guard\u00f3: no es una foto ni un video de Facebook");
         table.put("Not saved: the file is over 512 MB",
@@ -898,6 +953,9 @@ public final class L10nTranslations {
                 "Guardando una foto");
         table.put("Saving a video",
                 "Guardando un video");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Guardando el archivo de configuraci\u00f3n");
         table.put("Saving...",
@@ -918,9 +976,6 @@ public final class L10nTranslations {
                 "Configuraci\u00f3n importada. Cambiaron %1$d interruptores.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Configuraci\u00f3n importada. Lo que guardes ir\u00e1 a una carpeta llamada %1$s.");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("Smallest",
                 "La m\u00e1s peque\u00f1a");
         table.put("Source code and issues",
@@ -933,6 +988,8 @@ public final class L10nTranslations {
                 "Detener el avance autom\u00e1tico de historias");
         table.put("Stop update prompts",
                 "Detener los avisos de actualizaci\u00f3n");
+        table.put("Stops using the font file and goes back to your phone's font.",
+                "Deja de usar el archivo de fuente y vuelve a la fuente de tu tel\u00e9fono.");
         table.put("Stories",
                 "Historias");
         table.put("Tab to open on",
@@ -947,8 +1004,12 @@ public final class L10nTranslations {
                 "Ese archivo no es texto legible, as\u00ed que puede haberse da\u00f1ado por el camino. No se cambi\u00f3 nada.");
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "Ese archivo incluye un ajuste dos veces, as\u00ed que no se sabe qu\u00e9 valor usar. No se cambi\u00f3 nada.");
+        table.put("That font file is over %1$d MB. Your font didn't change.",
+                "Ese archivo de fuente pesa m\u00e1s de %1$d MB. Tu fuente no cambi\u00f3.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Eso no es un archivo de configuraci\u00f3n de Hushfacebook. No se cambi\u00f3 nada.");
+        table.put("That isn't a TrueType or OpenType font file. Your font didn't change.",
+                "Eso no es un archivo de fuente TrueType u OpenType. Tu fuente no cambi\u00f3.");
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "Ese archivo de configuraci\u00f3n contiene un valor que Hushfacebook no puede leer. No se cambi\u00f3 nada.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -995,6 +1056,10 @@ public final class L10nTranslations {
                 "Usar los emojis del tel\u00e9fono");
         table.put("Use the system font",
                 "Usar la fuente del sistema");
+        table.put("Use your phone's font",
+                "Usar la fuente del tel\u00e9fono");
+        table.put("Using %1$s. Choose another file to replace it.",
+                "Usando %1$s. Elige otro archivo para reemplazarlo.");
         table.put("Version",
                 "Versi\u00f3n");
         table.put("Version %1$s for Facebook %2$s",
@@ -1011,6 +1076,9 @@ public final class L10nTranslations {
                 "Los videos se guardar\u00e1n en %1$s o en la calidad m\u00e1s cercana por debajo. Si un video no tiene ninguna tan baja, se guardar\u00e1 en la m\u00e1s cercana por encima.");
         table.put("Videos will save at the best quality.",
                 "Los videos se guardar\u00e1n con la mejor calidad.");
+    }
+
+    private static void fillEs4(Map<String, String> table) {
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Los videos se guardar\u00e1n con su calidad m\u00e1s baja, para que los archivos sean lo m\u00e1s peque\u00f1os posible.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
@@ -1042,11 +1110,12 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(478);
+        Map<String, String> table = new HashMap<>(508);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
         fillIn3(table);
+        fillIn4(table);
         return table;
     }
 
@@ -1093,6 +1162,8 @@ public final class L10nTranslations {
                 "Menambahkan opsi Simpan ke menu cerita siapa pun dan menyimpannya dengan kualitas yang diatur di bagian Unduhan. Jika nonaktif atau dijeda, opsi Simpan hanya ada di cerita Anda sendiri dan memakai fitur simpan bawaan Facebook.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Iklan di dalam Reels, mulai dari kumpulan berikutnya yang dimuat Facebook. Banner, iklan di tengah video, dan iklan yang disisipkan aplikasi tetap diblokir saat dijeda.");
+        table.put("Android couldn't draw with that font file. Your font didn't change.",
+                "Android tidak dapat menggambar dengan file font itu. Font Anda tidak berubah.");
         table.put("Appearance",
                 "Tampilan");
         table.put("Asks GitHub for the newest release right now, even with the switch above off.",
@@ -1101,6 +1172,8 @@ public final class L10nTranslations {
                 "Audience Network nonaktif");
         table.put("Back",
                 "Kembali");
+        table.put("Back to your phone's font. Restart Facebook to see it.",
+                "Kembali ke font ponsel Anda. Mulai ulang Facebook untuk melihatnya.");
         table.put("Background ad prefetch blocked",
                 "Pramuat iklan di latar belakang diblokir");
         table.put("Best",
@@ -1127,18 +1200,26 @@ public final class L10nTranslations {
                 "Salin laporan singkat ke papan klip.");
         table.put("Copy quick report",
                 "Salin laporan singkat");
+        table.put("Copying the font file",
+                "Menyalin file font");
+        table.put("Couldn't go back to your phone's font. Try again.",
+                "Tidak dapat kembali ke font ponsel Anda. Coba lagi.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
                 "Tidak semua pengaturan dapat diimpor. Periksa sakelar di layar ini.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "Pengaturan tidak dapat diimpor. Tidak ada yang diubah.");
         table.put("Couldn't open that file. Nothing was changed.",
                 "File itu tidak dapat dibuka. Tidak ada yang diubah.");
+        table.put("Couldn't open that file. Your font didn't change.",
+                "File itu tidak dapat dibuka. Font Anda tidak berubah.");
         table.put("Couldn't open the file picker. Try again.",
                 "Pemilih file tidak dapat dibuka. Coba lagi.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "Data diagnostik tidak dapat dikembalikan. Coba lagi.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "GitHub tidak dapat dihubungi. Coba lagi nanti.");
+        table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
+                "Salinan font itu tidak dapat disimpan. Pastikan ponsel masih punya ruang, lalu coba lagi.");
         table.put("Couldn't save the settings file. Try again.",
                 "File pengaturan tidak dapat disimpan. Coba lagi.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -1159,6 +1240,9 @@ public final class L10nTranslations {
                 "Laporan diagnostik disalin ke papan klip.");
         table.put("Don't send reel watch history",
                 "Jangan kirim riwayat tontonan reel");
+    }
+
+    private static void fillIn1(Map<String, String> table) {
         table.put("Download",
                 "Unduh");
         table.put("Download button on reels",
@@ -1171,9 +1255,6 @@ public final class L10nTranslations {
                 "Kualitas unduhan");
         table.put("Download to phone",
                 "Unduh ke ponsel");
-    }
-
-    private static void fillIn1(Map<String, String> table) {
         table.put("Downloads",
                 "Unduhan");
         table.put("Each video saves at %1$s or the closest quality below it. A video with nothing that low saves at the closest quality above.",
@@ -1208,8 +1289,8 @@ public final class L10nTranslations {
                 "Facebook tidak lagi menerima daftar reel yang sudah Anda tonton, yang dipakainya untuk menyusun urutan feed Reels Anda. Tidak ada orang lain yang melihat daftar itu. Reel yang sudah Anda tonton mungkin muncul lagi di feed.");
         table.put("Facebook will open on %1$s.",
                 "Facebook akan terbuka di %1$s.");
-        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
-                "Teks Facebook digambar dengan font ponsel Anda, bukan font milik Meta. Mulai ulang Facebook setelah mengubah ini.");
+        table.put("Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.",
+                "Teks Facebook digambar dengan font ponsel Anda, atau dengan file font yang Anda pilih di bawah, bukan font milik Meta. Mulai ulang Facebook setelah mengubah ini.");
         table.put("Feeds",
                 "Feed");
         table.put("File name",
@@ -1220,6 +1301,10 @@ public final class L10nTranslations {
                 "Nama folder");
         table.put("Folder set to %1$s.",
                 "Folder diatur menjadi %1$s.");
+        table.put("Font file",
+                "File font");
+        table.put("Font set to %1$s. Restart Facebook to see it.",
+                "Font diatur menjadi %1$s. Mulai ulang Facebook untuk melihatnya.");
         table.put("Friends",
                 "Teman");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -1278,6 +1363,9 @@ public final class L10nTranslations {
                 "Hushfacebook dijeda");
         table.put("Hushfacebook pauses when Facebook restarts.",
                 "Hushfacebook dijeda saat Facebook dimulai ulang.");
+    }
+
+    private static void fillIn2(Map<String, String> table) {
         table.put("Hushfacebook saves",
                 "Penyimpanan Hushfacebook");
         table.put("Hushfacebook settings",
@@ -1286,6 +1374,8 @@ public final class L10nTranslations {
                 "Pengaturan Hushfacebook tidak dapat dibuka");
         table.put("Hushfacebook turns back on when Facebook restarts.",
                 "Hushfacebook aktif lagi saat Facebook dimulai ulang.");
+        table.put("Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.",
+                "Salinan %1$s milik Hushfacebook sudah tidak ada, jadi font ponsel Anda yang dipakai. Pilih file itu lagi.");
         table.put("Import",
                 "Impor");
         table.put("Import settings",
@@ -1294,9 +1384,6 @@ public final class L10nTranslations {
                 "Mengimpor pengaturan");
         table.put("It targets Facebook %1$s.",
                 "Rilis ini ditujukan untuk Facebook %1$s.");
-    }
-
-    private static void fillIn2(Map<String, String> table) {
         table.put("Jump to a section",
                 "Lompat ke bagian");
         table.put("Keep feed position on return",
@@ -1321,6 +1408,8 @@ public final class L10nTranslations {
                 "Tidak ada aplikasi di ponsel ini yang dapat membuka tautan ini. Alamatnya %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
                 "Tangkapan layar iklan tidak dipantau, dan aplikasi yang Anda pasang tidak dilaporkan.");
+        table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
+                "Belum ada yang dipilih, jadi font ponsel Anda yang dipakai. Pilih file TrueType atau OpenType hingga %1$d MB.");
         table.put("Not saved: that isn't a Facebook photo or video",
                 "Tidak disimpan: itu bukan foto atau video Facebook");
         table.put("Not saved: the file is over 512 MB",
@@ -1397,6 +1486,9 @@ public final class L10nTranslations {
                 "Menyimpan foto");
         table.put("Saving a video",
                 "Menyimpan video");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Menyimpan file pengaturan");
         table.put("Saving...",
@@ -1417,9 +1509,6 @@ public final class L10nTranslations {
                 "Pengaturan diimpor. %1$d sakelar berubah.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Pengaturan diimpor. Semua yang Anda simpan akan masuk ke folder bernama %1$s.");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("Smallest",
                 "Terkecil");
         table.put("Source code and issues",
@@ -1432,6 +1521,8 @@ public final class L10nTranslations {
                 "Hentikan perpindahan otomatis Cerita");
         table.put("Stop update prompts",
                 "Hentikan permintaan pembaruan");
+        table.put("Stops using the font file and goes back to your phone's font.",
+                "Berhenti memakai file font dan kembali ke font ponsel Anda.");
         table.put("Stories",
                 "Cerita");
         table.put("Tab to open on",
@@ -1446,8 +1537,12 @@ public final class L10nTranslations {
                 "File itu bukan teks yang dapat dibaca, jadi mungkin rusak saat ditransfer. Tidak ada yang diubah.");
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "File itu mencantumkan satu pengaturan dua kali, jadi tidak jelas nilai mana yang harus dipakai. Tidak ada yang diubah.");
+        table.put("That font file is over %1$d MB. Your font didn't change.",
+                "File font itu lebih dari %1$d MB. Font Anda tidak berubah.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Itu bukan file pengaturan Hushfacebook. Tidak ada yang diubah.");
+        table.put("That isn't a TrueType or OpenType font file. Your font didn't change.",
+                "Itu bukan file font TrueType atau OpenType. Font Anda tidak berubah.");
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "File pengaturan itu memuat nilai yang tidak dapat dibaca Hushfacebook. Tidak ada yang diubah.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -1494,6 +1589,10 @@ public final class L10nTranslations {
                 "Gunakan emoji ponsel");
         table.put("Use the system font",
                 "Gunakan font sistem");
+        table.put("Use your phone's font",
+                "Gunakan font ponsel");
+        table.put("Using %1$s. Choose another file to replace it.",
+                "Memakai %1$s. Pilih file lain untuk menggantinya.");
         table.put("Version",
                 "Versi");
         table.put("Version %1$s for Facebook %2$s",
@@ -1510,6 +1609,9 @@ public final class L10nTranslations {
                 "Video akan disimpan dalam %1$s atau kualitas terdekat di bawahnya. Video yang tidak memiliki kualitas serendah itu akan disimpan dalam kualitas terdekat di atasnya.");
         table.put("Videos will save at the best quality.",
                 "Video akan disimpan dengan kualitas terbaik.");
+    }
+
+    private static void fillIn4(Map<String, String> table) {
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Video akan disimpan dengan kualitas terendahnya, agar ukuran filenya sekecil mungkin.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
@@ -1541,11 +1643,12 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(478);
+        Map<String, String> table = new HashMap<>(508);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
         fillPt_rBR3(table);
+        fillPt_rBR4(table);
         return table;
     }
 
@@ -1592,6 +1695,8 @@ public final class L10nTranslations {
                 "Adiciona o item Salvar ao menu do story de qualquer pessoa e salva na qualidade definida em Downloads. Com esta op\u00e7\u00e3o desligada ou durante a pausa, o item Salvar s\u00f3 aparece nos seus pr\u00f3prios stories, e quem salva \u00e9 o pr\u00f3prio Facebook.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "An\u00fancios dentro dos Reels, a partir do pr\u00f3ximo lote que o Facebook carregar. Banners, an\u00fancios no meio do v\u00eddeo e an\u00fancios inseridos pelo app continuam bloqueados mesmo durante a pausa.");
+        table.put("Android couldn't draw with that font file. Your font didn't change.",
+                "O Android n\u00e3o conseguiu desenhar com esse arquivo de fonte. Sua fonte n\u00e3o mudou.");
         table.put("Appearance",
                 "Apar\u00eancia");
         table.put("Asks GitHub for the newest release right now, even with the switch above off.",
@@ -1600,6 +1705,8 @@ public final class L10nTranslations {
                 "Audience Network desativado");
         table.put("Back",
                 "Voltar");
+        table.put("Back to your phone's font. Restart Facebook to see it.",
+                "De volta \u00e0 fonte do seu celular. Reinicie o Facebook para ver.");
         table.put("Background ad prefetch blocked",
                 "Pr\u00e9-carregamento de an\u00fancios em segundo plano bloqueado");
         table.put("Best",
@@ -1626,18 +1733,26 @@ public final class L10nTranslations {
                 "Copie um relat\u00f3rio curto para a \u00e1rea de transfer\u00eancia.");
         table.put("Copy quick report",
                 "Copiar relat\u00f3rio r\u00e1pido");
+        table.put("Copying the font file",
+                "Copiando o arquivo de fonte");
+        table.put("Couldn't go back to your phone's font. Try again.",
+                "N\u00e3o foi poss\u00edvel voltar para a fonte do seu celular. Tente de novo.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
                 "N\u00e3o foi poss\u00edvel importar todas as configura\u00e7\u00f5es. Confira as op\u00e7\u00f5es nesta tela.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "N\u00e3o foi poss\u00edvel importar as configura\u00e7\u00f5es. Nada foi alterado.");
         table.put("Couldn't open that file. Nothing was changed.",
                 "N\u00e3o foi poss\u00edvel abrir esse arquivo. Nada foi alterado.");
+        table.put("Couldn't open that file. Your font didn't change.",
+                "N\u00e3o foi poss\u00edvel abrir esse arquivo. Sua fonte n\u00e3o mudou.");
         table.put("Couldn't open the file picker. Try again.",
                 "N\u00e3o foi poss\u00edvel abrir o seletor de arquivos. Tente de novo.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "N\u00e3o foi poss\u00edvel restaurar os dados de diagn\u00f3stico. Tente de novo.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "N\u00e3o foi poss\u00edvel falar com o GitHub. Tente de novo mais tarde.");
+        table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
+                "N\u00e3o foi poss\u00edvel salvar uma c\u00f3pia dessa fonte. Veja se o celular tem espa\u00e7o e tente de novo.");
         table.put("Couldn't save the settings file. Try again.",
                 "N\u00e3o foi poss\u00edvel salvar o arquivo de configura\u00e7\u00f5es. Tente de novo.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -1658,6 +1773,9 @@ public final class L10nTranslations {
                 "Relat\u00f3rio de diagn\u00f3stico copiado para a \u00e1rea de transfer\u00eancia.");
         table.put("Don't send reel watch history",
                 "N\u00e3o enviar o hist\u00f3rico de reels assistidos");
+    }
+
+    private static void fillPt_rBR1(Map<String, String> table) {
         table.put("Download",
                 "Baixar");
         table.put("Download button on reels",
@@ -1670,9 +1788,6 @@ public final class L10nTranslations {
                 "Qualidade do download");
         table.put("Download to phone",
                 "Baixar no celular");
-    }
-
-    private static void fillPt_rBR1(Map<String, String> table) {
         table.put("Downloads",
                 "Downloads");
         table.put("Each video saves at %1$s or the closest quality below it. A video with nothing that low saves at the closest quality above.",
@@ -1707,8 +1822,8 @@ public final class L10nTranslations {
                 "O Facebook para de receber a lista de reels que voc\u00ea assistiu, que ele usa para ordenar seu feed do Reels. Ningu\u00e9m mais v\u00ea essa lista. Reels que voc\u00ea j\u00e1 assistiu podem voltar a aparecer no feed.");
         table.put("Facebook will open on %1$s.",
                 "O Facebook vai abrir em %1$s.");
-        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
-                "O texto do Facebook \u00e9 desenhado com a fonte do seu celular em vez da fonte da Meta. Reinicie o Facebook depois de mudar isso.");
+        table.put("Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.",
+                "O texto do Facebook \u00e9 desenhado com a fonte do seu celular, ou com um arquivo de fonte que voc\u00ea escolher abaixo, em vez da fonte da Meta. Reinicie o Facebook depois de mudar isso.");
         table.put("Feeds",
                 "Feeds");
         table.put("File name",
@@ -1719,6 +1834,10 @@ public final class L10nTranslations {
                 "Nome da pasta");
         table.put("Folder set to %1$s.",
                 "Pasta definida como %1$s.");
+        table.put("Font file",
+                "Arquivo de fonte");
+        table.put("Font set to %1$s. Restart Facebook to see it.",
+                "Fonte definida como %1$s. Reinicie o Facebook para ver.");
         table.put("Friends",
                 "Amigos");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -1777,6 +1896,9 @@ public final class L10nTranslations {
                 "O Hushfacebook est\u00e1 pausado");
         table.put("Hushfacebook pauses when Facebook restarts.",
                 "O Hushfacebook ser\u00e1 pausado quando o Facebook reiniciar.");
+    }
+
+    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Hushfacebook saves",
                 "Salvamentos do Hushfacebook");
         table.put("Hushfacebook settings",
@@ -1785,6 +1907,8 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel abrir as configura\u00e7\u00f5es do Hushfacebook");
         table.put("Hushfacebook turns back on when Facebook restarts.",
                 "O Hushfacebook ser\u00e1 reativado quando o Facebook reiniciar.");
+        table.put("Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.",
+                "A c\u00f3pia de %1$s feita pelo Hushfacebook sumiu, ent\u00e3o a fonte do seu celular \u00e9 usada. Escolha o arquivo de novo.");
         table.put("Import",
                 "Importar");
         table.put("Import settings",
@@ -1793,9 +1917,6 @@ public final class L10nTranslations {
                 "Importando as configura\u00e7\u00f5es");
         table.put("It targets Facebook %1$s.",
                 "Ele \u00e9 feito para o Facebook %1$s.");
-    }
-
-    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Jump to a section",
                 "Ir para uma se\u00e7\u00e3o");
         table.put("Keep feed position on return",
@@ -1820,6 +1941,8 @@ public final class L10nTranslations {
                 "Nenhum app deste celular consegue abrir o link. O endere\u00e7o \u00e9 %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
                 "Sem monitoramento de capturas de tela de an\u00fancios e sem relat\u00f3rios sobre quais apps voc\u00ea instala.");
+        table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
+                "Nenhum escolhido, ent\u00e3o a fonte do seu celular \u00e9 usada. Escolha um arquivo TrueType ou OpenType de at\u00e9 %1$d MB.");
         table.put("Not saved: that isn't a Facebook photo or video",
                 "N\u00e3o foi salvo: isso n\u00e3o \u00e9 uma foto nem um v\u00eddeo do Facebook");
         table.put("Not saved: the file is over 512 MB",
@@ -1896,6 +2019,9 @@ public final class L10nTranslations {
                 "Salvando uma foto");
         table.put("Saving a video",
                 "Salvando um v\u00eddeo");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Salvando o arquivo de configura\u00e7\u00f5es");
         table.put("Saving...",
@@ -1916,9 +2042,6 @@ public final class L10nTranslations {
                 "Configura\u00e7\u00f5es importadas. %1$d op\u00e7\u00f5es mudaram.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Configura\u00e7\u00f5es importadas. O que voc\u00ea salvar vai para uma pasta chamada %1$s.");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Smallest",
                 "A menor");
         table.put("Source code and issues",
@@ -1931,6 +2054,8 @@ public final class L10nTranslations {
                 "Parar o avan\u00e7o autom\u00e1tico dos stories");
         table.put("Stop update prompts",
                 "Parar os avisos de atualiza\u00e7\u00e3o");
+        table.put("Stops using the font file and goes back to your phone's font.",
+                "Deixa de usar o arquivo de fonte e volta para a fonte do seu celular.");
         table.put("Stories",
                 "Stories");
         table.put("Tab to open on",
@@ -1945,8 +2070,12 @@ public final class L10nTranslations {
                 "Esse arquivo n\u00e3o \u00e9 texto leg\u00edvel, ent\u00e3o pode ter sido danificado no caminho. Nada foi alterado.");
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "Esse arquivo lista uma configura\u00e7\u00e3o duas vezes, ent\u00e3o n\u00e3o d\u00e1 para saber qual valor usar. Nada foi alterado.");
+        table.put("That font file is over %1$d MB. Your font didn't change.",
+                "Esse arquivo de fonte tem mais de %1$d MB. Sua fonte n\u00e3o mudou.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Isso n\u00e3o \u00e9 um arquivo de configura\u00e7\u00f5es do Hushfacebook. Nada foi alterado.");
+        table.put("That isn't a TrueType or OpenType font file. Your font didn't change.",
+                "Isso n\u00e3o \u00e9 um arquivo de fonte TrueType ou OpenType. Sua fonte n\u00e3o mudou.");
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "Esse arquivo de configura\u00e7\u00f5es tem um valor que o Hushfacebook n\u00e3o consegue ler. Nada foi alterado.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -1993,6 +2122,10 @@ public final class L10nTranslations {
                 "Usar os emojis do celular");
         table.put("Use the system font",
                 "Usar a fonte do sistema");
+        table.put("Use your phone's font",
+                "Usar a fonte do celular");
+        table.put("Using %1$s. Choose another file to replace it.",
+                "Usando %1$s. Escolha outro arquivo para substitu\u00ed-lo.");
         table.put("Version",
                 "Vers\u00e3o");
         table.put("Version %1$s for Facebook %2$s",
@@ -2009,6 +2142,9 @@ public final class L10nTranslations {
                 "Os v\u00eddeos v\u00e3o ser salvos em %1$s ou na qualidade mais pr\u00f3xima abaixo disso. Um v\u00eddeo que n\u00e3o tiver nenhuma qualidade t\u00e3o baixa vai ser salvo na mais pr\u00f3xima acima.");
         table.put("Videos will save at the best quality.",
                 "Os v\u00eddeos v\u00e3o ser salvos na melhor qualidade.");
+    }
+
+    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Os v\u00eddeos v\u00e3o ser salvos na qualidade mais baixa deles, para os arquivos ficarem os menores poss\u00edveis.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",
@@ -2040,11 +2176,12 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(478);
+        Map<String, String> table = new HashMap<>(508);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
         fillTr3(table);
+        fillTr4(table);
         return table;
     }
 
@@ -2091,6 +2228,8 @@ public final class L10nTranslations {
                 "Kimin olursa olsun her hikayenin men\u00fcs\u00fcne Kaydet se\u00e7ene\u011fini ekler ve hikayeyi \u0130ndirmeler b\u00f6l\u00fcm\u00fcnde se\u00e7ilen kalitede kaydeder. Kapal\u0131yken veya duraklat\u0131lm\u0131\u015fken Kaydet se\u00e7ene\u011fi yaln\u0131zca kendi hikayelerinde bulunur ve Facebook'un kendi kaydetme i\u015flevini \u00e7al\u0131\u015ft\u0131r\u0131r.");
         table.put("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.",
                 "Reels i\u00e7indeki reklamlar, Facebook'un y\u00fckledi\u011fi bir sonraki gruptan itibaren. Banner'lar, video ortas\u0131 reklamlar ve uygulaman\u0131n ekledi\u011fi reklamlar duraklat\u0131ld\u0131\u011f\u0131nda da engellenir.");
+        table.put("Android couldn't draw with that font file. Your font didn't change.",
+                "Android bu yaz\u0131 tipi dosyas\u0131yla \u00e7izim yapamad\u0131. Yaz\u0131 tipin de\u011fi\u015fmedi.");
         table.put("Appearance",
                 "G\u00f6r\u00fcn\u00fcm");
         table.put("Asks GitHub for the newest release right now, even with the switch above off.",
@@ -2099,6 +2238,8 @@ public final class L10nTranslations {
                 "Audience Network kapal\u0131");
         table.put("Back",
                 "Geri");
+        table.put("Back to your phone's font. Restart Facebook to see it.",
+                "Telefonunun yaz\u0131 tipine geri d\u00f6n\u00fcld\u00fc. G\u00f6rmek i\u00e7in Facebook'u yeniden ba\u015flat.");
         table.put("Background ad prefetch blocked",
                 "Arka planda reklam indirme engellendi");
         table.put("Best",
@@ -2125,18 +2266,26 @@ public final class L10nTranslations {
                 "K\u0131sa raporu panoya kopyalar.");
         table.put("Copy quick report",
                 "H\u0131zl\u0131 raporu kopyala");
+        table.put("Copying the font file",
+                "Yaz\u0131 tipi dosyas\u0131 kopyalan\u0131yor");
+        table.put("Couldn't go back to your phone's font. Try again.",
+                "Telefonunun yaz\u0131 tipine geri d\u00f6n\u00fclemedi. Tekrar dene.");
         table.put("Couldn't import every setting. Check the switches on this screen.",
                 "Baz\u0131 ayarlar i\u00e7e aktar\u0131lamad\u0131. Bu ekrandaki anahtarlar\u0131 kontrol et.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "Ayarlar i\u00e7e aktar\u0131lamad\u0131. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("Couldn't open that file. Nothing was changed.",
                 "Bu dosya a\u00e7\u0131lamad\u0131. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
+        table.put("Couldn't open that file. Your font didn't change.",
+                "Bu dosya a\u00e7\u0131lamad\u0131. Yaz\u0131 tipin de\u011fi\u015fmedi.");
         table.put("Couldn't open the file picker. Try again.",
                 "Dosya se\u00e7ici a\u00e7\u0131lamad\u0131. Tekrar dene.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "Tan\u0131lama verileri geri getirilemedi. Tekrar dene.");
         table.put("Couldn't reach GitHub. Try again later.",
                 "GitHub'a ula\u015f\u0131lamad\u0131. Daha sonra tekrar dene.");
+        table.put("Couldn't save a copy of that font. Check that the phone has room, then try again.",
+                "Bu yaz\u0131 tipinin kopyas\u0131 kaydedilemedi. Telefonda yer olup olmad\u0131\u011f\u0131n\u0131 kontrol et, sonra tekrar dene.");
         table.put("Couldn't save the settings file. Try again.",
                 "Ayar dosyas\u0131 kaydedilemedi. Tekrar dene.");
         table.put("Couldn't save this video. Play it for a moment, then try again.",
@@ -2157,6 +2306,9 @@ public final class L10nTranslations {
                 "Tan\u0131lama raporu panoya kopyaland\u0131.");
         table.put("Don't send reel watch history",
                 "Reels izleme ge\u00e7mi\u015fini g\u00f6nderme");
+    }
+
+    private static void fillTr1(Map<String, String> table) {
         table.put("Download",
                 "\u0130ndir");
         table.put("Download button on reels",
@@ -2169,9 +2321,6 @@ public final class L10nTranslations {
                 "\u0130ndirme kalitesi");
         table.put("Download to phone",
                 "Telefona indir");
-    }
-
-    private static void fillTr1(Map<String, String> table) {
         table.put("Downloads",
                 "\u0130ndirmeler");
         table.put("Each video saves at %1$s or the closest quality below it. A video with nothing that low saves at the closest quality above.",
@@ -2206,8 +2355,8 @@ public final class L10nTranslations {
                 "Facebook, Reels ak\u0131\u015f\u0131n\u0131 s\u0131ralamak i\u00e7in kulland\u0131\u011f\u0131, izledi\u011fin Reels videolar\u0131n\u0131n listesini art\u0131k almaz. Bu listeyi ba\u015fka kimse g\u00f6rmez. Daha \u00f6nce izledi\u011fin Reels videolar\u0131 ak\u0131\u015fta yeniden \u00e7\u0131kabilir.");
         table.put("Facebook will open on %1$s.",
                 "Facebook %1$s sekmesinde a\u00e7\u0131lacak.");
-        table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
-                "Facebook'un metni Meta'n\u0131n kendi yaz\u0131 tipi yerine telefonunun yaz\u0131 tipiyle \u00e7izilir. Bunu de\u011fi\u015ftirdikten sonra Facebook'u yeniden ba\u015flat.");
+        table.put("Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.",
+                "Facebook'un metni, Meta'n\u0131n kendi yaz\u0131 tipi yerine telefonunun yaz\u0131 tipiyle ya da a\u015fa\u011f\u0131da se\u00e7ti\u011fin bir yaz\u0131 tipi dosyas\u0131yla \u00e7izilir. Bunu de\u011fi\u015ftirdikten sonra Facebook'u yeniden ba\u015flat.");
         table.put("Feeds",
                 "Ak\u0131\u015flar");
         table.put("File name",
@@ -2218,6 +2367,10 @@ public final class L10nTranslations {
                 "Klas\u00f6r ad\u0131");
         table.put("Folder set to %1$s.",
                 "Klas\u00f6r %1$s olarak ayarland\u0131.");
+        table.put("Font file",
+                "Yaz\u0131 tipi dosyas\u0131");
+        table.put("Font set to %1$s. Restart Facebook to see it.",
+                "Yaz\u0131 tipi %1$s olarak ayarland\u0131. G\u00f6rmek i\u00e7in Facebook'u yeniden ba\u015flat.");
         table.put("Friends",
                 "Arkada\u015flar");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -2276,6 +2429,9 @@ public final class L10nTranslations {
                 "Hushfacebook duraklat\u0131ld\u0131");
         table.put("Hushfacebook pauses when Facebook restarts.",
                 "Hushfacebook, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda duraklat\u0131l\u0131r.");
+    }
+
+    private static void fillTr2(Map<String, String> table) {
         table.put("Hushfacebook saves",
                 "Hushfacebook kaydetme i\u015flemleri");
         table.put("Hushfacebook settings",
@@ -2284,6 +2440,8 @@ public final class L10nTranslations {
                 "Hushfacebook ayarlar\u0131 a\u00e7\u0131lamad\u0131");
         table.put("Hushfacebook turns back on when Facebook restarts.",
                 "Hushfacebook, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda tekrar a\u00e7\u0131l\u0131r.");
+        table.put("Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.",
+                "Hushfacebook'un %1$s kopyas\u0131 yok, bu y\u00fczden telefonunun yaz\u0131 tipi kullan\u0131l\u0131yor. Dosyay\u0131 yeniden se\u00e7.");
         table.put("Import",
                 "\u0130\u00e7e aktar");
         table.put("Import settings",
@@ -2292,9 +2450,6 @@ public final class L10nTranslations {
                 "Ayarlar i\u00e7e aktar\u0131l\u0131yor");
         table.put("It targets Facebook %1$s.",
                 "Facebook %1$s i\u00e7in haz\u0131rland\u0131.");
-    }
-
-    private static void fillTr2(Map<String, String> table) {
         table.put("Jump to a section",
                 "Bir b\u00f6l\u00fcme git");
         table.put("Keep feed position on return",
@@ -2319,6 +2474,8 @@ public final class L10nTranslations {
                 "Bu telefondaki hi\u00e7bir uygulama ba\u011flant\u0131y\u0131 a\u00e7am\u0131yor. Adres: %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
                 "Reklamlarda ekran g\u00f6r\u00fcnt\u00fcs\u00fc takibi yok, hangi uygulamalar\u0131 y\u00fckledi\u011fine dair rapor da yok.");
+        table.put("None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.",
+                "Hi\u00e7biri se\u00e7ilmedi, bu y\u00fczden telefonunun yaz\u0131 tipi kullan\u0131l\u0131yor. En fazla %1$d MB boyutunda bir TrueType veya OpenType dosyas\u0131 se\u00e7.");
         table.put("Not saved: that isn't a Facebook photo or video",
                 "Kaydedilmedi: Bu bir Facebook foto\u011fraf\u0131 veya videosu de\u011fil");
         table.put("Not saved: the file is over 512 MB",
@@ -2395,6 +2552,9 @@ public final class L10nTranslations {
                 "Foto\u011fraf kaydediliyor");
         table.put("Saving a video",
                 "Video kaydediliyor");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Ayar dosyas\u0131 kaydediliyor");
         table.put("Saving...",
@@ -2415,9 +2575,6 @@ public final class L10nTranslations {
                 "Ayarlar i\u00e7e aktar\u0131ld\u0131. %1$d anahtar de\u011fi\u015fti.");
         table.put("Settings imported. Saves will go to a folder named %1$s.",
                 "Ayarlar i\u00e7e aktar\u0131ld\u0131. Kaydettiklerin %1$s adl\u0131 bir klas\u00f6re gidecek.");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("Smallest",
                 "En k\u00fc\u00e7\u00fck");
         table.put("Source code and issues",
@@ -2430,6 +2587,8 @@ public final class L10nTranslations {
                 "Hikayelerin otomatik ilerlemesini durdur");
         table.put("Stop update prompts",
                 "G\u00fcncelleme uyar\u0131lar\u0131n\u0131 durdur");
+        table.put("Stops using the font file and goes back to your phone's font.",
+                "Yaz\u0131 tipi dosyas\u0131n\u0131 b\u0131rak\u0131r ve telefonunun yaz\u0131 tipine geri d\u00f6ner.");
         table.put("Stories",
                 "Hikayeler");
         table.put("Tab to open on",
@@ -2444,8 +2603,12 @@ public final class L10nTranslations {
                 "Bu dosya okunabilir bir metin de\u011fil, aktar\u0131m s\u0131ras\u0131nda hasar g\u00f6rm\u00fc\u015f olabilir. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "Bu dosyada bir ayar iki kez ge\u00e7iyor, bu y\u00fczden hangi de\u011ferin kullan\u0131laca\u011f\u0131 belli de\u011fil. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
+        table.put("That font file is over %1$d MB. Your font didn't change.",
+                "Bu yaz\u0131 tipi dosyas\u0131 %1$d MB'tan b\u00fcy\u00fck. Yaz\u0131 tipin de\u011fi\u015fmedi.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Bu bir Hushfacebook ayar dosyas\u0131 de\u011fil. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
+        table.put("That isn't a TrueType or OpenType font file. Your font didn't change.",
+                "Bu bir TrueType veya OpenType yaz\u0131 tipi dosyas\u0131 de\u011fil. Yaz\u0131 tipin de\u011fi\u015fmedi.");
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "Bu ayar dosyas\u0131nda Hushfacebook'un okuyamad\u0131\u011f\u0131 bir de\u011fer var. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -2492,6 +2655,10 @@ public final class L10nTranslations {
                 "Telefonun emojilerini kullan");
         table.put("Use the system font",
                 "Sistem yaz\u0131 tipini kullan");
+        table.put("Use your phone's font",
+                "Telefonun yaz\u0131 tipini kullan");
+        table.put("Using %1$s. Choose another file to replace it.",
+                "%1$s kullan\u0131l\u0131yor. De\u011fi\u015ftirmek i\u00e7in ba\u015fka bir dosya se\u00e7.");
         table.put("Version",
                 "S\u00fcr\u00fcm");
         table.put("Version %1$s for Facebook %2$s",
@@ -2508,6 +2675,9 @@ public final class L10nTranslations {
                 "Videolar %1$s kalitesinde ya da bunun alt\u0131ndaki en yak\u0131n kalitede kaydedilecek. Bu kadar d\u00fc\u015f\u00fck kalitesi olmayan video, bunun \u00fcst\u00fcndeki en yak\u0131n kalitede kaydedilecek.");
         table.put("Videos will save at the best quality.",
                 "Videolar en iyi kalitede kaydedilecek.");
+    }
+
+    private static void fillTr4(Map<String, String> table) {
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Videolar en d\u00fc\u015f\u00fck kalitelerinde kaydedilecek, b\u00f6ylece dosyalar en k\u00fc\u00e7\u00fck olur.");
         table.put("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.",

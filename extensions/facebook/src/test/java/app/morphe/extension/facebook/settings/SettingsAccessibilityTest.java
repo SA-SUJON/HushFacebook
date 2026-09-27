@@ -124,6 +124,26 @@ public class SettingsAccessibilityTest {
         }
     }
 
+    /**
+     * With a font file picked, Font file and the way back to the phone's font are both buttons a
+     * double tap reaches. Without one, the way back isn't on the page at all.
+     */
+    @Test
+    public void withAFontPickedBothFontRowsAreButtons() {
+        Settings.FONT_SOURCE.save("Inter.ttf");
+        try {
+            SettingsDialog dialog = SettingsL10nTest.show(controller.get());
+            for (String key : new String[]{FontFilePreference.CHOOSE_KEY, FontFilePreference.PHONE_FONT_KEY}) {
+                AccessibilityNodeInfo info = node(rowFor(dialog, key));
+                assertEquals(key + " role", Button.class.getName(), String.valueOf(info.getClassName()));
+                assertTrue(key + " can't be double tapped", info.getActionList().contains(
+                        AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK));
+            }
+        } finally {
+            Settings.FONT_SOURCE.resetToDefault();
+        }
+    }
+
     /** A double tap goes through the list as a tap does, and the row then reads the new state. */
     @Test
     public void aDoubleTapTurnsTheSwitchAndTheRowSaysSo() {

@@ -57,8 +57,23 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook tidak mengunduh iklan atau model iklannya di latar belakang.
 Facebook doesn't serve ads to other apps on this phone.	Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Mode gelap Facebook dan halaman ini memakai warna wallpaper Anda. Android 11 memakai biru. Aktifkan mode gelap Facebook untuk melihatnya.
-Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.	Teks Facebook digambar dengan font ponsel Anda, bukan font milik Meta. Mulai ulang Facebook setelah mengubah ini.
 Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Emoji digambar dengan font emoji ponsel Anda, bukan milik Meta. Reaksi dan stiker tidak berubah. Mulai ulang Facebook setelah mengubah ini.
+Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.	Teks Facebook digambar dengan font ponsel Anda, atau dengan file font yang Anda pilih di bawah, bukan font milik Meta. Mulai ulang Facebook setelah mengubah ini.
+Font file	File font
+Use your phone's font	Gunakan font ponsel
+Stops using the font file and goes back to your phone's font.	Berhenti memakai file font dan kembali ke font ponsel Anda.
+None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.	Belum ada yang dipilih, jadi font ponsel Anda yang dipakai. Pilih file TrueType atau OpenType hingga %1$d MB.
+Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.	Salinan %1$s milik Hushfacebook sudah tidak ada, jadi font ponsel Anda yang dipakai. Pilih file itu lagi.
+Using %1$s. Choose another file to replace it.	Memakai %1$s. Pilih file lain untuk menggantinya.
+Copying the font file	Menyalin file font
+Font set to %1$s. Restart Facebook to see it.	Font diatur menjadi %1$s. Mulai ulang Facebook untuk melihatnya.
+That isn't a TrueType or OpenType font file. Your font didn't change.	Itu bukan file font TrueType atau OpenType. Font Anda tidak berubah.
+That font file is over %1$d MB. Your font didn't change.	File font itu lebih dari %1$d MB. Font Anda tidak berubah.
+Android couldn't draw with that font file. Your font didn't change.	Android tidak dapat menggambar dengan file font itu. Font Anda tidak berubah.
+Couldn't save a copy of that font. Check that the phone has room, then try again.	Salinan font itu tidak dapat disimpan. Pastikan ponsel masih punya ruang, lalu coba lagi.
+Couldn't open that file. Your font didn't change.	File itu tidak dapat dibuka. Font Anda tidak berubah.
+Back to your phone's font. Restart Facebook to see it.	Kembali ke font ponsel Anda. Mulai ulang Facebook untuk melihatnya.
+Couldn't go back to your phone's font. Try again.	Tidak dapat kembali ke font ponsel Anda. Coba lagi.
 From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Mulai pembukaan berikutnya, sakelar di atas berhenti bekerja dan perilaku Facebook kembali. Pencatatan debug tetap berjalan dan pilihan Anda tersimpan.
 Full report saved to %1$s	Laporan lengkap disimpan ke %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, beserta pemberitahuan dari proyek yang menjadi dasarnya

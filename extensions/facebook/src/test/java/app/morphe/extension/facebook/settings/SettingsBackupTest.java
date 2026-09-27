@@ -105,6 +105,16 @@ public class SettingsBackupTest {
                     + "changes, so a file someone shared could turn it on unseen. It's switched on from the "
                     + "phone's own screen.");
 
+    /**
+     * Settings in {@link Settings} that aren't switches and stay out of a settings file, by key,
+     * each with the reason. A new one in neither this nor {@link SettingsBackup#VALUES} fails the
+     * test below. Keys, not the settings: a Setting read before the context rule has run poisons
+     * the registry for the rest of the sandbox.
+     */
+    private static final Map<String, String> VALUES_STAY_OUT = Collections.singletonMap("hushfacebook_font_source",
+            "it names the font file Use the system font draws in, whose copy only this install holds. A settings "
+                    + "file can't carry the font itself, and the name alone would point at nothing on another phone.");
+
     /** Hushfacebook's own state and its diagnostics. None of them is ever in a file. */
     private static List<Setting<?>> neverInAFile() {
         return Arrays.asList(BaseSettings.PAUSED, BaseSettings.SAFE_MODE, BaseSettings.DEBUG,
@@ -165,11 +175,17 @@ public class SettingsBackupTest {
         // it checks against the ones this build offers. Any other setting in Settings needs a
         // format that can carry it before it can be decided on.
         List<Setting<?>> notSwitches = new ArrayList<>();
+        Set<String> declared = new TreeSet<>();
         for (Setting<?> setting : declaredSettings(Settings.class)) {
-            if (!(setting instanceof BooleanSetting)) notSwitches.add(setting);
+            declared.add(setting.key);
+            if (!(setting instanceof BooleanSetting) && !VALUES_STAY_OUT.containsKey(setting.key)) notSwitches.add(setting);
         }
-        assertEquals("a setting in Settings that isn't a switch has no format in a settings file",
-                SettingsBackup.VALUES, notSwitches);
+        assertEquals("a setting in Settings that isn't a switch has no format in a settings file: add it to "
+                + "SettingsBackup.VALUES, or to VALUES_STAY_OUT here with the reason", SettingsBackup.VALUES, notSwitches);
+        assertTrue("VALUES_STAY_OUT names a setting Settings no longer has", declared.containsAll(VALUES_STAY_OUT.keySet()));
+        for (Setting<?> setting : SettingsBackup.VALUES) {
+            assertFalse(setting.key + " is carried and kept out at once", VALUES_STAY_OUT.containsKey(setting.key));
+        }
         assertEquals(Arrays.<Setting<?>>asList(Settings.SAVE_FOLDER, Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE,
                 Settings.START_TAB), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_FOLDER, SettingsBackup.FOLDER);
@@ -187,6 +203,29 @@ public class SettingsBackupTest {
         }
         for (Setting<?> setting : neverInAFile()) {
             assertFalse(setting.key + " is on the list", SettingsBackup.ALLOWLIST.contains(setting));
+        }
+    }
+
+    /**
+     * The font file Use the system font draws in stays out of a file both ways: an export doesn't
+     * name it, and a file that does has it counted as something this build doesn't know.
+     */
+    @Test
+    public void thePickedFontStaysOutOfAFile() throws Exception {
+        Settings.FONT_SOURCE.save("Inter-Regular.ttf");
+        try {
+            String text = SettingsBackup.create();
+            assertFalse(text, text.contains(Settings.FONT_SOURCE.key));
+            assertFalse(text, text.contains("Inter-Regular.ttf"));
+
+            JSONObject file = new JSONObject(text);
+            file.getJSONObject("settings").put(Settings.FONT_SOURCE.key, "Other.ttf");
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file.toString());
+            assertEquals(1, snapshot.unknown);
+            assertEquals(0, SettingsBackup.apply(snapshot));
+            assertEquals("Inter-Regular.ttf", Settings.FONT_SOURCE.savedValue());
+        } finally {
+            Settings.FONT_SOURCE.resetToDefault();
         }
     }
 

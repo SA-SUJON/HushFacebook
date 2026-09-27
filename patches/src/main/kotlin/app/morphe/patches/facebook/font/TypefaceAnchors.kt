@@ -34,8 +34,25 @@ internal const val TYPEFACE_BUILDERS = "Lcom/meta/foa/typefacebuilder/ApiUtils;"
 internal const val BUILDER_FACTORY = "createTypefaceBuilderFor26Api"
 
 /**
+ * What React Native's typeface utilities log for a font variation string Android won't parse,
+ * under the tag "ReactNative". Redex merges those utilities into one class of static methods, and
+ * the two that parse and apply the string keep this literal in both builds, beside the resolver
+ * every piece of React Native text asks for its typeface.
+ */
+internal const val INVALID_FONT_VARIATION = "Invalid fontVariationSettings: "
+internal const val ASSET_MANAGER = "Landroid/content/res/AssetManager;"
+/** How React Native's font manager loads a family it finds among the app's font assets. */
+private const val CREATE_FROM_ASSET = "createFromAsset"
+
+/**
+ * The parameter of React Native's resolver that names the family: after the asset manager and
+ * the base typeface, and before the style and the weight.
+ */
+internal const val REACT_FAMILY = 2
+
+/**
  * The family constants the extension swaps: Meta's interface families, by the names the enum
- * keeps. SystemFont.isInterfaceFamily is the same rule on the phone.
+ * keeps. OwnFont.isInterfaceFamily is the same rule on the phone.
  */
 internal fun isInterfaceFamily(name: String): Boolean =
     name.startsWith("OPTIMISTIC") || name == "FACEBOOK_SANS_VARIABLE"
@@ -128,6 +145,21 @@ internal fun touchesFamily(method: Method, familyType: String): Boolean =
                 else -> false
             }
         } == true
+
+/**
+ * React Native's typeface resolvers among [owner]'s methods: static, answering a Typeface for an
+ * asset manager, a base typeface, a family name, a style and a weight, and loading a family it
+ * finds among the app's font assets itself. That's React Native's applyStyles with its font
+ * manager's lookup inlined. The patch wants exactly one.
+ */
+internal fun reactNativeResolvers(owner: ClassDef): List<Method> = owner.methods.filter { method ->
+    method.isStatic() && method.returnType == TYPEFACE &&
+        method.parameterTypeNames() == listOf(ASSET_MANAGER, TYPEFACE, STRING, "I", "I") &&
+        method.implementation?.instructions?.any { instruction ->
+            val call = (instruction as? ReferenceInstruction)?.reference as? MethodReference
+            call?.definingClass == TYPEFACE && call.name == CREATE_FROM_ASSET
+        } == true
+}
 
 /** Whether [type] is the root every chain ends at. */
 internal fun isObject(type: String) = type == OBJECT

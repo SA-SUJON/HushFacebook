@@ -65,7 +65,8 @@ public class RowChevronTest {
 
     /** Every row on the screen whose tap opens a dialog, a file picker or the browser. */
     private static final Set<String> OPENS_SOMETHING = new LinkedHashSet<>(Arrays.asList(
-            "Jump to a section", "Tab to open on", "Download quality", "Save folder", "Video file name", "Export settings", "Import settings",
+            "Jump to a section", "Tab to open on", "Font file", "Download quality", "Save folder", "Video file name",
+            "Export settings", "Import settings",
             "Export diagnostic report", "Source code and issues", "Licenses"));
 
     /** Built by the first show(), after a test has set the text size it wants. */
@@ -82,6 +83,7 @@ public class RowChevronTest {
         PatchFamily.inBuildForTests = null;
         ScreenColors.shown = null;
         PauseForTests.resume();
+        Settings.FONT_SOURCE.resetToDefault();
         RuntimeEnvironment.setFontScale(1f);
     }
 
@@ -117,13 +119,16 @@ public class RowChevronTest {
     }
 
     /**
-     * Three rows act the moment they're tapped: the paused card turns Hushfacebook back on for the
-     * next start, Clear diagnostic data clears it, and Check now asks GitHub and says how that went
-     * in its own summary. A chevron there would promise something opens.
+     * Four rows act the moment they're tapped: the paused card turns Hushfacebook back on for the
+     * next start, Clear diagnostic data clears it, Check now asks GitHub and says how that went in
+     * its own summary, and Use your phone's font takes the picked font away. A chevron there would
+     * promise something opens.
      */
     @Test
     public void thePausedCardAndClearActAtOnceAndWearNone() {
         PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        // The way back to the phone's font is on the page while a font file is picked.
+        Settings.FONT_SOURCE.save("Inter.ttf");
         List<View> rows = rows(show());
         View card = rows.get(0);
         assertTrue(item(card).isSelectable());
@@ -133,6 +138,7 @@ public class RowChevronTest {
         View checkNow = rowTitled(rows, "Check now");
         assertNotNull(item(checkNow).getOnPreferenceClickListener());
         assertNull("Check now wears a chevron", chevronOf(checkNow));
+        assertNull("Use your phone's font wears a chevron", chevronOf(rowTitled(rows, "Use your phone's font")));
         assertNotNull("Licenses lost its chevron while paused", chevronOf(rowTitled(rows, "Licenses")));
     }
 

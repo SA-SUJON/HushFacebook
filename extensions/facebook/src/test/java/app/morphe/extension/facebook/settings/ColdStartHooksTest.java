@@ -40,7 +40,7 @@ import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
-import app.morphe.extension.facebook.font.SystemFont;
+import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
@@ -149,11 +149,13 @@ public class ColdStartHooksTest {
         String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
         assertEquals("a link shared before the context was cleaned", shared, LinkCleaner.sanitizeShared(shared));
         assertSame("a typeface resolved before the context was swapped", Typeface.SERIF,
-                SystemFont.systemize(Typeface.SERIF, FontFamily.OPTIMISTIC_TEXT_APP_BOLD, 700));
+                OwnFont.replace(Typeface.SERIF, FontFamily.OPTIMISTIC_TEXT_APP_BOLD, 700));
         Object fontBuilder = new Object();
-        SystemFont.rememberVariation(fontBuilder, "'wght' 700");
+        OwnFont.rememberVariation(fontBuilder, "'wght' 700");
         assertSame("a typeface built before the context was swapped", Typeface.SERIF,
-                SystemFont.systemizeBuilt(Typeface.SERIF, fontBuilder));
+                OwnFont.replaceBuilt(Typeface.SERIF, fontBuilder));
+        assertSame("React Native text drawn before the context was swapped", Typeface.SERIF,
+                OwnFont.replaceReactNative(Typeface.SERIF, "Optimistic VF App Lite 500"));
         // Facebook warms its emoji font from an app init task, which can ask the provider this early.
         assertNull("an emoji typeface asked for before the context was answered", SystemEmoji.typeface());
 

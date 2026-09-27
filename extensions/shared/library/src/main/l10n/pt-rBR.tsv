@@ -57,8 +57,23 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	O Facebook não baixa anúncios nem o modelo de anúncios dele em segundo plano.
 Facebook doesn't serve ads to other apps on this phone.	O Facebook não envia anúncios para outros apps deste celular.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	O modo escuro do Facebook e esta tela usam as cores do seu papel de parede. O Android 11 usa azul. Ative o modo escuro do Facebook para ver.
-Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.	O texto do Facebook é desenhado com a fonte do seu celular em vez da fonte da Meta. Reinicie o Facebook depois de mudar isso.
 Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Os emojis são desenhados com a fonte de emojis do seu celular em vez da fonte da Meta. Reações e figurinhas não mudam. Reinicie o Facebook depois de mudar isso.
+Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.	O texto do Facebook é desenhado com a fonte do seu celular, ou com um arquivo de fonte que você escolher abaixo, em vez da fonte da Meta. Reinicie o Facebook depois de mudar isso.
+Font file	Arquivo de fonte
+Use your phone's font	Usar a fonte do celular
+Stops using the font file and goes back to your phone's font.	Deixa de usar o arquivo de fonte e volta para a fonte do seu celular.
+None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.	Nenhum escolhido, então a fonte do seu celular é usada. Escolha um arquivo TrueType ou OpenType de até %1$d MB.
+Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.	A cópia de %1$s feita pelo Hushfacebook sumiu, então a fonte do seu celular é usada. Escolha o arquivo de novo.
+Using %1$s. Choose another file to replace it.	Usando %1$s. Escolha outro arquivo para substituí-lo.
+Copying the font file	Copiando o arquivo de fonte
+Font set to %1$s. Restart Facebook to see it.	Fonte definida como %1$s. Reinicie o Facebook para ver.
+That isn't a TrueType or OpenType font file. Your font didn't change.	Isso não é um arquivo de fonte TrueType ou OpenType. Sua fonte não mudou.
+That font file is over %1$d MB. Your font didn't change.	Esse arquivo de fonte tem mais de %1$d MB. Sua fonte não mudou.
+Android couldn't draw with that font file. Your font didn't change.	O Android não conseguiu desenhar com esse arquivo de fonte. Sua fonte não mudou.
+Couldn't save a copy of that font. Check that the phone has room, then try again.	Não foi possível salvar uma cópia dessa fonte. Veja se o celular tem espaço e tente de novo.
+Couldn't open that file. Your font didn't change.	Não foi possível abrir esse arquivo. Sua fonte não mudou.
+Back to your phone's font. Restart Facebook to see it.	De volta à fonte do seu celular. Reinicie o Facebook para ver.
+Couldn't go back to your phone's font. Try again.	Não foi possível voltar para a fonte do seu celular. Tente de novo.
 From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Na próxima abertura, as opções acima deixam de agir e o comportamento do Facebook volta. O Registro de depuração continua funcionando e suas escolhas ficam salvas.
 Full report saved to %1$s	Relatório completo salvo em %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, com os avisos dos projetos em que o Hushfacebook se baseia

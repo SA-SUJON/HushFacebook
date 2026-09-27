@@ -49,7 +49,7 @@ import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
-import app.morphe.extension.facebook.font.SystemFont;
+import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
@@ -216,14 +216,16 @@ public class PausedHooksTest {
                 ReelDeclutter::skipSocialBubbles));
         // The Reels batcher's send of the reels you watched never reaches its executor.
         probes.put(PatchFamily.REEL_WATCH_HISTORY, Collections.singletonList(SeenStateSendForTests::heldBack));
-        // The repository's answer for one of Meta's families, and a variable-font builder's.
+        // The repository's answer for one of Meta's families, a variable-font builder's, and React
+        // Native's for a family Facebook registered there.
         probes.put(PatchFamily.SYSTEM_FONT, Arrays.asList(
-                () -> SystemFont.systemize(Typeface.SERIF, FontFamily.OPTIMISTIC_TEXT_APP_BOLD, -1) != Typeface.SERIF,
+                () -> OwnFont.replace(Typeface.SERIF, FontFamily.OPTIMISTIC_TEXT_APP_BOLD, -1) != Typeface.SERIF,
                 () -> {
                     Object builder = new Object();
-                    SystemFont.rememberVariation(builder, "'wght' 700");
-                    return SystemFont.systemizeBuilt(Typeface.SERIF, builder) != Typeface.SERIF;
-                }));
+                    OwnFont.rememberVariation(builder, "'wght' 700");
+                    return OwnFont.replaceBuilt(Typeface.SERIF, builder) != Typeface.SERIF;
+                },
+                () -> OwnFont.replaceReactNative(Typeface.SERIF, "Optimistic VF App Lite 500") != Typeface.SERIF));
         // The emoji typeface provider hears the phone's default typeface instead of running its own code.
         probes.put(PatchFamily.SYSTEM_EMOJI, Collections.singletonList(() -> SystemEmoji.typeface() != null));
         probes.put(PatchFamily.EXTERNAL_BROWSER, Collections.singletonList(() -> {

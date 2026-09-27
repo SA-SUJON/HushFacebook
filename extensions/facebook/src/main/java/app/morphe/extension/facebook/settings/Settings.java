@@ -130,8 +130,9 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_dont_send_reel_watch_history", TRUE);
 
     /**
-     * Facebook's own text drawn in the phone's font instead of Meta's Optimistic, at the same
-     * weight and slant. A typeface already on screen keeps its font until Facebook restarts.
+     * Facebook's own text, React Native screens' included, drawn in the font {@link #FONT_SOURCE}
+     * names instead of Meta's Optimistic, at the same weight and slant. A typeface already on
+     * screen keeps its font until Facebook restarts.
      */
     public static final BooleanSetting USE_SYSTEM_FONT =
             new BooleanSetting("hushfacebook_use_system_font", TRUE);
@@ -231,4 +232,14 @@ public class Settings extends BaseSettings {
      */
     public static final EnumSetting<StartTab> START_TAB =
             new EnumSetting<>("hushfacebook_start_tab", StartTab.MARKETPLACE);
+
+    /**
+     * Where {@link #USE_SYSTEM_FONT} takes its font from: empty for the phone's own, or the name of
+     * the font file picked in the settings, whose copy sits in Facebook's files
+     * ({@link app.morphe.extension.facebook.font.FontFile}). Only the settings screen writes it,
+     * after the copy has passed its checks. It isn't a switch, and a settings file leaves it out:
+     * the font can't travel in one, and the name alone would point at nothing on another phone.
+     */
+    public static final StringSetting FONT_SOURCE =
+            new StringSetting("hushfacebook_font_source", "");
 }

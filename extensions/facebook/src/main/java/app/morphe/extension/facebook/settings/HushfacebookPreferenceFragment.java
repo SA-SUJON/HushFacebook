@@ -178,7 +178,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        SettingsBackupPreference.onResult(this, requestCode, resultCode, data);
+        if (SettingsBackupPreference.onResult(this, requestCode, resultCode, data)) return;
+        FontFilePreference.onResult(this, requestCode, resultCode, data);
     }
 
     /** Shows what the switches are saved as, after an import wrote them. */
@@ -379,8 +380,16 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
             if (build.contains(PatchFamily.SYSTEM_FONT)) {
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT, L10n.t("Use the system font"),
-                        L10n.t("Facebook's text is drawn in your phone's font instead of Meta's own. Restart "
-                                + "Facebook after changing this.")));
+                        L10n.t("Facebook's text is drawn in your phone's font, or in a font file you choose below, "
+                                + "instead of Meta's own. Restart Facebook after changing this.")));
+                // The file the switch draws in, and, while one is picked, the way back to the phone's font.
+                // The way back goes in once whatever is picked, so it keeps its place right after Font file
+                // when a pick brings it back, rather than landing at the end of the section.
+                FontRow choose = new FontRow(this, context, FontFilePreference.CHOOSE);
+                choose.wayBack = new FontRow(this, context, FontFilePreference.PHONE_FONT);
+                appearance.addPreference(choose);
+                appearance.addPreference(choose.wayBack);
+                choose.show();
             }
             if (build.contains(PatchFamily.SYSTEM_EMOJI)) {
                 // The quick emoji picker keeps the first typeface it's given until Facebook restarts.
@@ -1217,6 +1226,21 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     static final class ClearRow extends ClearLogBufferPreference {
         ClearRow(Context context) {
             super(context);
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+    }
+
+    /** Font file, which opens the picker, or Use your phone's font, which acts at once. */
+    static final class FontRow extends FontFilePreference {
+        FontRow(HushfacebookPreferenceFragment page, Context context, int role) {
+            super(page, context, role);
         }
 
         @Override
