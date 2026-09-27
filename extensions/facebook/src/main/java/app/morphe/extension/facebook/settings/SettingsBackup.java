@@ -105,7 +105,8 @@ public final class SettingsBackup {
             Settings.DOWNLOAD_REELS,
             Settings.DOWNLOAD_VIDEOS,
             Settings.DOWNLOAD_COMPATIBLE,
-            Settings.OPEN_ON_CHOSEN_TAB));
+            Settings.OPEN_ON_CHOSEN_TAB,
+            Settings.HIDE_GET_MESSENGER_CARD));
 
     /**
      * The one setting a file carries that isn't a switch: the folder saves go to. A file holds it

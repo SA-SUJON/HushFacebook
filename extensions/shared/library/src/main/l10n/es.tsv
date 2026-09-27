@@ -265,3 +265,9 @@ Go straight to one group of settings. Back returns to where you were.	Ve directo
 Save videos other apps can open	Guardar videos que otras apps puedan abrir
 # context: summary of that switch; H.264, AAC, AV1 and WhatsApp are names and stay as they are
 Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.	Guarda los videos en H.264 con sonido AAC, el formato que aceptan apps como WhatsApp. La versión más nítida de Facebook suele ser AV1, que algunas apps rechazan, así que un video puede guardarse con menor calidad. Un video sin esa versión se guarda como siempre.
+# context: section title for the Chats settings, named like Facebook's own Chats screen
+Chats	Chats
+# context: switch title under Chats; the card is Facebook's own "Get the Messenger app" card
+Hide the Get Messenger card	Ocultar la tarjeta para obtener Messenger
+# context: summary of that switch; Messenger is the app's name and stays as it is
+The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	La tarjeta de la parte superior de Chats que te pide que descargues la app de Messenger desaparece mientras Messenger esté instalado. Sin Messenger, se queda para que puedas seguir instalándolo desde ahí.

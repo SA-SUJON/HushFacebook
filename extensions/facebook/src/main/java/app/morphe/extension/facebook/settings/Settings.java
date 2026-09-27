@@ -163,6 +163,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_stop_update_prompts", TRUE);
 
     /**
+     * The "Get the Messenger app" card at the top of Facebook's own Chats, while Messenger is
+     * installed. Facebook drops it by itself only for a Messenger signed with its own key, which a
+     * re-signed Facebook never matches. Without Messenger the card stays, and so does its way to
+     * install it.
+     */
+    public static final BooleanSetting HIDE_GET_MESSENGER_CARD =
+            new BooleanSetting("hushfacebook_hide_get_messenger_card", TRUE);
+
+    /**
      * Once a day, when Facebook starts, ask api.github.com whether a newer Hushfacebook release is
      * out, and say so on the settings screen ({@link ReleaseCheck}). It's the settings entry's own
      * switch rather than a patch's, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off

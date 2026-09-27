@@ -264,6 +264,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the tab Facebook opens on. The patch checks that Facebook 577 and 580 still pick the main screen's start tab from an intent's target_tab_id, by the one method that answers a tab id from that extra, and puts the extension first in the onCreate the main screen inherits. For a start from the launcher icon with nothing to restore, the extension hands the screen a copy of its intent asking for the chosen tab's id, the id each kept TabTag subclass hands TabTag, and leaves links, notifications, shortcuts and restored screens alone."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/chats/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the Get Messenger card in Facebook's own Chats. Facebook 577 and 580 build the rows above the chat list from plugins that each answer whether they show, and the card's plugin is found by the one builder that tags its banner mib-native-dismissible-top-banner. Facebook already leaves the card out when Messenger is installed, but only for a Messenger isSameSignature matches with its own key, which a re-signed build never does. The patch asks the extension first in that plugin's show question, and the extension answers no while the switch is on and com.facebook.orca is installed and enabled, whatever key signed it."
     }
   ]
 }

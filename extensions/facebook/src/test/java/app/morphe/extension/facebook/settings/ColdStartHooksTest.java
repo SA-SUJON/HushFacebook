@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
+import app.morphe.extension.facebook.chats.MessengerCardForTests;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
 import app.morphe.extension.facebook.download.ReelDownload;
@@ -146,6 +147,8 @@ public class ColdStartHooksTest {
         assertFalse("a post menu built before the context got the video item", VideoMenuItemForTests.addsAnItem());
         assertFalse(PlayerSourcesForTests.recordsAVideoPlayer());
         assertFalse("a start before the context asked Facebook for a tab", StartTabRouteForTests.routes());
+        assertFalse("a Chats list built before the context lost the Get Messenger card",
+                MessengerCardForTests.hidesWithMessenger());
         String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
         assertEquals("a link shared before the context was cleaned", shared, LinkCleaner.sanitizeShared(shared));
         assertSame("a typeface resolved before the context was swapped", Typeface.SERIF,

@@ -354,6 +354,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             downloads.addPreference(fileNameRow(context));
         }
 
+        if (build.contains(PatchFamily.MESSENGER_CARD)) {
+            PreferenceCategory chats = category(screen, L10n.t("Chats"));
+            chats.addPreference(toggle(context, Settings.HIDE_GET_MESSENGER_CARD, L10n.t("Hide the Get Messenger card"),
+                    L10n.t("The card at the top of Chats that asks you to get the Messenger app goes while Messenger "
+                            + "is installed. Without Messenger it stays, so you can still install it from there.")));
+        }
+
         if (build.contains(PatchFamily.EXTERNAL_BROWSER) || build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {
             PreferenceCategory links = category(screen, L10n.t("Links"));
             if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {

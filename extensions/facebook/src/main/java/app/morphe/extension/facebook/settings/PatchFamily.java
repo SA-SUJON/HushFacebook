@@ -77,6 +77,8 @@ public enum PatchFamily {
             Settings.DOWNLOAD_VIDEOS),
     START_TAB(FamilyNames.START_TAB, "startTab", null,
             Settings.OPEN_ON_CHOSEN_TAB),
+    MESSENGER_CARD(FamilyNames.MESSENGER_CARD, "messengerCard", null,
+            Settings.HIDE_GET_MESSENGER_CARD),
     AD_PREFETCH(FamilyNames.AD_PREFETCH, "adPrefetch", "the block on downloading ads in the background"),
     AD_TELEMETRY(FamilyNames.AD_TELEMETRY, "adTelemetry", "the block on reports of ad screenshots and app installs"),
     AUDIENCE_NETWORK(FamilyNames.AUDIENCE_NETWORK, "audienceNetwork", "the Audience Network block"),

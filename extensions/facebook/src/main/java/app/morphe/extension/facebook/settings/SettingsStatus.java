@@ -125,4 +125,8 @@ public final class SettingsStatus {
     public static boolean startTab() {
         return false;
     }
+
+    public static boolean messengerCard() {
+        return false;
+    }
 }

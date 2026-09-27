@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
+import app.morphe.extension.facebook.chats.MessengerCardForTests;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
 import app.morphe.extension.facebook.download.ReelDownload;
@@ -266,6 +267,8 @@ public class PausedHooksTest {
                 PlayerSourcesForTests::recordsAVideoPlayer));
         // A start from the launcher icon asks Facebook for the chosen tab.
         probes.put(PatchFamily.START_TAB, Collections.singletonList(StartTabRouteForTests::routes));
+        // With Messenger installed, the card's show question answers no in Chats.
+        probes.put(PatchFamily.MESSENGER_CARD, Collections.singletonList(MessengerCardForTests::hidesWithMessenger));
         // A shared link loses what the app added to it.
         probes.put(PatchFamily.SANITIZE_SHARING_LINKS, Collections.singletonList(() -> {
             String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
