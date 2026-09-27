@@ -106,10 +106,11 @@ function New-DexApk {
 }
 
 function Invoke-DexDiff {
-    param([string]$Clean, [string]$Patched, [string]$Allowlist, [string]$Name, [string]$Contracts)
+    param([string]$Clean, [string]$Patched, [string]$Allowlist, [string]$Name, [string]$Contracts, [string]$Base)
     $report = Join-Path $caseRoot "$Name-report.txt"
     $arguments = @('-Xmx1g', '-cp', $classPath, 'DexDiff', $Clean, $Patched, $report, $Allowlist)
     if ($Contracts) { $arguments += $Contracts }
+    if ($Base) { $arguments += $Base }
     $ErrorActionPreference = 'Continue'
     $global:LASTEXITCODE = 0
     $output = @(& $Java @arguments 2>&1 | ForEach-Object { "$_" })
@@ -281,7 +282,7 @@ try {
                 "if (`$false) { $Text }`n`$diff = [pscustomobject]@{ ExitCode = 0; Output = @() }" } }
         @{ Name = 'the patched APK moved off its place in the DexDiff call'; Check = $runsDexDiff
             Text = Edit-ScriptNode $verifierText $dexDiffCall { param($Text)
-                $Text.Replace('$cleanBase $PatchedApk', '$PatchedApk $cleanBase') } }
+                $Text.Replace('$CleanMerged $PatchedApk', '$PatchedApk $CleanMerged') } }
         @{ Name = 'the verifier run on the stock APK, which follows -o only in a dead branch'; Check = $verifiesPatched
             Text = Edit-ScriptNode (Edit-ScriptNode $allPatchesText $verifierCall { param($Text)
                 $Text.Replace('-PatchedApk $out', '-PatchedApk $stockApk') }) { param($Node)
@@ -1046,6 +1047,60 @@ try {
     $dexAllowed = Invoke-DexDiff -Clean $dexCleanApk -Patched $dexPatchedApk `
         -Allowlist $dexAllowlist -Name 'allowed-dex' -Contracts $contracts
     Assert-True ($dexAllowed.ExitCode -eq 0) "An exact reviewed DEX removal was rejected.`n$($dexAllowed.Output -join "`n")"
+
+    # A signature defined in two dex entries, the way Facebook 580's merged bundle defines its
+    # browser's methods: the host class again in a later entry, as it ships, on both sides. The
+    # patch's definition in classes.dex is the one held to the checks, so the good build passes
+    # with the same host changes as on its own, and the guard's answer put out of range fails as a
+    # register finding and nothing else. Read one body per signature, the copy would stand for both.
+    $copyEntry = 'lib/arm64-v8a/libcopy.dex.so'
+    $twiceClean = New-DexApk -Name 'twice-clean' -Entries ([ordered]@{
+        'classes.dex' = (Get-Dex 'clean'); $copyEntry = (Get-Dex 'host-copy') })
+    $twiceBad = Invoke-DexDiff -Clean $twiceClean -Patched (New-DexApk -Name 'twice-bad' -Entries ([ordered]@{
+        'classes.dex' = (Get-Dex 'bad-register-changed'); $copyEntry = (Get-Dex 'host-copy') })) `
+        -Allowlist $emptyAllowlist -Name 'twice-bad' -Contracts $contracts
+    $twiceBadFindings = Get-Findings $twiceBad
+    Assert-True ($twiceBad.ExitCode -ne 0 -and $twiceBadFindings.Categories.Count -ne 0 -and
+        @($twiceBadFindings.Categories | Where-Object { $_ -ne 'register' }).Count -eq 0) `
+        "An out-of-range register in classes.dex, with an untouched copy of its method in another entry, wasn't refused as a register finding alone.`n$($twiceBad.Output -join "`n")"
+    $twiceGood = Invoke-DexDiff -Clean $twiceClean -Patched (New-DexApk -Name 'twice-good' -Entries ([ordered]@{
+        'classes.dex' = (Get-Dex 'good'); $copyEntry = (Get-Dex 'host-copy') })) `
+        -Allowlist $emptyAllowlist -Name 'twice-good' -Contracts $contracts -Base $cleanApk
+    $twiceGoodText = $twiceGood.Output -join "`n"
+    Assert-True ($twiceGood.ExitCode -eq 0 -and (Get-Findings $twiceGood).Fails.Count -eq 0) `
+        "The good build with a second copy of the host class failed.`n$twiceGoodText"
+    Assert-True ($twiceGoodText -match "the clean APK carries clean\.apk's classes\*\.dex byte for byte") `
+        "A merge carrying its base's classes.dex and a split's dex under another name wasn't matched to the base.`n$twiceGoodText"
+    Assert-True ($twiceGoodText -match 'signatures defined in more than one dex entry: clean 6, patched 6') `
+        "The host class's six methods were not counted as defined twice.`n$twiceGoodText"
+    $changedAlone = [regex]::Match(($good.Output -join "`n"), 'host methods changed: (\d+)').Groups[1].Value
+    Assert-True ($changedAlone -and $twiceGoodText -match "host methods changed: $changedAlone\b") `
+        "The good build with a second copy of the host class didn't change the $changedAlone host methods it changes alone.`n$twiceGoodText"
+
+    # A clean side carrying the bundle's own code is a patched build, whatever else differs.
+    $patchedClean = Invoke-DexDiff -Clean (Join-Path $caseRoot 'good.apk') -Patched (Join-Path $caseRoot 'bad-branch.apk') `
+        -Allowlist $emptyAllowlist -Name 'patched-clean' -Contracts $contracts
+    Assert-True ($patchedClean.ExitCode -ne 0 -and ($patchedClean.Output -join "`n") -match
+        'the clean APK carries \d+ methods under Lapp/morphe/ .*so it is a patched build') `
+        "A clean side holding the bundle's code was accepted.`n$($patchedClean.Output -join "`n")"
+
+    # Handed the signed base.apk, DexDiff holds the merge it reads to base.apk's classes*.dex as they
+    # are, and no other classes*.dex; a split's dex under another name is what a merge adds. The
+    # base itself as the clean side passes.
+    $asBase = Invoke-DexDiff -Clean $cleanApk -Patched (Join-Path $caseRoot 'good.apk') `
+        -Allowlist $emptyAllowlist -Name 'merge-is-base' -Contracts $contracts -Base $cleanApk
+    Assert-True ($asBase.ExitCode -eq 0) "A clean APK held to itself as its base was refused.`n$($asBase.Output -join "`n")"
+    foreach ($case in @(
+            @{ Name = 'merge-changes'; Clean = (Join-Path $caseRoot 'clean-no-hand-over.apk'); Base = $cleanApk; Says = 'changes classes.dex' },
+            @{ Name = 'merge-adds'; Clean = $dexCleanApk; Base = $cleanApk; Says = 'adds classes2.dex' },
+            @{ Name = 'merge-lacks'; Clean = $cleanApk; Base = $dexCleanApk; Says = 'lacks classes2.dex' })) {
+        $refused = Invoke-DexDiff -Clean $case.Clean -Patched (Join-Path $caseRoot 'good.apk') `
+            -Allowlist $emptyAllowlist -Name $case.Name -Contracts $contracts -Base $case.Base
+        $expected = "[diff] FAIL: the clean APK $(Split-Path -Leaf $case.Clean) doesn't carry " +
+            "$(Split-Path -Leaf $case.Base)'s code as it is: it $($case.Says)."
+        Assert-True ($refused.ExitCode -ne 0 -and @($refused.Output | Where-Object { $_.StartsWith($expected) }).Count -eq 1) `
+            "A merge that $($case.Says) was not refused for it.`n$($refused.Output -join "`n")"
+    }
 
     $same = Invoke-DexDiff -Clean $cleanApk -Patched $cleanApk -Allowlist $emptyAllowlist `
         -Name 'same-file' -Contracts $contracts

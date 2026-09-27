@@ -1194,11 +1194,17 @@ public class DexDiff {
      * Holds every changed and added method of the patched APK to the structural rules, and counts
      * each contract's call sites across the whole APK. Returns method signature to findings, with
      * contract results under the pseudo-method "contract". [clean] is the build the patched one
-     * came from, which a sole-call rule reads the call its hook replaced out of.
+     * came from, which a sole-call rule reads the call its hook replaced out of. [fresh] holds the
+     * prints of each wanted method's definitions that the clean build doesn't have; a definition
+     * the clean build has body for body, a copy in another dex entry the patch left alone, isn't
+     * checked again.
      */
     private static Map<String, List<String>> structuralPass(File apk, File clean, Set<String> wanted,
-            List<Contract> contracts) throws Exception {
+            Map<String, List<String>> fresh, List<Contract> contracts) throws Exception {
         Map<String, List<String>> out = new TreeMap<>();
+        Map<String, List<String>> unchecked = new HashMap<>();
+        for (Map.Entry<String, List<String>> e : fresh.entrySet()) unchecked.put(e.getKey(), new ArrayList<>(e.getValue()));
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
         Map<String, List<String>> callSites = new LinkedHashMap<>();
         // first-call: the method, and the first call it makes on the class before it returns, or
         // an empty string when it makes none there.
@@ -1247,9 +1253,10 @@ public class DexDiff {
             for (ClassDef cd : container.getEntry(entry).getDexFile().getClasses()) {
                 for (Method m : cd.getMethods()) {
                     String s = sig(cd, m);
-                    if (wanted.contains(s)) {
+                    List<String> left = wanted.contains(s) ? unchecked.get(s) : null;
+                    if (left != null && left.remove(print(m, digest))) {
                         List<String> findings = structuralFindings(cd, m);
-                        if (!findings.isEmpty()) out.put(s, findings);
+                        if (!findings.isEmpty()) out.computeIfAbsent(s, k -> new ArrayList<>()).addAll(findings);
                     }
                     String firstCallOn = firstCallTargets.get(s);
                     if (firstCallOn != null) firstCalls.put(s, firstCallBeforeReturn(m, firstCallOn));
@@ -1678,7 +1685,19 @@ public class DexDiff {
         return new TreeSet<>(container.getDexEntryNames());
     }
 
-    /** Signature -> "registerCount:bodyHash", for every method of an APK. */
+    /**
+     * Signature -> the print of each of its definitions ("registerCount:bodyHash"), sorted and
+     * joined with a space, for every method of an APK.
+     *
+     * <p>A signature can be defined in more than one dex entry. Facebook 580's split bundle, merged,
+     * carries the in-app browser's standalone dex twice (lib/arm64-v8a/libhelium_standalone.dex.so
+     * and assets/heliumcore/helium_standalone.dex.force-store), and 480 of its methods are in
+     * classes*.dex too, 212 of them with other bodies. dexlib2 reads the entries in name order, and
+     * keyed one body to a signature, the last copy stood for every one: the browser's copy in lib/
+     * hid whatever a patch did to the classes*.dex one, and read against base.apk, which has no
+     * such copy, those 212 came out changed. So every definition counts, and a signature is changed
+     * when the multiset of its definitions' prints is.
+     */
     private static Map<String, String> fingerprintAll(File apk) throws Exception {
         Map<String, String> out = new HashMap<>(1 << 20);
         MultiDexContainer<? extends DexFile> container =
@@ -1686,29 +1705,104 @@ public class DexDiff {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         for (String entry : container.getDexEntryNames()) {
             for (ClassDef cd : container.getEntry(entry).getDexFile().getClasses()) {
-                for (Method m : cd.getMethods()) {
-                    MethodImplementation impl = m.getImplementation();
-                    StringBuilder body = new StringBuilder();
-                    int registers = 0;
-                    if (impl != null) {
-                        registers = impl.getRegisterCount();
-                        for (Instruction i : impl.getInstructions()) body.append(render(i)).append('\n');
-                        for (String t : tryBlocks(impl)) body.append(t).append('\n');
-                    }
-                    digest.reset();
-                    byte[] hash = digest.digest(body.toString().getBytes("UTF-8"));
-                    StringBuilder hex = new StringBuilder();
-                    for (int k = 0; k < 8; k++) hex.append(String.format("%02x", hash[k]));
-                    out.put(sig(cd, m), registers + ":" + hex);
-                }
+                for (Method m : cd.getMethods()) out.merge(sig(cd, m), print(m, digest), DexDiff::joinPrints);
             }
         }
         return out;
     }
 
-    /** Signature -> rendered body, for the named methods only. */
-    private static Map<String, List<String>> bodiesOf(File apk, Set<String> wanted) throws Exception {
-        Map<String, List<String>> out = new LinkedHashMap<>();
+    /**
+     * What keeps [merged] from carrying every classes*.dex at [base]'s root byte for byte, and no
+     * other classes*.dex there: "lacks", "changes" and "adds" with the entry names, or nothing.
+     *
+     * <p>The comparison reads a bundle's merge, which carries no signature, while Meta's signer is
+     * checked on base.apk and the device half runs base.apk. The CLI's merger copies base.apk's
+     * classes*.dex as they are; other dex a merge carries (580's in-app browser's, from
+     * split_heliumcore.apk, twice) came from the splits under other names.
+     */
+    private static List<String> rootDexMismatch(File base, File merged) throws Exception {
+        Map<String, String> baseDex = rootDexDigests(base);
+        Map<String, String> mergedDex = rootDexDigests(merged);
+        if (baseDex.isEmpty()) return List.of("was handed a " + base.getName() + " with no classes*.dex to hold it to");
+        List<String> lacks = new ArrayList<>(), changes = new ArrayList<>(), adds = new ArrayList<>();
+        for (Map.Entry<String, String> e : baseDex.entrySet()) {
+            String other = mergedDex.get(e.getKey());
+            if (other == null) lacks.add(e.getKey());
+            else if (!other.equals(e.getValue())) changes.add(e.getKey());
+        }
+        for (String name : mergedDex.keySet()) if (!baseDex.containsKey(name)) adds.add(name);
+        List<String> said = new ArrayList<>();
+        if (!lacks.isEmpty()) said.add("lacks " + String.join(", ", lacks));
+        if (!changes.isEmpty()) said.add("changes " + String.join(", ", changes));
+        if (!adds.isEmpty()) said.add("adds " + String.join(", ", adds));
+        return said;
+    }
+
+    /** classes*.dex entry name at an APK's root -> the SHA-256 of its bytes. */
+    private static Map<String, String> rootDexDigests(File apk) throws Exception {
+        Map<String, String> out = new TreeMap<>();
+        try (java.util.zip.ZipFile zip = new java.util.zip.ZipFile(apk)) {
+            for (java.util.zip.ZipEntry entry : java.util.Collections.list(zip.entries())) {
+                if (!entry.getName().matches("classes\\d*\\.dex")) continue;
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                try (java.io.InputStream in = zip.getInputStream(entry)) {
+                    byte[] buffer = new byte[1 << 16];
+                    for (int n; (n = in.read(buffer)) > 0; ) digest.update(buffer, 0, n);
+                }
+                out.put(entry.getName(), java.util.HexFormat.of().formatHex(digest.digest()));
+            }
+        }
+        return out;
+    }
+
+    /** One definition's "registerCount:bodyHash": its register count and its rendered body's hash. */
+    private static String print(Method m, MessageDigest digest) throws Exception {
+        MethodImplementation impl = m.getImplementation();
+        StringBuilder body = new StringBuilder();
+        int registers = 0;
+        if (impl != null) {
+            registers = impl.getRegisterCount();
+            for (Instruction i : impl.getInstructions()) body.append(render(i)).append('\n');
+            for (String t : tryBlocks(impl)) body.append(t).append('\n');
+        }
+        digest.reset();
+        byte[] hash = digest.digest(body.toString().getBytes("UTF-8"));
+        StringBuilder hex = new StringBuilder();
+        for (int k = 0; k < 8; k++) hex.append(String.format("%02x", hash[k]));
+        return registers + ":" + hex;
+    }
+
+    /** Two joined print lists as one, sorted, so the same definitions compare equal in any order. */
+    private static String joinPrints(String a, String b) {
+        List<String> all = new ArrayList<>(prints(a));
+        all.addAll(prints(b));
+        java.util.Collections.sort(all);
+        return String.join(" ", all);
+    }
+
+    /** The prints fingerprintAll joined for one signature, one per definition; none for null. */
+    private static List<String> prints(String joined) {
+        return joined == null ? List.of() : Arrays.asList(joined.split(" "));
+    }
+
+    /** How many of fingerprintAll's signatures have more than one definition. */
+    private static int multiplyDefined(Map<String, String> prints) {
+        int count = 0;
+        for (String joined : prints.values()) if (joined.indexOf(' ') >= 0) count++;
+        return count;
+    }
+
+    /** The items of [a] that [b] doesn't hold, counting duplicates. */
+    private static <T> List<T> without(List<T> a, List<T> b) {
+        List<T> left = new ArrayList<>(b);
+        List<T> out = new ArrayList<>();
+        for (T item : a) if (!left.remove(item)) out.add(item);
+        return out;
+    }
+
+    /** Signature -> the rendered body of each of its definitions, in dex entry order, for the named methods only. */
+    private static Map<String, List<List<String>>> bodiesOf(File apk, Set<String> wanted) throws Exception {
+        Map<String, List<List<String>>> out = new LinkedHashMap<>();
         MultiDexContainer<? extends DexFile> container =
                 DexFileFactory.loadDexContainer(apk, Opcodes.getDefault());
         for (String entry : container.getDexEntryNames()) {
@@ -1723,7 +1817,7 @@ public class DexDiff {
                         for (Instruction i : impl.getInstructions()) body.add(render(i));
                         body.addAll(tryBlocks(impl));
                     }
-                    out.put(s, body);
+                    out.computeIfAbsent(s, k -> new ArrayList<>()).add(body);
                 }
             }
         }
@@ -1812,8 +1906,8 @@ public class DexDiff {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 4 || args.length > 5) {
-            System.err.println("usage: DexDiff <cleanApk> <patchedApk> <reportFile> <removalAllowlist> [<contracts>]");
+        if (args.length < 4 || args.length > 6) {
+            System.err.println("usage: DexDiff <cleanApk> <patchedApk> <reportFile> <removalAllowlist> [<contracts> [<signedBase>]]");
             System.exit(2);
         }
         File clean = new File(args[0]);
@@ -1822,6 +1916,9 @@ public class DexDiff {
         RemovalAllowlist allowlist = readRemovalAllowlist(allowlistFile);
         File contractFile = args.length > 4 ? new File(args[4]) : null;
         List<Contract> contracts = readContracts(contractFile);
+        // The base.apk whose signer was checked, when the clean side is the bundle's merge.
+        File signedBase = args.length > 5 ? new File(args[5]) : null;
+        List<String> baseMismatch = signedBase == null ? List.of() : rootDexMismatch(signedBase, clean);
 
         System.out.println("[diff] fingerprinting clean " + clean.getName());
         Map<String, String> before = fingerprintAll(clean);
@@ -1831,6 +1928,8 @@ public class DexDiff {
         Map<String, String> after = fingerprintAll(patched);
         Set<String> afterDexEntries = dexEntries(patched);
         System.out.println("[diff] " + after.size() + " methods");
+        System.out.println("[diff] signatures defined in more than one dex entry: clean " + multiplyDefined(before)
+                + ", patched " + multiplyDefined(after));
 
         Set<String> changed = new TreeSet<>();
         Set<String> added = new TreeSet<>();
@@ -1839,8 +1938,17 @@ public class DexDiff {
             if (was == null) added.add(e.getKey());
             else if (!was.equals(e.getValue())) changed.add(e.getKey());
         }
+        // A method gone from the patched APK, or one of its definitions gone while a copy in another
+        // dex entry stays: a definition the clean build has more of than the patched one.
         Set<String> removed = new TreeSet<>();
-        for (String k : before.keySet()) if (!after.containsKey(k)) removed.add(k);
+        for (Map.Entry<String, String> e : before.entrySet()) {
+            if (prints(after.get(e.getKey())).size() < prints(e.getValue()).size()) removed.add(e.getKey());
+        }
+        // The clean side is Meta's build, which carries none of the bundle's code. A merged bundle
+        // carries no signature to prove that the way base.apk does, and a patched build on the clean
+        // side would hide everything the bundle added.
+        Set<String> cleanOwn = new TreeSet<>();
+        for (String s : before.keySet()) if (s.startsWith(OWN)) cleanOwn.add(s);
         Set<String> removedDexEntries = new TreeSet<>(beforeDexEntries);
         removedDexEntries.removeAll(afterDexEntries);
 
@@ -1867,6 +1975,20 @@ public class DexDiff {
         // A pair of files with nothing between them is not a clean bill of health, it is the wrong
         // pair of files. Both of these were reachable by pointing the run at one APK twice.
         int problems = 0;
+        if (!baseMismatch.isEmpty()) {
+            System.out.println("[diff] FAIL: the clean APK " + clean.getName() + " doesn't carry " + signedBase.getName()
+                    + "'s code as it is: it " + String.join("; ", baseMismatch) + ". Meta's signer was checked on "
+                    + signedBase.getName() + ", so this would compare against code nobody checked.");
+            problems++;
+        } else if (signedBase != null) {
+            System.out.println("[diff] the clean APK carries " + signedBase.getName() + "'s classes*.dex byte for byte");
+        }
+        if (!cleanOwn.isEmpty()) {
+            System.out.println("[diff] FAIL: the clean APK carries " + cleanOwn.size() + " method"
+                    + (cleanOwn.size() == 1 ? "" : "s") + " under " + OWN + " (" + cleanOwn.iterator().next()
+                    + (cleanOwn.size() == 1 ? "" : " first") + "), so it is a patched build, not the one the patch started from.");
+            problems++;
+        }
         if (changed.isEmpty()) {
             System.out.println("[diff] FAIL: no host method differs, so these two APKs are not a "
                     + "clean build and a patched build of it.");
@@ -1897,15 +2019,18 @@ public class DexDiff {
         System.out.println("[diff] reading both bodies for the changed and added methods");
         Set<String> wanted = new TreeSet<>(changed);
         wanted.addAll(added);
-        Map<String, List<String>> beforeBodies = bodiesOf(clean, changed);
-        Map<String, List<String>> afterBodies = bodiesOf(patched, wanted);
+        Map<String, List<List<String>>> beforeBodies = bodiesOf(clean, changed);
+        Map<String, List<List<String>>> afterBodies = bodiesOf(patched, wanted);
 
-        // Every method the patch wrote or touched, the host's and the bundle's alike.
+        // Every method the patch wrote or touched, the host's and the bundle's alike: each
+        // definition of it the clean build doesn't have.
         System.out.println("[diff] checking branches, invokes, parameters and try ranges of "
                 + (changed.size() + added.size()) + " methods");
         Set<String> structuralWanted = new TreeSet<>(changed);
         structuralWanted.addAll(added);
-        Map<String, List<String>> structural = structuralPass(patched, clean, structuralWanted, contracts);
+        Map<String, List<String>> fresh = new HashMap<>();
+        for (String s : structuralWanted) fresh.put(s, without(prints(after.get(s)), prints(before.get(s))));
+        Map<String, List<String>> structural = structuralPass(patched, clean, structuralWanted, fresh, contracts);
         int structuralCount = 0;
         for (Map.Entry<String, List<String>> e : structural.entrySet()) {
             for (String finding : e.getValue()) {
@@ -1953,56 +2078,67 @@ public class DexDiff {
             int unreadable = 0;
 
             for (String s : changed) {
-                List<String> b = beforeBodies.getOrDefault(s, List.of());
-                List<String> a = afterBodies.getOrDefault(s, List.of());
-                int regsBefore = registersOf(b), regsAfter = registersOf(a);
-                report.println("==== " + s);
-                report.println("     registers " + regsBefore + " -> " + regsAfter
-                        + ", instructions " + Math.max(0, b.size() - 1) + " -> " + Math.max(0, a.size() - 1));
-                if (regsAfter < 0 && !a.isEmpty()) {
-                    // Nothing to hold the injected lines to. Silently skipping this was a hole:
-                    // any method the second pass failed to render passed the check by default.
-                    report.println("  !  no register count could be read for this method");
-                    unreadable++;
+                // The definitions both builds have, body for body, are copies in other dex entries
+                // the patch left alone. What's left on each side is paired in dex entry order.
+                List<List<String>> cleanBodies = beforeBodies.getOrDefault(s, List.of());
+                List<List<String>> patchedBodies = afterBodies.getOrDefault(s, List.of());
+                List<List<String>> befores = without(cleanBodies, patchedBodies);
+                List<List<String>> afters = without(patchedBodies, cleanBodies);
+                int pairs = Math.max(befores.size(), afters.size());
+                for (int k = 0; k < pairs; k++) {
+                    List<String> b = k < befores.size() ? befores.get(k) : List.of();
+                    List<String> a = k < afters.size() ? afters.get(k) : List.of();
+                    int regsBefore = registersOf(b), regsAfter = registersOf(a);
+                    report.println("==== " + s + (pairs == 1 ? "" : "  (definition " + (k + 1) + " of " + pairs + " that differ)"));
+                    report.println("     registers " + regsBefore + " -> " + regsAfter
+                            + ", instructions " + Math.max(0, b.size() - 1) + " -> " + Math.max(0, a.size() - 1));
+                    if (regsAfter < 0 && !a.isEmpty()) {
+                        // Nothing to hold the injected lines to. Silently skipping this was a hole:
+                        // any method the second pass failed to render passed the check by default.
+                        report.println("  !  no register count could be read for this method");
+                        unreadable++;
+                    }
+                    List<String> onlyAfter = minus(a, b);
+                    for (String line : minus(b, a)) report.println("  -  " + line);
+                    for (String line : onlyAfter) {
+                        int high = highestRegister(line);
+                        boolean bad = high >= 0 && regsAfter >= 0 && high >= regsAfter;
+                        if (bad) overRegister++;
+                        report.println("  +  " + line + (bad ? "   <<< REGISTER >= registerCount" : ""));
+                    }
+                    report.println();
                 }
-                List<String> onlyAfter = minus(a, b);
-                for (String line : minus(b, a)) report.println("  -  " + line);
-                for (String line : onlyAfter) {
-                    int high = highestRegister(line);
-                    boolean bad = high >= 0 && regsAfter >= 0 && high >= regsAfter;
-                    if (bad) overRegister++;
-                    report.println("  +  " + line + (bad ? "   <<< REGISTER >= registerCount" : ""));
-                }
-                report.println();
             }
 
             // Added methods are where registers are chosen by hand rather than reused from the
             // host, which is exactly where an out-of-range one would come from: the extension's,
             // and the helpers a patch adds to one of Facebook's own classes (the story, reel and
             // video downloads each add one). Only the extension's were read here until 2026-09-26.
+            // Each definition of one is read, in whichever dex entry it landed.
             for (String s : added) {
-                List<String> a = afterBodies.getOrDefault(s, List.of());
-                int regsAfter = registersOf(a);
-                if (a.isEmpty()) continue;
-                List<String> offending = new ArrayList<>();
-                for (String line : a) {
-                    if (line.startsWith("#")) continue;
-                    int high = highestRegister(line);
-                    if (high >= 0 && regsAfter >= 0 && high >= regsAfter) offending.add(line);
-                }
-                if (regsAfter < 0) {
+                for (List<String> a : afterBodies.getOrDefault(s, List.of())) {
+                    int regsAfter = registersOf(a);
+                    if (a.isEmpty()) continue;
+                    List<String> offending = new ArrayList<>();
+                    for (String line : a) {
+                        if (line.startsWith("#")) continue;
+                        int high = highestRegister(line);
+                        if (high >= 0 && regsAfter >= 0 && high >= regsAfter) offending.add(line);
+                    }
+                    if (regsAfter < 0) {
+                        report.println("==== added " + s);
+                        report.println("  !  no register count could be read for this method");
+                        unreadable++;
+                    }
+                    if (offending.isEmpty()) continue;
+                    overRegister += offending.size();
                     report.println("==== added " + s);
-                    report.println("  !  no register count could be read for this method");
-                    unreadable++;
+                    report.println("     registers " + regsAfter);
+                    for (String line : offending) {
+                        report.println("  +  " + line + "   <<< REGISTER >= registerCount");
+                    }
+                    report.println();
                 }
-                if (offending.isEmpty()) continue;
-                overRegister += offending.size();
-                report.println("==== added " + s);
-                report.println("     registers " + regsAfter);
-                for (String line : offending) {
-                    report.println("  +  " + line + "   <<< REGISTER >= registerCount");
-                }
-                report.println();
             }
 
             report.println("Lines naming a register at or above the method's register count: " + overRegister);

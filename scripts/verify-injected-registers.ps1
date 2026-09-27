@@ -40,11 +40,20 @@
     build of the same version as the patched one: a patched APK on the clean side would compare
     two bundles instead of the bundle against Facebook.
 
+    The static half compares the whole clean bundle, merged the way the CLI merges it before it
+    patches (Get-MergedApk), because the patched APK carries what the splits brought as well as
+    base.apk's code: 580's in-app browser ships its own dex in split_heliumcore.apk, and against
+    base.apk its methods read as some 12,000 added and 212 changed. The merge carries no
+    signature, so Meta's signer is checked on base.apk, DexDiff holds the merge to base.apk's
+    classes*.dex byte for byte (handed base.apk as its last argument), and it fails a clean side
+    that holds any of the bundle's own code. The device half runs base.apk, the same app code.
+
 .EXAMPLE
     scripts/verify-injected-registers.ps1 -PatchedApk C:\work\patched.apk
 
     The clean side is the fixture of the same version in the folder HUSHFACEBOOK_FIXTURE_DIR
-    names, an .apk or the .apkm bundle Facebook ships as.
+    names, an .apk or the .apkm bundle Facebook ships as. A bundle is merged here unless
+    -CleanMerged hands over its merge (verify-all-patches.ps1 has made one to patch).
 
 .EXAMPLE
     scripts/verify-injected-registers.ps1 -FromDevice -Serial $env:HUSHFACEBOOK_DEVICE_SERIAL
@@ -52,6 +61,7 @@
 [CmdletBinding()]
 param(
     [string]$CleanApk,
+    [string]$CleanMerged,
     [string]$PatchedApk,
     [switch]$FromDevice,
     [string]$Serial,
@@ -107,9 +117,9 @@ function Invoke-DexDiff {
     $ErrorActionPreference = 'Continue'
     $global:LASTEXITCODE = -1
     $output = @(& $Java '-Xmx8g' '-cp' $DesktopJar (Join-Path $PSScriptRoot 'DexDiff.java') `
-        $cleanBase $PatchedApk $ReportPath `
+        $CleanMerged $PatchedApk $ReportPath `
         (Join-Path $PSScriptRoot 'injected-register-removal-allowlist.txt') `
-        (Join-Path $PSScriptRoot 'injected-mutation-contracts.txt') 2>&1 | ForEach-Object { "$_" })
+        (Join-Path $PSScriptRoot 'injected-mutation-contracts.txt') $cleanBase 2>&1 | ForEach-Object { "$_" })
     [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = $output }
 }
 
@@ -166,7 +176,8 @@ if (-not $CleanApk) {
     $CleanApk = $matching[0].FullName
 }
 if (-not (Test-Path -LiteralPath $CleanApk -PathType Leaf)) { throw "No clean APK at $CleanApk." }
-# Facebook ships as a split bundle; every dex lives in its base APK.
+# Facebook ships as a split bundle. Its base APK holds the manifest, Meta's signature and the app's
+# own classes*.dex, which is what the device half verifies.
 $cleanBase = Get-BaseApk -Apk $CleanApk -Destination (Join-Path $work 'clean-base.apk')
 
 # The clean side has to be Meta's own build of the version that was patched, not a patched build
@@ -187,8 +198,16 @@ $cleanSigners = @(Get-SignerDigests -Apk $cleanBase)
 if (@($cleanSigners | Where-Object { $_ -in $metaSigners }).Count -eq 0) {
     throw "The clean APK at $CleanApk is signed by $($cleanSigners -join ', '), not by Meta; it is not a vendor build."
 }
+# The dex comparison's clean side: the whole bundle, merged as the CLI merged it before patching,
+# so a split's dex (580's in-app browser) is on both sides. DexDiff holds it to the signed base.apk's
+# classes*.dex. A plain APK is its own merge.
+if (-not $CleanMerged) {
+    $CleanMerged = Get-MergedApk -Apk $CleanApk -Destination (Join-Path $work 'clean-merged.apk') -Java $Java -DesktopJar $DesktopJar
+}
+if (-not (Test-Path -LiteralPath $CleanMerged -PathType Leaf)) { throw "No merged clean APK at $CleanMerged." }
 
 Write-Host "[registers] clean   $CleanApk (Facebook $($clean.versionName), signed by Meta)"
+Write-Host "[registers] merged  $CleanMerged (the dex comparison's clean side)"
 Write-Host "[registers] patched $PatchedApk"
 
 $diff = Invoke-DexDiff

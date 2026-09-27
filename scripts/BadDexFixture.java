@@ -1231,6 +1231,9 @@ public class BadDexFixture {
         // hook to have taken the place of.
         dexes.put("clean-no-hand-over", clean(Collections.<Instruction>emptyList()));
         dexes.put("secondary", Collections.singletonList(secondary()));
+        // The host class again, as it ships, for a second dex entry: Facebook 580's merged bundle
+        // defines some methods in more than one entry (its browser's standalone dex).
+        dexes.put("host-copy", Collections.singletonList(cleanHost()));
         dexes.put("good", good());
         List<ClassDef> goodWithSecondary = new ArrayList<>(good());
         goodWithSecondary.add(secondary());
