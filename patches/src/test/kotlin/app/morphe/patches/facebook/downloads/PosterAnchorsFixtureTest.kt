@@ -8,8 +8,6 @@ import app.morphe.Fixtures
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.shared.compat.AppCompatibilities
-import app.morphe.util.RegisterLiveness
-import app.morphe.util.namedRegisters
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
@@ -19,7 +17,6 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -29,8 +26,9 @@ import java.io.File
  * declares: the tree class and the accessors it keeps, the field hashes Facebook's own getters
  * load for a post's actors, a video's owner and its creation story, the story card's kept
  * timestamp reading the card's creation time, and the reel's story, which the reel sidebar hands
- * its assembly call and whose creation time Facebook reads, with a dead 4-bit register for it at
- * the injection point. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
+ * its assembly call and whose creation time Facebook reads. The register the reel button borrows
+ * for that story is DownloadReelFixtureTest's to pin, from the patch's own pick. Reads the fixture
+ * bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class PosterAnchorsFixtureTest {
     private fun versions() = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
@@ -107,12 +105,13 @@ class PosterAnchorsFixtureTest {
      * the one argument, besides the session, whose type is also the type of a component field. One
      * class implements that type, a GraphQL tree that reads actors, and Facebook's own reel code
      * reads creation_time off that type through TreeJNI.getTimeValue, as the file name does. (The
-     * component's own tree field is the reel's feedback, which knows neither.) At the injection
-     * point v0 to v2 are dead, and so is a fourth 4-bit register for the story, by the liveness of
-     * the whole method.
+     * component's own tree field is the reel's feedback, which knows neither.) Which registers the
+     * button's block borrows there, the story's among them, DownloadReelFixtureTest pins by running
+     * the patch on each build, whose own liveness pick is what reaches a device. This test doesn't
+     * count them again over a window of its own.
      */
     @Test
-    fun `every declared build hands the reel sidebar's assembly the reel's story, with a dead register for it`() {
+    fun `every declared build hands the reel sidebar's assembly the reel's story`() {
         val checked = mutableMapOf<String, String>()
         for (version in versions()) {
             for (bundle in bundles(version)) {
@@ -129,7 +128,7 @@ class PosterAnchorsFixtureTest {
                     ((instruction as? ReferenceInstruction)?.reference as? MethodReference)?.parameterTypes
                         ?.count { it.toString() == ARRAY_LIST } == 2
                 }
-                assertTrue("$name: ${builder.name} assembles no sidebar", assemblyIndex > 3)
+                assertTrue("$name: ${builder.name} assembles no sidebar", assemblyIndex >= 0)
                 val assembly = (instructions[assemblyIndex] as ReferenceInstruction).reference as MethodReference
                 val fieldTypes = component.fields.filter { !AccessFlags.STATIC.isSet(it.accessFlags) }.map { it.type }.toSet()
                 val stories = assembly.parameterTypes.map(CharSequence::toString)
@@ -168,14 +167,7 @@ class PosterAnchorsFixtureTest {
                 assertTrue("$name: ${story.type} isn't a GraphQL tree", extendsTree(story.type))
                 assertTrue("$name: ${story.type} reads no actors", story.methods.any { holdsLiteral(it, ACTORS) })
                 assertTrue("$name: nothing reads creation_time off a $storyType through $TREE_JNI->getTimeValue", timeReaders.isNotEmpty())
-
-                val injectAt = assemblyIndex - 3
-                val live = RegisterLiveness.of(builder).liveInto(injectAt)
-                assertTrue("$name: v0 to v2 live at the injection point: ${live.filter { it < 3 }}", (0..2).none { it in live })
-                val touched = (injectAt..assemblyIndex).flatMap { instructions[it].namedRegisters() }.toSet()
-                val scratch = (3..15).firstOrNull { it !in live && it !in touched }
-                assertNotNull("$name: no dead 4-bit register at the injection point; live ${live.filter { it < 16 }}", scratch)
-                checked[version] = "story $storyType (${story.type}), its time read by ${timeReaders.first()}, scratch v$scratch"
+                checked[version] = "story $storyType (${story.type}), its time read by ${timeReaders.first()}"
             }
         }
         assertEquals("a declared build went unchecked: $checked", versions(), checked.keys)
