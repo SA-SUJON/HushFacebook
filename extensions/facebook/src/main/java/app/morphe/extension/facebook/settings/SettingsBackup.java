@@ -107,6 +107,7 @@ public final class SettingsBackup {
             Settings.DOWNLOAD_VIDEOS,
             Settings.DOWNLOAD_COMPATIBLE,
             Settings.OPEN_ON_CHOSEN_TAB,
+            Settings.MARKETPLACE_ONLY,
             Settings.HIDE_GET_MESSENGER_CARD));
 
     /**

@@ -214,13 +214,23 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         LogBufferManager.registerReportSection(ReleaseCheck.REPORT);
         Set<PatchFamily> build = PatchFamily.inThisBuild();
 
-        if (build.contains(PatchFamily.START_TAB)) {
+        if (build.contains(PatchFamily.START_TAB) || build.contains(PatchFamily.MARKETPLACE_ONLY)) {
             // First: it's what happens before anything the other rows change comes on screen.
             PreferenceCategory opening = category(screen, L10n.t("Opening Facebook"));
-            opening.addPreference(toggle(context, Settings.OPEN_ON_CHOSEN_TAB, L10n.t("Open on a chosen tab"),
-                    L10n.t("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual "
-                            + "one. Notifications and links still open where they lead.")));
-            opening.addPreference(startTabRow(context));
+            if (build.contains(PatchFamily.MARKETPLACE_ONLY)) {
+                // Facebook builds the tab bar once, and the hook is asked then and not again.
+                opening.addPreference(toggle(context, Settings.MARKETPLACE_ONLY, L10n.t("Marketplace only"),
+                        L10n.t("The tab bar keeps Marketplace, Notifications and your profile or Menu, and "
+                                + "Facebook opens on Marketplace. Home with the news feed, Video, Friends and the "
+                                + "other tabs go. Notifications and links still open where they lead.") + " "
+                                + L10n.t("The switch takes effect when Facebook restarts.")));
+            }
+            if (build.contains(PatchFamily.START_TAB)) {
+                opening.addPreference(toggle(context, Settings.OPEN_ON_CHOSEN_TAB, L10n.t("Open on a chosen tab"),
+                        L10n.t("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual "
+                                + "one. Notifications and links still open where they lead.")));
+                opening.addPreference(startTabRow(context));
+            }
         }
 
         if (build.contains(PatchFamily.SPONSORED_POSTS) || build.contains(PatchFamily.SUGGESTED_POSTS)

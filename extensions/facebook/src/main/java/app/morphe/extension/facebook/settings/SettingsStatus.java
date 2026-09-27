@@ -130,6 +130,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean marketplaceOnly() {
+        return false;
+    }
+
     public static boolean messengerCard() {
         return false;
     }

@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(524);
+        Map<String, String> table = new HashMap<>(528);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -334,6 +334,8 @@ public final class L10nTranslations {
                 "Links");
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace only",
+                "Nur Marketplace");
         table.put("Material You theme",
                 "Material-You-Design");
         table.put("Menu",
@@ -418,11 +420,11 @@ public final class L10nTranslations {
                 "Gespeichert unter %1$s");
         table.put("Saved to the gallery",
                 "In der Galerie gespeichert");
-        table.put("Saved videos will be named %1$s.",
-                "Gespeicherte Videos hei\u00dfen dann %1$s.");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Saved videos will be named %1$s.",
+                "Gespeicherte Videos hei\u00dfen dann %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Gespeichert. Starte Facebook neu, um diese \u00c4nderung zu \u00fcbernehmen.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
@@ -519,6 +521,8 @@ public final class L10nTranslations {
                 "Die Einstellung lie\u00df sich nicht vollst\u00e4ndig aktualisieren. Der gespeicherte Wert wird angezeigt.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Der Schalter wirkt, sobald Facebook neu startet.");
+        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
+                "Die Tab-Leiste beh\u00e4lt Marketplace, Benachrichtigungen und dein Profil oder das Men\u00fc, und Facebook \u00f6ffnet sich im Marketplace. Die Startseite mit dem Newsfeed, Video, Freunde und die \u00fcbrigen Tabs verschwinden. Benachrichtigungen und Links \u00f6ffnen weiterhin dort, wohin sie f\u00fchren.");
         table.put("There's no diagnostic data to clear.",
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
         table.put("There's no diagnostic data to put back.",
@@ -539,13 +543,13 @@ public final class L10nTranslations {
                 "Systemschriftart verwenden");
         table.put("Use your phone's font",
                 "Schriftart des Handys verwenden");
+    }
+
+    private static void fillDe4(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "%1$s wird verwendet. W\u00e4hle eine andere Datei, um sie zu ersetzen.");
         table.put("Version",
                 "Version");
-    }
-
-    private static void fillDe4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Version %1$s f\u00fcr Facebook %2$s");
         table.put("Video",
@@ -593,7 +597,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(524);
+        Map<String, String> table = new HashMap<>(528);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -883,6 +887,8 @@ public final class L10nTranslations {
                 "Enlaces");
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace only",
+                "Solo Marketplace");
         table.put("Material You theme",
                 "Tema Material You");
         table.put("Menu",
@@ -967,11 +973,11 @@ public final class L10nTranslations {
                 "Se guard\u00f3 en %1$s");
         table.put("Saved to the gallery",
                 "Se guard\u00f3 en la galer\u00eda");
-        table.put("Saved videos will be named %1$s.",
-                "Los videos guardados se llamar\u00e1n %1$s.");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Saved videos will be named %1$s.",
+                "Los videos guardados se llamar\u00e1n %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Guardado. Reinicia Facebook para aplicar este cambio.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
@@ -1068,6 +1074,8 @@ public final class L10nTranslations {
                 "No se pudo terminar de actualizar el ajuste. Se muestra su valor guardado.");
         table.put("The switch takes effect when Facebook restarts.",
                 "El interruptor surte efecto cuando Facebook se reinicie.");
+        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
+                "La barra de pesta\u00f1as conserva Marketplace, Notificaciones y tu perfil o el Men\u00fa, y Facebook se abre en Marketplace. Inicio con el feed, Video, Amigos y las dem\u00e1s pesta\u00f1as desaparecen. Las notificaciones y los enlaces siguen abri\u00e9ndose donde apuntan.");
         table.put("There's no diagnostic data to clear.",
                 "No hay datos de diagn\u00f3stico que borrar.");
         table.put("There's no diagnostic data to put back.",
@@ -1088,13 +1096,13 @@ public final class L10nTranslations {
                 "Usar la fuente del sistema");
         table.put("Use your phone's font",
                 "Usar la fuente del tel\u00e9fono");
+    }
+
+    private static void fillEs4(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "Usando %1$s. Elige otro archivo para reemplazarlo.");
         table.put("Version",
                 "Versi\u00f3n");
-    }
-
-    private static void fillEs4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Versi\u00f3n %1$s para Facebook %2$s");
         table.put("Video",
@@ -1142,7 +1150,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(524);
+        Map<String, String> table = new HashMap<>(528);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1432,6 +1440,8 @@ public final class L10nTranslations {
                 "Tautan");
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace only",
+                "Hanya Marketplace");
         table.put("Material You theme",
                 "Tema Material You");
         table.put("Menu",
@@ -1516,11 +1526,11 @@ public final class L10nTranslations {
                 "Disimpan ke %1$s");
         table.put("Saved to the gallery",
                 "Disimpan ke galeri");
-        table.put("Saved videos will be named %1$s.",
-                "Video yang disimpan akan diberi nama %1$s.");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Saved videos will be named %1$s.",
+                "Video yang disimpan akan diberi nama %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Tersimpan. Mulai ulang Facebook untuk menerapkan perubahan ini.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
@@ -1617,6 +1627,8 @@ public final class L10nTranslations {
                 "Pengaturan ini tidak dapat selesai diperbarui. Nilai yang tersimpan ditampilkan.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Sakelar ini berlaku saat Facebook dimulai ulang.");
+        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
+                "Bilah tab hanya menyisakan Marketplace, Notifikasi, dan profil Anda atau Menu, lalu Facebook terbuka di Marketplace. Beranda beserta Kabar Beranda, Video, Teman, dan tab lainnya dihilangkan. Notifikasi dan tautan tetap terbuka ke tujuannya.");
         table.put("There's no diagnostic data to clear.",
                 "Tidak ada data diagnostik yang dapat dihapus.");
         table.put("There's no diagnostic data to put back.",
@@ -1637,13 +1649,13 @@ public final class L10nTranslations {
                 "Gunakan font sistem");
         table.put("Use your phone's font",
                 "Gunakan font ponsel");
+    }
+
+    private static void fillIn4(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "Memakai %1$s. Pilih file lain untuk menggantinya.");
         table.put("Version",
                 "Versi");
-    }
-
-    private static void fillIn4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Versi %1$s untuk Facebook %2$s");
         table.put("Video",
@@ -1691,7 +1703,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(524);
+        Map<String, String> table = new HashMap<>(528);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1981,6 +1993,8 @@ public final class L10nTranslations {
                 "Links");
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace only",
+                "S\u00f3 Marketplace");
         table.put("Material You theme",
                 "Tema Material You");
         table.put("Menu",
@@ -2065,11 +2079,11 @@ public final class L10nTranslations {
                 "Salvo em %1$s");
         table.put("Saved to the gallery",
                 "Salvo na galeria");
-        table.put("Saved videos will be named %1$s.",
-                "Os v\u00eddeos salvos v\u00e3o se chamar %1$s.");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Saved videos will be named %1$s.",
+                "Os v\u00eddeos salvos v\u00e3o se chamar %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Salvo. Reinicie o Facebook para aplicar esta altera\u00e7\u00e3o.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
@@ -2166,6 +2180,8 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel concluir a atualiza\u00e7\u00e3o da configura\u00e7\u00e3o. O valor salvo est\u00e1 sendo mostrado.");
         table.put("The switch takes effect when Facebook restarts.",
                 "A op\u00e7\u00e3o passa a valer quando o Facebook reiniciar.");
+        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
+                "A barra de abas mant\u00e9m Marketplace, Notifica\u00e7\u00f5es e seu perfil ou o Menu, e o Facebook abre no Marketplace. A P\u00e1gina inicial com o feed de not\u00edcias, V\u00eddeo, Amigos e as outras abas somem. Notifica\u00e7\u00f5es e links continuam abrindo onde levam.");
         table.put("There's no diagnostic data to clear.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
         table.put("There's no diagnostic data to put back.",
@@ -2186,13 +2202,13 @@ public final class L10nTranslations {
                 "Usar a fonte do sistema");
         table.put("Use your phone's font",
                 "Usar a fonte do celular");
+    }
+
+    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "Usando %1$s. Escolha outro arquivo para substitu\u00ed-lo.");
         table.put("Version",
                 "Vers\u00e3o");
-    }
-
-    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Vers\u00e3o %1$s para o Facebook %2$s");
         table.put("Video",
@@ -2240,7 +2256,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(524);
+        Map<String, String> table = new HashMap<>(528);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2530,6 +2546,8 @@ public final class L10nTranslations {
                 "Ba\u011flant\u0131lar");
         table.put("Marketplace",
                 "Marketplace");
+        table.put("Marketplace only",
+                "Yaln\u0131zca Marketplace");
         table.put("Material You theme",
                 "Material You temas\u0131");
         table.put("Menu",
@@ -2614,11 +2632,11 @@ public final class L10nTranslations {
                 "\u015euraya kaydedildi: %1$s");
         table.put("Saved to the gallery",
                 "Galeriye kaydedildi");
-        table.put("Saved videos will be named %1$s.",
-                "Kaydedilen videolar\u0131n ad\u0131 %1$s olacak.");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Saved videos will be named %1$s.",
+                "Kaydedilen videolar\u0131n ad\u0131 %1$s olacak.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Kaydedildi. Bu de\u011fi\u015fikli\u011fi uygulamak i\u00e7in Facebook'u yeniden ba\u015flat.");
         table.put("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.",
@@ -2715,6 +2733,8 @@ public final class L10nTranslations {
                 "Ayar\u0131n g\u00fcncellenmesi tamamlanamad\u0131. Kay\u0131tl\u0131 de\u011feri g\u00f6steriliyor.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Anahtar, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda etkili olur.");
+        table.put("The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.",
+                "Sekme \u00e7ubu\u011funda Marketplace, Bildirimler ve profilin ya da Men\u00fc kal\u0131r, Facebook da Marketplace'te a\u00e7\u0131l\u0131r. Ak\u0131\u015f\u0131yla birlikte Ana Sayfa, Video, Arkada\u015flar ve di\u011fer sekmeler kalkar. Bildirimler ve ba\u011flant\u0131lar yine gittikleri yerde a\u00e7\u0131l\u0131r.");
         table.put("There's no diagnostic data to clear.",
                 "Temizlenecek tan\u0131lama verisi yok.");
         table.put("There's no diagnostic data to put back.",
@@ -2735,13 +2755,13 @@ public final class L10nTranslations {
                 "Sistem yaz\u0131 tipini kullan");
         table.put("Use your phone's font",
                 "Telefonun yaz\u0131 tipini kullan");
+    }
+
+    private static void fillTr4(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "%1$s kullan\u0131l\u0131yor. De\u011fi\u015ftirmek i\u00e7in ba\u015fka bir dosya se\u00e7.");
         table.put("Version",
                 "S\u00fcr\u00fcm");
-    }
-
-    private static void fillTr4(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Facebook %2$s i\u00e7in %1$s s\u00fcr\u00fcm\u00fc");
         table.put("Video",

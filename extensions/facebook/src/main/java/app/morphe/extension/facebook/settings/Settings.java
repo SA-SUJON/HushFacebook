@@ -216,6 +216,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_open_on_chosen_tab", TRUE);
 
     /**
+     * The tab bar keeps Marketplace, Notifications and the profile or Menu tab, and a start from
+     * the launcher icon opens Marketplace whatever {@link #START_TAB} says. Home with the news feed,
+     * Video, Friends, Feeds, Groups, Gaming and Events go. Facebook builds the bar once, so a change
+     * shows when it restarts.
+     */
+    public static final BooleanSetting MARKETPLACE_ONLY =
+            new BooleanSetting("hushfacebook_marketplace_only", TRUE);
+
+    /**
      * The folder every save goes to, under Movies for a video and Pictures for a photo. The
      * settings row and an import keep it clean, and {@link SaveFolder#sanitize} cleans it again
      * wherever it's read, so whatever wrote the store, a save lands in one folder under each.

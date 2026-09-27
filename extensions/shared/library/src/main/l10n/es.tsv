@@ -277,3 +277,7 @@ Playback	Reproducción
 Tap to play	Toca para reproducir
 # context: summary of that switch; Autoplay and Off are the name and value of Facebook's own setting, as Facebook shows them in this language
 Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.	Los videos, reels, historias y la música esperan a que toques antes de reproducirse. La opción de reproducción automática de Facebook aparece como desactivada mientras esto está activado y vuelve a lo que elegiste cuando lo desactivas.
+# context: switch title under Opening Facebook; Marketplace is Facebook's tab and keeps its name
+Marketplace only	Solo Marketplace
+# context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
+The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.	La barra de pestañas conserva Marketplace, Notificaciones y tu perfil o el Menú, y Facebook se abre en Marketplace. Inicio con el feed, Video, Amigos y las demás pestañas desaparecen. Las notificaciones y los enlaces siguen abriéndose donde apuntan.

@@ -277,3 +277,7 @@ Playback	Oynatma
 Tap to play	Oynatmak için dokun
 # context: summary of that switch; Autoplay and Off are the name and value of Facebook's own setting, as Facebook shows them in this language
 Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.	Videolar, reels videoları, hikayeler ve müzik oynatılmadan önce dokunmanı bekler. Bu açıkken Facebook'un kendi Otomatik Oynatma ayarı Kapalı görünür, kapattığında seçtiğin değere döner.
+# context: switch title under Opening Facebook; Marketplace is Facebook's tab and keeps its name
+Marketplace only	Yalnızca Marketplace
+# context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
+The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.	Sekme çubuğunda Marketplace, Bildirimler ve profilin ya da Menü kalır, Facebook da Marketplace'te açılır. Akışıyla birlikte Ana Sayfa, Video, Arkadaşlar ve diğer sekmeler kalkar. Bildirimler ve bağlantılar yine gittikleri yerde açılır.

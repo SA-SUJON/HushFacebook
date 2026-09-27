@@ -56,6 +56,7 @@ import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
+import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
@@ -281,6 +282,8 @@ public class PausedHooksTest {
                 PlayerSourcesForTests::recordsAVideoPlayer));
         // A start from the launcher icon asks Facebook for the chosen tab.
         probes.put(PatchFamily.START_TAB, Collections.singletonList(StartTabRouteForTests::routes));
+        // The tab bar builder is told to leave Home out.
+        probes.put(PatchFamily.MARKETPLACE_ONLY, Collections.singletonList(MarketplaceOnlyForTests::hidesHome));
         // With Messenger installed, the card's show question answers no in Chats.
         probes.put(PatchFamily.MESSENGER_CARD, Collections.singletonList(MessengerCardForTests::hidesWithMessenger));
         // A shared link loses what the app added to it.

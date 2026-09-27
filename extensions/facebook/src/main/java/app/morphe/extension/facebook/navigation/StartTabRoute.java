@@ -42,7 +42,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * {@code onCreate}. When that's the main screen started from the launcher icon, the screen gets a
  * copy of its intent with the chosen tab's id in it, before any of Facebook's own start code reads
  * it. The intent it was started with isn't touched, since Facebook's start-up prediction can be
- * reading it on another thread; all that prediction decides is what to fetch early.
+ * reading it on another thread; all that prediction decides is what to fetch early. While
+ * {@link MarketplaceOnly} is on, the tab is Marketplace, whatever the chosen tab and its switch.
  *
  * <p>On a cold start Facebook's own start-up would still drop the request twice. It replaces the
  * intent of a start another app sent, a launcher included, with a copy that keeps no tab, and its
@@ -146,8 +147,12 @@ public final class StartTabRoute {
             settled();
             HookStatus.invoked(FamilyNames.START_TAB);
             // Settings first: before the context is set, reading a switch would break Facebook's start.
-            if (!Utils.settingsReady() || !Settings.OPEN_ON_CHOSEN_TAB.get()) return;
-            StartTab tab = Settings.START_TAB.get();
+            if (!Utils.settingsReady()) return;
+            // Marketplace only opens on Marketplace whatever tab is chosen, and whether or not the
+            // chosen tab's own switch is on.
+            boolean marketplaceOnly = MarketplaceOnly.on();
+            if (!marketplaceOnly && !Settings.OPEN_ON_CHOSEN_TAB.get()) return;
+            StartTab tab = marketplaceOnly ? StartTab.MARKETPLACE : Settings.START_TAB.get();
             Intent intent = activity.getIntent();
             String leftAlone = whyLeftAlone(intent, savedState);
             if (leftAlone != null) {

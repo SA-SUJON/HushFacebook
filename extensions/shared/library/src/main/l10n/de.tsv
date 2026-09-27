@@ -277,3 +277,7 @@ Playback	Wiedergabe
 Tap to play	Zum Abspielen tippen
 # context: summary of that switch; Autoplay and Off are the name and value of Facebook's own setting, as Facebook shows them in this language
 Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.	Videos, Reels, Stories und Musik warten auf dein Tippen, bevor sie abgespielt werden. Facebooks eigene Einstellung „Automatische Wiedergabe“ steht auf Aus, solange dies an ist, und kehrt zu deiner Wahl zurück, wenn es aus ist.
+# context: switch title under Opening Facebook; Marketplace is Facebook's tab and keeps its name
+Marketplace only	Nur Marketplace
+# context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
+The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.	Die Tab-Leiste behält Marketplace, Benachrichtigungen und dein Profil oder das Menü, und Facebook öffnet sich im Marketplace. Die Startseite mit dem Newsfeed, Video, Freunde und die übrigen Tabs verschwinden. Benachrichtigungen und Links öffnen weiterhin dort, wohin sie führen.

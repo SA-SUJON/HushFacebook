@@ -58,6 +58,16 @@ public final class FacebookTabs {
     public static final long MENU_ID = 281710865595635L;
     public static final String MENU_CLASS = "com.facebook.bookmark.tab.BookmarkTab";
 
+    /** The profile tab, which some accounts get in place of Menu. */
+    public static final String PROFILE_CLASS = "com.facebook.timeline.dashboard.tab.TimelineTab";
+
+    /** Tabs a start can't be sent to, which Marketplace only takes off the bar. */
+    public static final String GROUPS_CLASS = "com.facebook.groups.targetedtab.groupstabtag.GroupsTargetedTab";
+    public static final String GAMING_CLASS = "com.facebook.games.tab.GamesTab";
+    /** A second tab class for Gaming, drawn with a game controller. */
+    public static final String GAMING_CONTROLLER_CLASS = "com.facebook.games.tab.GamesTabWithSNESControllerIcon";
+    public static final String EVENTS_CLASS = "com.facebook.events.targetedtab.EventsTab";
+
     private FacebookTabs() {
     }
 }
