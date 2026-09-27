@@ -118,7 +118,13 @@ public final class SettingsBackup {
             Settings.HIDE_GET_MESSENGER_CARD,
             Settings.HIDE_MENU_UPGRADES,
             Settings.HIDE_MENU_ALSO_FROM_META,
-            Settings.HIDE_META_AI_IN_SEARCH));
+            Settings.HIDE_META_AI_IN_SEARCH,
+            Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS,
+            Settings.BLOCK_MEMORY_NOTIFICATIONS,
+            Settings.BLOCK_BIRTHDAY_NOTIFICATIONS,
+            Settings.BLOCK_HIGHLIGHT_NOTIFICATIONS,
+            Settings.BLOCK_PEOPLE_YOU_MAY_KNOW_NOTIFICATIONS,
+            Settings.BLOCK_NEARBY_NOTIFICATIONS));
 
     /**
      * The one setting a file carries that isn't a switch: the folder saves go to. A file holds it

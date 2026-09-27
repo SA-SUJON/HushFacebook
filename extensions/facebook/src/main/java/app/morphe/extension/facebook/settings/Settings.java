@@ -241,6 +241,38 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_meta_ai_in_search", TRUE);
 
     /**
+     * Push notifications Facebook types TOP_TRENDING_VIDEO or PERSONALIZED_REELS: trending videos
+     * and reels it picked for you. Off by default, like every notification switch: each one drops a
+     * whole kind of notification, so it's yours to turn on.
+     */
+    public static final BooleanSetting BLOCK_TRENDING_VIDEO_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_trending_video_notifications", FALSE);
+
+    /** Push notifications Facebook types ONTHISDAY: its "On this day" memories. */
+    public static final BooleanSetting BLOCK_MEMORY_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_memory_notifications", FALSE);
+
+    /** Push notifications Facebook types BIRTHDAY_REMINDER: a friend's birthday is today. */
+    public static final BooleanSetting BLOCK_BIRTHDAY_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_birthday_notifications", FALSE);
+
+    /**
+     * Push notifications Facebook types GROUP_HIGHLIGHTS, GROUP_NF_HIGHLIGHTS, PAGE_HIGHLIGHTS or
+     * CREATOR_HIGHLIGHTS: digests of what happened in groups, pages and creators you follow.
+     * Comments, replies and mentions in groups are other kinds and still come through.
+     */
+    public static final BooleanSetting BLOCK_HIGHLIGHT_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_highlight_notifications", FALSE);
+
+    /** Push notifications Facebook types PYMK_EMAIL: friend suggestions. Friend requests still come through. */
+    public static final BooleanSetting BLOCK_PEOPLE_YOU_MAY_KNOW_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_people_you_may_know_notifications", FALSE);
+
+    /** Push notifications Facebook types PLACE_FEED_NEARBY, NEAR_SAVED_PLACE or WEATHER_NOWCAST. */
+    public static final BooleanSetting BLOCK_NEARBY_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_nearby_notifications", FALSE);
+
+    /**
      * Once a day, when Facebook starts, ask api.github.com whether a newer Hushfacebook release is
      * out, and say so on the settings screen ({@link ReleaseCheck}). It's the settings entry's own
      * switch rather than a patch's, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off

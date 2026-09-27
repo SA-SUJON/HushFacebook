@@ -216,7 +216,7 @@ public class PatchFamilyTest {
                         + "Tap to play, "
                         + "Use the system font, Use the phone's emoji, Open links in "
                         + "external browser, Sanitize sharing links, Stop update prompts, Download any story, Download any reel, "
-                        + "Download any video, Open on a chosen tab, Marketplace only, Hide the Get Messenger card, Hide Menu promotions, Hide Meta AI in search, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
+                        + "Download any video, Open on a chosen tab, Marketplace only, Hide the Get Messenger card, Hide Menu promotions, Hide Meta AI in search, Block promotional notifications, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
                         + "Restore screens on re-signed builds, Install beside Meta's apps, Hushfacebook in the Menu"),
                 running);
         // Clean up Reels has three switches, and the report names each one.
@@ -237,6 +237,13 @@ public class PatchFamilyTest {
         assertEquals("Hide Menu promotions: on (hushfacebook_hide_menu_upgrades=on, "
                         + "hushfacebook_hide_menu_also_from_meta=off)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.MENU_PROMOTIONS), false).get(0));
+        // Every notification switch starts off, so the patch reads off until one of them is turned on.
+        assertEquals("Block promotional notifications: disabled by its switch ("
+                        + "hushfacebook_block_trending_video_notifications=off, hushfacebook_block_memory_notifications=off, "
+                        + "hushfacebook_block_birthday_notifications=off, hushfacebook_block_highlight_notifications=off, "
+                        + "hushfacebook_block_people_you_may_know_notifications=off, "
+                        + "hushfacebook_block_nearby_notifications=off)",
+                PatchFamily.reportLines(EnumSet.of(PatchFamily.PROMO_NOTIFICATIONS), false).get(0));
 
         List<String> paused = PatchFamily.reportLines(build, true);
         assertEquals("Hide sponsored posts: disabled while paused (saved "

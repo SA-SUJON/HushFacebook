@@ -339,3 +339,31 @@ The row of groups to join between posts, with its Discover more groups button. P
 Hide "Stories you might like"	“Beğenebileceğin hikayeler” bölümünü gizle
 # context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
 The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	Facebook'un gönderilerin arasına koyduğu, bağlantın olmayan kişilerin hikayelerinden oluşan satır. Arkadaşlarının hikayeleri ve hikaye şeridi kalır.
+# context: switch title under Notifications; trending videos Facebook sends as push notifications
+Block trending video notifications	Trend video bildirimlerini engelle
+# context: summary of that switch; reels are Facebook's short videos
+Trending videos and the reels Facebook picked for you stop showing up in your notifications.	Trend videolar ve Facebook'un senin için seçtiği reels videoları artık bildirimlerinde görünmez.
+# context: switch title under Notifications; memories are Facebook's posts from past years on the same day
+Block memory notifications	Anı bildirimlerini engelle
+# context: summary of that switch; On this day is the name Facebook gives its memories feature
+Facebook's "On this day" memories stop showing up in your notifications.	Facebook'un “Geçmişte Bugün” anıları artık bildirimlerinde görünmez.
+# context: switch title under Notifications; reminders of friends' birthdays
+Block birthday notifications	Doğum günü bildirimlerini engelle
+# context: summary of that switch
+No more reminders that it's a friend's birthday.	Bir arkadaşının doğum günü olduğunu hatırlatan bildirimler artık gelmez.
+# context: switch title under Notifications; Page is Facebook's name for a business or public figure's page
+Block group and Page highlights	Grup ve Sayfa öne çıkanlarını engelle
+# context: summary of that switch; creators are the people and Pages who post videos and posts you follow
+Digests of what's going on in groups, Pages and creators you follow stop. Comments, replies and mentions still come through.	Takip ettiğin gruplarda, Sayfalarda ve içerik üreticilerinde olup bitenlerin özetleri gelmez. Yorumlar, yanıtlar ve bahsetmeler gelmeye devam eder.
+# context: switch title under Notifications; People you may know is Facebook's name for its friend suggestions, as in Hide "People you may know"
+Block "People you may know"	“Tanıyor olabileceğin kişiler” bildirimlerini engelle
+# context: summary of that switch; friend requests are other notifications, which always come through
+Friend suggestions stop showing up in your notifications. Friend requests still come through.	Arkadaş önerileri artık bildirimlerinde görünmez. Arkadaşlık istekleri gelmeye devam eder.
+# context: switch title under Notifications; places near you and weather alerts Facebook sends
+Block nearby and weather notifications	Yakındaki yerler ve hava durumu bildirimlerini engelle
+# context: summary of that switch
+Alerts about places near you and about the weather stop.	Yakınındaki yerler ve hava durumuyla ilgili uyarılar gelmez.
+# context: title of a note under Notifications, below the switches; what no switch there blocks
+What always comes through	Her zaman gelenler
+# context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines
+Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.	Mesajlar, arkadaşlık istekleri, yorumlar, bahsetmeler, aramalar ve giriş uyarıları, bir de Hushfacebook'un tanımadığı her tür. Android'in Facebook bildirim kategorileri için kendi ayarları da işe yarar, çünkü Facebook kategorisini kapattığın bir bildirimi göstermez. Yine de hangi kategorileri alacağına Facebook'un sunucusu karar verir, bu yüzden bu türleri ayırmayabilirler.

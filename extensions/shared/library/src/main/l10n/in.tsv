@@ -339,3 +339,31 @@ The row of groups to join between posts, with its Discover more groups button. P
 Hide "Stories you might like"	Sembunyikan “Cerita yang mungkin Anda sukai”
 # context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
 The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	Deretan Cerita dari orang yang tidak terhubung dengan Anda, yang diselipkan Facebook di antara postingan. Cerita teman Anda dan deretan Cerita tetap ada.
+# context: switch title under Notifications; trending videos Facebook sends as push notifications
+Block trending video notifications	Blokir notifikasi video yang sedang tren
+# context: summary of that switch; reels are Facebook's short videos
+Trending videos and the reels Facebook picked for you stop showing up in your notifications.	Video yang sedang tren dan reel yang dipilihkan Facebook untuk Anda tidak lagi muncul di notifikasi Anda.
+# context: switch title under Notifications; memories are Facebook's posts from past years on the same day
+Block memory notifications	Blokir notifikasi kenangan
+# context: summary of that switch; On this day is the name Facebook gives its memories feature
+Facebook's "On this day" memories stop showing up in your notifications.	Kenangan “Pada Hari Ini” dari Facebook tidak lagi muncul di notifikasi Anda.
+# context: switch title under Notifications; reminders of friends' birthdays
+Block birthday notifications	Blokir notifikasi ulang tahun
+# context: summary of that switch
+No more reminders that it's a friend's birthday.	Tidak ada lagi pengingat bahwa seorang teman sedang berulang tahun.
+# context: switch title under Notifications; Page is Facebook's name for a business or public figure's page
+Block group and Page highlights	Blokir sorotan grup dan Halaman
+# context: summary of that switch; creators are the people and Pages who post videos and posts you follow
+Digests of what's going on in groups, Pages and creators you follow stop. Comments, replies and mentions still come through.	Ringkasan tentang apa yang terjadi di grup, Halaman, dan kreator yang Anda ikuti berhenti. Komentar, balasan, dan sebutan tetap masuk.
+# context: switch title under Notifications; People you may know is Facebook's name for its friend suggestions, as in Hide "People you may know"
+Block "People you may know"	Blokir “Orang yang Mungkin Anda Kenal”
+# context: summary of that switch; friend requests are other notifications, which always come through
+Friend suggestions stop showing up in your notifications. Friend requests still come through.	Saran teman tidak lagi muncul di notifikasi Anda. Permintaan pertemanan tetap masuk.
+# context: switch title under Notifications; places near you and weather alerts Facebook sends
+Block nearby and weather notifications	Blokir notifikasi tempat terdekat dan cuaca
+# context: summary of that switch
+Alerts about places near you and about the weather stop.	Peringatan tentang tempat di dekat Anda dan tentang cuaca berhenti.
+# context: title of a note under Notifications, below the switches; what no switch there blocks
+What always comes through	Yang selalu masuk
+# context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines
+Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.	Pesan, permintaan pertemanan, komentar, sebutan, panggilan, dan peringatan login, ditambah jenis apa pun yang tidak dikenal Hushfacebook. Pengaturan Android sendiri untuk kategori notifikasi Facebook juga berfungsi, karena Facebook membuang notifikasi yang kategorinya Anda matikan. Namun server Facebook yang menentukan kategori apa saja yang Anda dapat, jadi kategori itu mungkin tidak memisahkan jenis-jenis ini.

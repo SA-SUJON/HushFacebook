@@ -339,3 +339,31 @@ The row of groups to join between posts, with its Discover more groups button. P
 Hide "Stories you might like"	Ocultar “Stories que você talvez curta”
 # context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
 The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	A fileira de stories de pessoas com quem você não tem conexão, que o Facebook coloca entre as publicações. Os stories dos seus amigos e a bandeja de stories continuam.
+# context: switch title under Notifications; trending videos Facebook sends as push notifications
+Block trending video notifications	Bloquear notificações de vídeos em alta
+# context: summary of that switch; reels are Facebook's short videos
+Trending videos and the reels Facebook picked for you stop showing up in your notifications.	Vídeos em alta e os reels que o Facebook escolheu para você deixam de aparecer nas suas notificações.
+# context: switch title under Notifications; memories are Facebook's posts from past years on the same day
+Block memory notifications	Bloquear notificações de lembranças
+# context: summary of that switch; On this day is the name Facebook gives its memories feature
+Facebook's "On this day" memories stop showing up in your notifications.	As lembranças “Neste dia” do Facebook deixam de aparecer nas suas notificações.
+# context: switch title under Notifications; reminders of friends' birthdays
+Block birthday notifications	Bloquear notificações de aniversário
+# context: summary of that switch
+No more reminders that it's a friend's birthday.	Chega de lembretes de que um amigo faz aniversário.
+# context: switch title under Notifications; Page is Facebook's name for a business or public figure's page
+Block group and Page highlights	Bloquear destaques de grupos e Páginas
+# context: summary of that switch; creators are the people and Pages who post videos and posts you follow
+Digests of what's going on in groups, Pages and creators you follow stop. Comments, replies and mentions still come through.	Param os resumos do que está acontecendo nos grupos, Páginas e criadores que você segue. Comentários, respostas e menções continuam chegando.
+# context: switch title under Notifications; People you may know is Facebook's name for its friend suggestions, as in Hide "People you may know"
+Block "People you may know"	Bloquear “Pessoas que você talvez conheça”
+# context: summary of that switch; friend requests are other notifications, which always come through
+Friend suggestions stop showing up in your notifications. Friend requests still come through.	As sugestões de amizade deixam de aparecer nas suas notificações. As solicitações de amizade continuam chegando.
+# context: switch title under Notifications; places near you and weather alerts Facebook sends
+Block nearby and weather notifications	Bloquear notificações de lugares próximos e do tempo
+# context: summary of that switch
+Alerts about places near you and about the weather stop.	Param os alertas sobre lugares perto de você e sobre o tempo.
+# context: title of a note under Notifications, below the switches; what no switch there blocks
+What always comes through	O que sempre chega
+# context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines
+Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.	Mensagens, solicitações de amizade, comentários, menções, chamadas e alertas de login, além de qualquer tipo que o Hushfacebook não conheça. As configurações do próprio Android para as categorias de notificação do Facebook também funcionam, porque o Facebook descarta uma notificação cuja categoria você desativou. Mas é o servidor do Facebook que decide quais categorias você recebe, então elas podem não separar esses tipos.

@@ -54,6 +54,7 @@ import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
+import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
@@ -175,6 +176,9 @@ public class ColdStartHooksTest {
         assertFalse("a results page built before the context lost its Meta AI prompts", MetaAiSearchForTests.dropsPrompts());
         assertFalse("a suggestion parsed before the context lost its Meta AI route",
                 MetaAiSearchForTests.stopsSuggestionRoute());
+        // A push can start Facebook, so the notification hook can run this early.
+        assertFalse("a trending video push before the context was blocked", NotificationKindsForTests.blocksTrendingVideo());
+        assertFalse("a birthday push before the context was blocked", NotificationKindsForTests.blocksBirthday());
         assertTrue("a player start before the context was held",
                 TapToPlay.allowStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY));
         assertTrue("an older player start before the context was held",

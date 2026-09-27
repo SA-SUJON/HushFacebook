@@ -338,6 +338,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the People you may know carousel on your own profile. In Facebook 577 and 580 it is one Litho section that hands the name ProfilePeopleYouMayKnowSection to the section base class, and the profile's root section adds it only when the profile is the viewer's. The patch finds the one children builder loading that name, holds it to the section's constructor, to the base class's getLogTag() and setChildren of the builder's Children type, and to that type's public empty constructor and getChildren(), and asks the extension first there. The extension reads the name back through getLogTag() and has the builder hand back an empty Children while the People you may know switch is on."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/notifications/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/notifications/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the kinds of push notification a user picks. Facebook 577 and 580 parse each push into the kept SystemTrayNotification, whose mType holds the payload's type, and read that type as a constant name of the kept NotificationType enum, before the first colon and ignoring case. Every push is posted through the one method of the kept SystemTrayNotificationManager that loads show_notif_start. The patch finds it by that literal and its kept parameter types, reads mType from the push its builder holds, and returns before anything is posted when the extension says the kind is blocked. Twelve kinds sit under six switches that all start off, and every other kind posts as Facebook posts it."
     }
   ]
 }

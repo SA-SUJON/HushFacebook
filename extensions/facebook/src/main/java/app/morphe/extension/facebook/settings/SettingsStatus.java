@@ -161,4 +161,8 @@ public final class SettingsStatus {
     public static boolean menuSettingsRow() {
         return false;
     }
+
+    public static boolean promoNotifications() {
+        return false;
+    }
 }

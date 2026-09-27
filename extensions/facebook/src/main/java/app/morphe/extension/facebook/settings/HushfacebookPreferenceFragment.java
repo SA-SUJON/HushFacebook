@@ -429,6 +429,37 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
         }
 
+        if (build.contains(PatchFamily.PROMO_NOTIFICATIONS)) {
+            PreferenceCategory notifications = category(screen, L10n.t("Notifications"));
+            notifications.addPreference(toggle(context, Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS,
+                    L10n.t("Block trending video notifications"),
+                    L10n.t("Trending videos and the reels Facebook picked for you stop showing up in your "
+                            + "notifications.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_MEMORY_NOTIFICATIONS,
+                    L10n.t("Block memory notifications"),
+                    L10n.t("Facebook's \"On this day\" memories stop showing up in your notifications.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_BIRTHDAY_NOTIFICATIONS,
+                    L10n.t("Block birthday notifications"),
+                    L10n.t("No more reminders that it's a friend's birthday.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_HIGHLIGHT_NOTIFICATIONS,
+                    L10n.t("Block group and Page highlights"),
+                    L10n.t("Digests of what's going on in groups, Pages and creators you follow stop. Comments, "
+                            + "replies and mentions still come through.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_PEOPLE_YOU_MAY_KNOW_NOTIFICATIONS,
+                    L10n.t("Block \"People you may know\""),
+                    L10n.t("Friend suggestions stop showing up in your notifications. Friend requests still come "
+                            + "through.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_NEARBY_NOTIFICATIONS,
+                    L10n.t("Block nearby and weather notifications"),
+                    L10n.t("Alerts about places near you and about the weather stop.")));
+            notifications.addPreference(info(context, L10n.t("What always comes through"),
+                    L10n.t("Messages, friend requests, comments, mentions, calls and login alerts, and any kind "
+                            + "Hushfacebook doesn't know. Android's own settings for Facebook's notification "
+                            + "categories work too, since Facebook drops a notification whose category you turned "
+                            + "off. Facebook's server decides which categories you get, though, so they may not "
+                            + "split these kinds out.")));
+        }
+
         if (build.contains(PatchFamily.EXTERNAL_BROWSER) || build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {
             PreferenceCategory links = category(screen, L10n.t("Links"));
             if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {

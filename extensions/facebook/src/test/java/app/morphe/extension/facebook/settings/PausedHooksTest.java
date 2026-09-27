@@ -63,6 +63,7 @@ import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
+import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
@@ -318,6 +319,14 @@ public class PausedHooksTest {
                 MetaAiSearchForTests::hidesAnswer,
                 MetaAiSearchForTests::dropsPrompts,
                 MetaAiSearchForTests::stopsSuggestionRoute));
+        // A push of each kind a notification switch blocks isn't posted.
+        probes.put(PatchFamily.PROMO_NOTIFICATIONS, Arrays.asList(
+                NotificationKindsForTests::blocksTrendingVideo,
+                NotificationKindsForTests::blocksMemory,
+                NotificationKindsForTests::blocksBirthday,
+                NotificationKindsForTests::blocksHighlights,
+                NotificationKindsForTests::blocksPeopleYouMayKnow,
+                NotificationKindsForTests::blocksNearby));
         // A shared link loses what the app added to it.
         probes.put(PatchFamily.SANITIZE_SHARING_LINKS, Collections.singletonList(() -> {
             String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
