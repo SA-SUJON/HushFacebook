@@ -22,11 +22,13 @@
     missing, the reels hook deleted from the pre-EOF injector or put after a branch, the showcase
     stub left unfilled, calling another class, or calling a class that isn't the only one
     answering its type name, Clean up Reels' hook deleted from Facebook's Follow check or put
-    after a branch there, and the GenAI reel stub left unfilled, filled with a call that stays in
-    the extension, or calling Facebook's finder only after it has returned. Each start-call hook is
-    also put first in a method holding part of what its rule picks by (the tray controller, onPause,
-    another method naming both surfaces), and one rule is given two methods to choose from; all
-    four fail naming the method the rule picks. A register out of range fails as its own finding:
+    after a branch there, Use the phone's emoji's hook deleted from Facebook's emoji typeface
+    provider or put after a branch there, and the GenAI reel stub left unfilled, filled with a call
+    that stays in the extension, or calling Facebook's finder only after it has returned. Each
+    start-call hook is also put first in a method holding part of what its rule picks by (the tray
+    controller, onPause, another method naming both surfaces, a method holding the emoji
+    provider's log tag alone), and one rule is given two methods to choose from; all five fail
+    naming the method the rule picks. A register out of range fails as its own finding:
     named by a helper added to a host class, as the upper half of a long read from the last
     register, as a long an extension method writes there, and in the feed guard. Each of the five
     ShortcutManager calls the settings patch sends to the
@@ -588,6 +590,10 @@ try {
             'friendly_feed friends_tab_ifu: first in Lfixture/FollowCheck;->offersFollow('))) `
         "The good build's Follow hook was not first in Facebook's Follow check.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        ('SystemEmoji;->typeface()Landroid/graphics/Typeface; in instance ()Landroid/graphics/Typeface; holding ' +
+            'fb.e2e.force_system_emoji_font FacebookEmojiTypefaceProviderImpl: first in Lfixture/EmojiProvider;->emojiTypeface('))) `
+        "The good build's emoji hook was not first in Facebook's emoji typeface provider.`n$($good.Output -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         'GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside ' +
         'Lapp/morphe/extension/: calls Lfixture/Attributions;->A02(Lfixture/ReelModel;Ljava/lang/String;)Lfixture/Model; ' +
         'before its first return')) `
@@ -720,6 +726,8 @@ try {
         'bad-return-refresh-hook-late' = 'contract'
         'bad-follow-hook-missing' = 'contract'
         'bad-follow-hook-late' = 'contract'
+        'bad-emoji-hook-missing' = 'contract'
+        'bad-emoji-hook-late' = 'contract'
         'bad-logo-hook-missing' = 'contract'
         'bad-logo-hook-other-call' = 'contract'
         'bad-logo-hook-other-view' = 'contract'
@@ -731,6 +739,7 @@ try {
         'bad-return-refresh-hook-wrong-method' = 'contract'
         'bad-return-refresh-two-callbacks' = 'contract'
         'bad-follow-hook-wrong-method' = 'contract'
+        'bad-emoji-hook-wrong-method' = 'contract'
         'bad-register-added-helper' = 'register'
         'bad-register-wide-source' = 'register'
         'bad-register-own-wide' = 'register'
@@ -817,6 +826,10 @@ try {
             'called in Lfixture/FollowCheck;->offersFollow(Lcom/facebook/auth/usersession/FbUserSession;)Z, the one method holding ' +
             '"friendly_feed" and "friends_tab_ifu" with the shape static (Lcom/facebook/auth/usersession/FbUserSession;*)Z; the host ' +
             'methods that call it: Lfixture/FollowCheck;->offersFollowHere(Lcom/facebook/auth/usersession/FbUserSession;)Z'))
+        'bad-emoji-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/emoji/SystemEmoji;->typeface()Landroid/graphics/Typeface; ' +
+            'is not called in Lfixture/EmojiProvider;->emojiTypeface()Landroid/graphics/Typeface;, the one method holding ' +
+            '"fb.e2e.force_system_emoji_font" and "FacebookEmojiTypefaceProviderImpl" with the shape instance ' +
+            '()Landroid/graphics/Typeface;; the host methods that call it: Lfixture/EmojiProvider;->loggedTypeface()Landroid/graphics/Typeface;'))
         'bad-return-refresh-two-callbacks' = @(('*contract: 2 methods hold "FeedRefreshTriggerController" and "onRefresh", and exactly ' +
             'one must, so the rule can''t say which one calls Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z: *' +
             'Lfixture/ReturnController;->resume*(Ljava/lang/Object;)V, Lfixture/ReturnController;->resume*(Ljava/lang/Object;)V'))

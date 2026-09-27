@@ -40,6 +40,11 @@ start-call Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z holding F
 # author you don't follow, the Reels tab's among them. Nineteen methods name both surfaces; the check
 # is the one that's static, takes the session first and answers a boolean.
 start-call Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton()Z in static (Lcom/facebook/auth/usersession/FbUserSession;*)Z holding friendly_feed friends_tab_ifu
+# Use the phone's emoji asks the extension first thing in Facebook's emoji typeface provider, the one
+# method holding the end-to-end flag for the phone's emoji font and the provider's log tag. Left out
+# or put later, the provider hands out Meta's emoji font whatever the switch says. A string table
+# holds the log tag too; the flag is the provider's alone.
+start-call Lapp/morphe/extension/facebook/emoji/SystemEmoji;->typeface()Landroid/graphics/Typeface; in instance ()Landroid/graphics/Typeface; holding fb.e2e.force_system_emoji_font FacebookEmojiTypefaceProviderImpl
 # Facebook ranks its own launcher shortcuts ahead of the Hushfacebook one with these calls, so the
 # settings patch sends every one to SettingsEntry, which makes it and puts the Hushfacebook shortcut
 # back in front (#2). One left in Facebook's code would let it drop out of the long-press menu.

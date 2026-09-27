@@ -67,9 +67,11 @@ import java.util.Set;
  * Reels' call to {@code ReelDeclutter.hideFollowButton} first. And the top bar's method building
  * the Facebook logo, holding its trace section, where the settings patch sends the logo's touch
  * listener call to {@code SettingsEntry.setLogoTouchListener} right after the logo gets its tap.
+ * And Facebook's emoji typeface provider, holding its end-to-end flag and its log tag, with Use
+ * the phone's emoji's call to {@code SystemEmoji.typeface} first.
  * Beside each method a start-call rule picks sit methods holding part of what it's picked by, as
- * Facebook's do: the tray controller, the refresh controller's onPause and two other methods naming
- * both surfaces.
+ * Facebook's do: the tray controller, the refresh controller's onPause, two other methods naming
+ * both surfaces and one holding the emoji provider's log tag alone.
  *
  *   java -cp &lt;cli jar&gt; BadDexFixture.java &lt;outDir&gt;
  */
@@ -125,6 +127,11 @@ public class BadDexFixture {
     private static final String FB_USER_SESSION = "Lcom/facebook/auth/usersession/FbUserSession;";
     private static final String REEL_DECLUTTER = "Lapp/morphe/extension/facebook/reels/ReelDeclutter;";
     private static final ImmutableMethodReference HIDE_FOLLOW_BUTTON = method(REEL_DECLUTTER, "hideFollowButton", "Z");
+
+    private static final String EMOJI_PROVIDER = "Lfixture/EmojiProvider;";
+    private static final String TYPEFACE = "Landroid/graphics/Typeface;";
+    private static final String SYSTEM_EMOJI = "Lapp/morphe/extension/facebook/emoji/SystemEmoji;";
+    private static final ImmutableMethodReference SYSTEM_EMOJI_TYPEFACE = method(SYSTEM_EMOJI, "typeface", TYPEFACE);
 
     private static final String SHORTCUT_MANAGER = "Landroid/content/pm/ShortcutManager;";
     private static final String SHORTCUT_INFO = "Landroid/content/pm/ShortcutInfo;";
@@ -630,6 +637,49 @@ public class BadDexFixture {
         return replaced(classes, followCheck(prefix));
     }
 
+    /**
+     * Facebook's emoji typeface provider, an instance method taking nothing: v0 free, v1 this.
+     * [prefix] comes first, then the end-to-end flag and the log tag it holds, then no typeface,
+     * which is what it answers before Meta's font is on the phone. Beside it, a method holding the
+     * log tag without the flag, as the string table naming the provider does on 580, with
+     * [tagPrefix] first. Only the flag tells them apart.
+     */
+    private static ClassDef emojiProvider(List<Instruction> prefix, List<Instruction> tagPrefix) {
+        return new ImmutableClassDef(EMOJI_PROVIDER, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Arrays.asList(
+                        define(EMOJI_PROVIDER, "emojiTypeface", TYPEFACE, false,
+                                emojiBody(prefix, "fb.e2e.force_system_emoji_font", "FacebookEmojiTypefaceProviderImpl")),
+                        define(EMOJI_PROVIDER, "loggedTypeface", TYPEFACE, false,
+                                emojiBody(tagPrefix, "FacebookEmojiTypefaceProviderImpl"))));
+    }
+
+    /** [prefix], then each of [strings] in v0 and no typeface, in two registers with v0 free. */
+    private static ImmutableMethodImplementation emojiBody(List<Instruction> prefix, String... strings) {
+        List<Instruction> instructions = new ArrayList<>(prefix);
+        for (String s : strings) {
+            instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(s)));
+        }
+        instructions.add(new ImmutableInstruction11n(Opcode.CONST_4, 0, 0));
+        instructions.add(op(Opcode.RETURN_OBJECT, 0));
+        return new ImmutableMethodImplementation(2, instructions, null, null);
+    }
+
+    /** What Use the phone's emoji puts first in the provider: ask, and return the answer when there is one. Facebook's own code lands at 7. */
+    private static List<Instruction> emojiHook() {
+        return Arrays.asList(
+                invoke(SYSTEM_EMOJI_TYPEFACE),                         // 0
+                op(Opcode.MOVE_RESULT_OBJECT, 0),                      // 3
+                ifEqz(0, 3),                                           // 4 -> 7
+                op(Opcode.RETURN_OBJECT, 0));                          // 6
+    }
+
+    private static ClassDef systemEmoji() {
+        return new ImmutableClassDef(SYSTEM_EMOJI, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
+                OBJECT, null, null, null, null, Collections.singletonList(define(SYSTEM_EMOJI,
+                        "typeface", TYPEFACE, true, body(1,
+                                new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN_OBJECT, 0)))));
+    }
+
     /** [classes] with each of [replacements] in place of the class of its type. */
     private static List<ClassDef> replaced(List<ClassDef> classes, ClassDef... replacements) {
         List<ClassDef> out = new ArrayList<>(classes);
@@ -921,7 +971,8 @@ public class BadDexFixture {
         return Arrays.asList(host, adapters, trayController(Collections.<Instruction>emptyList()), filter(), genAiLabel,
                 recommendationLabel, showcaseUnit(), showcaseType, preEof, returnController(returnHook()), returnRefresh(),
                 shortcuts(Collections.<String>emptySet()), settingsEntry(), followCheck(followHook()), reelDeclutter(),
-                topBar(false, true, 1), finderStub(FILLED_FINDER_STUB));
+                topBar(false, true, 1), finderStub(FILLED_FINDER_STUB),
+                emojiProvider(emojiHook(), Collections.<Instruction>emptyList()), systemEmoji());
     }
 
     /**
@@ -1034,7 +1085,8 @@ public class BadDexFixture {
         dexes.put("clean", Arrays.asList(cleanHost(), cleanAdapters(), trayController(Collections.<Instruction>emptyList()),
                 showcaseUnit(), preEof(Collections.<Instruction>emptyList()), returnController(Collections.<Instruction>emptyList()),
                 shortcuts(allShortcutCalls()), followCheck(Collections.<Instruction>emptyList()),
-                topBar(false, false, 1)));
+                topBar(false, false, 1),
+                emojiProvider(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList())));
         dexes.put("secondary", Collections.singletonList(secondary()));
         dexes.put("good", good());
         List<ClassDef> goodWithSecondary = new ArrayList<>(good());
@@ -1385,6 +1437,17 @@ public class BadDexFixture {
         lateFollowHook.addAll(followHook());                              // 3
         dexes.put("bad-follow-hook-late", withFollowCheck(good(), lateFollowHook));
 
+        // contract: the emoji provider left without Use the phone's emoji's call, the hook deleted.
+        dexes.put("bad-emoji-hook-missing", replaced(good(),
+                emojiProvider(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList())));
+        // contract: the provider's call after a branch on this, not first.
+        List<Instruction> lateEmojiHook = new ArrayList<>();
+        lateEmojiHook.add(ifEqz(1, 3));                                   // 0 -> 3
+        lateEmojiHook.add(op(Opcode.NOP));                                // 2
+        lateEmojiHook.addAll(emojiHook());                                // 3
+        dexes.put("bad-emoji-hook-late", replaced(good(),
+                emojiProvider(lateEmojiHook, Collections.<Instruction>emptyList())));
+
         // contract: the GenAI reel stub left as the extension ships it, answering its marker.
         dexes.put("bad-finder-stub-not-filled", withFinderStub(good(), UNFILLED_FINDER_STUB));
         // contract: the stub filled with a call that never leaves the extension, not Facebook's finder.
@@ -1426,12 +1489,14 @@ public class BadDexFixture {
         // but isn't the one the patch hooks. A rule naming only that string counted any method
         // holding it, so each of these passed: the unified tray hook in the tray controller, which
         // holds the adapter's start and stop names but not "tofu"; the return-refresh hook in
-        // onPause, which holds the controller's name without "onRefresh"; and the Follow hook in
-        // an instance method naming both surfaces, which isn't the static check.
+        // onPause, which holds the controller's name without "onRefresh"; the Follow hook in an
+        // instance method naming both surfaces, which isn't the static check; and the emoji hook in
+        // a method holding the provider's log tag without its end-to-end flag.
         List<Instruction> none = Collections.<Instruction>emptyList();
         dexes.put("bad-tray-hook-wrong-method", replaced(good(), adapters(trayHook(0), none), trayController(trayHook(1))));
         dexes.put("bad-return-refresh-hook-wrong-method", replaced(good(), returnController(none, returnHook(), false)));
         dexes.put("bad-follow-hook-wrong-method", replaced(good(), followCheck(none, followHook())));
+        dexes.put("bad-emoji-hook-wrong-method", replaced(good(), emojiProvider(none, emojiHook())));
         // contract: a second method answering the return-refresh rule, so it can't say which one
         // the hook belongs in, although the hook is where it was.
         dexes.put("bad-return-refresh-two-callbacks", replaced(good(), returnController(returnHook(), none, true)));
