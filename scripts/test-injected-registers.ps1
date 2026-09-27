@@ -574,7 +574,8 @@ try {
         "The good build's guard was not reported at its one call site.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match 'structural findings: 0') `
         "The good build did not report its structural count.`n$($good.Output -join "`n")"
-    foreach ($stub in 'GenAiLabel;->detectedInfo', 'RecommendationLabel;->recommendationContext') {
+    foreach ($stub in 'GenAiLabel;->detectedInfo', 'GenAiLabel;->selfDisclosureInfo',
+            'RecommendationLabel;->recommendationContext') {
         Assert-True (($good.Output -join "`n") -match ([regex]::Escape("$stub(Ljava/lang/Object;)Ljava/lang/Object;: calls " +
             'Lcom/facebook/graphql/model/GraphQLStory;->A0X()Lfixture/Model; before its first return'))) `
             "The good build's $stub was not reported calling the story's accessor.`n$($good.Output -join "`n")"
@@ -748,6 +749,7 @@ try {
         'bad-guard-elsewhere' = 'contract'
         'bad-no-guard' = 'contract'
         'bad-stub-not-filled' = 'contract'
+        'bad-self-label-stub-not-filled' = 'contract'
         'bad-stub-other-class' = 'contract'
         'bad-stub-call-after-return' = 'contract'
         'bad-tray-hook-missing' = 'contract'

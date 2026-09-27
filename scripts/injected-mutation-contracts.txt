@@ -16,6 +16,7 @@ single-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideEdge(Ljava/lang
 # Each story-flag stub has to call GraphQLStory's renamed accessor before it returns. A patch that
 # stops filling one leaves the stub answering its marker, and the rule keeps every post.
 first-call Lapp/morphe/extension/facebook/feed/GenAiLabel;->detectedInfo(Ljava/lang/Object;)Ljava/lang/Object; on Lcom/facebook/graphql/model/GraphQLStory;
+first-call Lapp/morphe/extension/facebook/feed/GenAiLabel;->selfDisclosureInfo(Ljava/lang/Object;)Ljava/lang/Object; on Lcom/facebook/graphql/model/GraphQLStory;
 first-call Lapp/morphe/extension/facebook/feed/RecommendationLabel;->recommendationContext(Ljava/lang/Object;)Ljava/lang/Object; on Lcom/facebook/graphql/model/GraphQLStory;
 # The GenAI reel stub has to call Facebook's attribution finder before it returns. The finder's
 # class and name are Redex's and it answers no type name, so the rule asks only that the stub's

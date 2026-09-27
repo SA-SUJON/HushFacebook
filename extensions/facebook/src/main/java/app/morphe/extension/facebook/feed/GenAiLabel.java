@@ -16,7 +16,10 @@ import app.morphe.extension.facebook.settings.FamilyNames;
  * the flag Facebook's AI label in the post header reads.
  *
  * <p>Only a definite true hides anything (see {@link StoryFlag}). A post its creator labeled as
- * AI, and Facebook didn't detect, carries its own flag on another model and stays.
+ * AI, and Facebook didn't detect, carries its own flag on another model:
+ * {@code ai_generated_self_disclosure_info.was_self_disclosed_as_ai_generated}. The same header
+ * label shows on that flag alone, and {@link #SELF_LABEL} reads it for the opt-in switch that hides
+ * those posts too. Without that switch they stay.
  */
 public final class GenAiLabel {
     /** The GraphQL names. See the patch's Fingerprints.kt for how the keys were read. */
@@ -35,6 +38,19 @@ public final class GenAiLabel {
 
     static final StoryFlag.Accessor PATCHED = GenAiLabel::detectedInfo;
 
+    /** The creator's own AI label. See the patch's Fingerprints.kt for how the keys were read. */
+    static final String SELF_DISCLOSURE_INFO_FIELD = "ai_generated_self_disclosure_info";
+    static final String SELF_DISCLOSURE_INFO_TYPE = "XFBAIGeneratedSelfDisclosureInfo";
+    static final String SELF_DISCLOSED_FLAG = "was_self_disclosed_as_ai_generated";
+
+    static final StoryFlag SELF_LABEL = new StoryFlag(FamilyNames.AI_DETECTED_POSTS, "Creator AI label",
+            "creator AI label info", SELF_DISCLOSURE_INFO_FIELD, SELF_DISCLOSURE_INFO_TYPE, SELF_DISCLOSED_FLAG);
+
+    static final int SELF_DISCLOSED_FLAG_KEY = SELF_LABEL.flagKey;
+    static final int SELF_DISCLOSURE_INFO_TYPE_TAG = SELF_LABEL.modelTypeTag;
+
+    static final StoryFlag.Accessor SELF_LABEL_PATCHED = GenAiLabel::selfDisclosureInfo;
+
     private GenAiLabel() {
     }
 
@@ -44,6 +60,15 @@ public final class GenAiLabel {
      * accessor, whose name changes every build. Only a GraphQLStory may be passed.
      */
     public static Object detectedInfo(Object story) {
+        return StoryFlag.NOT_PATCHED;
+    }
+
+    /**
+     * Injection point, filled in by the patch: the story's {@code ai_generated_self_disclosure_info}
+     * model, or null when it has none. Like {@link #detectedInfo}, the patch replaces this body with
+     * a call to GraphQLStory's renamed accessor. Only a GraphQLStory may be passed.
+     */
+    public static Object selfDisclosureInfo(Object story) {
         return StoryFlag.NOT_PATCHED;
     }
 }

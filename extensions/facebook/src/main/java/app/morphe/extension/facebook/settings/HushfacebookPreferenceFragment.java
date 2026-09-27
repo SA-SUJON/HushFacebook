@@ -300,6 +300,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("Posts that Facebook's own detection marks as made with AI. A post that only its "
                                 + "creator labelled as AI stays. It's off by default because it hasn't been tested "
                                 + "on a real feed yet.")));
+                feed.addPreference(toggle(context, Settings.HIDE_AI_LABELLED_POSTS,
+                        L10n.t("Also hide posts labelled as AI"),
+                        L10n.t("Posts whose creator marked them as made with AI. Facebook puts its AI label next to "
+                                + "the name on these as well as on the posts its detection found, and with this on, "
+                                + "both kinds go. It's off by default because it hasn't been tested on a real feed "
+                                + "yet.")));
             }
             if (build.contains(PatchFamily.POST_WORDS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_POSTS_WITH_WORDS,

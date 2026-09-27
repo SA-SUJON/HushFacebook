@@ -48,7 +48,7 @@ public enum PatchFamily {
     RETURN_REFRESH(FamilyNames.RETURN_REFRESH, "returnRefresh", null,
             Settings.BLOCK_RETURN_REFRESH),
     AI_DETECTED_POSTS(FamilyNames.AI_DETECTED_POSTS, "aiDetectedPosts", null,
-            Settings.HIDE_AI_DETECTED_POSTS, Settings.HIDE_AI_DETECTED_REELS),
+            Settings.HIDE_AI_DETECTED_POSTS, Settings.HIDE_AI_LABELLED_POSTS, Settings.HIDE_AI_DETECTED_REELS),
     POST_WORDS(FamilyNames.POST_WORDS, "postWords", null,
             Settings.HIDE_POSTS_WITH_WORDS),
     SPONSORED_STORIES(FamilyNames.SPONSORED_STORIES, "sponsoredStories", null,

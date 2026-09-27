@@ -77,6 +77,11 @@ public final class FeedFilter {
      */
     static final String AI_ROUTE = "GenAI flag";
     /**
+     * The stories the creator's AI label rule read, counted only while its switch is on, with what
+     * each read of the self-disclosed flag found as the kind.
+     */
+    static final String AI_LABEL_ROUTE = "Creator AI label flag";
+    /**
      * The stories the "Suggested for you" rule read, counted only while its switch is on, with what
      * each read of Facebook's recommendation flag found as the kind.
      */
@@ -171,7 +176,7 @@ public final class FeedFilter {
         return hideEdge(category, feedUnit, SettingsStatus.sponsoredPosts(), SettingsStatus.suggestedPosts(),
                 RecommendationLabel.PATCHED, SettingsStatus.aiDetectedPosts(), GenAiLabel.PATCHED,
                 SettingsStatus.feedReels(), ShowcaseType.PATCHED, SettingsStatus.postWords(), PostText.MESSAGE,
-                PostText.ATTACHED);
+                PostText.ATTACHED, GenAiLabel.SELF_LABEL_PATCHED);
     }
 
     /** The guard with the sponsored and suggested patch-time flags passed in, and no GenAI rule. */
@@ -228,6 +233,25 @@ public final class FeedFilter {
             StoryFlag.Accessor recommendationAccessor, boolean aiPatched, StoryFlag.Accessor aiAccessor,
             boolean reelsPatched, StoryFlag.Accessor showcaseAccessor, boolean wordsPatched,
             StoryFlag.Accessor messageAccessor, StoryFlag.Accessor attachedAccessor) {
+        return hideEdge(category, feedUnit, sponsoredPatched, suggestedPatched, recommendationAccessor, aiPatched,
+                aiAccessor, reelsPatched, showcaseAccessor, wordsPatched, messageAccessor, attachedAccessor,
+                GenAiLabel.SELF_LABEL_PATCHED);
+    }
+
+    /**
+     * The guard with the GenAI patch's second stub passed in too, the creator's AI label, so a test
+     * can stand in for it.
+     *
+     * <p>Facebook's header label shows on either GenAI flag: the one its detection sets, and the one
+     * a post's creator sets. The detection rule reads the first while either GenAI switch is on, and
+     * the label rule reads the second only while its own switch is on, after the first found nothing,
+     * so with that switch on every post carrying either flag goes and with it off nothing changes.
+     */
+    static boolean hideEdge(Object category, Object feedUnit, boolean sponsoredPatched, boolean suggestedPatched,
+            StoryFlag.Accessor recommendationAccessor, boolean aiPatched, StoryFlag.Accessor aiAccessor,
+            boolean reelsPatched, StoryFlag.Accessor showcaseAccessor, boolean wordsPatched,
+            StoryFlag.Accessor messageAccessor, StoryFlag.Accessor attachedAccessor,
+            StoryFlag.Accessor aiLabelAccessor) {
         try {
             if (sponsoredPatched) HookStatus.invoked(FamilyNames.SPONSORED_POSTS);
             if (reelsPatched) HookStatus.invoked(FamilyNames.FEED_REELS);
@@ -245,16 +269,18 @@ public final class FeedFilter {
             String categoryName = category instanceof Enum ? ((Enum<?>) category).name() : null;
             FeedFilterCounters.sawKind(FEED_ROUTE, categoryName);
             // What kind of post this is, for a report of what reaches the feed: an enum constant, a
-            // GraphQL type name and what Facebook's recommendation flag reads, never the post itself.
-            // Built only when debug logging is on, and the flag and the showcase type only read with
-            // the patch that fills their accessor.
+            // GraphQL type name and what Facebook's recommendation and GenAI flags read, never the
+            // post itself. Built only when debug logging is on, and the flags and the showcase type
+            // only read with the patch that fills their accessor.
             Logger.printDebug(() -> {
                 String type = typeName(feedUnit);
                 return "Feed edge: " + categoryName + " " + type + " ifr="
                         + (suggestedPatched ? recommendationFlag(feedUnit, recommendationAccessor) : "none")
                         + (reelsPatched ? " showcase=" + showcaseFor(type, feedUnit, showcaseAccessor) : "")
                         + (suggestedPatched && DISCOVER_UNIT_TYPE.equals(type)
-                                ? " stories=" + unconnectedStories(feedUnit) : "");
+                                ? " stories=" + unconnectedStories(feedUnit) : "")
+                        + (aiPatched ? " genai=" + flagValue(GenAiLabel.FLAG, feedUnit, aiAccessor)
+                                + " ailabel=" + flagValue(GenAiLabel.SELF_LABEL, feedUnit, aiLabelAccessor) : "");
             });
             // An edge a prefetch adds before the settings are ready stays: no switch can be read yet.
             if (!Utils.settingsReady()) return false;
@@ -281,8 +307,12 @@ public final class FeedFilter {
                     }
                 }
             }
-            if (reason == null && aiPatched && Settings.HIDE_AI_DETECTED_POSTS.get()) {
+            boolean aiLabelled = aiPatched && Settings.HIDE_AI_LABELLED_POSTS.get();
+            if (reason == null && aiPatched && (aiLabelled || Settings.HIDE_AI_DETECTED_POSTS.get())) {
                 reason = flagReason(GenAiLabel.FLAG, AI_ROUTE, feedUnit, aiAccessor);
+            }
+            if (reason == null && aiLabelled) {
+                reason = flagReason(GenAiLabel.SELF_LABEL, AI_LABEL_ROUTE, feedUnit, aiLabelAccessor);
             }
             if (reason == null && wordsPatched && Settings.HIDE_POSTS_WITH_WORDS.get()) {
                 reason = wordsReason(feedUnit, messageAccessor, attachedAccessor);
@@ -426,7 +456,12 @@ public final class FeedFilter {
 
     /** Facebook's recommendation flag for the debug line: true, false, or none when it can't say. */
     private static String recommendationFlag(Object feedUnit, StoryFlag.Accessor accessor) {
-        StoryFlag.Outcome outcome = RecommendationLabel.FLAG.read(feedUnit, accessor);
+        return flagValue(RecommendationLabel.FLAG, feedUnit, accessor);
+    }
+
+    /** What a story flag reads for the debug line: true, false, or none when there's nothing to read. */
+    private static String flagValue(StoryFlag flag, Object feedUnit, StoryFlag.Accessor accessor) {
+        StoryFlag.Outcome outcome = flag.read(feedUnit, accessor);
         if (outcome == StoryFlag.Outcome.FLAGGED) return "true";
         if (outcome == StoryFlag.Outcome.NOT_FLAGGED) return "false";
         return "none";

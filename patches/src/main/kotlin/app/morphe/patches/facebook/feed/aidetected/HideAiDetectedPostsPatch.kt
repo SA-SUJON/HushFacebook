@@ -26,6 +26,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 /** The extension class that reads the feed's flag, and its accessor this patch fills in. */
 internal const val GEN_AI_LABEL = "$EXTENSION_PACKAGE/feed/GenAiLabel;"
 internal const val DETECTED_INFO_STUB = "detectedInfo"
+internal const val SELF_DISCLOSURE_INFO_STUB = "selfDisclosureInfo"
 
 /** The extension class that filters the Reels pages, its finder stub this patch fills in, and its two page filters. */
 internal const val GEN_AI_REEL_FILTER = "$EXTENSION_PACKAGE/feed/GenAiReelFilter;"
@@ -46,6 +47,11 @@ private const val PATCH = "Hide AI-detected posts"
  * answers a marker until then. Everything else, the flag included, the extension reads through
  * members Facebook keeps.
  *
+ * The same plugin reads a second flag beside it, `was_self_disclosed_as_ai_generated` on the
+ * story's self-disclosure model, and shows the label on that flag alone: that's a post its creator
+ * labelled as AI. Its accessor is found and held to the plugin the same way and written into
+ * `GenAiLabel.selfDisclosureInfo`, for the opt-in switch that hides those posts too.
+ *
  * The Reels rule runs where a fetched page enters the Reels and Watch item collection, on the same
  * three methods the sponsored reels filter runs on, each prepended with a call of its own; the two
  * patches work alone or together. What this patch adds there is Facebook's own finder of the
@@ -57,7 +63,7 @@ private const val PATCH = "Hide AI-detected posts"
  * own, and for those the extension reads `ai_generated_detected_info` by its key through
  * `TreeJNI.getTree(int)`, which the patch requires too (see ReelLabel.kt).
  *
- * Both switches start off. Nobody has yet recorded a signed-in feed with one AI-labeled post and
+ * Every switch starts off. Nobody has yet recorded a signed-in feed with one AI-labeled post and
  * one ordinary post beside it, nor a Reels feed with an AI-labelled reel, and until someone does,
  * each rule waits to be turned on.
  */
@@ -65,8 +71,8 @@ private const val PATCH = "Hide AI-detected posts"
 val hideAiDetectedPostsPatch = bytecodePatch(
     name = "Hide AI-detected posts",
     description = "Removes feed posts that Facebook's own detection marked as made with AI, and the reels " +
-        "and Watch videos it flagged the same way. Both switches start off, so turn them on in " +
-        "Hushfacebook's settings.",
+        "and Watch videos it flagged the same way. A third switch also removes posts their creator " +
+        "labelled as AI. Every switch starts off, so turn them on in Hushfacebook's settings.",
     default = true,
 ) {
     category("Feed")
@@ -92,9 +98,23 @@ val hideAiDetectedPostsPatch = bytecodePatch(
             )
         }
 
-        // The extension reads the flag and the model's type tag through these, by reflection.
+        // The creator's own label: the plugin shows it on this flag alone. Held to the plugin the
+        // same way, so a flag that moved or changed meaning stops the patch instead of guessing.
+        val selfLabels = selfDisclosureInfoAccessors(story)
+        val selfLabel = selfLabels.singleOrNull() ?: throw PatchException(
+            "GraphQLStory has ${selfLabels.size} accessors of $SELF_DISCLOSURE_INFO_FIELD as " +
+                "$SELF_DISCLOSURE_INFO_TYPE, expected one: ${selfLabels.joinToString { it.name }}",
+        )
+        if (plugin.methods.none { readsSelfDisclosedFlag(it, selfLabel) }) {
+            throw PatchException(
+                "GenAiTransparencyPlugin no longer reads $SELF_DISCLOSED_FLAG through GraphQLStory.${selfLabel.name}()",
+            )
+        }
+
+        // The extension reads the flags and the models' type tags through these, by reflection.
         requireStoryFlagReaders()
         fillStoryModelStub(GEN_AI_LABEL, DETECTED_INFO_STUB, accessor)
+        fillStoryModelStub(GEN_AI_LABEL, SELF_DISCLOSURE_INFO_STUB, selfLabel)
 
         hideReels()
 

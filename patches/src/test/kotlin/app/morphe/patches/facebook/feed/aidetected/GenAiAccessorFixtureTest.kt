@@ -92,4 +92,36 @@ class GenAiAccessorFixtureTest {
         }
         assertEquals("a declared build went unchecked", versions.toSet(), accessorNames.keys)
     }
+
+    @Test
+    fun `every declared build has one creator-label accessor, the one its AI label reads the self-disclosed flag through`() {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }
+        assertTrue("the bundle declares no Facebook build", versions.isNotEmpty())
+        val accessorNames = mutableMapOf<String, String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                val classes = classesOf(bundle)
+                fun kept(type: String) = classes[type] ?: throw AssertionError("${bundle.name} has no $type")
+                val story = kept(GRAPHQL_STORY)
+                val plugin = kept(GEN_AI_TRANSPARENCY_PLUGIN)
+
+                val accessors = selfDisclosureInfoAccessors(story)
+                assertEquals("${bundle.name}: ${accessors.map { it.name }}", 1, accessors.size)
+                val accessor = accessors.single()
+                accessorNames[version] = "${accessor.name}()${accessor.returnType}"
+                assertTrue("${bundle.name}: the AI label doesn't read $SELF_DISCLOSED_FLAG through ${accessor.name}()",
+                    plugin.methods.any { readsSelfDisclosedFlag(it, accessor) })
+
+                // The control: the detected-info accessor is another method, and the label reads each
+                // flag only through its own accessor.
+                val detected = detectedInfoAccessors(story).single()
+                assertTrue("${bundle.name}: the two accessors are one method", detected.name != accessor.name)
+                assertFalse("${bundle.name}: the label reads the self-disclosed flag through ${detected.name}() too",
+                    plugin.methods.any { readsSelfDisclosedFlag(it, detected) })
+                assertFalse("${bundle.name}: the label reads the detected flag through ${accessor.name}()",
+                    plugin.methods.any { readsDetectedFlag(it, accessor) })
+            }
+        }
+        assertEquals("a declared build went unchecked", versions.toSet(), accessorNames.keys)
+    }
 }

@@ -182,6 +182,25 @@ public class HushfacebookPreferenceFragmentTest {
         }
     }
 
+    /**
+     * The creator AI label switch sits right below Hide AI-detected posts in News feed, which it adds
+     * to, and says it hides both kinds of labelled post.
+     */
+    @Test
+    public void theAiLabelRowSitsRightBelowTheDetectionRow() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.AI_DETECTED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int detected = indexOfKey(rows, Settings.HIDE_AI_DETECTED_POSTS.key);
+            int labelled = indexOfKey(rows, Settings.HIDE_AI_LABELLED_POSTS.key);
+            assertTrue("the AI-detected posts row is missing", detected >= 0);
+            assertEquals("the AI label row isn't right below the detection row", detected + 1, labelled);
+            assertEquals("Also hide posts labelled as AI", String.valueOf(rows.get(labelled).getTitle()));
+            assertTrue(String.valueOf(rows.get(labelled).getSummary()), String.valueOf(rows.get(labelled).getSummary())
+                    .contains("with this on, both kinds go."));
+        }
+    }
+
     @Test
     public void thePausedCardSaysWhatStaysInForEveryReason() {
         for (HushfacebookPause.Reason why : HushfacebookPause.Reason.values()) {

@@ -68,6 +68,15 @@ public final class FeedGuardForTests {
         return FeedFilter.hideEdge(category, feedUnit, true, true, story -> null, true, story -> detectedInfo);
     }
 
+    /**
+     * The guard with the GenAI patch in, where any story's detected-AI info is {@code detectedInfo}
+     * and its creator AI label info is {@code selfDisclosureInfo}.
+     */
+    public static boolean hidesLabelled(Object category, Object feedUnit, Object detectedInfo, Object selfDisclosureInfo) {
+        return FeedFilter.hideEdge(category, feedUnit, true, true, story -> null, true, story -> detectedInfo, false,
+                ShowcaseType.PATCHED, false, PostText.MESSAGE, PostText.ATTACHED, story -> selfDisclosureInfo);
+    }
+
     /** The guard with both feed patches in, where any story's recommendation context is {@code context}. */
     public static boolean hidesRecommended(Object category, Object feedUnit, Object context) {
         return FeedFilter.hideEdge(category, feedUnit, true, true, story -> context, false, GenAiLabel.PATCHED);
@@ -112,6 +121,11 @@ public final class FeedGuardForTests {
     /** GenAI info of the type Facebook's detection writes, with its flag set to [flagged]. */
     public static BaseModelWithTree detectedInfo(boolean flagged) {
         return new BaseModelWithTree(GenAiLabel.DETECTED_INFO_TYPE_TAG).with(GenAiLabel.DETECTED_FLAG, flagged);
+    }
+
+    /** A creator AI label info of the type Facebook writes, with its flag set to [labelled]. */
+    public static BaseModelWithTree selfDisclosureInfo(boolean labelled) {
+        return new BaseModelWithTree(GenAiLabel.SELF_DISCLOSURE_INFO_TYPE_TAG).with(GenAiLabel.SELF_DISCLOSED_FLAG, labelled);
     }
 
     /** A story's recommendation context, with Facebook's recommendation flag set to [recommended]. */

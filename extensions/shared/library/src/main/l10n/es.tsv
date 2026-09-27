@@ -427,3 +427,7 @@ Facebook stops offering people to tag while you type ordinary words in posts and
 Resume long videos	Reanudar videos largos
 # context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
 A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.	Un video de más de dos minutos que dejaste a medias sigue donde lo dejaste la próxima vez que se reproduce. Arrastra la barra de progreso para empezar en otro punto. Los reels, los videos en vivo y los anuncios empiezan como siempre.
+# context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
+Also hide posts labelled as AI	Ocultar también publicaciones etiquetadas como IA
+# context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
+Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Publicaciones que su autor marcó como creadas con IA. Facebook pone su etiqueta de IA junto al nombre en estas y también en las que encontró su propia detección, y con este interruptor activado se ocultan las dos. Viene desactivado porque todavía no se probó en un feed real.

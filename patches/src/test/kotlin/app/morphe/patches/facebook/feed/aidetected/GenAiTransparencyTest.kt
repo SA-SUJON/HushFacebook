@@ -56,8 +56,9 @@ class GenAiTransparencyTest {
         assertEquals(0x70da9d19, treeTypeTag(DETECTED_INFO_TYPE))
         assertEquals(0x723ea5fe, treeFieldKey(DETECTED_FLAG))
         // The self-disclosure accessor beside it loads these, and has to stay a different method.
-        assertEquals(0x73da0c74, treeFieldKey("ai_generated_self_disclosure_info"))
-        assertEquals(0x9213d34e.toInt(), treeTypeTag("XFBAIGeneratedSelfDisclosureInfo"))
+        assertEquals(0x73da0c74, treeFieldKey(SELF_DISCLOSURE_INFO_FIELD))
+        assertEquals(0x9213d34e.toInt(), treeTypeTag(SELF_DISCLOSURE_INFO_TYPE))
+        assertEquals(0xbc6e7b43.toInt(), treeFieldKey(SELF_DISCLOSED_FLAG))
     }
 
     private fun method(
@@ -120,6 +121,17 @@ class GenAiTransparencyTest {
             AccessFlags.PRIVATE.value, null, null, shape.implementation)))
     }
 
+    @Test
+    fun `the creator label's accessor is picked by its own two keys`() {
+        val selfLabel = accessor("A0Y", treeFieldKey(SELF_DISCLOSURE_INFO_FIELD), treeTypeTag(SELF_DISCLOSURE_INFO_TYPE))
+        assertTrue(isSelfDisclosureInfoAccessor(selfLabel))
+        assertFalse("the detected-info accessor", isSelfDisclosureInfoAccessor(accessor()))
+        assertFalse("the field key alone", isSelfDisclosureInfoAccessor(
+            accessor("A0Y", treeFieldKey(SELF_DISCLOSURE_INFO_FIELD), treeTypeTag(DETECTED_INFO_TYPE))))
+        assertFalse("the type tag alone", isSelfDisclosureInfoAccessor(
+            accessor("A0Y", treeFieldKey(DETECTED_INFO_FIELD), treeTypeTag(SELF_DISCLOSURE_INFO_TYPE))))
+    }
+
     /** Facebook's label: call the accessor, check for null, load the flag's key, read it. */
     private fun label(accessorName: String, key: Int) = method(
         "A01",
@@ -151,6 +163,15 @@ class GenAiTransparencyTest {
             ImmutableInstruction11x(Opcode.RETURN_OBJECT, 3),
             definingClass = GEN_AI_TRANSPARENCY_PLUGIN)
         assertFalse("no getCachedBoolean", readsDetectedFlag(noRead, found))
+    }
+
+    @Test
+    fun `the label has to read the self-disclosed flag through the creator label's accessor`() {
+        val selfLabel = accessor("A0Y", treeFieldKey(SELF_DISCLOSURE_INFO_FIELD), treeTypeTag(SELF_DISCLOSURE_INFO_TYPE))
+        assertTrue(readsSelfDisclosedFlag(label("A0Y", treeFieldKey(SELF_DISCLOSED_FLAG)), selfLabel))
+        assertFalse("the detected flag through it", readsSelfDisclosedFlag(label("A0Y", treeFieldKey(DETECTED_FLAG)), selfLabel))
+        assertFalse("through the detected-info accessor",
+            readsSelfDisclosedFlag(label("A0X", treeFieldKey(SELF_DISCLOSED_FLAG)), selfLabel))
     }
 
     private fun classWith(type: String, methods: List<Method> = emptyList(), fields: List<ImmutableField> = emptyList()) =
@@ -200,6 +221,12 @@ class GenAiTransparencyTest {
         assertTrue("the extension checks another type", text.contains("\"$DETECTED_INFO_TYPE\""))
         assertTrue("the extension has no public static Object $DETECTED_INFO_STUB(Object)",
             Regex("""public static Object $DETECTED_INFO_STUB\(Object \w+\)""").containsMatchIn(text))
+        assertTrue("the extension reads another creator label flag", text.contains("\"$SELF_DISCLOSED_FLAG\""))
+        assertTrue("the extension checks another creator label type", text.contains("\"$SELF_DISCLOSURE_INFO_TYPE\""))
+        assertTrue("the extension reads the creator label under another field",
+            text.contains("\"$SELF_DISCLOSURE_INFO_FIELD\""))
+        assertTrue("the extension has no public static Object $SELF_DISCLOSURE_INFO_STUB(Object)",
+            Regex("""public static Object $SELF_DISCLOSURE_INFO_STUB\(Object \w+\)""").containsMatchIn(text))
         val reader = File(java.parentFile, "StoryFlag.java").readText()
         for (kept in listOf(GRAPHQL_STORY, BASE_MODEL_WITH_TREE, TREE_JNI)) {
             val binary = kept.removePrefix("L").removeSuffix(";").replace('/', '.')

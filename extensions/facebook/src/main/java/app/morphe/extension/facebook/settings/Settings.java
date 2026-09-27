@@ -100,6 +100,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_ai_detected_posts", FALSE);
 
     /**
+     * Feed posts carrying Facebook's AI label for any reason: the ones its creator labelled as AI,
+     * which {@link #HIDE_AI_DETECTED_POSTS} keeps, and the detected ones too. Off, like the switch
+     * above, until a labelled post has been seen going on a signed-in feed.
+     */
+    public static final BooleanSetting HIDE_AI_LABELLED_POSTS =
+            new BooleanSetting("hushfacebook_hide_ai_labelled_posts", FALSE);
+
+    /**
      * Reels and Watch videos Facebook's own detection marked as made with AI, read off the
      * attribution the Reels viewer draws its AI label from. Off until it has been checked on a
      * signed-in Reels feed, like the feed switch above.

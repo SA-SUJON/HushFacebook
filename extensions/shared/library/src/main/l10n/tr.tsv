@@ -427,3 +427,7 @@ Facebook stops offering people to tag while you type ordinary words in posts and
 Resume long videos	Uzun videolara kaldığın yerden devam et
 # context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
 A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.	Yarıda bıraktığın, iki dakikadan uzun bir video bir sonraki oynatılışında kaldığın yerden devam eder. Başka bir yerden başlamak için ilerleme çubuğunu sürükle. Reels videoları, canlı videolar ve reklamlar her zamanki gibi başlar.
+# context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
+Also hide posts labelled as AI	Yapay zekâ olarak etiketlenen gönderileri de gizle
+# context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
+Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Oluşturan kişinin yapay zekâ ile üretildiğini belirttiği gönderiler. Facebook, yapay zekâ etiketini hem bunlarda hem de kendi tespitinin bulduğu gönderilerde adın yanına koyar ve bu anahtar açıkken ikisi de gizlenir. Henüz gerçek bir akışta test edilmediği için varsayılan olarak kapalıdır.

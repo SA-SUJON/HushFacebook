@@ -215,10 +215,13 @@ public class PausedHooksTest {
             ReturnRefresh.uiHidden();
             return ReturnRefresh.skip();
         }));
-        // A story Facebook's own detection marked as made with AI, and a reel whose GenAI attribution
-        // carries the same flag, at both levels a page of reels enters.
+        // A story Facebook's own detection marked as made with AI, one only its creator labelled as AI,
+        // and a reel whose GenAI attribution carries the detected flag, at both levels a page of reels
+        // enters.
         probes.put(PatchFamily.AI_DETECTED_POSTS, Arrays.asList(
                 () -> FeedGuardForTests.hides(Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.detectedInfo(true)),
+                () -> FeedGuardForTests.hidesLabelled(Category.ORGANIC, new GraphQLStory(),
+                        FeedGuardForTests.detectedInfo(false), FeedGuardForTests.selfDisclosureInfo(true)),
                 () -> FeedGuardForTests.hidesAiReel(new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true))),
                 () -> {
                     FeedGuardForTests.ReelItem reel = new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true));

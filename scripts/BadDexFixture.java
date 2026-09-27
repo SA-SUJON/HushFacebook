@@ -1125,7 +1125,7 @@ public class BadDexFixture {
 
     /** A patched build: [host] and the bundle's own classes, both stubs filled. */
     private static List<ClassDef> bundle(ClassDef host) {
-        return bundle(host, stub(GENAI_LABEL, "detectedInfo", FILLED_STUB),
+        return bundle(host, genAiLabel(FILLED_STUB),
                 stub(RECOMMENDATION_LABEL, "recommendationContext", FILLED_STUB));
     }
 
@@ -1194,7 +1194,7 @@ public class BadDexFixture {
     /** A patched build that breaks only the reels patch's changes, as [showcaseType] and [preEof]. */
     private static List<ClassDef> reelsBundle(ClassDef showcaseType, ClassDef preEof) {
         return bundle(host(feedEdge(GUARDED_FEED_EDGE), staticHost(GOOD_STATIC_HOST), switchHost(7),
-                tryHost(CLEAN_TRY), true), stub(GENAI_LABEL, "detectedInfo", FILLED_STUB),
+                tryHost(CLEAN_TRY), true), genAiLabel(FILLED_STUB),
                 stub(RECOMMENDATION_LABEL, "recommendationContext", FILLED_STUB), hookedAdapters(), showcaseType, preEof);
     }
 
@@ -1206,6 +1206,21 @@ public class BadDexFixture {
         return new ImmutableClassDef(owner, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(), OBJECT,
                 null, null, null, null,
                 Collections.singletonList(define(owner, name, OBJECT, true, implementation, OBJECT)));
+    }
+
+    /**
+     * The GenAI label class with its two story stubs: detectedInfo as [detected], and
+     * selfDisclosureInfo filled the way the patch fills it.
+     */
+    private static ClassDef genAiLabel(ImmutableMethodImplementation detected) {
+        return genAiLabel(detected, FILLED_STUB);
+    }
+
+    private static ClassDef genAiLabel(ImmutableMethodImplementation detected, ImmutableMethodImplementation selfDisclosure) {
+        return new ImmutableClassDef(GENAI_LABEL, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(), OBJECT,
+                null, null, null, null,
+                Arrays.asList(define(GENAI_LABEL, "detectedInfo", OBJECT, true, detected, OBJECT),
+                        define(GENAI_LABEL, "selfDisclosureInfo", OBJECT, true, selfDisclosure, OBJECT)));
     }
 
     /** What the patches write: the story cast, its accessor called, its answer returned. */
@@ -1554,16 +1569,19 @@ public class BadDexFixture {
                 tryHost(CLEAN_TRY), true);
         ClassDef filledRecommendation = stub(RECOMMENDATION_LABEL, "recommendationContext", FILLED_STUB);
         // contract: the GenAI stub left as the extension ships it, answering its marker.
-        dexes.put("bad-stub-not-filled", bundle(goodHost, stub(GENAI_LABEL, "detectedInfo", UNFILLED_STUB),
+        dexes.put("bad-stub-not-filled", bundle(goodHost, genAiLabel(UNFILLED_STUB),
+                filledRecommendation));
+        // contract: the creator AI label stub left as the extension ships it, the detected one filled.
+        dexes.put("bad-self-label-stub-not-filled", bundle(goodHost, genAiLabel(FILLED_STUB, UNFILLED_STUB),
                 filledRecommendation));
         // contract: the recommendation stub calling a no-argument method, but not the story's.
-        dexes.put("bad-stub-other-class", bundle(goodHost, stub(GENAI_LABEL, "detectedInfo", FILLED_STUB),
+        dexes.put("bad-stub-other-class", bundle(goodHost, genAiLabel(FILLED_STUB),
                 stub(RECOMMENDATION_LABEL, "recommendationContext", body(2,
                         new ImmutableInstruction35c(Opcode.INVOKE_STATIC, 0, 0, 0, 0, 0, 0, method(MODEL, "A0X", MODEL)),
                         op(Opcode.MOVE_RESULT_OBJECT, 1),
                         op(Opcode.RETURN_OBJECT, 1)))));
         // contract: the unified tray adapter left without the tray patch's call.
-        ClassDef filledGenAi = stub(GENAI_LABEL, "detectedInfo", FILLED_STUB);
+        ClassDef filledGenAi = genAiLabel(FILLED_STUB);
         dexes.put("bad-tray-hook-missing", bundle(goodHost, filledGenAi, filledRecommendation,
                 adapters(trayHook(0), Collections.<Instruction>emptyList())));
         // contract: the classic tray adapter's call after a branch, not first.
@@ -1574,7 +1592,7 @@ public class BadDexFixture {
         dexes.put("bad-tray-hook-late", bundle(goodHost, filledGenAi, filledRecommendation,
                 adapters(late, trayHook(1))));
         // contract: the story's accessor called only after the stub has already returned.
-        dexes.put("bad-stub-call-after-return", bundle(goodHost, stub(GENAI_LABEL, "detectedInfo", body(2,
+        dexes.put("bad-stub-call-after-return", bundle(goodHost, genAiLabel(body(2,
                         new ImmutableInstruction11n(Opcode.CONST_4, 0, 0),
                         op(Opcode.RETURN_OBJECT, 0),
                         new ImmutableInstruction21c(Opcode.CHECK_CAST, 1, new ImmutableTypeReference(STORY)),
