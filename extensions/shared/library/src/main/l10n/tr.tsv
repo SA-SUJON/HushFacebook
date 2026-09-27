@@ -417,3 +417,9 @@ Your list of words that keep a post will be empty.	Gönderiyi tutan kelimeler li
 Your list of words that keep a post will hold %1$d word or phrase.	Gönderiyi tutan kelimeler listende %1$d kelime veya ifade olacak.
 # context: sentence in the import preview and the toast after an import; the keep list will hold several phrases
 Your list of words that keep a post will hold %1$d words or phrases.	Gönderiyi tutan kelimeler listende %1$d kelime veya ifade olacak.
+# context: section title for the settings about writing posts and comments
+Writing	Yazma
+# context: switch title under Writing; @ is the at sign that starts a mention and stays as it is
+Tag suggestions only after @	Etiket önerileri yalnızca @ sonrasında
+# context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
+Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	Facebook, gönderilerde ve yorumlarda sıradan kelimeler yazarken etiketlemen için kişi önermeyi bırakır. @ yazınca liste yine açılır ve yazdığın metin hiç değişmez.

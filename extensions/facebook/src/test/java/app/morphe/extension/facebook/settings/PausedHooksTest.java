@@ -57,6 +57,7 @@ import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
+import app.morphe.extension.facebook.composer.TagSuggestionsForTests;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
@@ -322,6 +323,11 @@ public class PausedHooksTest {
         // A request for a post's comments that names no order asks for the chosen one.
         probes.put(PatchFamily.DEFAULT_COMMENT_ORDER,
                 Collections.singletonList(DefaultCommentOrderForTests::asksForTheChosenOrder));
+        // A word without @ in a post or comment box looks nobody up, and a list of people left open
+        // by an earlier @ is closed.
+        probes.put(PatchFamily.TAG_SUGGESTIONS, Arrays.asList(
+                TagSuggestionsForTests::skipsAPlainWord,
+                TagSuggestionsForTests::closesAListLeftOpen));
         // With Messenger installed, the card's show question answers no in Chats.
         probes.put(PatchFamily.MESSENGER_CARD, Collections.singletonList(MessengerCardForTests::hidesWithMessenger));
         // The Menu's Upgrades and Also from Meta groups build nothing, in the section Facebook

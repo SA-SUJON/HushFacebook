@@ -392,6 +392,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             comments.addPreference(commentOrderRow(context));
         }
 
+        if (build.contains(PatchFamily.TAG_SUGGESTIONS)) {
+            PreferenceCategory writing = category(screen, L10n.t("Writing"));
+            writing.addPreference(toggle(context, Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
+                    L10n.t("Tag suggestions only after @"),
+                    L10n.t("Facebook stops offering people to tag while you type ordinary words in posts and "
+                            + "comments. Typing @ still brings up the list, and what you wrote is never changed.")));
+        }
+
         if (build.contains(PatchFamily.TAP_TO_PLAY)) {
             PreferenceCategory playback = category(screen, L10n.t("Playback"));
             playback.addPreference(toggle(context, Settings.TAP_TO_PLAY, L10n.t("Tap to play"),

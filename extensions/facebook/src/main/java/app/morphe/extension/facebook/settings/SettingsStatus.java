@@ -177,4 +177,8 @@ public final class SettingsStatus {
     public static boolean promoNotifications() {
         return false;
     }
+
+    public static boolean tagSuggestions() {
+        return false;
+    }
 }

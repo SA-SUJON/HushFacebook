@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(664);
+        Map<String, String> table = new HashMap<>(670);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -274,6 +274,8 @@ public final class L10nTranslations {
                 "Facebook fordert dich nicht mehr auf, \u00fcber den Meta App Manager zu aktualisieren, und l\u00e4sst ihn nicht mehr nach einem Update suchen. Chat-Hinweise f\u00fcr \u00e4ltere Versionen entfallen ebenfalls. Ein gepatchter Build kann Metas Updates ohnehin nicht installieren.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "Facebook erh\u00e4lt nicht mehr die Liste der Reels, die du angesehen hast, mit der es deinen Reels-Feed sortiert. Niemand sonst sieht diese Liste. Bereits angesehene Reels k\u00f6nnen im Feed wieder auftauchen.");
+        table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
+                "Facebook schl\u00e4gt keine Personen zum Markieren mehr vor, w\u00e4hrend du in Beitr\u00e4gen und Kommentaren normale W\u00f6rter tippst. Mit @ erscheint die Liste weiterhin, und dein Text wird nie ver\u00e4ndert.");
         table.put("Facebook will open on %1$s.",
                 "Facebook startet dann mit %1$s.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -296,11 +298,11 @@ public final class L10nTranslations {
                 "Schriftdatei");
         table.put("Font set to %1$s. Restart Facebook to see it.",
                 "Schriftart auf %1$s gesetzt. Starte Facebook neu, um sie zu sehen.");
-        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
-                "Freundschaftsvorschl\u00e4ge tauchen nicht mehr in deinen Benachrichtigungen auf. Freundschaftsanfragen kommen weiterhin an.");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
+                "Freundschaftsvorschl\u00e4ge tauchen nicht mehr in deinen Benachrichtigungen auf. Freundschaftsanfragen kommen weiterhin an.");
         table.put("Friends",
                 "Freunde");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -419,11 +421,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace only",
                 "Nur Marketplace");
-        table.put("Material You theme",
-                "Material-You-Design");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Material You theme",
+                "Material-You-Design");
         table.put("Menu",
                 "Men\u00fc");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
@@ -542,11 +544,11 @@ public final class L10nTranslations {
                 "Wird gespeichert \u2026");
         table.put("Search",
                 "Suche");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschl\u00e4ge \u201eMeta AI fragen\u201c mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beitr\u00e4ge bleiben, und die Meta AI-Schaltfl\u00e4che \u00f6ffnet Meta AI weiterhin.");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschl\u00e4ge \u201eMeta AI fragen\u201c mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beitr\u00e4ge bleiben, und die Meta AI-Schaltfl\u00e4che \u00f6ffnet Meta AI weiterhin.");
         table.put("Set when you patched",
                 "Beim Patchen festgelegt");
         table.put("Settings couldn't open",
@@ -583,6 +585,8 @@ public final class L10nTranslations {
                 "Stories in der Leiste von Personen und Seiten, denen du nicht folgst, also die als \u201eVorgeschlagen\u201c markierten. Die Stories deiner Freunde und der Seiten, denen du folgst, bleiben. Eine \u00c4nderung wirkt, sobald Facebook die Leiste das n\u00e4chste Mal l\u00e4dt.");
         table.put("Tab to open on",
                 "Tab beim Start");
+        table.put("Tag suggestions only after @",
+                "Markierungsvorschl\u00e4ge nur nach @");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Entfernt Tracking-Tags wie mibextid aus den Links, die du teilst oder kopierst. Ein Link zu facebook.com/share/ wird f\u00fcr ein einzelnes Teilen erstellt, deshalb kann Facebook ihn trotzdem auf dich zur\u00fcckf\u00fchren.");
         table.put("Tap to play",
@@ -663,13 +667,13 @@ public final class L10nTranslations {
                 "Systemschriftart verwenden");
         table.put("Use your phone's font",
                 "Schriftart des Handys verwenden");
+    }
+
+    private static void fillDe5(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "%1$s wird verwendet. W\u00e4hle eine andere Datei, um sie zu ersetzen.");
         table.put("Version",
                 "Version");
-    }
-
-    private static void fillDe5(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Version %1$s f\u00fcr Facebook %2$s");
         table.put("Video",
@@ -698,6 +702,8 @@ public final class L10nTranslations {
                 "W\u00f6rter zum Ausblenden");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
                 "Schreibt ins Android-Protokoll und in den Diagnosebericht, was jeder Patch tut, und zeigt Fehler auf dem Bildschirm an. Lass den Schalter aus, au\u00dfer du meldest ein Problem.");
+        table.put("Writing",
+                "Schreiben");
         table.put("You have the newest Hushfacebook release.",
                 "Du hast die neueste Version von Hushfacebook.");
         table.put("You paused Hushfacebook.",
@@ -737,7 +743,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(664);
+        Map<String, String> table = new HashMap<>(670);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -967,6 +973,8 @@ public final class L10nTranslations {
                 "Facebook deja de pedirte que actualices a trav\u00e9s de Meta App Manager y deja de hacer que busque una actualizaci\u00f3n. Las promociones de chat dirigidas a versiones antiguas tambi\u00e9n desaparecen. Una versi\u00f3n parcheada no puede instalar las actualizaciones de Meta de todos modos.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "Facebook deja de recibir la lista de reels que has visto, que usa para ordenar tu feed de Reels. Nadie m\u00e1s ve esa lista. Los reels que ya has visto pueden volver a aparecer en el feed.");
+        table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
+                "Facebook deja de ofrecerte personas para etiquetar mientras escribes palabras normales en publicaciones y comentarios. Si escribes @, la lista sigue apareciendo, y lo que escribiste nunca cambia.");
         table.put("Facebook will open on %1$s.",
                 "Facebook se abrir\u00e1 en %1$s.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -989,11 +997,11 @@ public final class L10nTranslations {
                 "Archivo de fuente");
         table.put("Font set to %1$s. Restart Facebook to see it.",
                 "Fuente establecida en %1$s. Reinicia Facebook para verla.");
-        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
-                "Las sugerencias de amistad dejan de aparecer en tus notificaciones. Las solicitudes de amistad siguen llegando.");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
+                "Las sugerencias de amistad dejan de aparecer en tus notificaciones. Las solicitudes de amistad siguen llegando.");
         table.put("Friends",
                 "Amigos");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -1112,11 +1120,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace only",
                 "Solo Marketplace");
-        table.put("Material You theme",
-                "Tema Material You");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Material You theme",
+                "Tema Material You");
         table.put("Menu",
                 "Men\u00fa");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
@@ -1235,11 +1243,11 @@ public final class L10nTranslations {
                 "Guardando...");
         table.put("Search",
                 "B\u00fasqueda");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Los resultados de b\u00fasqueda ya no muestran la respuesta de Meta AI ni las sugerencias para preguntarle a Meta AI, y una sugerencia ya no env\u00eda tu b\u00fasqueda a Meta AI. Las personas, los grupos, las p\u00e1ginas y las publicaciones se mantienen, y el bot\u00f3n de Meta AI sigue abriendo Meta AI.");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Los resultados de b\u00fasqueda ya no muestran la respuesta de Meta AI ni las sugerencias para preguntarle a Meta AI, y una sugerencia ya no env\u00eda tu b\u00fasqueda a Meta AI. Las personas, los grupos, las p\u00e1ginas y las publicaciones se mantienen, y el bot\u00f3n de Meta AI sigue abriendo Meta AI.");
         table.put("Set when you patched",
                 "Aplicado al parchear");
         table.put("Settings couldn't open",
@@ -1276,6 +1284,8 @@ public final class L10nTranslations {
                 "Historias de la bandeja de personas y p\u00e1ginas que no sigues, las marcadas como sugeridas. Las historias de tus amigos y de las p\u00e1ginas que sigues se quedan. Un cambio se ve la pr\u00f3xima vez que Facebook carga la bandeja.");
         table.put("Tab to open on",
                 "Pesta\u00f1a al abrir");
+        table.put("Tag suggestions only after @",
+                "Sugerencias para etiquetar solo despu\u00e9s de @");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Quita las etiquetas de seguimiento, como mibextid, de los enlaces que compartes o copias. Un enlace de facebook.com/share/ se crea para una sola acci\u00f3n de compartir, as\u00ed que Facebook puede vincularlo contigo de todos modos.");
         table.put("Tap to play",
@@ -1356,13 +1366,13 @@ public final class L10nTranslations {
                 "Usar la fuente del sistema");
         table.put("Use your phone's font",
                 "Usar la fuente del tel\u00e9fono");
+    }
+
+    private static void fillEs5(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "Usando %1$s. Elige otro archivo para reemplazarlo.");
         table.put("Version",
                 "Versi\u00f3n");
-    }
-
-    private static void fillEs5(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Versi\u00f3n %1$s para Facebook %2$s");
         table.put("Video",
@@ -1391,6 +1401,8 @@ public final class L10nTranslations {
                 "Palabras para ocultar");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
                 "Escribe en el registro de Android y en el informe de diagn\u00f3stico lo que hace cada parche, y muestra los errores en pantalla. D\u00e9jalo desactivado salvo que est\u00e9s reportando un problema.");
+        table.put("Writing",
+                "Escritura");
         table.put("You have the newest Hushfacebook release.",
                 "Tienes la versi\u00f3n m\u00e1s reciente de Hushfacebook.");
         table.put("You paused Hushfacebook.",
@@ -1430,7 +1442,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(664);
+        Map<String, String> table = new HashMap<>(670);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1660,6 +1672,8 @@ public final class L10nTranslations {
                 "Facebook berhenti meminta Anda memperbarui lewat Meta App Manager dan berhenti menyuruhnya mencari pembaruan. Promosi obrolan yang ditujukan ke versi lama juga hilang. Build yang dipatch memang tidak bisa memasang pembaruan Meta.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "Facebook tidak lagi menerima daftar reel yang sudah Anda tonton, yang dipakainya untuk menyusun urutan feed Reels Anda. Tidak ada orang lain yang melihat daftar itu. Reel yang sudah Anda tonton mungkin muncul lagi di feed.");
+        table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
+                "Facebook berhenti menawarkan orang untuk ditandai saat Anda mengetik kata biasa di postingan dan komentar. Mengetik @ tetap memunculkan daftarnya, dan tulisan Anda tidak pernah diubah.");
         table.put("Facebook will open on %1$s.",
                 "Facebook akan terbuka di %1$s.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -1682,11 +1696,11 @@ public final class L10nTranslations {
                 "File font");
         table.put("Font set to %1$s. Restart Facebook to see it.",
                 "Font diatur menjadi %1$s. Mulai ulang Facebook untuk melihatnya.");
-        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
-                "Saran teman tidak lagi muncul di notifikasi Anda. Permintaan pertemanan tetap masuk.");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
+                "Saran teman tidak lagi muncul di notifikasi Anda. Permintaan pertemanan tetap masuk.");
         table.put("Friends",
                 "Teman");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -1805,11 +1819,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace only",
                 "Hanya Marketplace");
-        table.put("Material You theme",
-                "Tema Material You");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Material You theme",
+                "Tema Material You");
         table.put("Menu",
                 "Menu");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
@@ -1928,11 +1942,11 @@ public final class L10nTranslations {
                 "Menyimpan...");
         table.put("Search",
                 "Pencarian");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.");
         table.put("Set when you patched",
                 "Diatur saat Anda menambal");
         table.put("Settings couldn't open",
@@ -1969,6 +1983,8 @@ public final class L10nTranslations {
                 "Cerita di deretan dari orang dan Halaman yang tidak Anda ikuti, yang ditandai sebagai disarankan. Cerita teman Anda dan Halaman yang Anda ikuti tetap ada. Perubahan terlihat saat Facebook memuat deretan itu lagi.");
         table.put("Tab to open on",
                 "Tab saat dibuka");
+        table.put("Tag suggestions only after @",
+                "Saran menandai hanya setelah @");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Menghapus tag pelacakan seperti mibextid dari tautan yang Anda bagikan atau salin. Tautan facebook.com/share/ dibuat khusus untuk satu kali berbagi, jadi Facebook tetap dapat mengaitkannya dengan Anda.");
         table.put("Tap to play",
@@ -2049,13 +2065,13 @@ public final class L10nTranslations {
                 "Gunakan font sistem");
         table.put("Use your phone's font",
                 "Gunakan font ponsel");
+    }
+
+    private static void fillIn5(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "Memakai %1$s. Pilih file lain untuk menggantinya.");
         table.put("Version",
                 "Versi");
-    }
-
-    private static void fillIn5(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Versi %1$s untuk Facebook %2$s");
         table.put("Video",
@@ -2084,6 +2100,8 @@ public final class L10nTranslations {
                 "Kata untuk disembunyikan");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
                 "Mencatat apa yang dilakukan setiap tambalan ke log Android dan laporan diagnostik, serta menampilkan pesan kesalahan di layar. Biarkan nonaktif kecuali Anda sedang melaporkan masalah.");
+        table.put("Writing",
+                "Menulis");
         table.put("You have the newest Hushfacebook release.",
                 "Anda sudah memakai rilis Hushfacebook terbaru.");
         table.put("You paused Hushfacebook.",
@@ -2123,7 +2141,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(664);
+        Map<String, String> table = new HashMap<>(670);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -2353,6 +2371,8 @@ public final class L10nTranslations {
                 "O Facebook para de pedir que voc\u00ea atualize pelo Meta App Manager e para de mand\u00e1-lo procurar uma atualiza\u00e7\u00e3o. As promo\u00e7\u00f5es de chat voltadas a vers\u00f5es antigas tamb\u00e9m somem. Uma vers\u00e3o com patch n\u00e3o consegue instalar as atualiza\u00e7\u00f5es da Meta de qualquer forma.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "O Facebook para de receber a lista de reels que voc\u00ea assistiu, que ele usa para ordenar seu feed do Reels. Ningu\u00e9m mais v\u00ea essa lista. Reels que voc\u00ea j\u00e1 assistiu podem voltar a aparecer no feed.");
+        table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
+                "O Facebook para de sugerir pessoas para marcar enquanto voc\u00ea digita palavras comuns em posts e coment\u00e1rios. Digitar @ ainda mostra a lista, e o que voc\u00ea escreveu nunca \u00e9 alterado.");
         table.put("Facebook will open on %1$s.",
                 "O Facebook vai abrir em %1$s.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -2375,11 +2395,11 @@ public final class L10nTranslations {
                 "Arquivo de fonte");
         table.put("Font set to %1$s. Restart Facebook to see it.",
                 "Fonte definida como %1$s. Reinicie o Facebook para ver.");
-        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
-                "As sugest\u00f5es de amizade deixam de aparecer nas suas notifica\u00e7\u00f5es. As solicita\u00e7\u00f5es de amizade continuam chegando.");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
+                "As sugest\u00f5es de amizade deixam de aparecer nas suas notifica\u00e7\u00f5es. As solicita\u00e7\u00f5es de amizade continuam chegando.");
         table.put("Friends",
                 "Amigos");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -2498,11 +2518,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace only",
                 "S\u00f3 Marketplace");
-        table.put("Material You theme",
-                "Tema Material You");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Material You theme",
+                "Tema Material You");
         table.put("Menu",
                 "Menu");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
@@ -2621,11 +2641,11 @@ public final class L10nTranslations {
                 "Salvando...");
         table.put("Search",
                 "Pesquisa");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugest\u00f5es para perguntar \u00e0 Meta AI, e uma sugest\u00e3o n\u00e3o envia mais sua pesquisa para a Meta AI. Pessoas, grupos, p\u00e1ginas e publica\u00e7\u00f5es continuam, e o bot\u00e3o da Meta AI ainda abre a Meta AI.");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugest\u00f5es para perguntar \u00e0 Meta AI, e uma sugest\u00e3o n\u00e3o envia mais sua pesquisa para a Meta AI. Pessoas, grupos, p\u00e1ginas e publica\u00e7\u00f5es continuam, e o bot\u00e3o da Meta AI ainda abre a Meta AI.");
         table.put("Set when you patched",
                 "Definido ao aplicar os patches");
         table.put("Settings couldn't open",
@@ -2662,6 +2682,8 @@ public final class L10nTranslations {
                 "Stories da bandeja de pessoas e P\u00e1ginas que voc\u00ea n\u00e3o segue, os marcados como sugeridos. Os stories dos seus amigos e das P\u00e1ginas que voc\u00ea segue ficam. Uma mudan\u00e7a aparece na pr\u00f3xima vez que o Facebook carregar a bandeja.");
         table.put("Tab to open on",
                 "Aba ao abrir");
+        table.put("Tag suggestions only after @",
+                "Sugest\u00f5es de marca\u00e7\u00e3o s\u00f3 depois de @");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Remove as tags de rastreamento, como mibextid, dos links que voc\u00ea compartilha ou copia. Um link facebook.com/share/ \u00e9 criado para um \u00fanico compartilhamento, ent\u00e3o o Facebook ainda consegue associ\u00e1-lo a voc\u00ea.");
         table.put("Tap to play",
@@ -2742,13 +2764,13 @@ public final class L10nTranslations {
                 "Usar a fonte do sistema");
         table.put("Use your phone's font",
                 "Usar a fonte do celular");
+    }
+
+    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "Usando %1$s. Escolha outro arquivo para substitu\u00ed-lo.");
         table.put("Version",
                 "Vers\u00e3o");
-    }
-
-    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Vers\u00e3o %1$s para o Facebook %2$s");
         table.put("Video",
@@ -2777,6 +2799,8 @@ public final class L10nTranslations {
                 "Palavras para ocultar");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
                 "Grava no registro do Android e no relat\u00f3rio de diagn\u00f3stico o que cada patch faz, e mostra os erros na tela. Deixe desligado, a n\u00e3o ser que esteja relatando um problema.");
+        table.put("Writing",
+                "Escrita");
         table.put("You have the newest Hushfacebook release.",
                 "Voc\u00ea j\u00e1 tem a vers\u00e3o mais recente do Hushfacebook.");
         table.put("You paused Hushfacebook.",
@@ -2816,7 +2840,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(664);
+        Map<String, String> table = new HashMap<>(670);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -3046,6 +3070,8 @@ public final class L10nTranslations {
                 "Facebook, Meta App Manager \u00fczerinden g\u00fcncelleme istemeyi ve ona g\u00fcncelleme aratmay\u0131 b\u0131rak\u0131r. Eski s\u00fcr\u00fcmlere y\u00f6nelik sohbet tan\u0131t\u0131mlar\u0131 da kalkar. Yamal\u0131 bir s\u00fcr\u00fcm zaten Meta'n\u0131n g\u00fcncellemelerini y\u00fckleyemez.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "Facebook, Reels ak\u0131\u015f\u0131n\u0131 s\u0131ralamak i\u00e7in kulland\u0131\u011f\u0131, izledi\u011fin Reels videolar\u0131n\u0131n listesini art\u0131k almaz. Bu listeyi ba\u015fka kimse g\u00f6rmez. Daha \u00f6nce izledi\u011fin Reels videolar\u0131 ak\u0131\u015fta yeniden \u00e7\u0131kabilir.");
+        table.put("Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.",
+                "Facebook, g\u00f6nderilerde ve yorumlarda s\u0131radan kelimeler yazarken etiketlemen i\u00e7in ki\u015fi \u00f6nermeyi b\u0131rak\u0131r. @ yaz\u0131nca liste yine a\u00e7\u0131l\u0131r ve yazd\u0131\u011f\u0131n metin hi\u00e7 de\u011fi\u015fmez.");
         table.put("Facebook will open on %1$s.",
                 "Facebook %1$s sekmesinde a\u00e7\u0131lacak.");
         table.put("Facebook's \"On this day\" memories stop showing up in your notifications.",
@@ -3068,11 +3094,11 @@ public final class L10nTranslations {
                 "Yaz\u0131 tipi dosyas\u0131");
         table.put("Font set to %1$s. Restart Facebook to see it.",
                 "Yaz\u0131 tipi %1$s olarak ayarland\u0131. G\u00f6rmek i\u00e7in Facebook'u yeniden ba\u015flat.");
-        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
-                "Arkada\u015f \u00f6nerileri art\u0131k bildirimlerinde g\u00f6r\u00fcnmez. Arkada\u015fl\u0131k istekleri gelmeye devam eder.");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Friend suggestions stop showing up in your notifications. Friend requests still come through.",
+                "Arkada\u015f \u00f6nerileri art\u0131k bildirimlerinde g\u00f6r\u00fcnmez. Arkada\u015fl\u0131k istekleri gelmeye devam eder.");
         table.put("Friends",
                 "Arkada\u015flar");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
@@ -3191,11 +3217,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace only",
                 "Yaln\u0131zca Marketplace");
-        table.put("Material You theme",
-                "Material You temas\u0131");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Material You theme",
+                "Material You temas\u0131");
         table.put("Menu",
                 "Men\u00fc");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
@@ -3314,11 +3340,11 @@ public final class L10nTranslations {
                 "Kaydediliyor...");
         table.put("Search",
                 "Arama");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Arama sonu\u00e7lar\u0131nda art\u0131k Meta AI yan\u0131t\u0131 ve Meta AI'a sor \u00f6nerileri g\u00f6r\u00fcnmez, bir \u00f6neri de araman\u0131 art\u0131k Meta AI'a g\u00f6ndermez. Ki\u015filer, gruplar, sayfalar ve g\u00f6nderiler kal\u0131r ve Meta AI d\u00fc\u011fmesi yine Meta AI'\u0131 a\u00e7ar.");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Arama sonu\u00e7lar\u0131nda art\u0131k Meta AI yan\u0131t\u0131 ve Meta AI'a sor \u00f6nerileri g\u00f6r\u00fcnmez, bir \u00f6neri de araman\u0131 art\u0131k Meta AI'a g\u00f6ndermez. Ki\u015filer, gruplar, sayfalar ve g\u00f6nderiler kal\u0131r ve Meta AI d\u00fc\u011fmesi yine Meta AI'\u0131 a\u00e7ar.");
         table.put("Set when you patched",
                 "Yamalad\u0131\u011f\u0131nda ayarlananlar");
         table.put("Settings couldn't open",
@@ -3355,6 +3381,8 @@ public final class L10nTranslations {
                 "\u015eeritte takip etmedi\u011fin ki\u015fi ve sayfalardan gelen, \u00f6nerilen olarak i\u015faretli hikayeler. Arkada\u015flar\u0131n\u0131n ve takip etti\u011fin sayfalar\u0131n hikayeleri kal\u0131r. Bir de\u011fi\u015fiklik, Facebook \u015feridi bir sonraki y\u00fckledi\u011finde g\u00f6r\u00fcn\u00fcr.");
         table.put("Tab to open on",
                 "A\u00e7\u0131l\u0131\u015fta g\u00f6sterilecek sekme");
+        table.put("Tag suggestions only after @",
+                "Etiket \u00f6nerileri yaln\u0131zca @ sonras\u0131nda");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Payla\u015ft\u0131\u011f\u0131n veya kopyalad\u0131\u011f\u0131n ba\u011flant\u0131lardan mibextid gibi izleme etiketlerini kald\u0131r\u0131r. Bir facebook.com/share/ ba\u011flant\u0131s\u0131 tek bir payla\u015f\u0131m i\u00e7in olu\u015fturulur, bu y\u00fczden Facebook onu yine de seninle ili\u015fkilendirebilir.");
         table.put("Tap to play",
@@ -3435,13 +3463,13 @@ public final class L10nTranslations {
                 "Sistem yaz\u0131 tipini kullan");
         table.put("Use your phone's font",
                 "Telefonun yaz\u0131 tipini kullan");
+    }
+
+    private static void fillTr5(Map<String, String> table) {
         table.put("Using %1$s. Choose another file to replace it.",
                 "%1$s kullan\u0131l\u0131yor. De\u011fi\u015ftirmek i\u00e7in ba\u015fka bir dosya se\u00e7.");
         table.put("Version",
                 "S\u00fcr\u00fcm");
-    }
-
-    private static void fillTr5(Map<String, String> table) {
         table.put("Version %1$s for Facebook %2$s",
                 "Facebook %2$s i\u00e7in %1$s s\u00fcr\u00fcm\u00fc");
         table.put("Video",
@@ -3470,6 +3498,8 @@ public final class L10nTranslations {
                 "Gizlenecek kelimeler");
         table.put("Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.",
                 "Her yaman\u0131n ne yapt\u0131\u011f\u0131n\u0131 Android g\u00fcnl\u00fc\u011f\u00fcne ve tan\u0131lama raporuna yazar, hatalar\u0131 da ekranda g\u00f6sterir. Bir sorun bildirmiyorsan kapal\u0131 b\u0131rak.");
+        table.put("Writing",
+                "Yazma");
         table.put("You have the newest Hushfacebook release.",
                 "En yeni Hushfacebook s\u00fcr\u00fcm\u00fcn\u00fc kullan\u0131yorsun.");
         table.put("You paused Hushfacebook.",

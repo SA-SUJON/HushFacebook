@@ -594,6 +594,42 @@ public class HushfacebookPreferenceFragmentTest {
     }
 
     /**
+     * With Tag suggestions only after @ in the build, the screen has a Writing section holding its
+     * one switch, which says what goes and what stays. Without the patch there's no such row.
+     */
+    @Test
+    public void theTagSuggestionRowSitsAloneUnderWriting() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.TAG_SUGGESTIONS, PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment page = new HushfacebookPreferenceFragment();
+            controller.get().getFragmentManager().beginTransaction().add(android.R.id.content, page).commitNow();
+            PreferenceGroup section = null;
+            for (int i = 0; i < page.getPreferenceScreen().getPreferenceCount(); i++) {
+                Preference top = page.getPreferenceScreen().getPreference(i);
+                if (top instanceof PreferenceGroup
+                        && ((PreferenceGroup) top).findPreference(Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT.key) != null) {
+                    section = (PreferenceGroup) top;
+                }
+            }
+            assertNotNull("no Tag suggestions only after @ switch", section);
+            assertEquals("Writing", String.valueOf(section.getTitle()));
+            assertEquals(1, section.getPreferenceCount());
+            Preference toggle = section.getPreference(0);
+            assertTrue(toggle instanceof SwitchPreference);
+            assertEquals("Tag suggestions only after @", String.valueOf(toggle.getTitle()));
+            assertEquals("Facebook stops offering people to tag while you type ordinary words in posts and comments. "
+                    + "Typing @ still brings up the list, and what you wrote is never changed.",
+                    String.valueOf(toggle.getSummary()));
+        }
+
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            assertEquals("a tag suggestion row with the patch left out", -1,
+                    indexOfKey(rowsOf(controller), Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT.key));
+        }
+    }
+
+    /**
      * The video file name's row, next to the folder, keeps the one clean template a save would use,
      * whatever is typed into it, says so in a toast when it changed what was typed, says what videos
      * and photos are named, and names both tokens in its dialog.

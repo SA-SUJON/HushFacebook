@@ -207,6 +207,16 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_default_comment_order", TRUE);
 
     /**
+     * Facebook's text boxes (posts, comments, captions, a story's text) look people up to tag only
+     * for a word that starts with @. Off, they also look them up for a plain word Facebook takes for
+     * a name, what its code calls an implicit mention
+     * ({@link app.morphe.extension.facebook.composer.TagSuggestions}). Words with @ or #, photo tags
+     * and the text itself are never touched.
+     */
+    public static final BooleanSetting TAG_SUGGESTIONS_ONLY_AFTER_AT =
+            new BooleanSetting("hushfacebook_tag_suggestions_only_after_at", TRUE);
+
+    /**
      * Videos, reels, stories and songs start only after a tap: a player's start goes ahead when a
      * tap has just ended, and Facebook's own Autoplay setting reads Off
      * ({@link app.morphe.extension.facebook.media.TapToPlay}). The stored Autoplay setting is never

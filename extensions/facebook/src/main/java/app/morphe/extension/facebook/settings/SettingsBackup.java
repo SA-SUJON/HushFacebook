@@ -109,6 +109,7 @@ public final class SettingsBackup {
             Settings.HIDE_REEL_SOCIAL_FOOTER,
             Settings.DONT_SEND_REEL_WATCH_HISTORY,
             Settings.DEFAULT_COMMENT_ORDER,
+            Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
             Settings.TAP_TO_PLAY,
             Settings.USE_SYSTEM_FONT,
             Settings.USE_SYSTEM_EMOJI,

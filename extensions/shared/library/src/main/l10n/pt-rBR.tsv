@@ -417,3 +417,9 @@ Your list of words that keep a post will be empty.	Sua lista de palavras que man
 Your list of words that keep a post will hold %1$d word or phrase.	Sua lista de palavras que mantêm um post vai ter %1$d palavra ou frase.
 # context: sentence in the import preview and the toast after an import; the keep list will hold several phrases
 Your list of words that keep a post will hold %1$d words or phrases.	Sua lista de palavras que mantêm um post vai ter %1$d palavras ou frases.
+# context: section title for the settings about writing posts and comments
+Writing	Escrita
+# context: switch title under Writing; @ is the at sign that starts a mention and stays as it is
+Tag suggestions only after @	Sugestões de marcação só depois de @
+# context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
+Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	O Facebook para de sugerir pessoas para marcar enquanto você digita palavras comuns em posts e comentários. Digitar @ ainda mostra a lista, e o que você escreveu nunca é alterado.

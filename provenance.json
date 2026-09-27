@@ -380,6 +380,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: hiding feed posts by words the person lists. In Facebook 577 and 580 GraphQLStory has one accessor that asks getCachedModel for the field keyed message as the type tagged TextWithEntities, and GraphQLStory's own toString calls it, labels its text message.text and reads that with a static helper that is getCachedString of the key text. The patch finds that accessor and the one of attached_story as Story by their keys, holds the first to toString's reading, and fills two stubs in PostText with them. The rule runs in the shared feed guard: the extension reads both texts through the kept getCachedString after checking the model's type tag, folds them and the two bounded phrase lists with NFKC case folding, lets a keep phrase win, keeps any post whose text it can't read, and reports only counts."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/composer/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/composer/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the people Facebook offers to tag while you write. In Facebook 577 and 580 every text box that can tag people is one AutoCompleteTextView subclass, found by the one performFiltering(CharSequence, int) that logs ImplicitMentionsCommonWordsFilter: JSON Parsing Exception. Right after it compares the first character of the word at the cursor with @, it reads a boolean of its MentionsAutoCompleteBehavior and returns before any lookup when the boolean is set, and both of those branches land on the lookup. The patch hands that boolean and the box (the behaviour's one field typed as the box's class) to the extension right after the read and keeps the answer in the same register. The extension answers yes while its switch is on, and closes a list of people left open by an earlier @. Words starting with @ or # never reach that read."
     }
   ]
 }

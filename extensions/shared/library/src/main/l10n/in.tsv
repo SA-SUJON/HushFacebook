@@ -417,3 +417,9 @@ Your list of words that keep a post will be empty.	Daftar kata yang mempertahank
 Your list of words that keep a post will hold %1$d word or phrase.	Daftar kata yang mempertahankan postingan akan berisi %1$d kata atau frasa.
 # context: sentence in the import preview and the toast after an import; the keep list will hold several phrases
 Your list of words that keep a post will hold %1$d words or phrases.	Daftar kata yang mempertahankan postingan akan berisi %1$d kata atau frasa.
+# context: section title for the settings about writing posts and comments
+Writing	Menulis
+# context: switch title under Writing; @ is the at sign that starts a mention and stays as it is
+Tag suggestions only after @	Saran menandai hanya setelah @
+# context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
+Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	Facebook berhenti menawarkan orang untuk ditandai saat Anda mengetik kata biasa di postingan dan komentar. Mengetik @ tetap memunculkan daftarnya, dan tulisan Anda tidak pernah diubah.
