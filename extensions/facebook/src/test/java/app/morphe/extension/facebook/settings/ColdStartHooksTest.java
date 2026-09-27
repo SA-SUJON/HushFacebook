@@ -157,6 +157,7 @@ public class ColdStartHooksTest {
                 TapToPlay.allowLegacyStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY));
         assertSame("the Autoplay setting read before the context was changed", TapToPlayForTests.Autoplay.ON,
                 TapToPlay.autoplaySetting(TapToPlayForTests.Autoplay.ON));
+        assertFalse("a reel built before the context was given its play button", TapToPlay.showReelPlayButton(false));
         String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
         assertEquals("a link shared before the context was cleaned", shared, LinkCleaner.sanitizeShared(shared));
         assertSame("a typeface resolved before the context was swapped", Typeface.SERIF,

@@ -241,7 +241,8 @@ public class PausedHooksTest {
                     TapToPlayForTests.forget();
                     return !TapToPlay.allowLegacyStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY);
                 },
-                () -> TapToPlay.autoplaySetting(TapToPlayForTests.Autoplay.ON) != TapToPlayForTests.Autoplay.ON));
+                () -> TapToPlay.autoplaySetting(TapToPlayForTests.Autoplay.ON) != TapToPlayForTests.Autoplay.ON,
+                () -> TapToPlay.showReelPlayButton(false)));
         // The repository's answer for one of Meta's families, a variable-font builder's, and React
         // Native's for a family Facebook registered there.
         probes.put(PatchFamily.SYSTEM_FONT, Arrays.asList(

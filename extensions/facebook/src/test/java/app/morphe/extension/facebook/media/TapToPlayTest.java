@@ -287,6 +287,43 @@ public class TapToPlayTest {
         assertSame("paused, it reads what was chosen", Autoplay.ON, TapToPlay.autoplaySetting(Autoplay.ON));
     }
 
+    /**
+     * The Reels controls show their play button up front while the switch is on, so a held reel
+     * starts with one tap. Facebook's own exclusion stands, and off, paused, before the settings are
+     * ready or on a failure, Facebook's own check decides.
+     */
+    @Test
+    public void theReelsShowTheirPlayButtonWhileTheSwitchIsOn() {
+        assertTrue(TapToPlay.showReelPlayButton(false));
+        assertFalse("Facebook's own exclusion stands", TapToPlay.showReelPlayButton(true));
+        Settings.TAP_TO_PLAY.save(false);
+        assertFalse(TapToPlay.showReelPlayButton(false));
+        Settings.TAP_TO_PLAY.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertFalse(TapToPlay.showReelPlayButton(false));
+        PauseForTests.resume();
+        SettingsContextRule.withoutContext(() -> assertFalse(TapToPlay.showReelPlayButton(false)));
+        SettingsContextRule.beforeThePauseIsDecided(() -> assertFalse(TapToPlay.showReelPlayButton(false)));
+
+        TapToPlay.failNext = new IllegalStateException("the check failed");
+        assertFalse(TapToPlay.showReelPlayButton(false));
+        assertTrue(String.join("\n", HookStatus.missing(FamilyNames.TAP_TO_PLAY)),
+                HookStatus.missing(FamilyNames.TAP_TO_PLAY).contains("a working 'Reels play button' hook (it threw "
+                        + IllegalStateException.class.getName() + ")"));
+        assertTrue("the control: once the failure has passed", TapToPlay.showReelPlayButton(false));
+    }
+
+    @Test
+    public void debugLoggingSaysOnceThatReelsShowTheirButton() {
+        BaseSettings.DEBUG.save(true);
+        LogBufferManager.clearLogBuffer();
+        TapToPlay.showReelPlayButton(false);
+        TapToPlay.showReelPlayButton(false);
+        TapToPlay.showReelPlayButton(true);
+        String report = LogBufferManager.buildExportText();
+        assertEquals(report, 1, occurrences(report, "Tap to play: Reels show their play button until a tap"));
+    }
+
     /** No answer, an answer that isn't an enum, or an enum with no OFF: Facebook's own answer stands. */
     @Test
     public void anAnswerItCantReadStands() {

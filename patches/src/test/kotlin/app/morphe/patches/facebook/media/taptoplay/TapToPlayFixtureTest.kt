@@ -36,8 +36,8 @@ import org.junit.Test
  * Tap to play's hooks on every Facebook build the bundle declares: FbGrootPlayer's play, its
  * inner pause and its bind, each there once; the older player's play and pause, once each; the
  * trigger enum naming every trigger the extension's rule reads; the one Autoplay settings checker
- * and its one reader of the ON, OFF, WIFI_ONLY and DEFAULT enum; and FbFragmentActivity's touch
- * dispatch. Then the patch itself, run on those classes, with each call first where it belongs and
+ * and its one reader of the ON, OFF, WIFI_ONLY and DEFAULT enum; the one autoplay-off check the Reels
+ * controls call, which asks that checker; and FbFragmentActivity's touch dispatch. Then the patch itself, run on those classes, with each call first where it belongs and
  * reading the registers the method keeps its arguments in. Reads the fixture bundles from
  * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
@@ -62,7 +62,7 @@ class TapToPlayFixtureTest {
 
                 // One pass over the build for the classes holding the anchors' strings.
                 val holders = mutableMapOf<String, MutableList<ClassDef>>()
-                val anchors = listOf(GROOT_PLAY, LEGACY_PLAY, AUTOPLAY_SETTINGS_CHECKER)
+                val anchors = listOf(GROOT_PLAY, LEGACY_PLAY, AUTOPLAY_SETTINGS_CHECKER, REELS_CONTROLS)
                 FixtureDex.forEach(fixture) { dex ->
                     val strings = anchors.filter { anchor -> dex.stringSection.any { it == anchor } }
                     if (strings.isEmpty()) return@forEach
@@ -102,7 +102,14 @@ class TapToPlayFixtureTest {
                 val enumCandidates = checker.methods.filter { it.parameterTypes.isEmpty() && it.returnType.startsWith("L") }
                     .map { it.returnType }.toSet()
 
-                val kept = setOf(trigger, FRAGMENT_ACTIVITY) + enumCandidates
+                // The Reels controls call one autoplay-off check, of one class.
+                val components = holders[REELS_CONTROLS].orEmpty().filter { autoplayOffChecksCalled(it).isNotEmpty() }
+                val reelChecks = components.flatMap(::autoplayOffChecksCalled).toSet()
+                assertEquals("$name: Reels autoplay-off checks", 1, reelChecks.size)
+                val reelCheckSignature = reelChecks.single()
+                val controlsType = reelCheckSignature.substringBefore("->")
+
+                val kept = setOf(trigger, FRAGMENT_ACTIVITY, controlsType) + enumCandidates
                 val classes = FixtureDex.classes(fixture, kept)
                 assertEquals("$name: classes missing", emptySet<String>(), setOf(trigger, FRAGMENT_ACTIVITY) - classes.keys)
                 assertTrue("$name: the trigger enum doesn't name ${TRIGGER_NAMES.joinToString()}",
@@ -112,11 +119,15 @@ class TapToPlayFixtureTest {
                 val reader = readers.single()
                 val setting = classes.getValue(reader.returnType)
                 assertEquals("$name: touch dispatches", 1, touchDispatches(classes.getValue(FRAGMENT_ACTIVITY)).size)
+                val reelCheck = methodNamed(classes.getValue(controlsType), reelCheckSignature)
+                assertNotNull("$name: $reelCheckSignature has no body", reelCheck)
+                assertTrue("$name: the Reels check doesn't ask the Autoplay settings checker",
+                    asksWithSession(reelCheck!!, checker.type))
 
                 // The patch, on this build's own classes.
                 val context = PatchContexts.of(
                     listOf(groot, legacy, checker, classes.getValue(trigger), setting, classes.getValue(FRAGMENT_ACTIVITY),
-                        ExtensionDex.classDef(SETTINGS_STATUS)),
+                        classes.getValue(controlsType), ExtensionDex.classDef(SETTINGS_STATUS)) + components,
                 )
                 tapToPlayPatch.execute(context)
                 fun patched(method: Method) = context.mutableClassDefBy(method.definingClass).methods.single {
@@ -175,6 +186,19 @@ class TapToPlayFixtureTest {
                     assertEquals(Opcode.CHECK_CAST, answers[index - 1].opcode)
                     assertEquals(setting.type, (answers[index - 1] as ReferenceInstruction).reference.toString())
                 }
+
+                // The Reels check asks the extension first with its first boolean, and a no runs its own code.
+                val reels = patched(reelCheck).implementation!!.instructions.toList()
+                assertEquals("$name: the Reels check's hook",
+                    listOf(Opcode.MOVE_FROM16, Opcode.INVOKE_STATIC, Opcode.MOVE_RESULT, Opcode.IF_EQZ, Opcode.RETURN),
+                    reels.take(5).map { it.opcode })
+                assertEquals("$name: the first boolean's copy", listOf(0, patched(reelCheck).parameterRegisterNumber(2)),
+                    (reels[0] as TwoRegisterInstruction).let { listOf(it.registerA, it.registerB) })
+                assertEquals(SHOW_REEL_PLAY_BUTTON, reels[1].call.toString())
+                assertEquals(listOf(0), reels[1].registers())
+                assertSame("$name: a no goes on to the check's own first instruction", reels[5],
+                    (reels[3] as BuilderOffsetInstruction).target.location.instruction)
+                assertEquals(reelCheck.implementation!!.instructions.first().opcode, reels[5].opcode)
 
                 // Every touch goes to the tap clock with the screen and the event, and on unchanged.
                 val dispatch = patched(touchDispatches(classes.getValue(FRAGMENT_ACTIVITY)).single())

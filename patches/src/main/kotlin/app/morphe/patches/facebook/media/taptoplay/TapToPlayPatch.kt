@@ -46,7 +46,8 @@ val tapToPlayPatch = bytecodePatch(
     execute {
         val trigger = hookGrootPlayer()
         hookLegacyPlayer(trigger)
-        hookAutoplaySetting()
+        val checker = hookAutoplaySetting()
+        hookReelPlayButton(checker)
         hookTouches()
         enableStatus("tapToPlay")
     }
@@ -97,8 +98,11 @@ private fun BytecodePatchContext.hookLegacyPlayer(trigger: String) {
     tellFirst(mutableOwner.findMutableMethodOf(pause), PAUSED)
 }
 
-/** Each answer of Facebook's Autoplay setting reader goes through the extension on its way out. */
-private fun BytecodePatchContext.hookAutoplaySetting() {
+/**
+ * Each answer of Facebook's Autoplay setting reader goes through the extension on its way out.
+ * Answers the checker's type.
+ */
+private fun BytecodePatchContext.hookAutoplaySetting(): String {
     val checkers = classDefByStrings(AUTOPLAY_SETTINGS_CHECKER, StringComparisonType.EQUALS)
         .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
         .filter(::isAutoplaySettingsChecker)
@@ -126,6 +130,43 @@ private fun BytecodePatchContext.hookAutoplaySetting() {
             """.trimIndent(),
         )
     }
+    return checker.type
+}
+
+/**
+ * First thing in the Reels controls' autoplay-off check, the extension answers yes while the switch
+ * is on, so a reel the gate holds shows its play button and one tap plays it. The check's first
+ * boolean, which makes Facebook's own answer no, goes to the extension with it; a no from the
+ * extension runs Facebook's own check.
+ */
+private fun BytecodePatchContext.hookReelPlayButton(checker: String) {
+    val checks = classDefByStrings(REELS_CONTROLS, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        .flatMap(::autoplayOffChecksCalled).toSet()
+    val signature = checks.singleOrNull() ?: throw PatchException(
+        "$PATCH: expected the classes holding \"$REELS_CONTROLS\" to call one (session, config, Z, Z)Z check, " +
+            "found ${checks.size}",
+    )
+    val owner = classDefByOrNull(signature.substringBefore("->"))
+        ?: throw PatchException("$PATCH: the Reels autoplay-off check's class isn't in this build")
+    val check = methodNamed(owner, signature)
+        ?: throw PatchException("$PATCH: $signature has no body in this build")
+    if (!asksWithSession(check, checker)) {
+        throw PatchException("$PATCH: $signature doesn't ask the Autoplay settings checker $checker")
+    }
+    val mutable = mutableClassDefBy(owner.type).findMutableMethodOf(check)
+    mutable.requireLocals(PATCH, 1)
+    mutable.addInstructionsWithLabels(
+        0,
+        """
+            move/from16 v0, ${mutable.parameterRegister(2)}
+            invoke-static { v0 }, $SHOW_REEL_PLAY_BUTTON
+            move-result v0
+            if-eqz v0, :check
+            return v0
+        """.trimIndent(),
+        ExternalLabel("check", mutable.getInstruction(0)),
+    )
 }
 
 /** Every touch on a Facebook screen goes to the tap clock before Facebook sees it. */

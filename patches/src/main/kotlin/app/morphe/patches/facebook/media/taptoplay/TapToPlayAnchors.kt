@@ -37,6 +37,14 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  *   the story tray's tiles, the Reels tray in the feed and the Reels and Watch controls all read it.
  * - Taps: FbFragmentActivity.dispatchTouchEvent, a framework override every Facebook screen
  *   inherits. The story viewer's floating screen overrides it and hands on to it.
+ * - The Reels controls' check of whether a reel starts with autoplay off: the one method the
+ *   classes holding "FbShortsVideoControlComponent" call that takes the session, the viewer's
+ *   config and two booleans and answers a boolean (580 LX/88V;->A07, 577 LX/9bD;->A07), and asks
+ *   the Autoplay settings checker. Its callers are that component's initial state and its reset
+ *   (580 LX/83J;->A1M and A1J, 577 LX/7mG;->A1S and A1R): a yes puts the control in
+ *   AUTOPLAY_OFF_INIT_STATE, where the reel shows its play button, whose tap ("reels_play_button_click")
+ *   goes through "unpause" to FbGrootPlayer's play with BY_USER. A yes changes nothing else: the
+ *   control's state change only tells the player's event bus.
  */
 
 internal const val TAP_TO_PLAY = "$EXTENSION_PACKAGE/media/TapToPlay;"
@@ -47,6 +55,7 @@ internal const val PAUSED = "$TAP_TO_PLAY->paused(Ljava/lang/Object;)V"
 internal const val REBOUND = "$TAP_TO_PLAY->rebound(Ljava/lang/Object;)V"
 internal const val AUTOPLAY_SETTING = "$TAP_TO_PLAY->autoplaySetting(Ljava/lang/Object;)Ljava/lang/Object;"
 internal const val TOUCH = "$TAP_CLOCK->touch(Landroid/app/Activity;Landroid/view/MotionEvent;)V"
+internal const val SHOW_REEL_PLAY_BUTTON = "$TAP_TO_PLAY->showReelPlayButton(Z)Z"
 
 internal const val GROOT_PLAY = "FbGrootPlayer.play"
 internal const val GROOT_PAUSE = "FbGrootPlayer.pause"
@@ -55,6 +64,9 @@ internal const val LEGACY_PLAY = "Play requested with video surface [%s]"
 internal const val LEGACY_PAUSE = "Pause requested with video surface [%s]"
 internal const val AUTOPLAY_SETTINGS_CHECKER =
     "Shared preference is expected to be present in VideoAutoPlaySettingsChecker but was null"
+
+internal const val REELS_CONTROLS = "FbShortsVideoControlComponent"
+internal const val FB_USER_SESSION = "Lcom/facebook/auth/usersession/FbUserSession;"
 
 internal const val FRAGMENT_ACTIVITY = "Lcom/facebook/base/activity/FbFragmentActivity;"
 internal const val MOTION_EVENT = "Landroid/view/MotionEvent;"
@@ -145,4 +157,32 @@ internal fun calls(caller: Method, callee: Method): Boolean =
         reference.definingClass == callee.definingClass && reference.name == callee.name &&
             reference.returnType == callee.returnType &&
             reference.parameterTypes.map(CharSequence::toString) == callee.parameters()
+    } == true
+
+/** Whether a method of these parameters and answer is shaped like the Reels autoplay-off check. */
+internal fun isAutoplayOffCheckShape(parameters: List<String>, returnType: String): Boolean =
+    returnType == "Z" && parameters.size == 4 && parameters[0] == FB_USER_SESSION && parameters[1].startsWith("L") &&
+        parameters[2] == "Z" && parameters[3] == "Z"
+
+/** The methods of that shape [component]'s methods call, as "class->name(parameters)answer", each once. */
+internal fun autoplayOffChecksCalled(component: ClassDef): Set<String> = component.methods.flatMap { method ->
+    method.implementation?.instructions?.mapNotNull { instruction ->
+        val reference = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: return@mapNotNull null
+        val parameters = reference.parameterTypes.map(CharSequence::toString)
+        if (!isAutoplayOffCheckShape(parameters, reference.returnType)) return@mapNotNull null
+        "${reference.definingClass}->${reference.name}(${parameters.joinToString("")})${reference.returnType}"
+    }.orEmpty()
+}.toSet()
+
+/** The method of [owner] a signature from [autoplayOffChecksCalled] names, when it has a body. */
+internal fun methodNamed(owner: ClassDef, signature: String): Method? = owner.methods.singleOrNull {
+    "${it.definingClass}->${it.name}(${it.parameters().joinToString("")})${it.returnType}" == signature &&
+        it.implementation != null && !it.isStatic()
+}
+
+/** Whether [method] asks [checker] something with the session, as the Reels check asks the Autoplay setting. */
+internal fun asksWithSession(method: Method, checker: String): Boolean =
+    method.implementation?.instructions?.any { instruction ->
+        val reference = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: return@any false
+        reference.definingClass == checker && reference.parameterTypes.firstOrNull()?.toString() == FB_USER_SESSION
     } == true

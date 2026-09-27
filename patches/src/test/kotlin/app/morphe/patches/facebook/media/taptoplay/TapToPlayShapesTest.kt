@@ -46,6 +46,9 @@ class TapToPlayShapesTest {
     private val controller = "Lfixture/Controller;"
     private val checker = "Lfixture/Checker;"
     private val session = "Lcom/facebook/auth/usersession/FbUserSession;"
+    private val controls = "Lfixture/ReelControls;"
+    private val component = "Lfixture/ControlComponent;"
+    private val config = "Lfixture/Config;"
 
     private fun method(
         owner: String,
@@ -131,14 +134,47 @@ class TapToPlayShapesTest {
         registers = 3,
     )
 
+    /** The Reels controls' autoplay-off check: (session, config, excluded, other)Z, asking the checker. */
+    private fun reelCheck(name: String = "offAtStart", asksChecker: Boolean = true) = method(
+        controls, name, listOf(session, config, "Z", "Z"), "Z",
+        if (asksChecker) {
+            """
+                const/4 v0, 0x0
+                invoke-virtual {v0, p1}, $checker->autoplayOff(${session})Z
+                move-result v0
+                return v0
+            """
+        } else {
+            """
+                const/4 v0, 0x0
+                return v0
+            """
+        },
+        registers = 6,
+    )
+
+    /** A class holding the component's name that calls [checks] of the check's shape. */
+    private fun controlComponent(vararg checks: String = arrayOf("offAtStart")) = classDef(
+        component, "Ljava/lang/Object;",
+        method(
+            component, "onCreateInitialState", emptyList(), "V",
+            listOf("const-string v0, \"$REELS_CONTROLS\"", "const/4 v1, 0x0", "const/4 v2, 0x0", "const/4 v3, 0x0",
+                "const/4 v4, 0x1").plus(checks.map { "invoke-virtual {v1, v2, v3, v4, v4}, $controls->$it(${session}${config}ZZ)Z" })
+                .plus("return-void").joinToString("\n"),
+            registers = 6,
+        ),
+    )
+
     private fun build(
         grootPlayer: ClassDef = groot(),
         triggerEnum: ClassDef = enumNaming(trigger, TRIGGER_NAMES),
         checkerClass: ClassDef = settingsChecker(),
         activityClass: ClassDef = activity(),
+        componentClass: ClassDef = controlComponent(),
+        controlsClass: ClassDef = classDef(controls, "Ljava/lang/Object;", reelCheck()),
     ) = PatchContexts.of(
         listOf(grootPlayer, triggerEnum, legacy(), checkerClass, enumNaming(setting, SETTING_NAMES), activityClass,
-            ExtensionDex.classDef(SETTINGS_STATUS)),
+            componentClass, controlsClass, ExtensionDex.classDef(SETTINGS_STATUS)),
     )
 
     private val Instruction.call: MethodReference?
@@ -197,6 +233,21 @@ class TapToPlayShapesTest {
         assertEquals(0, settingReaders(classDef(checker, "Ljava/lang/Object;",
             method(checker, "read", listOf("I"), setting, "const/4 v0, 0x0\nreturn-object v0"))) { it == setting }.size)
 
+        // The Reels check: (session, a config, two booleans) answering a boolean, and nothing like it.
+        assertTrue(isAutoplayOffCheckShape(listOf(session, config, "Z", "Z"), "Z"))
+        assertTrue(!isAutoplayOffCheckShape(listOf(session, config, "Z", "Z"), "V"))
+        assertTrue(!isAutoplayOffCheckShape(listOf(session, config, "Z"), "Z"))
+        assertTrue(!isAutoplayOffCheckShape(listOf(config, session, "Z", "Z"), "Z"))
+        assertTrue(!isAutoplayOffCheckShape(listOf(session, "I", "Z", "Z"), "Z"))
+        val signature = "$controls->offAtStart(${session}${config}ZZ)Z"
+        assertEquals(setOf(signature), autoplayOffChecksCalled(controlComponent("offAtStart", "offAtStart")))
+        assertEquals(2, autoplayOffChecksCalled(controlComponent("offAtStart", "offLater")).size)
+        val controlsClass = classDef(controls, "Ljava/lang/Object;", reelCheck(), reelCheck("silent", asksChecker = false))
+        assertEquals("offAtStart", methodNamed(controlsClass, signature)?.name)
+        assertTrue(asksWithSession(methodNamed(controlsClass, signature)!!, checker))
+        assertTrue(!asksWithSession(methodNamed(controlsClass, "$controls->silent(${session}${config}ZZ)Z")!!, checker))
+        assertTrue(!asksWithSession(methodNamed(controlsClass, signature)!!, player))
+
         assertEquals(1, touchDispatches(activity()).size)
         assertEquals(0, touchDispatches(activity(method(FRAGMENT_ACTIVITY, "dispatchTouchEvent", listOf(MOTION_EVENT, "I"), "Z",
             "const/4 v0, 0x0\nreturn v0"))).size)
@@ -254,6 +305,17 @@ class TapToPlayShapesTest {
         val branch = reader.first { it.opcode == Opcode.IF_NEZ } as BuilderOffsetInstruction
         assertSame(reader[returns[1].index - 3], branch.target.location.instruction)
 
+        // The Reels check asks the extension first with its first boolean, copied into v0 through
+        // the 16-bit form; a yes answers at once and a no runs Facebook's own check.
+        val reels = patched(context, controls, "offAtStart").implementation!!.instructions.toList()
+        assertEquals(listOf(Opcode.MOVE_FROM16, Opcode.INVOKE_STATIC, Opcode.MOVE_RESULT, Opcode.IF_EQZ, Opcode.RETURN,
+            Opcode.CONST_4), reels.take(6).map { it.opcode })
+        assertEquals(listOf(0, 4), (reels[0] as TwoRegisterInstruction).let { listOf(it.registerA, it.registerB) })
+        assertEquals(SHOW_REEL_PLAY_BUTTON, reels[1].call.toString())
+        assertEquals(listOf(0), reels[1].registers())
+        assertEquals(0, (reels[4] as OneRegisterInstruction).registerA)
+        assertSame(reels[5], (reels[3] as BuilderOffsetInstruction).target.location.instruction)
+
         // Every touch goes to the tap clock, the screen and the event in p0 and p1.
         val touch = patched(context, FRAGMENT_ACTIVITY, "dispatchTouchEvent").implementation!!.instructions.toList()
         assertEquals(TOUCH, touch[0].call.toString())
@@ -276,6 +338,12 @@ class TapToPlayShapesTest {
         assertTrue(refusal(build(checkerClass = settingsChecker(readerReturns = trigger))).contains("answering the enum"))
         assertTrue(refusal(build(activityClass = classDef(FRAGMENT_ACTIVITY, "Landroid/app/Activity;")))
             .contains("dispatchTouchEvent"))
+        assertTrue(refusal(build(componentClass = controlComponent("offAtStart", "offLater")))
+            .contains("to call one (session, config, Z, Z)Z check, found 2"))
+        assertTrue(refusal(build(componentClass = classDef(component, "Ljava/lang/Object;")))
+            .contains("found 0"))
+        assertTrue(refusal(build(controlsClass = classDef(controls, "Ljava/lang/Object;", reelCheck(asksChecker = false))))
+            .contains("doesn't ask the Autoplay settings checker"))
         // A play with one local has nowhere to put the player and the trigger.
         assertTrue(refusal(build(grootPlayer = groot(play(registers = 3), outerPause(), innerPause(), bind())))
             .contains("needs 2"))

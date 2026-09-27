@@ -48,7 +48,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *
  * <p>Every other start is held, and the player stays where it was, showing its first frame or its
  * cover. Facebook's own Autoplay setting reads Off while the switch is on ({@link #autoplaySetting}),
- * so the surfaces that ask it draw their play button. Off, paused, before the settings are ready, or
+ * so the surfaces that ask it draw their play button, and the Reels controls show theirs up front
+ * ({@link #showReelPlayButton}). Off, paused, before the settings are ready, or
  * when anything here throws, every start goes ahead and the setting reads what you chose, as it
  * would unpatched.
  */
@@ -86,6 +87,7 @@ public final class TapToPlay {
     private static int decisions;
     private static int allowedSinceSummary;
     private static int heldSinceSummary;
+    private static boolean reelButtonLogged;
     private static final Set<String> SETTINGS_LOGGED = new HashSet<>();
     private static final Map<Class<?>, Object> OFF_BY_TYPE = new HashMap<>();
 
@@ -146,6 +148,41 @@ public final class TapToPlay {
             HookStatus.threw(FamilyNames.TAP_TO_PLAY, "Autoplay setting", failure);
             return answer;
         }
+    }
+
+    /**
+     * The hook, first thing in the Reels controls' check of whether a reel starts with autoplay off,
+     * which decides whether the reel shows its play button before anything plays. While the switch
+     * is on it answers yes, so a reel the gate holds shows that button and one tap on it plays the
+     * reel (the button's tap starts the player with BY_USER). [excluded] is the flag Facebook hands
+     * the check first, which makes Facebook's own answer no whatever the setting (an ad break's
+     * video), and it stays no. False lets Facebook's own check run.
+     */
+    public static boolean showReelPlayButton(boolean excluded) {
+        try {
+            HookStatus.invoked(FamilyNames.TAP_TO_PLAY);
+            RuntimeException failure = failNext;
+            if (failure != null) {
+                failNext = null;
+                throw failure;
+            }
+            if (excluded || !on()) return false;
+            HookStatus.bound(FamilyNames.TAP_TO_PLAY, "Reels play button");
+            logReelButtonOnce();
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.TAP_TO_PLAY, "Reels play button", failure);
+            return false;
+        }
+    }
+
+    private static void logReelButtonOnce() {
+        synchronized (LOG_LOCK) {
+            if (reelButtonLogged) return;
+            reelButtonLogged = true;
+        }
+        Logger.diagnosticDebug(DiagnosticCategory.OTHER, SOURCE,
+                () -> "Tap to play: Reels show their play button until a tap");
     }
 
     private static boolean allow(Object player, Object trigger, String hook, String path) {
@@ -244,6 +281,7 @@ public final class TapToPlay {
             allowedSinceSummary = 0;
             heldSinceSummary = 0;
             SETTINGS_LOGGED.clear();
+            reelButtonLogged = false;
         }
         failNext = null;
     }
