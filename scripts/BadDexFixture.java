@@ -68,12 +68,14 @@ import java.util.Set;
  * the Facebook logo, holding its two trace sections, where the settings patch sends the logo's
  * touch listener call to {@code SettingsEntry.setLogoTouchListener} right after the logo gets its
  * tap. And Facebook's emoji typeface provider, holding its end-to-end flag and its log tag, with Use
- * the phone's emoji's call to {@code SystemEmoji.typeface} first.
- * Beside each method a start-call or next-call rule picks sit methods holding part of what it's
- * picked by: the tray controller, the refresh controller's onPause, two other methods naming both
- * surfaces and one holding the emoji provider's log tag alone, as Facebook's do, and three top bar
- * methods, which Facebook's bar doesn't have, so the logo rule has to name both sections and the
- * builder's shape.
+ * the phone's emoji's call to {@code SystemEmoji.typeface} first. And the Reels viewer's batcher of
+ * watched reels, whose flush holds the mutation's name and its input field and hands each batch to
+ * an executor, the call Don't send reel watch history sends to {@code ReelWatchHistory.send}.
+ * Beside each method a start-call, next-call or sole-call rule picks sit methods holding part of
+ * what it's picked by: the tray controller, the refresh controller's onPause, two other methods
+ * naming both surfaces and one holding the emoji provider's log tag alone, as Facebook's do, and
+ * three top bar and three batcher methods, which Facebook doesn't have, so neither the logo rule
+ * nor the watch-history rule passes with its second string or its shape left out.
  *
  *   java -cp &lt;cli jar&gt; BadDexFixture.java &lt;outDir&gt;
  */
@@ -159,6 +161,16 @@ public class BadDexFixture {
             method(VIEW, "setContentDescription", "V", "Ljava/lang/CharSequence;");
     private static final ImmutableMethodReference LOGO_TOUCH_STAND_IN =
             method(SETTINGS_ENTRY, "setLogoTouchListener", "V", VIEW, ON_TOUCH_LISTENER);
+
+    /** The Reels viewer's batcher of watched reels, a class Redex renames. */
+    private static final String BATCHER = "Lfixture/SeenStateBatcher;";
+    private static final String EXECUTOR = "Ljava/util/concurrent/Executor;";
+    private static final String RUNNABLE = "Ljava/lang/Runnable;";
+    private static final ImmutableMethodReference EXECUTE = method(EXECUTOR, "execute", "V", RUNNABLE);
+    private static final String REEL_WATCH_HISTORY = "Lapp/morphe/extension/facebook/reels/ReelWatchHistory;";
+    private static final ImmutableMethodReference WATCH_SEND = method(REEL_WATCH_HISTORY, "send", "V", EXECUTOR, RUNNABLE);
+    /** The mutation's name and its input field, which the watch-history rule picks the flush by. */
+    private static final List<String> SEEN_STATE = Arrays.asList("FbShortsSeenStateMutation", "video_ids");
 
     /**
      * One of the ShortcutManager calls the settings patch sends to SettingsEntry: its name, what it
@@ -829,15 +841,15 @@ public class BadDexFixture {
                 CONTEXT, WORDMARK_BAR);
     }
 
-    /** A method of the top bar that loads [names] into v0 and returns, and takes [parameters]. */
-    private static Method holding(String name, boolean isStatic, List<String> names, String... parameters) {
+    /** A method of [owner] that loads [names] into v0 and returns, and takes [parameters], none wide. */
+    private static Method holding(String owner, String name, boolean isStatic, List<String> names, String... parameters) {
         List<Instruction> instructions = new ArrayList<>();
         for (String held : names) {
             instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(held)));
         }
         instructions.add(op(Opcode.RETURN_VOID));
         int registers = 1 + (isStatic ? 0 : 1) + parameters.length;
-        return define(TOP_BAR, name, "V", isStatic, new ImmutableMethodImplementation(registers, instructions, null, null),
+        return define(owner, name, "V", isStatic, new ImmutableMethodImplementation(registers, instructions, null, null),
                 parameters);
     }
 
@@ -860,10 +872,74 @@ public class BadDexFixture {
         List<Method> methods = new ArrayList<>();
         methods.add(logoMethod("buildLogo", LOGO_SECTIONS, containerSent, logoSent, logoView));
         methods.add(logoMethod("buildSearch", LOGO_SECTIONS.subList(0, 1), false, searchSent, 1));
-        methods.add(holding("refreshLogo", false, LOGO_SECTIONS, CONTEXT, WORDMARK_BAR));
-        methods.add(holding("buildLogoFor", true, LOGO_SECTIONS, CONTEXT));
+        methods.add(holding(TOP_BAR, "refreshLogo", false, LOGO_SECTIONS, CONTEXT, WORDMARK_BAR));
+        methods.add(holding(TOP_BAR, "buildLogoFor", true, LOGO_SECTIONS, CONTEXT));
         if (secondBuilder) methods.add(logoMethod("buildLogoAgain", LOGO_SECTIONS, false, false, 1));
         return new ImmutableClassDef(TOP_BAR, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null, methods);
+    }
+
+    /** The batcher's flush handing the send in [runnable] to the executor in [executor], as Facebook makes the call. */
+    private static Instruction execute(int executor, int runnable) {
+        return new ImmutableInstruction35c(Opcode.INVOKE_INTERFACE, 2, executor, runnable, 0, 0, 0, EXECUTE);
+    }
+
+    /** Don't send reel watch history's stand-in for that call: static, the executor first. */
+    private static Instruction watchSend(int executor, int runnable) {
+        return invoke(WATCH_SEND, executor, runnable);
+    }
+
+    /**
+     * An instance method of the batcher taking nothing, this in v3: it loads [names] into v0, reads
+     * the send it built into v1 and its executor into v2, then makes [handOver], the calls handing
+     * the send over.
+     */
+    private static Method batcherMethod(String name, List<String> names, List<Instruction> handOver) {
+        List<Instruction> instructions = new ArrayList<>();
+        for (String held : names) {
+            instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(held)));
+        }
+        instructions.add(new ImmutableInstruction22c(Opcode.IGET_OBJECT, 1, 3, new ImmutableFieldReference(BATCHER, "send", RUNNABLE)));
+        instructions.add(new ImmutableInstruction22c(Opcode.IGET_OBJECT, 2, 3, new ImmutableFieldReference(BATCHER, "executor", EXECUTOR)));
+        instructions.addAll(handOver);
+        instructions.add(op(Opcode.RETURN_VOID));
+        return define(BATCHER, name, "V", false, new ImmutableMethodImplementation(4, instructions, null, null));
+    }
+
+    /** Facebook's call handing the batch over, as the clean build makes it. */
+    private static List<Instruction> handedOver() {
+        return Collections.singletonList(execute(2, 1));
+    }
+
+    /** The call as Don't send reel watch history leaves it: the stand-in, on the same registers. */
+    private static List<Instruction> heldBack() {
+        return Collections.singletonList(watchSend(2, 1));
+    }
+
+    /**
+     * Facebook's batcher of watched reels. Its flush, an instance method taking nothing, holds the
+     * mutation's name and its input field and hands the send over with [handOver]. Facebook's
+     * batcher has nothing else holding either, but beside the flush here sit three methods holding
+     * part of what the watch-history rule picks it by, so a rule naming less would pass a hook in
+     * one of them: one taking nothing that holds the mutation's name alone and, with [describeSent],
+     * hands the send to the stand-in too, one holding both that is static, and one holding both
+     * that takes an int. With [secondFlush] a second method answers the rule, making Facebook's call.
+     */
+    private static ClassDef batcher(List<Instruction> handOver, boolean describeSent, boolean secondFlush) {
+        List<Method> methods = new ArrayList<>();
+        methods.add(batcherMethod("flush", SEEN_STATE, handOver));
+        methods.add(batcherMethod("describe", SEEN_STATE.subList(0, 1),
+                describeSent ? heldBack() : Collections.<Instruction>emptyList()));
+        methods.add(holding(BATCHER, "flushAll", true, SEEN_STATE));
+        methods.add(holding(BATCHER, "flushSome", false, SEEN_STATE, "I"));
+        if (secondFlush) methods.add(batcherMethod("flushAgain", SEEN_STATE, handedOver()));
+        return new ImmutableClassDef(BATCHER, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null, methods);
+    }
+
+    /** The extension's stand-in, static, v0 the executor and v1 the send: it makes the real call. */
+    private static ClassDef reelWatchHistory() {
+        return new ImmutableClassDef(REEL_WATCH_HISTORY, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
+                OBJECT, null, null, null, null, Collections.singletonList(define(REEL_WATCH_HISTORY, "send", "V", true,
+                        body(2, execute(0, 1), op(Opcode.RETURN_VOID)), EXECUTOR, RUNNABLE)));
     }
 
     /** [classes] with the top bar replaced by [topBar]. */
@@ -1029,7 +1105,18 @@ public class BadDexFixture {
                 recommendationLabel, showcaseUnit(), showcaseType, preEof, returnController(returnHook()), returnRefresh(),
                 shortcuts(Collections.<String>emptySet()), settingsEntry(), followCheck(followHook()), reelDeclutter(),
                 topBar(false, true, 1), finderStub(FILLED_FINDER_STUB),
-                emojiProvider(emojiHook(), Collections.<Instruction>emptyList()), systemEmoji());
+                emojiProvider(emojiHook(), Collections.<Instruction>emptyList()), systemEmoji(),
+                batcher(heldBack(), false, false), reelWatchHistory());
+    }
+
+    /** The clean host, Facebook's classes as they ship, with the batcher's flush making [handOver]. */
+    private static List<ClassDef> clean(List<Instruction> handOver) {
+        return Arrays.asList(cleanHost(), cleanAdapters(), trayController(Collections.<Instruction>emptyList()),
+                showcaseUnit(), preEof(Collections.<Instruction>emptyList()), returnController(Collections.<Instruction>emptyList()),
+                shortcuts(allShortcutCalls()), followCheck(Collections.<Instruction>emptyList()),
+                topBar(false, false, 1),
+                emojiProvider(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
+                batcher(handOver, false, false));
     }
 
     /**
@@ -1139,11 +1226,10 @@ public class BadDexFixture {
         if (!out.isDirectory() && !out.mkdirs()) throw new IllegalStateException("Cannot create " + out);
 
         Map<String, List<ClassDef>> dexes = new LinkedHashMap<>();
-        dexes.put("clean", Arrays.asList(cleanHost(), cleanAdapters(), trayController(Collections.<Instruction>emptyList()),
-                showcaseUnit(), preEof(Collections.<Instruction>emptyList()), returnController(Collections.<Instruction>emptyList()),
-                shortcuts(allShortcutCalls()), followCheck(Collections.<Instruction>emptyList()),
-                topBar(false, false, 1),
-                emojiProvider(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList())));
+        dexes.put("clean", clean(handedOver()));
+        // A clean build whose flush hands nothing over, so there is no call for the watch-history
+        // hook to have taken the place of.
+        dexes.put("clean-no-hand-over", clean(Collections.<Instruction>emptyList()));
         dexes.put("secondary", Collections.singletonList(secondary()));
         dexes.put("good", good());
         List<ClassDef> goodWithSecondary = new ArrayList<>(good());
@@ -1550,6 +1636,25 @@ public class BadDexFixture {
         // contract: a second method answering the logo rule, so it can't say which one the hook
         // belongs in, although the hook is where it was.
         dexes.put("bad-logo-two-builders", withTopBar(good(), topBar(false, true, 1, false, true)));
+
+        // contract: the batcher's flush left as Facebook makes it, handing each batch of watched
+        // reels to its executor.
+        dexes.put("bad-watch-hook-missing", replaced(good(), batcher(handedOver(), false, false)));
+        // contract: the stand-in in the method holding the mutation's name alone, and the flush
+        // left as Facebook makes it.
+        dexes.put("bad-watch-hook-decoy", replaced(good(), batcher(handedOver(), true, false)));
+        // contract: the stand-in in the flush and in that other method too.
+        dexes.put("bad-watch-hook-also-elsewhere", replaced(good(), batcher(heldBack(), true, false)));
+        // contract: the stand-in twice in the flush.
+        dexes.put("bad-watch-hook-twice", replaced(good(), batcher(Arrays.asList(watchSend(2, 1), watchSend(2, 1)), false, false)));
+        // contract: the stand-in in the flush with Facebook's call left after it, so the batch goes
+        // out anyway.
+        dexes.put("bad-watch-execute-left", replaced(good(), batcher(Arrays.asList(watchSend(2, 1), execute(2, 1)), false, false)));
+        // contract: the stand-in handed the send as its executor and the executor as its send.
+        dexes.put("bad-watch-hook-other-registers", replaced(good(), batcher(Collections.singletonList(watchSend(1, 2)), false, false)));
+        // contract: a second method answering the watch-history rule, so it can't say which one
+        // the hook belongs in, although the hook is where it was.
+        dexes.put("bad-watch-two-flushes", replaced(good(), batcher(heldBack(), false, true)));
 
         // contract: each start-call hook put first in a method that holds the rule's first string
         // but isn't the one the patch hooks. A rule naming only that string counted any method

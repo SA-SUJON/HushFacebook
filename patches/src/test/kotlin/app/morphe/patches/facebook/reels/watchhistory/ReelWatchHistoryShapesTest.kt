@@ -4,6 +4,7 @@
  */
 package app.morphe.patches.facebook.reels.watchhistory
 
+import app.morphe.RepoFiles
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import com.android.tools.smali.dexlib2.AccessFlags
@@ -35,10 +36,12 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 
 /**
  * The parts of Don't send reel watch history that need no Facebook build: what the fingerprint
- * takes as the batcher's flush and what it refuses, and the call the hook leaves in its place.
+ * takes as the batcher's flush and what it refuses, the call the hook leaves in its place, and the
+ * contract rule that holds a patched build to it.
  */
 class ReelWatchHistoryShapesTest {
     private val owner = "Lfixture/Batcher;"
@@ -209,5 +212,22 @@ class ReelWatchHistoryShapesTest {
         val refusal = assertThrows(PatchException::class.java) { method.withholdSendAt(3) }
         assertTrue(refusal.message, refusal.message!!.contains(PATCH))
         assertTrue(method.implementation!!.instructions.elementAt(4).isExecute())
+    }
+
+    /**
+     * The receipt refuses a patched build whose flush still hands its batch to the executor, or
+     * whose stand-in went anywhere else or onto other registers, by a sole-call rule in
+     * scripts/injected-mutation-contracts.txt. The rule names what the patch finds the flush by and
+     * the call it writes, so a rename on one side can't leave it looking for something no build has.
+     */
+    @Test
+    fun `the contract file holds the hook`() {
+        val rules = File(RepoFiles.root, "scripts/injected-mutation-contracts.txt").readLines()
+            .map { it.trim() }
+            .filter { it.startsWith("sole-call ") && it.contains("/ReelWatchHistory;->") }
+        assertEquals(
+            listOf("sole-call $SEND replacing ${execute.descriptor()} in instance ()V holding $SEEN_STATE_MUTATION $VIDEO_IDS"),
+            rules,
+        )
     }
 }

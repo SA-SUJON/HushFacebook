@@ -6,9 +6,10 @@
 #   start-call <method reference> [in [static|instance] <(parameters)return, * for any run>] holding <string> [<string> ...]
 #   no-call <method reference> outside <package prefix>
 #   next-call <method reference> after <method reference> [in [static|instance] <shape>] holding <string> [<string> ...]
-# A start-call or next-call rule picks its method by every string it names and its shape, and
-# exactly one of Facebook's methods may answer that; name as much as the patch itself finds the
-# method by.
+#   sole-call <method reference> replacing <method reference> [in [static|instance] <shape>] holding <string> [<string> ...]
+# A start-call, next-call or sole-call rule picks its method by every string it names and its
+# shape, and exactly one of Facebook's methods may answer that; name as much as the patch itself
+# finds the method by.
 # Two feed guards stacked on addNewEdgeToCollection is the shape that broke builds before, and a
 # guard anywhere else filters nothing.
 single-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideEdge(Ljava/lang/Object;Ljava/lang/Object;)Z in addNewEdgeToCollection
@@ -63,3 +64,10 @@ no-call Landroid/content/pm/ShortcutManager;->removeAllDynamicShortcuts()V outsi
 # context and the bar, which keeps its name (580 and 577 have one more static method of that shape
 # in the bar, holding neither section).
 next-call Lapp/morphe/extension/facebook/settings/SettingsEntry;->setLogoTouchListener(Landroid/view/View;Landroid/view/View$OnTouchListener;)V after Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V in static (Landroid/content/Context;Lcom/facebook/navigation/navbar/legacy/search/WordmarkNavigationBar;)V holding WordmarkNavigationBar#createWordmarkView WordmarkNavigationBar.initContents
+# Don't send reel watch history takes the place of the Reels viewer's hand-over of each batch of
+# watched reels: the one Executor.execute call in the batcher's flush becomes ReelWatchHistory.send,
+# on the executor's and the send's registers in that order. The flush is the one method holding the
+# mutation's name and its input field, an instance method taking nothing (on 580 and 577 no other
+# method holds the mutation's name). Left out or left beside the stand-in, the batch goes out; on
+# other registers, the stand-in gets the send as its executor.
+sole-call Lapp/morphe/extension/facebook/reels/ReelWatchHistory;->send(Ljava/util/concurrent/Executor;Ljava/lang/Runnable;)V replacing Ljava/util/concurrent/Executor;->execute(Ljava/lang/Runnable;)V in instance ()V holding FbShortsSeenStateMutation video_ids

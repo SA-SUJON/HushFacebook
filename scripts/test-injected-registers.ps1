@@ -40,7 +40,14 @@
     twice, sent in another top bar method holding the logo's first trace section with the builder
     left alone, or sent there as well as in the builder, and a second builder answers the rule, a
     build each, and each has to fail the logo's next-call rule for its own reason; the contract
-    file may hold no other next-call rule.
+    file may hold no other next-call rule. The call that hands the Reels viewer's batch of watched
+    reels to its executor is left as Facebook makes it, the watch-history stand-in is sent in
+    another batcher method holding the mutation's name with the flush left alone, sent there as
+    well as in the flush, sent twice, sent with Facebook's call left beside it, or handed the two
+    registers the wrong way round, and a second flush answers the rule, a build each, each failing
+    the sole-call rule for its own reason; a clean build whose flush makes no such call fails the
+    good build's stand-in for want of one to stand in for, and the contract file may hold no other
+    sole-call rule.
     The good build carries the joins, copies and reads ART accepts, a zero tested against
     an object among them, so a check made stricter still has to pass them. Each bad build has to
     fail with findings of its own category only, so a check that fires for the wrong reason fails
@@ -647,6 +654,21 @@ try {
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         "contract $logoRule`: right after it on v1 in $logoBuilder")) `
         "The good build's logo hook was not reported right after the logo's tap.`n$($good.Output -join "`n")"
+    # Don't send reel watch history sends the batcher's one hand-over of watched reels to a
+    # stand-in on the same registers. The contract file's one sole-call rule is that hook, so a rule
+    # this suite builds no bad fixtures for can't pass on a count nobody checks.
+    $watchSend = 'Lapp/morphe/extension/facebook/reels/ReelWatchHistory;->send(Ljava/util/concurrent/Executor;Ljava/lang/Runnable;)V'
+    $watchExecute = 'Ljava/util/concurrent/Executor;->execute(Ljava/lang/Runnable;)V'
+    $watchFlush = 'Lfixture/SeenStateBatcher;->flush()V'
+    $watchHeld = '"FbShortsSeenStateMutation" and "video_ids" with the shape instance ()V'
+    $watchRule = "sole-call $watchSend replacing $watchExecute in instance ()V holding FbShortsSeenStateMutation video_ids"
+    $soleCallRules = @(Get-Content -LiteralPath $contracts | Where-Object { $_ -match '^\s*sole-call\s' } |
+        ForEach-Object { ($_.Trim() -split '\s+') -join ' ' })
+    Assert-True ($soleCallRules.Count -eq 1 -and $soleCallRules[0] -ceq $watchRule) `
+        "The contract file's sole-call rules are not the watch-history hook this suite builds bad fixtures for:`n$($soleCallRules -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        "contract $watchRule`: in place of it on v2, v1 in $watchFlush")) `
+        "The good build's watch-history hook was not reported in place of the executor call.`n$($good.Output -join "`n")"
 
     $bad = [ordered]@{
         'bad-branch' = 'branch'
@@ -742,6 +764,13 @@ try {
         'bad-logo-hook-decoy' = 'contract'
         'bad-logo-hook-also-elsewhere' = 'contract'
         'bad-logo-two-builders' = 'contract'
+        'bad-watch-hook-missing' = 'contract'
+        'bad-watch-hook-decoy' = 'contract'
+        'bad-watch-hook-also-elsewhere' = 'contract'
+        'bad-watch-hook-twice' = 'contract'
+        'bad-watch-execute-left' = 'contract'
+        'bad-watch-hook-other-registers' = 'contract'
+        'bad-watch-two-flushes' = 'contract'
         'bad-finder-stub-not-filled' = 'contract'
         'bad-finder-stub-extension-call' = 'contract'
         'bad-finder-stub-call-after-return' = 'contract'
@@ -816,6 +845,39 @@ try {
         Assert-True ($fails.Count -eq 1 -and $fails[0] -ceq $case.Value) `
             "$($case.Key) did not fail with its own logo finding alone.`nExpected: $($case.Value)`nGot:`n$($fails -join "`n")"
     }
+
+    # Each watch-history build fails on the sole-call rule alone, for its own reason: no stand-in,
+    # one in another method holding the mutation's name, one there as well as in the flush, two,
+    # Facebook's call left beside it, one on the registers the wrong way round, or a second flush.
+    $watchDescribe = 'Lfixture/SeenStateBatcher;->describe()V'
+    $watchFails = [ordered]@{
+        'bad-watch-hook-missing' = "[diff] FAIL: contract: $watchSend is not called in $watchFlush, the one method holding $watchHeld"
+        'bad-watch-hook-decoy' = "[diff] FAIL: contract: $watchSend is not called in $watchFlush, the one method holding " +
+            "$watchHeld; the host methods that call it: $watchDescribe"
+        'bad-watch-hook-also-elsewhere' = "[diff] FAIL: contract: $watchSend is called in $watchDescribe as well as in " +
+            "$watchFlush, the one method holding $watchHeld"
+        'bad-watch-hook-twice' = "[diff] FAIL: contract: $watchSend has 2 call sites in $watchFlush, and must have exactly one"
+        'bad-watch-execute-left' = "[diff] FAIL: contract: $watchFlush still calls $watchExecute, which $watchSend stands in for"
+        'bad-watch-hook-other-registers' = "[diff] FAIL: contract: $watchSend is called in $watchFlush on v1, v2, but the " +
+            "clean build calls $watchExecute there on v2, v1"
+        'bad-watch-two-flushes' = "[diff] FAIL: contract: 2 methods hold $watchHeld, and exactly one must, so the rule " +
+            "can't say which one calls ${watchSend}: $watchFlush, Lfixture/SeenStateBatcher;->flushAgain()V"
+    }
+    foreach ($case in $watchFails.GetEnumerator()) {
+        $fails = @((Get-Findings $badResults[$case.Key]).Fails)
+        Assert-True ($fails.Count -eq 1 -and $fails[0] -ceq $case.Value) `
+            "$($case.Key) did not fail with its own watch-history finding alone.`nExpected: $($case.Value)`nGot:`n$($fails -join "`n")"
+    }
+    # And against a clean build whose flush makes no executor call, the good build's stand-in has
+    # nothing it took the place of.
+    $noHandOverClean = New-DexApk -Name 'clean-no-hand-over' -Entries ([ordered]@{ 'classes.dex' = (Get-Dex 'clean-no-hand-over') })
+    $noHandOver = Invoke-DexDiff -Clean $noHandOverClean -Patched (Join-Path $caseRoot 'good.apk') `
+        -Allowlist $emptyAllowlist -Name 'no-hand-over' -Contracts $contracts
+    $noHandOverFails = @((Get-Findings $noHandOver).Fails)
+    $noHandOverExpected = "[diff] FAIL: contract: $watchSend is called in $watchFlush on v2, v1, but the clean build " +
+        "calls $watchExecute there 0 times, not once"
+    Assert-True ($noHandOver.ExitCode -ne 0 -and $noHandOverFails.Count -eq 1 -and $noHandOverFails[0] -ceq $noHandOverExpected) `
+        "A stand-in for a call the clean build never made was accepted.`nExpected: $noHandOverExpected`nGot:`n$($noHandOver.Output -join "`n")"
 
     # The GenAI reel stub's three builds fail on that stub's own rule alone: a call that stays in the
     # extension, or Facebook's finder reached only after a return, is no fill.
@@ -928,7 +990,15 @@ try {
             "next-call $logoHook after $logoTap in static $logoShape",
             "next-call $logoHook after $logoTap in sometimes $logoShape holding tofu",
             "next-call $logoHook after $logoTap in static Landroid/content/Context;)V holding tofu",
-            "next-call $logoHook after $logoTap tofu holding tofu")) {
+            "next-call $logoHook after $logoTap tofu holding tofu",
+            "sole-call $watchSend holding FbShortsSeenStateMutation video_ids",
+            "sole-call $watchSend replacing execute holding FbShortsSeenStateMutation video_ids",
+            "sole-call send replacing $watchExecute holding FbShortsSeenStateMutation video_ids",
+            "sole-call $watchSend after $watchExecute holding FbShortsSeenStateMutation video_ids",
+            "sole-call $watchSend replacing $watchExecute holding",
+            "sole-call $watchSend replacing $watchExecute holding video_ids video_ids",
+            "sole-call $watchSend replacing $watchExecute in instance holding video_ids",
+            "sole-call $watchSend replacing $watchExecute in instance ()V")) {
         [System.IO.File]::WriteAllText($badContract, "# a comment line first`n$line`n")
         $unreadableFirstCall = Invoke-DexDiff -Clean $cleanApk -Patched (Join-Path $caseRoot 'good.apk') `
             -Allowlist $emptyAllowlist -Name 'bad-first-call-contract' -Contracts $badContract
