@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
@@ -343,6 +344,15 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("A Download button in the sidebar of every reel saves it at the quality set "
                                 + "under Downloads. Off or paused, reels show only Facebook's own buttons.")));
             }
+        }
+
+        if (build.contains(PatchFamily.DEFAULT_COMMENT_ORDER)) {
+            PreferenceCategory comments = category(screen, L10n.t("Comments"));
+            comments.addPreference(toggle(context, Settings.DEFAULT_COMMENT_ORDER, L10n.t("Default comment order"),
+                    L10n.t("Comments open in the order chosen below instead of the one Facebook picks. An order you "
+                            + "pick in a post's comments stays for that post until Facebook restarts, and links to a "
+                            + "comment keep Facebook's order.")));
+            comments.addPreference(commentOrderRow(context));
         }
 
         if (build.contains(PatchFamily.TAP_TO_PLAY)) {
@@ -922,13 +932,66 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 tabLabel(tab));
     }
 
-    /** The quality and start tab rows' summaries are sentences of their own rather than the chosen entry. */
+    /**
+     * The order comment sheets ask for. Like the start tab row, its values are the setting's own
+     * names and its summary says what the choice does.
+     */
+    static CommentOrderRow commentOrderRow(Context context) {
+        CommentOrderRow row = new CommentOrderRow(context);
+        row.setKey(Settings.COMMENT_ORDER.key);
+        row.setTitle(L10n.t("Comment order"));
+        row.setDialogTitle(L10n.t("Comment order"));
+        // Android's own Cancel follows the activity's language, as the other lists' did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        CommentOrder[] orders = CommentOrder.values();
+        CharSequence[] entries = new CharSequence[orders.length];
+        CharSequence[] values = new CharSequence[orders.length];
+        for (int i = 0; i < orders.length; i++) {
+            entries[i] = commentOrderLabel(orders[i]);
+            values[i] = orders[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.COMMENT_ORDER.savedValue().name());
+        return row;
+    }
+
+    /** What the list and its summary call [order]: the name Facebook's own sort menu gives it. */
+    static String commentOrderLabel(CommentOrder order) {
+        switch (order) {
+            case MOST_RELEVANT:
+                return L10n.t("Most relevant");
+            case NEWEST:
+                return L10n.t("Newest");
+            case ALL_COMMENTS:
+                return L10n.t("All comments");
+            default:
+                return L10n.t("Facebook's choice");
+        }
+    }
+
+    /**
+     * What a comment sheet does with [order], for the row's summary. Facebook answers with the
+     * order it used and its menu shows that one, so the summary names the menu, and says the post
+     * has to offer the order rather than promise it.
+     */
+    static String commentOrderSummary(CommentOrder order) {
+        if (order == CommentOrder.FACEBOOK) {
+            return L10n.t("Comments open in the order Facebook picks, which is usually Most relevant.");
+        }
+        return L10n.f("A post's comments open with %1$s picked in their sort menu, where the post offers it.",
+                commentOrderLabel(order));
+    }
+
+    /** The quality, start tab and comment order rows' summaries are sentences of their own rather than the chosen entry. */
     @Override
     protected void updateListPreferenceSummary(ListPreference listPreference, Setting<?> setting) {
         if (listPreference instanceof QualityRow) {
             ((QualityRow) listPreference).showSummary();
         } else if (listPreference instanceof StartTabRow) {
             ((StartTabRow) listPreference).showSummary();
+        } else if (listPreference instanceof CommentOrderRow) {
+            ((CommentOrderRow) listPreference).showSummary();
         } else {
             super.updateListPreferenceSummary(listPreference, setting);
         }
@@ -1215,6 +1278,45 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 if (candidate.name().equals(getValue())) tab = candidate;
             }
             setSummary(startTabSummary(tab));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The comment order's row. Its summary follows its value, whoever sets it: the person, the
+     * shared page syncing it from the setting, or an import.
+     */
+    static final class CommentOrderRow extends ListPreference {
+        CommentOrderRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            CommentOrder order = CommentOrder.FACEBOOK;
+            for (CommentOrder candidate : CommentOrder.values()) {
+                if (candidate.name().equals(getValue())) order = candidate;
+            }
+            setSummary(commentOrderSummary(order));
         }
 
         @Override

@@ -295,3 +295,27 @@ Search	Suche
 Hide Meta AI in search	Meta AI in der Suche ausblenden
 # context: summary of that switch; Meta AI and Ask Meta AI are Meta's own names, as Facebook shows them
 Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.	Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschläge „Meta AI fragen“ mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beiträge bleiben, und die Meta AI-Schaltfläche öffnet Meta AI weiterhin.
+# context: settings section heading for the Default comment order switch and its list
+Comments	Kommentare
+# context: switch title; on, a post's comments open in the order chosen in the list below it
+Default comment order	Standard-Reihenfolge der Kommentare
+# context: summary of that switch; a link to a comment is one from a notification, say
+Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.	Kommentare öffnen sich in der unten gewählten Reihenfolge statt in der, die Facebook auswählt. Eine Reihenfolge, die du in den Kommentaren eines Beitrags wählst, bleibt für diesen Beitrag, bis Facebook neu startet, und Links zu einem Kommentar behalten die Reihenfolge von Facebook.
+# context: title of the list of comment orders, and of its dialog
+Comment order	Reihenfolge der Kommentare
+# context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook
+Facebook's choice	Wahl von Facebook
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+Most relevant	Relevanteste
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+Newest	Neueste
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+All comments	Alle Kommentare
+# context: summary of the list when Facebook's choice is picked; Most relevant is Facebook's own name for that order
+Comments open in the order Facebook picks, which is usually Most relevant.	Kommentare öffnen sich in der Reihenfolge, die Facebook auswählt, meist „Relevanteste“.
+# context: summary of the list; %1$s is one of the order names above, as Facebook's sort menu shows it
+A post's comments open with %1$s picked in their sort menu, where the post offers it.	Die Kommentare eines Beitrags öffnen sich mit %1$s als Auswahl im Sortiermenü, wenn der Beitrag das anbietet.
+# context: sentence in the import preview and the toast after an import that sets the comment order to Facebook's choice
+Comments will open in the order Facebook picks.	Kommentare öffnen sich dann in der Reihenfolge, die Facebook auswählt.
+# context: sentence in the import preview and the toast after an import that sets the comment order; %1$s is one of the order names above
+Comments will open with %1$s picked in their sort menu.	Kommentare öffnen sich dann mit %1$s als Auswahl im Sortiermenü.

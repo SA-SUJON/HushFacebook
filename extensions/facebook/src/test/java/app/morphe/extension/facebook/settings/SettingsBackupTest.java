@@ -68,6 +68,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.Utils;
@@ -144,6 +145,7 @@ public class SettingsBackupTest {
         Settings.DOWNLOAD_QUALITY.resetToDefault();
         Settings.FILENAME_TEMPLATE.resetToDefault();
         Settings.START_TAB.resetToDefault();
+        Settings.COMMENT_ORDER.resetToDefault();
         BaseSettings.PAUSED.resetToDefault();
         BaseSettings.DEBUG.resetToDefault();
         BaseSettings.DEBUG_LOG_FILTERS.resetToDefault();
@@ -187,11 +189,12 @@ public class SettingsBackupTest {
             assertFalse(setting.key + " is carried and kept out at once", VALUES_STAY_OUT.containsKey(setting.key));
         }
         assertEquals(Arrays.<Setting<?>>asList(Settings.SAVE_FOLDER, Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE,
-                Settings.START_TAB), SettingsBackup.VALUES);
+                Settings.START_TAB, Settings.COMMENT_ORDER), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_FOLDER, SettingsBackup.FOLDER);
         assertEquals(Settings.DOWNLOAD_QUALITY, SettingsBackup.QUALITY);
         assertEquals(Settings.FILENAME_TEMPLATE, SettingsBackup.FILE_NAME);
         assertEquals(Settings.START_TAB, SettingsBackup.START);
+        assertEquals(Settings.COMMENT_ORDER, SettingsBackup.ORDER);
     }
 
     @Test
@@ -243,6 +246,7 @@ public class SettingsBackupTest {
         Settings.DOWNLOAD_QUALITY.save(DownloadQuality.P480);
         Settings.FILENAME_TEMPLATE.save("../{video_id}");
         Settings.START_TAB.save(StartTab.FRIENDS);
+        Settings.COMMENT_ORDER.save(CommentOrder.ALL_COMMENTS);
         BaseSettings.PAUSED.save(true);
         BaseSettings.DEBUG.save(true);
         BaseSettings.DEBUG_LOG_FILTERS.save("downloads");
@@ -272,6 +276,8 @@ public class SettingsBackupTest {
         assertEquals("{video_id}", switches.get(SettingsBackup.FILE_NAME.key));
         // Saved, not what a paused Facebook is answered: paused, it opens where it chooses.
         assertEquals("friends", switches.get(SettingsBackup.START.key));
+        // Saved, not what a paused Facebook is answered: paused, comments open as Facebook picks.
+        assertEquals("all_comments", switches.get(SettingsBackup.ORDER.key));
         for (Setting<?> setting : Setting.allLoadedSettings()) {
             if (SettingsBackup.ALLOWLIST.contains(setting) || SettingsBackup.VALUES.contains(setting)) continue;
             assertFalse(setting.key + " is in the file", text.contains(setting.key));
@@ -829,6 +835,90 @@ public class SettingsBackupTest {
         assertNull(SettingsBackup.Snapshot.fromBundle(state).start);
         state.putInt("start_tab", 3);
         assertNull(SettingsBackup.Snapshot.fromBundle(state).start);
+    }
+
+    /**
+     * The order comments open in goes out as its file value and comes back only as one this build
+     * offers: any other value, or one that isn't text, refuses the whole file.
+     */
+    @Test
+    public void theCommentOrderRoundTripsAndComesBackOnlyAsOneThisBuildOffers() throws Exception {
+        for (CommentOrder order : CommentOrder.values()) {
+            Settings.COMMENT_ORDER.save(order);
+            String file = SettingsBackup.create();
+            assertEquals(order.fileValue, new JSONObject(file).getJSONObject("settings").get(SettingsBackup.ORDER.key));
+            Settings.COMMENT_ORDER.save(order == CommentOrder.NEWEST ? CommentOrder.FACEBOOK : CommentOrder.NEWEST);
+
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+            assertEquals(order, snapshot.order);
+            assertEquals(order, snapshot.orderChange());
+            assertEquals(0, snapshot.switchChanges());
+            assertEquals(Collections.singletonMap(SettingsBackup.ORDER, order), snapshot.changes());
+            assertEquals(1, SettingsBackup.apply(snapshot));
+            assertEquals(order, Settings.COMMENT_ORDER.savedValue());
+            assertEquals("a file read back is the file", file, SettingsBackup.create());
+            assertEquals("the same order again changes nothing", 0, SettingsBackup.parse(file).changes().size());
+        }
+
+        Settings.COMMENT_ORDER.save(CommentOrder.ALL_COMMENTS);
+        String file = SettingsBackup.create();
+        Map<String, ?> before = store();
+        for (Object refused : new Object[]{"ALL_COMMENTS", "All comments", "all", " all_comments", "",
+                "RANKED_UNFILTERED_CHRONOLOGICAL_REPLIES_INTENT_V1", 3, true, JSONObject.NULL, new JSONObject(),
+                new org.json.JSONArray()}) {
+            JSONObject hostile = new JSONObject(file);
+            hostile.getJSONObject("settings").put(SettingsBackup.ORDER.key, refused);
+            try {
+                SettingsBackup.parse(hostile.toString());
+                fail("a file with the comment order " + printable(String.valueOf(refused)) + " was read");
+            } catch (SettingsBackup.Rejected rejected) {
+                assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the order was carried leaves it alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.order);
+        assertNull(older.orderChange());
+        SettingsBackup.apply(older);
+        assertEquals(CommentOrder.ALL_COMMENTS, Settings.COMMENT_ORDER.savedValue());
+
+        // A preview kept across a rebuild keeps its order, and only one this build offers comes back.
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(CommentOrder.ALL_COMMENTS, SettingsBackup.Snapshot.fromBundle(state).order);
+        state.putString("comment_order", "ALL_COMMENTS");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).order);
+        state.putInt("comment_order", 3);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).order);
+    }
+
+    /** A file that changes the comment order says how comments will open, before and after. */
+    @Test
+    public void importOfACommentOrderSaysHowCommentsWillOpen() throws Exception {
+        JSONObject file = new JSONObject(fileWith(Settings.DOWNLOAD_REELS, false));
+        file.getJSONObject("settings").put(SettingsBackup.ORDER.key, "newest")
+                .put(SettingsBackup.START.key, "notifications");
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            deliver(activity, tap(activity, page, IMPORT_ROW), file.toString());
+            AlertDialog preview = shownPreview();
+            String start = "Facebook will open on Notifications.";
+            String order = "Comments will open with Newest picked in their sort menu.";
+            assertEquals("1 switch will change.\n\n" + start + "\n\n" + order,
+                    String.valueOf(shadowOf(preview).getMessage()));
+            preview.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+            settle();
+            assertEquals("Settings imported. 1 switch changed. " + start + " " + order,
+                    ShadowToast.getTextOfLatestToast());
+            assertEquals(CommentOrder.NEWEST, Settings.COMMENT_ORDER.savedValue());
+            assertEquals("the comment order row still shows the old order",
+                    HushfacebookPreferenceFragment.commentOrderSummary(CommentOrder.NEWEST),
+                    String.valueOf(page.findPreference(Settings.COMMENT_ORDER.key).getSummary()));
+        }
+        assertEquals("Settings imported. Comments will open in the order Facebook picks.",
+                SettingsBackupPreference.importedMessage(0, null, null, null, null, CommentOrder.FACEBOOK));
     }
 
     /** A file that changes the start tab says where Facebook will open, before and after. */

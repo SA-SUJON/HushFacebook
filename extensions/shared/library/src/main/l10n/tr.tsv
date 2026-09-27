@@ -295,3 +295,27 @@ Search	Arama
 Hide Meta AI in search	Aramada Meta AI'ı gizle
 # context: summary of that switch; Meta AI and Ask Meta AI are Meta's own names, as Facebook shows them
 Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.	Arama sonuçlarında artık Meta AI yanıtı ve Meta AI'a sor önerileri görünmez, bir öneri de aramanı artık Meta AI'a göndermez. Kişiler, gruplar, sayfalar ve gönderiler kalır ve Meta AI düğmesi yine Meta AI'ı açar.
+# context: settings section heading for the Default comment order switch and its list
+Comments	Yorumlar
+# context: switch title; on, a post's comments open in the order chosen in the list below it
+Default comment order	Varsayılan yorum sırası
+# context: summary of that switch; a link to a comment is one from a notification, say
+Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.	Yorumlar, Facebook'un seçtiği sıra yerine aşağıda seçilen sırayla açılır. Bir gönderinin yorumlarında seçtiğin sıra, Facebook yeniden başlayana kadar o gönderi için kalır ve bir yoruma giden bağlantılar Facebook'un sırasını korur.
+# context: title of the list of comment orders, and of its dialog
+Comment order	Yorum sırası
+# context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook
+Facebook's choice	Facebook'un seçimi
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+Most relevant	En alakalı
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+Newest	En yeni
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+All comments	Tüm yorumlar
+# context: summary of the list when Facebook's choice is picked; Most relevant is Facebook's own name for that order
+Comments open in the order Facebook picks, which is usually Most relevant.	Yorumlar Facebook'un seçtiği sırayla açılır. Bu genellikle En alakalı sıralamasıdır.
+# context: summary of the list; %1$s is one of the order names above, as Facebook's sort menu shows it
+A post's comments open with %1$s picked in their sort menu, where the post offers it.	Bir gönderinin yorumları, gönderi bunu sunuyorsa sıralama menüsünde %1$s seçili olarak açılır.
+# context: sentence in the import preview and the toast after an import that sets the comment order to Facebook's choice
+Comments will open in the order Facebook picks.	Yorumlar Facebook'un seçtiği sırayla açılacak.
+# context: sentence in the import preview and the toast after an import that sets the comment order; %1$s is one of the order names above
+Comments will open with %1$s picked in their sort menu.	Yorumlar, sıralama menüsünde %1$s seçili olarak açılacak.

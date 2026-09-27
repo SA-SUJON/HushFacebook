@@ -9,6 +9,7 @@ package app.morphe.extension.facebook.settings;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
+import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
@@ -129,6 +130,16 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting DONT_SEND_REEL_WATCH_HISTORY =
             new BooleanSetting("hushfacebook_dont_send_reel_watch_history", TRUE);
+
+    /**
+     * Comment sheets ask for the order in {@link #COMMENT_ORDER} where Facebook's servers would
+     * choose one, and an order picked in a post's comments stays for that post until Facebook
+     * restarts ({@link app.morphe.extension.facebook.comments.DefaultCommentOrder}). A request that
+     * names its own order, and a link to one comment, keep Facebook's. With the order left as
+     * Facebook's, the switch changes nothing.
+     */
+    public static final BooleanSetting DEFAULT_COMMENT_ORDER =
+            new BooleanSetting("hushfacebook_default_comment_order", TRUE);
 
     /**
      * Videos, reels, stories and songs start only after a tap: a player's start goes ahead when a
@@ -294,6 +305,15 @@ public class Settings extends BaseSettings {
      */
     public static final EnumSetting<StartTab> START_TAB =
             new EnumSetting<>("hushfacebook_start_tab", StartTab.MARKETPLACE);
+
+    /**
+     * The order comment sheets ask for while {@link #DEFAULT_COMMENT_ORDER} is on: Facebook's own
+     * choice until someone picks Most relevant, Newest or All comments, so picking the patch changes
+     * nothing on its own. It isn't a switch, and a paused Facebook takes the order its servers
+     * choose.
+     */
+    public static final EnumSetting<CommentOrder> COMMENT_ORDER =
+            new EnumSetting<>("hushfacebook_comment_order", CommentOrder.FACEBOOK);
 
     /**
      * Where {@link #USE_SYSTEM_FONT} takes its font from: empty for the phone's own, or the name of

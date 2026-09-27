@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -291,7 +292,7 @@ public class SettingsBackupPreference extends Preference {
                 parts.add(L10n.quantity(switches, "%1$d switch will change.", "%1$d switches will change.", switches));
             }
             parts.addAll(valueSentences(snapshot.folderChange(), snapshot.qualityChange(), snapshot.fileNameChange(),
-                    snapshot.startChange()));
+                    snapshot.startChange(), snapshot.orderChange()));
             message = String.join("\n\n", parts);
         }
         if (snapshot.unknown > 0) {
@@ -350,14 +351,24 @@ public class SettingsBackupPreference extends Preference {
         return L10n.f("Facebook will open on %1$s.", HushfacebookPreferenceFragment.tabLabel(tab));
     }
 
+    /** The sentence that says in what order comments open after an import. */
+    static String commentOrderSentence(CommentOrder order) {
+        if (order == CommentOrder.FACEBOOK) return L10n.t("Comments will open in the order Facebook picks.");
+        return L10n.f("Comments will open with %1$s picked in their sort menu.",
+                HushfacebookPreferenceFragment.commentOrderLabel(order));
+    }
+
     /**
      * A sentence for each setting that isn't a switch an import changes, in the order the screen
-     * shows them: the tab Facebook opens on, then the download settings.
+     * shows them: the tab Facebook opens on, the order comments open in, then the download
+     * settings.
      */
     static List<String> valueSentences(@Nullable String folder, @Nullable DownloadQuality quality,
-                                       @Nullable String fileName, @Nullable StartTab start) {
+                                       @Nullable String fileName, @Nullable StartTab start,
+                                       @Nullable CommentOrder order) {
         List<String> sentences = new ArrayList<>();
         if (start != null) sentences.add(startTabSentence(start));
+        if (order != null) sentences.add(commentOrderSentence(order));
         if (quality != null) sentences.add(qualitySentence(quality));
         if (folder != null) sentences.add(folderSentence(folder));
         if (fileName != null) sentences.add(fileNameSentence(fileName));
@@ -377,7 +388,7 @@ public class SettingsBackupPreference extends Preference {
         AbstractPreferenceFragment.settingImportInProgress = true;
         // Counted before the write, which makes every change match the store.
         String done = importedMessage(snapshot.switchChanges(), snapshot.folderChange(), snapshot.qualityChange(),
-                snapshot.fileNameChange(), snapshot.startChange());
+                snapshot.fileNameChange(), snapshot.startChange(), snapshot.orderChange());
         boolean accepted = Utils.runOnBackgroundThread(() -> {
             try {
                 SettingsBackup.apply(snapshot);
@@ -409,19 +420,25 @@ public class SettingsBackupPreference extends Preference {
         return importedMessage(switches, folder, quality, fileName, null);
     }
 
+    /** The toast after an import that changed no comment order. */
+    static String importedMessage(int switches, @Nullable String folder, @Nullable DownloadQuality quality,
+                                  @Nullable String fileName, @Nullable StartTab start) {
+        return importedMessage(switches, folder, quality, fileName, start, null);
+    }
+
     /**
      * What the toast after an import says: how many switches changed, then a sentence for each
      * other setting that did. A folder alone keeps the one sentence it always had.
      */
     static String importedMessage(int switches, @Nullable String folder, @Nullable DownloadQuality quality,
-                                  @Nullable String fileName, @Nullable StartTab start) {
-        if (switches == 0 && folder != null && quality == null && fileName == null && start == null) {
+                                  @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order) {
+        if (switches == 0 && folder != null && quality == null && fileName == null && start == null && order == null) {
             return L10n.f("Settings imported. Saves will go to a folder named %1$s.", L10n.isolate(folder));
         }
         List<String> parts = new ArrayList<>();
         parts.add(switches == 0 ? L10n.t("Settings imported.") : L10n.quantity(switches,
                 "Settings imported. %1$d switch changed.", "Settings imported. %1$d switches changed.", switches));
-        parts.addAll(valueSentences(folder, quality, fileName, start));
+        parts.addAll(valueSentences(folder, quality, fileName, start, order));
         return String.join(" ", parts);
     }
 

@@ -304,6 +304,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: Meta AI in Facebook's search. On Facebook 577 and 580 the patch finds three of Facebook's own decisions from kept names and literals. The results page's question of whether to add a Meta AI answer is the one boolean over FbUserSession and SearchResultsMutableContext that both callers of the meta_ai_answer_entities page builder ask first, and the patch answers no there. A page of results is built by one constructor from a list of result modules, whose role is a constant of the enum Facebook loads where it logs a failed GraphQLGraphSearchResultRole parse, and the extension leaves out Meta AI's answer and prompt roles (SEARCH_META_AI_ANSWER with its body, full body and loading state, HCM_SEARCH_META_AI_ANSWER, HCM_RELATED_META_AI_PROMPTS with its loading state, and HCM_SEARCH_AI_MODE) and keeps every other role. The page's name comes along, so the Meta AI tab's own page, the one its builder names search_meta_ai_answer_module, keeps its answer. A suggestion's flag to open Meta AI is the boolean the results router asks GraphSearchQuerySpec before it sends a search to META_AI_TAB, and the patch hands it to the extension where the suggestion parser stores it from the server's reply. The Meta AI button and the results page's Meta AI tab go around all three."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/comments/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/comments/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the order comments open in. Facebook 577 and 580 build every request for a post's comments from FetchFeedbackParams, and the request's builder sets comment_rendering_intent_token from one of its strings only when it isn't empty, so an ordinary comment sheet leaves the order to Facebook's servers. The patch finds that builder by the three variable names it reads from the params (comment_rendering_intent_token, feedback_id and focused_comment_id), finds the one params constructor that stores those three from its own parameters, and asks the extension first there. It also tells the extension first in the comment sheet's pick handler, the one method taking the session and a token that fetches UpdateCommentOrderType_FetchFeedbackQuery. The extension fills in RANKED_FILTERED_INTENT_V1, RECENT_ACTIVITY_INTENT_V1 or RANKED_UNFILTERED_CHRONOLOGICAL_REPLIES_INTENT_V1 only for a request that names no order and no focused comment, and asks again for the order picked in a post's menu until Facebook restarts."
     }
   ]
 }

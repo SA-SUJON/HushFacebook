@@ -18,6 +18,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.SwitchPreference;
 
+import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -435,6 +436,84 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse("a start tab row with no Open on a chosen tab in the build",
                         row instanceof HushfacebookPreferenceFragment.StartTabRow);
                 assertFalse(Settings.OPEN_ON_CHOSEN_TAB.key.equals(row.getKey()));
+            }
+        }
+    }
+
+    /**
+     * With Default comment order in the build, the screen has a Comments section with its switch and
+     * the list of orders, which offers Facebook's own choice first and each order by the name
+     * Facebook's sort menu gives it, says what the chosen one does, and reaches the setting the way
+     * the list's own dialog sends a pick.
+     */
+    @Test
+    public void theCommentOrderRowOffersFacebooksChoiceAndEachOrder() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.DEFAULT_COMMENT_ORDER, PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment page = new HushfacebookPreferenceFragment();
+            controller.get().getFragmentManager().beginTransaction().add(android.R.id.content, page).commitNow();
+            List<Preference> rows = new ArrayList<>();
+            collect(page.getPreferenceScreen(), rows);
+            int toggle = -1;
+            for (int i = 0; i < rows.size(); i++) {
+                if (Settings.DEFAULT_COMMENT_ORDER.key.equals(rows.get(i).getKey())) toggle = i;
+            }
+            assertTrue("no Default comment order switch", toggle >= 0);
+            // Its own section, headed Comments, holds the switch and the list and nothing else.
+            PreferenceGroup section = null;
+            for (int i = 0; i < page.getPreferenceScreen().getPreferenceCount(); i++) {
+                Preference top = page.getPreferenceScreen().getPreference(i);
+                if (top instanceof PreferenceGroup
+                        && ((PreferenceGroup) top).findPreference(Settings.DEFAULT_COMMENT_ORDER.key) != null) {
+                    section = (PreferenceGroup) top;
+                }
+            }
+            assertNotNull(section);
+            assertEquals("Comments", String.valueOf(section.getTitle()));
+            assertEquals(2, section.getPreferenceCount());
+            assertEquals("Default comment order", String.valueOf(rows.get(toggle).getTitle()));
+            assertTrue(rows.get(toggle + 1) instanceof HushfacebookPreferenceFragment.CommentOrderRow);
+            HushfacebookPreferenceFragment.CommentOrderRow order =
+                    (HushfacebookPreferenceFragment.CommentOrderRow) rows.get(toggle + 1);
+            assertEquals(Settings.COMMENT_ORDER.key, order.getKey());
+            assertEquals("Comment order", String.valueOf(order.getTitle()));
+
+            List<String> entries = new ArrayList<>();
+            for (CharSequence entry : order.getEntries()) entries.add(String.valueOf(entry));
+            assertEquals(Arrays.asList("Facebook's choice", "Most relevant", "Newest", "All comments"), entries);
+            List<String> values = new ArrayList<>();
+            for (CharSequence value : order.getEntryValues()) values.add(String.valueOf(value));
+            List<String> names = new ArrayList<>();
+            for (CommentOrder each : CommentOrder.values()) names.add(each.name());
+            assertEquals(names, values);
+
+            assertEquals("FACEBOOK", order.getValue());
+            assertEquals("Comments open in the order Facebook picks, which is usually Most relevant.",
+                    String.valueOf(order.getSummary()));
+
+            // A pick in the list, the way its dialog sends one.
+            order.setValue("ALL_COMMENTS");
+            ShadowLooper.idleMainLooper();
+            assertEquals(CommentOrder.ALL_COMMENTS, Settings.COMMENT_ORDER.savedValue());
+            assertEquals("A post's comments open with All comments picked in their sort menu, where the post offers it.",
+                    String.valueOf(order.getSummary()));
+
+            // A value set behind the row, as an import does, shows once the page syncs.
+            Settings.COMMENT_ORDER.save(CommentOrder.NEWEST);
+            page.refreshSwitches();
+            assertEquals("NEWEST", order.getValue());
+            assertEquals(HushfacebookPreferenceFragment.commentOrderSummary(CommentOrder.NEWEST),
+                    String.valueOf(order.getSummary()));
+        } finally {
+            Settings.COMMENT_ORDER.resetToDefault();
+        }
+
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            for (Preference row : rowsOf(controller)) {
+                assertFalse("a comment order row with no Default comment order in the build",
+                        row instanceof HushfacebookPreferenceFragment.CommentOrderRow);
+                assertFalse(Settings.DEFAULT_COMMENT_ORDER.key.equals(row.getKey()));
             }
         }
     }

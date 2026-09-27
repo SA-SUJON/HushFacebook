@@ -31,6 +31,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
@@ -49,14 +50,15 @@ import app.morphe.extension.shared.settings.StringSetting;
  * over. This writes them to a JSON file the person chooses and reads one back.
  *
  * <p>Only the switches in {@link #ALLOWLIST} and the settings in {@link #VALUES} (the save folder,
- * the save quality, the video file name and the tab Facebook opens on) go out or come in. Pause,
- * safe mode, the debug settings, the app language and the counters Hushfacebook keeps for itself
- * stay out, and so do the log, the diagnostic data and anything about the person or the phone: a
- * file is a format name, a version number, one true or false per switch, one folder name, one
- * quality, one file name template and one tab. An import applies what it read in one preference
- * commit. A file that is too large, isn't JSON, names something twice, holds a value of the wrong
- * type, a folder or a template that isn't one clean name, or a quality or tab this build doesn't
- * offer, or comes from a newer version changes nothing.
+ * the save quality, the video file name, the tab Facebook opens on and the order comments open
+ * in) go out or come in. Pause, safe mode, the debug settings, the app language and the counters
+ * Hushfacebook keeps for itself stay out, and so do the log, the diagnostic data and anything about
+ * the person or the phone: a file is a format name, a version number, one true or false per switch,
+ * one folder name, one quality, one file name template, one tab and one comment order. An import
+ * applies what it read in one preference commit. A file that is too large, isn't JSON, names
+ * something twice, holds a value of the wrong type, a folder or a template that isn't one clean
+ * name, or a quality, tab or comment order this build doesn't offer, or comes from a newer version
+ * changes nothing.
  * <p>The release check stays out of the file: it puts the phone online, so it's switched on
  * from the phone's own screen, never by a file.
  *
@@ -96,6 +98,7 @@ public final class SettingsBackup {
             Settings.HIDE_REEL_FOLLOW_BUTTON,
             Settings.HIDE_REEL_SOCIAL_FOOTER,
             Settings.DONT_SEND_REEL_WATCH_HISTORY,
+            Settings.DEFAULT_COMMENT_ORDER,
             Settings.TAP_TO_PLAY,
             Settings.USE_SYSTEM_FONT,
             Settings.USE_SYSTEM_EMOJI,
@@ -141,9 +144,15 @@ public final class SettingsBackup {
      */
     static final EnumSetting<StartTab> START = Settings.START_TAB;
 
+    /**
+     * The order comment sheets ask for, held in a file as its {@link CommentOrder#fileValue}.
+     * Anything else refuses the whole file, as a tab does.
+     */
+    static final EnumSetting<CommentOrder> ORDER = Settings.COMMENT_ORDER;
+
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(FOLDER, QUALITY, FILE_NAME, START));
+            Arrays.<Setting<?>>asList(FOLDER, QUALITY, FILE_NAME, START, ORDER));
 
     /**
      * Bounds for the parser, well past anything this class writes, so a file built to be
@@ -202,8 +211,8 @@ public final class SettingsBackup {
     }
 
     /**
-     * What a file says: a value for each switch it names, the folder, the quality, the file name
-     * and the start tab when it names them, and how many other names it holds.
+     * What a file says: a value for each switch it names, the folder, the quality, the file name,
+     * the start tab and the comment order when it names them, and how many other names it holds.
      */
     public static final class Snapshot {
         private static final String SWITCHES = "switches";
@@ -212,6 +221,7 @@ public final class SettingsBackup {
         private static final String QUALITY_NAME = "quality";
         private static final String FILE_NAME_NAME = "file_name";
         private static final String START_NAME = "start_tab";
+        private static final String ORDER_NAME = "comment_order";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -227,16 +237,20 @@ public final class SettingsBackup {
         /** The tab Facebook opens on that the file holds, or null when it names none. */
         @Nullable
         final StartTab start;
+        /** The order comments open in that the file holds, or null when it names none. */
+        @Nullable
+        final CommentOrder order;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
         Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
-                 @Nullable String fileName, @Nullable StartTab start, int unknown) {
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
             this.fileName = fileName;
             this.start = start;
+            this.order = order;
             this.unknown = unknown;
         }
 
@@ -259,6 +273,8 @@ public final class SettingsBackup {
             if (fileNameChange != null) changes.put(FILE_NAME, fileNameChange);
             StartTab startChange = startChange();
             if (startChange != null) changes.put(START, startChange);
+            CommentOrder orderChange = orderChange();
+            if (orderChange != null) changes.put(ORDER, orderChange);
             return changes;
         }
 
@@ -300,6 +316,12 @@ public final class SettingsBackup {
             return start == null || start == START.savedValue() ? null : start;
         }
 
+        /** The comment order this file sets, or null when it names none or the one already set. */
+        @Nullable
+        CommentOrder orderChange() {
+            return order == null || order == ORDER.savedValue() ? null : order;
+        }
+
         /** For the settings page's saved state, so a preview outlives the page being rebuilt. */
         Bundle toBundle() {
             Bundle switches = new Bundle();
@@ -312,6 +334,7 @@ public final class SettingsBackup {
             if (quality != null) state.putString(QUALITY_NAME, quality.fileValue);
             if (fileName != null) state.putString(FILE_NAME_NAME, fileName);
             if (start != null) state.putString(START_NAME, start.fileValue);
+            if (order != null) state.putString(ORDER_NAME, order.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -337,7 +360,7 @@ public final class SettingsBackup {
             return new Snapshot(values, folder instanceof String && SaveFolder.isClean((String) folder)
                     ? (String) folder : null, DownloadQuality.fromFile(state.get(QUALITY_NAME)),
                     fileName instanceof String && FileNameTemplate.isClean((String) fileName) ? (String) fileName : null,
-                    StartTab.fromFile(state.get(START_NAME)), unknown);
+                    StartTab.fromFile(state.get(START_NAME)), CommentOrder.fromFile(state.get(ORDER_NAME)), unknown);
         }
     }
 
@@ -355,6 +378,7 @@ public final class SettingsBackup {
         switches.put(QUALITY.key, QUALITY.savedValue().fileValue);
         switches.put(FILE_NAME.key, FileNameTemplate.sanitize(FILE_NAME.savedValue()));
         switches.put(START.key, START.savedValue().fileValue);
+        switches.put(ORDER.key, ORDER.savedValue().fileValue);
         return new JSONObject()
                 .put(FORMAT_NAME, FORMAT)
                 .put(SCHEMA_NAME, SCHEMA)
@@ -442,6 +466,7 @@ public final class SettingsBackup {
         DownloadQuality quality = null;
         String fileName = null;
         StartTab start = null;
+        CommentOrder order = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -473,6 +498,11 @@ public final class SettingsBackup {
                 if (start == null) throw new Rejected(Reason.VALUE, "Not a start tab: " + name);
                 continue;
             }
+            if (ORDER.key.equals(name)) {
+                order = CommentOrder.fromFile(values.opt(name));
+                if (order == null) throw new Rejected(Reason.VALUE, "Not a comment order: " + name);
+                continue;
+            }
             BooleanSetting setting = known.get(name);
             if (setting == null) {
                 // A name this build doesn't know, Pause and the debug settings included: left
@@ -491,7 +521,7 @@ public final class SettingsBackup {
             Boolean value = found.get(setting);
             if (value != null) ordered.put(setting, value);
         }
-        return new Snapshot(ordered, folder, quality, fileName, start, unknown);
+        return new Snapshot(ordered, folder, quality, fileName, start, order, unknown);
     }
 
     /**

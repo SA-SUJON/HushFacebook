@@ -30,6 +30,7 @@ public final class FamilyNames {
     public static final String SPONSORED_REELS = "Hide sponsored reels";
     public static final String REEL_DECLUTTER = "Clean up Reels";
     public static final String REEL_WATCH_HISTORY = "Don't send reel watch history";
+    public static final String DEFAULT_COMMENT_ORDER = "Default comment order";
     public static final String TAP_TO_PLAY = "Tap to play";
     public static final String SYSTEM_FONT = "Use the system font";
     public static final String SYSTEM_EMOJI = "Use the phone's emoji";

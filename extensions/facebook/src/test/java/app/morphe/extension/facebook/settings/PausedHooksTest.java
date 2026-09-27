@@ -52,6 +52,7 @@ import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
+import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
@@ -286,6 +287,9 @@ public class PausedHooksTest {
         probes.put(PatchFamily.START_TAB, Collections.singletonList(StartTabRouteForTests::routes));
         // The tab bar builder is told to leave Home out.
         probes.put(PatchFamily.MARKETPLACE_ONLY, Collections.singletonList(MarketplaceOnlyForTests::hidesHome));
+        // A request for a post's comments that names no order asks for the chosen one.
+        probes.put(PatchFamily.DEFAULT_COMMENT_ORDER,
+                Collections.singletonList(DefaultCommentOrderForTests::asksForTheChosenOrder));
         // With Messenger installed, the card's show question answers no in Chats.
         probes.put(PatchFamily.MESSENGER_CARD, Collections.singletonList(MessengerCardForTests::hidesWithMessenger));
         // The Menu's Upgrades and Also from Meta groups build nothing, in the section Facebook

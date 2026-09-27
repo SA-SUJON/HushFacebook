@@ -295,3 +295,27 @@ Search	Pencarian
 Hide Meta AI in search	Sembunyikan Meta AI di pencarian
 # context: summary of that switch; Meta AI and Ask Meta AI are Meta's own names, as Facebook shows them
 Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.	Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.
+# context: settings section heading for the Default comment order switch and its list
+Comments	Komentar
+# context: switch title; on, a post's comments open in the order chosen in the list below it
+Default comment order	Urutan komentar bawaan
+# context: summary of that switch; a link to a comment is one from a notification, say
+Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.	Komentar dibuka dengan urutan yang dipilih di bawah, bukan urutan yang dipilih Facebook. Urutan yang kamu pilih di komentar sebuah postingan tetap berlaku untuk postingan itu sampai Facebook dimulai ulang, dan tautan ke sebuah komentar tetap memakai urutan Facebook.
+# context: title of the list of comment orders, and of its dialog
+Comment order	Urutan komentar
+# context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook
+Facebook's choice	Pilihan Facebook
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+Most relevant	Paling relevan
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+Newest	Terbaru
+# context: entry of that list; Facebook's own name for this order in the sort menu of a post's comments
+All comments	Semua komentar
+# context: summary of the list when Facebook's choice is picked; Most relevant is Facebook's own name for that order
+Comments open in the order Facebook picks, which is usually Most relevant.	Komentar dibuka dengan urutan yang dipilih Facebook, biasanya Paling relevan.
+# context: summary of the list; %1$s is one of the order names above, as Facebook's sort menu shows it
+A post's comments open with %1$s picked in their sort menu, where the post offers it.	Komentar sebuah postingan dibuka dengan %1$s terpilih di menu urutannya, jika postingan itu menyediakannya.
+# context: sentence in the import preview and the toast after an import that sets the comment order to Facebook's choice
+Comments will open in the order Facebook picks.	Komentar akan dibuka dengan urutan yang dipilih Facebook.
+# context: sentence in the import preview and the toast after an import that sets the comment order; %1$s is one of the order names above
+Comments will open with %1$s picked in their sort menu.	Komentar akan dibuka dengan %1$s terpilih di menu urutannya.

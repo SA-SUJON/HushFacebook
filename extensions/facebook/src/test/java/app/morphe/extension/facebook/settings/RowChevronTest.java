@@ -65,7 +65,8 @@ public class RowChevronTest {
 
     /** Every row on the screen whose tap opens a dialog, a file picker or the browser. */
     private static final Set<String> OPENS_SOMETHING = new LinkedHashSet<>(Arrays.asList(
-            "Jump to a section", "Tab to open on", "Font file", "Download quality", "Save folder", "Video file name",
+            "Jump to a section", "Tab to open on", "Comment order", "Font file", "Download quality", "Save folder",
+            "Video file name",
             "Export settings", "Import settings",
             "Export diagnostic report", "Source code and issues", "Licenses"));
 
