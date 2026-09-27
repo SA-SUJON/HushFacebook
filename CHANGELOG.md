@@ -7,6 +7,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** A saved video whose name is already in the save folder now gets the time of the save on the end, like `Some Page_20260925_143005.mp4`. With a name like `{owner}_{posted}`, a second video one person posted that day used to be left to Android, which numbers each repeat up to (31) and then refuses the save. The Video file name dialog says so too.
 * **Facebook:** The Hide sponsored reels and Hide AI-detected reels and videos rows now say that a change starts with the next batch of reels Facebook loads. Both filters work on each batch as it arrives, so reels already loaded stay as they were. The README says so too.
 * **Facebook:** The README now says why Meta's Facebook builds for Android 9 and Android 8 can't be patched. They keep all of their code except a small startup part in a compressed archive the patcher can't read, so none of the patches apply, rather than lacking the code some patches need, as it used to say. Android 11 and newer is the only range Hushfacebook supports.
+* **Facebook:** Patching a Facebook build for Android 9 or older now stops at once and says why. Such a build keeps nearly all of its code in a compressed archive the patcher can't read, so the message points to the (arm64-v8a) (Android 11+) build instead. It used to stop with a note that no class of FbMainTabActivity's hierarchy declares onCreate, which named the symptom and not the build.
 
 ## 0.2.0 (2026-09-26)
 

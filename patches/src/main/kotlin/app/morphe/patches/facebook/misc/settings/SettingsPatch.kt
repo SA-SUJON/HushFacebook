@@ -17,11 +17,34 @@ import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.superclassChain
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.ClassDef
 
 internal const val ENTRY = "$EXTENSION_PACKAGE/settings/SettingsEntry;"
 
 /** The activity the manifest's launcher alias targets. A manifest name is never obfuscated. */
-private const val MAIN_TAB_ACTIVITY = "Lcom/facebook/katana/activity/FbMainTabActivity;"
+internal const val MAIN_TAB_ACTIVITY = "Lcom/facebook/katana/activity/FbMainTabActivity;"
+
+/**
+ * Why this APK can't be patched at all, said before the settings patch changes anything, or null
+ * when nothing here stands in the way. [hasApplication] says the APK's readable dex carries
+ * FacebookApplication, and [mainTab] is the main tab activity as it carries it, or null.
+ *
+ * Meta's Facebook builds for Android 9 (arm64-v8a) and Android 8 (armeabi-v7a) ship one startup
+ * dex, 4,420 classes in 580.0.0.51.74 for Android 9, and pack the rest of the code into a compressed
+ * Superpack archive, `assets/secondary-program-dex-jars/store-0.dex.spo`, which the patcher can't
+ * read (checked 2026-09-26: 0 of 26 patches apply). The application class is in the startup dex and
+ * the main tab activity isn't, so without this the settings patch stopped saying no class of the
+ * activity's hierarchy declares onCreate, which named the symptom and not the build.
+ */
+internal fun compressedCodeRefusal(hasApplication: Boolean, mainTab: ClassDef?): String? {
+    if (!hasApplication) return null
+    if (mainTab != null && mainTab.methods.any { it.implementation != null }) return null
+    return "This Facebook build has FacebookApplication but no readable code for FbMainTabActivity, the screen " +
+        "Facebook opens on. That's what a Facebook build for Android 9 or older looks like. Meta packs all but " +
+        "its startup code into a compressed archive (assets/secondary-program-dex-jars/store-0.dex.spo) that " +
+        "the patcher can't read, so none of Hushfacebook's patches can apply. Hushfacebook supports Android 11 " +
+        "and newer. Patch the (arm64-v8a) (Android 11+) build of Facebook instead."
+}
 
 /**
  * The first class in [type]'s hierarchy, as far as the APK carries it, that declares this
@@ -61,6 +84,11 @@ val settingsPatch = bytecodePatch(
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {
+        // A build whose code the patcher can't read is refused first, naming the build it most
+        // likely is, before anything in it changes.
+        compressedCodeRefusal(classDefByOrNull(FACEBOOK_APPLICATION) != null, classDefByOrNull(MAIN_TAB_ACTIVITY))
+            ?.let { throw PatchException(it) }
+
         // Before each return of the application's onCreate, after Facebook's own startup: the
         // application overrides registerActivityLifecycleCallbacks, and the override is only safe
         // to call once Facebook has set itself up.
