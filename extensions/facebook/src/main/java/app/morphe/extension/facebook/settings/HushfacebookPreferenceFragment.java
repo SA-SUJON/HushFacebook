@@ -272,16 +272,19 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 || build.contains(PatchFamily.REEL_DECLUTTER) || build.contains(PatchFamily.REEL_WATCH_HISTORY)
                 || build.contains(PatchFamily.REEL_DOWNLOAD)) {
             PreferenceCategory reels = category(screen, L10n.t("Reels and Watch"));
+            // Both reel filters work on each batch of reels as it arrives, so a change leaves the
+            // reels already loaded as they are, and the rows say so.
             if (build.contains(PatchFamily.SPONSORED_REELS)) {
                 reels.addPreference(toggle(context, Settings.HIDE_SPONSORED_REELS, L10n.t("Hide sponsored reels"),
-                        L10n.t("Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.")));
+                        L10n.t("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls "
+                                + "and app-inserted ads stay blocked even while paused.")));
             }
             if (build.contains(PatchFamily.AI_DETECTED_POSTS)) {
                 reels.addPreference(toggle(context, Settings.HIDE_AI_DETECTED_REELS,
                         L10n.t("Hide AI-detected reels and videos"),
-                        L10n.t("Reels and Watch videos that Facebook's own detection marks as made with AI. One "
-                                + "that only its creator labelled as AI stays. It's off by default because it "
-                                + "hasn't been tested on a real account yet.")));
+                        L10n.t("Reels and Watch videos that Facebook's own detection marks as made with AI, starting "
+                                + "with the next batch Facebook loads. One that only its creator labelled as AI stays. "
+                                + "It's off by default because it hasn't been tested on a real account yet.")));
             }
             if (build.contains(PatchFamily.REEL_DECLUTTER)) {
                 reels.addPreference(toggle(context, Settings.HIDE_REEL_CHIPS,

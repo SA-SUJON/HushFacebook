@@ -145,6 +145,28 @@ public class HushfacebookPreferenceFragmentTest {
         }
     }
 
+    /**
+     * The sponsored and AI reel filters take ads and flagged reels out of each batch of reels as it
+     * arrives, so reels already loaded stay as they were until the next batch. Both rows say when a
+     * change starts, right after what the switch hides.
+     */
+    @Test
+    public void theReelFilterRowsSayAChangeStartsWithTheNextBatch() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_REELS, PatchFamily.AI_DETECTED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int sponsored = indexOfKey(rows, Settings.HIDE_SPONSORED_REELS.key);
+            int ai = indexOfKey(rows, Settings.HIDE_AI_DETECTED_REELS.key);
+            assertTrue("the sponsored reels row is missing", sponsored >= 0);
+            assertTrue("the AI reels row is missing", ai >= 0);
+            assertTrue(String.valueOf(rows.get(sponsored).getSummary()), String.valueOf(rows.get(sponsored).getSummary())
+                    .startsWith("Ads inside Reels, starting with the next batch Facebook loads. "));
+            assertTrue(String.valueOf(rows.get(ai).getSummary()), String.valueOf(rows.get(ai).getSummary())
+                    .startsWith("Reels and Watch videos that Facebook's own detection marks as made with AI, "
+                            + "starting with the next batch Facebook loads. "));
+        }
+    }
+
     @Test
     public void thePausedCardSaysWhatStaysInForEveryReason() {
         for (HushfacebookPause.Reason why : HushfacebookPause.Reason.values()) {

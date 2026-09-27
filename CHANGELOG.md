@@ -5,6 +5,7 @@ Every Hushfacebook release, newest first.
 ## Unreleased
 
 * **Facebook:** A saved video whose name is already in the save folder now gets the time of the save on the end, like `Some Page_20260925_143005.mp4`. With a name like `{owner}_{posted}`, a second video one person posted that day used to be left to Android, which numbers each repeat up to (31) and then refuses the save. The Video file name dialog says so too.
+* **Facebook:** The Hide sponsored reels and Hide AI-detected reels and videos rows now say that a change starts with the next batch of reels Facebook loads. Both filters work on each batch as it arrives, so reels already loaded stay as they were. The README says so too.
 
 ## 0.2.0 (2026-09-26)
 

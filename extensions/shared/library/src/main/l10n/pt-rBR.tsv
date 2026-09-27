@@ -17,7 +17,7 @@ Ad cards between the stories people posted.	Anúncios entre os stories que as pe
 Ad telemetry blocked	Telemetria de anúncios bloqueada
 Adds "Download to phone" to feed and Watch video menus. Saves at the quality set below. Off or paused, Facebook's menu returns.	Adiciona “Baixar no celular” aos menus de vídeo do feed e do Watch. Salva na qualidade definida abaixo. Desligado ou em pausa, o menu do Facebook volta.
 Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.	Adiciona o item Salvar ao menu do story de qualquer pessoa e salva na qualidade definida em Downloads. Com esta opção desligada ou durante a pausa, o item Salvar só aparece nos seus próprios stories, e quem salva é o próprio Facebook.
-Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.	Anúncios dentro dos Reels. Banners, anúncios no meio do vídeo e anúncios inseridos pelo app continuam bloqueados mesmo durante a pausa.
+Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.	Anúncios dentro dos Reels, a partir do próximo lote que o Facebook carregar. Banners, anúncios no meio do vídeo e anúncios inseridos pelo app continuam bloqueados mesmo durante a pausa.
 AMOLED black theme	Tema preto AMOLED
 Appearance	Aparência
 Audience Network off	Audience Network desativado
@@ -219,7 +219,7 @@ Pause, backup and diagnostics	Pausa, backup e diagnóstico
 Updates	Atualizações
 Stop update prompts	Parar os avisos de atualização
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	O Facebook para de pedir que você atualize pelo Meta App Manager e para de mandá-lo procurar uma atualização. As promoções de chat voltadas a versões antigas também somem. Uma versão com patch não consegue instalar as atualizações da Meta de qualquer forma.
-Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reels e vídeos do Watch que a detecção do próprio Facebook marca como feitos com IA. Um que só o autor marcou como IA continua aparecendo. Esta opção vem desligada porque ainda não foi testada com uma conta real.
+Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reels e vídeos do Watch que a detecção do próprio Facebook marca como feitos com IA, a partir do próximo lote que o Facebook carregar. Um que só o autor marcou como IA continua aparecendo. Esta opção vem desligada porque ainda não foi testada com uma conta real.
 Don't send reel watch history	Não enviar o histórico de reels assistidos
 Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.	O Facebook para de receber a lista de reels que você assistiu, que ele usa para ordenar seu feed do Reels. Ninguém mais vê essa lista. Reels que você já assistiu podem voltar a aparecer no feed.
 the rename of the shared permissions	a renomeação das permissões compartilhadas

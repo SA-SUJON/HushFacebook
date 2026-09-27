@@ -17,7 +17,7 @@ Ad cards between the stories people posted.	İnsanların paylaştığı hikayele
 Ad telemetry blocked	Reklam telemetrisi engellendi
 Adds "Download to phone" to feed and Watch video menus. Saves at the quality set below. Off or paused, Facebook's menu returns.	Akış ve Watch video menülerine “Telefona indir” seçeneğini ekler. Aşağıda seçilen kalitede kaydeder. Kapalıyken veya duraklatıldığında Facebook menüsü geri gelir.
 Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.	Kimin olursa olsun her hikayenin menüsüne Kaydet seçeneğini ekler ve hikayeyi İndirmeler bölümünde seçilen kalitede kaydeder. Kapalıyken veya duraklatılmışken Kaydet seçeneği yalnızca kendi hikayelerinde bulunur ve Facebook'un kendi kaydetme işlevini çalıştırır.
-Ads inside Reels. Banners, mid-rolls and app-inserted ads stay blocked even while paused.	Reels içindeki reklamlar. Banner'lar, video ortası reklamlar ve uygulamanın eklediği reklamlar duraklatıldığında da engellenir.
+Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.	Reels içindeki reklamlar, Facebook'un yüklediği bir sonraki gruptan itibaren. Banner'lar, video ortası reklamlar ve uygulamanın eklediği reklamlar duraklatıldığında da engellenir.
 AMOLED black theme	AMOLED siyah tema
 Appearance	Görünüm
 Audience Network off	Audience Network kapalı
@@ -219,7 +219,7 @@ Pause, backup and diagnostics	Duraklatma, yedekleme ve tanılama
 Updates	Güncellemeler
 Stop update prompts	Güncelleme uyarılarını durdur
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook, Meta App Manager üzerinden güncelleme istemeyi ve ona güncelleme aratmayı bırakır. Eski sürümlere yönelik sohbet tanıtımları da kalkar. Yamalı bir sürüm zaten Meta'nın güncellemelerini yükleyemez.
-Reels and Watch videos that Facebook's own detection marks as made with AI. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Facebook'un kendi tespitinin yapay zekâ ile üretildiğini işaretlediği reels ve Watch videoları. Yalnızca oluşturan kişinin yapay zekâ olarak etiketlediği bir video kalır. Bu anahtar henüz gerçek bir hesapla test edilmediği için varsayılan olarak kapalıdır.
+Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Facebook'un kendi tespitinin yapay zekâ ile üretildiğini işaretlediği reels ve Watch videoları, Facebook'un yüklediği bir sonraki gruptan itibaren. Yalnızca oluşturan kişinin yapay zekâ olarak etiketlediği bir video kalır. Bu anahtar henüz gerçek bir hesapla test edilmediği için varsayılan olarak kapalıdır.
 Don't send reel watch history	Reels izleme geçmişini gönderme
 Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.	Facebook, Reels akışını sıralamak için kullandığı, izlediğin Reels videolarının listesini artık almaz. Bu listeyi başka kimse görmez. Daha önce izlediğin Reels videoları akışta yeniden çıkabilir.
 the rename of the shared permissions	paylaşılan izinlerin yeniden adlandırılması
