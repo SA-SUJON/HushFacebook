@@ -58,6 +58,7 @@ Facebook doesn't download ads or its ad model in the background.	Facebook no des
 Facebook doesn't serve ads to other apps on this phone.	Facebook no envía anuncios a otras apps de este teléfono.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	El modo oscuro de Facebook y esta pantalla usan los colores de tu fondo. Android 11 usa azul en su lugar. Activa el modo oscuro de Facebook para verlo.
 Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.	El texto de Facebook se dibuja con la fuente de tu teléfono en lugar de la propia de Meta. Reinicia Facebook después de cambiar esto.
+Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Los emojis se dibujan con la fuente de emojis de tu teléfono en lugar de la de Meta. Las reacciones y los stickers no cambian. Reinicia Facebook después de cambiar esto.
 From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Desde el próximo inicio, los interruptores de arriba dejan de actuar y vuelve el comportamiento de Facebook. El Registro de depuración sigue funcionando y tus elecciones se conservan.
 Full report saved to %1$s	Informe completo guardado en %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, con los avisos de los proyectos en los que se basa
@@ -172,6 +173,7 @@ This phone has no file picker, so there's no way to choose a file here.	Este tel
 Try again, or go back to Facebook.	Inténtalo de nuevo o vuelve a Facebook.
 The switch takes effect when Facebook restarts.	El interruptor surte efecto cuando Facebook se reinicie.
 Use the system font	Usar la fuente del sistema
+Use the phone's emoji	Usar los emojis del teléfono
 Version	Versión
 Version %1$s for Facebook %2$s	Versión %1$s para Facebook %2$s
 Videos go to %1$s and photos to %2$s.	Los videos van a %1$s y las fotos a %2$s.

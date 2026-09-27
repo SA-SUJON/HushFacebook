@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(444);
+        Map<String, String> table = new HashMap<>(448);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -184,6 +184,8 @@ public final class L10nTranslations {
                 "Jedes Video wird in seiner niedrigsten Qualit\u00e4t gespeichert, damit die Datei so klein wie m\u00f6glich ist.");
         table.put("Each video saves at the best quality the player streams.",
                 "Jedes Video wird in der besten Qualit\u00e4t gespeichert, die der Player streamt.");
+        table.put("Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.",
+                "Emojis werden mit der Emoji-Schriftart deines Handys statt mit der von Meta gezeichnet. Reaktionen und Sticker bleiben, wie sie sind. Starte Facebook nach dem \u00c4ndern neu.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Leert das Protokoll und die Filterz\u00e4hler, die ein Bericht enthalten w\u00fcrde.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
@@ -294,11 +296,11 @@ public final class L10nTranslations {
                 "Material-You-Design");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite und Workplace lassen sich neben diesem Facebook installieren. Es gibt den zwei Berechtigungen, die sie mit ihm teilen, eigene Namen.");
-        table.put("News feed",
-                "Newsfeed");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("News feed",
+                "Newsfeed");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Keine App auf diesem Handy kann den Link \u00f6ffnen. Die Adresse ist %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
@@ -417,11 +419,11 @@ public final class L10nTranslations {
                 "Diese Datei f\u00fchrt eine Einstellung zweimal auf, daher ist unklar, welcher Wert gilt. Es wurde nichts ge\u00e4ndert.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Das ist keine Hushfacebook-Einstellungsdatei. Es wurde nichts ge\u00e4ndert.");
-        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
-                "Diese Einstellungsdatei enth\u00e4lt einen Wert, den Hushfacebook nicht lesen kann. Es wurde nichts ge\u00e4ndert.");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
+                "Diese Einstellungsdatei enth\u00e4lt einen Wert, den Hushfacebook nicht lesen kann. Es wurde nichts ge\u00e4ndert.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
                 "Diese Einstellungsdatei ist besch\u00e4digt oder nur teilweise heruntergeladen. Es wurde nichts ge\u00e4ndert.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
@@ -462,6 +464,8 @@ public final class L10nTranslations {
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
         table.put("Updates",
                 "Updates");
+        table.put("Use the phone's emoji",
+                "Emojis des Handys verwenden");
         table.put("Use the system font",
                 "Systemschriftart verwenden");
         table.put("Version",
@@ -509,7 +513,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(444);
+        Map<String, String> table = new HashMap<>(448);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -649,6 +653,8 @@ public final class L10nTranslations {
                 "Cada video se guarda con su calidad m\u00e1s baja, para que el archivo sea lo m\u00e1s peque\u00f1o posible.");
         table.put("Each video saves at the best quality the player streams.",
                 "Cada video se guarda con la mejor calidad que ofrece el reproductor.");
+        table.put("Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.",
+                "Los emojis se dibujan con la fuente de emojis de tu tel\u00e9fono en lugar de la de Meta. Las reacciones y los stickers no cambian. Reinicia Facebook despu\u00e9s de cambiar esto.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Vac\u00eda el registro y los recuentos de filtros que incluir\u00eda un informe.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
@@ -759,11 +765,11 @@ public final class L10nTranslations {
                 "Tema Material You");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite y Workplace se instalan junto a este Facebook. Les da nombres propios a los dos permisos que comparten con \u00e9l.");
-        table.put("News feed",
-                "Feed");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("News feed",
+                "Feed");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Ninguna app de este tel\u00e9fono puede abrir el enlace. La direcci\u00f3n es %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
@@ -882,11 +888,11 @@ public final class L10nTranslations {
                 "Ese archivo incluye un ajuste dos veces, as\u00ed que no se sabe qu\u00e9 valor usar. No se cambi\u00f3 nada.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Eso no es un archivo de configuraci\u00f3n de Hushfacebook. No se cambi\u00f3 nada.");
-        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
-                "Ese archivo de configuraci\u00f3n contiene un valor que Hushfacebook no puede leer. No se cambi\u00f3 nada.");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
+                "Ese archivo de configuraci\u00f3n contiene un valor que Hushfacebook no puede leer. No se cambi\u00f3 nada.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
                 "Ese archivo de configuraci\u00f3n est\u00e1 da\u00f1ado o solo se descarg\u00f3 en parte. No se cambi\u00f3 nada.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
@@ -927,6 +933,8 @@ public final class L10nTranslations {
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
         table.put("Updates",
                 "Actualizaciones");
+        table.put("Use the phone's emoji",
+                "Usar los emojis del tel\u00e9fono");
         table.put("Use the system font",
                 "Usar la fuente del sistema");
         table.put("Version",
@@ -974,7 +982,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(444);
+        Map<String, String> table = new HashMap<>(448);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1114,6 +1122,8 @@ public final class L10nTranslations {
                 "Setiap video disimpan dengan kualitas terendahnya, agar ukuran filenya sekecil mungkin.");
         table.put("Each video saves at the best quality the player streams.",
                 "Setiap video disimpan dengan kualitas streaming terbaik dari pemutar.");
+        table.put("Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.",
+                "Emoji digambar dengan font emoji ponsel Anda, bukan milik Meta. Reaksi dan stiker tidak berubah. Mulai ulang Facebook setelah mengubah ini.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Mengosongkan log dan hitungan filter yang akan dimasukkan ke laporan.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
@@ -1224,11 +1234,11 @@ public final class L10nTranslations {
                 "Tema Material You");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite, dan Workplace dapat dipasang di samping Facebook ini. Facebook ini memberi nama sendiri pada dua izin yang mereka gunakan bersama dengannya.");
-        table.put("News feed",
-                "Kabar Beranda");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("News feed",
+                "Kabar Beranda");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Tidak ada aplikasi di ponsel ini yang dapat membuka tautan ini. Alamatnya %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
@@ -1347,11 +1357,11 @@ public final class L10nTranslations {
                 "File itu mencantumkan satu pengaturan dua kali, jadi tidak jelas nilai mana yang harus dipakai. Tidak ada yang diubah.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Itu bukan file pengaturan Hushfacebook. Tidak ada yang diubah.");
-        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
-                "File pengaturan itu memuat nilai yang tidak dapat dibaca Hushfacebook. Tidak ada yang diubah.");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
+                "File pengaturan itu memuat nilai yang tidak dapat dibaca Hushfacebook. Tidak ada yang diubah.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
                 "File pengaturan itu rusak atau hanya terunduh sebagian. Tidak ada yang diubah.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
@@ -1392,6 +1402,8 @@ public final class L10nTranslations {
                 "Coba lagi, atau kembali ke Facebook.");
         table.put("Updates",
                 "Pembaruan");
+        table.put("Use the phone's emoji",
+                "Gunakan emoji ponsel");
         table.put("Use the system font",
                 "Gunakan font sistem");
         table.put("Version",
@@ -1439,7 +1451,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(444);
+        Map<String, String> table = new HashMap<>(448);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1579,6 +1591,8 @@ public final class L10nTranslations {
                 "Cada v\u00eddeo \u00e9 salvo na qualidade mais baixa dele, para o arquivo ficar o menor poss\u00edvel.");
         table.put("Each video saves at the best quality the player streams.",
                 "Cada v\u00eddeo \u00e9 salvo na melhor qualidade que o player reproduz.");
+        table.put("Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.",
+                "Os emojis s\u00e3o desenhados com a fonte de emojis do seu celular em vez da fonte da Meta. Rea\u00e7\u00f5es e figurinhas n\u00e3o mudam. Reinicie o Facebook depois de mudar isso.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Apaga o registro e as contagens dos filtros que iriam para um relat\u00f3rio.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
@@ -1689,11 +1703,11 @@ public final class L10nTranslations {
                 "Tema Material You");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite e Workplace se instalam ao lado deste Facebook. Ele d\u00e1 nomes pr\u00f3prios \u00e0s duas permiss\u00f5es que eles compartilham com ele.");
-        table.put("News feed",
-                "Feed de not\u00edcias");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("News feed",
+                "Feed de not\u00edcias");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Nenhum app deste celular consegue abrir o link. O endere\u00e7o \u00e9 %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
@@ -1812,11 +1826,11 @@ public final class L10nTranslations {
                 "Esse arquivo lista uma configura\u00e7\u00e3o duas vezes, ent\u00e3o n\u00e3o d\u00e1 para saber qual valor usar. Nada foi alterado.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Isso n\u00e3o \u00e9 um arquivo de configura\u00e7\u00f5es do Hushfacebook. Nada foi alterado.");
-        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
-                "Esse arquivo de configura\u00e7\u00f5es tem um valor que o Hushfacebook n\u00e3o consegue ler. Nada foi alterado.");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
+                "Esse arquivo de configura\u00e7\u00f5es tem um valor que o Hushfacebook n\u00e3o consegue ler. Nada foi alterado.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
                 "Esse arquivo de configura\u00e7\u00f5es est\u00e1 danificado ou s\u00f3 foi baixado em parte. Nada foi alterado.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
@@ -1857,6 +1871,8 @@ public final class L10nTranslations {
                 "Tente de novo ou volte para o Facebook.");
         table.put("Updates",
                 "Atualiza\u00e7\u00f5es");
+        table.put("Use the phone's emoji",
+                "Usar os emojis do celular");
         table.put("Use the system font",
                 "Usar a fonte do sistema");
         table.put("Version",
@@ -1904,7 +1920,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(444);
+        Map<String, String> table = new HashMap<>(448);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2044,6 +2060,8 @@ public final class L10nTranslations {
                 "Her video en d\u00fc\u015f\u00fck kalitesinde kaydedilir, b\u00f6ylece dosya en k\u00fc\u00e7\u00fck olur.");
         table.put("Each video saves at the best quality the player streams.",
                 "Her video, oynat\u0131c\u0131n\u0131n sundu\u011fu en iyi kalitede kaydedilir.");
+        table.put("Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.",
+                "Emojiler Meta'n\u0131nki yerine telefonunun kendi emoji yaz\u0131 tipiyle \u00e7izilir. Tepkiler ve \u00e7\u0131kartmalar de\u011fi\u015fmez. Bunu de\u011fi\u015ftirdikten sonra Facebook'u yeniden ba\u015flat.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Bir raporun i\u00e7erece\u011fi g\u00fcnl\u00fc\u011f\u00fc ve filtre saya\u00e7lar\u0131n\u0131 bo\u015falt\u0131r.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
@@ -2154,11 +2172,11 @@ public final class L10nTranslations {
                 "Material You temas\u0131");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite ve Workplace bu Facebook'un yan\u0131na y\u00fcklenebilir. Onlarla payla\u015ft\u0131\u011f\u0131 iki izne kendi adlar\u0131n\u0131 verir.");
-        table.put("News feed",
-                "Ak\u0131\u015f");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("News feed",
+                "Ak\u0131\u015f");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Bu telefondaki hi\u00e7bir uygulama ba\u011flant\u0131y\u0131 a\u00e7am\u0131yor. Adres: %1$s.");
         table.put("No screenshot watching for ads, and no reports of which apps you install.",
@@ -2277,11 +2295,11 @@ public final class L10nTranslations {
                 "Bu dosyada bir ayar iki kez ge\u00e7iyor, bu y\u00fczden hangi de\u011ferin kullan\u0131laca\u011f\u0131 belli de\u011fil. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Bu bir Hushfacebook ayar dosyas\u0131 de\u011fil. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
-        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
-                "Bu ayar dosyas\u0131nda Hushfacebook'un okuyamad\u0131\u011f\u0131 bir de\u011fer var. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
+                "Bu ayar dosyas\u0131nda Hushfacebook'un okuyamad\u0131\u011f\u0131 bir de\u011fer var. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
                 "Bu ayar dosyas\u0131 hasarl\u0131 ya da yaln\u0131zca bir k\u0131sm\u0131 indirilmi\u015f. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.",
@@ -2322,6 +2340,8 @@ public final class L10nTranslations {
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
         table.put("Updates",
                 "G\u00fcncellemeler");
+        table.put("Use the phone's emoji",
+                "Telefonun emojilerini kullan");
         table.put("Use the system font",
                 "Sistem yaz\u0131 tipini kullan");
         table.put("Version",

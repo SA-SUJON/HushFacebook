@@ -135,6 +135,14 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting USE_SYSTEM_FONT =
             new BooleanSetting("hushfacebook_use_system_font", TRUE);
 
+    /**
+     * Emoji drawn with the phone's own emoji font instead of the one Meta downloads. An emoji
+     * already laid out keeps its look until its text is drawn again, and the quick emoji picker
+     * until Facebook restarts. Reactions and stickers are pictures, not text, and don't change.
+     */
+    public static final BooleanSetting USE_SYSTEM_EMOJI =
+            new BooleanSetting("hushfacebook_use_system_emoji", TRUE);
+
     /** Web links leave Facebook's in-app browser for the default browser. */
     public static final BooleanSetting OPEN_LINKS_EXTERNALLY =
             new BooleanSetting("hushfacebook_open_links_externally", TRUE);

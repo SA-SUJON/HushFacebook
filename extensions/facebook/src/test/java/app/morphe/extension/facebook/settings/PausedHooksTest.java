@@ -44,6 +44,7 @@ import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
 import app.morphe.extension.facebook.download.ReelDownload;
 import app.morphe.extension.facebook.download.VideoMenuItemForTests;
+import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
@@ -222,6 +223,8 @@ public class PausedHooksTest {
                     SystemFont.rememberVariation(builder, "'wght' 700");
                     return SystemFont.systemizeBuilt(Typeface.SERIF, builder) != Typeface.SERIF;
                 }));
+        // The emoji typeface provider hears the phone's default typeface instead of running its own code.
+        probes.put(PatchFamily.SYSTEM_EMOJI, Collections.singletonList(() -> SystemEmoji.typeface() != null));
         probes.put(PatchFamily.EXTERNAL_BROWSER, Collections.singletonList(() -> {
             Activity browser = Robolectric.buildActivity(Activity.class,
                     new Intent(Intent.ACTION_VIEW, Uri.parse("https://example.org/"))).create().get();

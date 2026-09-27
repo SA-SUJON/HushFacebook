@@ -244,6 +244,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the rename that lets Meta's own apps install beside a re-signed Facebook. It renames the two signature permissions Facebook shares with Messenger, Lite, Business Suite and Workplace, com.facebook.permission.prod.FB_APP_COMMUNICATION and com.facebook.receiver.permission.ACCESS, to app.hushfacebook. names in every place the manifest names them, and hands every literal Facebook's code loads for them to an extension that answers the name the install holds. Messenger-Z's notes on the collision were read for the behavior only; no code came from them."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/emoji/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/emoji/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the switch to the phone's emoji font. It asks the extension first thing in Facebook's emoji typeface provider, found in Facebook 577 and 580 by the end-to-end system emoji flag and the log tag it keeps, and hands back the phone's default typeface while the switch is on, so the spans and pickers that draw emoji with Meta's downloaded font draw the phone's emoji font instead."
     }
   ]
 }

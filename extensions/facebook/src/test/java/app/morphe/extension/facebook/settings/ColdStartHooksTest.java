@@ -36,6 +36,7 @@ import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
 import app.morphe.extension.facebook.download.ReelDownload;
 import app.morphe.extension.facebook.download.VideoMenuItemForTests;
+import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
@@ -151,6 +152,8 @@ public class ColdStartHooksTest {
         SystemFont.rememberVariation(fontBuilder, "'wght' 700");
         assertSame("a typeface built before the context was swapped", Typeface.SERIF,
                 SystemFont.systemizeBuilt(Typeface.SERIF, fontBuilder));
+        // Facebook warms its emoji font from an app init task, which can ask the provider this early.
+        assertNull("an emoji typeface asked for before the context was answered", SystemEmoji.typeface());
 
         // A hook that touched the settings above left them unusable, and this is where a real
         // start would crash. While setContext decides the pause the context is already set, so a

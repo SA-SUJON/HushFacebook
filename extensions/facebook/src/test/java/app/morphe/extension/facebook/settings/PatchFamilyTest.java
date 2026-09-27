@@ -175,7 +175,7 @@ public class PatchFamilyTest {
                 "not in this build: Hide suggested and promoted posts, Hide Stories tray, Hide Reels in the feed, "
                         + "Block background-return feed refresh, Hide AI-detected posts, "
                         + "Hide sponsored stories, Stop Story auto-advance, Clean up Reels, Don't send reel watch history, "
-                        + "Use the system font, Open links in "
+                        + "Use the system font, Use the phone's emoji, Open links in "
                         + "external browser, Sanitize sharing links, Stop update prompts, Download any story, Download any reel, "
                         + "Download any video, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
                         + "Restore screens on re-signed builds, Install beside Meta's apps"),

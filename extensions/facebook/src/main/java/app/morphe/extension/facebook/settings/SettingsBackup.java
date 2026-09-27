@@ -95,6 +95,7 @@ public final class SettingsBackup {
             Settings.HIDE_REEL_SOCIAL_FOOTER,
             Settings.DONT_SEND_REEL_WATCH_HISTORY,
             Settings.USE_SYSTEM_FONT,
+            Settings.USE_SYSTEM_EMOJI,
             Settings.OPEN_LINKS_EXTERNALLY,
             Settings.SANITIZE_SHARING_LINKS,
             Settings.STOP_UPDATE_PROMPTS,

@@ -58,6 +58,7 @@ Facebook doesn't download ads or its ad model in the background.	Facebook tidak 
 Facebook doesn't serve ads to other apps on this phone.	Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Mode gelap Facebook dan halaman ini memakai warna wallpaper Anda. Android 11 memakai biru. Aktifkan mode gelap Facebook untuk melihatnya.
 Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.	Teks Facebook digambar dengan font ponsel Anda, bukan font milik Meta. Mulai ulang Facebook setelah mengubah ini.
+Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Emoji digambar dengan font emoji ponsel Anda, bukan milik Meta. Reaksi dan stiker tidak berubah. Mulai ulang Facebook setelah mengubah ini.
 From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Mulai pembukaan berikutnya, sakelar di atas berhenti bekerja dan perilaku Facebook kembali. Pencatatan debug tetap berjalan dan pilihan Anda tersimpan.
 Full report saved to %1$s	Laporan lengkap disimpan ke %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, beserta pemberitahuan dari proyek yang menjadi dasarnya
@@ -172,6 +173,7 @@ This phone has no file picker, so there's no way to choose a file here.	Ponsel i
 Try again, or go back to Facebook.	Coba lagi, atau kembali ke Facebook.
 The switch takes effect when Facebook restarts.	Sakelar ini berlaku saat Facebook dimulai ulang.
 Use the system font	Gunakan font sistem
+Use the phone's emoji	Gunakan emoji ponsel
 Version	Versi
 Version %1$s for Facebook %2$s	Versi %1$s untuk Facebook %2$s
 Videos go to %1$s and photos to %2$s.	Video disimpan ke %1$s dan foto ke %2$s.

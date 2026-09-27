@@ -66,6 +66,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean systemEmoji() {
+        return false;
+    }
+
     public static boolean adPrefetch() {
         return false;
     }

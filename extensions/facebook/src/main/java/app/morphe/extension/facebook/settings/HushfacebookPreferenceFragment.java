@@ -352,11 +352,19 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         updates.addPreference(checkNowRow(context));
         ReleaseCheck.watch(this);
 
-        if (build.contains(PatchFamily.SYSTEM_FONT)) {
+        if (build.contains(PatchFamily.SYSTEM_FONT) || build.contains(PatchFamily.SYSTEM_EMOJI)) {
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
-            appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT, L10n.t("Use the system font"),
-                    L10n.t("Facebook's text is drawn in your phone's font instead of Meta's own. Restart "
-                            + "Facebook after changing this.")));
+            if (build.contains(PatchFamily.SYSTEM_FONT)) {
+                appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT, L10n.t("Use the system font"),
+                        L10n.t("Facebook's text is drawn in your phone's font instead of Meta's own. Restart "
+                                + "Facebook after changing this.")));
+            }
+            if (build.contains(PatchFamily.SYSTEM_EMOJI)) {
+                // The quick emoji picker keeps the first typeface it's given until Facebook restarts.
+                appearance.addPreference(toggle(context, Settings.USE_SYSTEM_EMOJI, L10n.t("Use the phone's emoji"),
+                        L10n.t("Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and "
+                                + "stickers don't change. Restart Facebook after changing this.")));
+            }
         }
 
         if (build.contains(PatchFamily.AD_PREFETCH) || build.contains(PatchFamily.AD_TELEMETRY)

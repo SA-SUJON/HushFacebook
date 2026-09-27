@@ -58,6 +58,7 @@ Facebook doesn't download ads or its ad model in the background.	Facebook reklam
 Facebook doesn't serve ads to other apps on this phone.	Facebook bu telefondaki diğer uygulamalara reklam sunmaz.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebook karanlık modu ve bu ekran duvar kâğıdının renklerini kullanır. Android 11 bunun yerine mavi kullanır. Görmek için Facebook karanlık modunu aç.
 Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.	Facebook'un metni Meta'nın kendi yazı tipi yerine telefonunun yazı tipiyle çizilir. Bunu değiştirdikten sonra Facebook'u yeniden başlat.
+Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Emojiler Meta'nınki yerine telefonunun kendi emoji yazı tipiyle çizilir. Tepkiler ve çıkartmalar değişmez. Bunu değiştirdikten sonra Facebook'u yeniden başlat.
 From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Sonraki açılıştan itibaren yukarıdaki anahtarlar çalışmaz ve Facebook'un kendi davranışı geri gelir. Hata ayıklama günlüğü çalışmaya devam eder ve seçimlerin korunur.
 Full report saved to %1$s	Tam rapor şuraya kaydedildi: %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, üzerine kurulduğu projelerin lisans bildirimleriyle
@@ -172,6 +173,7 @@ This phone has no file picker, so there's no way to choose a file here.	Bu telef
 Try again, or go back to Facebook.	Tekrar dene veya Facebook'a geri dön.
 The switch takes effect when Facebook restarts.	Anahtar, Facebook yeniden başladığında etkili olur.
 Use the system font	Sistem yazı tipini kullan
+Use the phone's emoji	Telefonun emojilerini kullan
 Version	Sürüm
 Version %1$s for Facebook %2$s	Facebook %2$s için %1$s sürümü
 Videos go to %1$s and photos to %2$s.	Videolar %1$s klasörüne, fotoğraflar %2$s klasörüne kaydedilir.

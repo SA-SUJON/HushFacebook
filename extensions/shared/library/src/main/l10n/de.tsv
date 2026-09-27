@@ -58,6 +58,7 @@ Facebook doesn't download ads or its ad model in the background.	Facebook lädt 
 Facebook doesn't serve ads to other apps on this phone.	Facebook liefert keine Werbung an andere Apps auf diesem Handy aus.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebooks Dunkelmodus und diese Seite nutzen die Farben deines Hintergrundbilds. Android 11 nutzt stattdessen Blau. Aktiviere Facebooks Dunkelmodus, um es zu sehen.
 Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.	Facebooks Text wird in der Schriftart deines Handys statt in Metas eigener gezeichnet. Starte Facebook nach dem Ändern neu.
+Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Emojis werden mit der Emoji-Schriftart deines Handys statt mit der von Meta gezeichnet. Reaktionen und Sticker bleiben, wie sie sind. Starte Facebook nach dem Ändern neu.
 From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Ab dem nächsten Start wirken die obigen Schalter nicht mehr und Facebooks eigenes Verhalten kehrt zurück. Die Debug-Protokollierung läuft weiter, und deine Auswahl bleibt erhalten.
 Full report saved to %1$s	Vollständiger Bericht gespeichert unter %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, mit den Hinweisen der Projekte, auf denen es aufbaut
@@ -172,6 +173,7 @@ This phone has no file picker, so there's no way to choose a file here.	Dieses H
 Try again, or go back to Facebook.	Versuche es noch einmal oder kehre zu Facebook zurück.
 The switch takes effect when Facebook restarts.	Der Schalter wirkt, sobald Facebook neu startet.
 Use the system font	Systemschriftart verwenden
+Use the phone's emoji	Emojis des Handys verwenden
 Version	Version
 Version %1$s for Facebook %2$s	Version %1$s für Facebook %2$s
 Videos go to %1$s and photos to %2$s.	Videos landen in %1$s und Fotos in %2$s.
