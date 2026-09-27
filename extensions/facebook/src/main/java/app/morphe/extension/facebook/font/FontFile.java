@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 /**
  * The font file Use the system font draws in: a copy in Facebook's own files, made when the file is
@@ -23,8 +25,8 @@ import java.io.RandomAccessFile;
  * <p>A picked file is checked on the way in. It has to start with one of the tags an sfnt font
  * starts with (TrueType's version 1.0 or 'true', 'OTTO' for OpenType with CFF outlines, 'ttcf' for
  * a collection), be at most {@link #MAX_MEGABYTES}, and be a font Android builds a typeface from.
- * The copy it replaces stays until the new one has passed, and a file turned down leaves nothing
- * behind.
+ * The copy it replaces stays until the new one has passed and takes its place in one rename, and a
+ * file turned down leaves nothing behind but, at worst, a partial file the next pick writes over.
  */
 public final class FontFile {
     /**
@@ -63,7 +65,7 @@ public final class FontFile {
         TOO_LARGE,
         /** It starts like a font, but Android builds no typeface from it. */
         WONT_LOAD,
-        /** The copy couldn't be written to Facebook's files. */
+        /** The copy couldn't be written to Facebook's files or take the old one's place, or its name couldn't be saved. */
         NOT_SAVED
     }
 
@@ -82,6 +84,30 @@ public final class FontFile {
         boolean loads(File file);
     }
 
+    /**
+     * What else a copy taking the old one's place has to change: the setting that names the font.
+     * [save] runs once the copy has passed its checks and before it moves in, so a name that won't
+     * save leaves the copy before as it was. [undo] puts the name back when the copy then can't move
+     * in. Either may throw; a throw from [save] counts as a name that didn't save.
+     */
+    public interface Choice {
+        boolean save();
+
+        void undo();
+    }
+
+    /** No setting to change, for a copy with nothing but the file to it. */
+    private static final Choice FILE_ONLY = new Choice() {
+        @Override
+        public boolean save() {
+            return true;
+        }
+
+        @Override
+        public void undo() {
+        }
+    };
+
     private FontFile() {
     }
 
@@ -95,16 +121,23 @@ public final class FontFile {
         return tag == TRUETYPE || tag == TRUETYPE_APPLE || tag == OPENTYPE_CFF || tag == COLLECTION;
     }
 
+    /** {@link #copy(InputStream, File, Check, Choice)} with no setting to change. */
+    public static void copy(@Nullable InputStream input, File target, Check check) throws Refused {
+        copy(input, target, check, FILE_ONLY);
+    }
+
     /**
      * Copies [input] to [target], checking it on the way, and closes [input]. The bytes go to a
-     * file beside [target] first and replace it only once [check] has built a typeface from them,
-     * so a refused file, or one that stops halfway, leaves [target] as it was.
+     * file beside [target] first and replace it only once [check] has built a typeface from them and
+     * [choice] has saved, in one rename that swaps the whole file or leaves [target] as it was. So a
+     * refused file, one that stops halfway, a name that won't save and a copy that can't move in all
+     * leave [target] and the name as they were.
      *
      * <p>The first four bytes are read before anything is written, so a picked video or photo is
      * turned down without being copied. Reading stops one chunk past {@link #MAX_BYTES}, so a
      * stream that never ends is turned down too.
      */
-    public static void copy(@Nullable InputStream input, File target, Check check) throws Refused {
+    public static void copy(@Nullable InputStream input, File target, Check check, Choice choice) throws Refused {
         if (input == null) throw new Refused(Refusal.UNREADABLE, "No stream to read");
         File partial = new File(target.getParentFile(), PARTIAL);
         boolean kept = false;
@@ -122,8 +155,22 @@ public final class FontFile {
                 loads = false;
             }
             if (!loads) throw new Refused(Refusal.WONT_LOAD, "Android built no typeface from it");
-            if (!partial.renameTo(target) && !(target.delete() && partial.renameTo(target))) {
-                throw new Refused(Refusal.NOT_SAVED, "The copy couldn't take the font file's place");
+            boolean saved;
+            try {
+                saved = choice.save();
+            } catch (RuntimeException failure) {
+                saved = false;
+            }
+            if (!saved) throw new Refused(Refusal.NOT_SAVED, "The font file's name couldn't be saved");
+            try {
+                moveIn(partial, target);
+            } catch (Refused refused) {
+                try {
+                    choice.undo();
+                } catch (RuntimeException failure) {
+                    // The name stays the new one, and the copy the old one. Picking again mends it.
+                }
+                throw refused;
             }
             kept = true;
         } finally {
@@ -134,6 +181,20 @@ public final class FontFile {
             }
             // A leftover that won't go is written over by the next pick.
             if (!kept) partial.delete();
+        }
+    }
+
+    /**
+     * Puts [partial] in [target]'s place in one rename, which replaces [target] whole or leaves it
+     * as it was. The old copy is never deleted first, so a rename that fails can't lose both.
+     */
+    private static void moveIn(File partial, File target) throws Refused {
+        try {
+            Files.move(partial.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException | RuntimeException failure) {
+            // The class only: a message can carry a path.
+            throw new Refused(Refusal.NOT_SAVED, failure.getClass().getSimpleName());
         }
     }
 

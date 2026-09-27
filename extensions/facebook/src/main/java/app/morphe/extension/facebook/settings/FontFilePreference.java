@@ -85,7 +85,7 @@ public class FontFilePreference extends Preference implements ImmediateAction {
 
     /**
      * On Font file, the Use your phone's font row it keeps beside itself while a font file is
-     * picked, and takes away while the phone's font is in use, when there's nothing to go back from.
+     * picked or a copy of one is left, and takes away when there's neither to go back from.
      */
     @Nullable
     FontFilePreference wayBack;
@@ -122,12 +122,15 @@ public class FontFilePreference extends Preference implements ImmediateAction {
         String source = Settings.FONT_SOURCE.savedValue();
         String line = runningLine;
         boolean running = BUSY.get();
+        boolean copy = copyExists();
+        // A copy no name points at, one a removal couldn't delete, still has a way out.
+        boolean wayBack = !source.isEmpty() || copy;
         if (role == CHOOSE) {
             setEnabled(!running);
-            setSummary(line != null ? line : chosenSummary(source, copyExists()));
-            showWayBack(!source.isEmpty());
+            setSummary(line != null ? line : chosenSummary(source, copy));
+            showWayBack(wayBack);
         } else {
-            setEnabled(!running && !source.isEmpty());
+            setEnabled(!running && wayBack);
             setSummary(L10n.t("Stops using the font file and goes back to your phone's font."));
         }
     }
@@ -202,14 +205,23 @@ public class FontFilePreference extends Preference implements ImmediateAction {
         boolean accepted = Utils.runOnBackgroundThread(() -> {
             try {
                 String name = displayName(context, uri);
-                FontFile.copy(open(context, uri), FontFile.file(context), OwnFont::loads);
+                String before = Settings.FONT_SOURCE.savedValue();
+                // The name is saved before the copy moves in and put back if it can't, so the row,
+                // the message and the copy never disagree about which font is in use.
+                FontFile.copy(open(context, uri), FontFile.file(context), OwnFont::loads, new FontFile.Choice() {
+                    @Override
+                    public boolean save() {
+                        return Settings.FONT_SOURCE.save(name);
+                    }
+
+                    @Override
+                    public void undo() {
+                        Settings.FONT_SOURCE.save(before);
+                    }
+                });
                 // Whatever was built from the copy that was there before is stale now.
                 OwnFont.fileChanged();
-                if (Settings.FONT_SOURCE.save(name)) {
-                    Utils.showToastLong(L10n.f("Font set to %1$s. Restart Facebook to see it.", L10n.isolate(name)));
-                } else {
-                    Utils.showToastLong(refusal(FontFile.Refusal.NOT_SAVED));
-                }
+                Utils.showToastLong(L10n.f("Font set to %1$s. Restart Facebook to see it.", L10n.isolate(name)));
             } catch (FontFile.Refused refused) {
                 Logger.printInfo(() -> "Font file refused: " + refused.reason);
                 Utils.showToastLong(refusal(refused.reason));

@@ -262,10 +262,14 @@ public final class OwnFont {
 
     /**
      * Forgets the font read from the copy. The settings screen calls this after it writes a new
-     * copy or removes one, so the next typeface is built from what's there now.
+     * copy or removes one, so the next typeface is built from what's there now. It waits for a
+     * read already under way, which could have begun on the old copy and would otherwise be kept
+     * after this under a name that didn't change.
      */
     public static void fileChanged() {
-        picked = null;
+        synchronized (OwnFont.class) {
+            picked = null;
+        }
     }
 
     /** The picked font, or null while the phone's font is chosen. Read from the copy the first time. */

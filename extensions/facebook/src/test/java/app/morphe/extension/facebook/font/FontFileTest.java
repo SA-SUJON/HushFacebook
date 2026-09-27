@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,15 +22,20 @@ import org.robolectric.annotation.Config;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * What a picked font has to be before its copy is kept, and what its fvar table says. The fonts
@@ -253,6 +259,111 @@ public class FontFileTest {
         assertUntouched(target);
         assertEquals(FontFile.Refusal.UNREADABLE, refusal(null, target, file -> true));
         assertUntouched(target);
+    }
+
+    /** The name is saved once the copy has passed and before it moves in; one that won't save changes nothing. */
+    @Test
+    public void theNameIsSavedBeforeTheCopyMovesIn() throws Exception {
+        byte[] rubik = font(STATIC_FONT);
+        File target = existingCopy();
+        List<String> said = new ArrayList<>();
+        FontFile.copy(new ByteArrayInputStream(rubik), target, file -> {
+            said.add("check");
+            return true;
+        }, new FontFile.Choice() {
+            @Override
+            public boolean save() {
+                try {
+                    said.add("save, the copy before still " + (Files.readAllBytes(target.toPath()).length
+                            == "the font picked before".length() ? "in place" : "gone"));
+                } catch (IOException unreadable) {
+                    throw new AssertionError(unreadable);
+                }
+                return true;
+            }
+
+            @Override
+            public void undo() {
+                said.add("undo");
+            }
+        });
+        assertEquals(Arrays.asList("check", "save, the copy before still in place"), said);
+        assertArrayEquals(rubik, Files.readAllBytes(target.toPath()));
+
+        // A name that won't save, or whose saving throws, leaves the copy before where it was.
+        File again = existingCopy();
+        AtomicInteger undone = new AtomicInteger();
+        for (boolean throwing : new boolean[]{false, true}) {
+            try {
+                FontFile.copy(new ByteArrayInputStream(rubik), again, file -> true, new FontFile.Choice() {
+                    @Override
+                    public boolean save() {
+                        if (throwing) throw new IllegalStateException("injected commit failure");
+                        return false;
+                    }
+
+                    @Override
+                    public void undo() {
+                        undone.incrementAndGet();
+                    }
+                });
+                fail("the copy was taken without its name");
+            } catch (FontFile.Refused refused) {
+                assertEquals(FontFile.Refusal.NOT_SAVED, refused.reason);
+            }
+            assertUntouched(again);
+        }
+        assertEquals("a name that never saved was put back", 0, undone.get());
+    }
+
+    /**
+     * A copy that can't move in leaves the one picked before in place, never neither, and puts the
+     * name back. Windows won't rename a file another handle holds open without sharing its
+     * deletion, which stands in here for a rename that fails.
+     */
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void aCopyThatCantMoveInLeavesTheOneBefore() throws Exception {
+        assumeTrue("only Windows refuses to rename a file held open",
+                System.getProperty("os.name", "").startsWith("Windows"));
+        // The JDK's own option, looked up by name: the test sources compile against Android's classes.
+        OpenOption noShareDelete = (OpenOption) Enum.valueOf(
+                (Class) Class.forName("com.sun.nio.file.ExtendedOpenOption"), "NOSHARE_DELETE");
+        File target = existingCopy();
+        List<Closeable> held = new ArrayList<>();
+        AtomicInteger saved = new AtomicInteger();
+        AtomicInteger undone = new AtomicInteger();
+        try {
+            FontFile.copy(new ByteArrayInputStream(font(STATIC_FONT)), target, file -> {
+                try {
+                    held.add(Files.newByteChannel(file.toPath(), StandardOpenOption.READ, noShareDelete));
+                } catch (IOException unreadable) {
+                    throw new AssertionError(unreadable);
+                }
+                return true;
+            }, new FontFile.Choice() {
+                @Override
+                public boolean save() {
+                    saved.incrementAndGet();
+                    return true;
+                }
+
+                @Override
+                public void undo() {
+                    undone.incrementAndGet();
+                }
+            });
+            fail("a copy held open moved in");
+        } catch (FontFile.Refused refused) {
+            assertEquals(FontFile.Refusal.NOT_SAVED, refused.reason);
+        } finally {
+            for (Closeable handle : held) handle.close();
+        }
+        assertTrue("the copy picked before was lost", target.isFile());
+        assertEquals("the copy picked before changed", "the font picked before",
+                new String(Files.readAllBytes(target.toPath()), StandardCharsets.UTF_8));
+        assertEquals(1, saved.get());
+        assertEquals("the name wasn't put back", 1, undone.get());
     }
 
     @Test

@@ -36,6 +36,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.ShadowToast;
+import org.robolectric.util.ReflectionHelpers;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,6 +53,7 @@ import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.WorkerPoolForTests;
+import app.morphe.extension.shared.settings.Setting;
 
 /**
  * Font file and Use your phone's font under the Use the system font switch: the picker a tap opens,
@@ -279,6 +281,65 @@ public class FontFilePreferenceTest {
                     page.findPreference(FontFilePreference.PHONE_FONT_KEY));
             assertEquals(FontFilePreference.chosenSummary("", false),
                     String.valueOf(page.findPreference(FontFilePreference.CHOOSE_KEY).getSummary()));
+        }
+    }
+
+    /**
+     * A pick whose name can't be saved changes nothing: the copy, the name, the row and the message
+     * all stay with the font picked before. For that pick the preferences file's folder is swapped
+     * for a plain file, so Android can't write the name.
+     */
+    @Test
+    public void aPickWhoseNameWontSaveChangesNothing() throws Exception {
+        byte[] rubik = FontFileTest.font(FontFileTest.STATIC_FONT);
+        byte[] khmer = FontFileTest.font(FontFileTest.VARIABLE_FONT);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            deliver(activity, tap(activity, page), "content://font-test/documents/Rubik-Regular.ttf", rubik);
+            assertEquals("Rubik-Regular.ttf", Settings.FONT_SOURCE.savedValue());
+
+            File stored = ReflectionHelpers.getField(Setting.preferences.preferences, "mFile");
+            File folder = stored.getParentFile();
+            File aside = new File(folder.getParentFile(), folder.getName() + ".aside");
+            assertTrue(folder.renameTo(aside));
+            assertTrue(folder.createNewFile());
+            try {
+                deliver(activity, tap(activity, page), "content://font-test/documents/NotoSansKhmer-VF.ttf", khmer);
+            } finally {
+                assertTrue(folder.delete());
+                assertTrue(aside.renameTo(folder));
+            }
+
+            assertEquals("Couldn't save a copy of that font. Check that the phone has room, then try again.",
+                    ShadowToast.getTextOfLatestToast());
+            assertEquals("Rubik-Regular.ttf", Settings.FONT_SOURCE.savedValue());
+            assertArrayEquals("the copy moved on without its name", rubik, Files.readAllBytes(copy().toPath()));
+            assertEquals("Using " + L10n.isolate("Rubik-Regular.ttf") + ". Choose another file to replace it.",
+                    String.valueOf(page.findPreference(FontFilePreference.CHOOSE_KEY).getSummary()));
+            assertTrue(page.findPreference(FontFilePreference.PHONE_FONT_KEY).isEnabled());
+        }
+    }
+
+    /** A copy no name points at, one a removal couldn't delete, can still be taken away. */
+    @Test
+    public void aCopyNoNamePointsAtCanStillBeTakenAway() throws Exception {
+        File copy = copy();
+        Files.write(copy.toPath(), FontFileTest.font(FontFileTest.STATIC_FONT));
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(controller.get()));
+            assertEquals(FontFilePreference.chosenSummary("", true),
+                    String.valueOf(page.findPreference(FontFilePreference.CHOOSE_KEY).getSummary()));
+            Preference phone = page.findPreference(FontFilePreference.PHONE_FONT_KEY);
+            assertNotNull("no way to take away a copy no name points at", phone);
+            assertTrue(phone.isEnabled());
+
+            phone.getOnPreferenceClickListener().onPreferenceClick(phone);
+            settle();
+            assertFalse(copy.exists());
+            assertEquals("", Settings.FONT_SOURCE.savedValue());
+            assertEquals("Back to your phone's font. Restart Facebook to see it.", ShadowToast.getTextOfLatestToast());
+            assertNull(page.findPreference(FontFilePreference.PHONE_FONT_KEY));
         }
     }
 
