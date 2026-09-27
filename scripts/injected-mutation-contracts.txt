@@ -48,6 +48,10 @@ start-call Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton
 # or put later, the provider hands out Meta's emoji font whatever the switch says. A string table
 # holds the log tag too; the flag is the provider's alone.
 start-call Lapp/morphe/extension/facebook/emoji/SystemEmoji;->typeface()Landroid/graphics/Typeface; in instance ()Landroid/graphics/Typeface; holding fb.e2e.force_system_emoji_font FacebookEmojiTypefaceProviderImpl
+# It also asks the extension first thing in Facebook's maker of emoji picture addresses, the one
+# static method answering a String that holds the base address of Meta's emoji pictures. Left out
+# or put later, a chat's big emoji keeps Meta's picture whatever the switch says.
+start-call Lapp/morphe/extension/facebook/emoji/SystemEmoji;->skipRemoteEmoji()Z in static (Ljava/lang/String;*)Ljava/lang/String; holding https://www.facebook.com/images/mobileemoji
 # Facebook ranks its own launcher shortcuts ahead of the Hushfacebook one with these calls, so the
 # settings patch sends every one to SettingsEntry, which makes it and puts the Hushfacebook shortcut
 # back in front (#2). One left in Facebook's code would let it drop out of the long-press menu.

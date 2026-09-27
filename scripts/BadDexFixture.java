@@ -68,12 +68,15 @@ import java.util.Set;
  * the Facebook logo, holding its two trace sections, where the settings patch sends the logo's
  * touch listener call to {@code SettingsEntry.setLogoTouchListener} right after the logo gets its
  * tap. And Facebook's emoji typeface provider, holding its end-to-end flag and its log tag, with Use
- * the phone's emoji's call to {@code SystemEmoji.typeface} first. And the Reels viewer's batcher of
+ * the phone's emoji's call to {@code SystemEmoji.typeface} first, and its maker of emoji picture
+ * addresses, holding the pictures' base address, with the call to {@code SystemEmoji.skipRemoteEmoji}
+ * first. And the Reels viewer's batcher of
  * watched reels, whose flush holds the mutation's name and its input field and hands each batch to
  * an executor, the call Don't send reel watch history sends to {@code ReelWatchHistory.send}.
  * Beside each method a start-call, next-call or sole-call rule picks sit methods holding part of
  * what it's picked by: the tray controller, the refresh controller's onPause, two other methods
- * naming both surfaces and one holding the emoji provider's log tag alone, as Facebook's do, and
+ * naming both surfaces and one holding the emoji provider's log tag alone, as Facebook's do, an
+ * instance method holding the emoji pictures' base address, and
  * three top bar and three batcher methods, which Facebook doesn't have, so neither the logo rule
  * nor the watch-history rule passes with its second string or its shape left out.
  *
@@ -136,6 +139,10 @@ public class BadDexFixture {
     private static final String TYPEFACE = "Landroid/graphics/Typeface;";
     private static final String SYSTEM_EMOJI = "Lapp/morphe/extension/facebook/emoji/SystemEmoji;";
     private static final ImmutableMethodReference SYSTEM_EMOJI_TYPEFACE = method(SYSTEM_EMOJI, "typeface", TYPEFACE);
+    private static final ImmutableMethodReference SKIP_REMOTE_EMOJI = method(SYSTEM_EMOJI, "skipRemoteEmoji", "Z");
+    private static final String EMOJI_PICTURES = "Lfixture/EmojiPictures;";
+    private static final String EMOJI_SIZE = "Lfixture/EmojiSize;";
+    private static final String EMOJI_PICTURE_BASE = "https://www.facebook.com/images/mobileemoji";
 
     private static final String SHORTCUT_MANAGER = "Landroid/content/pm/ShortcutManager;";
     private static final String SHORTCUT_INFO = "Landroid/content/pm/ShortcutInfo;";
@@ -695,9 +702,43 @@ public class BadDexFixture {
 
     private static ClassDef systemEmoji() {
         return new ImmutableClassDef(SYSTEM_EMOJI, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
-                OBJECT, null, null, null, null, Collections.singletonList(define(SYSTEM_EMOJI,
-                        "typeface", TYPEFACE, true, body(1,
-                                new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN_OBJECT, 0)))));
+                OBJECT, null, null, null, null, Arrays.asList(
+                        define(SYSTEM_EMOJI, "typeface", TYPEFACE, true, body(1,
+                                new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN_OBJECT, 0))),
+                        define(SYSTEM_EMOJI, "skipRemoteEmoji", "Z", true, body(1,
+                                new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN, 0)))));
+    }
+
+    /**
+     * Facebook's maker of emoji picture addresses, static (name, size, version, density) to a
+     * String: v0 free, v1 to v4 the arguments. [prefix] comes first, then the base address it
+     * answers. Beside it, an instance method holding the base address too, with [otherPrefix]
+     * first, which Facebook doesn't have: only the shape tells them apart.
+     */
+    private static ClassDef emojiPictures(List<Instruction> prefix, List<Instruction> otherPrefix) {
+        return new ImmutableClassDef(EMOJI_PICTURES, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Arrays.asList(
+                        define(EMOJI_PICTURES, "makeUrl", "Ljava/lang/String;", true, pictureBody(prefix, 5),
+                                "Ljava/lang/String;", EMOJI_SIZE, "Ljava/lang/String;", "I"),
+                        define(EMOJI_PICTURES, "pictureAddress", "Ljava/lang/String;", false, pictureBody(otherPrefix, 2))));
+    }
+
+    /** [prefix], then the base address in v0, answered, in [registers] with v0 free. */
+    private static ImmutableMethodImplementation pictureBody(List<Instruction> prefix, int registers) {
+        List<Instruction> instructions = new ArrayList<>(prefix);
+        instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(EMOJI_PICTURE_BASE)));
+        instructions.add(op(Opcode.RETURN_OBJECT, 0));
+        return new ImmutableMethodImplementation(registers, instructions, null, null);
+    }
+
+    /** What Use the phone's emoji puts first in the address maker: ask, and answer null when told to. Facebook's own code lands at 8. */
+    private static List<Instruction> emojiPicturesHook() {
+        return Arrays.asList(
+                invoke(SKIP_REMOTE_EMOJI),                             // 0
+                op(Opcode.MOVE_RESULT, 0),                             // 3
+                ifEqz(0, 4),                                           // 4 -> 8
+                new ImmutableInstruction11n(Opcode.CONST_4, 0, 0),    // 6
+                op(Opcode.RETURN_OBJECT, 0));                          // 7
     }
 
     /** [classes] with each of [replacements] in place of the class of its type. */
@@ -1106,6 +1147,7 @@ public class BadDexFixture {
                 shortcuts(Collections.<String>emptySet()), settingsEntry(), followCheck(followHook()), reelDeclutter(),
                 topBar(false, true, 1), finderStub(FILLED_FINDER_STUB),
                 emojiProvider(emojiHook(), Collections.<Instruction>emptyList()), systemEmoji(),
+                emojiPictures(emojiPicturesHook(), Collections.<Instruction>emptyList()),
                 batcher(heldBack(), false, false), reelWatchHistory());
     }
 
@@ -1116,6 +1158,7 @@ public class BadDexFixture {
                 shortcuts(allShortcutCalls()), followCheck(Collections.<Instruction>emptyList()),
                 topBar(false, false, 1),
                 emojiProvider(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
+                emojiPictures(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 batcher(handOver, false, false));
     }
 
@@ -1593,6 +1636,16 @@ public class BadDexFixture {
         lateEmojiHook.addAll(emojiHook());                                // 3
         dexes.put("bad-emoji-hook-late", replaced(good(),
                 emojiProvider(lateEmojiHook, Collections.<Instruction>emptyList())));
+        // contract: the address maker left without the call, and a chat's big emoji keeps Meta's picture.
+        dexes.put("bad-emoji-pictures-hook-missing", replaced(good(),
+                emojiPictures(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList())));
+        // contract: the maker's call after a branch on its first argument, not first.
+        List<Instruction> lateEmojiPicturesHook = new ArrayList<>();
+        lateEmojiPicturesHook.add(ifEqz(1, 3));                           // 0 -> 3
+        lateEmojiPicturesHook.add(op(Opcode.NOP));                        // 2
+        lateEmojiPicturesHook.addAll(emojiPicturesHook());                // 3
+        dexes.put("bad-emoji-pictures-hook-late", replaced(good(),
+                emojiPictures(lateEmojiPicturesHook, Collections.<Instruction>emptyList())));
 
         // contract: the GenAI reel stub left as the extension ships it, answering its marker.
         dexes.put("bad-finder-stub-not-filled", withFinderStub(good(), UNFILLED_FINDER_STUB));
@@ -1664,13 +1717,15 @@ public class BadDexFixture {
         // holding it, so each of these passed: the unified tray hook in the tray controller, which
         // holds the adapter's start and stop names but not "tofu"; the return-refresh hook in
         // onPause, which holds the controller's name without "onRefresh"; the Follow hook in an
-        // instance method naming both surfaces, which isn't the static check; and the emoji hook in
-        // a method holding the provider's log tag without its end-to-end flag.
+        // instance method naming both surfaces, which isn't the static check; the emoji hook in
+        // a method holding the provider's log tag without its end-to-end flag; and the emoji picture
+        // hook in an instance method holding the pictures' base address, which isn't the maker.
         List<Instruction> none = Collections.<Instruction>emptyList();
         dexes.put("bad-tray-hook-wrong-method", replaced(good(), adapters(trayHook(0), none), trayController(trayHook(1))));
         dexes.put("bad-return-refresh-hook-wrong-method", replaced(good(), returnController(none, returnHook(), false)));
         dexes.put("bad-follow-hook-wrong-method", replaced(good(), followCheck(none, followHook())));
         dexes.put("bad-emoji-hook-wrong-method", replaced(good(), emojiProvider(none, emojiHook())));
+        dexes.put("bad-emoji-pictures-hook-wrong-method", replaced(good(), emojiPictures(none, emojiPicturesHook())));
         // contract: a second method answering the return-refresh rule, so it can't say which one
         // the hook belongs in, although the hook is where it was.
         dexes.put("bad-return-refresh-two-callbacks", replaced(good(), returnController(returnHook(), none, true)));

@@ -4,6 +4,7 @@
  */
 package app.morphe.extension.facebook.emoji;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -69,5 +70,34 @@ public class SystemEmojiTest {
         SystemEmoji.typeface();
         List<String> on = HookStatus.report();
         assertTrue(String.join("\n", on), on.contains("Use the phone's emoji: invoked 3, 1 found, 0 missing"));
+    }
+
+    /**
+     * A chat's big emoji: on, the maker of Meta's emoji picture addresses hears there's no picture,
+     * so the chat keeps the emoji drawn with the provider's typeface. Off, Meta's picture as before.
+     */
+    @Test
+    public void theBigChatEmojiSkipsMetasPictureOnlyWhileTheSwitchIsOn() {
+        assertTrue(SystemEmoji.skipRemoteEmoji());
+        Settings.USE_SYSTEM_EMOJI.save(false);
+        assertFalse(SystemEmoji.skipRemoteEmoji());
+        Settings.USE_SYSTEM_EMOJI.save(true);
+        assertTrue(SystemEmoji.skipRemoteEmoji());
+    }
+
+    /** The picture hook counts in the same line, and a skip marks the address maker found. */
+    @Test
+    public void thePictureHookIsCountedBesideTheProvider() {
+        HookStatus.clear();
+        Settings.USE_SYSTEM_EMOJI.save(false);
+        SystemEmoji.skipRemoteEmoji();
+        List<String> off = HookStatus.report();
+        assertTrue(String.join("\n", off), off.contains("Use the phone's emoji: invoked 1, 0 found, 0 missing"));
+
+        Settings.USE_SYSTEM_EMOJI.save(true);
+        SystemEmoji.skipRemoteEmoji();
+        SystemEmoji.typeface();
+        List<String> on = HookStatus.report();
+        assertTrue(String.join("\n", on), on.contains("Use the phone's emoji: invoked 3, 2 found, 0 missing"));
     }
 }

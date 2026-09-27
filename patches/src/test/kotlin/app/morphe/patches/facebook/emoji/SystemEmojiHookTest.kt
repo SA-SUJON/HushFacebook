@@ -4,6 +4,7 @@
  */
 package app.morphe.patches.facebook.emoji
 
+import app.morphe.RepoFiles
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import com.android.tools.smali.dexlib2.AccessFlags
@@ -12,6 +13,7 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodImplementation
@@ -24,10 +26,11 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 
 /**
- * The parts of Use the phone's emoji that need no Facebook build: which method the patch takes for
- * the provider, and the code it puts in front of it.
+ * The parts of Use the phone's emoji that need no Facebook build: which methods the patch takes for
+ * the provider and for the maker of emoji picture addresses, and the code it puts in front of each.
  */
 class SystemEmojiHookTest {
     /** A method loading each of [literals] into v0 and returning it, with [registers] in its frame. */
@@ -101,6 +104,85 @@ class SystemEmojiHookTest {
     fun `a provider with no local register stops the patch`() {
         val tight = MutableMethod(method(registers = 1))
         val refusal = assertThrows(PatchException::class.java) { tight.answerPhoneEmojiFirst() }
+        assertTrue(refusal.message, refusal.message!!.contains(PATCH))
+        assertEquals(Opcode.CONST_STRING, tight.at(0).opcode)
+    }
+
+    private val sizeEnum = "Lfixture/EmojiSize;"
+
+    /** Facebook's address maker: static, (name, size, version, density) to a String, 9 registers. */
+    private fun urlMaker(
+        literals: List<String> = listOf(REMOTE_EMOJI_BASE),
+        static: Boolean = true,
+        parameters: List<String> = listOf(STRING, sizeEnum, STRING, "I"),
+        returnType: String = STRING,
+        registers: Int = 9,
+    ) = method(literals, static, parameters, returnType, registers)
+
+    @Test
+    fun `the address maker is the static method answering a String that holds the picture base`() {
+        assertTrue(isRemoteEmojiUrlMaker(urlMaker()))
+        assertFalse(isRemoteEmojiUrlMaker(urlMaker(literals = listOf("https://www.facebook.com/images/emoji"))))
+        assertFalse(isRemoteEmojiUrlMaker(urlMaker(static = false)))
+        assertFalse(isRemoteEmojiUrlMaker(urlMaker(returnType = "Ljava/lang/Object;")))
+        // The cache key maker next to it takes the same size but builds a drawable, not an address.
+        assertFalse(isRemoteEmojiUrlMaker(urlMaker(parameters = listOf(sizeEnum, STRING))))
+        assertFalse(isRemoteEmojiUrlMaker(urlMaker(parameters = listOf(STRING, sizeEnum, STRING, "J"))))
+        assertFalse(isRemoteEmojiUrlMaker(urlMaker(parameters = listOf(STRING, sizeEnum, STRING, "I", "I"))))
+    }
+
+    @Test
+    fun `the address maker asks the extension first and answers no address only when told to`() {
+        val maker = MutableMethod(urlMaker())
+        val own = maker.implementation!!.instructions.count()
+        maker.answerNoPictureFirst()
+
+        val call = (maker.at(0) as ReferenceInstruction).reference as MethodReference
+        assertEquals(Opcode.INVOKE_STATIC, maker.at(0).opcode)
+        assertEquals(SKIP_REMOTE_EMOJI,
+            call.definingClass + "->" + call.name + call.parameterTypes.joinToString("", "(", ")") + call.returnType)
+        assertEquals(Opcode.MOVE_RESULT, maker.at(1).opcode)
+        assertEquals(0, (maker.at(1) as OneRegisterInstruction).registerA)
+        assertEquals(Opcode.IF_EQZ, maker.at(2).opcode)
+        assertEquals(0, (maker.at(2) as OneRegisterInstruction).registerA)
+        // True: null, which Facebook reads as an emoji Meta has no picture of.
+        assertEquals(Opcode.CONST_4, maker.at(3).opcode)
+        assertEquals(0, (maker.at(3) as OneRegisterInstruction).registerA)
+        assertEquals(0L, (maker.at(3) as WideLiteralInstruction).wideLiteral)
+        assertEquals(Opcode.RETURN_OBJECT, maker.at(4).opcode)
+        assertEquals(0, (maker.at(4) as OneRegisterInstruction).registerA)
+        // False lands on the maker's own first instruction, so none of Facebook's code is skipped.
+        assertEquals(own + 5, maker.implementation!!.instructions.count())
+        assertEquals(5, maker.target(2))
+        assertEquals(Opcode.CONST_STRING, maker.at(5).opcode)
+    }
+
+    /**
+     * The receipt refuses a patched build whose provider or address maker doesn't ask the extension
+     * first, by two start-call rules in scripts/injected-mutation-contracts.txt. They name what the
+     * patch finds each method by and the call it puts there, so a rename on one side can't leave a
+     * rule looking for something no build has.
+     */
+    @Test
+    fun `the contract file holds both hooks`() {
+        val rules = File(RepoFiles.root, "scripts/injected-mutation-contracts.txt").readLines()
+            .map { it.trim() }
+            .filter { it.startsWith("start-call ") && it.contains("/SystemEmoji;->") }
+        assertEquals(
+            listOf(
+                "start-call $SYSTEM_EMOJI_TYPEFACE in instance ()$TYPEFACE holding $FORCE_SYSTEM_EMOJI_FONT " +
+                    EMOJI_TYPEFACE_PROVIDER,
+                "start-call $SKIP_REMOTE_EMOJI in static ($STRING*)$STRING holding $REMOTE_EMOJI_BASE",
+            ),
+            rules,
+        )
+    }
+
+    /** A maker with no local for the answer is refused by name, before anything goes in. */
+    @Test
+    fun `an address maker with no local register stops the patch`() {
+        val tight = MutableMethod(urlMaker(registers = 4))
+        val refusal = assertThrows(PatchException::class.java) { tight.answerNoPictureFirst() }
         assertTrue(refusal.message, refusal.message!!.contains(PATCH))
         assertEquals(Opcode.CONST_STRING, tight.at(0).opcode)
     }

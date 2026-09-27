@@ -21,6 +21,7 @@ import app.morphe.util.findMutableMethodOf
 internal const val PATCH = "Use the phone's emoji"
 private const val EXTENSION_ROOT = "Lapp/morphe/extension/"
 internal const val SYSTEM_EMOJI_TYPEFACE = "$EXTENSION_PACKAGE/emoji/SystemEmoji;->typeface()$TYPEFACE"
+internal const val SKIP_REMOTE_EMOJI = "$EXTENSION_PACKAGE/emoji/SystemEmoji;->skipRemoteEmoji()Z"
 
 /**
  * Facebook draws the emoji in its text with Meta's own emoji font, which it downloads and hands out
@@ -28,6 +29,11 @@ internal const val SYSTEM_EMOJI_TYPEFACE = "$EXTENSION_PACKAGE/emoji/SystemEmoji
  * answers with what it gets: the phone's default typeface while the switch is on, whose font
  * fallback ends in the phone's emoji font. Anything else, the switch off, a pause, settings not
  * ready yet or a failure in the extension, comes back as null and the provider's own code runs.
+ *
+ * A chat's big emoji is a picture Meta serves, drawn with the provider's typeface only until it
+ * arrives. The maker of those pictures' addresses asks the extension first thing too, and while the
+ * switch is on it answers no address, which Facebook takes as an emoji Meta has no picture of: the
+ * chat keeps the emoji drawn with the provider's typeface. Otherwise the maker's own code runs.
  *
  * Reactions and stickers are pictures of their own, not text in a typeface, so nothing here
  * reaches them. Neither does androidx EmojiCompat, which Facebook starts with Google's downloadable
@@ -37,9 +43,9 @@ internal const val SYSTEM_EMOJI_TYPEFACE = "$EXTENSION_PACKAGE/emoji/SystemEmoji
 val useSystemEmojiPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Use the phone's emoji",
-    description = "Draws emoji with your phone's own emoji font instead of Meta's, so the ones in posts and " +
-        "comments look like the ones on your keyboard. Reactions and stickers stay as they are. Restart " +
-        "Facebook after changing the switch.",
+    description = "Draws emoji with your phone's own emoji font instead of Meta's, so the ones in posts, " +
+        "comments and chats look like the ones on your keyboard, big chat emoji included. Reactions and stickers " +
+        "stay as they are. Restart Facebook after changing the switch.",
     default = false,
 ) {
     category("Interface")
@@ -56,8 +62,37 @@ val useSystemEmojiPatch = bytecodePatch(
                 "found ${providers.size}",
         )
         mutableClassDefBy(provider.definingClass).findMutableMethodOf(provider).answerPhoneEmojiFirst()
+
+        val urlMakers = classDefByStrings(REMOTE_EMOJI_BASE, StringComparisonType.EQUALS)
+            .filterNot { it.type.startsWith(EXTENSION_ROOT) }
+            .flatMap { owner -> owner.methods.filter(::isRemoteEmojiUrlMaker) }
+        val urlMaker = urlMakers.singleOrNull() ?: throw PatchException(
+            "$PATCH: expected one maker of emoji picture addresses, a static method answering a String from " +
+                "(String, size, String, int) that holds \"$REMOTE_EMOJI_BASE\", found ${urlMakers.size}",
+        )
+        mutableClassDefBy(urlMaker.definingClass).findMutableMethodOf(urlMaker).answerNoPictureFirst()
         enableStatus("systemEmoji")
     }
+}
+
+/**
+ * Asks the extension before the address maker's own first instruction and answers null, no
+ * picture, when it says so. A false answer branches to that first instruction, so none of Facebook's
+ * code is skipped. The answer goes through v0: at index 0 no local holds anything yet.
+ */
+internal fun MutableMethod.answerNoPictureFirst() {
+    requireLocals(PATCH, 1)
+    addInstructionsWithLabels(
+        0,
+        """
+            invoke-static { }, $SKIP_REMOTE_EMOJI
+            move-result v0
+            if-eqz v0, :meta
+            const/4 v0, 0x0
+            return-object v0
+        """,
+        ExternalLabel("meta", getInstruction(0)),
+    )
 }
 
 /**

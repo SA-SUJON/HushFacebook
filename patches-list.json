@@ -1706,7 +1706,7 @@
     },
     {
       "name": "Use the phone's emoji",
-      "description": "Draws emoji with your phone's own emoji font instead of Meta's, so the ones in posts and comments look like the ones on your keyboard. Reactions and stickers stay as they are. Restart Facebook after changing the switch.",
+      "description": "Draws emoji with your phone's own emoji font instead of Meta's, so the ones in posts, comments and chats look like the ones on your keyboard, big chat emoji included. Reactions and stickers stay as they are. Restart Facebook after changing the switch.",
       "category": "Interface",
       "use": false,
       "dependencies": [

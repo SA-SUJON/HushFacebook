@@ -279,8 +279,11 @@ public class PausedHooksTest {
                     return OwnFont.replaceBuilt(Typeface.SERIF, builder) != Typeface.SERIF;
                 },
                 () -> OwnFont.replaceReactNative(Typeface.SERIF, "Optimistic VF App Lite 500") != Typeface.SERIF));
-        // The emoji typeface provider hears the phone's default typeface instead of running its own code.
-        probes.put(PatchFamily.SYSTEM_EMOJI, Collections.singletonList(() -> SystemEmoji.typeface() != null));
+        // The emoji typeface provider hears the phone's default typeface instead of running its own code,
+        // and the maker of Meta's emoji picture addresses hears there's no picture for a chat's big emoji.
+        probes.put(PatchFamily.SYSTEM_EMOJI, Arrays.asList(
+                () -> SystemEmoji.typeface() != null,
+                SystemEmoji::skipRemoteEmoji));
         probes.put(PatchFamily.EXTERNAL_BROWSER, Collections.singletonList(() -> {
             Activity browser = Robolectric.buildActivity(Activity.class,
                     new Intent(Intent.ACTION_VIEW, Uri.parse("https://example.org/"))).create().get();

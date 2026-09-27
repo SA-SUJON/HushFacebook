@@ -254,7 +254,7 @@
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: the switch to the phone's emoji font. It asks the extension first thing in Facebook's emoji typeface provider, found in Facebook 577 and 580 by the end-to-end system emoji flag and the log tag it keeps, and hands back the phone's default typeface while the switch is on, so the spans and pickers that draw emoji with Meta's downloaded font draw the phone's emoji font instead."
+      "changes": "Written for Hushfacebook: the switch to the phone's emoji font. It asks the extension first thing in Facebook's emoji typeface provider, found in Facebook 577 and 580 by the end-to-end system emoji flag and the log tag it keeps, and hands back the phone's default typeface while the switch is on, so the spans and pickers that draw emoji with Meta's downloaded font draw the phone's emoji font instead. It also asks the extension first thing in the maker of Meta's emoji picture addresses, found by the picture base address it holds, and answers no address while the switch is on, so a chat's big emoji stays drawn with the provider's typeface instead of Meta's PNG."
     },
     {
       "paths": [

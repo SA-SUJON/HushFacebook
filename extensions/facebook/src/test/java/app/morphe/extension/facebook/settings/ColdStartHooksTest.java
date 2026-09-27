@@ -206,6 +206,7 @@ public class ColdStartHooksTest {
                 OwnFont.replaceReactNative(Typeface.SERIF, "Optimistic VF App Lite 500"));
         // Facebook warms its emoji font from an app init task, which can ask the provider this early.
         assertNull("an emoji typeface asked for before the context was answered", SystemEmoji.typeface());
+        assertFalse("a chat's big emoji asked for before the context lost Meta's picture", SystemEmoji.skipRemoteEmoji());
 
         // A hook that touched the settings above left them unusable, and this is where a real
         // start would crash. While setContext decides the pause the context is already set, so a

@@ -22,12 +22,13 @@
     missing, the reels hook deleted from the pre-EOF injector or put after a branch, the showcase
     stub left unfilled, calling another class, or calling a class that isn't the only one
     answering its type name, Clean up Reels' hook deleted from Facebook's Follow check or put
-    after a branch there, Use the phone's emoji's hook deleted from Facebook's emoji typeface
-    provider or put after a branch there, and the GenAI reel stub left unfilled, filled with a call
-    that stays in the extension, or calling Facebook's finder only after it has returned. Each
-    start-call hook is also put first in a method holding part of what its rule picks by (the tray
-    controller, onPause, another method naming both surfaces, a method holding the emoji
-    provider's log tag alone), and one rule is given two methods to choose from; all five fail
+    after a branch there, Use the phone's emoji's hooks deleted from Facebook's emoji typeface
+    provider and from its maker of emoji picture addresses, or put after a branch there, and the
+    GenAI reel stub left unfilled, filled with a call that stays in the extension, or calling
+    Facebook's finder only after it has returned. Each start-call hook is also put first in a method
+    holding part of what its rule picks by (the tray controller, onPause, another method naming both
+    surfaces, a method holding the emoji provider's log tag alone, an instance method holding the
+    emoji pictures' base address), and one rule is given two methods to choose from; all six fail
     naming the method the rule picks. The Follow hook is also put first in that other method as
     well as in the check. A register out of range fails as its own finding:
     named by a helper added to a host class, as the upper half of a long read from the last
@@ -605,6 +606,10 @@ try {
             'fb.e2e.force_system_emoji_font FacebookEmojiTypefaceProviderImpl: first in Lfixture/EmojiProvider;->emojiTypeface('))) `
         "The good build's emoji hook was not first in Facebook's emoji typeface provider.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        ('SystemEmoji;->skipRemoteEmoji()Z in static (Ljava/lang/String;*)Ljava/lang/String; holding ' +
+            'https://www.facebook.com/images/mobileemoji: first in Lfixture/EmojiPictures;->makeUrl('))) `
+        "The good build's emoji picture hook was not first in Facebook's maker of emoji picture addresses.`n$($good.Output -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         'GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside ' +
         'Lapp/morphe/extension/: calls Lfixture/Attributions;->A02(Lfixture/ReelModel;Ljava/lang/String;)Lfixture/Model; ' +
         'before its first return')) `
@@ -758,6 +763,8 @@ try {
         'bad-follow-hook-late' = 'contract'
         'bad-emoji-hook-missing' = 'contract'
         'bad-emoji-hook-late' = 'contract'
+        'bad-emoji-pictures-hook-missing' = 'contract'
+        'bad-emoji-pictures-hook-late' = 'contract'
         'bad-logo-hook-missing' = 'contract'
         'bad-logo-hook-other-call' = 'contract'
         'bad-logo-hook-other-view' = 'contract'
@@ -780,6 +787,7 @@ try {
         'bad-return-refresh-two-callbacks' = 'contract'
         'bad-follow-hook-wrong-method' = 'contract'
         'bad-emoji-hook-wrong-method' = 'contract'
+        'bad-emoji-pictures-hook-wrong-method' = 'contract'
         'bad-follow-hook-also-elsewhere' = 'contract'
         'bad-register-added-helper' = 'register'
         'bad-register-wide-source' = 'register'
@@ -910,6 +918,10 @@ try {
             'is not called in Lfixture/EmojiProvider;->emojiTypeface()Landroid/graphics/Typeface;, the one method holding ' +
             '"fb.e2e.force_system_emoji_font" and "FacebookEmojiTypefaceProviderImpl" with the shape instance ' +
             '()Landroid/graphics/Typeface;; the host methods that call it: Lfixture/EmojiProvider;->loggedTypeface()Landroid/graphics/Typeface;'))
+        'bad-emoji-pictures-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/emoji/SystemEmoji;->skipRemoteEmoji()Z ' +
+            'is not called in Lfixture/EmojiPictures;->makeUrl(Ljava/lang/String;Lfixture/EmojiSize;Ljava/lang/String;I)Ljava/lang/String;, ' +
+            'the one method holding "https://www.facebook.com/images/mobileemoji" with the shape static (Ljava/lang/String;*)Ljava/lang/String;; ' +
+            'the host methods that call it: Lfixture/EmojiPictures;->pictureAddress()Ljava/lang/String;'))
         'bad-follow-hook-also-elsewhere' = @(('*contract: Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton()Z ' +
             'is called in Lfixture/FollowCheck;->offersFollowHere(Lcom/facebook/auth/usersession/FbUserSession;)Z as well as in ' +
             'Lfixture/FollowCheck;->offersFollow(Lcom/facebook/auth/usersession/FbUserSession;)Z, the one method holding ' +
