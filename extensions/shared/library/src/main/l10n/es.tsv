@@ -423,3 +423,7 @@ Writing	Escritura
 Tag suggestions only after @	Sugerencias para etiquetar solo después de @
 # context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
 Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	Facebook deja de ofrecerte personas para etiquetar mientras escribes palabras normales en publicaciones y comentarios. Si escribes @, la lista sigue apareciendo, y lo que escribiste nunca cambia.
+# context: switch title under Playback; on, a long video you left partway starts again where you left it
+Resume long videos	Reanudar videos largos
+# context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
+A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.	Un video de más de dos minutos que dejaste a medias sigue donde lo dejaste la próxima vez que se reproduce. Arrastra la barra de progreso para empezar en otro punto. Los reels, los videos en vivo y los anuncios empiezan como siempre.

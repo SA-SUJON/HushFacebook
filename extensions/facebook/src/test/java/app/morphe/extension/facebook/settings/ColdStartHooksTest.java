@@ -48,6 +48,7 @@ import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
+import app.morphe.extension.facebook.media.ResumePlaybackForTests;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
@@ -199,6 +200,7 @@ public class ColdStartHooksTest {
         assertSame("the Autoplay setting read before the context was changed", TapToPlayForTests.Autoplay.ON,
                 TapToPlay.autoplaySetting(TapToPlayForTests.Autoplay.ON));
         assertFalse("a reel built before the context was given its play button", TapToPlay.showReelPlayButton(false));
+        assertFalse("a long video started before the context was moved", ResumePlaybackForTests.resumesALongVideo());
         String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
         assertEquals("a link shared before the context was cleaned", shared, LinkCleaner.sanitizeShared(shared));
         assertSame("a typeface resolved before the context was swapped", Typeface.SERIF,

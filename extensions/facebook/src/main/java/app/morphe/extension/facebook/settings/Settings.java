@@ -226,6 +226,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_tap_to_play", TRUE);
 
     /**
+     * A video longer than two minutes that was left partway picks up where it was left, once, the
+     * next time a player starts it ({@link app.morphe.extension.facebook.media.ResumePlayback}).
+     * Starts off. Off or paused, nothing is saved or looked up and videos start as Facebook starts
+     * them; the points already saved stay until they're 30 days old.
+     */
+    public static final BooleanSetting RESUME_LONG_VIDEOS =
+            new BooleanSetting("hushfacebook_resume_long_videos", FALSE);
+
+    /**
      * Facebook's own text, React Native screens' included, drawn in the font {@link #FONT_SOURCE}
      * names instead of Meta's Optimistic, at the same weight and slant. A typeface already on
      * screen keeps its font until Facebook restarts.

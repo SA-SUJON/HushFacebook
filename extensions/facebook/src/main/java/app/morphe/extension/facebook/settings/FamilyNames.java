@@ -43,6 +43,7 @@ public final class FamilyNames {
     public static final String DEFAULT_COMMENT_ORDER = "Default comment order";
     public static final String TAG_SUGGESTIONS = "Tag suggestions only after @";
     public static final String TAP_TO_PLAY = "Tap to play";
+    public static final String RESUME_LONG_VIDEOS = "Resume long videos";
     public static final String SYSTEM_FONT = "Use the system font";
     public static final String SYSTEM_EMOJI = "Use the phone's emoji";
     public static final String EXTERNAL_BROWSER = "Open links in external browser";

@@ -423,3 +423,7 @@ Writing	Yazma
 Tag suggestions only after @	Etiket önerileri yalnızca @ sonrasında
 # context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
 Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	Facebook, gönderilerde ve yorumlarda sıradan kelimeler yazarken etiketlemen için kişi önermeyi bırakır. @ yazınca liste yine açılır ve yazdığın metin hiç değişmez.
+# context: switch title under Playback; on, a long video you left partway starts again where you left it
+Resume long videos	Uzun videolara kaldığın yerden devam et
+# context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
+A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.	Yarıda bıraktığın, iki dakikadan uzun bir video bir sonraki oynatılışında kaldığın yerden devam eder. Başka bir yerden başlamak için ilerleme çubuğunu sürükle. Reels videoları, canlı videolar ve reklamlar her zamanki gibi başlar.

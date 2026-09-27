@@ -1573,6 +1573,50 @@
       "options": []
     },
     {
+      "name": "Resume long videos",
+      "description": "A video longer than two minutes that you left partway picks up where you left it the next time it plays. Reels, live videos and ads start as usual. Its switch starts off.",
+      "category": "Interface",
+      "use": true,
+      "dependencies": [
+        "Hushfacebook settings"
+      ],
+      "compatiblePackages": {
+        "com.facebook.katana": [
+          "580.0.0.51.74",
+          "577.0.0.50.72"
+        ]
+      },
+      "compatibility": [
+        {
+          "name": "Facebook",
+          "packageName": "com.facebook.katana",
+          "description": null,
+          "appIconColor": 550655,
+          "signatures": [
+            "911d604446084ca7f4760b775bfc160fa8702441240a7258645d7a72c4312d27",
+            "e3f9e1e0cf99d0e56a055ba65e241b3399f7cea524326b0cdd6ec1327ed0fdc1"
+          ],
+          "targets": [
+            {
+              "version": "580.0.0.51.74",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 475019344
+              }
+            },
+            {
+              "version": "577.0.0.50.72",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 474426275
+              }
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Sanitize sharing links",
       "description": "Takes Facebook's tracking tags, such as mibextid, off the links you share or copy. The post or reel a link opens stays the same. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
       "category": "Privacy",

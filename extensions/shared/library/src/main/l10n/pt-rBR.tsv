@@ -423,3 +423,7 @@ Writing	Escrita
 Tag suggestions only after @	Sugestões de marcação só depois de @
 # context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
 Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	O Facebook para de sugerir pessoas para marcar enquanto você digita palavras comuns em posts e comentários. Digitar @ ainda mostra a lista, e o que você escreveu nunca é alterado.
+# context: switch title under Playback; on, a long video you left partway starts again where you left it
+Resume long videos	Retomar vídeos longos
+# context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
+A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.	Um vídeo com mais de dois minutos que você deixou pela metade continua de onde você parou na próxima vez que for reproduzido. Arraste a barra de progresso para começar em outro ponto. Reels, vídeos ao vivo e anúncios começam como sempre.

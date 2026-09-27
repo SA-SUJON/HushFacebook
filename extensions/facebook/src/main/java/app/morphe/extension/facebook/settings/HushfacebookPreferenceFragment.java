@@ -400,12 +400,20 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                             + "comments. Typing @ still brings up the list, and what you wrote is never changed.")));
         }
 
-        if (build.contains(PatchFamily.TAP_TO_PLAY)) {
+        if (build.contains(PatchFamily.TAP_TO_PLAY) || build.contains(PatchFamily.RESUME_LONG_VIDEOS)) {
             PreferenceCategory playback = category(screen, L10n.t("Playback"));
-            playback.addPreference(toggle(context, Settings.TAP_TO_PLAY, L10n.t("Tap to play"),
-                    L10n.t("Videos, reels, stories and music wait for your tap before they play. Facebook's own "
-                            + "Autoplay setting reads Off while this is on, and goes back to what you chose when "
-                            + "it's off.")));
+            if (build.contains(PatchFamily.TAP_TO_PLAY)) {
+                playback.addPreference(toggle(context, Settings.TAP_TO_PLAY, L10n.t("Tap to play"),
+                        L10n.t("Videos, reels, stories and music wait for your tap before they play. Facebook's own "
+                                + "Autoplay setting reads Off while this is on, and goes back to what you chose when "
+                                + "it's off.")));
+            }
+            if (build.contains(PatchFamily.RESUME_LONG_VIDEOS)) {
+                playback.addPreference(toggle(context, Settings.RESUME_LONG_VIDEOS, L10n.t("Resume long videos"),
+                        L10n.t("A video over two minutes long that you left partway picks up where you left it "
+                                + "the next time it plays. Drag the seek bar to start somewhere else. Reels, live "
+                                + "videos and ads start as usual.")));
+            }
         }
 
         if (build.contains(PatchFamily.STORY_DOWNLOAD) || build.contains(PatchFamily.REEL_DOWNLOAD)

@@ -423,3 +423,7 @@ Writing	Menulis
 Tag suggestions only after @	Saran menandai hanya setelah @
 # context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
 Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	Facebook berhenti menawarkan orang untuk ditandai saat Anda mengetik kata biasa di postingan dan komentar. Mengetik @ tetap memunculkan daftarnya, dan tulisan Anda tidak pernah diubah.
+# context: switch title under Playback; on, a long video you left partway starts again where you left it
+Resume long videos	Lanjutkan video panjang
+# context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
+A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.	Video berdurasi lebih dari dua menit yang Anda tinggalkan di tengah jalan akan berlanjut dari tempat Anda berhenti saat diputar lagi. Geser bilah progres untuk mulai dari bagian lain. Reel, video siaran langsung, dan iklan mulai seperti biasa.

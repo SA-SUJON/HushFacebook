@@ -76,6 +76,8 @@ public enum PatchFamily {
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT),
     TAP_TO_PLAY(FamilyNames.TAP_TO_PLAY, "tapToPlay", null,
             Settings.TAP_TO_PLAY),
+    RESUME_LONG_VIDEOS(FamilyNames.RESUME_LONG_VIDEOS, "resumeLongVideos", null,
+            Settings.RESUME_LONG_VIDEOS),
     SYSTEM_FONT(FamilyNames.SYSTEM_FONT, "systemFont", null,
             Settings.USE_SYSTEM_FONT),
     SYSTEM_EMOJI(FamilyNames.SYSTEM_EMOJI, "systemEmoji", null,

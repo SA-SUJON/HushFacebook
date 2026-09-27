@@ -390,6 +390,18 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the people Facebook offers to tag while you write. In Facebook 577 and 580 every text box that can tag people is one AutoCompleteTextView subclass, found by the one performFiltering(CharSequence, int) that logs ImplicitMentionsCommonWordsFilter: JSON Parsing Exception. Right after it compares the first character of the word at the cursor with @, it reads a boolean of its MentionsAutoCompleteBehavior and returns before any lookup when the boolean is set, and both of those branches land on the lookup. The patch hands that boolean and the box (the behaviour's one field typed as the box's class) to the extension right after the read and keeps the answer in the same register. The extension answers yes while its switch is on, and closes a list of people left open by an earlier @. Words starting with @ or # never reach that read."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/ResumePlayback.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/ResumePoints.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/resume/ResumeAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/resume/ResumeLongVideosPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: resume long videos. FacebookAppAdsRemover describes the behavior and has no licence, so nothing was taken from its code. The patch finds FbGrootPlayer in Facebook 577 and 580 by its play trace, then its kept-name maybeTrackVideoStart and maybeTrackVideoStop, its release, bind and static seek by the trace strings they keep, its public seek as the one that hands on to that seek, its position reader as the one int method of the interface that declares isPlaying, and its length reader as the other int method its own remaining-time sum asks. VideoPlayerParams' field names come from the debug dump that reports each under its real name. The extension saves where a video longer than two minutes stopped, up to 200 of them for 30 days in a preferences file of its own, forgets one stopped near its end, and seeks back once on the video's next first start unless a seek came first or Facebook placed the start itself."
     }
   ]
 }
