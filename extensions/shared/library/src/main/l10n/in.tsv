@@ -225,3 +225,22 @@ Facebook stops getting the list of reels you've watched, which it uses to rank y
 the rename of the shared permissions	penggantian nama izin bersama
 Room for Meta's apps	Ruang untuk aplikasi Meta
 Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.	Messenger, Facebook Lite, Business Suite, dan Workplace dapat dipasang di samping Facebook ini. Facebook ini memberi nama sendiri pada dua izin yang mereka gunakan bersama dengannya.
+# context: settings section heading for the Open on a chosen tab rows
+Opening Facebook	Saat Facebook dibuka
+# context: switch title; the list below it picks the tab
+Open on a chosen tab	Buka di tab pilihan
+Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.	Membuka Facebook dari ikonnya akan membuka tab yang dipilih di bawah, bukan tab yang biasa. Notifikasi dan tautan tetap terbuka ke tujuannya.
+# context: title of the list of tabs Facebook can open on
+Tab to open on	Tab saat dibuka
+# context: the names of Facebook's own tabs, as its tab bar shows them
+Home	Beranda
+Feeds	Feed
+Video	Video
+Friends	Teman
+Marketplace	Marketplace
+Notifications	Notifikasi
+Menu	Menu
+# context: summary of the tab list; %1$s is one of the tab names above
+Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.	Facebook terbuka di %1$s. Jika bilah tab tidak memilikinya, Facebook terbuka di Beranda.
+# context: a sentence in the settings import preview and its toast; %1$s is a tab name
+Facebook will open on %1$s.	Facebook akan terbuka di %1$s.

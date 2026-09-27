@@ -225,3 +225,22 @@ Facebook stops getting the list of reels you've watched, which it uses to rank y
 the rename of the shared permissions	paylaşılan izinlerin yeniden adlandırılması
 Room for Meta's apps	Meta uygulamalarına yer
 Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.	Messenger, Facebook Lite, Business Suite ve Workplace bu Facebook'un yanına yüklenebilir. Onlarla paylaştığı iki izne kendi adlarını verir.
+# context: settings section heading for the Open on a chosen tab rows
+Opening Facebook	Facebook açılırken
+# context: switch title; the list below it picks the tab
+Open on a chosen tab	Seçilen sekmede aç
+Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.	Facebook'u simgesinden başlatmak, her zamanki sekme yerine aşağıda seçilen sekmeyi açar. Bildirimler ve bağlantılar yine gittikleri yerde açılır.
+# context: title of the list of tabs Facebook can open on
+Tab to open on	Açılışta gösterilecek sekme
+# context: the names of Facebook's own tabs, as its tab bar shows them
+Home	Ana Sayfa
+Feeds	Akışlar
+Video	Video
+Friends	Arkadaşlar
+Marketplace	Marketplace
+Notifications	Bildirimler
+Menu	Menü
+# context: summary of the tab list; %1$s is one of the tab names above
+Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.	Facebook %1$s sekmesinde açılır. Sekme çubuğunda bu sekme yoksa Facebook Ana Sayfa'da açılır.
+# context: a sentence in the settings import preview and its toast; %1$s is a tab name
+Facebook will open on %1$s.	Facebook %1$s sekmesinde açılacak.

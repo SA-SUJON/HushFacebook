@@ -19,6 +19,7 @@ import android.preference.PreferenceGroup;
 import android.preference.SwitchPreference;
 
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.settings.BaseSettings;
@@ -337,6 +338,68 @@ public class HushfacebookPreferenceFragmentTest {
             for (Preference row : rowsOf(controller)) {
                 assertFalse("a quality row with no download in the build",
                         row instanceof HushfacebookPreferenceFragment.QualityRow);
+            }
+        }
+    }
+
+    /**
+     * With Open on a chosen tab in the build, the screen opens with its switch and the list of
+     * tabs, which offers each tab by its name in Facebook, says what the chosen one does, and
+     * reaches the setting the way the list's own dialog sends a pick.
+     */
+    @Test
+    public void theStartTabRowOffersEveryTabAndSaysWhatItDoes() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.START_TAB, PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment page = new HushfacebookPreferenceFragment();
+            controller.get().getFragmentManager().beginTransaction().add(android.R.id.content, page).commitNow();
+            List<Preference> rows = new ArrayList<>();
+            collect(page.getPreferenceScreen(), rows);
+            // Right under the status card: the heading, the switch, then the list.
+            assertEquals("Opening Facebook", String.valueOf(page.getPreferenceScreen().getPreference(1).getTitle()));
+            assertEquals(Settings.OPEN_ON_CHOSEN_TAB.key, rows.get(1).getKey());
+            assertEquals("Open on a chosen tab", String.valueOf(rows.get(1).getTitle()));
+            assertTrue(rows.get(2) instanceof HushfacebookPreferenceFragment.StartTabRow);
+            HushfacebookPreferenceFragment.StartTabRow start = (HushfacebookPreferenceFragment.StartTabRow) rows.get(2);
+            assertEquals(Settings.START_TAB.key, start.getKey());
+            assertEquals("Tab to open on", String.valueOf(start.getTitle()));
+
+            List<String> entries = new ArrayList<>();
+            for (CharSequence entry : start.getEntries()) entries.add(String.valueOf(entry));
+            assertEquals(Arrays.asList("Home", "Feeds", "Video", "Friends", "Marketplace", "Notifications", "Menu"),
+                    entries);
+            List<String> values = new ArrayList<>();
+            for (CharSequence value : start.getEntryValues()) values.add(String.valueOf(value));
+            List<String> names = new ArrayList<>();
+            for (StartTab each : StartTab.values()) names.add(each.name());
+            assertEquals(names, values);
+
+            assertEquals("MARKETPLACE", start.getValue());
+            assertEquals("Facebook opens on Marketplace. If your tab bar doesn't have it, Facebook opens on Home.",
+                    String.valueOf(start.getSummary()));
+
+            // A pick in the list, the way its dialog sends one.
+            start.setValue("FRIENDS");
+            ShadowLooper.idleMainLooper();
+            assertEquals(StartTab.FRIENDS, Settings.START_TAB.savedValue());
+            assertEquals("Facebook opens on Friends. If your tab bar doesn't have it, Facebook opens on Home.",
+                    String.valueOf(start.getSummary()));
+
+            // A value set behind the row, as an import does, shows once the page syncs.
+            Settings.START_TAB.save(StartTab.MENU);
+            page.refreshSwitches();
+            assertEquals("MENU", start.getValue());
+            assertEquals(HushfacebookPreferenceFragment.startTabSummary(StartTab.MENU), String.valueOf(start.getSummary()));
+        } finally {
+            Settings.START_TAB.resetToDefault();
+        }
+
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            for (Preference row : rowsOf(controller)) {
+                assertFalse("a start tab row with no Open on a chosen tab in the build",
+                        row instanceof HushfacebookPreferenceFragment.StartTabRow);
+                assertFalse(Settings.OPEN_ON_CHOSEN_TAB.key.equals(row.getKey()));
             }
         }
     }

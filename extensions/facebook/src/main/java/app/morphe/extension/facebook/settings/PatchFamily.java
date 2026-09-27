@@ -75,6 +75,8 @@ public enum PatchFamily {
             Settings.DOWNLOAD_REELS),
     VIDEO_DOWNLOAD(FamilyNames.VIDEO_DOWNLOAD, "videoDownload", null,
             Settings.DOWNLOAD_VIDEOS),
+    START_TAB(FamilyNames.START_TAB, "startTab", null,
+            Settings.OPEN_ON_CHOSEN_TAB),
     AD_PREFETCH(FamilyNames.AD_PREFETCH, "adPrefetch", "the block on downloading ads in the background"),
     AD_TELEMETRY(FamilyNames.AD_TELEMETRY, "adTelemetry", "the block on reports of ad screenshots and app installs"),
     AUDIENCE_NETWORK(FamilyNames.AUDIENCE_NETWORK, "audienceNetwork", "the Audience Network block"),

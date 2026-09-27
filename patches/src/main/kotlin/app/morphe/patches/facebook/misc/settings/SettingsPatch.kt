@@ -50,7 +50,7 @@ internal fun compressedCodeRefusal(hasApplication: Boolean, mainTab: ClassDef?):
  * The first class in [type]'s hierarchy, as far as the APK carries it, that declares this
  * method with a body.
  */
-private fun BytecodePatchContext.declaredInHierarchy(
+internal fun BytecodePatchContext.declaredInHierarchy(
     type: String,
     name: String,
     vararg parameters: String,

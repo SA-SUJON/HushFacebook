@@ -65,7 +65,7 @@ public class RowChevronTest {
 
     /** Every row on the screen whose tap opens a dialog, a file picker or the browser. */
     private static final Set<String> OPENS_SOMETHING = new LinkedHashSet<>(Arrays.asList(
-            "Download quality", "Save folder", "Video file name", "Export settings", "Import settings",
+            "Tab to open on", "Download quality", "Save folder", "Video file name", "Export settings", "Import settings",
             "Export diagnostic report", "Source code and issues", "Licenses"));
 
     /** Built by the first show(), after a test has set the text size it wants. */

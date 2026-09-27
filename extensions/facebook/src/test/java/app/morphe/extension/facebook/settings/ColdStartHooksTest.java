@@ -43,6 +43,7 @@ import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.SystemFont;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
+import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.shared.Utils;
@@ -144,6 +145,7 @@ public class ColdStartHooksTest {
         assertFalse(PlayerSourcesForTests.recordsAPlayer());
         assertFalse("a post menu built before the context got the video item", VideoMenuItemForTests.addsAnItem());
         assertFalse(PlayerSourcesForTests.recordsAVideoPlayer());
+        assertFalse("a start before the context asked Facebook for a tab", StartTabRouteForTests.routes());
         String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
         assertEquals("a link shared before the context was cleaned", shared, LinkCleaner.sanitizeShared(shared));
         assertSame("a typeface resolved before the context was swapped", Typeface.SERIF,

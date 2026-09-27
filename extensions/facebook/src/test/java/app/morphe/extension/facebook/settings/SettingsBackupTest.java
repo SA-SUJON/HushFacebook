@@ -68,6 +68,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.WorkerPoolForTests;
@@ -132,6 +133,7 @@ public class SettingsBackupTest {
         Settings.SAVE_FOLDER.resetToDefault();
         Settings.DOWNLOAD_QUALITY.resetToDefault();
         Settings.FILENAME_TEMPLATE.resetToDefault();
+        Settings.START_TAB.resetToDefault();
         BaseSettings.PAUSED.resetToDefault();
         BaseSettings.DEBUG.resetToDefault();
         BaseSettings.DEBUG_LOG_FILTERS.resetToDefault();
@@ -168,11 +170,12 @@ public class SettingsBackupTest {
         }
         assertEquals("a setting in Settings that isn't a switch has no format in a settings file",
                 SettingsBackup.VALUES, notSwitches);
-        assertEquals(Arrays.<Setting<?>>asList(Settings.SAVE_FOLDER, Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE),
-                SettingsBackup.VALUES);
+        assertEquals(Arrays.<Setting<?>>asList(Settings.SAVE_FOLDER, Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE,
+                Settings.START_TAB), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_FOLDER, SettingsBackup.FOLDER);
         assertEquals(Settings.DOWNLOAD_QUALITY, SettingsBackup.QUALITY);
         assertEquals(Settings.FILENAME_TEMPLATE, SettingsBackup.FILE_NAME);
+        assertEquals(Settings.START_TAB, SettingsBackup.START);
     }
 
     @Test
@@ -200,6 +203,7 @@ public class SettingsBackupTest {
         Settings.SAVE_FOLDER.save("../My/Clips");
         Settings.DOWNLOAD_QUALITY.save(DownloadQuality.P480);
         Settings.FILENAME_TEMPLATE.save("../{video_id}");
+        Settings.START_TAB.save(StartTab.FRIENDS);
         BaseSettings.PAUSED.save(true);
         BaseSettings.DEBUG.save(true);
         BaseSettings.DEBUG_LOG_FILTERS.save("downloads");
@@ -227,6 +231,8 @@ public class SettingsBackupTest {
         // Saved, not what a paused Facebook is answered: paused, the quality answers the best.
         assertEquals("480p", switches.get(SettingsBackup.QUALITY.key));
         assertEquals("{video_id}", switches.get(SettingsBackup.FILE_NAME.key));
+        // Saved, not what a paused Facebook is answered: paused, it opens where it chooses.
+        assertEquals("friends", switches.get(SettingsBackup.START.key));
         for (Setting<?> setting : Setting.allLoadedSettings()) {
             if (SettingsBackup.ALLOWLIST.contains(setting) || SettingsBackup.VALUES.contains(setting)) continue;
             assertFalse(setting.key + " is in the file", text.contains(setting.key));
@@ -714,6 +720,91 @@ public class SettingsBackupTest {
         assertNull(SettingsBackup.Snapshot.fromBundle(state).quality);
         state.putInt("quality", 360);
         assertNull(SettingsBackup.Snapshot.fromBundle(state).quality);
+    }
+
+    /**
+     * The tab Facebook opens on goes out as its file value and comes back only as one this build
+     * offers: any other value, or one that isn't text, refuses the whole file.
+     */
+    @Test
+    public void theStartTabRoundTripsAndComesBackOnlyAsOneThisBuildOffers() throws Exception {
+        for (StartTab tab : StartTab.values()) {
+            Settings.START_TAB.save(tab);
+            String file = SettingsBackup.create();
+            assertEquals(tab.fileValue, new JSONObject(file).getJSONObject("settings").get(SettingsBackup.START.key));
+            Settings.START_TAB.save(tab == StartTab.HOME ? StartTab.MENU : StartTab.HOME);
+
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+            assertEquals(tab, snapshot.start);
+            assertEquals(tab, snapshot.startChange());
+            assertEquals(0, snapshot.switchChanges());
+            assertEquals(Collections.singletonMap(SettingsBackup.START, tab), snapshot.changes());
+            assertEquals(1, SettingsBackup.apply(snapshot));
+            assertEquals(tab, Settings.START_TAB.savedValue());
+            assertEquals("a file read back is the file", file, SettingsBackup.create());
+            assertEquals("the same tab again changes nothing", 0, SettingsBackup.parse(file).changes().size());
+        }
+
+        Settings.START_TAB.save(StartTab.FRIENDS);
+        String file = SettingsBackup.create();
+        Map<String, ?> before = store();
+        for (Object refused : new Object[]{"FRIENDS", "Friends", "friend", " friends", "", 772219799489960L, true,
+                JSONObject.NULL, new JSONObject(), new org.json.JSONArray()}) {
+            JSONObject hostile = new JSONObject(file);
+            hostile.getJSONObject("settings").put(SettingsBackup.START.key, refused);
+            try {
+                SettingsBackup.parse(hostile.toString());
+                fail("a file with the start tab " + printable(String.valueOf(refused)) + " was read");
+            } catch (SettingsBackup.Rejected rejected) {
+                assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the tab was carried leaves it alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.start);
+        assertNull(older.startChange());
+        SettingsBackup.apply(older);
+        assertEquals(StartTab.FRIENDS, Settings.START_TAB.savedValue());
+
+        // A preview kept across a rebuild keeps its tab, and only one this build offers comes back.
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(StartTab.FRIENDS, SettingsBackup.Snapshot.fromBundle(state).start);
+        state.putString("start_tab", "FRIENDS");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).start);
+        state.putInt("start_tab", 3);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).start);
+    }
+
+    /** A file that changes the start tab says where Facebook will open, before and after. */
+    @Test
+    public void importOfAStartTabSaysWhereFacebookWillOpen() throws Exception {
+        JSONObject file = new JSONObject(fileWith(Settings.DOWNLOAD_REELS, false));
+        file.getJSONObject("settings").put(SettingsBackup.START.key, "notifications")
+                .put(SettingsBackup.QUALITY.key, "720p");
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            deliver(activity, tap(activity, page, IMPORT_ROW), file.toString());
+            AlertDialog preview = shownPreview();
+            String start = "Facebook will open on Notifications.";
+            String quality = "Videos will save at " + app.morphe.extension.shared.L10n.isolate("720p")
+                    + " or the closest quality below it. A video with nothing that low will save at the closest "
+                    + "quality above.";
+            assertEquals("1 switch will change.\n\n" + start + "\n\n" + quality,
+                    String.valueOf(shadowOf(preview).getMessage()));
+            preview.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+            settle();
+            assertEquals("Settings imported. 1 switch changed. " + start + " " + quality,
+                    ShadowToast.getTextOfLatestToast());
+            assertEquals(StartTab.NOTIFICATIONS, Settings.START_TAB.savedValue());
+            assertEquals("the start tab row still shows the old tab",
+                    HushfacebookPreferenceFragment.startTabSummary(StartTab.NOTIFICATIONS),
+                    String.valueOf(page.findPreference(Settings.START_TAB.key).getSummary()));
+        }
+        assertEquals("Settings imported. Facebook will open on Home.",
+                SettingsBackupPreference.importedMessage(0, null, null, null, StartTab.HOME));
     }
 
     /** A preview kept across a rebuild keeps its folder, and only a clean one comes back. */

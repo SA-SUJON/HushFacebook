@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(448);
+        Map<String, String> table = new HashMap<>(474);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -202,12 +202,18 @@ public final class L10nTranslations {
                 "Facebook l\u00e4dt im Hintergrund weder Werbung noch sein Werbemodell herunter.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "Facebook liefert keine Werbung an andere Apps auf diesem Handy aus.");
+        table.put("Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.",
+                "Facebook startet mit %1$s. Fehlt dieser Tab in deiner Tab-Leiste, startet Facebook mit der Startseite.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "Facebook fordert dich nicht mehr auf, \u00fcber den Meta App Manager zu aktualisieren, und l\u00e4sst ihn nicht mehr nach einem Update suchen. Chat-Hinweise f\u00fcr \u00e4ltere Versionen entfallen ebenfalls. Ein gepatchter Build kann Metas Updates ohnehin nicht installieren.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "Facebook erh\u00e4lt nicht mehr die Liste der Reels, die du angesehen hast, mit der es deinen Reels-Feed sortiert. Niemand sonst sieht diese Liste. Bereits angesehene Reels k\u00f6nnen im Feed wieder auftauchen.");
+        table.put("Facebook will open on %1$s.",
+                "Facebook startet dann mit %1$s.");
         table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
                 "Facebooks Text wird in der Schriftart deines Handys statt in Metas eigener gezeichnet. Starte Facebook nach dem \u00c4ndern neu.");
+        table.put("Feeds",
+                "Feeds");
         table.put("File name",
                 "Dateiname");
         table.put("File name set to %1$s.",
@@ -216,6 +222,8 @@ public final class L10nTranslations {
                 "Ordnername");
         table.put("Folder set to %1$s.",
                 "Ordner auf %1$s gesetzt.");
+        table.put("Friends",
+                "Freunde");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
                 "Ab dem n\u00e4chsten Start wirken die obigen Schalter nicht mehr und Facebooks eigenes Verhalten kehrt zur\u00fcck. Die Debug-Protokollierung l\u00e4uft weiter, und deine Auswahl bleibt erhalten.");
         table.put("Full report saved to %1$s",
@@ -254,6 +262,8 @@ public final class L10nTranslations {
                 "Folgen-Button bei Reels ausblenden");
         table.put("Hide the Stories tray",
                 "Stories-Leiste ausblenden");
+        table.put("Home",
+                "Startseite");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Fortschritt beim Speichern eines Fotos oder Videos, mit einem Button zum Abbrechen");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
@@ -286,19 +296,23 @@ public final class L10nTranslations {
                 "Es ist f\u00fcr Facebook %1$s gedacht.");
         table.put("Keep feed position on return",
                 "Feedposition beim Zur\u00fcckkehren beibehalten");
+    }
+
+    private static void fillDe2(Map<String, String> table) {
         table.put("Licenses",
                 "Lizenzen");
         table.put("Link expired. Reopen the item and try again",
                 "Link abgelaufen. \u00d6ffne den Inhalt neu und versuche es noch einmal");
         table.put("Links",
                 "Links");
+        table.put("Marketplace",
+                "Marketplace");
         table.put("Material You theme",
                 "Material-You-Design");
+        table.put("Menu",
+                "Men\u00fc");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite und Workplace lassen sich neben diesem Facebook installieren. Es gibt den zwei Berechtigungen, die sie mit ihm teilen, eigene Namen.");
-    }
-
-    private static void fillDe2(Map<String, String> table) {
         table.put("News feed",
                 "Newsfeed");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -309,12 +323,18 @@ public final class L10nTranslations {
                 "Nicht gespeichert: Das ist kein Foto oder Video von Facebook");
         table.put("Not saved: the file is over 512 MB",
                 "Nicht gespeichert: Die Datei ist \u00fcber 512 MB gro\u00df");
+        table.put("Notifications",
+                "Benachrichtigungen");
         table.put("OK",
                 "OK");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Einmal am Tag fragt Hushfacebook beim Start von Facebook bei GitHub nach der neuesten Version und zeigt sie oben auf dieser Seite, wenn sie neuer ist. Nur daf\u00fcr geht Hushfacebook von sich aus online, deshalb bleibt das aus, bis du es einschaltest. Heruntergeladen wird nichts.");
         table.put("Open links in your browser",
                 "Links in deinem Browser \u00f6ffnen");
+        table.put("Open on a chosen tab",
+                "Mit einem gew\u00e4hlten Tab starten");
+        table.put("Opening Facebook",
+                "Beim \u00d6ffnen von Facebook");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Bezahlte Anzeigen im Feed. Diese werden aussortiert, bevor Facebook sie einf\u00fcgt, sodass keine L\u00fccke bleibt.");
         table.put("Pause Hushfacebook",
@@ -399,6 +419,11 @@ public final class L10nTranslations {
                 "Kleinste");
         table.put("Source code and issues",
                 "Quellcode und Issues");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
+        table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
+                "Wenn du Facebook \u00fcber sein Symbol startest, \u00f6ffnet sich statt des \u00fcblichen Tabs der unten gew\u00e4hlte. Benachrichtigungen und Links \u00f6ffnen weiterhin dort, wohin sie f\u00fchren.");
         table.put("Stays in while paused",
                 "Bleibt w\u00e4hrend der Pause aktiv");
         table.put("Stop Story auto-advance",
@@ -407,6 +432,8 @@ public final class L10nTranslations {
                 "Update-Aufforderungen stoppen");
         table.put("Stories",
                 "Stories");
+        table.put("Tab to open on",
+                "Tab beim Start");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Entfernt Tracking-Tags wie mibextid aus den Links, die du teilst oder kopierst. Ein Link zu facebook.com/share/ wird f\u00fcr ein einzelnes Teilen erstellt, deshalb kann Facebook ihn trotzdem auf dich zur\u00fcckf\u00fchren.");
         table.put("Tap to turn it back on.",
@@ -419,9 +446,6 @@ public final class L10nTranslations {
                 "Diese Datei f\u00fchrt eine Einstellung zweimal auf, daher ist unklar, welcher Wert gilt. Es wurde nichts ge\u00e4ndert.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Das ist keine Hushfacebook-Einstellungsdatei. Es wurde nichts ge\u00e4ndert.");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "Diese Einstellungsdatei enth\u00e4lt einen Wert, den Hushfacebook nicht lesen kann. Es wurde nichts ge\u00e4ndert.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -472,6 +496,8 @@ public final class L10nTranslations {
                 "Version");
         table.put("Version %1$s for Facebook %2$s",
                 "Version %1$s f\u00fcr Facebook %2$s");
+        table.put("Video",
+                "Video");
         table.put("Video file name",
                 "Dateiname f\u00fcr Videos");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -513,7 +539,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(448);
+        Map<String, String> table = new HashMap<>(474);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -671,12 +697,18 @@ public final class L10nTranslations {
                 "Facebook no descarga anuncios ni su modelo de anuncios en segundo plano.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "Facebook no env\u00eda anuncios a otras apps de este tel\u00e9fono.");
+        table.put("Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.",
+                "Facebook se abre en %1$s. Si tu barra de pesta\u00f1as no la tiene, Facebook se abre en Inicio.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "Facebook deja de pedirte que actualices a trav\u00e9s de Meta App Manager y deja de hacer que busque una actualizaci\u00f3n. Las promociones de chat dirigidas a versiones antiguas tambi\u00e9n desaparecen. Una versi\u00f3n parcheada no puede instalar las actualizaciones de Meta de todos modos.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "Facebook deja de recibir la lista de reels que has visto, que usa para ordenar tu feed de Reels. Nadie m\u00e1s ve esa lista. Los reels que ya has visto pueden volver a aparecer en el feed.");
+        table.put("Facebook will open on %1$s.",
+                "Facebook se abrir\u00e1 en %1$s.");
         table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
                 "El texto de Facebook se dibuja con la fuente de tu tel\u00e9fono en lugar de la propia de Meta. Reinicia Facebook despu\u00e9s de cambiar esto.");
+        table.put("Feeds",
+                "Feeds");
         table.put("File name",
                 "Nombre de archivo");
         table.put("File name set to %1$s.",
@@ -685,6 +717,8 @@ public final class L10nTranslations {
                 "Nombre de carpeta");
         table.put("Folder set to %1$s.",
                 "Carpeta establecida en %1$s.");
+        table.put("Friends",
+                "Amigos");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
                 "Desde el pr\u00f3ximo inicio, los interruptores de arriba dejan de actuar y vuelve el comportamiento de Facebook. El Registro de depuraci\u00f3n sigue funcionando y tus elecciones se conservan.");
         table.put("Full report saved to %1$s",
@@ -723,6 +757,8 @@ public final class L10nTranslations {
                 "Ocultar el bot\u00f3n Seguir en los reels");
         table.put("Hide the Stories tray",
                 "Ocultar la bandeja de historias");
+        table.put("Home",
+                "Inicio");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "El progreso de la foto o el video que est\u00e1s guardando, con un bot\u00f3n para cancelar");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
@@ -755,19 +791,23 @@ public final class L10nTranslations {
                 "Est\u00e1 pensado para Facebook %1$s.");
         table.put("Keep feed position on return",
                 "Mantener la posici\u00f3n del feed al volver");
+    }
+
+    private static void fillEs2(Map<String, String> table) {
         table.put("Licenses",
                 "Licencias");
         table.put("Link expired. Reopen the item and try again",
                 "El enlace expir\u00f3. Vuelve a abrir el contenido e int\u00e9ntalo de nuevo");
         table.put("Links",
                 "Enlaces");
+        table.put("Marketplace",
+                "Marketplace");
         table.put("Material You theme",
                 "Tema Material You");
+        table.put("Menu",
+                "Men\u00fa");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite y Workplace se instalan junto a este Facebook. Les da nombres propios a los dos permisos que comparten con \u00e9l.");
-    }
-
-    private static void fillEs2(Map<String, String> table) {
         table.put("News feed",
                 "Feed");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -778,12 +818,18 @@ public final class L10nTranslations {
                 "No se guard\u00f3: no es una foto ni un video de Facebook");
         table.put("Not saved: the file is over 512 MB",
                 "No se guard\u00f3: el archivo supera los 512 MB");
+        table.put("Notifications",
+                "Notificaciones");
         table.put("OK",
                 "Aceptar");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Una vez al d\u00eda, al iniciarse Facebook, Hushfacebook pregunta a GitHub por su versi\u00f3n m\u00e1s reciente y la muestra arriba en esta pantalla si es m\u00e1s nueva. Es la \u00fanica vez que Hushfacebook se conecta por su cuenta, as\u00ed que est\u00e1 desactivado hasta que lo actives. No se descarga nada.");
         table.put("Open links in your browser",
                 "Abrir enlaces en tu navegador");
+        table.put("Open on a chosen tab",
+                "Abrir en una pesta\u00f1a elegida");
+        table.put("Opening Facebook",
+                "Al abrir Facebook");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Anuncios pagados en el feed. Se eliminan antes de que Facebook los inserte, as\u00ed que no queda ning\u00fan espacio vac\u00edo.");
         table.put("Pause Hushfacebook",
@@ -868,6 +914,11 @@ public final class L10nTranslations {
                 "La m\u00e1s peque\u00f1a");
         table.put("Source code and issues",
                 "C\u00f3digo fuente e incidencias");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
+        table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
+                "Al abrir Facebook desde su icono, se abre la pesta\u00f1a elegida abajo en lugar de la habitual. Las notificaciones y los enlaces siguen abri\u00e9ndose donde apuntan.");
         table.put("Stays in while paused",
                 "Se mantiene durante la pausa");
         table.put("Stop Story auto-advance",
@@ -876,6 +927,8 @@ public final class L10nTranslations {
                 "Detener los avisos de actualizaci\u00f3n");
         table.put("Stories",
                 "Historias");
+        table.put("Tab to open on",
+                "Pesta\u00f1a al abrir");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Quita las etiquetas de seguimiento, como mibextid, de los enlaces que compartes o copias. Un enlace de facebook.com/share/ se crea para una sola acci\u00f3n de compartir, as\u00ed que Facebook puede vincularlo contigo de todos modos.");
         table.put("Tap to turn it back on.",
@@ -888,9 +941,6 @@ public final class L10nTranslations {
                 "Ese archivo incluye un ajuste dos veces, as\u00ed que no se sabe qu\u00e9 valor usar. No se cambi\u00f3 nada.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Eso no es un archivo de configuraci\u00f3n de Hushfacebook. No se cambi\u00f3 nada.");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "Ese archivo de configuraci\u00f3n contiene un valor que Hushfacebook no puede leer. No se cambi\u00f3 nada.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -941,6 +991,8 @@ public final class L10nTranslations {
                 "Versi\u00f3n");
         table.put("Version %1$s for Facebook %2$s",
                 "Versi\u00f3n %1$s para Facebook %2$s");
+        table.put("Video",
+                "Video");
         table.put("Video file name",
                 "Nombre de archivo de los videos");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -982,7 +1034,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(448);
+        Map<String, String> table = new HashMap<>(474);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1140,12 +1192,18 @@ public final class L10nTranslations {
                 "Facebook tidak mengunduh iklan atau model iklannya di latar belakang.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.");
+        table.put("Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.",
+                "Facebook terbuka di %1$s. Jika bilah tab tidak memilikinya, Facebook terbuka di Beranda.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "Facebook berhenti meminta Anda memperbarui lewat Meta App Manager dan berhenti menyuruhnya mencari pembaruan. Promosi obrolan yang ditujukan ke versi lama juga hilang. Build yang dipatch memang tidak bisa memasang pembaruan Meta.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "Facebook tidak lagi menerima daftar reel yang sudah Anda tonton, yang dipakainya untuk menyusun urutan feed Reels Anda. Tidak ada orang lain yang melihat daftar itu. Reel yang sudah Anda tonton mungkin muncul lagi di feed.");
+        table.put("Facebook will open on %1$s.",
+                "Facebook akan terbuka di %1$s.");
         table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
                 "Teks Facebook digambar dengan font ponsel Anda, bukan font milik Meta. Mulai ulang Facebook setelah mengubah ini.");
+        table.put("Feeds",
+                "Feed");
         table.put("File name",
                 "Nama file");
         table.put("File name set to %1$s.",
@@ -1154,6 +1212,8 @@ public final class L10nTranslations {
                 "Nama folder");
         table.put("Folder set to %1$s.",
                 "Folder diatur menjadi %1$s.");
+        table.put("Friends",
+                "Teman");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
                 "Mulai pembukaan berikutnya, sakelar di atas berhenti bekerja dan perilaku Facebook kembali. Pencatatan debug tetap berjalan dan pilihan Anda tersimpan.");
         table.put("Full report saved to %1$s",
@@ -1192,6 +1252,8 @@ public final class L10nTranslations {
                 "Sembunyikan tombol Ikuti di reel");
         table.put("Hide the Stories tray",
                 "Sembunyikan deretan Cerita");
+        table.put("Home",
+                "Beranda");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Progres foto atau video yang sedang Anda simpan, dengan tombol untuk membatalkannya");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
@@ -1224,19 +1286,23 @@ public final class L10nTranslations {
                 "Rilis ini ditujukan untuk Facebook %1$s.");
         table.put("Keep feed position on return",
                 "Pertahankan posisi beranda saat kembali");
+    }
+
+    private static void fillIn2(Map<String, String> table) {
         table.put("Licenses",
                 "Lisensi");
         table.put("Link expired. Reopen the item and try again",
                 "Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi");
         table.put("Links",
                 "Tautan");
+        table.put("Marketplace",
+                "Marketplace");
         table.put("Material You theme",
                 "Tema Material You");
+        table.put("Menu",
+                "Menu");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite, dan Workplace dapat dipasang di samping Facebook ini. Facebook ini memberi nama sendiri pada dua izin yang mereka gunakan bersama dengannya.");
-    }
-
-    private static void fillIn2(Map<String, String> table) {
         table.put("News feed",
                 "Kabar Beranda");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -1247,12 +1313,18 @@ public final class L10nTranslations {
                 "Tidak disimpan: itu bukan foto atau video Facebook");
         table.put("Not saved: the file is over 512 MB",
                 "Tidak disimpan: file lebih dari 512 MB");
+        table.put("Notifications",
+                "Notifikasi");
         table.put("OK",
                 "Oke");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Sekali sehari, saat Facebook dibuka, Hushfacebook menanyakan rilis terbarunya ke GitHub dan menampilkannya di bagian atas layar ini jika lebih baru. Hanya pada saat inilah Hushfacebook terhubung ke internet atas kemauannya sendiri, jadi fitur ini mati sampai Anda menyalakannya. Tidak ada yang diunduh.");
         table.put("Open links in your browser",
                 "Buka tautan di browser Anda");
+        table.put("Open on a chosen tab",
+                "Buka di tab pilihan");
+        table.put("Opening Facebook",
+                "Saat Facebook dibuka");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Iklan berbayar di Kabar Beranda. Iklannya dibuang sebelum ditambahkan Facebook, jadi tidak meninggalkan ruang kosong.");
         table.put("Pause Hushfacebook",
@@ -1337,6 +1409,11 @@ public final class L10nTranslations {
                 "Terkecil");
         table.put("Source code and issues",
                 "Kode sumber dan laporan masalah");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
+        table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
+                "Membuka Facebook dari ikonnya akan membuka tab yang dipilih di bawah, bukan tab yang biasa. Notifikasi dan tautan tetap terbuka ke tujuannya.");
         table.put("Stays in while paused",
                 "Tetap aktif saat dijeda");
         table.put("Stop Story auto-advance",
@@ -1345,6 +1422,8 @@ public final class L10nTranslations {
                 "Hentikan permintaan pembaruan");
         table.put("Stories",
                 "Cerita");
+        table.put("Tab to open on",
+                "Tab saat dibuka");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Menghapus tag pelacakan seperti mibextid dari tautan yang Anda bagikan atau salin. Tautan facebook.com/share/ dibuat khusus untuk satu kali berbagi, jadi Facebook tetap dapat mengaitkannya dengan Anda.");
         table.put("Tap to turn it back on.",
@@ -1357,9 +1436,6 @@ public final class L10nTranslations {
                 "File itu mencantumkan satu pengaturan dua kali, jadi tidak jelas nilai mana yang harus dipakai. Tidak ada yang diubah.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Itu bukan file pengaturan Hushfacebook. Tidak ada yang diubah.");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "File pengaturan itu memuat nilai yang tidak dapat dibaca Hushfacebook. Tidak ada yang diubah.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -1410,6 +1486,8 @@ public final class L10nTranslations {
                 "Versi");
         table.put("Version %1$s for Facebook %2$s",
                 "Versi %1$s untuk Facebook %2$s");
+        table.put("Video",
+                "Video");
         table.put("Video file name",
                 "Nama file video");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -1451,7 +1529,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(448);
+        Map<String, String> table = new HashMap<>(474);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -1609,12 +1687,18 @@ public final class L10nTranslations {
                 "O Facebook n\u00e3o baixa an\u00fancios nem o modelo de an\u00fancios dele em segundo plano.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "O Facebook n\u00e3o envia an\u00fancios para outros apps deste celular.");
+        table.put("Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.",
+                "O Facebook abre em %1$s. Se a sua barra de abas n\u00e3o tiver essa aba, o Facebook abre na P\u00e1gina inicial.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "O Facebook para de pedir que voc\u00ea atualize pelo Meta App Manager e para de mand\u00e1-lo procurar uma atualiza\u00e7\u00e3o. As promo\u00e7\u00f5es de chat voltadas a vers\u00f5es antigas tamb\u00e9m somem. Uma vers\u00e3o com patch n\u00e3o consegue instalar as atualiza\u00e7\u00f5es da Meta de qualquer forma.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "O Facebook para de receber a lista de reels que voc\u00ea assistiu, que ele usa para ordenar seu feed do Reels. Ningu\u00e9m mais v\u00ea essa lista. Reels que voc\u00ea j\u00e1 assistiu podem voltar a aparecer no feed.");
+        table.put("Facebook will open on %1$s.",
+                "O Facebook vai abrir em %1$s.");
         table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
                 "O texto do Facebook \u00e9 desenhado com a fonte do seu celular em vez da fonte da Meta. Reinicie o Facebook depois de mudar isso.");
+        table.put("Feeds",
+                "Feeds");
         table.put("File name",
                 "Nome do arquivo");
         table.put("File name set to %1$s.",
@@ -1623,6 +1707,8 @@ public final class L10nTranslations {
                 "Nome da pasta");
         table.put("Folder set to %1$s.",
                 "Pasta definida como %1$s.");
+        table.put("Friends",
+                "Amigos");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
                 "Na pr\u00f3xima abertura, as op\u00e7\u00f5es acima deixam de agir e o comportamento do Facebook volta. O Registro de depura\u00e7\u00e3o continua funcionando e suas escolhas ficam salvas.");
         table.put("Full report saved to %1$s",
@@ -1661,6 +1747,8 @@ public final class L10nTranslations {
                 "Ocultar o bot\u00e3o Seguir nos reels");
         table.put("Hide the Stories tray",
                 "Ocultar a bandeja de stories");
+        table.put("Home",
+                "P\u00e1gina inicial");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "O progresso da foto ou do v\u00eddeo que voc\u00ea est\u00e1 salvando, com um bot\u00e3o para cancelar");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
@@ -1693,19 +1781,23 @@ public final class L10nTranslations {
                 "Ele \u00e9 feito para o Facebook %1$s.");
         table.put("Keep feed position on return",
                 "Manter a posi\u00e7\u00e3o no feed ao voltar");
+    }
+
+    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("Licenses",
                 "Licen\u00e7as");
         table.put("Link expired. Reopen the item and try again",
                 "Link expirado. Reabra o item e tente de novo");
         table.put("Links",
                 "Links");
+        table.put("Marketplace",
+                "Marketplace");
         table.put("Material You theme",
                 "Tema Material You");
+        table.put("Menu",
+                "Menu");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite e Workplace se instalam ao lado deste Facebook. Ele d\u00e1 nomes pr\u00f3prios \u00e0s duas permiss\u00f5es que eles compartilham com ele.");
-    }
-
-    private static void fillPt_rBR2(Map<String, String> table) {
         table.put("News feed",
                 "Feed de not\u00edcias");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -1716,12 +1808,18 @@ public final class L10nTranslations {
                 "N\u00e3o foi salvo: isso n\u00e3o \u00e9 uma foto nem um v\u00eddeo do Facebook");
         table.put("Not saved: the file is over 512 MB",
                 "N\u00e3o foi salvo: o arquivo tem mais de 512 MB");
+        table.put("Notifications",
+                "Notifica\u00e7\u00f5es");
         table.put("OK",
                 "OK");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Uma vez por dia, quando o Facebook abre, o Hushfacebook pergunta ao GitHub qual \u00e9 a vers\u00e3o mais recente e a mostra no topo desta tela se for mais nova. \u00c9 a \u00fanica vez que o Hushfacebook se conecta por conta pr\u00f3pria, por isso fica desligado at\u00e9 voc\u00ea ligar. Nada \u00e9 baixado.");
         table.put("Open links in your browser",
                 "Abrir links no seu navegador");
+        table.put("Open on a chosen tab",
+                "Abrir em uma aba escolhida");
+        table.put("Opening Facebook",
+                "Ao abrir o Facebook");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "An\u00fancios pagos no feed. S\u00e3o removidos antes de o Facebook adicion\u00e1-los, ent\u00e3o n\u00e3o fica nenhum espa\u00e7o vazio.");
         table.put("Pause Hushfacebook",
@@ -1806,6 +1904,11 @@ public final class L10nTranslations {
                 "A menor");
         table.put("Source code and issues",
                 "C\u00f3digo-fonte e relatos de problemas");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
+                "Abrir o Facebook pelo \u00edcone abre a aba escolhida abaixo em vez da de costume. Notifica\u00e7\u00f5es e links continuam abrindo onde levam.");
         table.put("Stays in while paused",
                 "O que continua ativo na pausa");
         table.put("Stop Story auto-advance",
@@ -1814,6 +1917,8 @@ public final class L10nTranslations {
                 "Parar os avisos de atualiza\u00e7\u00e3o");
         table.put("Stories",
                 "Stories");
+        table.put("Tab to open on",
+                "Aba ao abrir");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Remove as tags de rastreamento, como mibextid, dos links que voc\u00ea compartilha ou copia. Um link facebook.com/share/ \u00e9 criado para um \u00fanico compartilhamento, ent\u00e3o o Facebook ainda consegue associ\u00e1-lo a voc\u00ea.");
         table.put("Tap to turn it back on.",
@@ -1826,9 +1931,6 @@ public final class L10nTranslations {
                 "Esse arquivo lista uma configura\u00e7\u00e3o duas vezes, ent\u00e3o n\u00e3o d\u00e1 para saber qual valor usar. Nada foi alterado.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Isso n\u00e3o \u00e9 um arquivo de configura\u00e7\u00f5es do Hushfacebook. Nada foi alterado.");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "Esse arquivo de configura\u00e7\u00f5es tem um valor que o Hushfacebook n\u00e3o consegue ler. Nada foi alterado.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -1879,6 +1981,8 @@ public final class L10nTranslations {
                 "Vers\u00e3o");
         table.put("Version %1$s for Facebook %2$s",
                 "Vers\u00e3o %1$s para o Facebook %2$s");
+        table.put("Video",
+                "V\u00eddeo");
         table.put("Video file name",
                 "Nome do arquivo de v\u00eddeo");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
@@ -1920,7 +2024,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(448);
+        Map<String, String> table = new HashMap<>(474);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -2078,12 +2182,18 @@ public final class L10nTranslations {
                 "Facebook reklamlar\u0131 veya reklam modelini arka planda indirmez.");
         table.put("Facebook doesn't serve ads to other apps on this phone.",
                 "Facebook bu telefondaki di\u011fer uygulamalara reklam sunmaz.");
+        table.put("Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.",
+                "Facebook %1$s sekmesinde a\u00e7\u0131l\u0131r. Sekme \u00e7ubu\u011funda bu sekme yoksa Facebook Ana Sayfa'da a\u00e7\u0131l\u0131r.");
         table.put("Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.",
                 "Facebook, Meta App Manager \u00fczerinden g\u00fcncelleme istemeyi ve ona g\u00fcncelleme aratmay\u0131 b\u0131rak\u0131r. Eski s\u00fcr\u00fcmlere y\u00f6nelik sohbet tan\u0131t\u0131mlar\u0131 da kalkar. Yamal\u0131 bir s\u00fcr\u00fcm zaten Meta'n\u0131n g\u00fcncellemelerini y\u00fckleyemez.");
         table.put("Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.",
                 "Facebook, Reels ak\u0131\u015f\u0131n\u0131 s\u0131ralamak i\u00e7in kulland\u0131\u011f\u0131, izledi\u011fin Reels videolar\u0131n\u0131n listesini art\u0131k almaz. Bu listeyi ba\u015fka kimse g\u00f6rmez. Daha \u00f6nce izledi\u011fin Reels videolar\u0131 ak\u0131\u015fta yeniden \u00e7\u0131kabilir.");
+        table.put("Facebook will open on %1$s.",
+                "Facebook %1$s sekmesinde a\u00e7\u0131lacak.");
         table.put("Facebook's text is drawn in your phone's font instead of Meta's own. Restart Facebook after changing this.",
                 "Facebook'un metni Meta'n\u0131n kendi yaz\u0131 tipi yerine telefonunun yaz\u0131 tipiyle \u00e7izilir. Bunu de\u011fi\u015ftirdikten sonra Facebook'u yeniden ba\u015flat.");
+        table.put("Feeds",
+                "Ak\u0131\u015flar");
         table.put("File name",
                 "Dosya ad\u0131");
         table.put("File name set to %1$s.",
@@ -2092,6 +2202,8 @@ public final class L10nTranslations {
                 "Klas\u00f6r ad\u0131");
         table.put("Folder set to %1$s.",
                 "Klas\u00f6r %1$s olarak ayarland\u0131.");
+        table.put("Friends",
+                "Arkada\u015flar");
         table.put("From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.",
                 "Sonraki a\u00e7\u0131l\u0131\u015ftan itibaren yukar\u0131daki anahtarlar \u00e7al\u0131\u015fmaz ve Facebook'un kendi davran\u0131\u015f\u0131 geri gelir. Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc \u00e7al\u0131\u015fmaya devam eder ve se\u00e7imlerin korunur.");
         table.put("Full report saved to %1$s",
@@ -2130,6 +2242,8 @@ public final class L10nTranslations {
                 "Reels videolar\u0131ndaki Takip Et d\u00fc\u011fmesini gizle");
         table.put("Hide the Stories tray",
                 "Hikaye \u015feridini gizle");
+        table.put("Home",
+                "Ana Sayfa");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Kaydetti\u011fin foto\u011fraf veya videonun ilerleme durumu ve iptal etmek i\u00e7in bir d\u00fc\u011fme");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
@@ -2162,19 +2276,23 @@ public final class L10nTranslations {
                 "Facebook %1$s i\u00e7in haz\u0131rland\u0131.");
         table.put("Keep feed position on return",
                 "Geri d\u00f6n\u00fcnce ak\u0131\u015f konumunu koru");
+    }
+
+    private static void fillTr2(Map<String, String> table) {
         table.put("Licenses",
                 "Lisanslar");
         table.put("Link expired. Reopen the item and try again",
                 "Ba\u011flant\u0131n\u0131n s\u00fcresi doldu. \u00d6\u011feyi yeniden a\u00e7\u0131p tekrar dene");
         table.put("Links",
                 "Ba\u011flant\u0131lar");
+        table.put("Marketplace",
+                "Marketplace");
         table.put("Material You theme",
                 "Material You temas\u0131");
+        table.put("Menu",
+                "Men\u00fc");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite ve Workplace bu Facebook'un yan\u0131na y\u00fcklenebilir. Onlarla payla\u015ft\u0131\u011f\u0131 iki izne kendi adlar\u0131n\u0131 verir.");
-    }
-
-    private static void fillTr2(Map<String, String> table) {
         table.put("News feed",
                 "Ak\u0131\u015f");
         table.put("No app on this phone can open the link. The address is %1$s.",
@@ -2185,12 +2303,18 @@ public final class L10nTranslations {
                 "Kaydedilmedi: Bu bir Facebook foto\u011fraf\u0131 veya videosu de\u011fil");
         table.put("Not saved: the file is over 512 MB",
                 "Kaydedilmedi: Dosya 512 MB'tan b\u00fcy\u00fck");
+        table.put("Notifications",
+                "Bildirimler");
         table.put("OK",
                 "Tamam");
         table.put("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.",
                 "Hushfacebook, Facebook a\u00e7\u0131ld\u0131\u011f\u0131nda g\u00fcnde bir kez GitHub'a en yeni s\u00fcr\u00fcm\u00fcn\u00fc sorar ve daha yeniyse bu ekran\u0131n \u00fcst\u00fcnde g\u00f6sterir. Hushfacebook'un kendi ba\u015f\u0131na internete ba\u011fland\u0131\u011f\u0131 tek durum budur, bu y\u00fczden sen a\u00e7ana kadar kapal\u0131d\u0131r. Hi\u00e7bir \u015fey indirilmez.");
         table.put("Open links in your browser",
                 "Ba\u011flant\u0131lar\u0131 taray\u0131c\u0131nda a\u00e7");
+        table.put("Open on a chosen tab",
+                "Se\u00e7ilen sekmede a\u00e7");
+        table.put("Opening Facebook",
+                "Facebook a\u00e7\u0131l\u0131rken");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Ak\u0131\u015ftaki \u00fccretli reklamlar. Facebook eklemeden \u00f6nce \u00e7\u0131kar\u0131ld\u0131klar\u0131 i\u00e7in yerlerinde bo\u015fluk kalmaz.");
         table.put("Pause Hushfacebook",
@@ -2275,6 +2399,11 @@ public final class L10nTranslations {
                 "En k\u00fc\u00e7\u00fck");
         table.put("Source code and issues",
                 "Kaynak kodu ve sorunlar");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
+        table.put("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.",
+                "Facebook'u simgesinden ba\u015flatmak, her zamanki sekme yerine a\u015fa\u011f\u0131da se\u00e7ilen sekmeyi a\u00e7ar. Bildirimler ve ba\u011flant\u0131lar yine gittikleri yerde a\u00e7\u0131l\u0131r.");
         table.put("Stays in while paused",
                 "Duraklat\u0131lsa da devrede kal\u0131r");
         table.put("Stop Story auto-advance",
@@ -2283,6 +2412,8 @@ public final class L10nTranslations {
                 "G\u00fcncelleme uyar\u0131lar\u0131n\u0131 durdur");
         table.put("Stories",
                 "Hikayeler");
+        table.put("Tab to open on",
+                "A\u00e7\u0131l\u0131\u015fta g\u00f6sterilecek sekme");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Payla\u015ft\u0131\u011f\u0131n veya kopyalad\u0131\u011f\u0131n ba\u011flant\u0131lardan mibextid gibi izleme etiketlerini kald\u0131r\u0131r. Bir facebook.com/share/ ba\u011flant\u0131s\u0131 tek bir payla\u015f\u0131m i\u00e7in olu\u015fturulur, bu y\u00fczden Facebook onu yine de seninle ili\u015fkilendirebilir.");
         table.put("Tap to turn it back on.",
@@ -2295,9 +2426,6 @@ public final class L10nTranslations {
                 "Bu dosyada bir ayar iki kez ge\u00e7iyor, bu y\u00fczden hangi de\u011ferin kullan\u0131laca\u011f\u0131 belli de\u011fil. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That isn't a Hushfacebook settings file. Nothing was changed.",
                 "Bu bir Hushfacebook ayar dosyas\u0131 de\u011fil. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("That settings file holds a value Hushfacebook can't read. Nothing was changed.",
                 "Bu ayar dosyas\u0131nda Hushfacebook'un okuyamad\u0131\u011f\u0131 bir de\u011fer var. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That settings file is damaged or only partly downloaded. Nothing was changed.",
@@ -2348,6 +2476,8 @@ public final class L10nTranslations {
                 "S\u00fcr\u00fcm");
         table.put("Version %1$s for Facebook %2$s",
                 "Facebook %2$s i\u00e7in %1$s s\u00fcr\u00fcm\u00fc");
+        table.put("Video",
+                "Video");
         table.put("Video file name",
                 "Video dosya ad\u0131");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",

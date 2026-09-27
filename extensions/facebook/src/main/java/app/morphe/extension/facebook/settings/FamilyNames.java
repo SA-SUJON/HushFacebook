@@ -38,6 +38,7 @@ public final class FamilyNames {
     public static final String STORY_DOWNLOAD = "Download any story";
     public static final String REEL_DOWNLOAD = "Download any reel";
     public static final String VIDEO_DOWNLOAD = "Download any video";
+    public static final String START_TAB = "Open on a chosen tab";
     public static final String AD_PREFETCH = "Block background ad prefetch";
     public static final String AD_TELEMETRY = "Block ad telemetry";
     public static final String AUDIENCE_NETWORK = "Disable Audience Network";

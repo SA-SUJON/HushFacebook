@@ -52,6 +52,7 @@ import java.util.Set;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
@@ -200,6 +201,15 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         PatchFamily.registerDiagnostics();
         LogBufferManager.registerReportSection(ReleaseCheck.REPORT);
         Set<PatchFamily> build = PatchFamily.inThisBuild();
+
+        if (build.contains(PatchFamily.START_TAB)) {
+            // First: it's what happens before anything the other rows change comes on screen.
+            PreferenceCategory opening = category(screen, L10n.t("Opening Facebook"));
+            opening.addPreference(toggle(context, Settings.OPEN_ON_CHOSEN_TAB, L10n.t("Open on a chosen tab"),
+                    L10n.t("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual "
+                            + "one. Notifications and links still open where they lead.")));
+            opening.addPreference(startTabRow(context));
+        }
 
         if (build.contains(PatchFamily.SPONSORED_POSTS) || build.contains(PatchFamily.SUGGESTED_POSTS)
                 || build.contains(PatchFamily.STORIES_TRAY) || build.contains(PatchFamily.FEED_REELS)
@@ -715,11 +725,66 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         }
     }
 
-    /** The quality row's summary is a sentence of its own rather than the chosen entry. */
+    /**
+     * The tab a start from the launcher icon opens on. Like the quality row, its values are the
+     * setting's own names and its summary says what the choice does.
+     */
+    static StartTabRow startTabRow(Context context) {
+        StartTabRow row = new StartTabRow(context);
+        row.setKey(Settings.START_TAB.key);
+        row.setTitle(L10n.t("Tab to open on"));
+        row.setDialogTitle(L10n.t("Tab to open on"));
+        // Android's own Cancel follows the activity's language, as the quality row's did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        StartTab[] tabs = StartTab.values();
+        CharSequence[] entries = new CharSequence[tabs.length];
+        CharSequence[] values = new CharSequence[tabs.length];
+        for (int i = 0; i < tabs.length; i++) {
+            entries[i] = tabLabel(tabs[i]);
+            values[i] = tabs[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.START_TAB.savedValue().name());
+        return row;
+    }
+
+    /** What the list, its summary and an import's preview call [tab]: the tab's name in Facebook. */
+    static String tabLabel(StartTab tab) {
+        switch (tab) {
+            case HOME:
+                return L10n.t("Home");
+            case FEEDS:
+                return L10n.t("Feeds");
+            case VIDEO:
+                return L10n.t("Video");
+            case FRIENDS:
+                return L10n.t("Friends");
+            case NOTIFICATIONS:
+                return L10n.t("Notifications");
+            case MENU:
+                return L10n.t("Menu");
+            default:
+                return L10n.t("Marketplace");
+        }
+    }
+
+    /**
+     * What a start does with [tab], for the row's summary. Facebook opens Home for a tab the
+     * account's tab bar hasn't got, so the summary says so rather than promise the tab.
+     */
+    static String startTabSummary(StartTab tab) {
+        return L10n.f("Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.",
+                tabLabel(tab));
+    }
+
+    /** The quality and start tab rows' summaries are sentences of their own rather than the chosen entry. */
     @Override
     protected void updateListPreferenceSummary(ListPreference listPreference, Setting<?> setting) {
         if (listPreference instanceof QualityRow) {
             ((QualityRow) listPreference).showSummary();
+        } else if (listPreference instanceof StartTabRow) {
+            ((StartTabRow) listPreference).showSummary();
         } else {
             super.updateListPreferenceSummary(listPreference, setting);
         }
@@ -967,6 +1032,45 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 if (candidate.name().equals(getValue())) quality = candidate;
             }
             setSummary(qualitySummary(quality));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The start tab's row. Its summary follows its value, whoever sets it: the person, the shared
+     * page syncing it from the setting, or an import.
+     */
+    static final class StartTabRow extends ListPreference {
+        StartTabRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            StartTab tab = StartTab.MARKETPLACE;
+            for (StartTab candidate : StartTab.values()) {
+                if (candidate.name().equals(getValue())) tab = candidate;
+            }
+            setSummary(startTabSummary(tab));
         }
 
         @Override

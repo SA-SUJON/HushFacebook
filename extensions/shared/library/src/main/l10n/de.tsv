@@ -225,3 +225,22 @@ Facebook stops getting the list of reels you've watched, which it uses to rank y
 the rename of the shared permissions	die Umbenennung der gemeinsamen Berechtigungen
 Room for Meta's apps	Platz für Metas Apps
 Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.	Messenger, Facebook Lite, Business Suite und Workplace lassen sich neben diesem Facebook installieren. Es gibt den zwei Berechtigungen, die sie mit ihm teilen, eigene Namen.
+# context: settings section heading for the Open on a chosen tab rows
+Opening Facebook	Beim Öffnen von Facebook
+# context: switch title; the list below it picks the tab
+Open on a chosen tab	Mit einem gewählten Tab starten
+Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.	Wenn du Facebook über sein Symbol startest, öffnet sich statt des üblichen Tabs der unten gewählte. Benachrichtigungen und Links öffnen weiterhin dort, wohin sie führen.
+# context: title of the list of tabs Facebook can open on
+Tab to open on	Tab beim Start
+# context: the names of Facebook's own tabs, as its tab bar shows them
+Home	Startseite
+Feeds	Feeds
+Video	Video
+Friends	Freunde
+Marketplace	Marketplace
+Notifications	Benachrichtigungen
+Menu	Menü
+# context: summary of the tab list; %1$s is one of the tab names above
+Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.	Facebook startet mit %1$s. Fehlt dieser Tab in deiner Tab-Leiste, startet Facebook mit der Startseite.
+# context: a sentence in the settings import preview and its toast; %1$s is a tab name
+Facebook will open on %1$s.	Facebook startet dann mit %1$s.

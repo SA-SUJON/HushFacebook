@@ -52,6 +52,7 @@ import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.SystemFont;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
+import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.stories.StoryAdvance;
@@ -249,6 +250,8 @@ public class PausedHooksTest {
         probes.put(PatchFamily.VIDEO_DOWNLOAD, Arrays.asList(
                 VideoMenuItemForTests::addsAnItem,
                 PlayerSourcesForTests::recordsAVideoPlayer));
+        // A start from the launcher icon asks Facebook for the chosen tab.
+        probes.put(PatchFamily.START_TAB, Collections.singletonList(StartTabRouteForTests::routes));
         // A shared link loses what the app added to it.
         probes.put(PatchFamily.SANITIZE_SHARING_LINKS, Collections.singletonList(() -> {
             String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";

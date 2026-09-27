@@ -177,7 +177,7 @@ public class PatchFamilyTest {
                         + "Hide sponsored stories, Stop Story auto-advance, Clean up Reels, Don't send reel watch history, "
                         + "Use the system font, Use the phone's emoji, Open links in "
                         + "external browser, Sanitize sharing links, Stop update prompts, Download any story, Download any reel, "
-                        + "Download any video, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
+                        + "Download any video, Open on a chosen tab, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
                         + "Restore screens on re-signed builds, Install beside Meta's apps"),
                 running);
         // Clean up Reels has three switches, and the report names each one.

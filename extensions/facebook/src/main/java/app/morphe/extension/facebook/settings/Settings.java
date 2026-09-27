@@ -12,6 +12,7 @@ import static java.lang.Boolean.TRUE;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.EnumSetting;
@@ -188,6 +189,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_download_videos", TRUE);
 
     /**
+     * A start from Facebook's launcher icon opens the tab in {@link #START_TAB} instead of the one
+     * Facebook would choose. Notifications, links and shortcuts keep their own destination.
+     */
+    public static final BooleanSetting OPEN_ON_CHOSEN_TAB =
+            new BooleanSetting("hushfacebook_open_on_chosen_tab", TRUE);
+
+    /**
      * The folder every save goes to, under Movies for a video and Pictures for a photo. The
      * settings row and an import keep it clean, and {@link SaveFolder#sanitize} cleans it again
      * wherever it's read, so whatever wrote the store, a save lands in one folder under each.
@@ -214,4 +222,13 @@ public class Settings extends BaseSettings {
      */
     public static final StringSetting FILENAME_TEMPLATE =
             new StringSetting("hushfacebook_filename_template", FileNameTemplate.DEFAULT);
+
+    /**
+     * The tab a start from the launcher icon opens on while {@link #OPEN_ON_CHOSEN_TAB} is on:
+     * Marketplace, the one people asked for, unless it's changed. A tab this account's tab bar
+     * hasn't got opens Home, which is what Facebook does with a notification about such a tab. It
+     * isn't a switch, and a paused Facebook opens where it chooses.
+     */
+    public static final EnumSetting<StartTab> START_TAB =
+            new EnumSetting<>("hushfacebook_start_tab", StartTab.MARKETPLACE);
 }

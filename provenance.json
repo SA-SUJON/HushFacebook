@@ -254,6 +254,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the switch to the phone's emoji font. It asks the extension first thing in Facebook's emoji typeface provider, found in Facebook 577 and 580 by the end-to-end system emoji flag and the log tag it keeps, and hands back the phone's default typeface while the switch is on, so the spans and pickers that draw emoji with Meta's downloaded font draw the phone's emoji font instead."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/navigation/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/navigation/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the tab Facebook opens on. The patch checks that Facebook 577 and 580 still pick the main screen's start tab from an intent's target_tab_id, by the one method that answers a tab id from that extra, and puts the extension first in the onCreate the main screen inherits. For a start from the launcher icon with nothing to restore, the extension hands the screen a copy of its intent asking for the chosen tab's id, the id each kept TabTag subclass hands TabTag, and leaves links, notifications, shortcuts and restored screens alone."
     }
   ]
 }

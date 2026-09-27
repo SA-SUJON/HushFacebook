@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.EnumSetting;
 import app.morphe.extension.shared.settings.Setting;
@@ -47,16 +48,17 @@ import app.morphe.extension.shared.settings.StringSetting;
  * switches, which live in Facebook's own data, so a reinstall or a new phone started them all
  * over. This writes them to a JSON file the person chooses and reads one back.
  *
- * <p>Only the switches in {@link #ALLOWLIST} and the download settings in {@link #VALUES} (the
- * save folder, the save quality and the video file name) go out or come in. Pause, safe mode, the debug settings, the
- * app language and the counters Hushfacebook keeps for itself stay out. So does the release check: it puts
- * the phone online, so it's switched on from the phone's own screen, never by a file. So do the log, the
- * diagnostic data and anything about the person or the phone: a file is a format name, a version
- * number, one true or false per switch, one folder name, one quality and one file name template.
- * An import applies what it read in one preference commit. A file that is too large, isn't JSON,
- * names something twice, holds a value of the wrong type, a folder or a template that isn't one
- * clean name, or a quality this build doesn't offer, or comes from a newer version changes
- * nothing.
+ * <p>Only the switches in {@link #ALLOWLIST} and the settings in {@link #VALUES} (the save folder,
+ * the save quality, the video file name and the tab Facebook opens on) go out or come in. Pause,
+ * safe mode, the debug settings, the app language and the counters Hushfacebook keeps for itself
+ * stay out, and so do the log, the diagnostic data and anything about the person or the phone: a
+ * file is a format name, a version number, one true or false per switch, one folder name, one
+ * quality, one file name template and one tab. An import applies what it read in one preference
+ * commit. A file that is too large, isn't JSON, names something twice, holds a value of the wrong
+ * type, a folder or a template that isn't one clean name, or a quality or tab this build doesn't
+ * offer, or comes from a newer version changes nothing.
+ * <p>The release check stays out of the file: it puts the phone online, so it's switched on
+ * from the phone's own screen, never by a file.
  *
  * <p>Call the file and preference work on a worker thread.
  */
@@ -101,7 +103,8 @@ public final class SettingsBackup {
             Settings.STOP_UPDATE_PROMPTS,
             Settings.DOWNLOAD_STORIES,
             Settings.DOWNLOAD_REELS,
-            Settings.DOWNLOAD_VIDEOS));
+            Settings.DOWNLOAD_VIDEOS,
+            Settings.OPEN_ON_CHOSEN_TAB));
 
     /**
      * The one setting a file carries that isn't a switch: the folder saves go to. A file holds it
@@ -125,9 +128,15 @@ public final class SettingsBackup {
      */
     static final StringSetting FILE_NAME = Settings.FILENAME_TEMPLATE;
 
+    /**
+     * The tab a start from the launcher icon opens on, held in a file as its
+     * {@link StartTab#fileValue}. Anything else refuses the whole file, as a quality does.
+     */
+    static final EnumSetting<StartTab> START = Settings.START_TAB;
+
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(FOLDER, QUALITY, FILE_NAME));
+            Arrays.<Setting<?>>asList(FOLDER, QUALITY, FILE_NAME, START));
 
     /**
      * Bounds for the parser, well past anything this class writes, so a file built to be
@@ -186,8 +195,8 @@ public final class SettingsBackup {
     }
 
     /**
-     * What a file says: a value for each switch it names, the folder, the quality and the file
-     * name when it names them, and how many other names it holds.
+     * What a file says: a value for each switch it names, the folder, the quality, the file name
+     * and the start tab when it names them, and how many other names it holds.
      */
     public static final class Snapshot {
         private static final String SWITCHES = "switches";
@@ -195,6 +204,7 @@ public final class SettingsBackup {
         private static final String FOLDER_NAME = "folder";
         private static final String QUALITY_NAME = "quality";
         private static final String FILE_NAME_NAME = "file_name";
+        private static final String START_NAME = "start_tab";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -207,15 +217,19 @@ public final class SettingsBackup {
         /** The clean file name template the file holds, or null when it names none. */
         @Nullable
         final String fileName;
+        /** The tab Facebook opens on that the file holds, or null when it names none. */
+        @Nullable
+        final StartTab start;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
         Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
-                 @Nullable String fileName, int unknown) {
+                 @Nullable String fileName, @Nullable StartTab start, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
             this.fileName = fileName;
+            this.start = start;
             this.unknown = unknown;
         }
 
@@ -236,6 +250,8 @@ public final class SettingsBackup {
             if (qualityChange != null) changes.put(QUALITY, qualityChange);
             String fileNameChange = fileNameChange();
             if (fileNameChange != null) changes.put(FILE_NAME, fileNameChange);
+            StartTab startChange = startChange();
+            if (startChange != null) changes.put(START, startChange);
             return changes;
         }
 
@@ -271,6 +287,12 @@ public final class SettingsBackup {
             return fileName.equals(FileNameTemplate.sanitize(FILE_NAME.savedValue())) ? null : fileName;
         }
 
+        /** The start tab this file sets, or null when it names none or the one already set. */
+        @Nullable
+        StartTab startChange() {
+            return start == null || start == START.savedValue() ? null : start;
+        }
+
         /** For the settings page's saved state, so a preview outlives the page being rebuilt. */
         Bundle toBundle() {
             Bundle switches = new Bundle();
@@ -282,6 +304,7 @@ public final class SettingsBackup {
             if (folder != null) state.putString(FOLDER_NAME, folder);
             if (quality != null) state.putString(QUALITY_NAME, quality.fileValue);
             if (fileName != null) state.putString(FILE_NAME_NAME, fileName);
+            if (start != null) state.putString(START_NAME, start.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -307,7 +330,7 @@ public final class SettingsBackup {
             return new Snapshot(values, folder instanceof String && SaveFolder.isClean((String) folder)
                     ? (String) folder : null, DownloadQuality.fromFile(state.get(QUALITY_NAME)),
                     fileName instanceof String && FileNameTemplate.isClean((String) fileName) ? (String) fileName : null,
-                    unknown);
+                    StartTab.fromFile(state.get(START_NAME)), unknown);
         }
     }
 
@@ -324,6 +347,7 @@ public final class SettingsBackup {
         switches.put(FOLDER.key, SaveFolder.sanitize(FOLDER.savedValue()));
         switches.put(QUALITY.key, QUALITY.savedValue().fileValue);
         switches.put(FILE_NAME.key, FileNameTemplate.sanitize(FILE_NAME.savedValue()));
+        switches.put(START.key, START.savedValue().fileValue);
         return new JSONObject()
                 .put(FORMAT_NAME, FORMAT)
                 .put(SCHEMA_NAME, SCHEMA)
@@ -410,6 +434,7 @@ public final class SettingsBackup {
         String folder = null;
         DownloadQuality quality = null;
         String fileName = null;
+        StartTab start = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -436,6 +461,11 @@ public final class SettingsBackup {
                 fileName = FileNameTemplate.sanitize((String) value);
                 continue;
             }
+            if (START.key.equals(name)) {
+                start = StartTab.fromFile(values.opt(name));
+                if (start == null) throw new Rejected(Reason.VALUE, "Not a start tab: " + name);
+                continue;
+            }
             BooleanSetting setting = known.get(name);
             if (setting == null) {
                 // A name this build doesn't know, Pause and the debug settings included: left
@@ -454,14 +484,14 @@ public final class SettingsBackup {
             Boolean value = found.get(setting);
             if (value != null) ordered.put(setting, value);
         }
-        return new Snapshot(ordered, folder, quality, fileName, unknown);
+        return new Snapshot(ordered, folder, quality, fileName, start, unknown);
     }
 
     /**
-     * Writes the switches and the download settings a file changes, all of them in one preference
+     * Writes the switches and the other settings a file changes, all of them in one preference
      * commit. A setting the file doesn't name is left as it is.
      *
-     * @return how many settings changed, each download setting counted as one.
+     * @return how many settings changed, each setting that isn't a switch counted as one.
      * @throws ApplyFailed when the commit failed. {@link Setting#saveAll} puts the switches
      *                     back; {@link ApplyFailed#rolledBack} says whether that worked.
      */
