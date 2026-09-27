@@ -87,6 +87,15 @@ public final class FeedFilter {
      */
     static final String STORIES_YOU_MIGHT_LIKE_ROUTE = "Stories you might like";
     /**
+     * The stories the word filter read, counted only while its switch is on, with which list
+     * matched or why nothing was read as the kind. Never a word or a phrase.
+     */
+    static final String WORDS_ROUTE = "Your words";
+    /** What a post the word filter hid counts under on the feed's route. */
+    static final String WORDS_REASON = "word filter";
+    /** The kind a post counts under while the hide list is empty, when nothing of it is read. */
+    static final String NO_WORDS = "no words listed";
+    /**
      * The Stories tray adapters the feed asked for, each call counted with its adapter as the kind,
      * and a skipped one as a removal. The tray is never a feed edge: the feed's adapter list adds it
      * as an adapter of its own, so it never reaches the edge guard.
@@ -161,7 +170,8 @@ public final class FeedFilter {
     public static boolean hideEdge(Object category, Object feedUnit) {
         return hideEdge(category, feedUnit, SettingsStatus.sponsoredPosts(), SettingsStatus.suggestedPosts(),
                 RecommendationLabel.PATCHED, SettingsStatus.aiDetectedPosts(), GenAiLabel.PATCHED,
-                SettingsStatus.feedReels());
+                SettingsStatus.feedReels(), ShowcaseType.PATCHED, SettingsStatus.postWords(), PostText.MESSAGE,
+                PostText.ATTACHED);
     }
 
     /** The guard with the sponsored and suggested patch-time flags passed in, and no GenAI rule. */
@@ -202,9 +212,26 @@ public final class FeedFilter {
     static boolean hideEdge(Object category, Object feedUnit, boolean sponsoredPatched, boolean suggestedPatched,
             StoryFlag.Accessor recommendationAccessor, boolean aiPatched, StoryFlag.Accessor aiAccessor,
             boolean reelsPatched, StoryFlag.Accessor showcaseAccessor) {
+        return hideEdge(category, feedUnit, sponsoredPatched, suggestedPatched, recommendationAccessor, aiPatched,
+                aiAccessor, reelsPatched, showcaseAccessor, false, PostText.MESSAGE, PostText.ATTACHED);
+    }
+
+    /**
+     * The guard with the word filter's flag passed in too, and the two text accessors its patch
+     * fills, so a test can stand in for them.
+     *
+     * <p>The word filter reads a post only while its switch is on and its hide list holds a
+     * phrase. Its kinds and its reason are shapes; the words it read and the phrase that matched
+     * go nowhere.
+     */
+    static boolean hideEdge(Object category, Object feedUnit, boolean sponsoredPatched, boolean suggestedPatched,
+            StoryFlag.Accessor recommendationAccessor, boolean aiPatched, StoryFlag.Accessor aiAccessor,
+            boolean reelsPatched, StoryFlag.Accessor showcaseAccessor, boolean wordsPatched,
+            StoryFlag.Accessor messageAccessor, StoryFlag.Accessor attachedAccessor) {
         try {
             if (sponsoredPatched) HookStatus.invoked(FamilyNames.SPONSORED_POSTS);
             if (reelsPatched) HookStatus.invoked(FamilyNames.FEED_REELS);
+            if (wordsPatched) HookStatus.invoked(FamilyNames.POST_WORDS);
             if (suggestedPatched) {
                 HookStatus.invoked(FamilyNames.SUGGESTED_POSTS);
                 reportSuggestedClasses();
@@ -257,6 +284,9 @@ public final class FeedFilter {
             if (reason == null && aiPatched && Settings.HIDE_AI_DETECTED_POSTS.get()) {
                 reason = flagReason(GenAiLabel.FLAG, AI_ROUTE, feedUnit, aiAccessor);
             }
+            if (reason == null && wordsPatched && Settings.HIDE_POSTS_WITH_WORDS.get()) {
+                reason = wordsReason(feedUnit, messageAccessor, attachedAccessor);
+            }
             if (reason == null) return false;
 
             FeedFilterCounters.removed(FEED_ROUTE, 1, reason);
@@ -268,6 +298,7 @@ public final class FeedFilter {
             if (reelsPatched) HookStatus.threw(FamilyNames.FEED_REELS, "feed guard", failure);
             if (suggestedPatched) HookStatus.threw(FamilyNames.SUGGESTED_POSTS, "feed guard", failure);
             if (aiPatched) HookStatus.threw(FamilyNames.AI_DETECTED_POSTS, "feed guard", failure);
+            if (wordsPatched) HookStatus.threw(FamilyNames.POST_WORDS, "feed guard", failure);
             Logger.printException(() -> "Feed filter: could not judge an edge", failure);
             return false;
         }
@@ -340,6 +371,33 @@ public final class FeedFilter {
             HookStatus.threw(FamilyNames.SUGGESTED_POSTS, "Stories you might like flag reader", failure);
             return "read failed";
         }
+    }
+
+    /**
+     * The word filter: {@link #WORDS_REASON} when the post's own words, or those of the post it
+     * shares, hold a phrase from the hide list and none from the keep list, otherwise null. Every
+     * story it's asked about is counted on its route under which list matched or why nothing was
+     * read, so a kept post always has a reason in the report. With the hide list empty nothing of
+     * the post is read, and a post whose words can't be read is kept.
+     */
+    private static String wordsReason(Object feedUnit, StoryFlag.Accessor message, StoryFlag.Accessor attached) {
+        FeedFilterCounters.sawList(WORDS_ROUTE, 1);
+        PostWords.Rules rules = PostWords.rules(Settings.HIDDEN_WORDS.get(), Settings.KEPT_WORDS.get());
+        if (rules.hidesNothing()) {
+            FeedFilterCounters.sawKind(WORDS_ROUTE, NO_WORDS);
+            return null;
+        }
+        PostText.Read read = PostText.read(feedUnit, message, attached);
+        if (read.outcome != PostText.Outcome.TEXT) {
+            FeedFilterCounters.sawKind(WORDS_ROUTE, read.outcome.reason);
+            return null;
+        }
+        PostWords.Verdict verdict = rules.judge(read.texts);
+        FeedFilterCounters.sawKind(WORDS_ROUTE, verdict.reason);
+        if (verdict != PostWords.Verdict.HIDE) return null;
+        FeedFilterCounters.removed(WORDS_ROUTE, 1, verdict.reason);
+        PostWords.HIDDEN.incrementAndGet();
+        return WORDS_REASON;
     }
 
     /**

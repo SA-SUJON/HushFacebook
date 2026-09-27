@@ -375,3 +375,45 @@ Stories in the tray from people and Pages you don't follow, the ones marked Sugg
 Hide sponsored Marketplace listings	Sembunyikan tawaran bersponsor di Marketplace
 # context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
 Ads and boosted listings in Marketplace's feed. The other listings stay.	Iklan dan tawaran yang dipromosikan di feed Marketplace. Tawaran lainnya tetap ada.
+# context: switch title under News feed; hides posts whose text holds a word or phrase the person listed
+Hide posts with words you choose	Sembunyikan postingan dengan kata pilihan Anda
+# context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes
+Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.	Postingan yang teksnya berisi kata atau frasa dari daftar Anda di bawah. Postingan dengan kata dari daftar pertahankan Anda tetap ada, begitu juga postingan tanpa teks. Kata-kata Anda hanya keluar dari ponsel dalam file pengaturan yang Anda ekspor.
+# context: title of the row and dialog holding the list of words and phrases that hide a post
+Words to hide	Kata untuk disembunyikan
+# context: title of the row and dialog holding the list of words and phrases that keep a post even when it has a word to hide
+Words that keep a post	Kata yang mempertahankan postingan
+# context: message of the Words to hide dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
+One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.	Satu kata atau frasa per baris, hingga %1$d, masing-masing %2$d sampai %3$d karakter. Huruf besar dan kecil tidak berpengaruh, dan frasa cocok di mana saja dalam teks postingan, termasuk di dalam kata yang lebih panjang.
+# context: message of the Words that keep a post dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
+A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long.	Postingan dengan salah satu kata ini tetap ada, meskipun juga berisi kata untuk disembunyikan. Satu per baris, hingga %1$d, masing-masing %2$d sampai %3$d karakter.
+# context: hint in the empty text box of both word list dialogs
+One word or phrase per line	Satu kata atau frasa per baris
+# context: toast after saving a word list, one line left out; %2$d and %3$d are the shortest and longest phrase in characters, %4$d how many a list holds
+%1$d line was left out. A phrase needs %2$d to %3$d characters, one given twice counts once, and a list holds %4$d.	%1$d baris tidak disertakan. Frasa perlu %2$d sampai %3$d karakter, frasa yang ditulis dua kali dihitung sekali, dan daftar memuat hingga %4$d.
+# context: toast after saving a word list, several lines left out; %2$d and %3$d are the shortest and longest phrase in characters, %4$d how many a list holds
+%1$d lines were left out. A phrase needs %2$d to %3$d characters, one given twice counts once, and a list holds %4$d.	%1$d baris tidak disertakan. Frasa perlu %2$d sampai %3$d karakter, frasa yang ditulis dua kali dihitung sekali, dan daftar memuat hingga %4$d.
+# context: summary of the Words to hide row while it's empty
+No words yet, so no post is hidden.	Belum ada kata, jadi tidak ada postingan yang disembunyikan.
+# context: summary of the Words that keep a post row while it's empty
+No words yet.	Belum ada kata.
+# context: summary of a word list row holding one phrase
+%1$d word or phrase.	%1$d kata atau frasa.
+# context: summary of a word list row holding several phrases
+%1$d words or phrases.	%1$d kata atau frasa.
+# context: added to the Words to hide summary: posts the filter hid since Facebook last started, one
+Hid %1$d post since Facebook started.	%1$d postingan disembunyikan sejak Facebook dimulai.
+# context: added to the Words to hide summary: posts the filter hid since Facebook last started, several
+Hid %1$d posts since Facebook started.	%1$d postingan disembunyikan sejak Facebook dimulai.
+# context: sentence in the import preview and the toast after an import that empties the list of words to hide
+Your list of words to hide will be empty.	Daftar kata untuk disembunyikan akan kosong.
+# context: sentence in the import preview and the toast after an import; the list of words to hide will hold one phrase
+Your list of words to hide will hold %1$d word or phrase.	Daftar kata untuk disembunyikan akan berisi %1$d kata atau frasa.
+# context: sentence in the import preview and the toast after an import; the list of words to hide will hold several phrases
+Your list of words to hide will hold %1$d words or phrases.	Daftar kata untuk disembunyikan akan berisi %1$d kata atau frasa.
+# context: sentence in the import preview and the toast after an import that empties the keep list
+Your list of words that keep a post will be empty.	Daftar kata yang mempertahankan postingan akan kosong.
+# context: sentence in the import preview and the toast after an import; the keep list will hold one phrase
+Your list of words that keep a post will hold %1$d word or phrase.	Daftar kata yang mempertahankan postingan akan berisi %1$d kata atau frasa.
+# context: sentence in the import preview and the toast after an import; the keep list will hold several phrases
+Your list of words that keep a post will hold %1$d words or phrases.	Daftar kata yang mempertahankan postingan akan berisi %1$d kata atau frasa.

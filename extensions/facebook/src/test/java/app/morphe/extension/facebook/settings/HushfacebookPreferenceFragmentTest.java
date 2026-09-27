@@ -20,6 +20,7 @@ import android.preference.SwitchPreference;
 
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.feed.PostWordsForTests;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -29,6 +30,7 @@ import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,8 +65,15 @@ public class HushfacebookPreferenceFragmentTest {
     /** Wording that tells the reader a paused Facebook is an unpatched one, which it isn't. */
     private static final Pattern UNPATCHED = Pattern.compile("(?i)unpatched|n't patched|not patched|as if it weren");
 
+    /** The count of hidden posts is the process's, and other test classes in this JVM hide posts too. */
+    @Before
+    public void forgetHiddenPosts() {
+        PostWordsForTests.forget();
+    }
+
     @After
     public void restore() {
+        PostWordsForTests.forget();
         PatchFamily.inBuildForTests = null;
         ScreenColors.shown = null;
         PauseForTests.resume();
@@ -72,6 +81,8 @@ public class HushfacebookPreferenceFragmentTest {
         Settings.SAVE_FOLDER.resetToDefault();
         Settings.DOWNLOAD_QUALITY.resetToDefault();
         Settings.FILENAME_TEMPLATE.resetToDefault();
+        Settings.HIDDEN_WORDS.resetToDefault();
+        Settings.KEPT_WORDS.resetToDefault();
     }
 
     @Test
@@ -269,6 +280,70 @@ public class HushfacebookPreferenceFragmentTest {
                         row instanceof HushfacebookPreferenceFragment.FolderRow);
             }
         }
+    }
+
+    /**
+     * The word filter's switch sits in News feed with its two lists under it. Each list keeps what
+     * the filter will read, whatever is typed, and a toast says how many lines were left out,
+     * never which. The rows are there only with the patch in the build.
+     */
+    @Test
+    public void theWordRowsKeepCleanListsAndSayHowManyPhrasesTheyHold() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.POST_WORDS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int switchAt = indexOfKey(rows, Settings.HIDE_POSTS_WITH_WORDS.key);
+            assertTrue("no word filter switch", switchAt >= 0);
+            assertEquals("the hide list isn't under the switch", switchAt + 1, indexOfKey(rows, Settings.HIDDEN_WORDS.key));
+            assertEquals("the keep list isn't under the hide list", switchAt + 2, indexOfKey(rows, Settings.KEPT_WORDS.key));
+            HushfacebookPreferenceFragment.WordsRow hide = (HushfacebookPreferenceFragment.WordsRow) rows.get(switchAt + 1);
+            HushfacebookPreferenceFragment.WordsRow keep = (HushfacebookPreferenceFragment.WordsRow) rows.get(switchAt + 2);
+            assertEquals("Words to hide", String.valueOf(hide.getTitle()));
+            assertEquals("No words yet, so no post is hidden.", String.valueOf(hide.getSummary()));
+            assertEquals("No words yet.", String.valueOf(keep.getSummary()));
+            assertFalse("the list's field is one line", hide.getEditText().getMaxLines() == 1);
+
+            ShadowToast.reset();
+            Preference.OnPreferenceChangeListener ok = hide.getOnPreferenceChangeListener();
+            assertFalse("a list with lines out of bounds was kept as typed",
+                    ok.onPreferenceChange(hide, " spoiler \na\nSPOILER\ngiveaway now\n"));
+            ShadowLooper.idleMainLooper();
+            assertEquals("spoiler\ngiveaway now", hide.getText());
+            assertEquals("spoiler\ngiveaway now", Settings.HIDDEN_WORDS.savedValue());
+            assertEquals("2 words or phrases.", String.valueOf(hide.getSummary()));
+            assertEquals("2 lines were left out. A phrase needs 2 to 60 characters, one given twice counts once, "
+                    + "and a list holds 50.", ShadowToast.getTextOfLatestToast());
+
+            ShadowToast.reset();
+            assertTrue("a clean list was changed", ok.onPreferenceChange(hide, "spoiler"));
+            assertFalse("only spaces around a phrase", ok.onPreferenceChange(hide, "spoiler  "));
+            ShadowLooper.idleMainLooper();
+            assertNull("a list cleaned of spaces alone said something", ShadowToast.getTextOfLatestToast());
+            assertEquals("spoiler", Settings.HIDDEN_WORDS.savedValue());
+
+            assertFalse(keep.getOnPreferenceChangeListener().onPreferenceChange(keep, "my team\nmy team"));
+            ShadowLooper.idleMainLooper();
+            assertEquals("my team", Settings.KEPT_WORDS.savedValue());
+            assertEquals("1 word or phrase.", String.valueOf(keep.getSummary()));
+        }
+
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            assertEquals(-1, indexOfKey(rows, Settings.HIDDEN_WORDS.key));
+            assertEquals(-1, indexOfKey(rows, Settings.HIDE_POSTS_WITH_WORDS.key));
+        }
+    }
+
+    /** The hide list's row counts the posts it hid since Facebook started, and never names one. */
+    @Test
+    public void theHideListSaysHowManyPostsItHid() {
+        assertEquals("1 word or phrase.", HushfacebookPreferenceFragment.wordsSummary("spoiler", true));
+        PostWordsForTests.countHidden(3);
+        assertEquals("1 word or phrase. Hid 3 posts since Facebook started.",
+                HushfacebookPreferenceFragment.wordsSummary("spoiler", true));
+        assertEquals("the keep list hides nothing", "1 word or phrase.",
+                HushfacebookPreferenceFragment.wordsSummary("spoiler", false));
     }
 
     /**

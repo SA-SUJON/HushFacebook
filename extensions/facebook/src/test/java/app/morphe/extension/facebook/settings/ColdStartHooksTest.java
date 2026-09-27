@@ -132,6 +132,8 @@ public class ColdStartHooksTest {
         assertFalse(FeedGuardForTests.hidesShowcaseReels(Category.SHOWCASE, ShowcaseStoryType.SHOWCASE_SHORT_VIDEO));
         assertFalse(FeedFilter.hidePreEofReels());
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.detectedInfo(true)));
+        assertFalse("a post with listed words before the context was hidden", FeedGuardForTests.hidesByWords(
+                Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.postText("Big SPOILER inside")));
         assertFalse(FeedGuardForTests.hidesAiReel(new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true))));
         FeedGuardForTests.ReelItem flaggedReel = new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true));
         Section reelSection = new Section(new ArrayList<>(Arrays.asList(new Reel(), flaggedReel)));

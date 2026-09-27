@@ -143,6 +143,7 @@ public class PausedHooksTest {
     public void restore() {
         PauseForTests.resume();
         for (BooleanSetting setting : settingsSwitches()) setting.resetToDefault();
+        Settings.HIDDEN_WORDS.resetToDefault();
         FeedFilterCounters.clear();
         ReleaseCheckForTests.forget();
     }
@@ -223,6 +224,12 @@ public class PausedHooksTest {
                     FeedGuardForTests.aiReelSections(Collections.singletonList(section));
                     return !section.items.contains(reel);
                 }));
+        // A story whose own words hold a phrase from the hide list. Paused, the list reads empty too.
+        // Saved here, with the context, so a probe run without one reads it rather than loading it.
+        Settings.HIDDEN_WORDS.save("spoiler");
+        probes.put(PatchFamily.POST_WORDS, Collections.singletonList(
+                () -> FeedGuardForTests.hidesByWords(Category.ORGANIC, new GraphQLStory(),
+                        FeedGuardForTests.postText("Big SPOILER inside"))));
         probes.put(PatchFamily.SPONSORED_STORIES, Collections.singletonList(FeedFilter::hideSponsoredStories));
         // A tray of a friend's bucket, a suggested one and one labelled SUGGESTED keeps only the friend's.
         probes.put(PatchFamily.SUGGESTED_STORIES, Collections.singletonList(SuggestedStoriesForTests::hidesSuggestions));

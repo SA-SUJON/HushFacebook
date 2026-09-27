@@ -375,3 +375,45 @@ Stories in the tray from people and Pages you don't follow, the ones marked Sugg
 Hide sponsored Marketplace listings	Marketplace'teki sponsorlu ilanları gizle
 # context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
 Ads and boosted listings in Marketplace's feed. The other listings stay.	Marketplace akışındaki reklamlar ve öne çıkarılan ilanlar. Diğer ilanlar kalır.
+# context: switch title under News feed; hides posts whose text holds a word or phrase the person listed
+Hide posts with words you choose	Seçtiğin kelimeleri içeren gönderileri gizle
+# context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes
+Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.	Metninde aşağıdaki listenden bir kelime veya ifade geçen gönderiler. Tutma listendeki bir kelimeyi içeren gönderi kalır, metni olmayan gönderi de kalır. Kelimelerin telefondan yalnızca dışa aktardığın bir ayar dosyasıyla çıkar.
+# context: title of the row and dialog holding the list of words and phrases that hide a post
+Words to hide	Gizlenecek kelimeler
+# context: title of the row and dialog holding the list of words and phrases that keep a post even when it has a word to hide
+Words that keep a post	Gönderiyi tutan kelimeler
+# context: message of the Words to hide dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
+One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.	Her satıra bir kelime veya ifade, en fazla %1$d tane, her biri %2$d ile %3$d karakter arası. Büyük küçük harf fark etmez ve bir ifade, gönderi metninin herhangi bir yerinde, daha uzun kelimelerin içinde bile eşleşir.
+# context: message of the Words that keep a post dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
+A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long.	Bunlardan birini içeren gönderi, gizlenecek bir kelime de içerse kalır. Her satıra bir tane, en fazla %1$d tane, her biri %2$d ile %3$d karakter arası.
+# context: hint in the empty text box of both word list dialogs
+One word or phrase per line	Her satıra bir kelime veya ifade
+# context: toast after saving a word list, one line left out; %2$d and %3$d are the shortest and longest phrase in characters, %4$d how many a list holds
+%1$d line was left out. A phrase needs %2$d to %3$d characters, one given twice counts once, and a list holds %4$d.	%1$d satır dışarıda bırakıldı. Bir ifade %2$d ile %3$d karakter arası olmalı, iki kez yazılan bir kez sayılır ve bir liste en fazla %4$d tane alır.
+# context: toast after saving a word list, several lines left out; %2$d and %3$d are the shortest and longest phrase in characters, %4$d how many a list holds
+%1$d lines were left out. A phrase needs %2$d to %3$d characters, one given twice counts once, and a list holds %4$d.	%1$d satır dışarıda bırakıldı. Bir ifade %2$d ile %3$d karakter arası olmalı, iki kez yazılan bir kez sayılır ve bir liste en fazla %4$d tane alır.
+# context: summary of the Words to hide row while it's empty
+No words yet, so no post is hidden.	Henüz kelime yok, bu yüzden hiçbir gönderi gizlenmiyor.
+# context: summary of the Words that keep a post row while it's empty
+No words yet.	Henüz kelime yok.
+# context: summary of a word list row holding one phrase
+%1$d word or phrase.	%1$d kelime veya ifade.
+# context: summary of a word list row holding several phrases
+%1$d words or phrases.	%1$d kelime veya ifade.
+# context: added to the Words to hide summary: posts the filter hid since Facebook last started, one
+Hid %1$d post since Facebook started.	Facebook açıldığından beri %1$d gönderi gizlendi.
+# context: added to the Words to hide summary: posts the filter hid since Facebook last started, several
+Hid %1$d posts since Facebook started.	Facebook açıldığından beri %1$d gönderi gizlendi.
+# context: sentence in the import preview and the toast after an import that empties the list of words to hide
+Your list of words to hide will be empty.	Gizlenecek kelimeler listen boş olacak.
+# context: sentence in the import preview and the toast after an import; the list of words to hide will hold one phrase
+Your list of words to hide will hold %1$d word or phrase.	Gizlenecek kelimeler listende %1$d kelime veya ifade olacak.
+# context: sentence in the import preview and the toast after an import; the list of words to hide will hold several phrases
+Your list of words to hide will hold %1$d words or phrases.	Gizlenecek kelimeler listende %1$d kelime veya ifade olacak.
+# context: sentence in the import preview and the toast after an import that empties the keep list
+Your list of words that keep a post will be empty.	Gönderiyi tutan kelimeler listen boş olacak.
+# context: sentence in the import preview and the toast after an import; the keep list will hold one phrase
+Your list of words that keep a post will hold %1$d word or phrase.	Gönderiyi tutan kelimeler listende %1$d kelime veya ifade olacak.
+# context: sentence in the import preview and the toast after an import; the keep list will hold several phrases
+Your list of words that keep a post will hold %1$d words or phrases.	Gönderiyi tutan kelimeler listende %1$d kelime veya ifade olacak.

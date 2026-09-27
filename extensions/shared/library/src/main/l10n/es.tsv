@@ -375,3 +375,45 @@ Stories in the tray from people and Pages you don't follow, the ones marked Sugg
 Hide sponsored Marketplace listings	Ocultar artículos publicitarios de Marketplace
 # context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
 Ads and boosted listings in Marketplace's feed. The other listings stay.	Anuncios y artículos promocionados en el feed de Marketplace. Los demás artículos se quedan.
+# context: switch title under News feed; hides posts whose text holds a word or phrase the person listed
+Hide posts with words you choose	Ocultar publicaciones con las palabras que elijas
+# context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes
+Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.	Publicaciones cuyo texto tiene una palabra o frase de tu lista de abajo. Una publicación con una palabra de tu lista para conservar se mantiene, igual que una publicación sin texto. Tus palabras solo salen del teléfono en un archivo de configuración que exportes.
+# context: title of the row and dialog holding the list of words and phrases that hide a post
+Words to hide	Palabras para ocultar
+# context: title of the row and dialog holding the list of words and phrases that keep a post even when it has a word to hide
+Words that keep a post	Palabras que mantienen una publicación
+# context: message of the Words to hide dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
+One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.	Una palabra o frase por línea, hasta %1$d, cada una de %2$d a %3$d caracteres. Las mayúsculas no importan, y una frase coincide en cualquier parte del texto de una publicación, también dentro de palabras más largas.
+# context: message of the Words that keep a post dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
+A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long.	Una publicación con cualquiera de estas se mantiene, aunque también tenga una palabra para ocultar. Una por línea, hasta %1$d, cada una de %2$d a %3$d caracteres.
+# context: hint in the empty text box of both word list dialogs
+One word or phrase per line	Una palabra o frase por línea
+# context: toast after saving a word list, one line left out; %2$d and %3$d are the shortest and longest phrase in characters, %4$d how many a list holds
+%1$d line was left out. A phrase needs %2$d to %3$d characters, one given twice counts once, and a list holds %4$d.	Se omitió %1$d línea. Una frase necesita de %2$d a %3$d caracteres, una repetida cuenta una sola vez y una lista admite %4$d.
+# context: toast after saving a word list, several lines left out; %2$d and %3$d are the shortest and longest phrase in characters, %4$d how many a list holds
+%1$d lines were left out. A phrase needs %2$d to %3$d characters, one given twice counts once, and a list holds %4$d.	Se omitieron %1$d líneas. Una frase necesita de %2$d a %3$d caracteres, una repetida cuenta una sola vez y una lista admite %4$d.
+# context: summary of the Words to hide row while it's empty
+No words yet, so no post is hidden.	Todavía no hay palabras, así que no se oculta ninguna publicación.
+# context: summary of the Words that keep a post row while it's empty
+No words yet.	Todavía no hay palabras.
+# context: summary of a word list row holding one phrase
+%1$d word or phrase.	%1$d palabra o frase.
+# context: summary of a word list row holding several phrases
+%1$d words or phrases.	%1$d palabras o frases.
+# context: added to the Words to hide summary: posts the filter hid since Facebook last started, one
+Hid %1$d post since Facebook started.	Se ocultó %1$d publicación desde que Facebook se inició.
+# context: added to the Words to hide summary: posts the filter hid since Facebook last started, several
+Hid %1$d posts since Facebook started.	Se ocultaron %1$d publicaciones desde que Facebook se inició.
+# context: sentence in the import preview and the toast after an import that empties the list of words to hide
+Your list of words to hide will be empty.	Tu lista de palabras para ocultar quedará vacía.
+# context: sentence in the import preview and the toast after an import; the list of words to hide will hold one phrase
+Your list of words to hide will hold %1$d word or phrase.	Tu lista de palabras para ocultar tendrá %1$d palabra o frase.
+# context: sentence in the import preview and the toast after an import; the list of words to hide will hold several phrases
+Your list of words to hide will hold %1$d words or phrases.	Tu lista de palabras para ocultar tendrá %1$d palabras o frases.
+# context: sentence in the import preview and the toast after an import that empties the keep list
+Your list of words that keep a post will be empty.	Tu lista de palabras que mantienen una publicación quedará vacía.
+# context: sentence in the import preview and the toast after an import; the keep list will hold one phrase
+Your list of words that keep a post will hold %1$d word or phrase.	Tu lista de palabras que mantienen una publicación tendrá %1$d palabra o frase.
+# context: sentence in the import preview and the toast after an import; the keep list will hold several phrases
+Your list of words that keep a post will hold %1$d words or phrases.	Tu lista de palabras que mantienen una publicación tendrá %1$d palabras o frases.

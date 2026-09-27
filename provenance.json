@@ -369,6 +369,17 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the ads in Marketplace's feed. Facebook 577 and 580 draw Marketplace with React Native, and its Relay queries go out through Facebook's own Networking module, whose sendRequest is the one method holding FBNetworkingModule_React_Native. It reads a POST body from the request data's string entry into a StringEntity, and the query's tracking name (RelayFBNetwork_ and the query's name) from the same data. The patch hands the body and the data to the extension right after that read. For a Marketplace query whose form-encoded variables name shouldSkipAdRequest or shouldSkipBoostedListingAdRequest at their top level as false or null, the extension sets them to true and changes nothing else. For the four ads-only queries Facebook's own Tigon callbacks list (MarketplaceHomeFeedAdsQueryRendererQuery, MarketplaceHomeFeedAdsPaginationQuery, MarketplaceHomeFeedBoostedListingAdsQuery and MarketplaceHomeFeedBoostedListingAdsPaginationQuery) it answers no body, which the module reports to JavaScript as a request it couldn't make."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/PostText.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/PostWords.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/feed/words/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: hiding feed posts by words the person lists. In Facebook 577 and 580 GraphQLStory has one accessor that asks getCachedModel for the field keyed message as the type tagged TextWithEntities, and GraphQLStory's own toString calls it, labels its text message.text and reads that with a static helper that is getCachedString of the key text. The patch finds that accessor and the one of attached_story as Story by their keys, holds the first to toString's reading, and fills two stubs in PostText with them. The rule runs in the shared feed guard: the extension reads both texts through the kept getCachedString after checking the model's type tag, folds them and the two bounded phrase lists with NFKC case folding, lets a keep phrase win, keeps any post whose text it can't read, and reports only counts."
     }
   ]
 }

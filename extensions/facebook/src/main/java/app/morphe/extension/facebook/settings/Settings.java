@@ -22,11 +22,12 @@ import app.morphe.extension.shared.settings.StringSetting;
 /**
  * The switches behind the hooks that ask before they act.
  *
- * <p>All but four of them are on by default. Picking a patch in Morphe Manager is the choice to use
+ * <p>All but five of them are on by default. Picking a patch in Morphe Manager is the choice to use
  * it, and the switch is the way to turn it off again without patching a second time. The two GenAI
  * switches start off until each rule has been checked on a signed-in feed, the release check
- * starts off because it's the only request Hushfacebook makes for itself, and saves other apps can
- * open start off because they can come out below the sharpest version. While Hushfacebook is
+ * starts off because it's the only request Hushfacebook makes for itself, saves other apps can
+ * open start off because they can come out below the sharpest version, and the word filter starts
+ * off because it has nothing to hide by until someone lists words. While Hushfacebook is
  * paused, or in safe mode after three crashed starts, each switch answers off and the hook behind
  * it takes Facebook's own path.
  */
@@ -105,6 +106,28 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting HIDE_AI_DETECTED_REELS =
             new BooleanSetting("hushfacebook_hide_ai_detected_reels", FALSE);
+
+    /**
+     * Feed posts whose own words hold a phrase from {@link #HIDDEN_WORDS} and none from
+     * {@link #KEPT_WORDS} ({@link app.morphe.extension.facebook.feed.PostWords}). Off by default,
+     * and with the hide list empty it reads nothing of any post.
+     */
+    public static final BooleanSetting HIDE_POSTS_WITH_WORDS =
+            new BooleanSetting("hushfacebook_hide_posts_with_words", FALSE);
+
+    /**
+     * The words and phrases that hide a post while {@link #HIDE_POSTS_WITH_WORDS} is on, one per
+     * line, bounded wherever it's read. It isn't a switch, and a paused Facebook reads it as empty.
+     */
+    public static final StringSetting HIDDEN_WORDS =
+            new StringSetting("hushfacebook_hidden_words", "");
+
+    /**
+     * The words and phrases that keep a post whatever else it says, one per line, bounded the same
+     * way. It isn't a switch either.
+     */
+    public static final StringSetting KEPT_WORDS =
+            new StringSetting("hushfacebook_kept_words", "");
 
     /** The four story bucket sources that splice ad cards into the story viewer. */
     public static final BooleanSetting HIDE_SPONSORED_STORIES =

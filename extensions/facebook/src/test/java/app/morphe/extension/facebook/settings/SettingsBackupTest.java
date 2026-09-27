@@ -146,6 +146,8 @@ public class SettingsBackupTest {
         Settings.FILENAME_TEMPLATE.resetToDefault();
         Settings.START_TAB.resetToDefault();
         Settings.COMMENT_ORDER.resetToDefault();
+        Settings.HIDDEN_WORDS.resetToDefault();
+        Settings.KEPT_WORDS.resetToDefault();
         BaseSettings.PAUSED.resetToDefault();
         BaseSettings.DEBUG.resetToDefault();
         BaseSettings.DEBUG_LOG_FILTERS.resetToDefault();
@@ -188,8 +190,11 @@ public class SettingsBackupTest {
         for (Setting<?> setting : SettingsBackup.VALUES) {
             assertFalse(setting.key + " is carried and kept out at once", VALUES_STAY_OUT.containsKey(setting.key));
         }
-        assertEquals(Arrays.<Setting<?>>asList(Settings.SAVE_FOLDER, Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE,
-                Settings.START_TAB, Settings.COMMENT_ORDER), SettingsBackup.VALUES);
+        assertEquals(Arrays.<Setting<?>>asList(Settings.HIDDEN_WORDS, Settings.KEPT_WORDS, Settings.SAVE_FOLDER,
+                Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE, Settings.START_TAB, Settings.COMMENT_ORDER),
+                SettingsBackup.VALUES);
+        assertEquals(Settings.HIDDEN_WORDS, SettingsBackup.HIDDEN);
+        assertEquals(Settings.KEPT_WORDS, SettingsBackup.KEPT);
         assertEquals(Settings.SAVE_FOLDER, SettingsBackup.FOLDER);
         assertEquals(Settings.DOWNLOAD_QUALITY, SettingsBackup.QUALITY);
         assertEquals(Settings.FILENAME_TEMPLATE, SettingsBackup.FILE_NAME);
@@ -247,6 +252,8 @@ public class SettingsBackupTest {
         Settings.FILENAME_TEMPLATE.save("../{video_id}");
         Settings.START_TAB.save(StartTab.FRIENDS);
         Settings.COMMENT_ORDER.save(CommentOrder.ALL_COMMENTS);
+        // Stored as typed, and written as the list the filter reads.
+        Settings.HIDDEN_WORDS.save(" spoiler \nSPOILER\nleak");
         BaseSettings.PAUSED.save(true);
         BaseSettings.DEBUG.save(true);
         BaseSettings.DEBUG_LOG_FILTERS.save("downloads");
@@ -278,6 +285,9 @@ public class SettingsBackupTest {
         assertEquals("friends", switches.get(SettingsBackup.START.key));
         // Saved, not what a paused Facebook is answered: paused, comments open as Facebook picks.
         assertEquals("all_comments", switches.get(SettingsBackup.ORDER.key));
+        // Saved, not what a paused Facebook is answered: paused, the lists read empty.
+        assertEquals("spoiler\nleak", switches.get(SettingsBackup.HIDDEN.key));
+        assertEquals("", switches.get(SettingsBackup.KEPT.key));
         for (Setting<?> setting : Setting.allLoadedSettings()) {
             if (SettingsBackup.ALLOWLIST.contains(setting) || SettingsBackup.VALUES.contains(setting)) continue;
             assertFalse(setting.key + " is in the file", text.contains(setting.key));
@@ -585,6 +595,87 @@ public class SettingsBackupTest {
         assertNull(older.folderChange());
         SettingsBackup.apply(older);
         assertEquals("Clips", Settings.SAVE_FOLDER.savedValue());
+    }
+
+    /**
+     * The word filter's two lists go out and come back exactly as the settings row stores them. A
+     * list the row would clean differently, or that isn't text, refuses the whole file, so a file
+     * can't carry a longer or looser list than someone could type.
+     */
+    @Test
+    public void theWordListsRoundTripAndComeBackOnlyAsCleanLists() throws Exception {
+        Settings.HIDDEN_WORDS.save("spoiler\ngiveaway now");
+        Settings.KEPT_WORDS.save("my team");
+        String file = SettingsBackup.create();
+        Settings.HIDDEN_WORDS.resetToDefault();
+        Settings.KEPT_WORDS.resetToDefault();
+
+        SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+        assertEquals("spoiler\ngiveaway now", snapshot.hiddenChange());
+        assertEquals("my team", snapshot.keptChange());
+        assertEquals(0, snapshot.switchChanges());
+        assertEquals(2, SettingsBackup.apply(snapshot));
+        assertEquals("spoiler\ngiveaway now", Settings.HIDDEN_WORDS.savedValue());
+        assertEquals("my team", Settings.KEPT_WORDS.savedValue());
+        assertEquals("a file read back is the file", file, SettingsBackup.create());
+        assertEquals("the same lists again change nothing", 0, SettingsBackup.parse(file).changes().size());
+
+        Map<String, ?> before = store();
+        StringBuilder long51 = new StringBuilder("w0");
+        for (int i = 1; i <= 50; i++) long51.append("\nw").append(i);
+        for (Object refused : new Object[]{" spoiler", "spoiler\n", "spoiler\nSPOILER", "a", repeat('a', 61),
+                "spoiler\n\nleak", long51.toString(), 5, true, JSONObject.NULL, new JSONObject()}) {
+            for (Setting<?> list : Arrays.<Setting<?>>asList(SettingsBackup.HIDDEN, SettingsBackup.KEPT)) {
+                JSONObject hostile = new JSONObject(file);
+                hostile.getJSONObject("settings").put(list.key, refused);
+                try {
+                    SettingsBackup.parse(hostile.toString());
+                    fail("a file with the list " + printable(String.valueOf(refused)) + " was read");
+                } catch (SettingsBackup.Rejected rejected) {
+                    assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+                    assertFalse("the refusal quotes the list", rejected.getMessage().contains("spoiler"));
+                }
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // An empty list is a list: a file can clear one.
+        JSONObject emptied = new JSONObject(file);
+        emptied.getJSONObject("settings").put(SettingsBackup.KEPT.key, "");
+        SettingsBackup.Snapshot clearing = SettingsBackup.parse(emptied.toString());
+        assertEquals("", clearing.keptChange());
+        assertNull(clearing.hiddenChange());
+        SettingsBackup.apply(clearing);
+        assertEquals("", Settings.KEPT_WORDS.savedValue());
+
+        // A file from before the lists were carried leaves them alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.hidden);
+        assertNull(older.hiddenChange());
+        SettingsBackup.apply(older);
+        assertEquals("spoiler\ngiveaway now", Settings.HIDDEN_WORDS.savedValue());
+
+        // A waiting import keeps its lists across a rebuilt page only while they're clean.
+        Bundle state = snapshot.toBundle();
+        SettingsBackup.Snapshot back = SettingsBackup.Snapshot.fromBundle(state);
+        assertEquals("spoiler\ngiveaway now", back.hidden);
+        assertEquals("my team", back.kept);
+        state.putString("hidden_words", "spoiler\nSPOILER");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).hidden);
+    }
+
+    /** The preview and the toast say how many phrases each list will hold, never which. */
+    @Test
+    public void importOfTheWordListsSaysHowManyPhrasesEachHolds() {
+        assertEquals("Settings imported. Your list of words to hide will hold 2 words or phrases. Your list of words "
+                        + "that keep a post will be empty.",
+                SettingsBackupPreference.importedMessage(0, null, null, null, null, null, "spoiler\nleak", ""));
+        assertEquals("Settings imported. 1 switch changed. Your list of words to hide will be empty. Your list of "
+                        + "words that keep a post will hold 1 word or phrase.",
+                SettingsBackupPreference.importedMessage(1, null, null, null, null, null, "", "my team"));
+        String withFolder = SettingsBackupPreference.importedMessage(0, "Clips", null, null, null, null, "spoiler", null);
+        assertFalse(withFolder, withFolder.contains("spoiler"));
+        assertTrue(withFolder, withFolder.contains("1 word or phrase"));
     }
 
     /**

@@ -28,6 +28,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.preference.TwoStatePreference;
+import android.text.InputType;
 import android.text.Layout;
 import android.text.util.Linkify;
 import android.util.TypedValue;
@@ -55,6 +56,7 @@ import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
@@ -63,6 +65,7 @@ import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.Setting;
+import app.morphe.extension.shared.settings.StringSetting;
 import app.morphe.extension.shared.settings.preference.AbstractPreferenceFragment;
 import app.morphe.extension.shared.settings.preference.ClearLogBufferPreference;
 import app.morphe.extension.shared.settings.preference.ExportDiagnosticReportPreference;
@@ -238,7 +241,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 || build.contains(PatchFamily.STORIES_TRAY) || build.contains(PatchFamily.FEED_REELS)
                 || build.contains(PatchFamily.RETURN_REFRESH)
                 || build.contains(PatchFamily.AI_DETECTED_POSTS)
-                || build.contains(PatchFamily.SPONSORED_PROFILE_POSTS)) {
+                || build.contains(PatchFamily.SPONSORED_PROFILE_POSTS)
+                || build.contains(PatchFamily.POST_WORDS)) {
             PreferenceCategory feed = category(screen, L10n.t("News feed"));
             if (build.contains(PatchFamily.SPONSORED_POSTS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_SPONSORED_POSTS, L10n.t("Hide sponsored posts"),
@@ -293,6 +297,15 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("Posts that Facebook's own detection marks as made with AI. A post that only its "
                                 + "creator labelled as AI stays. It's off by default because it hasn't been tested "
                                 + "on a real feed yet.")));
+            }
+            if (build.contains(PatchFamily.POST_WORDS)) {
+                feed.addPreference(toggle(context, Settings.HIDE_POSTS_WITH_WORDS,
+                        L10n.t("Hide posts with words you choose"),
+                        L10n.t("Posts whose text has a word or phrase from your list below. A post with a word from "
+                                + "your keep list stays, and so does a post with no text. Your words only leave the "
+                                + "phone in a settings file you export.")));
+                feed.addPreference(wordsRow(context, Settings.HIDDEN_WORDS, true));
+                feed.addPreference(wordsRow(context, Settings.KEPT_WORDS, false));
             }
         }
 
@@ -1148,6 +1161,73 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         return L10n.f("Videos go to %1$s and photos to %2$s.", L10n.isolate(videos), L10n.isolate(photos));
     }
 
+    /**
+     * One of the word filter's two lists: the words that hide a post ([hides]), or the ones that keep
+     * it. What's typed is cleaned before it's kept, one phrase per line within the bounds
+     * {@link PostWords} holds every list to, so the row, the setting and the filter all read the
+     * same phrases. A toast says how many lines were left out, never which.
+     */
+    static WordsRow wordsRow(Context context, StringSetting setting, boolean hides) {
+        WordsRow row = new WordsRow(context, hides);
+        row.setKey(setting.key);
+        String title = hides ? L10n.t("Words to hide") : L10n.t("Words that keep a post");
+        row.setTitle(title);
+        row.setDialogTitle(title);
+        row.setDialogMessage(hides
+                ? L10n.f("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital "
+                        + "letters don't matter, and a phrase matches anywhere in a post's text, inside longer "
+                        + "words too.", PostWords.MAX_PHRASES, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH)
+                : L10n.f("A post with any of these stays, even when it also has a word to hide. One per line, up "
+                        + "to %1$d, each %2$d to %3$d characters long.", PostWords.MAX_PHRASES, PostWords.MIN_LENGTH,
+                        PostWords.MAX_LENGTH));
+        row.setPositiveButtonText(L10n.t("Save"));
+        // Android's own Cancel follows the activity's language, as the folder row's did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        EditText field = row.getEditText();
+        field.setSingleLine(false);
+        field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        field.setMinLines(3);
+        field.setMaxLines(8);
+        field.setHint(L10n.t("One word or phrase per line"));
+        row.setText(setting.savedValue());
+        row.setOnPreferenceChangeListener((preference, typed) -> {
+            String raw = typed == null ? "" : typed.toString();
+            String clean = PostWords.clean(raw);
+            if (clean.equals(raw)) return true;
+            // Keeps the clean list in place of what was typed, as the folder row does.
+            int leftOut = PostWords.leftOut(raw);
+            ((WordsRow) preference).setText(clean);
+            if (leftOut > 0) {
+                Utils.showToastLong(L10n.quantity(leftOut,
+                        "%1$d line was left out. A phrase needs %2$d to %3$d characters, one given twice counts "
+                                + "once, and a list holds %4$d.",
+                        "%1$d lines were left out. A phrase needs %2$d to %3$d characters, one given twice counts "
+                                + "once, and a list holds %4$d.",
+                        leftOut, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH, PostWords.MAX_PHRASES));
+            }
+            return false;
+        });
+        return row;
+    }
+
+    /**
+     * What a word list's row says: how many phrases it holds, and for the hide list how many posts
+     * it has hidden since Facebook started. Counts only, never a phrase.
+     */
+    static String wordsSummary(String stored, boolean hides) {
+        int phrases = PostWords.count(stored);
+        if (phrases == 0) {
+            return hides ? L10n.t("No words yet, so no post is hidden.") : L10n.t("No words yet.");
+        }
+        String summary = L10n.quantity(phrases, "%1$d word or phrase.", "%1$d words or phrases.", phrases);
+        int hidden = hides ? PostWords.hiddenSinceStart() : 0;
+        if (hidden > 0) {
+            summary += " " + L10n.quantity(hidden, "Hid %1$d post since Facebook started.",
+                    "Hid %1$d posts since Facebook started.", hidden);
+        }
+        return summary;
+    }
+
     private static Preference info(Context context, String title, String summary) {
         Preference preference = new Row(context);
         preference.setTitle(title);
@@ -1249,6 +1329,40 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         }
 
         /** Its edit dialog takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * A word list's row. Its summary follows its text, whoever sets it: the person, the shared page
+     * syncing it from the setting, or an import.
+     */
+    static final class WordsRow extends EditTextPreference {
+        final boolean hides;
+
+        WordsRow(Context context, boolean hides) {
+            super(context);
+            this.hides = hides;
+        }
+
+        @Override
+        public void setText(String text) {
+            super.setText(text);
+            setSummary(wordsSummary(text, hides));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its edit dialog takes the screen's colours, as the folder's does. */
         @Override
         protected void showDialog(Bundle state) {
             super.showDialog(state);

@@ -35,6 +35,7 @@ import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.EnumSetting;
@@ -49,16 +50,18 @@ import app.morphe.extension.shared.settings.StringSetting;
  * switches, which live in Facebook's own data, so a reinstall or a new phone started them all
  * over. This writes them to a JSON file the person chooses and reads one back.
  *
- * <p>Only the switches in {@link #ALLOWLIST} and the settings in {@link #VALUES} (the save folder,
- * the save quality, the video file name, the tab Facebook opens on and the order comments open
- * in) go out or come in. Pause, safe mode, the debug settings, the app language and the counters
- * Hushfacebook keeps for itself stay out, and so do the log, the diagnostic data and anything about
- * the person or the phone: a file is a format name, a version number, one true or false per switch,
- * one folder name, one quality, one file name template, one tab and one comment order. An import
- * applies what it read in one preference commit. A file that is too large, isn't JSON, names
- * something twice, holds a value of the wrong type, a folder or a template that isn't one clean
- * name, or a quality, tab or comment order this build doesn't offer, or comes from a newer version
- * changes nothing.
+ * <p>Only the switches in {@link #ALLOWLIST} and the settings in {@link #VALUES} (the word
+ * filter's two lists, the save folder, the save quality, the video file name, the tab Facebook
+ * opens on and the order comments open in) go out or come in. Pause, safe mode, the debug
+ * settings, the app language and the counters Hushfacebook keeps for itself stay out, and so do
+ * the log, the diagnostic data and anything about the person or the phone: a file is a format
+ * name, a version number, one true or false per switch, two word lists, one folder name, one
+ * quality, one file name template, one tab and one comment order. The word lists go only into the
+ * file the person picks, with the rest. An import applies what it read in one preference commit.
+ * A file that is too large, isn't JSON, names something twice, holds a value of the wrong type, a
+ * word list that isn't one clean list, a folder or a template that isn't one clean name, or a
+ * quality, tab or comment order this build doesn't offer, or comes from a newer version changes
+ * nothing.
  * <p>The release check stays out of the file: it puts the phone online, so it's switched on
  * from the phone's own screen, never by a file.
  *
@@ -93,6 +96,7 @@ public final class SettingsBackup {
             Settings.BLOCK_RETURN_REFRESH,
             Settings.HIDE_AI_DETECTED_POSTS,
             Settings.HIDE_AI_DETECTED_REELS,
+            Settings.HIDE_POSTS_WITH_WORDS,
             Settings.HIDE_SPONSORED_STORIES,
             Settings.HIDE_SUGGESTED_STORIES,
             Settings.BLOCK_STORY_AUTO_ADVANCE,
@@ -127,6 +131,15 @@ public final class SettingsBackup {
             Settings.BLOCK_HIGHLIGHT_NOTIFICATIONS,
             Settings.BLOCK_PEOPLE_YOU_MAY_KNOW_NOTIFICATIONS,
             Settings.BLOCK_NEARBY_NOTIFICATIONS));
+
+    /**
+     * The word filter's two lists, held in a file exactly as the settings row stores them: one
+     * phrase per line within {@link PostWords}' bounds. A value {@link PostWords#clean} would change
+     * refuses the whole file, as a switch that isn't true or false does, so a file can't slip in a
+     * list longer or looser than the row allows.
+     */
+    static final StringSetting HIDDEN = Settings.HIDDEN_WORDS;
+    static final StringSetting KEPT = Settings.KEPT_WORDS;
 
     /**
      * The one setting a file carries that isn't a switch: the folder saves go to. A file holds it
@@ -164,7 +177,7 @@ public final class SettingsBackup {
 
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(FOLDER, QUALITY, FILE_NAME, START, ORDER));
+            Arrays.<Setting<?>>asList(HIDDEN, KEPT, FOLDER, QUALITY, FILE_NAME, START, ORDER));
 
     /**
      * Bounds for the parser, well past anything this class writes, so a file built to be
@@ -234,6 +247,8 @@ public final class SettingsBackup {
         private static final String FILE_NAME_NAME = "file_name";
         private static final String START_NAME = "start_tab";
         private static final String ORDER_NAME = "comment_order";
+        private static final String HIDDEN_NAME = "hidden_words";
+        private static final String KEPT_NAME = "kept_words";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -252,17 +267,31 @@ public final class SettingsBackup {
         /** The order comments open in that the file holds, or null when it names none. */
         @Nullable
         final CommentOrder order;
+        /** The clean list of words to hide the file holds, or null when it names none. */
+        @Nullable
+        final String hidden;
+        /** The clean list of words that keep a post the file holds, or null when it names none. */
+        @Nullable
+        final String kept;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
         Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
                  @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order, int unknown) {
+            this(values, folder, quality, fileName, start, order, null, null, unknown);
+        }
+
+        Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                 @Nullable String hidden, @Nullable String kept, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
             this.fileName = fileName;
             this.start = start;
             this.order = order;
+            this.hidden = hidden;
+            this.kept = kept;
             this.unknown = unknown;
         }
 
@@ -287,6 +316,10 @@ public final class SettingsBackup {
             if (startChange != null) changes.put(START, startChange);
             CommentOrder orderChange = orderChange();
             if (orderChange != null) changes.put(ORDER, orderChange);
+            String hiddenChange = hiddenChange();
+            if (hiddenChange != null) changes.put(HIDDEN, hiddenChange);
+            String keptChange = keptChange();
+            if (keptChange != null) changes.put(KEPT, keptChange);
             return changes;
         }
 
@@ -334,6 +367,24 @@ public final class SettingsBackup {
             return order == null || order == ORDER.savedValue() ? null : order;
         }
 
+        /** The list of words to hide this file sets, or null when it names none or the one already set. */
+        @Nullable
+        String hiddenChange() {
+            return listChange(hidden, HIDDEN);
+        }
+
+        /** The list of words that keep a post this file sets, or null when it names none or the one already set. */
+        @Nullable
+        String keptChange() {
+            return listChange(kept, KEPT);
+        }
+
+        @Nullable
+        private static String listChange(@Nullable String list, StringSetting setting) {
+            if (list == null) return null;
+            return list.equals(PostWords.clean(setting.savedValue())) ? null : list;
+        }
+
         /** For the settings page's saved state, so a preview outlives the page being rebuilt. */
         Bundle toBundle() {
             Bundle switches = new Bundle();
@@ -347,6 +398,8 @@ public final class SettingsBackup {
             if (fileName != null) state.putString(FILE_NAME_NAME, fileName);
             if (start != null) state.putString(START_NAME, start.fileValue);
             if (order != null) state.putString(ORDER_NAME, order.fileValue);
+            if (hidden != null) state.putString(HIDDEN_NAME, hidden);
+            if (kept != null) state.putString(KEPT_NAME, kept);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -369,10 +422,14 @@ public final class SettingsBackup {
             }
             Object folder = state.get(FOLDER_NAME);
             Object fileName = state.get(FILE_NAME_NAME);
+            Object hidden = state.get(HIDDEN_NAME);
+            Object kept = state.get(KEPT_NAME);
             return new Snapshot(values, folder instanceof String && SaveFolder.isClean((String) folder)
                     ? (String) folder : null, DownloadQuality.fromFile(state.get(QUALITY_NAME)),
                     fileName instanceof String && FileNameTemplate.isClean((String) fileName) ? (String) fileName : null,
-                    StartTab.fromFile(state.get(START_NAME)), CommentOrder.fromFile(state.get(ORDER_NAME)), unknown);
+                    StartTab.fromFile(state.get(START_NAME)), CommentOrder.fromFile(state.get(ORDER_NAME)),
+                    hidden instanceof String && PostWords.isClean((String) hidden) ? (String) hidden : null,
+                    kept instanceof String && PostWords.isClean((String) kept) ? (String) kept : null, unknown);
         }
     }
 
@@ -391,6 +448,9 @@ public final class SettingsBackup {
         switches.put(FILE_NAME.key, FileNameTemplate.sanitize(FILE_NAME.savedValue()));
         switches.put(START.key, START.savedValue().fileValue);
         switches.put(ORDER.key, ORDER.savedValue().fileValue);
+        // The lists the filter reads, so a file never carries one an import would refuse.
+        switches.put(HIDDEN.key, PostWords.clean(HIDDEN.savedValue()));
+        switches.put(KEPT.key, PostWords.clean(KEPT.savedValue()));
         return new JSONObject()
                 .put(FORMAT_NAME, FORMAT)
                 .put(SCHEMA_NAME, SCHEMA)
@@ -479,6 +539,8 @@ public final class SettingsBackup {
         String fileName = null;
         StartTab start = null;
         CommentOrder order = null;
+        String hidden = null;
+        String kept = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -515,6 +577,16 @@ public final class SettingsBackup {
                 if (order == null) throw new Rejected(Reason.VALUE, "Not a comment order: " + name);
                 continue;
             }
+            if (HIDDEN.key.equals(name) || KEPT.key.equals(name)) {
+                Object value = values.opt(name);
+                // The setting's name only: a list's words stay out of what a refusal says.
+                if (!(value instanceof String) || !PostWords.isClean((String) value)) {
+                    throw new Rejected(Reason.VALUE, "Not one clean word list: " + name);
+                }
+                if (HIDDEN.key.equals(name)) hidden = (String) value;
+                else kept = (String) value;
+                continue;
+            }
             BooleanSetting setting = known.get(name);
             if (setting == null) {
                 // A name this build doesn't know, Pause and the debug settings included: left
@@ -533,7 +605,7 @@ public final class SettingsBackup {
             Boolean value = found.get(setting);
             if (value != null) ordered.put(setting, value);
         }
-        return new Snapshot(ordered, folder, quality, fileName, start, order, unknown);
+        return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, unknown);
     }
 
     /**

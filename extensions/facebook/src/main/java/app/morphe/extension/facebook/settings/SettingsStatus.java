@@ -42,6 +42,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean postWords() {
+        return false;
+    }
+
     public static boolean sponsoredStories() {
         return false;
     }

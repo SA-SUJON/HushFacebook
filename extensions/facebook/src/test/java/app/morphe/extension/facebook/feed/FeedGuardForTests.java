@@ -95,6 +95,20 @@ public final class FeedGuardForTests {
         return new BaseModelWithTree(FeedFilter.DISCOVER_UNIT_TYPE) { }.with(FeedFilter.UNCONNECTED_STORIES_FLAG, unconnected);
     }
 
+    /**
+     * The guard with the word filter's patch in, and none of the story flag rules, where any story's
+     * message is {@code message} and no story shares another. The hide list is whatever the test saved.
+     */
+    public static boolean hidesByWords(Object category, Object feedUnit, Object message) {
+        return FeedFilter.hideEdge(category, feedUnit, true, true, story -> null, false, GenAiLabel.PATCHED, false,
+                ShowcaseType.PATCHED, true, story -> message, story -> null);
+    }
+
+    /** A story's message, of the type Facebook's posts carry, holding [text]. */
+    public static BaseModelWithTree postText(String text) {
+        return new BaseModelWithTree(PostText.TEXT_TYPE_TAG).with(PostText.TEXT_FIELD, text);
+    }
+
     /** GenAI info of the type Facebook's detection writes, with its flag set to [flagged]. */
     public static BaseModelWithTree detectedInfo(boolean flagged) {
         return new BaseModelWithTree(GenAiLabel.DETECTED_INFO_TYPE_TAG).with(GenAiLabel.DETECTED_FLAG, flagged);
