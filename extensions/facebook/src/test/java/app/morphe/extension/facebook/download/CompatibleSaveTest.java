@@ -75,6 +75,9 @@ public class CompatibleSaveTest {
     private static final String ISSUE_11_ON = "video/mp4 avc1.64001f 720x1280 1200kbps 720p"
             + " + audio/mp4 mp4a.40.2 0x0 64kbps";
     private static final String KEPT = ", kept to files other apps can open";
+    /** A single file's line when the switch is why it was saved: why, never what formats it holds. */
+    private static final String TAKEN = ", taken over the manifest's better tracks, which aren't H.264 with AAC-LC "
+            + "or HE-AAC sound";
 
     private static String manifest(String videos, String sounds) {
         return "<MPD><Period><AdaptationSet mimeType=\"video/mp4\">" + videos
@@ -177,17 +180,35 @@ public class CompatibleSaveTest {
         // always has: one fetch and no join.
         report = reelSave(true, new ReelSource(HD, null, MANIFEST));
         assertFalse(report, report.contains("DASH manifest"));
-        assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)" + KEPT));
+        assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)" + TAKEN + "\n"));
+        assertFalse("the single file's formats were claimed as checked", report.contains(KEPT));
     }
 
-    /** No H.264 picture: the single MP4, which is Facebook's H.264 and AAC-LC file. */
+    /**
+     * A single file the save would take with the switch off too says nothing about other apps: no
+     * manifest at all, or a manifest whose best tracks don't beat the file.
+     */
+    @Test
+    public void aSingleFileTakenForItsOwnSakeSaysNothingOfOtherApps() throws Exception {
+        String report = reelSave(true, new ReelSource(HD, null, null));
+        assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)\n"));
+
+        String small = manifest(representation("avc1.64001e", 360, 640, 400_000, "360p", "h360"),
+                sound("mp4a.40.2", 64_000, "lc"));
+        report = reelSave(true, new ReelSource(HD, null, small));
+        assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)\n"));
+        assertFalse(report, report.contains("other apps"));
+        assertFalse(report, report.contains(TAKEN));
+    }
+
+    /** No H.264 picture: Facebook's single MP4, whose formats the save doesn't read. */
     @Test
     public void anAv1OnlyManifestSavesTheSingleFile() throws Exception {
         String report = reelSave(true, new ReelSource(HD, null, AV1_ONLY));
         assertTrue(report, report.contains("the manifest of the reel has no H.264 video with AAC-LC or HE-AAC sound, "
                 + "saving the single file instead"));
         assertFalse(report, report.contains("from its DASH manifest"));
-        assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)" + KEPT));
+        assertTrue(report, report.contains("saving video mp4 (720p) from 1 candidate(s): mp4 (720p)" + TAKEN + "\n"));
 
         report = reelSave(false, new ReelSource(HD, null, AV1_ONLY));
         assertTrue(report, report.contains("saving the reel from its DASH manifest: video/mp4 " + AV1));

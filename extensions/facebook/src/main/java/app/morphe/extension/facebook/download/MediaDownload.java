@@ -113,12 +113,14 @@ public final class MediaDownload {
             // says who posted the story and when.
             PlayerSources.Source source = PlayerSources.find(host);
             PostDetails details = PostDetails.ofCard(source == null ? null : source.videoId, host);
+            Dash dash = Dash.SINGLE_FILE;
             if (source != null) {
                 addIfUsable(urls, source.hdUrl);
-                if (beginDash(context, "the story video", source.manifest, urls, details)) return true;
+                dash = beginDash(context, "the story video", source.manifest, urls, details);
+                if (dash == Dash.STARTED) return true;
             }
 
-            return begin(context, urls, true, details);
+            return begin(context, urls, true, details, dash);
         } catch (Throwable t) {
             // Throwable and not Exception. A renamed field surfaces as NoSuchFieldError, and a
             // reflective call on a changed class surfaces as a LinkageError. Neither is an
@@ -179,9 +181,10 @@ public final class MediaDownload {
             List<String> urls = collectVideoUrls(host, hdField, sdField);
 
             String manifest = RenditionPicker.fieldValue(host, manifestField);
-            if (beginDash(context, "the reel", manifest, urls, details)) return true;
+            Dash dash = beginDash(context, "the reel", manifest, urls, details);
+            if (dash == Dash.STARTED) return true;
 
-            return begin(context, urls, true, details);
+            return begin(context, urls, true, details, dash);
         } catch (Throwable t) {
             HookStatus.threw(FamilyNames.REEL_DOWNLOAD, "reel save", t);
             failure(() -> "the video save could not start", t);
@@ -227,9 +230,10 @@ public final class MediaDownload {
                 return false;
             }
 
-            if (source != null && beginDash(context, "the video", source.manifest, urls, details)) return true;
+            Dash dash = source == null ? Dash.SINGLE_FILE : beginDash(context, "the video", source.manifest, urls, details);
+            if (dash == Dash.STARTED) return true;
 
-            return begin(context, urls, false, details);
+            return begin(context, urls, false, details, dash);
         } catch (Throwable t) {
             HookStatus.threw(FamilyNames.VIDEO_DOWNLOAD, "video save", t);
             failure(() -> "the video save could not start", t);
@@ -290,9 +294,11 @@ public final class MediaDownload {
      *
      * <p>[imagesToo] is false for a caller that knows the item is a video, so a thumbnail can't
      * stand in for a video it couldn't find. [details] is what the save knows of the post for the
-     * file name.
+     * file name. [dash] is how the item's manifest went, which the report line names when saves
+     * other apps can open are why the single file was taken.
      */
-    private static boolean begin(Context context, List<String> urls, boolean imagesToo, PostDetails details) {
+    private static boolean begin(Context context, List<String> urls, boolean imagesToo, PostDetails details,
+            Dash dash) {
         if (urls == null || urls.isEmpty()) {
             failure(() -> "nothing to save: the item carried no address", null);
             return false;
@@ -338,7 +344,7 @@ public final class MediaDownload {
         info(() -> "saving " + (isVideo ? "video" : "image")
             + " " + describe(chosen)
             + " from " + candidates + " candidate(s): " + all
-            + (isVideo ? qualityNote(quality) + compatibleNote(compatibleSaves()) : ""));
+            + (isVideo ? qualityNote(quality) + singleFileNote(dash) : ""));
 
         Downloader.Kind kind = isVideo ? Downloader.Kind.VIDEO : Downloader.Kind.IMAGE;
         start(safe, isVideo, details, fileJob(safe, chosen, kind));
@@ -379,9 +385,30 @@ public final class MediaDownload {
         }
     }
 
-    /** What the report adds to a save line that kept to files other apps can open. */
+    /** What the report adds to a DASH save line whose tracks were kept to what other apps can open. */
     private static String compatibleNote(boolean compatible) {
         return compatible ? ", kept to files other apps can open" : "";
+    }
+
+    /**
+     * What the report adds to a single file's save line when saves other apps can open took it over
+     * tracks the manifest would otherwise have saved. The single file's own formats aren't read, so
+     * the line says why it was taken, not what it holds.
+     */
+    private static String singleFileNote(Dash dash) {
+        return dash == Dash.SINGLE_FILE_FOR_OTHER_APPS
+            ? ", taken over the manifest's better tracks, which aren't H.264 with AAC-LC or HE-AAC sound"
+            : "";
+    }
+
+    /** How a manifest's save went. */
+    enum Dash {
+        /** Its tracks are being saved. */
+        STARTED,
+        /** It's left to the single file, as it would be with saves other apps can open off. */
+        SINGLE_FILE,
+        /** It's left to the single file because saves other apps can open ruled out the tracks that beat it. */
+        SINGLE_FILE_FOR_OTHER_APPS
     }
 
     /** The save of one single file at [url]: the job every save of a single file runs. */
@@ -451,13 +478,15 @@ public final class MediaDownload {
      *
      * <p>With saves other apps can open on ({@link #compatibleSaves}), the track is H.264 and its
      * sound AAC-LC or HE-AAC ({@link DashManifest#pick}). A manifest with no such pair leaves the
-     * save to the single file, which is Facebook's H.264 and AAC-LC MP4. With no single file either,
-     * the save takes the tracks it would take with the switch off and the report says so, since a
-     * file some apps turn down beats no file.
+     * save to the single file, Facebook's own MP4, whose formats aren't read here. With no single
+     * file either, the save takes the tracks it would take with the switch off and the report says
+     * so, since a file some apps turn down beats no file.
      *
-     * @return whether a download started. {@code false} lets the caller save a single file.
+     * @return {@link Dash#STARTED} when a download started. Otherwise the caller saves a single
+     *     file, and {@link Dash#SINGLE_FILE_FOR_OTHER_APPS} says the switch is why: with it off, the
+     *     manifest's tracks would have been saved instead.
      */
-    private static boolean beginDash(Context context, String label, String manifest, List<String> urls,
+    private static Dash beginDash(Context context, String label, String manifest, List<String> urls,
             PostDetails details) {
         List<DashManifest.Track> tracks = new ArrayList<>();
         for (DashManifest.Track track : DashManifest.parse(manifest)) {
@@ -476,15 +505,20 @@ public final class MediaDownload {
         }
 
         String fallback = RenditionPicker.bestVideo(urls, quality);
+        int fallbackQuality = fallback == null ? 0 : RenditionPicker.qualityOf(fallback);
         DashManifest.Pick kept = DashManifest.pick(tracks, allowAv1, quality, compatible);
         DashManifest.Pick pick = kept;
+        // What the switch off would pick: when that beats the single file and the kept pick
+        // doesn't, the switch is why the single file is saved.
+        DashManifest.Pick usual = compatible ? DashManifest.pick(tracks, allowAv1, quality, false) : kept;
+        Dash leftToFile = compatible && usual != null && beatsFile(usual.video, fallback, fallbackQuality, quality)
+            ? Dash.SINGLE_FILE_FOR_OTHER_APPS : Dash.SINGLE_FILE;
 
         if (kept == null && compatible) {
-            DashManifest.Pick usual = DashManifest.pick(tracks, allowAv1, quality, false);
             if (usual != null && fallback != null) {
                 info(() -> "the manifest of " + label + " has no H.264 video with AAC-LC or HE-AAC sound, "
                     + "saving the single file instead");
-                return false;
+                return leftToFile;
             }
             if (usual != null) {
                 info(() -> "nothing of " + label + " is in a format other apps can open, saving it as the switch "
@@ -497,22 +531,17 @@ public final class MediaDownload {
             if (manifest != null) {
                 info(() -> "the manifest of " + label + " has no track to save: " + tracks);
             }
-            return false;
+            return Dash.SINGLE_FILE;
         }
 
         DashManifest.Track video = pick.video;
         DashManifest.Track audio = pick.audio;
         boolean keptCompatible = kept != null && compatible;
-        int fallbackQuality = fallback == null ? 0 : RenditionPicker.qualityOf(fallback);
 
-        if (quality == DownloadQuality.BEST) {
-            if (video.shortSide() <= fallbackQuality) return false;
-        } else if (fallback != null && quality.compare(video.quality(), fallbackQuality) >= 0) {
-            return false;
-        }
+        if (!beatsFile(video, fallback, fallbackQuality, quality)) return keptCompatible ? leftToFile : Dash.SINGLE_FILE;
 
         Context safe = ready(context);
-        if (safe == null) return false;
+        if (safe == null) return Dash.SINGLE_FILE;
 
         info(() -> "saving " + label + " from its DASH manifest: " + video
             + (audio == null ? ", no sound track" : " + " + audio)
@@ -520,7 +549,18 @@ public final class MediaDownload {
             + qualityNote(quality) + compatibleNote(keptCompatible));
 
         start(safe, true, details, dashJob(safe, video, audio, fallback));
-        return true;
+        return Dash.STARTED;
+    }
+
+    /**
+     * Whether [video] suits [quality] better than the single file [fallback] of quality
+     * [fallbackQuality]: at the best quality a larger picture, below it a nearer fit. On a tie the
+     * single file wins, one fetch and no join.
+     */
+    private static boolean beatsFile(DashManifest.Track video, String fallback, int fallbackQuality,
+            DownloadQuality quality) {
+        if (quality == DownloadQuality.BEST) return video.shortSide() > fallbackQuality;
+        return fallback == null || quality.compare(video.quality(), fallbackQuality) < 0;
     }
 
     /**
