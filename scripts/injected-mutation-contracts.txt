@@ -5,8 +5,10 @@
 #   first-call <method reference> outside <package prefix>
 #   start-call <method reference> [in [static|instance] <(parameters)return, * for any run>] holding <string> [<string> ...]
 #   no-call <method reference> outside <package prefix>
-# A start-call rule picks its method by every string it names and its shape, and exactly one of
-# Facebook's methods may answer that; name as much as the patch itself finds the method by.
+#   next-call <method reference> after <method reference> [in [static|instance] <shape>] holding <string> [<string> ...]
+# A start-call or next-call rule picks its method by every string it names and its shape, and
+# exactly one of Facebook's methods may answer that; name as much as the patch itself finds the
+# method by.
 # Two feed guards stacked on addNewEdgeToCollection is the shape that broke builds before, and a
 # guard anywhere else filters nothing.
 single-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideEdge(Ljava/lang/Object;Ljava/lang/Object;)Z in addNewEdgeToCollection
@@ -55,7 +57,9 @@ no-call Landroid/content/pm/ShortcutManager;->updateShortcuts(Ljava/util/List;)Z
 no-call Landroid/content/pm/ShortcutManager;->removeAllDynamicShortcuts()V outside Lapp/morphe/extension/
 # A long press on the Facebook logo at the top of the feed opens the settings screen, the way in
 # for a launcher with no shortcut menu (#2). The settings patch sends the call that gives the logo
-# its touch listener to SettingsEntry, in the top bar's method holding the logo's trace section,
-# right after the logo gets its tap. Left out, the long press does nothing; on another call or
-# register, another view takes it.
-next-call Lapp/morphe/extension/facebook/settings/SettingsEntry;->setLogoTouchListener(Landroid/view/View;Landroid/view/View$OnTouchListener;)V after Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V holding WordmarkNavigationBar#createWordmarkView
+# its touch listener to SettingsEntry, in the top bar's logo builder, right after the logo gets its
+# tap. Left out, the long press does nothing; on another call or register, another view takes it.
+# The builder holds both of the logo's trace sections, and Redex makes it static and hands it a
+# context and the bar, which keeps its name (580 and 577 have one more static method of that shape
+# in the bar, holding neither section).
+next-call Lapp/morphe/extension/facebook/settings/SettingsEntry;->setLogoTouchListener(Landroid/view/View;Landroid/view/View$OnTouchListener;)V after Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V in static (Landroid/content/Context;Lcom/facebook/navigation/navbar/legacy/search/WordmarkNavigationBar;)V holding WordmarkNavigationBar#createWordmarkView WordmarkNavigationBar.initContents

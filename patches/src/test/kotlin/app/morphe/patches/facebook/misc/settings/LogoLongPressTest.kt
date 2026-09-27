@@ -138,16 +138,29 @@ class LogoLongPressTest {
 
     /**
      * The receipt refuses a patched build whose logo call isn't the stand-in, right after the logo
-     * gets its tap, in the method holding the logo's trace section. The rule names what the patch
-     * names, so a rename on one side can't leave the rule looking for something no build has.
+     * gets its tap, in the one method holding both of the logo's trace sections with the builder's
+     * shape, which the fixture test below pins on every declared build. The rule names what the
+     * patch names, so a rename on one side can't leave the rule looking for something no build has.
      */
     @Test
     fun theContractFileHoldsTheLogoHook() {
         val rules = File(RepoFiles.root, "scripts/injected-mutation-contracts.txt").readLines()
             .map { it.trim() }
             .filter { it.startsWith("next-call ") && it.contains("->setLogoTouchListener(") }
-        assertEquals(listOf("next-call $LOGO_TOUCH_STAND_IN after $LOGO_CLICK_CALL holding $CREATE_WORDMARK_VIEW"), rules)
+        assertEquals(
+            listOf(
+                "next-call $LOGO_TOUCH_STAND_IN after $LOGO_CLICK_CALL in static $builderShape " +
+                    "holding $CREATE_WORDMARK_VIEW $initContents",
+            ),
+            rules,
+        )
     }
+
+    /** The logo builder's shape on every declared build: static, a context and the bar in, nothing out. */
+    private val builderShape = "(Landroid/content/Context;$WORDMARK_NAVIGATION_BAR)V"
+
+    /** The builder's other trace section, which only it holds. */
+    private val initContents = "WordmarkNavigationBar.initContents"
 
     /** Where each declared build gives its logo the touch listener, and the registers it uses. */
     private data class Pin(val index: Int, val registers: List<Int>)
@@ -176,12 +189,13 @@ class LogoLongPressTest {
                 val builders = bar.methods.filter { holdsString(it, CREATE_WORDMARK_VIEW) }
                 assertEquals("${bundle.name}: methods holding the logo's trace section", 1, builders.size)
                 val builder = builders.single()
-                assertTrue("${bundle.name}: the builder isn't initContents", holdsString(builder, "WordmarkNavigationBar.initContents"))
+                assertTrue("${bundle.name}: the builder isn't initContents", holdsString(builder, initContents))
                 assertEquals(
                     "${bundle.name}: the builder's shape",
-                    listOf("Landroid/content/Context;", WORDMARK_NAVIGATION_BAR, "V"),
-                    builder.parameterTypes.map { it.toString() } + builder.returnType,
+                    builderShape,
+                    builder.parameterTypes.joinToString("", "(", ")") + builder.returnType,
                 )
+                assertTrue("${bundle.name}: the builder isn't static", AccessFlags.STATIC.isSet(builder.accessFlags))
                 val was = builder.instructions()
                 val index = logoTouchListenerIndex(builder)
                 assertEquals("${bundle.name}: where the logo gets its touch listener", pin.index, index)

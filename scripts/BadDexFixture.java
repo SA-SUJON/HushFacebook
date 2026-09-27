@@ -65,13 +65,15 @@ import java.util.Set;
  * five calls the settings patch sends to {@code SettingsEntry}, which makes the real ones, and
  * Facebook's Follow check for a reel's author row, holding its two surface names, with Clean up
  * Reels' call to {@code ReelDeclutter.hideFollowButton} first. And the top bar's method building
- * the Facebook logo, holding its trace section, where the settings patch sends the logo's touch
- * listener call to {@code SettingsEntry.setLogoTouchListener} right after the logo gets its tap.
- * And Facebook's emoji typeface provider, holding its end-to-end flag and its log tag, with Use
+ * the Facebook logo, holding its two trace sections, where the settings patch sends the logo's
+ * touch listener call to {@code SettingsEntry.setLogoTouchListener} right after the logo gets its
+ * tap. And Facebook's emoji typeface provider, holding its end-to-end flag and its log tag, with Use
  * the phone's emoji's call to {@code SystemEmoji.typeface} first.
- * Beside each method a start-call rule picks sit methods holding part of what it's picked by, as
- * Facebook's do: the tray controller, the refresh controller's onPause, two other methods naming
- * both surfaces and one holding the emoji provider's log tag alone.
+ * Beside each method a start-call or next-call rule picks sit methods holding part of what it's
+ * picked by: the tray controller, the refresh controller's onPause, two other methods naming both
+ * surfaces and one holding the emoji provider's log tag alone, as Facebook's do, and three top bar
+ * methods, which Facebook's bar doesn't have, so the logo rule has to name both sections and the
+ * builder's shape.
  *
  *   java -cp &lt;cli jar&gt; BadDexFixture.java &lt;outDir&gt;
  */
@@ -140,6 +142,12 @@ public class BadDexFixture {
     private static final String SETTINGS_ENTRY = "Lapp/morphe/extension/facebook/settings/SettingsEntry;";
 
     private static final String TOP_BAR = "Lfixture/TopBar;";
+    private static final String CONTEXT = "Landroid/content/Context;";
+    /** The home feed's top bar, a name Facebook keeps: its logo builder takes it after a context. */
+    private static final String WORDMARK_BAR = "Lcom/facebook/navigation/navbar/legacy/search/WordmarkNavigationBar;";
+    /** The logo builder's two trace sections, which the logo rule picks it by. */
+    private static final List<String> LOGO_SECTIONS = Arrays.asList(
+            "WordmarkNavigationBar#createWordmarkView", "WordmarkNavigationBar.initContents");
     private static final String VIEW = "Landroid/view/View;";
     private static final String ON_CLICK_LISTENER = "Landroid/view/View$OnClickListener;";
     private static final String ON_TOUCH_LISTENER = "Landroid/view/View$OnTouchListener;";
@@ -788,25 +796,74 @@ public class BadDexFixture {
         return sent ? invoke(LOGO_TOUCH_STAND_IN, view, 4) : onView(SET_ON_TOUCH_LISTENER, view, 4);
     }
 
+    /** One of the views and listeners the top bar keeps in fields. */
+    private static Instruction barField(int register, String name, String type) {
+        return new ImmutableInstruction22c(Opcode.IGET_OBJECT, register, 6, new ImmutableFieldReference(WORDMARK_BAR, name, type));
+    }
+
     /**
-     * Facebook's top bar building the Facebook logo, static: v0 free, v1 the logo, v2 a container
-     * around it, v3 the logo's tap and v4 a touch listener. It holds the logo's trace section, gives
-     * the container a touch listener of its own, then gives the logo its tap, its touch listener
-     * and its content description, in that order, the way 573, 577 and 580 do. [containerSent] and
-     * [logoSent] say which of the two touch listener calls went to the settings patch's stand-in,
-     * and [logoView] the register the logo's goes to.
+     * A static method of Facebook's top bar giving the logo its listeners, taking a context (v5)
+     * and the bar (v6) as the logo builder does: v0 takes each of [names] in turn, then v1 the
+     * logo, v2 a container around it, v3 the logo's tap and v4 a touch listener, from the bar's
+     * fields. It gives the container a touch listener of its own, then gives the logo its tap, its
+     * touch listener and its content description, in that order, the way 573, 577 and 580 do.
+     * [containerSent] and [logoSent] say which of the two touch listener calls went to the settings
+     * patch's stand-in, and [logoView] the register the logo's goes to.
      */
+    private static Method logoMethod(String name, List<String> names, boolean containerSent, boolean logoSent,
+            int logoView) {
+        List<Instruction> instructions = new ArrayList<>();
+        for (String held : names) {
+            instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(held)));
+        }
+        instructions.add(barField(1, "logo", VIEW));
+        instructions.add(barField(2, "container", VIEW));
+        instructions.add(barField(3, "tap", ON_CLICK_LISTENER));
+        instructions.add(barField(4, "touch", ON_TOUCH_LISTENER));
+        instructions.add(touchListener(containerSent, 2));
+        instructions.add(onView(SET_ON_CLICK_LISTENER, 1, 3));
+        instructions.add(touchListener(logoSent, logoView));
+        instructions.add(onView(SET_CONTENT_DESCRIPTION, 1, 0));
+        instructions.add(op(Opcode.RETURN_VOID));
+        return define(TOP_BAR, name, "V", true, new ImmutableMethodImplementation(7, instructions, null, null),
+                CONTEXT, WORDMARK_BAR);
+    }
+
+    /** A method of the top bar that loads [names] into v0 and returns, and takes [parameters]. */
+    private static Method holding(String name, boolean isStatic, List<String> names, String... parameters) {
+        List<Instruction> instructions = new ArrayList<>();
+        for (String held : names) {
+            instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(held)));
+        }
+        instructions.add(op(Opcode.RETURN_VOID));
+        int registers = 1 + (isStatic ? 0 : 1) + parameters.length;
+        return define(TOP_BAR, name, "V", isStatic, new ImmutableMethodImplementation(registers, instructions, null, null),
+                parameters);
+    }
+
     private static ClassDef topBar(boolean containerSent, boolean logoSent, int logoView) {
-        return new ImmutableClassDef(TOP_BAR, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
-                Collections.singletonList(define(TOP_BAR, "buildLogo", "V", true, body(5,
-                        new ImmutableInstruction21c(Opcode.CONST_STRING, 0,
-                                new ImmutableStringReference("WordmarkNavigationBar#createWordmarkView")), // 0
-                        touchListener(containerSent, 2),                                                     // 2
-                        onView(SET_ON_CLICK_LISTENER, 1, 3),                                                 // 5
-                        touchListener(logoSent, logoView),                                                   // 8
-                        onView(SET_CONTENT_DESCRIPTION, 1, 0),                                               // 11
-                        op(Opcode.RETURN_VOID)),                                                             // 14
-                        VIEW, VIEW, ON_CLICK_LISTENER, ON_TOUCH_LISTENER)));
+        return topBar(containerSent, logoSent, logoView, false, false);
+    }
+
+    /**
+     * Facebook's top bar. Its logo builder is static, takes a context and the bar, and holds the
+     * logo's two trace sections, with [containerSent], [logoSent] and [logoView] as logoMethod has
+     * them. Facebook's bar has nothing else holding either section, but beside the builder here
+     * sit three methods holding part of what the logo rule picks it by, so a rule naming less would
+     * pass a hook in one of them: one of the builder's shape holding the first section alone,
+     * which gives a view its tap and its touch listener as the builder does ([searchSent] sends
+     * that touch listener to the stand-in), one holding both that isn't static, and one holding
+     * both that takes the context alone. With [secondBuilder] a second method answers the rule.
+     */
+    private static ClassDef topBar(boolean containerSent, boolean logoSent, int logoView, boolean searchSent,
+            boolean secondBuilder) {
+        List<Method> methods = new ArrayList<>();
+        methods.add(logoMethod("buildLogo", LOGO_SECTIONS, containerSent, logoSent, logoView));
+        methods.add(logoMethod("buildSearch", LOGO_SECTIONS.subList(0, 1), false, searchSent, 1));
+        methods.add(holding("refreshLogo", false, LOGO_SECTIONS, CONTEXT, WORDMARK_BAR));
+        methods.add(holding("buildLogoFor", true, LOGO_SECTIONS, CONTEXT));
+        if (secondBuilder) methods.add(logoMethod("buildLogoAgain", LOGO_SECTIONS, false, false, 1));
+        return new ImmutableClassDef(TOP_BAR, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null, methods);
     }
 
     /** [classes] with the top bar replaced by [topBar]. */
@@ -1484,6 +1541,15 @@ public class BadDexFixture {
         dexes.put("bad-logo-hook-other-view", withTopBar(good(), topBar(false, true, 2)));
         // contract: both touch listener calls sent, so the container takes a long press too.
         dexes.put("bad-logo-hook-twice", withTopBar(good(), topBar(true, true, 1)));
+        // contract: the stand-in right after a tap, on the same view, but in a method holding the
+        // logo's first trace section alone, and the builder left as Facebook has it. The rule
+        // named that one section and counted calls in any method holding it, so this passed.
+        dexes.put("bad-logo-hook-decoy", withTopBar(good(), topBar(false, false, 1, true, false)));
+        // contract: the stand-in in the builder and in that other method too.
+        dexes.put("bad-logo-hook-also-elsewhere", withTopBar(good(), topBar(false, true, 1, true, false)));
+        // contract: a second method answering the logo rule, so it can't say which one the hook
+        // belongs in, although the hook is where it was.
+        dexes.put("bad-logo-two-builders", withTopBar(good(), topBar(false, true, 1, false, true)));
 
         // contract: each start-call hook put first in a method that holds the rule's first string
         // but isn't the one the patch hooks. A rule naming only that string counted any method
@@ -1500,6 +1566,9 @@ public class BadDexFixture {
         // contract: a second method answering the return-refresh rule, so it can't say which one
         // the hook belongs in, although the hook is where it was.
         dexes.put("bad-return-refresh-two-callbacks", replaced(good(), returnController(returnHook(), none, true)));
+        // contract: the Follow hook first in Facebook's check and first in the instance method
+        // naming both surfaces as well.
+        dexes.put("bad-follow-hook-also-elsewhere", replaced(good(), followCheck(followHook(), followHook())));
 
         // register: a helper the patch adds to one of the host's own classes, naming a register its
         // one-register body doesn't have. Only the extension's added methods were held to their

@@ -28,16 +28,19 @@
     start-call hook is also put first in a method holding part of what its rule picks by (the tray
     controller, onPause, another method naming both surfaces, a method holding the emoji
     provider's log tag alone), and one rule is given two methods to choose from; all five fail
-    naming the method the rule picks. A register out of range fails as its own finding:
+    naming the method the rule picks. The Follow hook is also put first in that other method as
+    well as in the check. A register out of range fails as its own finding:
     named by a helper added to a host class, as the upper half of a long read from the last
     register, as a long an extension method writes there, and in the feed guard. Each of the five
     ShortcutManager calls the settings patch sends to the
     extension is left in Facebook's code by a build of its own, which has to fail that call's no-call
     rule and no other, and the contract file may hold no no-call rule without such a build. The
     call that gives the Facebook logo its touch listener is left as Facebook makes it, the stand-in
-    is sent in place of the container's call instead, made on the container's register, or sent
-    twice, a build each, and each has to fail the logo's next-call rule for its own reason; the
-    contract file may hold no other next-call rule.
+    is sent in place of the container's call instead, made on the container's register, sent
+    twice, sent in another top bar method holding the logo's first trace section with the builder
+    left alone, or sent there as well as in the builder, and a second builder answers the rule, a
+    build each, and each has to fail the logo's next-call rule for its own reason; the contract
+    file may hold no other next-call rule.
     The good build carries the joins, copies and reads ART accepts, a zero tested against
     an object among them, so a check made stricter still has to pass them. Each bad build has to
     fail with findings of its own category only, so a check that fires for the wrong reason fails
@@ -631,8 +634,12 @@ try {
     # rule this suite builds no bad fixtures for can't pass on a count nobody checks.
     $logoHook = 'Lapp/morphe/extension/facebook/settings/SettingsEntry;->setLogoTouchListener(Landroid/view/View;Landroid/view/View$OnTouchListener;)V'
     $logoTap = 'Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V'
-    $logoBuilder = 'Lfixture/TopBar;->buildLogo(Landroid/view/View;Landroid/view/View;Landroid/view/View$OnClickListener;Landroid/view/View$OnTouchListener;)V'
-    $logoRule = "next-call $logoHook after $logoTap holding WordmarkNavigationBar#createWordmarkView"
+    $logoShape = '(Landroid/content/Context;Lcom/facebook/navigation/navbar/legacy/search/WordmarkNavigationBar;)V'
+    $logoBuilder = "Lfixture/TopBar;->buildLogo$logoShape"
+    $logoHeld = '"WordmarkNavigationBar#createWordmarkView" and "WordmarkNavigationBar.initContents" with the shape ' +
+        "static $logoShape"
+    $logoRule = "next-call $logoHook after $logoTap in static $logoShape holding " +
+        'WordmarkNavigationBar#createWordmarkView WordmarkNavigationBar.initContents'
     $nextCallRules = @(Get-Content -LiteralPath $contracts | Where-Object { $_ -match '^\s*next-call\s' } |
         ForEach-Object { ($_.Trim() -split '\s+') -join ' ' })
     Assert-True ($nextCallRules.Count -eq 1 -and $nextCallRules[0] -ceq $logoRule) `
@@ -732,6 +739,9 @@ try {
         'bad-logo-hook-other-call' = 'contract'
         'bad-logo-hook-other-view' = 'contract'
         'bad-logo-hook-twice' = 'contract'
+        'bad-logo-hook-decoy' = 'contract'
+        'bad-logo-hook-also-elsewhere' = 'contract'
+        'bad-logo-two-builders' = 'contract'
         'bad-finder-stub-not-filled' = 'contract'
         'bad-finder-stub-extension-call' = 'contract'
         'bad-finder-stub-call-after-return' = 'contract'
@@ -740,6 +750,7 @@ try {
         'bad-return-refresh-two-callbacks' = 'contract'
         'bad-follow-hook-wrong-method' = 'contract'
         'bad-emoji-hook-wrong-method' = 'contract'
+        'bad-follow-hook-also-elsewhere' = 'contract'
         'bad-register-added-helper' = 'register'
         'bad-register-wide-source' = 'register'
         'bad-register-own-wide' = 'register'
@@ -784,15 +795,21 @@ try {
     }
 
     # Each logo build fails on the logo rule alone, for its own reason: no stand-in, a stand-in not
-    # right after the logo's tap, one made on another view, or two.
+    # right after the logo's tap, one made on another view, two, one in another method holding the
+    # first trace section, one there as well as in the builder, or a second builder.
+    $logoSearch = "Lfixture/TopBar;->buildSearch$logoShape"
     $logoFails = [ordered]@{
-        'bad-logo-hook-missing' = "[diff] FAIL: contract: $logoHook has 0 call sites in methods holding " +
-            '"WordmarkNavigationBar#createWordmarkView", and must have exactly one'
+        'bad-logo-hook-missing' = "[diff] FAIL: contract: $logoHook is not called in $logoBuilder, the one method holding $logoHeld"
         'bad-logo-hook-other-call' = "[diff] FAIL: contract: $logoHook is called in $logoBuilder, but not right after $logoTap"
         'bad-logo-hook-other-view' = "[diff] FAIL: contract: $logoHook is called in $logoBuilder on v2, not on v1, " +
             "the register $logoTap is made on"
-        'bad-logo-hook-twice' = "[diff] FAIL: contract: $logoHook has 2 call sites in methods holding " +
-            "`"WordmarkNavigationBar#createWordmarkView`", and must have exactly one: $logoBuilder, $logoBuilder"
+        'bad-logo-hook-twice' = "[diff] FAIL: contract: $logoHook has 2 call sites in $logoBuilder, and must have exactly one"
+        'bad-logo-hook-decoy' = "[diff] FAIL: contract: $logoHook is not called in $logoBuilder, the one method holding " +
+            "$logoHeld; the host methods that call it: $logoSearch"
+        'bad-logo-hook-also-elsewhere' = "[diff] FAIL: contract: $logoHook is called in $logoSearch as well as in " +
+            "$logoBuilder, the one method holding $logoHeld"
+        'bad-logo-two-builders' = "[diff] FAIL: contract: 2 methods hold $logoHeld, and exactly one must, so the rule " +
+            "can't say which one calls ${logoHook}: $logoBuilder, Lfixture/TopBar;->buildLogoAgain$logoShape"
     }
     foreach ($case in $logoFails.GetEnumerator()) {
         $fails = @((Get-Findings $badResults[$case.Key]).Fails)
@@ -830,6 +847,10 @@ try {
             'is not called in Lfixture/EmojiProvider;->emojiTypeface()Landroid/graphics/Typeface;, the one method holding ' +
             '"fb.e2e.force_system_emoji_font" and "FacebookEmojiTypefaceProviderImpl" with the shape instance ' +
             '()Landroid/graphics/Typeface;; the host methods that call it: Lfixture/EmojiProvider;->loggedTypeface()Landroid/graphics/Typeface;'))
+        'bad-follow-hook-also-elsewhere' = @(('*contract: Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton()Z ' +
+            'is called in Lfixture/FollowCheck;->offersFollowHere(Lcom/facebook/auth/usersession/FbUserSession;)Z as well as in ' +
+            'Lfixture/FollowCheck;->offersFollow(Lcom/facebook/auth/usersession/FbUserSession;)Z, the one method holding ' +
+            '"friendly_feed" and "friends_tab_ifu" with the shape static (Lcom/facebook/auth/usersession/FbUserSession;*)Z'))
         'bad-return-refresh-two-callbacks' = @(('*contract: 2 methods hold "FeedRefreshTriggerController" and "onRefresh", and exactly ' +
             'one must, so the rule can''t say which one calls Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z: *' +
             'Lfixture/ReturnController;->resume*(Ljava/lang/Object;)V, Lfixture/ReturnController;->resume*(Ljava/lang/Object;)V'))
@@ -901,7 +922,13 @@ try {
             "next-call $logoHook after $logoTap in WordmarkNavigationBar#createWordmarkView",
             "next-call $logoHook before $logoTap holding WordmarkNavigationBar#createWordmarkView",
             "next-call $logoHook after $logoTap holding",
-            "next-call $logoHook after $logoTap holding WordmarkNavigationBar#createWordmarkView and more")) {
+            "next-call $logoHook holding WordmarkNavigationBar#createWordmarkView",
+            "next-call $logoHook after $logoTap holding tofu tofu",
+            "next-call $logoHook after $logoTap in static holding tofu",
+            "next-call $logoHook after $logoTap in static $logoShape",
+            "next-call $logoHook after $logoTap in sometimes $logoShape holding tofu",
+            "next-call $logoHook after $logoTap in static Landroid/content/Context;)V holding tofu",
+            "next-call $logoHook after $logoTap tofu holding tofu")) {
         [System.IO.File]::WriteAllText($badContract, "# a comment line first`n$line`n")
         $unreadableFirstCall = Invoke-DexDiff -Clean $cleanApk -Patched (Join-Path $caseRoot 'good.apk') `
             -Allowlist $emptyAllowlist -Name 'bad-first-call-contract' -Contracts $badContract
