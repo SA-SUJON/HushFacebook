@@ -120,6 +120,107 @@ public class ExternalBrowserTest {
                 unwrap("https://fb.me/x?u=https%3A%2F%2Fexample.org").toString());
     }
 
+    /**
+     * Every form of the link shim Facebook's own code knows on 577 and 580 gives up its
+     * destination: /l.php on facebook.com, its subdomains and fb.me, Messenger's /si/ajax/l/, and
+     * the browser's three warning pages.
+     */
+    @Test
+    public void everyShimFormFacebookKnowsGivesUpItsDestination() throws Exception {
+        String destination = "u=https%3A%2F%2Fexample.org%2Fa%3Fb%3D1";
+        for (String shim : new String[]{
+                "https://l.facebook.com/l.php?" + destination + "&h=AT0x",
+                "https://lm.facebook.com/l.php?" + destination + "&h=AT0x",
+                "https://m.facebook.com/l.php?" + destination,
+                "https://www.facebook.com/l.php?" + destination,
+                "https://facebook.com/l.php?" + destination,
+                "https://fb.me/l.php?" + destination,
+                "https://www.facebook.com/si/ajax/l/render_redirect/?" + destination,
+                "https://lm.facebook.com/flx/warn/?" + destination + "&h=AT0x",
+                "https://www.facebook.com/fblynx/warn/?" + destination,
+                "https://m.facebook.com/si/linkclick/warn/?" + destination}) {
+            assertEquals(shim, "https://example.org/a?b=1", unwrap(shim).toString());
+        }
+    }
+
+    /** Messenger's older shim keeps its destination in the path, with http:// when it names no scheme. */
+    @Test
+    public void theOlderShimGivesUpTheDestinationInItsPath() throws Exception {
+        assertEquals("http://example.org/a", unwrap("https://www.facebook.com/l/AQDx1;example.org/a").toString());
+        assertEquals("https://example.org/a", unwrap("https://l.facebook.com/l/AQDx1/https://example.org/a").toString());
+        // Not the path the pattern reads: the link stays, as it does in Facebook.
+        assertEquals("https://www.facebook.com/l/", unwrap("https://www.facebook.com/l/").toString());
+    }
+
+    /** A shim inside a shim unwraps to the end, as Facebook's own unwrapping does. */
+    @Test
+    public void aShimInsideAShimUnwrapsToTheEnd() throws Exception {
+        String inner = "https://lm.facebook.com/flx/warn/?u=" + Uri.encode("https://example.org/a");
+        assertEquals("https://example.org/a",
+                unwrap("https://l.facebook.com/l.php?u=" + Uri.encode(inner) + "&h=AT0x").toString());
+    }
+
+    /**
+     * A Facebook page that merely carries a "u" isn't a shim. Sharing a link, the share dialog and
+     * any other page keep their parameters and stay in the app.
+     */
+    @Test
+    public void facebookPagesWithAUAreNotShims() throws Exception {
+        for (String page : new String[]{
+                "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fexample.org%2F",
+                "https://m.facebook.com/sharer.php?u=https%3A%2F%2Fexample.org%2F",
+                "https://www.facebook.com/dialog/share?app_id=1&href=https%3A%2F%2Fexample.org%2F"
+                        + "&u=https%3A%2F%2Fexample.org%2F",
+                "https://www.facebook.com/profile.php?id=4&u=https%3A%2F%2Fexample.org%2F"}) {
+            assertEquals(page, page, unwrap(page).toString());
+            Activity browser = browserWith(page);
+            assertFalse(page, ExternalBrowser.redirect(browser, browser.getIntent()));
+            assertNull(page, shadowOf(browser).getNextStartedActivity());
+        }
+    }
+
+    /**
+     * Messenger's web shim, the one Meta wraps links in chats with, unwraps too, and the link goes
+     * out. Facebook's own checks don't name it, and left wrapped the link stayed in the app.
+     */
+    @Test
+    public void messengersWebShimGivesUpItsDestination() throws Exception {
+        String shim = "https://l.messenger.com/l.php?u=https%3A%2F%2Fexample.org%2Fa%3Fb%3D1&h=AT0x";
+        assertEquals("https://example.org/a?b=1", unwrap(shim).toString());
+        assertEquals("https://example.org/a?b=1",
+                unwrap("https://www.messenger.com/l.php?u=https%3A%2F%2Fexample.org%2Fa%3Fb%3D1").toString());
+
+        Activity browser = browserWith(shim);
+        assertTrue(ExternalBrowser.redirect(browser, browser.getIntent()));
+        assertEquals("https://example.org/a?b=1", shadowOf(browser).getNextStartedActivity().getDataString());
+    }
+
+    /** A Messenger page that merely carries a "u" isn't a shim, and stays in the app as it came. */
+    @Test
+    public void aMessengerPageWithAUIsNotAShim() throws Exception {
+        String page = "https://www.messenger.com/t/12345?u=https%3A%2F%2Fexample.org%2F";
+        assertEquals(page, unwrap(page).toString());
+        Activity browser = browserWith(page);
+        assertFalse(ExternalBrowser.redirect(browser, browser.getIntent()));
+        assertNull(shadowOf(browser).getNextStartedActivity());
+    }
+
+    /**
+     * The other shim forms only count on the hosts Facebook's code names them on: the warning pages
+     * are the browser's pattern, which asks for https on a subdomain of facebook.com.
+     */
+    @Test
+    public void shimsOnlyCountOnTheHostsFacebookNames() throws Exception {
+        for (String link : new String[]{
+                "https://l.messenger.com/flx/warn/?u=https%3A%2F%2Fexample.org%2F",
+                "https://fb.me/flx/warn/?u=https%3A%2F%2Fexample.org%2F",
+                "https://facebook.com/flx/warn/?u=https%3A%2F%2Fexample.org%2F",
+                "http://lm.facebook.com/flx/warn/?u=https%3A%2F%2Fexample.org%2F",
+                "https://notfacebook.com/l.php?u=https%3A%2F%2Fexample.org%2F"}) {
+            assertEquals(link, link, unwrap(link).toString());
+        }
+    }
+
     /** Lower-cased in the phone's language, Turkish turned the I of FB.AUDIO into a dotless one. */
     @Test
     public void hostsCompareTheSameInTurkish() {

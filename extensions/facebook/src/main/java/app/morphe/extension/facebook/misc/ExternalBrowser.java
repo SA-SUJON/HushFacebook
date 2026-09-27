@@ -11,6 +11,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.Logger;
@@ -52,7 +56,7 @@ public final class ExternalBrowser {
     private static final String SOURCE = "ExternalBrowser";
 
     /**
-     * The hosts that stay in the in-app browser, and the only ones a link shim sits on.
+     * The hosts that stay in the in-app browser.
      *
      * <p>Login, checkout and the web pages of Facebook need the JavaScript bridges and the autofill
      * of the in-app browser. No other browser has them.
@@ -67,7 +71,8 @@ public final class ExternalBrowser {
     /**
      * Facebook's short links, which stay in the in-app browser too. Facebook's manifest claims
      * each of them, but a re-signed Facebook fails Android's check of that claim, so a browser
-     * given one opened Facebook's page on the web instead of in the app. They aren't shim hosts.
+     * given one opened Facebook's page on the web instead of in the app. None of them is a shim
+     * host, except fb.me for /l.php, which Facebook's own shim check counts.
      */
     private static final String[] SHORT_LINK_HOSTS = {
         "fb.watch",
@@ -77,6 +82,22 @@ public final class ExternalBrowser {
         "fb.audio",
         "m.me",
     };
+
+    /**
+     * The in-app browser's link warning pages, a shim of their own. The browser knows them by a
+     * pattern that asks for https on a subdomain of facebook.com.
+     */
+    private static final String[] WARNING_PATHS = {
+        "/flx/warn/",
+        "/fblynx/warn/",
+        "/si/linkclick/warn/",
+    };
+
+    /** Messenger's older shim, /l/&lt;signature&gt;;&lt;destination&gt;, read the way Messenger reads it. */
+    private static final Pattern PATH_SHIM = Pattern.compile("^/l/([a-zA-Z0-9_.-]*)(?:;|/)(.*)$");
+
+    /** How many shims deep a link is followed. Facebook's own unwrapping loops the same way. */
+    private static final int MAX_SHIMS = 8;
 
     /**
      * Gives the URL of {@code intent} to the system browser and closes the in-app browser.
@@ -129,22 +150,87 @@ public final class ExternalBrowser {
      * tracker of Facebook, and it is on a host that Facebook owns.
      *
      * <p>As a result each outbound link looks internal, and each one stays in the in-app browser.
-     * This was the fault that the device test of 2026-09-19 found. The {@code /flx/warn/}
-     * interstitial of Facebook has the same shape.
+     * This was the fault that the device test of 2026-09-19 found.
      *
      * <p>The destination goes out, and the shim does not. Thus the browser makes one request and
-     * not two, and Facebook does not learn that the link opened.
+     * not two, and Facebook does not learn that the link opened. A shim inside a shim unwraps to
+     * the end.
      */
     private static Uri unwrapLinkShim(Uri uri) {
-        // A shim is always on a host of Facebook. Each other URL is already the destination.
-        if (uri.isOpaque() || !isInternalHost(uri.getHost())) return uri;
+        Uri target = uri;
+        for (int depth = 0; depth < MAX_SHIMS; depth++) {
+            Uri inner = shimDestination(target);
+            if (inner == null) break;
+            target = inner;
+        }
+        return target;
+    }
 
-        String wrapped = uri.getQueryParameter("u");
-        if (wrapped == null) return uri;
+    /**
+     * The destination {@code uri} wraps, or null when it is no link shim or wraps no web link.
+     *
+     * <p>The shims are the ones Facebook's own code knows on 577 and 580, host and path
+     * (LinkShimFixtureTest), plus Messenger's web shim:
+     * <ul>
+     *   <li>{@code /l.php} on facebook.com, a subdomain of it, or fb.me. It's the check the rest of
+     *       the app asks, and it reads the destination from {@code u}.</li>
+     *   <li>{@code /l.php} on messenger.com or a subdomain, reading {@code u}. l.messenger.com is
+     *       Meta's shim host for links in chats. Neither build's own checks name it, but it's kept
+     *       beyond Facebook's lists because a chat link wrapped that way would otherwise look like
+     *       a Messenger page and stay in the in-app browser, the fault of 2026-09-19.</li>
+     *   <li>{@code /si/ajax/l/...} and {@code /l/...} on facebook.com or a subdomain, Messenger's
+     *       check for the links on its message cards. The first reads {@code u}. The second holds
+     *       the destination in its path, with http:// in front when it names no scheme.</li>
+     *   <li>The in-app browser's warning pages, {@code /flx/warn/}, {@code /fblynx/warn/} and
+     *       {@code /si/linkclick/warn/}, over https on a subdomain of facebook.com, reading
+     *       {@code u}.</li>
+     * </ul>
+     * Facebook's host check also turns away hosts starting "our.intern.", Meta's own intranet,
+     * which no link on a phone reaches. Any other page, sharer.php and the share dialog among them,
+     * keeps its "u", which there names the page to share and not a destination.
+     */
+    private static Uri shimDestination(Uri uri) {
+        if (uri.isOpaque()) return null;
+        String host = uri.getHost();
+        String path = uri.getPath();
+        if (host == null || path == null) return null;
 
-        // A "u" that is not an absolute web URL belongs to some other page. Keep the URL as it is.
+        host = host.toLowerCase(Locale.ROOT);
+        boolean subdomain = host.endsWith(".facebook.com");
+        boolean facebook = subdomain || host.equals("facebook.com");
+        boolean messenger = host.equals("messenger.com") || host.endsWith(".messenger.com");
+
+        String wrapped;
+        if (path.equals("/l.php")) {
+            if (!facebook && !messenger && !host.equals("fb.me")) return null;
+            wrapped = uri.getQueryParameter("u");
+        } else if (facebook && path.startsWith("/si/ajax/l/")) {
+            wrapped = uri.getQueryParameter("u");
+        } else if (facebook && path.startsWith("/l/")) {
+            Matcher inPath = PATH_SHIM.matcher(path);
+            if (!inPath.matches()) return null;
+            wrapped = inPath.group(2);
+            if (Uri.parse(wrapped).getScheme() == null) wrapped = "http://" + wrapped;
+        } else if (subdomain && "https".equalsIgnoreCase(uri.getScheme()) && isWarningPage(path)) {
+            wrapped = uri.getQueryParameter("u");
+        } else {
+            return null;
+        }
+        if (wrapped == null) return null;
+
+        // A destination that is not an absolute web URL belongs to some other page. Keep the URL
+        // as it is.
         Uri target = Uri.parse(wrapped);
-        return isWebUrl(target) ? target : uri;
+        String targetHost = target.getHost();
+        return isWebUrl(target) && targetHost != null && !targetHost.isEmpty() ? target : null;
+    }
+
+    /** Whether {@code path} is one of the browser's warning pages, compared as its pattern does, in any case. */
+    private static boolean isWarningPage(String path) {
+        for (String warning : WARNING_PATHS) {
+            if (path.regionMatches(true, 0, warning, 0, warning.length())) return true;
+        }
+        return false;
     }
 
     /**
@@ -177,7 +263,7 @@ public final class ExternalBrowser {
     private static boolean isOn(String host, String[] domains) {
         if (host == null) return false;
 
-        String lower = host.toLowerCase(java.util.Locale.ROOT);
+        String lower = host.toLowerCase(Locale.ROOT);
         for (String domain : domains) {
             // The dot keeps "notfacebook.com" from a match with "facebook.com".
             if (lower.equals(domain) || lower.endsWith("." + domain)) return true;
