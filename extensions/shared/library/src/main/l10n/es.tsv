@@ -281,3 +281,11 @@ Videos, reels, stories and music wait for your tap before they play. Facebook's 
 Marketplace only	Solo Marketplace
 # context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
 The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.	La barra de pestañas conserva Marketplace, Notificaciones y tu perfil o el Menú, y Facebook se abre en Marketplace. Inicio con el feed, Video, Amigos y las demás pestañas desaparecen. Las notificaciones y los enlaces siguen abriéndose donde apuntan.
+# context: switch title under Menu; Upgrades is the name of a section in Facebook's own Menu
+Hide Upgrades	Ocultar “Mejoras”
+# context: summary of that switch; Settings and Help and support are Facebook's own Menu sections
+The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.	La sección “Mejoras” y sus ofertas desaparecen del menú de Facebook. Configuración, Ayuda y soporte técnico y el resto del menú se quedan.
+# context: switch title under Menu; Also from Meta is the name of a section in Facebook's own Menu
+Hide Also from Meta	Ocultar “También de Meta”
+# context: summary of that switch; the section links to Meta's other apps and shows ads for its devices
+The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.	La sección “También de Meta” desaparece del menú de Facebook, con sus enlaces a las otras apps de Meta y sus anuncios de dispositivos de Meta. Tus propios accesos directos se quedan.

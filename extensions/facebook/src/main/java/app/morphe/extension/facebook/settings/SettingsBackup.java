@@ -108,7 +108,9 @@ public final class SettingsBackup {
             Settings.DOWNLOAD_COMPATIBLE,
             Settings.OPEN_ON_CHOSEN_TAB,
             Settings.MARKETPLACE_ONLY,
-            Settings.HIDE_GET_MESSENGER_CARD));
+            Settings.HIDE_GET_MESSENGER_CARD,
+            Settings.HIDE_MENU_UPGRADES,
+            Settings.HIDE_MENU_ALSO_FROM_META));
 
     /**
      * The one setting a file carries that isn't a switch: the folder saves go to. A file holds it

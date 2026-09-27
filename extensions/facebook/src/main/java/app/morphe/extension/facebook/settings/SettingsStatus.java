@@ -137,4 +137,8 @@ public final class SettingsStatus {
     public static boolean messengerCard() {
         return false;
     }
+
+    public static boolean menuPromotions() {
+        return false;
+    }
 }

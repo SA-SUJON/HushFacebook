@@ -42,6 +42,7 @@ public final class FamilyNames {
     public static final String START_TAB = "Open on a chosen tab";
     public static final String MARKETPLACE_ONLY = "Marketplace only";
     public static final String MESSENGER_CARD = "Hide the Get Messenger card";
+    public static final String MENU_PROMOTIONS = "Hide Menu promotions";
     public static final String AD_PREFETCH = "Block background ad prefetch";
     public static final String AD_TELEMETRY = "Block ad telemetry";
     public static final String AUDIENCE_NETWORK = "Disable Audience Network";

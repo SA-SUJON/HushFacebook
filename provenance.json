@@ -284,6 +284,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: tap to play. The patch finds FbGrootPlayer's play, its inner pause and its bind in Facebook 577 and 580 by the trace strings they keep, the older Rich Video Player's playback controller by its play and pause log lines, Facebook's Autoplay settings checker by the refusal its constructor names it in, and FbFragmentActivity's touch dispatch by its framework name. The extension holds a start unless the player is already playing something a tap started, the start's EventTriggerType is one only something you did sends, or a tap ended within a second and the trigger isn't one Facebook sends because something came into view or came back. The Autoplay setting reads Off while the switch is on, and nothing is written to it."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/menu/**",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/menu/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the Upgrades and Also from Meta sections of Facebook's Menu. Facebook 577 and 580 type each Menu group with one enum under kept names, UPSELL and PRODUCTS_FROM_FACEBOOK among them, and build every group from a native section and a section for what the server sends with it. The patch finds the first by the one children builder loading upsell_bookmarks_key and the second by the one loading ABOVE_NATIVE, REPLACE_NATIVE and BELOW_NATIVE, and asks the extension about the group right after each reads it. A yes hands back an empty list of children, built the way the section builds its own. Each group has its own switch, and every other group is left as Facebook built it."
     }
   ]
 }

@@ -181,6 +181,20 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_get_messenger_card", TRUE);
 
     /**
+     * The Upgrades section of Facebook's Menu, the group Facebook types UPSELL, with its offers.
+     * Only that group goes: Settings, Help and support and the rest of the Menu stay.
+     */
+    public static final BooleanSetting HIDE_MENU_UPGRADES =
+            new BooleanSetting("hushfacebook_hide_menu_upgrades", TRUE);
+
+    /**
+     * The Also from Meta section of Facebook's Menu, the group Facebook types
+     * PRODUCTS_FROM_FACEBOOK: its links to Meta's other apps and its cards for Meta's devices.
+     */
+    public static final BooleanSetting HIDE_MENU_ALSO_FROM_META =
+            new BooleanSetting("hushfacebook_hide_menu_also_from_meta", TRUE);
+
+    /**
      * Once a day, when Facebook starts, ask api.github.com whether a newer Hushfacebook release is
      * out, and say so on the settings screen ({@link ReleaseCheck}). It's the settings entry's own
      * switch rather than a patch's, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off

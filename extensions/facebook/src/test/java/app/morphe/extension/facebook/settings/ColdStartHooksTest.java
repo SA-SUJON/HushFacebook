@@ -44,6 +44,7 @@ import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
+import app.morphe.extension.facebook.menu.MenuSectionsForTests;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
@@ -153,6 +154,8 @@ public class ColdStartHooksTest {
         assertFalse("a tab bar built before the context lost Home", MarketplaceOnlyForTests.hidesHome());
         assertFalse("a Chats list built before the context lost the Get Messenger card",
                 MessengerCardForTests.hidesWithMessenger());
+        assertFalse("a Menu built before the context lost its Upgrades", MenuSectionsForTests.hidesUpgrades());
+        assertFalse("a Menu built before the context lost Also from Meta", MenuSectionsForTests.hidesServerAlsoFromMeta());
         assertTrue("a player start before the context was held",
                 TapToPlay.allowStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY));
         assertTrue("an older player start before the context was held",

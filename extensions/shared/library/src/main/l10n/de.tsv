@@ -281,3 +281,11 @@ Videos, reels, stories and music wait for your tap before they play. Facebook's 
 Marketplace only	Nur Marketplace
 # context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
 The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed, Video, Friends and the other tabs go. Notifications and links still open where they lead.	Die Tab-Leiste behält Marketplace, Benachrichtigungen und dein Profil oder das Menü, und Facebook öffnet sich im Marketplace. Die Startseite mit dem Newsfeed, Video, Freunde und die übrigen Tabs verschwinden. Benachrichtigungen und Links öffnen weiterhin dort, wohin sie führen.
+# context: switch title under Menu; Upgrades is the name of a section in Facebook's own Menu
+Hide Upgrades	„Upgrades“ ausblenden
+# context: summary of that switch; Settings and Help and support are Facebook's own Menu sections
+The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.	Der Bereich „Upgrades“ mit seinen Angeboten verschwindet aus dem Facebook-Menü. Einstellungen, Hilfe und Support und der Rest des Menüs bleiben.
+# context: switch title under Menu; Also from Meta is the name of a section in Facebook's own Menu
+Hide Also from Meta	„Auch von Meta“ ausblenden
+# context: summary of that switch; the section links to Meta's other apps and shows ads for its devices
+The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.	Der Bereich „Auch von Meta“ verschwindet aus dem Facebook-Menü, mit seinen Links zu Metas anderen Apps und seiner Werbung für Metas Geräte. Deine eigenen Verknüpfungen bleiben.

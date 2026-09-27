@@ -379,6 +379,16 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                             + "is installed. Without Messenger it stays, so you can still install it from there.")));
         }
 
+        if (build.contains(PatchFamily.MENU_PROMOTIONS)) {
+            PreferenceCategory menu = category(screen, L10n.t("Menu"));
+            menu.addPreference(toggle(context, Settings.HIDE_MENU_UPGRADES, L10n.t("Hide Upgrades"),
+                    L10n.t("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support "
+                            + "and the rest of the Menu stay.")));
+            menu.addPreference(toggle(context, Settings.HIDE_MENU_ALSO_FROM_META, L10n.t("Hide Also from Meta"),
+                    L10n.t("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps "
+                            + "and its ads for Meta's devices. Your own shortcuts stay.")));
+        }
+
         if (build.contains(PatchFamily.EXTERNAL_BROWSER) || build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {
             PreferenceCategory links = category(screen, L10n.t("Links"));
             if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {

@@ -54,6 +54,7 @@ import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
+import app.morphe.extension.facebook.menu.MenuSectionsForTests;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
@@ -286,6 +287,13 @@ public class PausedHooksTest {
         probes.put(PatchFamily.MARKETPLACE_ONLY, Collections.singletonList(MarketplaceOnlyForTests::hidesHome));
         // With Messenger installed, the card's show question answers no in Chats.
         probes.put(PatchFamily.MESSENGER_CARD, Collections.singletonList(MessengerCardForTests::hidesWithMessenger));
+        // The Menu's Upgrades and Also from Meta groups build nothing, in the section Facebook
+        // draws and in the one carrying what the server sends.
+        probes.put(PatchFamily.MENU_PROMOTIONS, Arrays.asList(
+                MenuSectionsForTests::hidesUpgrades,
+                MenuSectionsForTests::hidesAlsoFromMeta,
+                MenuSectionsForTests::hidesServerUpgrades,
+                MenuSectionsForTests::hidesServerAlsoFromMeta));
         // A shared link loses what the app added to it.
         probes.put(PatchFamily.SANITIZE_SHARING_LINKS, Collections.singletonList(() -> {
             String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";

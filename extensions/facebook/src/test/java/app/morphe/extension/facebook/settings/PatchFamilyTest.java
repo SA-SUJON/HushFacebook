@@ -58,6 +58,7 @@ public class PatchFamilyTest {
         Settings.HIDE_PROMOTED_POSTS.resetToDefault();
         Settings.HIDE_SPONSORED_POSTS.resetToDefault();
         Settings.HIDE_REEL_FOLLOW_BUTTON.resetToDefault();
+        Settings.HIDE_MENU_ALSO_FROM_META.resetToDefault();
         HookStatus.clear();
     }
 
@@ -213,7 +214,7 @@ public class PatchFamilyTest {
                         + "Hide sponsored stories, Stop Story auto-advance, Clean up Reels, Don't send reel watch history, Tap to play, "
                         + "Use the system font, Use the phone's emoji, Open links in "
                         + "external browser, Sanitize sharing links, Stop update prompts, Download any story, Download any reel, "
-                        + "Download any video, Open on a chosen tab, Marketplace only, Hide the Get Messenger card, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
+                        + "Download any video, Open on a chosen tab, Marketplace only, Hide the Get Messenger card, Hide Menu promotions, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
                         + "Restore screens on re-signed builds, Install beside Meta's apps"),
                 running);
         // Clean up Reels has three switches, and the report names each one.
@@ -229,6 +230,11 @@ public class PatchFamilyTest {
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.VIDEO_DOWNLOAD), false).get(0));
         assertEquals("Download any video: disabled while paused (saved hushfacebook_download_videos=on)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.VIDEO_DOWNLOAD), true).get(0));
+        // The Menu's two groups have a switch each, and the report names both.
+        Settings.HIDE_MENU_ALSO_FROM_META.save(false);
+        assertEquals("Hide Menu promotions: on (hushfacebook_hide_menu_upgrades=on, "
+                        + "hushfacebook_hide_menu_also_from_meta=off)",
+                PatchFamily.reportLines(EnumSet.of(PatchFamily.MENU_PROMOTIONS), false).get(0));
 
         List<String> paused = PatchFamily.reportLines(build, true);
         assertEquals("Hide sponsored posts: disabled while paused (saved "
