@@ -60,7 +60,7 @@ public final class TapToPlay {
     /**
      * How long a start keeps its player armed through a new bind. FbGrootPlayer can bind its video
      * inside the very play the gate let through, or replay a bind it put off, and neither should
-     * disarm that play. A reel you swipe to comes seconds later.
+     * disarm that play. A non-tap gesture expires this grace before another video can bind.
      */
     static final long BIND_GRACE_MS = 2000;
 
@@ -129,6 +129,11 @@ public final class TapToPlay {
         }
     }
 
+    /** A swipe keeps the current video armed, but the next bind must wait for its own start. */
+    static void nonTapGesture() {
+        ARMED.expireBindGrace();
+    }
+
     /**
      * The hook at each return of Facebook's Autoplay setting reader (VideoAutoPlaySettingsChecker).
      * While the switch is on it answers Off, the constant of the same enum named OFF, so the
@@ -176,6 +181,23 @@ public final class TapToPlay {
         }
     }
 
+    /**
+     * Runs only in the Reels PLAYING event branch. Facebook normally clears the initial overlay
+     * only for certain viewer configurations. Our forced autoplay-off state needs that same
+     * cleanup for every viewer once playback actually starts. Other control states stay native.
+     */
+    public static boolean clearReelPlayButton(boolean original, Object control) {
+        try {
+            HookStatus.invoked(FamilyNames.TAP_TO_PLAY);
+            if (original || !on() || !(control instanceof Enum)) return original;
+            HookStatus.bound(FamilyNames.TAP_TO_PLAY, "Reels playback controls");
+            return "AUTOPLAY_OFF_INIT_STATE".equals(((Enum<?>) control).name());
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.TAP_TO_PLAY, "Reels playback controls", failure);
+            return original;
+        }
+    }
+
     private static void logReelButtonOnce() {
         synchronized (LOG_LOCK) {
             if (reelButtonLogged) return;
@@ -211,10 +233,11 @@ public final class TapToPlay {
     static boolean decide(Object player, @Nullable String trigger, long now, String path) {
         boolean armed = ARMED.armed(player);
         long sinceTap = TapClock.msSinceTap(now);
+        boolean control = trigger != null && CONTROLS.contains(trigger);
         boolean allowed = armed
-                || (trigger != null && CONTROLS.contains(trigger))
+                || control
                 || (sinceTap >= 0 && sinceTap <= TAP_WINDOW_MS && !visibilityDriven(trigger));
-        if (allowed && !armed) ARMED.arm(player, now);
+        if (allowed && (!armed || control)) ARMED.arm(player, now);
         logDecision(allowed, trigger, sinceTap, armed, path);
         return allowed;
     }
@@ -315,6 +338,11 @@ public final class TapToPlay {
         synchronized void disarm(Object player) {
             purge();
             if (player != null) armedAt.remove(new Key(player, null));
+        }
+
+        synchronized void expireBindGrace() {
+            purge();
+            armedAt.replaceAll((player, at) -> Long.MIN_VALUE);
         }
 
         /** Disarms [player] unless its start came at or after [since]. */

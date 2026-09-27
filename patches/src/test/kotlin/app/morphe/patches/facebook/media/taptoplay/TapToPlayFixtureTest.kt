@@ -10,6 +10,8 @@ import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.ads.sponsoredsearch.enumConstantFields
+import app.morphe.util.ControlFlow
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.extension.parameterRegisterNumber
@@ -25,8 +27,10 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -62,7 +66,7 @@ class TapToPlayFixtureTest {
 
                 // One pass over the build for the classes holding the anchors' strings.
                 val holders = mutableMapOf<String, MutableList<ClassDef>>()
-                val anchors = listOf(GROOT_PLAY, LEGACY_PLAY, AUTOPLAY_SETTINGS_CHECKER, REELS_CONTROLS)
+                val anchors = listOf(GROOT_PLAY, LEGACY_PLAY, AUTOPLAY_SETTINGS_CHECKER, REELS_CONTROLS, REELS_PLAYBACK_STARTED)
                 FixtureDex.forEach(fixture) { dex ->
                     val strings = anchors.filter { anchor -> dex.stringSection.any { it == anchor } }
                     if (strings.isEmpty()) return@forEach
@@ -124,10 +128,26 @@ class TapToPlayFixtureTest {
                 assertTrue("$name: the Reels check doesn't ask the Autoplay settings checker",
                     asksWithSession(reelCheck!!, checker.type))
 
+                val playbackOwner = holders.getValue(REELS_PLAYBACK_STARTED).single { owner ->
+                    owner.methods.any { it.returnType == "V" && it.parameterTypes.size == 1 && holdsString(it, REELS_PLAYBACK_STARTED) }
+                }
+                val playback = playbackOwner.methods.single { holdsString(it, REELS_PLAYBACK_STARTED) }
+                val playbackClasses = mutableMapOf(playbackOwner.type to playbackOwner)
+                repeat(2) {
+                    val references = playbackClasses.values.flatMap { owner ->
+                        owner.fields.map { it.type } + owner.methods.flatMap { method ->
+                            method.implementation?.instructions?.mapNotNull { instruction ->
+                                (instruction as? ReferenceInstruction)?.reference as? FieldReference
+                            }?.flatMap { listOf(it.definingClass, it.type) }.orEmpty()
+                        }
+                    }.filter { it.startsWith("L") }.toSet() - playbackClasses.keys
+                    playbackClasses.putAll(FixtureDex.classes(fixture, references))
+                }
+
                 // The patch, on this build's own classes.
                 val context = PatchContexts.of(
                     listOf(groot, legacy, checker, classes.getValue(trigger), setting, classes.getValue(FRAGMENT_ACTIVITY),
-                        classes.getValue(controlsType), ExtensionDex.classDef(SETTINGS_STATUS)) + components,
+                        classes.getValue(controlsType), ExtensionDex.classDef(SETTINGS_STATUS)) + components + playbackClasses.values,
                 )
                 tapToPlayPatch.execute(context)
                 fun patched(method: Method) = context.mutableClassDefBy(method.definingClass).methods.single {
@@ -199,6 +219,35 @@ class TapToPlayFixtureTest {
                 assertSame("$name: a no goes on to the check's own first instruction", reels[5],
                     (reels[3] as BuilderOffsetInstruction).target.location.instruction)
                 assertEquals(reelCheck.implementation!!.instructions.first().opcode, reels[5].opcode)
+
+                // Only the actual PLAYING branch gains cleanup. PAUSED, preparing, seeking and
+                // error events still take their original route, with no early method return.
+                val events = patched(playback)
+                val eventCode = events.implementation!!.instructions.toList()
+                val cleanup = eventCode.indices.single { eventCode[it].call?.toString() == CLEAR_REEL_PLAY_BUTTON }
+                val playingRead = eventCode.indices.single { index ->
+                    val field = (eventCode[index] as? ReferenceInstruction)?.reference as? FieldReference
+                    eventCode[index].opcode == Opcode.SGET_OBJECT && field != null &&
+                        playbackClasses[field.type]?.let { enumConstantFields(it)[field.name] == "PLAYING" } == true
+                }
+                assertEquals(Opcode.IF_NE, eventCode[playingRead + 1].opcode)
+                val eventFlow = ControlFlow.of(events)
+                fun reaches(start: Int): Boolean {
+                    val pending = java.util.ArrayDeque<Int>().apply { add(start) }
+                    val seen = mutableSetOf<Int>()
+                    while (!pending.isEmpty()) {
+                        val index = pending.removeFirst()
+                        if (index == cleanup) return true
+                        if (seen.add(index)) eventFlow.normal[index].forEach(pending::add)
+                    }
+                    return false
+                }
+                assertTrue("$name: PLAYING reaches the cleanup decision", reaches(playingRead + 2))
+                assertFalse("$name: other playback states must bypass cleanup", reaches(eventFlow.normal[playingRead + 1].first()))
+                assertEquals("$name: original listener remains intact", playback.implementation!!.instructions.count() + 4, eventCode.size)
+                assertEquals("$name: cleanup keeps the original decision register",
+                    (eventCode[cleanup + 1] as OneRegisterInstruction).registerA,
+                    (eventCode[cleanup + 2] as OneRegisterInstruction).registerA)
 
                 // Every touch goes to the tap clock with the screen and the event, and on unchanged.
                 val dispatch = patched(touchDispatches(classes.getValue(FRAGMENT_ACTIVITY)).single())

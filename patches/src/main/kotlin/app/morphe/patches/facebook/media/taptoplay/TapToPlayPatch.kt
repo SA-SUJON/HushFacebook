@@ -48,6 +48,7 @@ val tapToPlayPatch = bytecodePatch(
         hookLegacyPlayer(trigger)
         val checker = hookAutoplaySetting()
         hookReelPlayButton(checker)
+        hookReelPlayback()
         hookTouches()
         enableStatus("tapToPlay")
     }

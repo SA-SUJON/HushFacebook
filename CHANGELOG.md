@@ -2,6 +2,13 @@
 
 Every Hushfacebook release, newest first.
 
+## 0.3.3 (2026-09-27)
+
+* **Facebook:** Tap to play now clears the initial Reels play button when playback starts. Facebook only cleared that state for certain viewer configurations, which could leave the button over a moving video. The fix uses the existing control cleanup and keeps paused controls and the off setting unchanged.
+* **Facebook:** A quick swipe after tapping Play no longer carries that tap into the next video. Swipes expire the previous tap and its player bind grace, while the current video and direct media controls keep working.
+* **Facebook:** Checked on the S22 with Facebook 580: the play button clears during playback and returns on pause, and both ordinary and rapid swipes leave the next reel waiting. Turning Tap to play off or pausing Hushfacebook restores native playback. The reporter's exact viewer configuration still needs confirmation.
+* **Facebook:** Marketplace mode passed S22 checks for cold launch, listing details, seller profiles and the listing's message composer. Return to regular Facebook restored six tabs and kept the saved startup choice. No message was sent. Incoming notifications and shared-listing links still need live checks.
+
 ## 0.3.2 (2026-09-27)
 
 * **Facebook:** Marketplace only is now included in the default patch selection. Its switch and Open on a chosen tab start off, so a normal installation keeps Facebook's navigation. Stored values are kept; older development builds that never stored their default-on choice need the switch enabled once after upgrading.

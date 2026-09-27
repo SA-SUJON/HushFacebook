@@ -73,6 +73,41 @@ public class TapToPlayTest {
         return TapToPlay.decide(player, trigger.name(), now, "");
     }
 
+    private enum ReelControl { AUTOPLAY_OFF_INIT_STATE, PLAYING, PAUSED, PLAYBACK_COMPLETE, UNKNOWN }
+
+    @Test
+    public void playingClearsTheHeldStartButtonEvenWhenFacebooksViewerFlagIsOff() {
+        assertTrue(TapToPlay.showReelPlayButton(false));
+        assertTrue("PLAYING must clear the forced initial overlay regardless of the viewer's flag",
+                TapToPlay.clearReelPlayButton(false, ReelControl.AUTOPLAY_OFF_INIT_STATE));
+        assertTrue("Facebook's own cleanup still runs",
+                TapToPlay.clearReelPlayButton(true, ReelControl.AUTOPLAY_OFF_INIT_STATE));
+        for (ReelControl control : ReelControl.values()) {
+            if (control == ReelControl.AUTOPLAY_OFF_INIT_STATE) continue;
+            assertFalse("ordinary controls stay native: " + control, TapToPlay.clearReelPlayButton(false, control));
+            assertTrue(TapToPlay.clearReelPlayButton(true, control));
+        }
+        assertFalse(TapToPlay.clearReelPlayButton(false, null));
+        assertFalse(TapToPlay.clearReelPlayButton(false, "AUTOPLAY_OFF_INIT_STATE"));
+        assertTrue("a different reel still waits for its own tap", TapToPlay.showReelPlayButton(false));
+    }
+
+    @Test
+    public void theReelOverlayCleanupKeepsTheNativeAnswerWhileOffPausedOrStarting() {
+        Settings.TAP_TO_PLAY.save(false);
+        assertFalse(TapToPlay.clearReelPlayButton(false, ReelControl.AUTOPLAY_OFF_INIT_STATE));
+        assertTrue(TapToPlay.clearReelPlayButton(true, ReelControl.AUTOPLAY_OFF_INIT_STATE));
+        Settings.TAP_TO_PLAY.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertFalse(TapToPlay.clearReelPlayButton(false, ReelControl.AUTOPLAY_OFF_INIT_STATE));
+        assertTrue(TapToPlay.clearReelPlayButton(true, ReelControl.AUTOPLAY_OFF_INIT_STATE));
+        PauseForTests.resume();
+        SettingsContextRule.withoutContext(() ->
+                assertFalse(TapToPlay.clearReelPlayButton(false, ReelControl.AUTOPLAY_OFF_INIT_STATE)));
+        SettingsContextRule.beforeThePauseIsDecided(() ->
+                assertTrue(TapToPlay.clearReelPlayButton(true, ReelControl.AUTOPLAY_OFF_INIT_STATE)));
+    }
+
     @Test
     public void theSwitchStartsOn() {
         assertTrue("picking the patch is the choice to use it", Settings.TAP_TO_PLAY.get());
@@ -185,6 +220,50 @@ public class TapToPlayTest {
         TapToPlay.rebound(player);
         assertFalse("the next video", TapToPlay.armed(player));
         assertFalse(TapToPlay.allowStart(player, Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+    }
+
+    @Test
+    public void aRapidSwipeCannotReuseThePreviousTapOrThePlayersBindGrace() {
+        Object player = new Object();
+        tapAt(SystemClock.uptimeMillis());
+        assertTrue(TapToPlay.allowStart(player, Trigger.BY_USER));
+        TapToPlay.rebound(player);
+        assertTrue("the tap's own bind", TapToPlay.armed(player));
+
+        SystemClock.sleep(10);
+        long swipe = SystemClock.uptimeMillis();
+        TapClock.record(MotionEvent.ACTION_DOWN, 50, 500, swipe, 8);
+        TapClock.record(MotionEvent.ACTION_MOVE, 50, 300, swipe, 8);
+        assertFalse("another player cannot borrow the previous tap during a swipe",
+                TapToPlay.allowStart(new Object(), Trigger.BY_AUTOPLAY));
+        assertTrue("scrolling alone doesn't interrupt the current video", TapToPlay.armed(player));
+        TapToPlay.rebound(player);
+        assertFalse("a new bind after the swipe cannot borrow the previous start", TapToPlay.armed(player));
+        TapClock.record(MotionEvent.ACTION_UP, 50, 100, swipe, 8);
+        assertFalse(TapToPlay.allowStart(player, Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+        assertFalse(TapToPlay.allowLegacyStart(player, Trigger.BY_USER_SWIPE));
+
+        SystemClock.sleep(1);
+        tapAt(SystemClock.uptimeMillis());
+        assertTrue("the next video's own tap works", TapToPlay.allowStart(player, Trigger.BY_USER));
+        TapToPlay.rebound(player);
+        assertTrue("that tap retains its own bind grace", TapToPlay.armed(player));
+    }
+
+    @Test
+    public void aControlStartAfterADragKeepsItsOwnImmediateBind() {
+        for (Trigger trigger : new Trigger[] { Trigger.BY_SEEKBAR_CONTROLLER,
+                Trigger.BY_MEDIA_SESSION_CONTROLS, Trigger.BY_MUSIC_PLAYER }) {
+            Object player = new Object();
+            assertTrue(TapToPlay.allowStart(player, trigger));
+            long drag = SystemClock.uptimeMillis();
+            TapClock.record(MotionEvent.ACTION_DOWN, 50, 500, drag, 8);
+            TapClock.record(MotionEvent.ACTION_MOVE, 200, 500, drag, 8);
+            TapClock.record(MotionEvent.ACTION_UP, 200, 500, drag, 8);
+            assertTrue(TapToPlay.allowStart(player, trigger));
+            TapToPlay.rebound(player);
+            assertTrue(trigger.name(), TapToPlay.armed(player));
+        }
     }
 
     /** Players are told apart by identity, so one whose equals claims another is still itself. */

@@ -24,6 +24,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstructio
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
+import com.android.tools.smali.dexlib2.immutable.ImmutableField
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodImplementation
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
@@ -49,6 +50,50 @@ class TapToPlayShapesTest {
     private val controls = "Lfixture/ReelControls;"
     private val component = "Lfixture/ControlComponent;"
     private val config = "Lfixture/Config;"
+    private val playbackListener = "Lfixture/ReelListener;"
+    private val playbackState = "Lfixture/PlaybackState;"
+    private val reelControl = "Lfixture/ReelControl;"
+    private val reelController = "Lfixture/ReelController;"
+
+    private fun playbackClasses(compare: String = "if-ne", resetValue: Int = 0): List<ClassDef> {
+        val playing = method(playbackState, "<clinit>", emptyList(), "V", """
+            new-instance v0, $playbackState
+            const-string v1, "PLAYING"
+            const/4 v2, 0x0
+            invoke-direct {v0, v1, v2}, $playbackState-><init>(Ljava/lang/String;I)V
+            sput-object v0, $playbackState->playing:$playbackState
+            ${(PLAYBACK_STATE_NAMES - "PLAYING").joinToString("\n") { "const-string v0, \"$it\"" }}
+            return-void
+        """, static = true)
+        val stateField = ImmutableField(reelController, "state", reelControl, AccessFlags.PUBLIC.value, null, null, null)
+        val reset = method(reelController, "clear", listOf(trigger, "Z"), "V", """
+            iget-object v0, p0, $reelController->state:$reelControl
+            const/4 v1, $resetValue
+            iput-object v1, p0, $reelController->state:$reelControl
+            return-void
+        """, registers = 6)
+        val controllerClass = ImmutableClassDef(reelController, AccessFlags.PUBLIC.value, "Ljava/lang/Object;",
+            null, null, null, listOf(stateField), listOf(ImmutableMethod.of(reset)))
+        val listener = method(playbackListener, "onState", listOf("Lfixture/PlaybackEvent;"), "V", """
+            iget-object v5, p1, Lfixture/PlaybackEvent;->state:$playbackState
+            sget-object v0, $playbackState->playing:$playbackState
+            $compare v5, v0, :done
+            const/4 v3, 0x0
+            const/4 v4, 0x0
+            const/4 v6, 0x0
+            const/4 v0, 0x0
+            if-nez v6, :clear
+            if-eqz v0, :done
+            :clear
+            iget-object v0, p0, $playbackListener->controller:$reelController
+            invoke-virtual {v0, v4, v3}, $reelController->clear(${trigger}Z)V
+            :done
+            const-string v0, "$REELS_PLAYBACK_STARTED"
+            return-void
+        """, registers = 9)
+        return listOf(classDef(playbackState, "Ljava/lang/Enum;", playing), enumNaming(reelControl, REEL_CONTROL_NAMES),
+            controllerClass, classDef(playbackListener, "Ljava/lang/Object;", listener))
+    }
 
     private fun method(
         owner: String,
@@ -174,7 +219,7 @@ class TapToPlayShapesTest {
         controlsClass: ClassDef = classDef(controls, "Ljava/lang/Object;", reelCheck()),
     ) = PatchContexts.of(
         listOf(grootPlayer, triggerEnum, legacy(), checkerClass, enumNaming(setting, SETTING_NAMES), activityClass,
-            componentClass, controlsClass, ExtensionDex.classDef(SETTINGS_STATUS)),
+            componentClass, controlsClass, ExtensionDex.classDef(SETTINGS_STATUS)) + playbackClasses(),
     )
 
     private val Instruction.call: MethodReference?
@@ -188,6 +233,13 @@ class TapToPlayShapesTest {
 
     private fun patched(context: app.morphe.patcher.patch.BytecodePatchContext, owner: String, name: String) =
         context.mutableClassDefBy(owner).methods.single { it.name == name }
+
+    @Test
+    fun `reel cleanup refuses an inverted state branch and a reset that keeps an overlay`() {
+        assertThrows(PatchException::class.java) { PatchContexts.of(playbackClasses(compare = "if-eq")).hookReelPlayback() }
+        assertThrows(PatchException::class.java) { PatchContexts.of(playbackClasses(resetValue = 1)).hookReelPlayback() }
+        assertThrows(PatchException::class.java) { PatchContexts.of(emptyList()).hookReelPlayback() }
+    }
 
     @Test
     fun `the anchors take the shapes they're written for and not their near misses`() {
@@ -321,6 +373,14 @@ class TapToPlayShapesTest {
         assertEquals(TOUCH, touch[0].call.toString())
         assertEquals(listOf(1, 2), touch[0].registers())
         assertEquals(Opcode.CONST_4, touch[1].opcode)
+
+        val events = patched(context, playbackListener, "onState").implementation!!.instructions.toList()
+        val cleanup = events.indexOfFirst { it.call?.toString() == CLEAR_REEL_PLAY_BUTTON }
+        assertTrue("PLAYING now reaches cleanup even when both viewer flags are false", cleanup > 2)
+        assertEquals(Opcode.IF_EQZ, events[cleanup + 2].opcode)
+        assertEquals(0, (events[cleanup + 1] as OneRegisterInstruction).registerA)
+        assertSame("non-playing states bypass the cleanup", events[events.lastIndex - 1],
+            (events[2] as BuilderOffsetInstruction).target.location.instruction)
     }
 
     @Test

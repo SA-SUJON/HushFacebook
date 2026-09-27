@@ -119,13 +119,14 @@ public class TapClockTest {
     }
 
     @Test
-    public void aLaterScrollLeavesTheLastTapWhereItWas() {
+    public void aLaterScrollInvalidatesThePreviousTapBeforeTheFingerLifts() {
         down(100, 100, 1_000);
         up(100, 100, 1_050);
         down(100, 100, 1_100);
         move(100, 400, 1_150);
+        assertEquals(-1, TapClock.msSinceTap(1_150));
         up(100, 400, 1_200);
-        assertEquals(250, TapClock.msSinceTap(1_300));
+        assertEquals(-1, TapClock.msSinceTap(1_300));
     }
 
     /**
@@ -154,7 +155,7 @@ public class TapClockTest {
         MotionEvent farUp = MotionEvent.obtain(6_000, 6_100, MotionEvent.ACTION_UP, 200 + slop + 1, 300, 0);
         TapClock.touch(activity, farDown);
         TapClock.touch(activity, farUp);
-        assertEquals("a finger that moved past the activity's slop", 1_080, TapClock.msSinceTap(6_200));
+        assertEquals("a finger that moved past the activity's slop", -1, TapClock.msSinceTap(6_200));
         down.recycle();
         up.recycle();
         farDown.recycle();

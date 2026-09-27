@@ -18,7 +18,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * and the patch hands each one here before Facebook sees it. A tap is a finger that went down and
  * came up again without moving further than the touch slop, however long it stayed: a quick tap and
  * a long press both count, a scroll, a fling or a second finger don't. Only the time the finger came
- * up is kept, on the clock {@link MotionEvent#getEventTime()} uses.
+ * up is kept, on the clock {@link MotionEvent#getEventTime()} uses. A later non-tap gesture
+ * invalidates that tap, so swiping to another video can't borrow it.
  *
  * <p>It only reads the event. It never changes, consumes or recycles one, and the hook returns
  * nothing, so Facebook gets every event exactly as it was.
@@ -60,21 +61,29 @@ public final class TapClock {
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 // A second finger makes a pinch or a zoom, not a tap.
-                moved = true;
+                invalidateTap();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (tracking && beyond(x, y, touchSlop)) moved = true;
+                if (tracking && beyond(x, y, touchSlop)) invalidateTap();
                 break;
             case MotionEvent.ACTION_UP:
                 if (tracking && !moved && !beyond(x, y, touchSlop)) lastTapUp = time;
+                else if (tracking) invalidateTap();
                 tracking = false;
                 break;
             case MotionEvent.ACTION_CANCEL:
+                invalidateTap();
                 tracking = false;
                 break;
             default:
                 break;
         }
+    }
+
+    private static void invalidateTap() {
+        lastTapUp = NO_TAP;
+        if (!moved) TapToPlay.nonTapGesture();
+        moved = true;
     }
 
     private static boolean beyond(float x, float y, int touchSlop) {
