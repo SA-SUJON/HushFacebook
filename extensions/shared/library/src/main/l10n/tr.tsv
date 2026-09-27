@@ -327,3 +327,7 @@ Ads between the results when you search Facebook. What you searched for stays.	F
 Hide sponsored profile posts	Profillerdeki sponsorlu gönderileri gizle
 # context: summary of that switch; Page is Facebook's name for a business or public figure's page
 Ads between the posts on someone's profile or a Page. Their own posts stay.	Birinin profilindeki ya da bir Sayfadaki gönderilerin arasındaki reklamlar. Kendi gönderileri kalır.
+# context: what stays in while Hushfacebook is paused, followed by the patch name in brackets; the row in Facebook's own Menu that opens Hushfacebook settings
+the settings row in Facebook's Menu	Facebook menüsündeki ayarlar satırı
+# context: a short message when the Hushfacebook row in Facebook's Menu couldn't open the settings
+Hushfacebook settings can't open here. Long-press the Facebook logo instead.	Hushfacebook ayarları burada açılamıyor. Bunun yerine Facebook logosuna basılı tut.

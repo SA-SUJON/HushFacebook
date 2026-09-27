@@ -102,7 +102,10 @@ public enum PatchFamily {
     // A manifest can't be switched at run time: the permissions are renamed in the APK, and Facebook's
     // code has to keep using the names this install holds whether or not Hushfacebook is paused.
     INSTALL_BESIDE_META_APPS(FamilyNames.INSTALL_BESIDE_META_APPS, "installBesideMetaApps",
-            "the rename of the shared permissions");
+            "the rename of the shared permissions"),
+    // The settings entry's own way in, like the logo long press and the launcher shortcut, which
+    // stay reachable while paused because the settings screen is where a pause is lifted.
+    MENU_SETTINGS_ROW(FamilyNames.MENU_SETTINGS_ROW, "menuSettingsRow", "the settings row in Facebook's Menu");
 
     /** The patch's name in Morphe Manager. */
     public final String patchName;

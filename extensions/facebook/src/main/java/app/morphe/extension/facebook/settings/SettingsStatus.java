@@ -157,4 +157,8 @@ public final class SettingsStatus {
     public static boolean metaAiSearch() {
         return false;
     }
+
+    public static boolean menuSettingsRow() {
+        return false;
+    }
 }

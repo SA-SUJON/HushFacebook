@@ -327,3 +327,7 @@ Ads between the results when you search Facebook. What you searched for stays.	I
 Hide sponsored profile posts	Sembunyikan postingan bersponsor di profil
 # context: summary of that switch; Page is Facebook's name for a business or public figure's page
 Ads between the posts on someone's profile or a Page. Their own posts stay.	Iklan di antara postingan di profil seseorang atau Halaman. Postingan milik mereka sendiri tetap ada.
+# context: what stays in while Hushfacebook is paused, followed by the patch name in brackets; the row in Facebook's own Menu that opens Hushfacebook settings
+the settings row in Facebook's Menu	baris pengaturan di Menu Facebook
+# context: a short message when the Hushfacebook row in Facebook's Menu couldn't open the settings
+Hushfacebook settings can't open here. Long-press the Facebook logo instead.	Pengaturan Hushfacebook tidak bisa dibuka di sini. Tekan lama logo Facebook sebagai gantinya.

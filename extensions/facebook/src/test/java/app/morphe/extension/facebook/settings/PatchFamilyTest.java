@@ -217,7 +217,7 @@ public class PatchFamilyTest {
                         + "Use the system font, Use the phone's emoji, Open links in "
                         + "external browser, Sanitize sharing links, Stop update prompts, Download any story, Download any reel, "
                         + "Download any video, Open on a chosen tab, Marketplace only, Hide the Get Messenger card, Hide Menu promotions, Hide Meta AI in search, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
-                        + "Restore screens on re-signed builds, Install beside Meta's apps"),
+                        + "Restore screens on re-signed builds, Install beside Meta's apps, Hushfacebook in the Menu"),
                 running);
         // Clean up Reels has three switches, and the report names each one.
         Settings.HIDE_REEL_FOLLOW_BUTTON.save(false);
