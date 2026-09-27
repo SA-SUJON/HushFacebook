@@ -266,7 +266,11 @@ public class ScreenColorsTest {
                 View widget = row.findViewById(android.R.id.switch_widget);
                 if (widget instanceof Switch) {
                     assertNotNull(((Switch) widget).getThumbTintList());
-                    assertEquals(colors.accent, ((Switch) widget).getThumbTintList()
+                    assertEquals(colors.onAccent, ((Switch) widget).getThumbTintList()
+                            .getColorForState(new int[]{android.R.attr.state_enabled, android.R.attr.state_checked}, 0));
+                    assertEquals(colors.accent, ((Switch) widget).getTrackTintList()
+                            .getColorForState(new int[]{android.R.attr.state_enabled, android.R.attr.state_checked}, 0));
+                    assertEquals(ScreenColors.half(colors.accent), ((Switch) widget).getTrackTintList()
                             .getColorForState(new int[]{android.R.attr.state_checked}, 0));
                     switches++;
                 }
@@ -375,6 +379,11 @@ public class ScreenColorsTest {
     /** Every row the list draws, laid out tall enough that none is left off. */
     private static List<View> rows(SettingsDialog dialog) {
         ListView list = dialog.getView().findViewById(android.R.id.list);
+        HushfacebookPreferenceFragment page = (HushfacebookPreferenceFragment) dialog.getChildFragmentManager()
+                .findFragmentById(SettingsDialog.CONTAINER_ID);
+        // Verify every preference row independently of the category shell.
+        list.setAdapter(page.getPreferenceScreen().getRootAdapter());
+        list.setOnItemClickListener(page.getPreferenceScreen());
         assertNotNull("no list in the dialog", list);
         list.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(40000, View.MeasureSpec.EXACTLY));

@@ -119,6 +119,9 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
         return null;
     }
 
+    /** The host can give recovery's explanation its own layout without altering retry behavior. */
+    protected void styleInitializationMessage(View row) { }
+
     /**
      * The context the recovery page's rows are built with, and so the theme they're drawn in.
      * The host activity's by default; an app that draws its settings on a background of its own
@@ -673,7 +676,12 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
             PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(context);
             setPreferenceScreen(screen);
 
-            Preference message = new Preference(context);
+            Preference message = new Preference(context) {
+                @Override protected void onBindView(View row) {
+                    super.onBindView(row);
+                    styleInitializationMessage(row);
+                }
+            };
             message.setKey(INITIALIZATION_ERROR_KEY);
             message.setTitle(initializationErrorTitle(activity));
             message.setSummary(initializationErrorSummary(activity));

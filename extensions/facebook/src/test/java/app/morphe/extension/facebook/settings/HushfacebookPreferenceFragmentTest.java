@@ -124,7 +124,7 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals(PatchFamily.staysWhilePausedSummary(EnumSet.allOf(PatchFamily.class)),
                     String.valueOf(stays.getSummary()));
 
-            // The Pause row turns off "every switch above" and says Debug logging keeps working.
+            // Pause covers runtime features and explicitly keeps debugging available.
             int pause = indexOfKey(rows, BaseSettings.PAUSED.key);
             assertTrue("the Pause row is missing", pause >= 0);
             for (String key : switchKeys) {
@@ -132,7 +132,7 @@ public class HushfacebookPreferenceFragmentTest {
             }
             assertTrue("Debug logging is drawn above the Pause row", indexOfKey(rows, BaseSettings.DEBUG.key) > pause);
             assertTrue(String.valueOf(rows.get(pause).getSummary()),
-                    String.valueOf(rows.get(pause).getSummary()).contains("Debug logging keeps working"));
+                    String.valueOf(rows.get(pause).getSummary()).contains("Debug logging and patches applied during installation keep working"));
         }
     }
 
@@ -458,9 +458,8 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse(((SwitchPreference) row).isChecked());
                 assertEquals(indexOfKey(rows, Settings.DOWNLOAD_QUALITY.key) - 1, compatible);
                 assertEquals("Save videos other apps can open", String.valueOf(row.getTitle()));
-                assertEquals("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's "
-                        + "sharpest version is often AV1, which some apps turn down, so a video can save at a lower "
-                        + "quality. A video with no such version saves as usual.", String.valueOf(row.getSummary()));
+                assertEquals("Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lower than AV1. "
+                        + "Without a compatible version, save as usual.", String.valueOf(row.getSummary()));
             }
         }
 
@@ -636,8 +635,7 @@ public class HushfacebookPreferenceFragmentTest {
             Preference toggle = section.getPreference(0);
             assertTrue(toggle instanceof SwitchPreference);
             assertEquals("Tag suggestions only after @", String.valueOf(toggle.getTitle()));
-            assertEquals("Facebook stops offering people to tag while you type ordinary words in posts and comments. "
-                    + "Typing @ still brings up the list, and what you wrote is never changed.",
+            assertEquals("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                     String.valueOf(toggle.getSummary()));
         }
 

@@ -81,16 +81,15 @@ final class ChoiceCards extends BaseAdapter {
 
         Card(Context context, ScreenColors colors) {
             super(context);
-            setOrientation(VERTICAL);
+            setOrientation(HORIZONTAL);
             setGravity(Gravity.CENTER_VERTICAL);
             int side = dp(context, SIDE_INSET_DP);
             int gap = dp(context, GAP_INSET_DP);
             GradientDrawable surface = new GradientDrawable();
-            // The page's own tone, a step off the dialog's in every palette, so the card reads as
-            // set into the dialog.
-            surface.setColor(colors.background);
+            // The shared row surface, with its outline separating it from the dialog.
+            surface.setColor(colors.card);
             surface.setStroke(dp(context, 1), colors.outline);
-            surface.setCornerRadius(dp(context, 12));
+            surface.setCornerRadius(dp(context, 10));
             setBackground(new RippleDrawable(ColorStateList.valueOf(ScreenColors.half(colors.accent)),
                     new InsetDrawable(surface, side, gap, side, gap), null));
             // Set after the background, which puts its insets in as the padding.
@@ -99,18 +98,30 @@ final class ChoiceCards extends BaseAdapter {
             // 48 dp of card to tap at the least, at any text size.
             setMinimumHeight(2 * gap + dp(context, 48));
 
+            LinearLayout text = new LinearLayout(context);
+            text.setOrientation(VERTICAL);
+            addView(text, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
+
             name = new TextView(context);
             name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             name.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             name.setTextColor(colors.title);
-            addView(name, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            ScreenColors.Chevron chevron = new ScreenColors.Chevron(colors.summary, dp(context, 2));
+            chevron.setBounds(0, 0, dp(context, 24), dp(context, 24));
+            text.addView(name, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
             detail = new TextView(context);
             detail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             detail.setTextColor(colors.summary);
             LayoutParams under = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             under.topMargin = dp(context, 2);
-            addView(detail, under);
+            text.addView(detail, under);
+            android.widget.ImageView arrow = new android.widget.ImageView(context);
+            arrow.setImageDrawable(chevron);
+            arrow.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            LayoutParams trailing = new LayoutParams(dp(context, 24), dp(context, 24));
+            trailing.setMarginStart(dp(context, 8));
+            addView(arrow, trailing);
         }
 
         private static int dp(Context context, int value) {

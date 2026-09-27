@@ -11,6 +11,9 @@ import android.app.DialogFragment;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,6 +25,8 @@ import android.view.WindowInsetsController;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -47,9 +52,10 @@ public final class SettingsDialog extends DialogFragment {
      */
     static final int CONTAINER_ID = 0x48464301;
 
-    /** The back arrows, left and right, built from their code points. */
-    static final String BACK_ARROW = String.valueOf((char) 0x2190);
-    static final String BACK_ARROW_RIGHT_TO_LEFT = String.valueOf((char) 0x2192);
+    private TextView pageTitle;
+    private LinearLayout searchBox;
+    private EditText search;
+    private boolean settingSearch;
 
     /** The page's colours, or null for the black page. Read when the dialog is created. */
     @Nullable
@@ -82,6 +88,7 @@ public final class SettingsDialog extends DialogFragment {
             // With three-button navigation Android lays a grey scrim under the buttons; the
             // screen is black edge to edge, so the scrim only shows as a grey band.
             window.setNavigationBarContrastEnforced(false);
+            window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             // Below Android 15 this window draws its own bars in the framework theme's colours,
             // grey and black, which a light page's dark icons can't be read on. The page's colour
             // goes behind them instead. Android 15 and newer draw the page there already.
@@ -113,13 +120,15 @@ public final class SettingsDialog extends DialogFragment {
         // Start and end, not left and right: in a right-to-left language the bar is mirrored.
         bar.setPaddingRelative(dp(4), dp(12), pad, dp(12));
 
-        TextView back = new TextView(getContext());
-        back.setText(rightToLeft() ? BACK_ARROW_RIGHT_TO_LEFT : BACK_ARROW);
-        back.setTextColor(foreground());
-        back.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
-        back.setGravity(Gravity.CENTER);
-        back.setMinWidth(dp(48));
-        back.setMinHeight(dp(48));
+        android.widget.ImageButton back = new android.widget.ImageButton(getContext());
+        android.graphics.drawable.Drawable arrow = SettingsIcons.icon(getContext(), SettingsIcons.BACK, foreground());
+        arrow.setBounds(0, 0, dp(24), dp(24));
+        arrow.setLayoutDirection(rightToLeft() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
+        back.setImageDrawable(arrow);
+        back.setPadding(dp(12), dp(12), dp(12), dp(12));
+        back.setBackgroundColor(Color.TRANSPARENT);
+        back.setMinimumWidth(dp(48));
+        back.setMinimumHeight(dp(48));
         back.setContentDescription(L10n.t(getContext(), "Back"));
         // A screen reader calls it a button, as it would the back arrow of any other screen.
         back.setAccessibilityDelegate(new View.AccessibilityDelegate() {
@@ -130,20 +139,25 @@ public final class SettingsDialog extends DialogFragment {
             }
         });
         back.setOnClickListener(v -> {
+            HushfacebookPreferenceFragment page = page();
+            if (page != null && page.backFromJump()) return;
             SettingsEntry.onClosedByUser();
             dismissAllowingStateLoss();
         });
-        bar.addView(back);
+        bar.addView(back, new LinearLayout.LayoutParams(dp(48), dp(48)));
 
         TextView title = new TextView(getContext());
+        pageTitle = title;
         title.setText("Hushfacebook");
         title.setTextColor(foreground());
-        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         title.setPaddingRelative(dp(8), 0, 0, 0);
         title.setAccessibilityHeading(true);
-        bar.addView(title);
+        bar.addView(title, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         root.addView(bar);
+
+        buildSearch(root);
 
         FrameLayout container = new FrameLayout(getContext());
         container.setId(CONTAINER_ID);
@@ -158,6 +172,82 @@ public final class SettingsDialog extends DialogFragment {
             return insets;
         });
         return root;
+    }
+
+    private void buildSearch(LinearLayout root) {
+        ScreenColors palette = colors == null ? ScreenColors.DEFAULT : colors;
+        searchBox = new LinearLayout(getContext());
+        searchBox.setGravity(Gravity.CENTER_VERTICAL);
+        android.graphics.drawable.GradientDrawable surface = new android.graphics.drawable.GradientDrawable();
+        surface.setColor(palette.card);
+        surface.setCornerRadius(dp(10));
+        surface.setStroke(dp(1), palette.outline);
+        searchBox.setBackground(surface);
+        searchBox.setPaddingRelative(dp(16), 0, 0, 0);
+        ImageView icon = new ImageView(getContext());
+        icon.setImageDrawable(SettingsIcons.icon(getContext(), SettingsIcons.SEARCH, palette.summary));
+        icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        searchBox.addView(icon, new LinearLayout.LayoutParams(dp(24), dp(24)));
+        search = new EditText(getContext());
+        search.setHint(L10n.t("Search settings"));
+        search.setContentDescription(L10n.t("Search settings"));
+        search.setSingleLine(true);
+        search.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        search.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        search.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
+        search.setBackground(null);
+        search.setTextColor(palette.title);
+        search.setHintTextColor(palette.summary);
+        search.setPaddingRelative(dp(12), dp(12), 0, dp(12));
+        search.setMinimumHeight(dp(52));
+        searchBox.addView(search, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        android.widget.ImageButton clear = new android.widget.ImageButton(getContext());
+        clear.setImageDrawable(SettingsIcons.icon(getContext(), SettingsIcons.CLOSE, palette.summary));
+        clear.setBackgroundColor(Color.TRANSPARENT);
+        clear.setPadding(dp(12), dp(12), dp(12), dp(12));
+        clear.setContentDescription(L10n.t("Clear search"));
+        clear.setVisibility(View.INVISIBLE);
+        clear.setOnClickListener(ignored -> search.setText(""));
+        searchBox.addView(clear, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        search.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence text, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence text, int start, int before, int count) {
+                clear.setVisibility(text.length() == 0 ? View.INVISIBLE : View.VISIBLE);
+                HushfacebookPreferenceFragment page = page();
+                if (!settingSearch && page != null && page.navigation != null) page.navigation.search(text.toString());
+            }
+            @Override public void afterTextChanged(Editable text) { }
+        });
+        search.setOnEditorActionListener((view, action, event) -> {
+            if (action != android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) return false;
+            hideKeyboard();
+            return true;
+        });
+        LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layout.setMargins(dp(16), 0, dp(16), dp(12));
+        root.addView(searchBox, layout);
+        // A newly opened screen must not steal focus and raise the keyboard.
+        root.setFocusableInTouchMode(true);
+        root.requestFocus();
+        searchBox.setVisibility(View.GONE);
+    }
+
+    void showPage(CharSequence title, boolean home, String query) {
+        pageTitle.setText(title);
+        searchBox.setVisibility(home ? View.VISIBLE : View.GONE);
+        settingSearch = true;
+        if (!search.getText().toString().equals(query)) search.setText(query);
+        settingSearch = false;
+        if (!home || query.isEmpty()) {
+            search.clearFocus();
+            hideKeyboard();
+        }
+    }
+
+    private void hideKeyboard() {
+        android.view.inputmethod.InputMethodManager keyboard = getContext().getSystemService(android.view.inputmethod.InputMethodManager.class);
+        if (keyboard != null) keyboard.hideSoftInputFromWindow(search.getWindowToken(), 0);
     }
 
     /**

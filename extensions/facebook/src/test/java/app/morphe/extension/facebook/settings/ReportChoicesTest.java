@@ -164,10 +164,13 @@ public class ReportChoicesTest {
             for (TextView text : new TextView[]{((ChoiceCards.Card) card).name, ((ChoiceCards.Card) card).detail}) {
                 assertEquals("\"" + text.getText() + "\" was cut off", 0, cutOff(text));
                 if (text.getLineCount() > 1) wrapped++;
-                assertTrue("\"" + text.getText() + "\" runs to the card's edge: " + text.getLeft() + ".." + text.getRight()
-                        + " in " + surface, text.getLeft() >= surface.left + dp(12) && text.getRight() <= surface.right - dp(12));
+                Rect bounds = new Rect();
+                text.getDrawingRect(bounds);
+                ((android.view.ViewGroup) card).offsetDescendantRectToMyCoords(text, bounds);
+                assertTrue("\"" + text.getText() + "\" runs to the card's edge: " + bounds
+                        + " in " + surface, bounds.left >= surface.left + dp(12) && bounds.right <= surface.right - dp(12));
                 assertTrue("\"" + text.getText() + "\" runs to the card's top or bottom",
-                        text.getTop() >= surface.top + dp(8) && text.getBottom() <= surface.bottom - dp(8));
+                        bounds.top >= surface.top + dp(8) && bounds.bottom <= surface.bottom - dp(8));
             }
         }
         if (fontScale > 1f) assertTrue("nothing wrapped at twice the text size, so this proves little", wrapped > 0);

@@ -10,7 +10,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.preference.Preference;
 import android.view.View;
 import android.widget.ListView;
@@ -24,7 +23,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowDialog;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -63,21 +61,19 @@ public class SectionJumpTest {
         HushfacebookPreferenceFragment page = page(dialog);
         ListView list = laidOut(dialog);
 
-        Preference jump = (Preference) list.getItemAtPosition(1);
-        assertEquals("Jump to a section", String.valueOf(jump.getTitle()));
-        assertTrue(jump.getOnPreferenceClickListener().onPreferenceClick(jump));
-
-        AlertDialog shown = (AlertDialog) ShadowDialog.getLatestDialog();
-        assertNotNull("tapping the row opened nothing", shown);
-        ListView choices = shown.getListView();
+        assertEquals("Browse settings", ((Preference) list.getItemAtPosition(1)).getTitle());
         List<String> titles = new ArrayList<>();
-        for (int i = 0; i < choices.getAdapter().getCount(); i++) titles.add(String.valueOf(choices.getAdapter().getItem(i)));
+        for (int i = 2; i < list.getCount() - 1; i++) titles.add(((Preference) list.getItemAtPosition(i)).getTitle().toString());
+        Preference more = (Preference) list.getItemAtPosition(list.getCount() - 1);
+        assertEquals("More settings", more.getTitle());
+        assertTrue(more.getOnPreferenceClickListener().onPreferenceClick(more));
+        for (int i = 0; i < list.getCount(); i++) titles.add(((Preference) list.getItemAtPosition(i)).getTitle().toString());
         List<String> expected = new ArrayList<>();
-        for (Preference section : page.sections()) expected.add(String.valueOf(section.getTitle()));
-        assertEquals(expected, titles);
-        assertTrue("Downloads isn't offered: " + titles, titles.contains("Downloads"));
-        assertTrue("Links isn't offered: " + titles, titles.contains("Links"));
-        assertTrue("too few sections to be the whole page: " + titles, titles.size() >= 8);
+        for (Preference section : page.sections()) expected.add(section.getTitle().toString());
+        assertEquals(new java.util.HashSet<>(expected), new java.util.HashSet<>(titles));
+        assertEquals(expected.size(), titles.size());
+        assertTrue(titles.contains("Downloads"));
+        assertTrue(titles.contains("Links"));
     }
 
     @Test
@@ -88,17 +84,10 @@ public class SectionJumpTest {
         assertEquals(0, list.getFirstVisiblePosition());
 
         Preference downloads = sectionTitled(page, "Downloads");
-        int heading = -1;
-        for (int i = 0; i < list.getAdapter().getCount(); i++) if (list.getItemAtPosition(i) == downloads) heading = i;
-        assertTrue(heading > 5);
         assertTrue(page.jumpTo(downloads));
         relayout(list);
-        // A person gets here by tapping, which puts the list in touch mode and the heading at the
-        // top. Outside touch mode, as under Robolectric, ListView moves a selection off a heading,
-        // which can't be selected, onto the section's first row, one below it.
-        int first = list.getFirstVisiblePosition();
-        assertTrue("Downloads isn't at the top: the list starts at " + first + ", the heading is " + heading,
-                first == heading || first == heading + 1);
+        assertEquals(((android.preference.PreferenceCategory) downloads).getPreferenceCount(), list.getCount());
+        assertEquals(downloads, ((Preference) list.getItemAtPosition(0)).getParent());
 
         dialog.getDialog().onBackPressed();
         relayout(list);

@@ -214,9 +214,9 @@ public class SettingsAccessibilityTest {
             assertTrue(item(row).getTitle() + " is " + row.getMinimumHeight() + " px tall at least",
                     row.getMinimumHeight() >= floor);
         }
-        TextView back = SettingsL10nTest.backOf(dialog);
-        assertTrue("the back arrow's width floor is " + back.getMinWidth(), back.getMinWidth() >= floor);
-        assertTrue("the back arrow's height floor is " + back.getMinHeight(), back.getMinHeight() >= floor);
+        android.widget.ImageButton back = SettingsL10nTest.backOf(dialog);
+        assertTrue("the back arrow's width floor is " + back.getMinimumWidth(), back.getMinimumWidth() >= floor);
+        assertTrue("the back arrow's height floor is " + back.getMinimumHeight(), back.getMinimumHeight() >= floor);
         back.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         assertTrue("the back arrow measures " + back.getMeasuredWidth() + " by " + back.getMeasuredHeight(),
@@ -226,12 +226,12 @@ public class SettingsAccessibilityTest {
     @Test
     public void theTitleIsAHeadingAndBackIsANamedButton() {
         SettingsDialog dialog = SettingsL10nTest.show(controller.get());
-        TextView back = SettingsL10nTest.backOf(dialog);
+        android.widget.ImageButton back = SettingsL10nTest.backOf(dialog);
         AccessibilityNodeInfo info = node(back);
         assertEquals(Button.class.getName(), String.valueOf(info.getClassName()));
         assertEquals("Back", String.valueOf(info.getContentDescription()));
         assertTrue(info.getActionList().contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK));
-        assertEquals(SettingsDialog.BACK_ARROW, String.valueOf(back.getText()));
+        assertNotNull("the back icon is missing", back.getDrawable());
 
         View title = ((android.view.ViewGroup) back.getParent()).getChildAt(1);
         assertEquals("Hushfacebook", String.valueOf(((TextView) title).getText()));
@@ -241,19 +241,31 @@ public class SettingsAccessibilityTest {
     @Test
     @Config(qualifiers = "ar-rXB-ldrtl")
     public void inARightToLeftLanguageTheWayBackPointsRight() {
-        TextView back = SettingsL10nTest.backOf(SettingsL10nTest.show(controller.get()));
-        assertEquals(SettingsDialog.BACK_ARROW_RIGHT_TO_LEFT, String.valueOf(back.getText()));
+        android.widget.ImageButton back = SettingsL10nTest.backOf(SettingsL10nTest.show(controller.get()));
+        android.graphics.drawable.Drawable arrow = back.getDrawable();
+        assertNotNull(arrow);
+        assertTrue("the original Material arrow must mirror", arrow.isAutoMirrored());
+        assertEquals(View.LAYOUT_DIRECTION_RTL, arrow.getLayoutDirection());
     }
 
     /** Every row the list draws, laid out tall enough that none is left off. */
     private static List<View> rows(SettingsDialog dialog) {
         ListView list = dialog.getView().findViewById(android.R.id.list);
         assertNotNull("no list in the dialog", list);
+        HushfacebookPreferenceFragment page = (HushfacebookPreferenceFragment) dialog.getChildFragmentManager()
+                .findFragmentById(SettingsDialog.CONTAINER_ID);
+        // Verify every preference row independently of the category shell.
+        list.setAdapter(page.getPreferenceScreen().getRootAdapter());
+        list.setOnItemClickListener(page.getPreferenceScreen());
         list.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(40000, View.MeasureSpec.EXACTLY));
         list.layout(0, 0, 1080, 40000);
         List<View> rows = new ArrayList<>();
-        for (int index = 0; index < list.getChildCount(); index++) rows.add(list.getChildAt(index));
+        for (int index = 0; index < list.getChildCount(); index++) {
+            View row = list.getChildAt(index);
+            row.setTag(list.getItemAtPosition(index));
+            rows.add(row);
+        }
         assertEquals("the list left rows off", list.getAdapter().getCount(), rows.size());
         return rows;
     }
@@ -266,8 +278,7 @@ public class SettingsAccessibilityTest {
     }
 
     private static Preference item(View row) {
-        ListView list = (ListView) row.getParent();
-        return (Preference) list.getItemAtPosition(list.getPositionForView(row));
+        return (Preference) row.getTag();
     }
 
     private static AccessibilityNodeInfo node(View view) {

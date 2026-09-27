@@ -2,6 +2,13 @@
 
 Every Hushfacebook release, newest first.
 
+## 0.3.4 (2026-09-27)
+
+* **Facebook:** Settings now open to a searchable overview. Six main categories lead to their own pages, with the rest under More settings. Search keeps the real controls in its results. Back returns through the pages, and rotation keeps your location and search.
+* **Facebook:** The settings pages have clearer spacing and consistent dark surfaces, with Material icons and refreshed dialogs. The existing light and wallpaper themes still work. Pause and Resume are available from the overview, with Undo before restarting.
+* **Facebook:** Video file names now show an example while you type. The field appears before its help text, so it's easier to reach above the keyboard. Several long descriptions are shorter, with updated translations in all five supported languages.
+* **Facebook:** Opening a page starts at the top, and Back restores the category list's scroll position. The overview action leaves more room for status text. All six download quality choices fit at the normal text size.
+
 ## 0.3.3 (2026-09-27)
 
 * **Facebook:** Tap to play now clears the initial Reels play button when playback starts. Facebook only cleared that state for certain viewer configurations, which could leave the button over a moving video. The fix uses the existing control cleanup and keeps paused controls and the off setting unchanged.

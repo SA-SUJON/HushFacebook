@@ -12,12 +12,7 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -129,6 +124,19 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     @Nullable
     int[] beforeJump;
 
+    @Nullable
+    SettingsNavigation navigation;
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // The complete model remains usable as a standalone preference page. The dialog adds
+        // its navigation shell only after the framework has bound that model to the list.
+        if (getParentFragment() instanceof SettingsDialog && !sections().isEmpty()) {
+            navigation = new SettingsNavigation(this, (SettingsDialog) getParentFragment(), savedInstanceState);
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState != null) pendingImport = savedInstanceState.getBundle(PENDING_IMPORT_STATE);
@@ -161,6 +169,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (pendingImport != null) outState.putBundle(PENDING_IMPORT_STATE, pendingImport);
+        if (navigation != null) navigation.save(outState);
     }
 
     @Override
@@ -169,6 +178,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         // replaces this one shows it again.
         SettingsBackupPreference.closePreview(this);
         ReleaseCheck.unwatch(this);
+        if (navigation != null) navigation.close();
+        navigation = null;
         super.onDestroyView();
     }
 
@@ -255,8 +266,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
             if (build.contains(PatchFamily.START_TAB)) {
                 opening.addPreference(toggle(context, Settings.OPEN_ON_CHOSEN_TAB, L10n.t("Open on a chosen tab"),
-                        L10n.t("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual "
-                                + "one. Notifications and links still open where they lead.")));
+                        L10n.t("Choose where Facebook opens from its icon. Notifications and links still open their destination.")));
                 opening.addPreference(startTabRow(context));
             }
         }
@@ -351,9 +361,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 // shows when Facebook next loads the tray, not on the tray already drawn.
                 stories.addPreference(toggle(context, Settings.HIDE_SUGGESTED_STORIES,
                         L10n.t("Hide suggested stories"),
-                        L10n.t("Stories in the tray from people and Pages you don't follow, the ones marked Suggested. "
-                                + "Your friends' stories and the Pages you follow stay. A change shows the next time "
-                                + "Facebook loads the tray.")));
+                        L10n.t("Keep friends and followed Pages in the Stories tray. Applies when Facebook next loads the tray.")));
             }
             if (build.contains(PatchFamily.STORY_AUTO_ADVANCE)) {
                 stories.addPreference(toggle(context, Settings.BLOCK_STORY_AUTO_ADVANCE,
@@ -362,9 +370,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
             if (build.contains(PatchFamily.STORY_DOWNLOAD)) {
                 stories.addPreference(toggle(context, Settings.DOWNLOAD_STORIES, L10n.t("Save any story"),
-                        L10n.t("Adds Save to the menu of anyone's story, and saves at the quality set under "
-                                + "Downloads. Off or paused, only your own stories have Save, and it's "
-                                + "Facebook's own.")));
+                        L10n.t("Add Save to every story menu, using your download quality. Off or paused, Facebook only saves your own stories.")));
             }
         }
 
@@ -402,23 +408,18 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             if (build.contains(PatchFamily.REEL_WATCH_HISTORY)) {
                 reels.addPreference(toggle(context, Settings.DONT_SEND_REEL_WATCH_HISTORY,
                         L10n.t("Don't send reel watch history"),
-                        L10n.t("Facebook stops getting the list of reels you've watched, which it uses to rank your "
-                                + "Reels feed. Nobody else sees that list. Reels you've already watched may come back "
-                                + "in the feed.")));
+                        L10n.t("Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.")));
             }
             if (build.contains(PatchFamily.REEL_DOWNLOAD)) {
                 reels.addPreference(toggle(context, Settings.DOWNLOAD_REELS, L10n.t("Download button on reels"),
-                        L10n.t("A Download button in the sidebar of every reel saves it at the quality set "
-                                + "under Downloads. Off or paused, reels show only Facebook's own buttons.")));
+                        L10n.t("Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.")));
             }
         }
 
         if (build.contains(PatchFamily.DEFAULT_COMMENT_ORDER)) {
             PreferenceCategory comments = category(screen, L10n.t("Comments"));
             comments.addPreference(toggle(context, Settings.DEFAULT_COMMENT_ORDER, L10n.t("Default comment order"),
-                    L10n.t("Comments open in the order chosen below instead of the one Facebook picks. An order you "
-                            + "pick in a post's comments stays for that post until Facebook restarts, and links to a "
-                            + "comment keep Facebook's order.")));
+                    L10n.t("Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.")));
             comments.addPreference(commentOrderRow(context));
         }
 
@@ -426,23 +427,18 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             PreferenceCategory writing = category(screen, L10n.t("Writing"));
             writing.addPreference(toggle(context, Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
                     L10n.t("Tag suggestions only after @"),
-                    L10n.t("Facebook stops offering people to tag while you type ordinary words in posts and "
-                            + "comments. Typing @ still brings up the list, and what you wrote is never changed.")));
+                    L10n.t("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.")));
         }
 
         if (build.contains(PatchFamily.TAP_TO_PLAY) || build.contains(PatchFamily.RESUME_LONG_VIDEOS)) {
             PreferenceCategory playback = category(screen, L10n.t("Playback"));
             if (build.contains(PatchFamily.TAP_TO_PLAY)) {
                 playback.addPreference(toggle(context, Settings.TAP_TO_PLAY, L10n.t("Tap to play"),
-                        L10n.t("Videos, reels, stories and music wait for your tap before they play. Facebook's own "
-                                + "Autoplay setting reads Off while this is on, and goes back to what you chose when "
-                                + "it's off.")));
+                        L10n.t("Videos, reels, stories and music wait for your tap. Facebook's Autoplay setting temporarily reads Off.")));
             }
             if (build.contains(PatchFamily.RESUME_LONG_VIDEOS)) {
                 playback.addPreference(toggle(context, Settings.RESUME_LONG_VIDEOS, L10n.t("Resume long videos"),
-                        L10n.t("A video over two minutes long that you left partway picks up where you left it "
-                                + "the next time it plays. Drag the seek bar to start somewhere else. Reels, live "
-                                + "videos and ads start as usual.")));
+                        L10n.t("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.")));
             }
         }
 
@@ -451,15 +447,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             PreferenceCategory downloads = category(screen, L10n.t("Downloads"));
             if (build.contains(PatchFamily.VIDEO_DOWNLOAD)) {
                 downloads.addPreference(toggle(context, Settings.DOWNLOAD_VIDEOS, L10n.t("Download feed and Watch videos"),
-                        L10n.t("Adds \"Download to phone\" to feed and Watch video menus. Saves at the quality set "
-                                + "below. Off or paused, Facebook's menu returns.")));
+                        L10n.t("Add Download to phone to feed and Watch video menus. Uses the quality below. Off or paused, Facebook's menu returns.")));
             }
             // Every save reads it, a story's and a reel's as much as a feed video's, so it's here
             // whichever download patch is in, above the quality it keeps within.
             downloads.addPreference(toggle(context, Settings.DOWNLOAD_COMPATIBLE, L10n.t("Save videos other apps can open"),
-                    L10n.t("Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest "
-                            + "version is often AV1, which some apps turn down, so a video can save at a lower quality. "
-                            + "A video with no such version saves as usual.")));
+                    L10n.t("Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lower than AV1. Without a compatible version, save as usual.")));
             downloads.addPreference(qualityRow(context));
             downloads.addPreference(folderRow(context));
             downloads.addPreference(fileNameRow(context));
@@ -539,7 +532,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             PreferenceCategory links = category(screen, L10n.t("Links"));
             if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {
                 links.addPreference(toggle(context, Settings.OPEN_LINKS_EXTERNALLY, L10n.t("Open links in your browser"),
-                        L10n.t("Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.")));
+                        L10n.t("Open web links in your browser. Facebook's own pages stay in the app.")));
             }
             if (build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {
                 links.addPreference(toggle(context, Settings.SANITIZE_SHARING_LINKS,
@@ -558,9 +551,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                             + "Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.")));
         }
         updates.addPreference(toggle(context, Settings.CHECK_FOR_RELEASES, L10n.t("Check for new Hushfacebook releases"),
-                L10n.t("Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it "
-                        + "at the top of this screen if it's newer. It's the only time Hushfacebook goes online for "
-                        + "itself, so it's off until you turn it on. Nothing gets downloaded.")));
+                L10n.t("Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.")));
         updates.addPreference(checkNowRow(context));
         ReleaseCheck.watch(this);
 
@@ -568,8 +559,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
             if (build.contains(PatchFamily.SYSTEM_FONT)) {
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT, L10n.t("Use the system font"),
-                        L10n.t("Facebook's text is drawn in your phone's font, or in a font file you choose below, "
-                                + "instead of Meta's own. Restart Facebook after changing this.")));
+                        L10n.t("Use your phone's font or a file chosen below. Restart Facebook after changing it.")));
                 // The file the switch draws in, and, while one is picked, the way back to the phone's font.
                 // The way back goes in once whatever is picked, so it keeps its place right after Font file
                 // when a pick brings it back, rather than landing at the end of the section.
@@ -582,8 +572,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             if (build.contains(PatchFamily.SYSTEM_EMOJI)) {
                 // The quick emoji picker keeps the first typeface it's given until Facebook restarts.
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_EMOJI, L10n.t("Use the phone's emoji"),
-                        L10n.t("Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and "
-                                + "stickers don't change. Restart Facebook after changing this.")));
+                        L10n.t("Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.")));
             }
         }
 
@@ -593,34 +582,34 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 || build.contains(PatchFamily.INSTALL_BESIDE_META_APPS)) {
             PreferenceCategory patched = category(screen, L10n.t("Set when you patched"));
             if (build.contains(PatchFamily.AD_PREFETCH)) {
-                patched.addPreference(info(context, L10n.t("Background ad prefetch blocked"),
-                        L10n.t("Facebook doesn't download ads or its ad model in the background.")));
+                patched.addPreference(mark(info(context, L10n.t("Background ad prefetch blocked"),
+                        L10n.t("Facebook doesn't download ads or its ad model in the background.")), SettingsIcons.BLOCK));
             }
             if (build.contains(PatchFamily.AD_TELEMETRY)) {
-                patched.addPreference(info(context, L10n.t("Ad telemetry blocked"),
-                        L10n.t("No screenshot watching for ads, and no reports of which apps you install.")));
+                patched.addPreference(mark(info(context, L10n.t("Ad telemetry blocked"),
+                        L10n.t("No screenshot watching for ads, and no reports of which apps you install.")), SettingsIcons.TELEMETRY));
             }
             if (build.contains(PatchFamily.AUDIENCE_NETWORK)) {
-                patched.addPreference(info(context, L10n.t("Audience Network off"),
-                        L10n.t("Facebook doesn't serve ads to other apps on this phone.")));
+                patched.addPreference(mark(info(context, L10n.t("Audience Network off"),
+                        L10n.t("Facebook doesn't serve ads to other apps on this phone.")), SettingsIcons.NETWORK));
             }
             if (build.contains(PatchFamily.AMOLED_THEME)) {
-                patched.addPreference(info(context, L10n.t("AMOLED black theme"),
-                        L10n.t("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.")));
+                patched.addPreference(mark(info(context, L10n.t("AMOLED black theme"),
+                        L10n.t("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.")), SettingsIcons.MOON));
             }
             if (build.contains(PatchFamily.MATERIAL_YOU_THEME)) {
-                patched.addPreference(info(context, L10n.t("Material You theme"),
+                patched.addPreference(mark(info(context, L10n.t("Material You theme"),
                         L10n.t("Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue "
-                                + "instead. Turn on Facebook dark mode to see it.")));
+                                + "instead. Turn on Facebook dark mode to see it.")), SettingsIcons.APPEARANCE));
             }
             if (build.contains(PatchFamily.RESTORE_TRUST)) {
-                patched.addPreference(info(context, L10n.t("Re-signed build fix"),
-                        L10n.t("Profiles and some Settings pages open again on this re-signed build.")));
+                patched.addPreference(mark(info(context, L10n.t("Re-signed build fix"),
+                        L10n.t("Profiles and some Settings pages open again on this re-signed build.")), SettingsIcons.BUILD));
             }
             if (build.contains(PatchFamily.INSTALL_BESIDE_META_APPS)) {
-                patched.addPreference(info(context, L10n.t("Room for Meta's apps"),
+                patched.addPreference(mark(info(context, L10n.t("Room for Meta's apps"),
                         L10n.t("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. "
-                                + "It gives the two permissions they share with it names of its own.")));
+                                + "It gives the two permissions they share with it names of its own.")), SettingsIcons.PHONE));
             }
             patched.addPreference(info(context, L10n.t("Changing these"),
                     L10n.t("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. "
@@ -629,42 +618,41 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
 
         // Named for its rows: the screen's own title already says Hushfacebook.
         PreferenceCategory hushfacebook = category(screen, L10n.t("Pause, backup and diagnostics"));
-        hushfacebook.addPreference(toggle(context, BaseSettings.PAUSED, L10n.t("Pause Hushfacebook"),
-                L10n.t("From the next start, the switches above stop running and Facebook's own behaviour returns. "
-                        + "Debug logging keeps working, and your choices stay.")));
+        hushfacebook.addPreference(mark(toggle(context, BaseSettings.PAUSED, L10n.t("Pause Hushfacebook"),
+                L10n.t("Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.")), SettingsIcons.PATCHED));
         String stays = PatchFamily.staysWhilePausedSummary(build);
-        if (stays != null) hushfacebook.addPreference(info(context, L10n.t(STAYS_WHILE_PAUSED), stays));
         // Morphe Manager can export the patch choices and the signing key, not these switches.
-        hushfacebook.addPreference(new BackupRow(this, context, SettingsBackupPreference.EXPORT,
+        hushfacebook.addPreference(mark(new BackupRow(this, context, SettingsBackupPreference.EXPORT,
                 L10n.t("Export settings"),
                 L10n.t("Save your switches and download settings to a file. Pause and Debug logging aren't included, "
-                        + "and neither is the release check.")));
+                        + "and neither is the release check.")), SettingsIcons.EXPORT));
         // The preview gives a count of the switches and the download settings' new values, not
         // each switch by name.
-        hushfacebook.addPreference(new BackupRow(this, context, SettingsBackupPreference.IMPORT,
+        hushfacebook.addPreference(mark(new BackupRow(this, context, SettingsBackupPreference.IMPORT,
                 L10n.t("Import settings"),
                 L10n.t("Choose a settings file. Before anything is imported, you'll see how many switches it "
-                        + "changes and any new download settings.")));
+                        + "changes and any new download settings.")), SettingsIcons.DOWNLOADS));
         // Debug logging also fills the exported report and turns on error toasts (Logger).
-        hushfacebook.addPreference(toggle(context, BaseSettings.DEBUG, L10n.t("Debug logging"),
-                L10n.t("Writes what each patch does to the Android log and the diagnostic report, and shows "
-                        + "errors on screen. Leave it off unless you're reporting a problem.")));
+        hushfacebook.addPreference(mark(toggle(context, BaseSettings.DEBUG, L10n.t("Debug logging"),
+                L10n.t("Record patch activity and show errors for a bug report. Leave off during normal use.")), SettingsIcons.BUG));
         // Both rows come without a title of their own: Hushfeed's gave them one from string
         // resources that Facebook's APK doesn't have, and untitled they showed as blank rows.
         ExportDiagnosticReportPreference export = new ExportRow(context);
         export.setTitle(L10n.t("Export diagnostic report"));
         export.setSummary(L10n.t("Copy a quick report or save the full one to Download/Morphe. Names, IDs, links "
                 + "and cookies are omitted."));
-        hushfacebook.addPreference(export);
+        hushfacebook.addPreference(mark(export, SettingsIcons.LICENSE));
         ClearLogBufferPreference clear = new ClearRow(context);
         clear.setTitle(L10n.t("Clear diagnostic data"));
         clear.setClearAndUndoSummaries(L10n.t("Empties the log and the filter counts a report would include."),
                 L10n.t("Diagnostic data cleared. Tap again to put it back."));
-        hushfacebook.addPreference(clear);
+        hushfacebook.addPreference(mark(clear, SettingsIcons.DELETE));
+        // Keep the detailed patch-time exception list after the controls people come here for.
+        if (stays != null) hushfacebook.addPreference(info(context, L10n.t(STAYS_WHILE_PAUSED), stays));
 
         PreferenceCategory about = category(screen, L10n.t("About"));
-        about.addPreference(info(context, L10n.t("Version"), L10n.f("Hushfacebook %1$s on Facebook %2$s",
-                L10n.isolate(Utils.getPatchesReleaseVersion()), L10n.isolate(Utils.getAppVersionName()))));
+        about.addPreference(mark(info(context, L10n.t("Version"), L10n.f("Hushfacebook %1$s on Facebook %2$s",
+                L10n.isolate(Utils.getPatchesReleaseVersion()), L10n.isolate(Utils.getAppVersionName()))), SettingsIcons.ABOUT));
 
         Preference source = new Row(context);
         source.setTitle(L10n.t("Source code and issues"));
@@ -681,7 +669,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
             return true;
         });
-        about.addPreference(source);
+        about.addPreference(mark(source, SettingsIcons.OPENING));
 
         // Section 7b asks that its notice reach the person using the software, and a file in the
         // repository does not reach them.
@@ -693,7 +681,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             showNotice(context);
             return true;
         });
-        about.addPreference(licenses);
+        about.addPreference(mark(licenses, SettingsIcons.LICENSE));
     }
 
     /**
@@ -742,6 +730,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * Back. Looked up in the list's own adapter, so it lands right however the page is flattened.
      */
     boolean jumpTo(Preference section) {
+        if (navigation != null) return navigation.open(section);
         ListView list = listView();
         if (list == null || list.getAdapter() == null) return false;
         for (int position = 0; position < list.getAdapter().getCount(); position++) {
@@ -756,6 +745,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
 
     /** Back after a jump: the list goes back to where it was, once, and the page stays open. */
     boolean backFromJump() {
+        if (navigation != null) return navigation.back();
         int[] before = beforeJump;
         if (before == null) return false;
         beforeJump = null;
@@ -780,33 +770,9 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         card.setPersistent(false);
         ScreenColors colors = ScreenColors.shown;
         boolean paused = HushfacebookPause.isPaused();
-        int fill = paused
-                ? (colors == null ? 0xFF858D9C : colors.switchOff)
-                : (colors == null ? 0xFF1769E0 : colors.accent);
-        int diameter = Math.round(40 * context.getResources().getDisplayMetrics().density);
-        Bitmap mark = Bitmap.createBitmap(diameter, diameter, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(mark);
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(fill);
-        canvas.drawRoundRect(0, 0, diameter, diameter, diameter / 5f, diameter / 5f, paint);
-        paint.setColor(colors == null ? Color.WHITE : colors.onAccent);
-        if (paused) {
-            canvas.drawRoundRect(diameter * .32f, diameter * .27f, diameter * .43f, diameter * .73f,
-                    diameter * .05f, diameter * .05f, paint);
-            canvas.drawRoundRect(diameter * .57f, diameter * .27f, diameter * .68f, diameter * .73f,
-                    diameter * .05f, diameter * .05f, paint);
-        } else {
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(diameter / 10f);
-            paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setStrokeJoin(Paint.Join.ROUND);
-            Path check = new Path();
-            check.moveTo(diameter * .24f, diameter * .52f);
-            check.lineTo(diameter * .43f, diameter * .70f);
-            check.lineTo(diameter * .77f, diameter * .32f);
-            canvas.drawPath(check, paint);
-        }
-        card.setIcon(new BitmapDrawable(context.getResources(), mark));
+        ScreenColors palette = colors == null ? ScreenColors.DEFAULT : colors;
+        card.setIcon(SettingsIcons.icon(context, paused ? SettingsIcons.PAUSE : SettingsIcons.PATCHED,
+                paused ? palette.summary : palette.heading));
         statusCard = card;
         if (!paused) {
             card.setTitle(L10n.t("Hushfacebook is on"));
@@ -819,19 +785,25 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         // A tap acts at once, taking the pause off the next start, and the card says so in words.
         card.actsAtOnce = true;
         card.setOnPreferenceClickListener(p -> {
-            boolean markerGone = HushfacebookPause.turnBackOn(context);
-            Preference pause = findPreference(BaseSettings.PAUSED.key);
-            if (pause instanceof SwitchPreference) ((SwitchPreference) pause).setChecked(false);
-            if (markerGone) {
-                showStatus(card, context);
-            } else {
-                card.setSummary(L10n.f("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
-                        L10n.isolate(HushfacebookPause.MARKER_FILE_NAME),
-                        L10n.isolate(markerFolder(context.getPackageName()))));
-            }
+            resumeFromOverview();
             return true;
         });
         return card;
+    }
+
+    void resumeFromOverview() {
+        Context context = getContext();
+        if (context == null || statusCard == null) return;
+        boolean markerGone = HushfacebookPause.turnBackOn(context);
+        Preference pause = findPreference(BaseSettings.PAUSED.key);
+        if (pause instanceof SwitchPreference) ((SwitchPreference) pause).setChecked(false);
+        if (markerGone) {
+            showStatus(statusCard, context);
+        } else {
+            statusCard.setSummary(L10n.f("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
+                    L10n.isolate(HushfacebookPause.MARKER_FILE_NAME),
+                    L10n.isolate(markerFolder(context.getPackageName()))));
+        }
     }
 
     /**
@@ -928,8 +900,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (chosen != null) {
             chosen.setEnabled(!selected);
             chosen.setSummary(selected ? L10n.t("Marketplace mode chooses the opening tab. Your previous choice stays saved.")
-                    : L10n.t("Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual "
-                            + "one. Notifications and links still open where they lead."));
+                    : L10n.t("Choose where Facebook opens from its icon. Notifications and links still open their destination."));
         }
         Preference tab = findPreference(Settings.START_TAB.key);
         if (tab != null) {
@@ -1011,6 +982,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     @Override
     protected ErrorActionStyler errorActionStyler() {
         return ScreenColors::recoveryAction;
+    }
+
+    @Override
+    protected void styleInitializationMessage(View row) {
+        ScreenColors.recoveryMessage(row);
     }
 
     private static PreferenceCategory category(PreferenceScreen screen, String title) {
@@ -1350,6 +1326,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         return summary;
     }
 
+    private static Preference mark(Preference row, String icon) {
+        ScreenColors colors = ScreenColors.shown == null ? ScreenColors.DEFAULT : ScreenColors.shown;
+        row.setIcon(SettingsIcons.icon(row.getContext(), icon, colors.heading));
+        return row;
+    }
+
     private static Preference info(Context context, String title, String summary) {
         Preference preference = new Row(context);
         preference.setTitle(title);
@@ -1513,8 +1495,66 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * shared page syncing it from the setting, or an import.
      */
     static final class FileNameRow extends EditTextPreference {
+        @Nullable private TextView preview;
+        private java.util.Date previewDate;
+
         FileNameRow(Context context) {
             super(context);
+            getEditText().addTextChangedListener(new android.text.TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence text, int start, int count, int after) { }
+                @Override public void onTextChanged(CharSequence text, int start, int before, int count) {
+                    if (preview != null) preview.setText(previewName(text.toString(), previewDate));
+                }
+                @Override public void afterTextChanged(android.text.Editable text) { }
+            });
+        }
+
+        static String previewName(String text, java.util.Date when) {
+            return FileNameTemplate.videoName(FileNameTemplate.sanitize(text), when, "123456") + ".mp4";
+        }
+
+        @Override protected View onCreateDialogView() {
+            Context context = getContext();
+            ScreenColors colors = ScreenColors.shown == null ? ScreenColors.DEFAULT : ScreenColors.shown;
+            int pad = Math.round(20 * context.getResources().getDisplayMetrics().density);
+            android.widget.LinearLayout content = new android.widget.LinearLayout(context);
+            content.setOrientation(android.widget.LinearLayout.VERTICAL);
+            content.setPadding(pad, pad / 2, pad, pad);
+            EditText field = getEditText();
+            if (field.getParent() instanceof android.view.ViewGroup) ((android.view.ViewGroup) field.getParent()).removeView(field);
+            content.addView(field, new android.widget.LinearLayout.LayoutParams(-1, -2));
+            TextView label = new TextView(context);
+            label.setText(L10n.t("Example without post details"));
+            label.setTextSize(12);
+            label.setTextColor(colors.summary);
+            label.setPadding(0, pad, 0, pad / 4);
+            content.addView(label);
+            previewDate = new java.util.Date();
+            preview = new TextView(context);
+            preview.setTextSize(14);
+            preview.setTextColor(colors.title);
+            preview.setText(previewName(getText(), previewDate));
+            content.addView(preview);
+            TextView help = new TextView(context);
+            help.setId(android.R.id.message);
+            help.setText(getDialogMessage());
+            help.setTextSize(14);
+            help.setTextColor(colors.summary);
+            help.setPadding(0, pad, 0, 0);
+            content.addView(help);
+            ScrollView scroll = new ScrollView(context);
+            scroll.addView(content);
+            return scroll;
+        }
+
+        @Override protected void onBindDialogView(View view) {
+            // The input is already in the custom scroll container, before its explanatory text.
+            getEditText().setText(getText());
+        }
+
+        @Override protected void onDialogClosed(boolean positive) {
+            super.onDialogClosed(positive);
+            preview = null;
         }
 
         @Override

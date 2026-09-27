@@ -263,7 +263,7 @@ public class SettingsEntryTest {
         dialog.getView().findViewsWithText(labelled, "Back", View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
         View arrow = null;
         for (View view : labelled) {
-            if (view instanceof TextView && "←".contentEquals(((TextView) view).getText())) arrow = view;
+            if (view instanceof android.widget.ImageButton && ((android.widget.ImageButton) view).getDrawable() != null) arrow = view;
         }
         assertNotNull("no arrow in the title bar among " + labelled, arrow);
 

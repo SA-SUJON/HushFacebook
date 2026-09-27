@@ -579,10 +579,10 @@ public class SettingsL10nTest {
     }
 
     /** The back arrow: the first view in the dialog's title bar. */
-    static android.widget.TextView backOf(SettingsDialog dialog) {
+    static android.widget.ImageButton backOf(SettingsDialog dialog) {
         android.view.ViewGroup root = (android.view.ViewGroup) dialog.getView();
         android.view.ViewGroup bar = (android.view.ViewGroup) root.getChildAt(0);
-        return (android.widget.TextView) bar.getChildAt(0);
+        return (android.widget.ImageButton) bar.getChildAt(0);
     }
 
     private static void collect(PreferenceGroup group, List<Preference> rows, Set<String> shown) {

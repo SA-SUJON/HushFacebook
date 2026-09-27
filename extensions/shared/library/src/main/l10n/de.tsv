@@ -10,13 +10,13 @@
 %1$s. It was set when you patched, so Pause can't turn it off. To rule it out, patch again and leave out that patch.	%1$s. Das wurde beim Patchen festgelegt, deshalb kann die Pause es nicht ausschalten. Um es auszuschließen, patche erneut und lass diesen Patch weg.
 %1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.	%1$s. Diese wurden beim Patchen festgelegt, deshalb kann die Pause sie nicht ausschalten. Um eines davon auszuschließen, patche erneut und lass den Patch weg, der in Klammern dahinter steht.
 A diagnostic report is already being saved.	Ein Diagnosebericht wird bereits gespeichert.
-A Download button in the sidebar of every reel saves it at the quality set under Downloads. Off or paused, reels show only Facebook's own buttons.	Ein Download-Button in der Seitenleiste jedes Reels speichert es in der Qualität, die unter „Downloads“ eingestellt ist. Ist der Schalter aus oder Hushfacebook pausiert, zeigen Reels nur Facebooks eigene Buttons.
+Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.	Fügt Reels einen Download-Button mit deiner Downloadqualität hinzu. Ausgeschaltet oder pausiert erscheinen Facebooks eigene Buttons.
 A file named %1$s in %2$s paused Hushfacebook.	Eine Datei namens %1$s in %2$s hat Hushfacebook pausiert.
 About	Info
 Ad cards between the stories people posted.	Werbekarten zwischen den Stories, die Leute gepostet haben.
 Ad telemetry blocked	Werbe-Telemetrie blockiert
-Adds "Download to phone" to feed and Watch video menus. Saves at the quality set below. Off or paused, Facebook's menu returns.	Fügt den Video-Menüs im Feed und in Watch „Aufs Handy herunterladen“ hinzu. Speichert in der Qualität, die weiter unten eingestellt ist. Ausgeschaltet oder pausiert erscheint wieder Facebooks Menü.
-Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.	Fügt „Speichern“ zum Menü jeder Story hinzu, egal von wem, und speichert sie in der Qualität, die unter „Downloads“ eingestellt ist. Ist der Schalter aus oder Hushfacebook pausiert, gibt es „Speichern“ nur bei deinen eigenen Stories, und dort läuft Facebooks eigene Speicherfunktion.
+Add Download to phone to feed and Watch video menus. Uses the quality below. Off or paused, Facebook's menu returns.	Fügt Aufs Telefon herunterladen zu Feed- und Watch-Videomenüs hinzu. Nutzt die Qualität unten. Ausgeschaltet oder pausiert kehrt Facebooks Menü zurück.
+Add Save to every story menu, using your download quality. Off or paused, Facebook only saves your own stories.	Fügt jedem Story-Menü Speichern mit deiner Downloadqualität hinzu. Ausgeschaltet oder pausiert speichert Facebook nur eigene Storys.
 Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.	Anzeigen in Reels, ab den nächsten Reels, die Facebook lädt. Banner, Werbeunterbrechungen und von der App eingefügte Anzeigen bleiben auch während einer Pause blockiert.
 AMOLED black theme	Schwarzes AMOLED-Design
 Appearance	Darstellung
@@ -57,8 +57,8 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook lädt im Hintergrund weder Werbung noch sein Werbemodell herunter.
 Facebook doesn't serve ads to other apps on this phone.	Facebook liefert keine Werbung an andere Apps auf diesem Handy aus.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebooks Dunkelmodus und diese Seite nutzen die Farben deines Hintergrundbilds. Android 11 nutzt stattdessen Blau. Aktiviere Facebooks Dunkelmodus, um es zu sehen.
-Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Emojis werden mit der Emoji-Schriftart deines Handys statt mit der von Meta gezeichnet. Reaktionen und Sticker bleiben, wie sie sind. Starte Facebook nach dem Ändern neu.
-Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.	Facebooks Text wird in der Schriftart deines Handys oder in einer Schriftdatei, die du unten wählst, statt in Metas eigener gezeichnet. Starte Facebook nach dem Ändern neu.
+Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Nutzt die Emoji deines Telefons. Reaktionen und Sticker bleiben gleich. Starte Facebook nach der Änderung neu.
+Use your phone's font or a file chosen below. Restart Facebook after changing it.	Nutzt die Schrift deines Telefons oder eine unten gewählte Datei. Starte Facebook nach der Änderung neu.
 Font file	Schriftdatei
 Use your phone's font	Schriftart des Handys verwenden
 Stops using the font file and goes back to your phone's font.	Verwendet die Schriftdatei nicht mehr und kehrt zur Schriftart deines Handys zurück.
@@ -74,7 +74,7 @@ Couldn't save a copy of that font. Check that the phone has room, then try again
 Couldn't open that file. Your font didn't change.	Diese Datei ließ sich nicht öffnen. Deine Schriftart wurde nicht geändert.
 Back to your phone's font. Restart Facebook to see it.	Zurück zur Schriftart deines Handys. Starte Facebook neu, um sie zu sehen.
 Couldn't go back to your phone's font. Try again.	Die Rückkehr zur Schriftart deines Handys hat nicht geklappt. Versuche es noch einmal.
-From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Ab dem nächsten Start wirken die obigen Schalter nicht mehr und Facebooks eigenes Verhalten kehrt zurück. Die Debug-Protokollierung läuft weiter, und deine Auswahl bleibt erhalten.
+Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.	Pausiert Laufzeitfunktionen ab dem nächsten Start. Deine Auswahl bleibt gespeichert. Debug-Protokollierung und beim Patchen angewendete Änderungen bleiben aktiv.
 Full report saved to %1$s	Vollständiger Bericht gespeichert unter %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, mit den Hinweisen der Projekte, auf denen es aufbaut
 Hide "People you may know"	„Personen, die du kennen könntest“ ausblenden
@@ -131,7 +131,7 @@ Saved. Restart Facebook to apply this change.	Gespeichert. Starte Facebook neu, 
 Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.	Speichert deine Schalter und die Download-Einstellungen in einer Datei. Pause und Debug-Protokollierung sind nicht enthalten, die Suche nach neuen Versionen auch nicht.
 # The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.
 Check for new Hushfacebook releases	Nach neuen Hushfacebook-Versionen suchen
-Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.	Einmal am Tag fragt Hushfacebook beim Start von Facebook bei GitHub nach der neuesten Version und zeigt sie oben auf dieser Seite, wenn sie neuer ist. Nur dafür geht Hushfacebook von sich aus online, deshalb bleibt das aus, bis du es einschaltest. Heruntergeladen wird nichts.
+Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.	Fragt GitHub einmal täglich beim Start ab und zeigt neue Versionen in der Übersicht. Standardmäßig aus. Es wird nichts heruntergeladen.
 Check now	Jetzt prüfen
 Asks GitHub for the newest release right now, even with the switch above off.	Fragt GitHub sofort nach der neuesten Version, auch wenn der Schalter darüber aus ist.
 Checking GitHub now.	GitHub wird gerade gefragt.
@@ -192,8 +192,8 @@ Use the phone's emoji	Emojis des Handys verwenden
 Version	Version
 Version %1$s for Facebook %2$s	Version %1$s für Facebook %2$s
 Videos go to %1$s and photos to %2$s.	Videos landen in %1$s und Fotos in %2$s.
-Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.	Weblinks öffnen sich nicht mehr im In-App-Browser von Facebook. Facebooks eigene Seiten öffnen sich weiterhin in der App.
-Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.	Schreibt ins Android-Protokoll und in den Diagnosebericht, was jeder Patch tut, und zeigt Fehler auf dem Bildschirm an. Lass den Schalter aus, außer du meldest ein Problem.
+Open web links in your browser. Facebook's own pages stay in the app.	Öffnet Weblinks in deinem Browser. Facebooks eigene Seiten bleiben in der App.
+Record patch activity and show errors for a bug report. Leave off during normal use.	Zeichnet Patch-Aktivität auf und zeigt Fehler für einen Fehlerbericht. Im Alltag ausgeschaltet lassen.
 You paused Hushfacebook.	Du hast Hushfacebook pausiert.
 Your switches already match that file, so nothing will change.	Deine Schalter entsprechen bereits dieser Datei, es ändert sich also nichts.
 Keep feed position on return	Feedposition beim Zurückkehren beibehalten
@@ -236,7 +236,7 @@ Stop update prompts	Update-Aufforderungen stoppen
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook fordert dich nicht mehr auf, über den Meta App Manager zu aktualisieren, und lässt ihn nicht mehr nach einem Update suchen. Chat-Hinweise für ältere Versionen entfallen ebenfalls. Ein gepatchter Build kann Metas Updates ohnehin nicht installieren.
 Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reels und Watch-Videos, die Facebooks eigene Erkennung als mit KI erstellt markiert, ab den nächsten, die Facebook lädt. Eines, das nur die Person, die es erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardmäßig aus, weil er noch nicht mit einem echten Konto getestet wurde.
 Don't send reel watch history	Reel-Wiedergabeverlauf nicht senden
-Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.	Facebook erhält nicht mehr die Liste der Reels, die du angesehen hast, mit der es deinen Reels-Feed sortiert. Niemand sonst sieht diese Liste. Bereits angesehene Reels können im Feed wieder auftauchen.
+Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Sendet keine Liste angesehener Reels an Facebook. Sie dient der Feed-Sortierung, daher können angesehene Reels wiederkommen.
 the rename of the shared permissions	die Umbenennung der gemeinsamen Berechtigungen
 Room for Meta's apps	Platz für Metas Apps
 Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.	Messenger, Facebook Lite, Business Suite und Workplace lassen sich neben diesem Facebook installieren. Es gibt den zwei Berechtigungen, die sie mit ihm teilen, eigene Namen.
@@ -244,7 +244,7 @@ Messenger, Facebook Lite, Business Suite and Workplace install beside this Faceb
 Opening Facebook	Beim Öffnen von Facebook
 # context: switch title; the list below it picks the tab
 Open on a chosen tab	Mit einem gewählten Tab starten
-Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.	Wenn du Facebook über sein Symbol startest, öffnet sich statt des üblichen Tabs der unten gewählte. Benachrichtigungen und Links öffnen weiterhin dort, wohin sie führen.
+Choose where Facebook opens from its icon. Notifications and links still open their destination.	Wähle den Starttab beim Öffnen über das Symbol. Benachrichtigungen und Links öffnen weiterhin ihr Ziel.
 # context: title of the list of tabs Facebook can open on
 Tab to open on	Tab beim Start
 # context: the names of Facebook's own tabs, as its tab bar shows them
@@ -264,7 +264,7 @@ Go straight to one group of settings. Back returns to where you were.	Direkt zu 
 # context: switch title under Downloads; on, every video save keeps to formats other apps accept
 Save videos other apps can open	Videos speichern, die andere Apps öffnen können
 # context: summary of that switch; H.264, AAC, AV1 and WhatsApp are names and stay as they are
-Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.	Speichert Videos im Format H.264 mit AAC-Ton, das Apps wie WhatsApp annehmen. Die schärfste Version bei Facebook ist oft AV1, und das lehnen manche Apps ab. Deshalb kann ein Video in niedrigerer Qualität gespeichert werden. Hat ein Video keine solche Version, wird es wie gewohnt gespeichert.
+Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lower than AV1. Without a compatible version, save as usual.	Bevorzugt H.264 mit AAC-Ton für Apps wie WhatsApp. Die Qualität kann unter AV1 liegen. Ohne passende Version wird wie gewohnt gespeichert.
 # context: section title for the Chats settings, named like Facebook's own Chats screen
 Chats	Chats
 # context: switch title under Chats; the card is Facebook's own "Get the Messenger app" card
@@ -276,7 +276,7 @@ Playback	Wiedergabe
 # context: switch title; on, videos and music wait for a tap before they play
 Tap to play	Zum Abspielen tippen
 # context: summary of that switch; Autoplay and Off are the name and value of Facebook's own setting, as Facebook shows them in this language
-Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.	Videos, Reels, Stories und Musik warten auf dein Tippen, bevor sie abgespielt werden. Facebooks eigene Einstellung „Automatische Wiedergabe“ steht auf Aus, solange dies an ist, und kehrt zu deiner Wahl zurück, wenn es aus ist.
+Videos, reels, stories and music wait for your tap. Facebook's Autoplay setting temporarily reads Off.	Videos, Reels, Storys und Musik warten auf dein Antippen. Facebooks Autoplay-Einstellung zeigt vorübergehend Aus.
 # context: switch title under Opening Facebook; Marketplace is Facebook's tab and keeps its name
 Marketplace only	Nur Marketplace
 # context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
@@ -299,7 +299,7 @@ Comments	Kommentare
 # context: switch title; on, a post's comments open in the order chosen in the list below it
 Default comment order	Standard-Reihenfolge der Kommentare
 # context: summary of that switch; a link to a comment is one from a notification, say
-Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.	Kommentare öffnen sich in der unten gewählten Reihenfolge statt in der, die Facebook auswählt. Eine Reihenfolge, die du in den Kommentaren eines Beitrags wählst, bleibt für diesen Beitrag, bis Facebook neu startet, und Links zu einem Kommentar behalten die Reihenfolge von Facebook.
+Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.	Verwendet die Reihenfolge unten. Eine Auswahl im Beitrag gilt bis zum Neustart. Kommentarlinks behalten Facebooks Reihenfolge.
 # context: title of the list of comment orders, and of its dialog
 Comment order	Reihenfolge der Kommentare
 # context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook
@@ -369,7 +369,7 @@ Messages, friend requests, comments, mentions, calls and login alerts, and any k
 # context: switch title under Stories; the stories Facebook suggests in the Stories tray from accounts you don't follow
 Hide suggested stories	Vorgeschlagene Stories ausblenden
 # context: summary of that switch; Suggested is the label Facebook shows under such a story in the tray, and the tray reloads on its own schedule
-Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.	Stories in der Leiste von Personen und Seiten, denen du nicht folgst, also die als „Vorgeschlagen“ markierten. Die Stories deiner Freunde und der Seiten, denen du folgst, bleiben. Eine Änderung wirkt, sobald Facebook die Leiste das nächste Mal lädt.
+Keep friends and followed Pages in the Stories tray. Applies when Facebook next loads the tray.	Behält Freunde und abonnierte Seiten in der Story-Leiste. Gilt beim nächsten Laden der Leiste.
 # context: switch title under Marketplace; the ads Facebook puts between the things people sell in Marketplace's feed
 Hide sponsored Marketplace listings	Gesponserte Marketplace-Angebote ausblenden
 # context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
@@ -421,11 +421,11 @@ Writing	Schreiben
 # context: switch title under Writing; @ is the at sign that starts a mention and stays as it is
 Tag suggestions only after @	Markierungsvorschläge nur nach @
 # context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
-Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	Facebook schlägt keine Personen zum Markieren mehr vor, während du in Beiträgen und Kommentaren normale Wörter tippst. Mit @ erscheint die Liste weiterhin, und dein Text wird nie verändert.
+Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.	Facebook schlägt Personen in Beiträgen und Kommentaren erst nach @ vor. Dein Text bleibt unverändert.
 # context: switch title under Playback; on, a long video you left partway starts again where you left it
 Resume long videos	Lange Videos fortsetzen
 # context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
-A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.	Ein Video über zwei Minuten, das du mittendrin verlassen hast, läuft beim nächsten Abspielen dort weiter, wo du aufgehört hast. Zieh die Zeitleiste, um woanders anzufangen. Reels, Live-Videos und Werbung starten wie gewohnt.
+Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.	Setzt Videos über zwei Minuten an deiner letzten Stelle fort. Die Suchleiste ändert den Start. Reels, Live-Videos und Werbung starten wie gewohnt.
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
 Also hide posts labelled as AI	Auch als KI gekennzeichnete Beiträge ausblenden
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
@@ -449,3 +449,26 @@ Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidd
 Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.	Schaltet Videovorschläge, Erinnerungen, Geburtstage und Freundschaftsvorschläge stumm, solange dieser Modus aktiv ist. Nachrichten und Updates zu Käufen und Verkäufen bleiben erhalten. Deine anderen Benachrichtigungseinstellungen bleiben gespeichert.
 Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.	Verringert das Laden des Feeds im Hintergrund, solange der Marketplace-Modus aktiv ist. Beim Start können weiterhin Daten geladen werden.
 Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.	Aktiv. Marketplace, Benachrichtigungen und Profil/Menü bleiben erhalten. Die Hushfacebook-Einstellungen findest du im Menü unter Einstellungen und Privatsphäre.
+
+# context: Settings overview, category navigation and search.
+Marketplace mode and your start tab	Marketplace-Modus und Starttab
+Ads, suggestions and word filters	Werbung, Vorschläge und Wortfilter
+Suggestions, saving and auto-advance	Vorschläge, Speichern und automatischer Wechsel
+Cleaner reels and video controls	Reels und Videosteuerung
+Tap to play and resume	Antippen zum Abspielen und Fortsetzen
+Quality, format and file names	Qualität, Format und Dateinamen
+Browse settings	Einstellungen durchsuchen
+More settings	Weitere Einstellungen
+Additional Facebook preferences	Weitere Facebook-Einstellungen
+No matching settings	Keine passenden Einstellungen
+Try a different word or clear the search.	Versuch ein anderes Wort oder lösche die Suche.
+Search settings	Einstellungen suchen
+Clear search	Suche löschen
+Your controls are active.	Deine Einstellungen sind aktiv.
+Your choices are saved. Resume after restarting Facebook.	Deine Auswahl bleibt gespeichert. Nach einem Neustart von Facebook geht es weiter.
+Pause	Pausieren
+Resume	Fortsetzen
+Undo	Rückgängig
+
+# context: Settings overview, category navigation and search.
+Example without post details	Beispiel ohne Beitragsdetails

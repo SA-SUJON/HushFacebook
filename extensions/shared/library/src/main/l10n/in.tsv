@@ -10,13 +10,13 @@
 %1$s. It was set when you patched, so Pause can't turn it off. To rule it out, patch again and leave out that patch.	%1$s. Ini diatur saat Anda menambal, jadi Jeda tidak dapat mematikannya. Untuk memastikan bukan ini penyebabnya, tambal ulang tanpa tambalan yang tertera dalam kurung setelahnya.
 %1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.	%1$s. Ini diatur saat Anda menambal, jadi Jeda tidak dapat mematikannya. Untuk memastikan bukan ini penyebabnya, tambal ulang tanpa tambalan yang tertera dalam kurung setelahnya.
 A diagnostic report is already being saved.	Sudah ada laporan diagnostik yang sedang disimpan.
-A Download button in the sidebar of every reel saves it at the quality set under Downloads. Off or paused, reels show only Facebook's own buttons.	Tombol Unduh di bilah samping setiap reel menyimpannya dengan kualitas yang diatur di bagian Unduhan. Jika nonaktif atau dijeda, reel hanya menampilkan tombol bawaan Facebook.
+Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.	Tambahkan tombol Unduh ke reel dengan kualitas unduhan Anda. Saat mati atau dijeda, tombol asli Facebook kembali.
 A file named %1$s in %2$s paused Hushfacebook.	File bernama %1$s di %2$s menjeda Hushfacebook.
 About	Tentang
 Ad cards between the stories people posted.	Kartu iklan di antara cerita yang diposting orang.
 Ad telemetry blocked	Telemetri iklan diblokir
-Adds "Download to phone" to feed and Watch video menus. Saves at the quality set below. Off or paused, Facebook's menu returns.	Menambahkan “Unduh ke ponsel” ke menu video Kabar Beranda dan Watch. Menyimpan dengan kualitas yang diatur di bawah. Jika nonaktif atau dijeda, menu Facebook kembali.
-Adds Save to the menu of anyone's story, and saves at the quality set under Downloads. Off or paused, only your own stories have Save, and it's Facebook's own.	Menambahkan opsi Simpan ke menu cerita siapa pun dan menyimpannya dengan kualitas yang diatur di bagian Unduhan. Jika nonaktif atau dijeda, opsi Simpan hanya ada di cerita Anda sendiri dan memakai fitur simpan bawaan Facebook.
+Add Download to phone to feed and Watch video menus. Uses the quality below. Off or paused, Facebook's menu returns.	Tambahkan Unduh ke ponsel pada menu video feed dan Watch. Menggunakan kualitas di bawah. Saat mati atau dijeda, menu Facebook kembali.
+Add Save to every story menu, using your download quality. Off or paused, Facebook only saves your own stories.	Tambahkan Simpan ke semua menu cerita dengan kualitas unduhan Anda. Saat mati atau dijeda, Facebook hanya menyimpan cerita sendiri.
 Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls and app-inserted ads stay blocked even while paused.	Iklan di dalam Reels, mulai dari kumpulan berikutnya yang dimuat Facebook. Banner, iklan di tengah video, dan iklan yang disisipkan aplikasi tetap diblokir saat dijeda.
 AMOLED black theme	Tema hitam AMOLED
 Appearance	Tampilan
@@ -57,8 +57,8 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook tidak mengunduh iklan atau model iklannya di latar belakang.
 Facebook doesn't serve ads to other apps on this phone.	Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Mode gelap Facebook dan halaman ini memakai warna wallpaper Anda. Android 11 memakai biru. Aktifkan mode gelap Facebook untuk melihatnya.
-Emoji are drawn with your phone's own emoji font instead of Meta's. Reactions and stickers don't change. Restart Facebook after changing this.	Emoji digambar dengan font emoji ponsel Anda, bukan milik Meta. Reaksi dan stiker tidak berubah. Mulai ulang Facebook setelah mengubah ini.
-Facebook's text is drawn in your phone's font, or in a font file you choose below, instead of Meta's own. Restart Facebook after changing this.	Teks Facebook digambar dengan font ponsel Anda, atau dengan file font yang Anda pilih di bawah, bukan font milik Meta. Mulai ulang Facebook setelah mengubah ini.
+Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Gunakan emoji ponsel. Reaksi dan stiker tetap sama. Mulai ulang Facebook setelah mengubahnya.
+Use your phone's font or a file chosen below. Restart Facebook after changing it.	Gunakan font ponsel atau file yang dipilih di bawah. Mulai ulang Facebook setelah mengubahnya.
 Font file	File font
 Use your phone's font	Gunakan font ponsel
 Stops using the font file and goes back to your phone's font.	Berhenti memakai file font dan kembali ke font ponsel Anda.
@@ -74,7 +74,7 @@ Couldn't save a copy of that font. Check that the phone has room, then try again
 Couldn't open that file. Your font didn't change.	File itu tidak dapat dibuka. Font Anda tidak berubah.
 Back to your phone's font. Restart Facebook to see it.	Kembali ke font ponsel Anda. Mulai ulang Facebook untuk melihatnya.
 Couldn't go back to your phone's font. Try again.	Tidak dapat kembali ke font ponsel Anda. Coba lagi.
-From the next start, the switches above stop running and Facebook's own behaviour returns. Debug logging keeps working, and your choices stay.	Mulai pembukaan berikutnya, sakelar di atas berhenti bekerja dan perilaku Facebook kembali. Pencatatan debug tetap berjalan dan pilihan Anda tersimpan.
+Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.	Jeda fitur runtime mulai peluncuran berikutnya. Pilihan Anda tersimpan. Log debug dan patch yang diterapkan saat instalasi tetap bekerja.
 Full report saved to %1$s	Laporan lengkap disimpan ke %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, beserta pemberitahuan dari proyek yang menjadi dasarnya
 Hide "People you may know"	Sembunyikan “Orang yang Mungkin Anda Kenal”
@@ -131,7 +131,7 @@ Saved. Restart Facebook to apply this change.	Tersimpan. Mulai ulang Facebook un
 Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.	Simpan sakelar dan pengaturan unduhan Anda ke sebuah file. Jeda dan Pencatatan debug tidak disertakan, begitu pula pemeriksaan rilis.
 # The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.
 Check for new Hushfacebook releases	Periksa rilis Hushfacebook baru
-Once a day, when Facebook starts, Hushfacebook asks GitHub for its newest release and shows it at the top of this screen if it's newer. It's the only time Hushfacebook goes online for itself, so it's off until you turn it on. Nothing gets downloaded.	Sekali sehari, saat Facebook dibuka, Hushfacebook menanyakan rilis terbarunya ke GitHub dan menampilkannya di bagian atas layar ini jika lebih baru. Hanya pada saat inilah Hushfacebook terhubung ke internet atas kemauannya sendiri, jadi fitur ini mati sampai Anda menyalakannya. Tidak ada yang diunduh.
+Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.	Periksa GitHub sekali sehari saat mulai dan tampilkan rilis baru di ringkasan. Mati secara bawaan. Tidak mengunduh apa pun.
 Check now	Periksa sekarang
 Asks GitHub for the newest release right now, even with the switch above off.	Menanyakan rilis terbaru ke GitHub sekarang juga, meski sakelar di atas mati.
 Checking GitHub now.	Sedang memeriksa GitHub.
@@ -192,8 +192,8 @@ Use the phone's emoji	Gunakan emoji ponsel
 Version	Versi
 Version %1$s for Facebook %2$s	Versi %1$s untuk Facebook %2$s
 Videos go to %1$s and photos to %2$s.	Video disimpan ke %1$s dan foto ke %2$s.
-Web links leave Facebook's in-app browser. Facebook's own pages still open in the app.	Tautan web tidak lagi dibuka di browser dalam aplikasi Facebook. Tautan ke Facebook sendiri tetap dibuka di aplikasi.
-Writes what each patch does to the Android log and the diagnostic report, and shows errors on screen. Leave it off unless you're reporting a problem.	Mencatat apa yang dilakukan setiap tambalan ke log Android dan laporan diagnostik, serta menampilkan pesan kesalahan di layar. Biarkan nonaktif kecuali Anda sedang melaporkan masalah.
+Open web links in your browser. Facebook's own pages stay in the app.	Buka tautan web di browser Anda. Halaman Facebook tetap di aplikasi.
+Record patch activity and show errors for a bug report. Leave off during normal use.	Catat aktivitas patch dan tampilkan kesalahan untuk laporan bug. Matikan saat penggunaan biasa.
 You paused Hushfacebook.	Anda menjeda Hushfacebook.
 Your switches already match that file, so nothing will change.	Sakelar Anda sudah sesuai dengan file itu, jadi tidak ada yang akan berubah.
 Keep feed position on return	Pertahankan posisi beranda saat kembali
@@ -236,7 +236,7 @@ Stop update prompts	Hentikan permintaan pembaruan
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook berhenti meminta Anda memperbarui lewat Meta App Manager dan berhenti menyuruhnya mencari pembaruan. Promosi obrolan yang ditujukan ke versi lama juga hilang. Build yang dipatch memang tidak bisa memasang pembaruan Meta.
 Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reel dan video Watch yang ditandai deteksi Facebook sendiri sebagai buatan AI, mulai dari kumpulan berikutnya yang dimuat Facebook. Yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji dengan akun sungguhan.
 Don't send reel watch history	Jangan kirim riwayat tontonan reel
-Facebook stops getting the list of reels you've watched, which it uses to rank your Reels feed. Nobody else sees that list. Reels you've already watched may come back in the feed.	Facebook tidak lagi menerima daftar reel yang sudah Anda tonton, yang dipakainya untuk menyusun urutan feed Reels Anda. Tidak ada orang lain yang melihat daftar itu. Reel yang sudah Anda tonton mungkin muncul lagi di feed.
+Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Hentikan pengiriman daftar reel yang ditonton ke Facebook. Daftar itu mengurutkan feed, jadi reel dapat muncul lagi.
 the rename of the shared permissions	penggantian nama izin bersama
 Room for Meta's apps	Ruang untuk aplikasi Meta
 Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.	Messenger, Facebook Lite, Business Suite, dan Workplace dapat dipasang di samping Facebook ini. Facebook ini memberi nama sendiri pada dua izin yang mereka gunakan bersama dengannya.
@@ -244,7 +244,7 @@ Messenger, Facebook Lite, Business Suite and Workplace install beside this Faceb
 Opening Facebook	Saat Facebook dibuka
 # context: switch title; the list below it picks the tab
 Open on a chosen tab	Buka di tab pilihan
-Starting Facebook from its icon opens the tab chosen below instead of Facebook's usual one. Notifications and links still open where they lead.	Membuka Facebook dari ikonnya akan membuka tab yang dipilih di bawah, bukan tab yang biasa. Notifikasi dan tautan tetap terbuka ke tujuannya.
+Choose where Facebook opens from its icon. Notifications and links still open their destination.	Pilih tab saat Facebook dibuka dari ikonnya. Notifikasi dan tautan tetap membuka tujuannya.
 # context: title of the list of tabs Facebook can open on
 Tab to open on	Tab saat dibuka
 # context: the names of Facebook's own tabs, as its tab bar shows them
@@ -264,7 +264,7 @@ Go straight to one group of settings. Back returns to where you were.	Langsung k
 # context: switch title under Downloads; on, every video save keeps to formats other apps accept
 Save videos other apps can open	Simpan video yang bisa dibuka aplikasi lain
 # context: summary of that switch; H.264, AAC, AV1 and WhatsApp are names and stay as they are
-Saves videos as H.264 with AAC sound, which apps like WhatsApp accept. Facebook's sharpest version is often AV1, which some apps turn down, so a video can save at a lower quality. A video with no such version saves as usual.	Menyimpan video dalam format H.264 dengan suara AAC, yang diterima aplikasi seperti WhatsApp. Versi tertajam di Facebook sering kali AV1, yang ditolak sebagian aplikasi, jadi video bisa tersimpan dengan kualitas lebih rendah. Video yang tidak punya versi seperti itu disimpan seperti biasa.
+Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lower than AV1. Without a compatible version, save as usual.	Utamakan video H.264 dengan suara AAC untuk aplikasi seperti WhatsApp. Kualitas mungkin di bawah AV1. Tanpa versi kompatibel, simpan seperti biasa.
 # context: section title for the Chats settings, named like Facebook's own Chats screen
 Chats	Chat
 # context: switch title under Chats; the card is Facebook's own "Get the Messenger app" card
@@ -276,7 +276,7 @@ Playback	Pemutaran
 # context: switch title; on, videos and music wait for a tap before they play
 Tap to play	Ketuk untuk memutar
 # context: summary of that switch; Autoplay and Off are the name and value of Facebook's own setting, as Facebook shows them in this language
-Videos, reels, stories and music wait for your tap before they play. Facebook's own Autoplay setting reads Off while this is on, and goes back to what you chose when it's off.	Video, reel, cerita, dan musik menunggu ketukan Anda sebelum diputar. Pengaturan Putar Otomatis milik Facebook terbaca Nonaktif selama ini aktif, dan kembali ke pilihan Anda saat ini dimatikan.
+Videos, reels, stories and music wait for your tap. Facebook's Autoplay setting temporarily reads Off.	Video, reel, cerita, dan musik menunggu ketukan Anda. Pengaturan Putar Otomatis Facebook sementara menampilkan Mati.
 # context: switch title under Opening Facebook; Marketplace is Facebook's tab and keeps its name
 Marketplace only	Hanya Marketplace
 # context: summary of that switch; the tab names are Facebook's own, as its tab bar shows them
@@ -299,7 +299,7 @@ Comments	Komentar
 # context: switch title; on, a post's comments open in the order chosen in the list below it
 Default comment order	Urutan komentar bawaan
 # context: summary of that switch; a link to a comment is one from a notification, say
-Comments open in the order chosen below instead of the one Facebook picks. An order you pick in a post's comments stays for that post until Facebook restarts, and links to a comment keep Facebook's order.	Komentar dibuka dengan urutan yang dipilih di bawah, bukan urutan yang dipilih Facebook. Urutan yang kamu pilih di komentar sebuah postingan tetap berlaku untuk postingan itu sampai Facebook dimulai ulang, dan tautan ke sebuah komentar tetap memakai urutan Facebook.
+Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.	Gunakan urutan di bawah. Pilihan pada postingan berlaku hingga mulai ulang. Tautan komentar mempertahankan urutan Facebook.
 # context: title of the list of comment orders, and of its dialog
 Comment order	Urutan komentar
 # context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook
@@ -369,7 +369,7 @@ Messages, friend requests, comments, mentions, calls and login alerts, and any k
 # context: switch title under Stories; the stories Facebook suggests in the Stories tray from accounts you don't follow
 Hide suggested stories	Sembunyikan cerita yang disarankan
 # context: summary of that switch; Suggested is the label Facebook shows under such a story in the tray, and the tray reloads on its own schedule
-Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.	Cerita di deretan dari orang dan Halaman yang tidak Anda ikuti, yang ditandai sebagai disarankan. Cerita teman Anda dan Halaman yang Anda ikuti tetap ada. Perubahan terlihat saat Facebook memuat deretan itu lagi.
+Keep friends and followed Pages in the Stories tray. Applies when Facebook next loads the tray.	Pertahankan teman dan Halaman yang diikuti di baki cerita. Berlaku saat Facebook memuat ulang baki.
 # context: switch title under Marketplace; the ads Facebook puts between the things people sell in Marketplace's feed
 Hide sponsored Marketplace listings	Sembunyikan tawaran bersponsor di Marketplace
 # context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
@@ -421,11 +421,11 @@ Writing	Menulis
 # context: switch title under Writing; @ is the at sign that starts a mention and stays as it is
 Tag suggestions only after @	Saran menandai hanya setelah @
 # context: summary of that switch; the list is Facebook's list of people to tag, and @ stays as it is
-Facebook stops offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list, and what you wrote is never changed.	Facebook berhenti menawarkan orang untuk ditandai saat Anda mengetik kata biasa di postingan dan komentar. Mengetik @ tetap memunculkan daftarnya, dan tulisan Anda tidak pernah diubah.
+Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.	Ketik @ sebelum Facebook menyarankan orang untuk ditandai dalam postingan atau komentar. Teks Anda tidak berubah.
 # context: switch title under Playback; on, a long video you left partway starts again where you left it
 Resume long videos	Lanjutkan video panjang
 # context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
-A video over two minutes long that you left partway picks up where you left it the next time it plays. Drag the seek bar to start somewhere else. Reels, live videos and ads start as usual.	Video berdurasi lebih dari dua menit yang Anda tinggalkan di tengah jalan akan berlanjut dari tempat Anda berhenti saat diputar lagi. Geser bilah progres untuk mulai dari bagian lain. Reel, video siaran langsung, dan iklan mulai seperti biasa.
+Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.	Lanjutkan video lebih dari dua menit dari posisi terakhir. Geser bilah untuk posisi lain. Reel, video langsung, dan iklan mulai seperti biasa.
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
 Also hide posts labelled as AI	Sembunyikan juga postingan berlabel AI
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
@@ -449,3 +449,26 @@ Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidd
 Silence video suggestions, memories, birthdays and friend suggestions while this mode is on. Messages and trading updates stay. Your other notification choices stay saved.	Senyapkan saran video, kenangan, ulang tahun, dan saran teman saat mode ini aktif. Pesan dan pembaruan jual beli tetap masuk. Pilihan notifikasi lainnya tetap tersimpan.
 Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.	Kurangi pemuatan beranda di latar belakang saat mode Marketplace aktif. Sebagian data masih bisa dimuat saat aplikasi mulai.
 Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook settings in Menu, under Settings and privacy.	Aktif. Marketplace, Notifikasi, dan Profil/Menu tetap ada. Setelan Hushfacebook ada di Menu, pada Pengaturan dan privasi.
+
+# context: Settings overview, category navigation and search.
+Marketplace mode and your start tab	Mode Marketplace dan tab awal
+Ads, suggestions and word filters	Iklan, saran, dan filter kata
+Suggestions, saving and auto-advance	Saran, penyimpanan, dan perpindahan otomatis
+Cleaner reels and video controls	Reels lebih bersih dan kontrol video
+Tap to play and resume	Ketuk untuk memutar dan melanjutkan
+Quality, format and file names	Kualitas, format, dan nama file
+Browse settings	Jelajahi pengaturan
+More settings	Pengaturan lainnya
+Additional Facebook preferences	Preferensi Facebook tambahan
+No matching settings	Tidak ada pengaturan yang cocok
+Try a different word or clear the search.	Coba kata lain atau hapus pencarian.
+Search settings	Cari pengaturan
+Clear search	Hapus pencarian
+Your controls are active.	Kontrol Anda aktif.
+Your choices are saved. Resume after restarting Facebook.	Pilihan Anda tersimpan. Lanjutkan setelah memulai ulang Facebook.
+Pause	Jeda
+Resume	Lanjutkan
+Undo	Urungkan
+
+# context: Settings overview, category navigation and search.
+Example without post details	Contoh tanpa detail postingan

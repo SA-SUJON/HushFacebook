@@ -268,6 +268,11 @@ public class RowChevronTest {
     /** Every row the list draws, laid out on the phone's width, tall enough that none is left off. */
     private List<View> rows(SettingsDialog dialog) {
         ListView list = dialog.getView().findViewById(android.R.id.list);
+        HushfacebookPreferenceFragment page = (HushfacebookPreferenceFragment) dialog.getChildFragmentManager()
+                .findFragmentById(SettingsDialog.CONTAINER_ID);
+        // Verify every preference row independently of the category shell.
+        list.setAdapter(page.getPreferenceScreen().getRootAdapter());
+        list.setOnItemClickListener(page.getPreferenceScreen());
         assertNotNull("no list in the dialog", list);
         int width = controller.get().getResources().getDisplayMetrics().widthPixels;
         list.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
