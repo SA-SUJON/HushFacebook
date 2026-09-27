@@ -371,3 +371,7 @@ Messages, friend requests, comments, mentions, calls and login alerts, and any k
 Hide suggested stories	Önerilen hikayeleri gizle
 # context: summary of that switch; Suggested is the label Facebook shows under such a story in the tray, and the tray reloads on its own schedule
 Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.	Şeritte takip etmediğin kişi ve sayfalardan gelen, önerilen olarak işaretli hikayeler. Arkadaşlarının ve takip ettiğin sayfaların hikayeleri kalır. Bir değişiklik, Facebook şeridi bir sonraki yüklediğinde görünür.
+# context: switch title under Marketplace; the ads Facebook puts between the things people sell in Marketplace's feed
+Hide sponsored Marketplace listings	Marketplace'teki sponsorlu ilanları gizle
+# context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
+Ads and boosted listings in Marketplace's feed. The other listings stay.	Marketplace akışındaki reklamlar ve öne çıkarılan ilanlar. Diğer ilanlar kalır.

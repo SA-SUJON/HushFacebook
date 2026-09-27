@@ -371,3 +371,7 @@ Messages, friend requests, comments, mentions, calls and login alerts, and any k
 Hide suggested stories	Ocultar stories sugeridos
 # context: summary of that switch; Suggested is the label Facebook shows under such a story in the tray, and the tray reloads on its own schedule
 Stories in the tray from people and Pages you don't follow, the ones marked Suggested. Your friends' stories and the Pages you follow stay. A change shows the next time Facebook loads the tray.	Stories da bandeja de pessoas e Páginas que você não segue, os marcados como sugeridos. Os stories dos seus amigos e das Páginas que você segue ficam. Uma mudança aparece na próxima vez que o Facebook carregar a bandeja.
+# context: switch title under Marketplace; the ads Facebook puts between the things people sell in Marketplace's feed
+Hide sponsored Marketplace listings	Ocultar anúncios patrocinados do Marketplace
+# context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
+Ads and boosted listings in Marketplace's feed. The other listings stay.	Propagandas e anúncios impulsionados no feed do Marketplace. Os outros anúncios continuam.

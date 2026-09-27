@@ -212,7 +212,7 @@ public class PatchFamilyTest {
                 "not in this build: Hide suggested and promoted posts, Hide Stories tray, Hide Reels in the feed, "
                         + "Block background-return feed refresh, Hide AI-detected posts, "
                         + "Hide sponsored stories, Hide suggested stories, Stop Story auto-advance, Hide sponsored search results, "
-                        + "Hide sponsored profile posts, Clean up Reels, Don't send reel watch history, Default comment order, "
+                        + "Hide sponsored profile posts, Hide sponsored Marketplace listings, Clean up Reels, Don't send reel watch history, Default comment order, "
                         + "Tap to play, "
                         + "Use the system font, Use the phone's emoji, Open links in "
                         + "external browser, Sanitize sharing links, Stop update prompts, Download any story, Download any reel, "

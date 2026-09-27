@@ -66,6 +66,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean sponsoredMarketplace() {
+        return false;
+    }
+
     public static boolean reelDeclutter() {
         return false;
     }

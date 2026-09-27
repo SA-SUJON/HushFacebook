@@ -136,6 +136,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_sponsored_profile_posts", TRUE);
 
     /**
+     * The ads and boosted listings of Marketplace's feed: its query asks the server to skip them,
+     * and its ads-only queries aren't sent.
+     */
+    public static final BooleanSetting HIDE_SPONSORED_MARKETPLACE_LISTINGS =
+            new BooleanSetting("hushfacebook_hide_sponsored_marketplace_listings", TRUE);
+
+    /**
      * The chips under a reel that prompt you to make something (Remix, Use template, Add yours,
      * Edits) or promote something (Stars, games, a partner app, a link out of Facebook). A chip of
      * any other type stays.

@@ -62,6 +62,8 @@ public enum PatchFamily {
             Settings.HIDE_SPONSORED_SEARCH_RESULTS),
     SPONSORED_PROFILE_POSTS(FamilyNames.SPONSORED_PROFILE_POSTS, "sponsoredProfilePosts", null,
             Settings.HIDE_SPONSORED_PROFILE_POSTS),
+    SPONSORED_MARKETPLACE(FamilyNames.SPONSORED_MARKETPLACE, "sponsoredMarketplace", null,
+            Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS),
     REEL_DECLUTTER(FamilyNames.REEL_DECLUTTER, "reelDeclutter", null,
             Settings.HIDE_REEL_CHIPS, Settings.HIDE_REEL_FOLLOW_BUTTON, Settings.HIDE_REEL_SOCIAL_FOOTER),
     REEL_WATCH_HISTORY(FamilyNames.REEL_WATCH_HISTORY, "reelWatchHistory", null,

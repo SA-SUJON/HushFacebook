@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import app.morphe.extension.facebook.ads.MarketplaceAdFilterForTests;
 import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
@@ -242,6 +243,10 @@ public class PausedHooksTest {
         // A timeline story with sponsored data isn't drawn on a profile.
         probes.put(PatchFamily.SPONSORED_PROFILE_POSTS,
                 Collections.singletonList(ProfileAdFilterForTests::hidesASponsoredStory));
+        // Marketplace's feed query asks to skip its ads, and an ads-only query isn't sent.
+        probes.put(PatchFamily.SPONSORED_MARKETPLACE, Arrays.asList(
+                MarketplaceAdFilterForTests::asksTheFeedToSkipAds,
+                MarketplaceAdFilterForTests::holdsBackAnAdsQuery));
         // A Remix chip under a reel, the Follow and Following buttons beside its author, and both
         // footer queries.
         probes.put(PatchFamily.REEL_DECLUTTER, Arrays.asList(

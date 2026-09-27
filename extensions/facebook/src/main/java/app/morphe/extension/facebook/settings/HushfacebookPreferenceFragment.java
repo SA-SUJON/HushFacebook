@@ -438,6 +438,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
         }
 
+        if (build.contains(PatchFamily.SPONSORED_MARKETPLACE)) {
+            PreferenceCategory marketplace = category(screen, L10n.t("Marketplace"));
+            marketplace.addPreference(toggle(context, Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS,
+                    L10n.t("Hide sponsored Marketplace listings"),
+                    L10n.t("Ads and boosted listings in Marketplace's feed. The other listings stay.")));
+        }
+
         if (build.contains(PatchFamily.PROMO_NOTIFICATIONS)) {
             PreferenceCategory notifications = category(screen, L10n.t("Notifications"));
             notifications.addPreference(toggle(context, Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS,
