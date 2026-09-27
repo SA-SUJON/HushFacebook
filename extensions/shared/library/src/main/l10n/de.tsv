@@ -335,3 +335,7 @@ Hushfacebook settings can't open here. Long-press the Facebook logo instead.	Die
 Hide suggested groups	Gruppenvorschläge ausblenden
 # context: summary of that switch; Discover more groups is the label of Facebook's own button under that row
 The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.	Die Reihe mit Gruppen zum Beitreten zwischen den Beiträgen, samt ihrem Button „Weitere Gruppen entdecken“. Beiträge aus deinen Gruppen bleiben.
+# context: switch title under News feed; Facebook's own header of a row of Stories from people you don't know, shown between posts
+Hide "Stories you might like"	„Stories, die dir gefallen könnten“ ausblenden
+# context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
+The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	Die Reihe mit Stories von Personen, mit denen du nicht verbunden bist, die Facebook zwischen die Beiträge setzt. Die Stories deiner Freunde und die Stories-Leiste bleiben.

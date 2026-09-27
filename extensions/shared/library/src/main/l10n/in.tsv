@@ -335,3 +335,7 @@ Hushfacebook settings can't open here. Long-press the Facebook logo instead.	Pen
 Hide suggested groups	Sembunyikan grup yang disarankan
 # context: summary of that switch; Discover more groups is the label of Facebook's own button under that row
 The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.	Deretan grup untuk diikuti di antara postingan, beserta tombol Temukan grup lainnya. Postingan dari grup tempat Anda bergabung tetap ada.
+# context: switch title under News feed; Facebook's own header of a row of Stories from people you don't know, shown between posts
+Hide "Stories you might like"	Sembunyikan “Cerita yang mungkin Anda sukai”
+# context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
+The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	Deretan Cerita dari orang yang tidak terhubung dengan Anda, yang diselipkan Facebook di antara postingan. Cerita teman Anda dan deretan Cerita tetap ada.

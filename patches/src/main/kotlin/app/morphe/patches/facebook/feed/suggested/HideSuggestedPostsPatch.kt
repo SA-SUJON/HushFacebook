@@ -7,9 +7,11 @@
  * feed filter, behind the shared feed hook. The patch still refuses a build that carries none of
  * the unit classes, so a rename fails at patch time instead of filtering nothing, and names each
  * one a build lacks in the patch log. It also finds the
- * story's recommendation flag, held to Facebook's own filter, and the People you may know and
- * suggested groups type names, which three more switches read. The People you may know switch
- * also reaches the carousel on your own profile, through a hook in that section's children builder.
+ * story's recommendation flag, held to Facebook's own filter, the People you may know and
+ * suggested groups type names, and the flag Facebook's own Discover unit reads to tell a row of
+ * Stories you might like from other rows of Stories, which four more switches read. The People you
+ * may know switch also reaches the carousel on your own profile, through a hook in that section's
+ * children builder.
  */
 package app.morphe.patches.facebook.feed.suggested
 
@@ -21,12 +23,15 @@ import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
+import app.morphe.patches.facebook.feed.DISCOVER_FEED_UNIT_TYPE
+import app.morphe.patches.facebook.feed.DISCOVER_UNIT_LAYOUT
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.GRAPHQL_STORY
 import app.morphe.patches.facebook.feed.HIDE_RECOMMENDATIONS_VALIDATOR
 import app.morphe.patches.facebook.feed.RECOMMENDATION_CONTEXT_FIELD
 import app.morphe.patches.facebook.feed.RECOMMENDATION_CONTEXT_TYPE
 import app.morphe.patches.facebook.feed.RECOMMENDED_FLAG
+import app.morphe.patches.facebook.feed.UNCONNECTED_STORIES_FLAG
 import app.morphe.patches.facebook.feed.edgePredicateCalls
 import app.morphe.patches.facebook.feed.fillStoryModelStub
 import app.morphe.patches.facebook.feed.hook.feedFilterHookPatch
@@ -37,6 +42,7 @@ import app.morphe.patches.facebook.feed.requireFeedTypeName
 import app.morphe.patches.facebook.feed.requireTaggedFeedTypeName
 import app.morphe.patches.facebook.feed.requireStoryFlagReaders
 import app.morphe.patches.facebook.feed.resolveStatic
+import app.morphe.patches.facebook.feed.unconnectedStoriesReaders
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.handleTargets
@@ -105,8 +111,9 @@ internal const val HIDE_PROFILE_SECTION =
 val hideSuggestedPostsPatch = bytecodePatch(
     name = "Hide suggested and promoted posts",
     description = "Removes what Facebook adds to the feed besides ads: \"Suggested for you\" posts, \"People " +
-        "you may know\", suggested groups, \"Pages you may like\" and its own upsells. In-feed surveys go too, and so does the " +
-        "\"People you may know\" row on your own profile. Each kind has its own switch.",
+        "you may know\", suggested groups, \"Stories you might like\", \"Pages you may like\" and its own upsells. " +
+        "In-feed surveys go too, and so does the \"People you may know\" row on your own profile. Each kind has its " +
+        "own switch.",
     default = true,
 ) {
     category("Feed")
@@ -118,6 +125,7 @@ val hideSuggestedPostsPatch = bytecodePatch(
         requireSuggestedUnits()
         requireFeedTypeName(PEOPLE_YOU_MAY_KNOW_TYPE)
         requireTaggedFeedTypeName(GROUPS_YOU_SHOULD_JOIN_TYPE)
+        requireUnconnectedStoriesFlag()
 
         // A "Suggested for you" post is an ordinary story on the wire (ENGAGEMENT, like a friend's),
         // so the rule reads the story's recommendation flag through GraphQLStory's accessor.
@@ -239,4 +247,24 @@ internal fun MutableMethod.buildNoChildrenWhenHidden(children: String) {
         """,
         ExternalLabel("facebook", getInstruction(0)),
     )
+}
+
+/**
+ * Checks the build for what the "Stories you might like" rule reads: a model answering
+ * `DiscoverFeedUnit`, and Facebook's own DiscoverUnitComponent reading [UNCONNECTED_STORIES_FLAG]
+ * from such a unit. The component's class is renamed, so it's found as the one parameter of its
+ * kept layout manager's constructor that reads the flag. If Facebook stops reading it there, the
+ * flag may have changed meaning, and the patch stops.
+ */
+internal fun BytecodePatchContext.requireUnconnectedStoriesFlag() {
+    requireFeedTypeName(DISCOVER_FEED_UNIT_TYPE)
+    val layout = classDefByOrNull(DISCOVER_UNIT_LAYOUT)
+        ?: throw PatchException("$DISCOVER_UNIT_LAYOUT isn't in this Facebook build")
+    val readers = unconnectedStoriesReaders(layout) { classDefByOrNull(it) }
+    if (readers.size != 1) {
+        throw PatchException(
+            "Facebook's Discover unit component should read $UNCONNECTED_STORIES_FLAG once, found " +
+                "${readers.size} readers: ${readers.joinToString { it.type }}",
+        )
+    }
 }

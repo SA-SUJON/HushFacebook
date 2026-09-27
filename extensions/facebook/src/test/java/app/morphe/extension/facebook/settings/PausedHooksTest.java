@@ -191,6 +191,8 @@ public class PausedHooksTest {
                         FeedGuardForTests.recommendationContext(true)),
                 () -> FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow()),
                 () -> FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.suggestedGroups()),
+                // A row of Stories from people you aren't connected to.
+                () -> FeedGuardForTests.hides(Category.ORGANIC, FeedGuardForTests.storiesRow(true)),
                 // Your own profile's People you may know carousel builds nothing.
                 ProfileSuggestionsForTests::hidesTheCarousel));
         // Each of the feed's two Stories tray adapters returns nothing.

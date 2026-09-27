@@ -66,6 +66,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_suggested_groups", TRUE);
 
     /**
+     * The row of Stories from people you aren't connected to that Facebook puts between posts,
+     * "Stories you might like", found by the flag Facebook's own Discover unit reads for it. A row
+     * of your friends' Stories and the Stories tray stay.
+     */
+    public static final BooleanSetting HIDE_STORIES_YOU_MIGHT_LIKE =
+            new BooleanSetting("hushfacebook_hide_stories_you_might_like", TRUE);
+
+    /**
      * The row of stories at the top of the feed. The feed's adapter list builds it as an adapter of
      * its own, and the patch has both tray adapters return nothing while this is on.
      */

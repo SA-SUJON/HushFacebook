@@ -87,6 +87,14 @@ public final class FeedGuardForTests {
                 false, GenAiLabel.PATCHED, true, unit -> storyType);
     }
 
+    /**
+     * A row of Stories between posts, as Facebook's Discover unit sees it: a model answering
+     * DiscoverFeedUnit whose is_unconnected_mbsu is [unconnected], true for "Stories you might like".
+     */
+    public static BaseModelWithTree storiesRow(boolean unconnected) {
+        return new BaseModelWithTree(FeedFilter.DISCOVER_UNIT_TYPE) { }.with(FeedFilter.UNCONNECTED_STORIES_FLAG, unconnected);
+    }
+
     /** GenAI info of the type Facebook's detection writes, with its flag set to [flagged]. */
     public static BaseModelWithTree detectedInfo(boolean flagged) {
         return new BaseModelWithTree(GenAiLabel.DETECTED_INFO_TYPE_TAG).with(GenAiLabel.DETECTED_FLAG, flagged);

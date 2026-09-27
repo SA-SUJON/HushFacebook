@@ -45,6 +45,7 @@ public class FeedFilterTest {
         Settings.HIDE_SUGGESTED_FOR_YOU.resetToDefault();
         Settings.HIDE_PEOPLE_YOU_MAY_KNOW.resetToDefault();
         Settings.HIDE_SUGGESTED_GROUPS.resetToDefault();
+        Settings.HIDE_STORIES_YOU_MIGHT_LIKE.resetToDefault();
         Settings.HIDE_STORIES_TRAY.resetToDefault();
         Settings.HIDE_FEED_REELS.resetToDefault();
         FeedFilterCounters.clear();
@@ -261,6 +262,56 @@ public class FeedFilterTest {
         String report = String.join("\n", FeedFilterCounters.report());
         assertTrue(report, report.contains(FeedFilter.FEED_ROUTE + ": 2 lists, 2 items, 2 removed. "
                 + "Last reason: GroupsYouShouldJoinFeedUnit. Removed: GroupsYouShouldJoinFeedUnit 2."));
+    }
+
+    /**
+     * A row of Stories between posts goes when the flag Facebook's Discover unit reads says it's
+     * from people you aren't connected to. A row of your friends' Stories stays, and so does a
+     * unit of another type carrying the same flag, a row without the patch, and every row once the
+     * switch is off. The other suggested rows keep their own switches.
+     */
+    @Test
+    public void storiesYouMightLikeGoByTheirFlag() {
+        assertTrue(Settings.HIDE_STORIES_YOU_MIGHT_LIKE.defaultValue);
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, FeedGuardForTests.storiesRow(true), false, true));
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, FeedGuardForTests.storiesRow(false), false, true));
+        BaseModelWithTree tray = new BaseModelWithTree("StoriesTrayFeedUnit") { }
+                .with(FeedFilter.UNCONNECTED_STORIES_FLAG, true);
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, tray, false, true));
+        assertEquals("the flag is only read on a Discover unit", 0, tray.reads);
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, FeedGuardForTests.storiesRow(true), true, false));
+
+        Settings.HIDE_STORIES_YOU_MIGHT_LIKE.save(false);
+        BaseModelWithTree unread = FeedGuardForTests.storiesRow(true);
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, unread, false, true));
+        assertEquals("the switch off reads nothing of the row", 0, unread.reads);
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.suggestedGroups(), false, true));
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow(), false, true));
+    }
+
+    /**
+     * The Stories rule fails open: a unit answering the type name that isn't a tree model, one
+     * whose name can't be read, and one whose tree Facebook released all stay. Each row read is
+     * counted on the rule's own route under what the read found, and a hidden one on the feed's
+     * route under the type and the flag.
+     */
+    @Test
+    public void storiesYouMightLikeFailOpenAndCountWhatTheyRead() {
+        FeedFilterCounters.clear();
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, new TypedFeedUnit(FeedFilter.DISCOVER_UNIT_TYPE), true, true));
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, new TypedFeedUnit.Unreadable(), true, true));
+        BaseModelWithTree released = FeedGuardForTests.storiesRow(true).released();
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, released, true, true));
+        assertFalse("the guard asked a released tree its type name", released.readAfterRelease);
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, FeedGuardForTests.storiesRow(false), true, true));
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, FeedGuardForTests.storiesRow(true), true, true));
+
+        String report = String.join("\n", FeedFilterCounters.report());
+        assertTrue(report, report.contains(FeedFilter.STORIES_YOU_MIGHT_LIKE_ROUTE + ": 3 lists, 3 items, 1 removed. "
+                + "Last reason: DiscoverFeedUnit:is_unconnected_mbsu. Removed: DiscoverFeedUnit:is_unconnected_mbsu 1. "
+                + "Kinds: connected 1, not a tree model 1, unconnected 1"));
+        assertTrue(report, report.contains(FeedFilter.FEED_ROUTE + ": 5 lists, 5 items, 1 removed. "
+                + "Last reason: DiscoverFeedUnit:is_unconnected_mbsu."));
     }
 
     /**

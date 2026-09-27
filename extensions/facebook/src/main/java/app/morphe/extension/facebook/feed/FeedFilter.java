@@ -18,6 +18,7 @@ import app.morphe.extension.shared.diagnostics.FeedFilterCounters;
 import app.morphe.extension.shared.diagnostics.HookStatus;
 import app.morphe.extension.shared.settings.BaseSettings;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -54,6 +55,19 @@ public final class FeedFilter {
      */
     static final String GROUPS_YOU_SHOULD_JOIN_TYPE = "GroupsYouShouldJoinFeedUnit";
 
+    /**
+     * The GraphQL type of the feed's rows of Stories between posts, a literal of the shared showcase
+     * model's {@code getTypeName()} in 577 and 580. Facebook draws one with its DiscoverUnitComponent,
+     * which reads {@link #UNCONNECTED_STORIES_FLAG} to tell a row of Stories from people you aren't
+     * connected to, "Stories you might like", from a row of your friends' Stories.
+     */
+    static final String DISCOVER_UNIT_TYPE = "DiscoverFeedUnit";
+    static final String UNCONNECTED_STORIES_FLAG = "is_unconnected_mbsu";
+    private static final int UNCONNECTED_STORIES_KEY = UNCONNECTED_STORIES_FLAG.hashCode();
+    /** What a read of that flag found, as the report counts it. Only the first hides anything. */
+    static final String UNCONNECTED = "unconnected";
+    static final String CONNECTED = "connected";
+
     /** The diagnostic counter routes. Each news feed edge counts as a list of one post. */
     static final String FEED_ROUTE = "News feed posts";
     static final String STORY_ROUTE = "Story ad sources";
@@ -67,6 +81,11 @@ public final class FeedFilter {
      * each read of Facebook's recommendation flag found as the kind.
      */
     static final String RECOMMENDATION_ROUTE = "Recommendation flag";
+    /**
+     * The rows of Stories between posts the "Stories you might like" rule read, counted only while
+     * its switch is on, with what each read of the row's flag found as the kind.
+     */
+    static final String STORIES_YOU_MIGHT_LIKE_ROUTE = "Stories you might like";
     /**
      * The Stories tray adapters the feed asked for, each call counted with its adapter as the kind,
      * and a skipped one as a removal. The tray is never a feed edge: the feed's adapter list adds it
@@ -206,7 +225,9 @@ public final class FeedFilter {
                 String type = typeName(feedUnit);
                 return "Feed edge: " + categoryName + " " + type + " ifr="
                         + (suggestedPatched ? recommendationFlag(feedUnit, recommendationAccessor) : "none")
-                        + (reelsPatched ? " showcase=" + showcaseFor(type, feedUnit, showcaseAccessor) : "");
+                        + (reelsPatched ? " showcase=" + showcaseFor(type, feedUnit, showcaseAccessor) : "")
+                        + (suggestedPatched && DISCOVER_UNIT_TYPE.equals(type)
+                                ? " stories=" + unconnectedStories(feedUnit) : "");
             });
             // An edge a prefetch adds before the settings are ready stays: no switch can be read yet.
             if (!Utils.settingsReady()) return false;
@@ -223,9 +244,14 @@ public final class FeedFilter {
                 if (reason == null && Settings.HIDE_SUGGESTED_FOR_YOU.get()) {
                     reason = flagReason(RecommendationLabel.FLAG, RECOMMENDATION_ROUTE, feedUnit, recommendationAccessor);
                 }
-                if (reason == null
-                        && (Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get() || Settings.HIDE_SUGGESTED_GROUPS.get())) {
-                    reason = suggestedTypeReason(typeName(feedUnit));
+                boolean storiesYouMightLike = Settings.HIDE_STORIES_YOU_MIGHT_LIKE.get();
+                if (reason == null && (Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get() || Settings.HIDE_SUGGESTED_GROUPS.get()
+                        || storiesYouMightLike)) {
+                    String type = typeName(feedUnit);
+                    reason = suggestedTypeReason(type);
+                    if (reason == null && storiesYouMightLike && DISCOVER_UNIT_TYPE.equals(type)) {
+                        reason = unconnectedStoriesReason(feedUnit);
+                    }
                 }
             }
             if (reason == null && aiPatched && Settings.HIDE_AI_DETECTED_POSTS.get()) {
@@ -275,6 +301,45 @@ public final class FeedFilter {
             return Settings.HIDE_SUGGESTED_GROUPS.get() ? GROUPS_YOU_SHOULD_JOIN_TYPE : null;
         }
         return null;
+    }
+
+    /**
+     * The "Stories you might like" rule for a unit that answers {@link #DISCOVER_UNIT_TYPE}: its
+     * reason when the row's {@link #UNCONNECTED_STORIES_FLAG} reads a definite true, otherwise null,
+     * so a row of your friends' Stories, and one this can't read, stays. Every row it reads is
+     * counted on its own route under what the read found.
+     */
+    private static String unconnectedStoriesReason(Object feedUnit) {
+        String kind = unconnectedStories(feedUnit);
+        FeedFilterCounters.sawList(STORIES_YOU_MIGHT_LIKE_ROUTE, 1);
+        FeedFilterCounters.sawKind(STORIES_YOU_MIGHT_LIKE_ROUTE, kind);
+        if (!UNCONNECTED.equals(kind)) return null;
+        String reason = DISCOVER_UNIT_TYPE + ":" + UNCONNECTED_STORIES_FLAG;
+        FeedFilterCounters.removed(STORIES_YOU_MIGHT_LIKE_ROUTE, 1, reason);
+        return reason;
+    }
+
+    /**
+     * What a row of Stories' {@link #UNCONNECTED_STORIES_FLAG} reads: {@link #UNCONNECTED},
+     * {@link #CONNECTED}, or why it couldn't be read. It goes through
+     * {@code BaseModelWithTree.getCachedBoolean}, the reader the story flags use, which checks the
+     * native tree is still there first. Never throws.
+     */
+    static String unconnectedStories(Object feedUnit) {
+        StoryFlag.Members found = StoryFlag.members();
+        if (found.treeModel == null || found.cachedBoolean == null) return "reader missing";
+        if (!found.treeModel.isInstance(feedUnit)) return "not a tree model";
+        try {
+            Object value = found.cachedBoolean.invoke(feedUnit, UNCONNECTED_STORIES_KEY);
+            if (!(value instanceof Boolean)) return "read failed";
+            return (Boolean) value ? UNCONNECTED : CONNECTED;
+        } catch (InvocationTargetException failure) {
+            HookStatus.threw(FamilyNames.SUGGESTED_POSTS, "Stories you might like flag reader", failure.getCause());
+            return "read failed";
+        } catch (ReflectiveOperationException | RuntimeException failure) {
+            HookStatus.threw(FamilyNames.SUGGESTED_POSTS, "Stories you might like flag reader", failure);
+            return "read failed";
+        }
     }
 
     /**

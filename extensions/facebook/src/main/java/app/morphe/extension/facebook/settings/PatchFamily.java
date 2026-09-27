@@ -40,7 +40,7 @@ public enum PatchFamily {
             Settings.HIDE_SPONSORED_POSTS, Settings.HIDE_PROMOTED_POSTS),
     SUGGESTED_POSTS(FamilyNames.SUGGESTED_POSTS, "suggestedPosts", null,
             Settings.HIDE_SUGGESTED_POSTS, Settings.HIDE_SUGGESTED_FOR_YOU, Settings.HIDE_PEOPLE_YOU_MAY_KNOW,
-            Settings.HIDE_SUGGESTED_GROUPS),
+            Settings.HIDE_SUGGESTED_GROUPS, Settings.HIDE_STORIES_YOU_MIGHT_LIKE),
     STORIES_TRAY(FamilyNames.STORIES_TRAY, "storiesTray", null,
             Settings.HIDE_STORIES_TRAY),
     FEED_REELS(FamilyNames.FEED_REELS, "feedReels", null,

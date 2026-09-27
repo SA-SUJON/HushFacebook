@@ -267,6 +267,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("Hide suggested groups"),
                         L10n.t("The row of groups to join between posts, with its Discover more groups button. "
                                 + "Posts from groups you're in stay.")));
+                feed.addPreference(toggle(context, Settings.HIDE_STORIES_YOU_MIGHT_LIKE,
+                        L10n.t("Hide \"Stories you might like\""),
+                        L10n.t("The row of Stories from people you aren't connected to that Facebook puts between "
+                                + "posts. Your friends' Stories and the Stories tray stay.")));
             }
             if (build.contains(PatchFamily.STORIES_TRAY)) {
                 // Facebook builds the feed's adapters once, when the feed is set up, and the tray is

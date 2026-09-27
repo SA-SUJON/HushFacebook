@@ -122,6 +122,7 @@ public class ColdStartHooksTest {
                 FeedGuardForTests.recommendationContext(true)));
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow()));
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.suggestedGroups()));
+        assertFalse(FeedGuardForTests.hides(Category.ORGANIC, FeedGuardForTests.storiesRow(true)));
         assertFalse(FeedFilter.hideStoriesTray(FeedFilter.LEGACY_TRAY));
         assertFalse(FeedFilter.hideStoriesTray(FeedFilter.UNIFIED_TRAY));
         assertFalse(FeedGuardForTests.hidesReels(Category.FB_SHORTS, new Object()));

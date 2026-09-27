@@ -164,6 +164,7 @@
       "paths": [
         "patches/src/main/kotlin/app/morphe/patches/facebook/feed/hook/**",
         "patches/src/main/kotlin/app/morphe/patches/facebook/feed/FeedTypeNames.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/feed/DiscoverUnits.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/feed/StoryModels.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/feed/Recommendations.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/feed/storiestray/**",

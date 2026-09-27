@@ -87,6 +87,7 @@ public final class SettingsBackup {
             Settings.HIDE_SUGGESTED_FOR_YOU,
             Settings.HIDE_PEOPLE_YOU_MAY_KNOW,
             Settings.HIDE_SUGGESTED_GROUPS,
+            Settings.HIDE_STORIES_YOU_MIGHT_LIKE,
             Settings.HIDE_STORIES_TRAY,
             Settings.HIDE_FEED_REELS,
             Settings.BLOCK_RETURN_REFRESH,
