@@ -4,7 +4,10 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
-* **Tooling:** A first push of a feature branch now checks its code without treating the branch's copy of `patches-bundle.json` as a new release. The old hook compared unreleased patch counts with v0.2.0 and blocked the push.
+## 0.3.0 (2026-09-27)
+
+* **Facebook:** This is a development build. The published bundle is still v0.2.0 while the remaining phone checks and reported failures are investigated. The README now records the Media settings and Xiaomi Gallery reports and removes stale notes for checks already recorded below.
+* **Facebook - Tooling:** A first push of a feature branch now checks its code without treating the branch's copy of `patches-bundle.json` as a new release. The old hook compared unreleased patch counts with v0.2.0 and blocked the push.
 * **Facebook:** New patch, Marketplace only, for people who open Facebook just for Marketplace. The tab bar keeps Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Home with the news feed goes, and so do Video, Friends, Feeds, Groups, Gaming and Events, the same way a tab you hide in Facebook's own tab bar settings goes. It's off in Morphe Manager, and once it's in, its switch sits under Opening Facebook in Hushfacebook's settings and takes effect when Facebook restarts. Notifications and links to posts still open, and a tab bar without Marketplace is left as it is.
 * **Facebook:** Choosing a font file can no longer leave Hushfacebook's settings naming one font while Facebook draws in another. The file's name is saved before its copy takes the old one's place, and if either step fails, the font you had stays, name and all. The old copy is never deleted before the new one is in place, so a failed pick can't lose both. Use your phone's font also shows up whenever a copy is left over with no font named, so there's always a way to remove it.
 * **Facebook:** Open on a chosen tab now stops asking for the tab if Facebook still hasn't built its main screen about 12 seconds after the screen first shows. From then on Facebook's own start decides, so a tab bar it builds late or reloads later can't be pushed onto the chosen tab. The diagnostic report's tab bar reading also waits until the screen shows a tab, so Hushfacebook never sets up Facebook's tab bar data before Facebook does.
