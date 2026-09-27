@@ -328,6 +328,15 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the ads in search results and on profiles. In Facebook 577 and 580 every page of search results is built by one constructor from the two builders that take a GraphQLResult and the search's SearchResultsMutableContext, and its module list is the parameter they fill with the module class's own list converter. The module class is the one holding the search result role enum it reads from result_role, and its static initializer keeps the enum's SEARCH_ADS, DEPENDENT_SEARCH_ADS, LATE_DEPENDENT_SEARCH_ADS and TOP_POSITION_SEARCH_ADS as its ads. The extension leaves a module out of the page when its role is one of those or one of the five other roles the enum names after ads. On a profile, the one method holding sponsored_timeline_stories_test_key is the timeline story component's render, which asks GraphQLStory for its sponsored_data; the extension has it draw nothing for a story that carries it."
+    },
+    {
+      "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/feed/suggested/ProfileSuggestionAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the People you may know carousel on your own profile. In Facebook 577 and 580 it is one Litho section that hands the name ProfilePeopleYouMayKnowSection to the section base class, and the profile's root section adds it only when the profile is the viewer's. The patch finds the one children builder loading that name, holds it to the section's constructor, to the base class's getLogTag() and setChildren of the builder's Children type, and to that type's public empty constructor and getChildren(), and asks the extension first there. The extension reads the name back through getLogTag() and has the builder hand back an empty Children while the People you may know switch is on."
     }
   ]
 }

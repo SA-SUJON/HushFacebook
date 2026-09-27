@@ -51,7 +51,10 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_SUGGESTED_FOR_YOU =
             new BooleanSetting("hushfacebook_hide_suggested_for_you", TRUE);
 
-    /** The "People you may know" row, found by its GraphQL type name. */
+    /**
+     * The "People you may know" row in the feed, found by its GraphQL type name, and the carousel on
+     * your own profile, found by the name its section gives itself.
+     */
     public static final BooleanSetting HIDE_PEOPLE_YOU_MAY_KNOW =
             new BooleanSetting("hushfacebook_hide_people_you_may_know", TRUE);
 

@@ -947,7 +947,7 @@
     },
     {
       "name": "Hide suggested and promoted posts",
-      "description": "Removes what Facebook adds to the feed besides ads: \"Suggested for you\" posts, \"People you may know\", \"Pages you may like\" and its own upsells. In-feed surveys go too. Each kind has its own switch.",
+      "description": "Removes what Facebook adds to the feed besides ads: \"Suggested for you\" posts, \"People you may know\", \"Pages you may like\" and its own upsells. In-feed surveys go too, and so does the \"People you may know\" row on your own profile. Each kind has its own switch.",
       "category": "Feed",
       "use": true,
       "dependencies": [

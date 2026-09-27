@@ -562,8 +562,8 @@ public final class L10nTranslations {
                 "Die Datei %1$s lie\u00df sich nicht entfernen. L\u00f6sche sie aus %2$s, um Hushfacebook wieder einzuschalten.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "Die neueste Version von Hushfacebook ist %1$s.");
-        table.put("The row of friend suggestions between posts.",
-                "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen.");
+        table.put("The row of friend suggestions between posts, and the one on your own profile.",
+                "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen und die auf deinem eigenen Profil.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Die Reihe mit Stories oben im Feed, \u201eStory erstellen\u201c eingeschlossen.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -1165,8 +1165,8 @@ public final class L10nTranslations {
                 "No se pudo eliminar el archivo %1$s. B\u00f3rralo de %2$s para volver a activar Hushfacebook.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "La versi\u00f3n m\u00e1s reciente de Hushfacebook es la %1$s.");
-        table.put("The row of friend suggestions between posts.",
-                "La fila de sugerencias de amistad entre las publicaciones.");
+        table.put("The row of friend suggestions between posts, and the one on your own profile.",
+                "La fila de sugerencias de amistad entre las publicaciones y la de tu propio perfil.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "La fila de historias en la parte superior del feed, con \u201cCrear historia\u201d incluida.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -1768,8 +1768,8 @@ public final class L10nTranslations {
                 "File %1$s tidak dapat dihapus. Hapus file itu dari %2$s untuk mengaktifkan Hushfacebook lagi.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "Rilis Hushfacebook terbaru adalah %1$s.");
-        table.put("The row of friend suggestions between posts.",
-                "Deretan saran pertemanan di antara postingan.");
+        table.put("The row of friend suggestions between posts, and the one on your own profile.",
+                "Deretan saran pertemanan di antara postingan, dan deretan di profilmu sendiri.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Deretan cerita di bagian atas Kabar Beranda, termasuk \u201cBuat cerita\u201d.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -2371,8 +2371,8 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel remover o arquivo %1$s. Exclua-o de %2$s para reativar o Hushfacebook.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "A vers\u00e3o mais recente do Hushfacebook \u00e9 a %1$s.");
-        table.put("The row of friend suggestions between posts.",
-                "A fileira de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es.");
+        table.put("The row of friend suggestions between posts, and the one on your own profile.",
+                "A fileira de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es e a do seu pr\u00f3prio perfil.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "A fileira de stories no topo do feed, incluindo \u201cCriar story\u201d.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -2974,8 +2974,8 @@ public final class L10nTranslations {
                 "%1$s dosyas\u0131 kald\u0131r\u0131lamad\u0131. Hushfacebook'u yeniden a\u00e7mak i\u00e7in onu %2$s i\u00e7inden sil.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "En yeni Hushfacebook s\u00fcr\u00fcm\u00fc %1$s.");
-        table.put("The row of friend suggestions between posts.",
-                "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131.");
+        table.put("The row of friend suggestions between posts, and the one on your own profile.",
+                "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131 ve kendi profilindeki sat\u0131r.");
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Ak\u0131\u015f\u0131n en \u00fcst\u00fcndeki hikaye \u015feridi, \u201cHikaye olu\u015ftur\u201d da dahil.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",

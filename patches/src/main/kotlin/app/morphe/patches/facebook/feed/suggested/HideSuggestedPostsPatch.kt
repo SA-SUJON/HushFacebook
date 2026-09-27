@@ -8,14 +8,20 @@
  * the unit classes, so a rename fails at patch time instead of filtering nothing, and names each
  * one a build lacks in the patch log. It also finds the
  * story's recommendation flag, held to Facebook's own filter, and the People you may know type
- * name, which two more switches read.
+ * name, which two more switches read. The People you may know switch also reaches the carousel on
+ * your own profile, through a hook in that section's children builder.
  */
 package app.morphe.patches.facebook.feed.suggested
 
 import app.morphe.patcher.StringComparisonType
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
+import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
+import app.morphe.patcher.util.smali.ExternalLabel
+import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.GRAPHQL_STORY
 import app.morphe.patches.facebook.feed.HIDE_RECOMMENDATIONS_VALIDATOR
 import app.morphe.patches.facebook.feed.RECOMMENDATION_CONTEXT_FIELD
@@ -34,8 +40,12 @@ import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.handleTargets
 import app.morphe.patches.facebook.misc.extension.javaName
+import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.settings.settingsPatch
+import app.morphe.util.findMutableMethodOf
+import com.android.tools.smali.dexlib2.iface.ClassDef
+import com.android.tools.smali.dexlib2.iface.Method
 
 private const val PATCH = "Hide suggested and promoted posts"
 
@@ -75,12 +85,16 @@ internal const val PEOPLE_YOU_MAY_KNOW_TYPE = "PaginatedPeopleYouMayKnowFeedUnit
 internal const val RECOMMENDATION_LABEL = "$EXTENSION_PACKAGE/feed/RecommendationLabel;"
 internal const val RECOMMENDATION_CONTEXT_STUB = "recommendationContext"
 
+/** The extension's question in your profile's People you may know section. */
+internal const val HIDE_PROFILE_SECTION =
+    "$EXTENSION_PACKAGE/feed/ProfileSuggestions;->hideSection(Ljava/lang/Object;)Z"
+
 @Suppress("unused")
 val hideSuggestedPostsPatch = bytecodePatch(
     name = "Hide suggested and promoted posts",
     description = "Removes what Facebook adds to the feed besides ads: \"Suggested for you\" posts, \"People " +
-        "you may know\", \"Pages you may like\" and its own upsells. In-feed surveys go too. Each kind has " +
-        "its own switch.",
+        "you may know\", \"Pages you may like\" and its own upsells. In-feed surveys go too, and so does the " +
+        "\"People you may know\" row on your own profile. Each kind has its own switch.",
     default = true,
 ) {
     category("Feed")
@@ -120,6 +134,9 @@ val hideSuggestedPostsPatch = bytecodePatch(
         // The extension reads the flag and the model's type tag through these, by reflection.
         requireStoryFlagReaders()
         fillStoryModelStub(RECOMMENDATION_LABEL, RECOMMENDATION_CONTEXT_STUB, accessor)
+
+        // The carousel on your own profile is a section of its own, not a feed unit.
+        hideProfileSuggestions()
         enableStatus("suggestedPosts")
     }
 }
@@ -135,4 +152,78 @@ internal fun BytecodePatchContext.requireSuggestedUnits() {
     handleTargets(PATCH, "suggested feed unit classes", SUGGESTED_FEED_UNITS) { type ->
         if (classDefByOrNull(type) != null) null else "${javaName(type)} isn't in this Facebook build"
     }
+}
+
+/** Your profile's People you may know section: its children builder, and the Children type that answers. */
+internal class ProfileSuggestionSection(val builder: Method, val children: String)
+
+/**
+ * Your profile's People you may know section, held to the evidence the hook rests on: it's the one
+ * children builder outside the extension loading [PROFILE_PYMK_SECTION], its class hands that name
+ * to the section base class, a superclass declares the kept getLogTag() the extension reads it back
+ * through and setChildren taking what the builder answers, and that Children type can be built
+ * empty. See ProfileSuggestionAnchors.kt.
+ */
+internal fun BytecodePatchContext.profileSuggestionSection(): ProfileSuggestionSection {
+    val builders = classDefByStrings(PROFILE_PYMK_SECTION, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        .flatMap(::profileSuggestionBuilders)
+    val builder = builders.singleOrNull() ?: throw PatchException(
+        "$PATCH: expected one section children builder loading \"$PROFILE_PYMK_SECTION\", found " +
+            builders.joinToString { "${it.definingClass}->${it.name}" }.ifEmpty { "none" },
+    )
+    val section = classDefBy(builder.definingClass)
+    if (!namesItself(section)) {
+        throw PatchException(
+            "$PATCH: ${section.type} doesn't hand \"$PROFILE_PYMK_SECTION\" to its superclass's constructor, " +
+                "so it isn't the section of that name",
+        )
+    }
+    val children = builder.returnType
+    if (superclasses(section).none { isSectionBase(it, children) }) {
+        throw PatchException(
+            "$PATCH: no superclass of ${section.type} declares $LOG_TAG() and $SET_CHILDREN($children), so " +
+                "${builder.name} doesn't build a section's children",
+        )
+    }
+    val list = classDefByOrNull(children)
+    if (list == null || !isChildrenList(list)) {
+        throw PatchException(
+            "$PATCH: $children has no public constructor taking nothing and $GET_CHILDREN(), so the patch " +
+                "can't hand back an empty one",
+        )
+    }
+    return ProfileSuggestionSection(builder, children)
+}
+
+/** The superclasses of [classDef] this APK carries, nearest first. */
+private fun BytecodePatchContext.superclasses(classDef: ClassDef): List<ClassDef> =
+    generateSequence(classDef.superclass?.let(::classDefByOrNull)) { it.superclass?.let(::classDefByOrNull) }.toList()
+
+/** Hooks your profile's People you may know section. */
+internal fun BytecodePatchContext.hideProfileSuggestions() {
+    val found = profileSuggestionSection()
+    mutableClassDefBy(found.builder.definingClass).findMutableMethodOf(found.builder)
+        .buildNoChildrenWhenHidden(found.children)
+}
+
+/**
+ * First thing in the section's children builder: hand the extension the section, and answer an
+ * empty [children] when it says the carousel goes. Otherwise the builder runs from its first
+ * instruction. v0 is free at index 0, and the range form names `this` wherever it sits.
+ */
+internal fun MutableMethod.buildNoChildrenWhenHidden(children: String) {
+    requireLocals(PATCH, 1)
+    addInstructionsWithLabels(
+        0,
+        """
+            invoke-static/range { p0 .. p0 }, $HIDE_PROFILE_SECTION
+            move-result v0
+            if-eqz v0, :facebook
+            new-instance v0, $children
+            invoke-direct { v0 }, $children-><init>()V
+            return-object v0
+        """,
+        ExternalLabel("facebook", getInstruction(0)),
+    )
 }

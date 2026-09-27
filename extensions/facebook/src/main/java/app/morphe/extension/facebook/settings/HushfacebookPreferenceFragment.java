@@ -262,7 +262,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.")));
                 feed.addPreference(toggle(context, Settings.HIDE_PEOPLE_YOU_MAY_KNOW,
                         L10n.t("Hide \"People you may know\""),
-                        L10n.t("The row of friend suggestions between posts.")));
+                        L10n.t("The row of friend suggestions between posts, and the one on your own profile.")));
             }
             if (build.contains(PatchFamily.STORIES_TRAY)) {
                 // Facebook builds the feed's adapters once, when the feed is set up, and the tray is

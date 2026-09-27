@@ -16,6 +16,11 @@ package app.morphe.extension.facebook.settings;
 public final class FamilyNames {
     public static final String SPONSORED_POSTS = "Hide sponsored posts";
     public static final String SUGGESTED_POSTS = "Hide suggested and promoted posts";
+    /**
+     * The Hook status row of the same patch's hook on your own profile, so the report tells the feed
+     * guard's reads from the profile section's. Not a patch name: PatchFamily lists the patch once.
+     */
+    public static final String SUGGESTED_POSTS_PROFILE = "Hide suggested and promoted posts (your profile)";
     public static final String AI_DETECTED_POSTS = "Hide AI-detected posts";
     /**
      * The Hook status row of the same patch's Reels and Watch hooks, so the report tells the feed

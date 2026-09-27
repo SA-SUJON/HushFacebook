@@ -52,6 +52,7 @@ import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
+import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
@@ -188,7 +189,9 @@ public class PausedHooksTest {
                 // A story Facebook's own recommendation flag marks as suggested for you.
                 () -> FeedGuardForTests.hidesRecommended(Category.ORGANIC, new GraphQLStory(),
                         FeedGuardForTests.recommendationContext(true)),
-                () -> FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow())));
+                () -> FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow()),
+                // Your own profile's People you may know carousel builds nothing.
+                ProfileSuggestionsForTests::hidesTheCarousel));
         // Each of the feed's two Stories tray adapters returns nothing.
         probes.put(PatchFamily.STORIES_TRAY, Arrays.asList(
                 () -> FeedFilter.hideStoriesTray(FeedFilter.LEGACY_TRAY),
