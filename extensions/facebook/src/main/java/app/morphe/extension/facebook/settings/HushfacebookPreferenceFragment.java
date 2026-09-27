@@ -8,6 +8,7 @@ package app.morphe.extension.facebook.settings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +35,8 @@ import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.AbsListView;
@@ -1322,6 +1325,20 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * An edit dialog shrinks to fit above the keyboard instead of going under it. Android's own
+     * EditTextPreference only asks for the keyboard, so at a large font size a long message pushed
+     * the dialog's Save and Cancel behind the keyboard, where nobody could reach them. The dialog's
+     * keyboard state is kept; only how it adjusts changes.
+     */
+    static void fitAboveKeyboard(Dialog dialog) {
+        Window window = dialog == null ? null : dialog.getWindow();
+        if (window == null) return;
+        int mode = window.getAttributes().softInputMode;
+        window.setSoftInputMode((mode & ~WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST)
+                | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+    }
+
+    /**
      * The save folder's row. Its summary follows its text, whoever sets it: the person, the shared
      * page syncing it from the setting, or an import.
      */
@@ -1349,6 +1366,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         protected void showDialog(Bundle state) {
             super.showDialog(state);
             if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+            fitAboveKeyboard(getDialog());
         }
     }
 
@@ -1383,6 +1401,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         protected void showDialog(Bundle state) {
             super.showDialog(state);
             if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+            fitAboveKeyboard(getDialog());
         }
     }
 
@@ -1414,6 +1433,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         protected void showDialog(Bundle state) {
             super.showDialog(state);
             if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+            fitAboveKeyboard(getDialog());
         }
     }
 
