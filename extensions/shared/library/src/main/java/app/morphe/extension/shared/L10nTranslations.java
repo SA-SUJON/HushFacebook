@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(782);
+        Map<String, String> table = new HashMap<>(780);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -749,8 +749,6 @@ public final class L10nTranslations {
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
         table.put("There's no diagnostic data to put back.",
                 "Es gibt keine Diagnosedaten zum Wiederherstellen.");
-        table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
-                "Noch nichts zu berichten. Schalte die Debug-Protokollierung ein, wiederhole, was schiefgelaufen ist, und exportiere dann erneut.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Diese werden beim Patchen in Morphe Manager ausgew\u00e4hlt, und die Pause schaltet sie nicht aus. Patche erneut, um sie zu \u00e4ndern.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
@@ -791,11 +789,11 @@ public final class L10nTranslations {
                 "Dateiname f\u00fcr Videos");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Videos hei\u00dfen %1$s. Fotos behalten Facebooks eigene Namen mit %2$s.");
+        table.put("Videos go to %1$s and photos to %2$s.",
+                "Videos landen in %1$s und Fotos in %2$s.");
     }
 
     private static void fillDe6(Map<String, String> table) {
-        table.put("Videos go to %1$s and photos to %2$s.",
-                "Videos landen in %1$s und Fotos in %2$s.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Videos werden dann in %1$s oder der n\u00e4chstniedrigeren Qualit\u00e4t gespeichert. Hat ein Video keine so niedrige Qualit\u00e4t, wird es in der n\u00e4chsth\u00f6heren gespeichert.");
         table.put("Videos will save at the best quality.",
@@ -859,7 +857,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(782);
+        Map<String, String> table = new HashMap<>(780);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1564,8 +1562,6 @@ public final class L10nTranslations {
                 "No hay datos de diagn\u00f3stico que borrar.");
         table.put("There's no diagnostic data to put back.",
                 "No hay datos de diagn\u00f3stico que restaurar.");
-        table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
-                "Todav\u00eda no hay nada que informar. Activa el Registro de depuraci\u00f3n, repite lo que fall\u00f3 y vuelve a exportar.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Se eligen en Morphe Manager al parchear, y Pausar no los desactiva. Vuelve a parchear para cambiarlos.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
@@ -1606,11 +1602,11 @@ public final class L10nTranslations {
                 "Nombre de archivo de los videos");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Los videos se llaman %1$s. Las fotos conservan los nombres %2$s propios de Facebook.");
+        table.put("Videos go to %1$s and photos to %2$s.",
+                "Los videos van a %1$s y las fotos a %2$s.");
     }
 
     private static void fillEs6(Map<String, String> table) {
-        table.put("Videos go to %1$s and photos to %2$s.",
-                "Los videos van a %1$s y las fotos a %2$s.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Los videos se guardar\u00e1n en %1$s o en la calidad m\u00e1s cercana por debajo. Si un video no tiene ninguna tan baja, se guardar\u00e1 en la m\u00e1s cercana por encima.");
         table.put("Videos will save at the best quality.",
@@ -1674,7 +1670,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(782);
+        Map<String, String> table = new HashMap<>(780);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -2379,8 +2375,6 @@ public final class L10nTranslations {
                 "Tidak ada data diagnostik yang dapat dihapus.");
         table.put("There's no diagnostic data to put back.",
                 "Tidak ada data diagnostik yang dapat dikembalikan.");
-        table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
-                "Belum ada yang bisa dilaporkan. Aktifkan Pencatatan debug, ulangi hal yang bermasalah, lalu ekspor lagi.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Semua ini dipilih di Morphe Manager saat Anda menambal, dan Jeda tidak mematikannya. Tambal ulang untuk mengubahnya.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
@@ -2421,11 +2415,11 @@ public final class L10nTranslations {
                 "Nama file video");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Video diberi nama %1$s. Foto tetap memakai nama %2$s bawaan Facebook.");
+        table.put("Videos go to %1$s and photos to %2$s.",
+                "Video disimpan ke %1$s dan foto ke %2$s.");
     }
 
     private static void fillIn6(Map<String, String> table) {
-        table.put("Videos go to %1$s and photos to %2$s.",
-                "Video disimpan ke %1$s dan foto ke %2$s.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Video akan disimpan dalam %1$s atau kualitas terdekat di bawahnya. Video yang tidak memiliki kualitas serendah itu akan disimpan dalam kualitas terdekat di atasnya.");
         table.put("Videos will save at the best quality.",
@@ -2489,7 +2483,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(782);
+        Map<String, String> table = new HashMap<>(780);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -3194,8 +3188,6 @@ public final class L10nTranslations {
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
         table.put("There's no diagnostic data to put back.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para restaurar.");
-        table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
-                "Ainda n\u00e3o h\u00e1 nada para relatar. Ative o Registro de depura\u00e7\u00e3o, repita o que deu errado e exporte de novo.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Eles s\u00e3o escolhidos no Morphe Manager quando voc\u00ea aplica os patches, e a pausa n\u00e3o os desliga. Aplique os patches de novo para mud\u00e1-los.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
@@ -3236,11 +3228,11 @@ public final class L10nTranslations {
                 "Nome do arquivo de v\u00eddeo");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Os v\u00eddeos se chamam %1$s. As fotos mant\u00eam os nomes %2$s do pr\u00f3prio Facebook.");
+        table.put("Videos go to %1$s and photos to %2$s.",
+                "Os v\u00eddeos v\u00e3o para %1$s e as fotos para %2$s.");
     }
 
     private static void fillPt_rBR6(Map<String, String> table) {
-        table.put("Videos go to %1$s and photos to %2$s.",
-                "Os v\u00eddeos v\u00e3o para %1$s e as fotos para %2$s.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Os v\u00eddeos v\u00e3o ser salvos em %1$s ou na qualidade mais pr\u00f3xima abaixo disso. Um v\u00eddeo que n\u00e3o tiver nenhuma qualidade t\u00e3o baixa vai ser salvo na mais pr\u00f3xima acima.");
         table.put("Videos will save at the best quality.",
@@ -3304,7 +3296,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(782);
+        Map<String, String> table = new HashMap<>(780);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -4009,8 +4001,6 @@ public final class L10nTranslations {
                 "Temizlenecek tan\u0131lama verisi yok.");
         table.put("There's no diagnostic data to put back.",
                 "Geri getirilecek tan\u0131lama verisi yok.");
-        table.put("There's nothing to report yet. Turn on Debug logging, repeat what went wrong, then export again.",
-                "Hen\u00fcz raporlanacak bir \u015fey yok. Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fcn\u00fc a\u00e7, sorunu yeniden olu\u015ftur, sonra tekrar d\u0131\u015fa aktar.");
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Bunlar yamalarken Morphe Manager'da se\u00e7ilir ve Duraklatma bunlar\u0131 kapatmaz. De\u011fi\u015ftirmek i\u00e7in yeniden yamala.");
         table.put("This phone has no file picker, so there's no way to choose a file here.",
@@ -4051,11 +4041,11 @@ public final class L10nTranslations {
                 "Video dosya ad\u0131");
         table.put("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 "Videolar\u0131n ad\u0131 %1$s olur. Foto\u011fraflar Facebook'un kendi %2$s adlar\u0131n\u0131 korur.");
+        table.put("Videos go to %1$s and photos to %2$s.",
+                "Videolar %1$s klas\u00f6r\u00fcne, foto\u011fraflar %2$s klas\u00f6r\u00fcne kaydedilir.");
     }
 
     private static void fillTr6(Map<String, String> table) {
-        table.put("Videos go to %1$s and photos to %2$s.",
-                "Videolar %1$s klas\u00f6r\u00fcne, foto\u011fraflar %2$s klas\u00f6r\u00fcne kaydedilir.");
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Videolar %1$s kalitesinde ya da bunun alt\u0131ndaki en yak\u0131n kalitede kaydedilecek. Bu kadar d\u00fc\u015f\u00fck kalitesi olmayan video, bunun \u00fcst\u00fcndeki en yak\u0131n kalitede kaydedilecek.");
         table.put("Videos will save at the best quality.",

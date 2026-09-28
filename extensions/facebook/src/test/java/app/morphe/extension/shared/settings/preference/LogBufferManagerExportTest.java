@@ -89,11 +89,7 @@ public class LogBufferManagerExportTest {
         org.robolectric.Shadows.shadowOf(manager).addApplicationExitInfo(exit);
         org.robolectric.Shadows.shadowOf(manager).addApplicationExitInfo(helper);
 
-        // The line rides along with a report that was already worth making. On its own it must
-        // not make one, because every process has a last exit and most of them are ordinary.
-        assertEquals("a last exit alone made a report", "", LogBufferManager.buildExportText());
-
-        app.morphe.extension.shared.diagnostics.HookStatus.missingViewId("comments", "jlk");
+        // Every report asked for carries the line, a healthy one with nothing else found included.
         String report = LogBufferManager.buildExportText();
         assertTrue("the report does not say why the process went away: " + report,
                 report.contains("[LAST EXIT]"));

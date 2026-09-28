@@ -68,7 +68,6 @@ public class SettingsL10nTest {
         // Another class may have left a bundle's own sentences set; this one reads the catalog's.
         LogBufferManager.clearedMessage = null;
         LogBufferManager.nothingToClearMessage = null;
-        LogBufferManager.nothingToExportMessage = null;
         LogBufferManager.copiedMessage = null;
     }
 
