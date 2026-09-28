@@ -61,9 +61,12 @@ final class SaveLeftovers {
         }
     }
 
-    /** A row was just inserted pending. */
-    static void pending(Context application, Uri row) {
-        record(application, row, true);
+    /**
+     * A row was just inserted pending. Answers whether the list holds it on disk now; a row it
+     * doesn't hold would be nobody's to remove, so the caller removes it before a byte goes in.
+     */
+    static boolean pending(Context application, Uri row) {
+        return record(application, row, true);
     }
 
     /** The row was published or removed. */
@@ -71,8 +74,8 @@ final class SaveLeftovers {
         record(application, row, false);
     }
 
-    private static void record(Context application, Uri row, boolean add) {
-        if (row == null) return;
+    private static boolean record(Context application, Uri row, boolean add) {
+        if (row == null) return false;
         synchronized (LOCK) {
             try {
                 SharedPreferences ledger = application.getSharedPreferences(LEDGER, Context.MODE_PRIVATE);
@@ -80,10 +83,12 @@ final class SaveLeftovers {
                 boolean changed = add ? rows.add(row.toString()) : rows.remove(row.toString());
                 // commit(), not apply(): a process ended right after an apply() can lose the
                 // entry, and the entry exists for exactly that case. This runs on the save's thread.
-                if (changed) ledger.edit().putStringSet(PENDING, rows).commit();
+                if (!changed || ledger.edit().putStringSet(PENDING, rows).commit()) return true;
+                MediaDownload.failure(() -> "could not write the list of pending gallery rows", null);
             } catch (Throwable t) {
                 MediaDownload.failure(() -> "could not update the list of pending gallery rows", t);
             }
+            return false;
         }
     }
 

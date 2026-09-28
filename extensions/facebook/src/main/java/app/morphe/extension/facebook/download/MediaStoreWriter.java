@@ -103,8 +103,22 @@ final class MediaStoreWriter implements Downloader.Sink {
         item = resolver.insert(collection, values);
         if (item == null) throw new IOException("the gallery refused a new entry");
         // Written down before any byte, so a process ended during the copy leaves a row the next
-        // save can find and remove. See SaveLeftovers.
-        SaveLeftovers.pending(context, item);
+        // save can find and remove. See SaveLeftovers. A row the list couldn't hold goes again
+        // before the copy starts: nothing would ever remove it.
+        if (!SaveLeftovers.pending(context, item)) {
+            Uri row = item;
+            item = null;
+            try {
+                if (resolver.delete(row, null, null) <= 0) {
+                    Logger.diagnosticError(DiagnosticCategory.DOWNLOADS, SOURCE, () -> "the gallery kept an unfinished "
+                            + "entry that isn't on the list of pending rows; Android removes it after about a week", null);
+                }
+            } catch (Throwable t) {
+                Logger.diagnosticError(DiagnosticCategory.DOWNLOADS, SOURCE,
+                        () -> "could not remove an unfinished entry that isn't on the list of pending rows", t);
+            }
+            throw new IOException("the list of pending gallery rows could not hold the new entry");
+        }
 
         stream = resolver.openOutputStream(item, "w");
         if (stream == null) throw new IOException("the gallery gave no way to write");

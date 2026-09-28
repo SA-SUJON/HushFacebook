@@ -14,14 +14,18 @@ import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.media.MediaFormat;
 import android.net.Uri;
+import android.os.Looper;
 import android.provider.MediaStore;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -31,12 +35,14 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowContentResolver;
 import org.robolectric.shadows.ShadowMediaExtractor;
+import org.robolectric.shadows.ShadowToast;
 import org.robolectric.shadows.util.DataSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Proxy;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +52,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import app.morphe.extension.shared.SettingsContextRule;
+import app.morphe.extension.shared.settings.preference.LogBufferManager;
+
 /**
  * A save as the feature runs one: into the cache, then through MediaStoreWriter into a stand-in
  * for MediaStore. A refused or broken fetch must never insert a row, pending or not, and must
@@ -54,6 +63,8 @@ import java.util.Map;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, sdk = 30)
 public class MediaSaveTest {
+    @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
+
     private LocalServer server;
     private String origin;
     private MediaUrlPolicy policy;
@@ -77,11 +88,13 @@ public class MediaSaveTest {
         gallery = Robolectric.setupContentProvider(Gallery.class, MediaStore.AUTHORITY);
         ShadowContentResolver resolver = Shadows.shadowOf(context.getContentResolver());
         resolver.registerOutputStream(gallery.videoUri(1), published);
+        LogBufferManager.clearLogBuffer();
     }
 
     @After
     public void tearDown() throws IOException {
         server.close();
+        LogBufferManager.clearLogBuffer();
         // The join cases tell Robolectric's extractor about their work files, and it keeps that
         // in a static map. Cleared here rather than left to Robolectric's own reset.
         ShadowMediaExtractor.reset();
@@ -452,11 +465,160 @@ public class MediaSaveTest {
         }
     }
 
+    /**
+     * The list of pending rows is what removes a row a stopped save leaves, so a row it can't hold
+     * would be nobody's to remove. A commit that answers false, and one that throws, each stop the
+     * save before a byte is copied, and the row goes again. A finished file of an earlier save,
+     * already in the gallery, is left as it was.
+     */
+    @Test
+    public void aRowTheListCannotHoldIsRemovedBeforeAByteIsCopied() {
+        assertAnUnlistedRowStopsTheSave(false);
+    }
+
+    @Test
+    public void aListThatThrowsStopsTheSaveTheSameWay() {
+        assertAnUnlistedRowStopsTheSave(true);
+    }
+
+    private void assertAnUnlistedRowStopsTheSave(boolean throwing) {
+        finishedRow();
+        ContentValues earlier = new ContentValues(gallery.rows.get(1L));
+        ByteArrayOutputStream copied = new ByteArrayOutputStream();
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(gallery.videoUri(2), copied);
+        byte[] body = mp4(4096);
+        serve("/v.mp4", "video/mp4", body, body.length);
+
+        Downloader.Result result = Downloader.save(origin + "/v.mp4", Downloader.Kind.VIDEO,
+                DashSave.workFolder(context), new MediaStoreWriter(new BrokenLedger(context, throwing), true), policy,
+                Downloader.MAX_BYTES);
+
+        assertEquals(result.toString(), Downloader.Status.WRITE_ERROR, result.status);
+        assertEquals("bytes were copied into a row the list doesn't hold", 0, copied.size());
+        assertEquals(2, gallery.inserts.size());
+        assertFalse("the unlisted row was left in the gallery", gallery.rows.containsKey(2L));
+        assertEquals("the earlier finished file was changed", earlier, gallery.rows.get(1L));
+        String[] left = DashSave.workFolder(context).list();
+        assertEquals(0, left == null ? 0 : left.length);
+    }
+
+    /** When the gallery won't take the unlisted row back either, the report says so. */
+    @Test
+    public void anUnlistedRowTheGalleryKeepsIsReported() {
+        gallery.refuseDeletion = true;
+        ByteArrayOutputStream copied = new ByteArrayOutputStream();
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(gallery.videoUri(1), copied);
+        byte[] body = mp4(4096);
+        serve("/v.mp4", "video/mp4", body, body.length);
+
+        Downloader.Result result = Downloader.save(origin + "/v.mp4", Downloader.Kind.VIDEO,
+                DashSave.workFolder(context), new MediaStoreWriter(new BrokenLedger(context, false), true), policy,
+                Downloader.MAX_BYTES);
+
+        assertEquals(result.toString(), Downloader.Status.WRITE_ERROR, result.status);
+        assertEquals(0, copied.size());
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("ERROR | the gallery kept an unfinished entry that isn't on the list of "
+                + "pending rows"));
+    }
+
+    /** The person saving is told the save failed, never that it was saved. */
+    @Test
+    public void aSaveWhoseRowCannotBeListedEndsAsAFailedSave() throws InterruptedException {
+        byte[] body = mp4(4096);
+        serve("/v.mp4", "video/mp4", body, body.length);
+        Context broken = new BrokenLedger(context, false);
+
+        Thread worker = MediaDownload.start(broken, true, (writer, progress) -> Downloader.save(origin + "/v.mp4",
+                Downloader.Kind.VIDEO, DashSave.workFolder(context), writer, policy, Downloader.MAX_BYTES, progress));
+        worker.join(30_000);
+        assertFalse("the save never finished", worker.isAlive());
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+
+        assertEquals("Download failed", ShadowToast.getTextOfLatestToast());
+        assertTrue("the unlisted row was left in the gallery", gallery.rows.isEmpty());
+        assertEquals(0, published.size());
+    }
+
+    /** A save the list can hold has its row on it before the first byte, as a stopped save needs. */
+    @Test
+    public void aGoodSaveListsItsRowBeforeTheFirstByte() {
+        List<java.util.Set<String>> listedAtFirstByte = new ArrayList<>();
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(gallery.videoUri(1), new OutputStream() {
+            @Override public void write(int value) {
+                write(new byte[] { (byte) value }, 0, 1);
+            }
+
+            @Override public void write(byte[] bytes, int offset, int length) {
+                if (listedAtFirstByte.isEmpty()) listedAtFirstByte.add(pendingList());
+                published.write(bytes, offset, length);
+            }
+        });
+        byte[] body = mp4(4096);
+        serve("/v.mp4", "video/mp4", body, body.length);
+
+        Downloader.Result result = save("/v.mp4", Downloader.MAX_BYTES);
+
+        assertEquals(result.toString(), Downloader.Status.OK, result.status);
+        assertEquals(java.util.Collections.singletonList(java.util.Collections.singleton(gallery.videoUri(1).toString())),
+                listedAtFirstByte);
+        assertTrue("the published row is still listed", pendingList().isEmpty());
+    }
+
+    private java.util.Set<String> pendingList() {
+        return new java.util.HashSet<>(context.getSharedPreferences("hushfacebook_saves", Context.MODE_PRIVATE)
+                .getStringSet("pending_rows", new java.util.HashSet<>()));
+    }
+
+    /** A row a finished save published. */
+    private void finishedRow() {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, "FB_VID_20260925_010203.mp4");
+        values.put(MediaStore.MediaColumns.IS_PENDING, 0);
+        context.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+    }
+
+    /**
+     * The application, with a list of pending rows whose commit answers false, or throws when
+     * [throwing]: a full disk, or storage that went read-only.
+     */
+    private static final class BrokenLedger extends ContextWrapper {
+        private final boolean throwing;
+
+        BrokenLedger(Context base, boolean throwing) {
+            super(base);
+            this.throwing = throwing;
+        }
+
+        @Override
+        public SharedPreferences getSharedPreferences(String name, int mode) {
+            SharedPreferences real = super.getSharedPreferences(name, mode);
+            if (!"hushfacebook_saves".equals(name)) return real;
+            ClassLoader loader = SharedPreferences.class.getClassLoader();
+            return (SharedPreferences) Proxy.newProxyInstance(loader, new Class<?>[] { SharedPreferences.class },
+                    (preferences, method, args) -> {
+                        Object answer = method.invoke(real, args);
+                        if (!method.getName().equals("edit")) return answer;
+                        SharedPreferences.Editor editor = (SharedPreferences.Editor) answer;
+                        return Proxy.newProxyInstance(loader, new Class<?>[] { SharedPreferences.Editor.class },
+                                (edit, call, given) -> {
+                                    if (call.getName().equals("commit")) {
+                                        if (throwing) throw new IllegalStateException("the disk is full");
+                                        return false;
+                                    }
+                                    Object result = call.invoke(editor, given);
+                                    return result == editor ? edit : result;
+                                });
+                    });
+        }
+    }
+
     /** MediaStore's video and image tables, as much of them as a save touches. */
     public static final class Gallery extends ContentProvider {
         final Map<Long, ContentValues> rows = new HashMap<>();
         final List<Uri> inserts = new ArrayList<>();
         boolean refuseUpdate;
+        boolean refuseDeletion;
         private long nextId = 1;
 
         Uri videoUri(long id) {
@@ -489,6 +651,7 @@ public class MediaSaveTest {
         }
 
         @Override public int delete(Uri uri, String selection, String[] selectionArgs) {
+            if (refuseDeletion) return 0;
             return rows.remove(ContentUris.parseId(uri)) == null ? 0 : 1;
         }
 

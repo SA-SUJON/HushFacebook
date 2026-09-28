@@ -5,6 +5,7 @@ Every Hushfacebook release, newest first.
 ## Unreleased
 
 * **Facebook:** `Restore screens on re-signed builds` now works in a copy renamed by Morphe's Clone app patch (issue #16). It used to recognize itself only by the name com.facebook.katana. Now it compares the ID Android gives each installed app, so a clone counts as itself while stock Facebook installed beside it, Messenger and look-alike names keep their own signatures. Dark mode and Active status should open in a clone again, but that hasn't been checked on a phone yet. Nor have sign-in and notifications in a clone.
+* **Facebook:** A save now stops before copying anything when it can't write down its unfinished gallery entry. That record is how a save cut short by Android gets cleaned up later, so an entry missing from it could sit half written in the gallery for about a week. The entry is removed straight away and the save reports that it failed. If the gallery won't remove it either, the diagnostic report says so. Files you've already saved aren't touched. Checked with unit tests only, not yet on a phone.
 
 ## 0.3.4 (2026-09-27)
 
