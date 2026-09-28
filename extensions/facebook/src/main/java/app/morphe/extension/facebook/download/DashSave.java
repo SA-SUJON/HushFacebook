@@ -104,46 +104,15 @@ final class DashSave {
     }
 
     /**
-     * Download [video] and [audio], join them, and write the result to [sink]. This blocks and
-     * never throws. [audio] is {@code null} for a video with no sound. Both tracks go through the
-     * same checks as a single file, so nothing reaches the gallery unless both are Meta's media.
-     */
-    static Downloader.Result save(
-        Context application,
-        DashManifest.Track video,
-        DashManifest.Track audio,
-        Downloader.Sink sink
-    ) {
-        return save(application, video, audio, sink, MediaUrlPolicy.META);
-    }
-
-    static Downloader.Result save(
-        Context application,
-        DashManifest.Track video,
-        DashManifest.Track audio,
-        Downloader.Sink sink,
-        MediaUrlPolicy policy
-    ) {
-        return save(application, video, audio, sink, policy, Downloader.MAX_BYTES);
-    }
-
-    /**
-     * [maxBytes] holds the two tracks together, the way it holds a single file: the sound gets
+     * Download [video] and [audio], join them, and write the result to [sink], reporting each
+     * track's fetch to [progress] and stopping when it's cancelled. This blocks and never throws.
+     * [audio] is {@code null} for a video with no sound. Both tracks go through the same checks as
+     * a single file, so nothing reaches the gallery unless both are Meta's media.
+     *
+     * <p>[maxBytes] holds the two tracks together, the way it holds a single file: the sound gets
      * what the picture left of it, and the joined file is held to it too. So what reaches the
      * gallery is never over the cap, whichever way it was saved.
      */
-    static Downloader.Result save(
-        Context application,
-        DashManifest.Track video,
-        DashManifest.Track audio,
-        Downloader.Sink sink,
-        MediaUrlPolicy policy,
-        long maxBytes
-    ) {
-        return save(application, video, audio, sink, policy, maxBytes, Downloader.SILENT);
-    }
-
-    /** As above, reporting each track's fetch to [progress] and stopping when it's cancelled. */
     static Downloader.Result save(
         Context application,
         DashManifest.Track video,

@@ -97,6 +97,7 @@ public class MediaSaveTest {
     public void tearDown() throws IOException {
         server.close();
         MediaDownload.policyForTests = null;
+        MediaDownload.capForTests = 0;
         DashSave.usableForTests = null;
         LogBufferManager.clearLogBuffer();
         // The join cases tell Robolectric's extractor about their work files, and it keeps that
@@ -123,6 +124,15 @@ public class MediaSaveTest {
 
     private Downloader.Result save(String path, MediaStoreWriter writer) {
         return MediaDownload.fileJob(context, origin + path, Downloader.Kind.VIDEO).run(writer, Downloader.SILENT);
+    }
+
+    /** The DASH save of [video] and [audio], on the path every DASH save takes, with no single file after it. */
+    private Downloader.Result saveDash(DashManifest.Track video, DashManifest.Track audio) {
+        return saveDash(video, audio, Downloader.SILENT);
+    }
+
+    private Downloader.Result saveDash(DashManifest.Track video, DashManifest.Track audio, Downloader.Progress progress) {
+        return MediaDownload.dashJob(context, video, audio, null).run(new MediaStoreWriter(context, true), progress);
     }
 
     private void assertNothingWasCreated(String what, Downloader.Result result) {
@@ -221,7 +231,9 @@ public class MediaSaveTest {
         DashManifest.Track audio = new DashManifest.Track("audio/mp4", "mp4a.40.2", 0, 0, 128_000,
                 "http://scontent.xx.fbcdn.net/a.mp4");
 
-        Downloader.Result result = DashSave.save(context, video, audio, new MediaStoreWriter(context, true));
+        // Meta's own rules, as a phone runs them.
+        MediaDownload.policyForTests = null;
+        Downloader.Result result = saveDash(video, audio);
 
         assertEquals(result.toString(), Downloader.Status.REFUSED, result.status);
         assertNothingWasCreated("a foreign DASH track", result);
@@ -248,7 +260,7 @@ public class MediaSaveTest {
 
             for (String url : new String[] { foreign.origin() + "/a.mp4", origin + "/away.mp4" }) {
                 DashManifest.Track audio = new DashManifest.Track("audio/mp4", "mp4a.40.2", 0, 0, 128_000, url);
-                Downloader.Result result = DashSave.save(context, video, audio, new MediaStoreWriter(context, true), policy);
+                Downloader.Result result = saveDash(video, audio);
                 assertEquals(url + ": " + result, Downloader.Status.REFUSED, result.status);
                 assertNothingWasCreated("a DASH save whose sound is at " + url, result);
             }
@@ -266,7 +278,8 @@ public class MediaSaveTest {
         serve("/a.mp4", "audio/mp4", sound, sound.length);
         DashManifest.Track audio = new DashManifest.Track("audio/mp4", "mp4a.40.2", 0, 0, 128_000, origin + "/a.mp4");
 
-        Downloader.Result result = DashSave.save(context, video, audio, new MediaStoreWriter(context, true), policy, 100_000);
+        MediaDownload.capForTests = 100_000;
+        Downloader.Result result = saveDash(video, audio);
 
         assertEquals(result.toString(), Downloader.Status.TOO_LARGE, result.status);
         assertNothingWasCreated("a DASH pair over the cap", result);
@@ -288,7 +301,8 @@ public class MediaSaveTest {
                 origin + "/v60.mp4");
         DashManifest.Track audio = new DashManifest.Track("audio/mp4", "mp4a.40.2", 0, 0, 128_000, origin + "/a40.mp4");
 
-        Downloader.Result result = DashSave.save(context, video, audio, new MediaStoreWriter(context, true), policy, 100_000);
+        MediaDownload.capForTests = 100_000;
+        Downloader.Result result = saveDash(video, audio);
 
         assertEquals("WRITE_ERROR (the tracks could not be joined)", result.toString());
         assertEquals("the sound track wasn't fetched", 1, server.hits("/a40.mp4"));
@@ -298,7 +312,7 @@ public class MediaSaveTest {
         serve("/v100.mp4", "video/mp4", whole, whole.length);
         DashManifest.Track wholeCap = new DashManifest.Track("video/mp4", "avc1.64001f", 1280, 720, 2_000_000,
                 origin + "/v100.mp4");
-        result = DashSave.save(context, wholeCap, audio, new MediaStoreWriter(context, true), policy, 100_000);
+        result = saveDash(wholeCap, audio);
         assertEquals(result.toString(), Downloader.Status.TOO_LARGE, result.status);
         assertTrue(result.toString(), result.reason.endsWith("more than 0"));
         assertNothingWasCreated("a picture that took the whole cap", result);
@@ -335,7 +349,7 @@ public class MediaSaveTest {
             }
         };
 
-        DashSave.save(context, video, audio, new MediaStoreWriter(context, true), policy, 100_000, watching);
+        saveDash(video, audio, watching);
 
         assertFalse("nothing was reported", told.isEmpty());
         for (int i = 1; i < told.size(); i++) {
@@ -371,7 +385,9 @@ public class MediaSaveTest {
                 return super.refusal(url);
             }
         };
-        return DashSave.save(context, video, audio, new MediaStoreWriter(context, true), describing, 10_000);
+        MediaDownload.policyForTests = describing;
+        MediaDownload.capForTests = 10_000;
+        return saveDash(video, audio);
     }
 
     /** Each work file, found by the name DashSave starts it with, gets its one sample. */

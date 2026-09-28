@@ -226,6 +226,11 @@ public class SaveBoundsTest {
                 Downloader.SILENT);
     }
 
+    private Downloader.Result saveDash(DashManifest.Track video, DashManifest.Track audio) {
+        return MediaDownload.dashJob(context, video, audio, null).run(new MediaStoreWriter(context, true),
+                Downloader.SILENT);
+    }
+
     @Test
     public void aFileLargerThanTheFreeSpaceIsRefused() {
         MediaDownload.policyForTests = policy;
@@ -278,6 +283,7 @@ public class SaveBoundsTest {
      */
     @Test
     public void aTrackSentWithNoLengthClaimsOnlyWhatItHoldsOnceItsIn() {
+        MediaDownload.policyForTests = policy;
         freeSpace(3 * 1024 * 1024);
         byte[] picture = new byte[50_000];
         System.arraycopy(MP4_HEAD, 0, picture, 0, MP4_HEAD.length);
@@ -285,8 +291,7 @@ public class SaveBoundsTest {
         DashManifest.Track video = new DashManifest.Track("video/mp4", "avc1.64001f", 1280, 720, 1_200_000,
                 server.origin() + "/v.mp4");
 
-        Downloader.Result result = DashSave.save(context, video, null, new MediaStoreWriter(context, true), policy,
-                Downloader.MAX_BYTES, Downloader.SILENT);
+        Downloader.Result result = saveDash(video, null);
 
         assertEquals("WRITE_ERROR (the tracks could not be joined)", result.toString());
         assertEquals(0, workBytes());
@@ -298,6 +303,7 @@ public class SaveBoundsTest {
      */
     @Test
     public void cleanupLeavesARunningSavesFilesAlone() throws Exception {
+        MediaDownload.policyForTests = policy;
         byte[] picture = new byte[4_096];
         System.arraycopy(MP4_HEAD, 0, picture, 0, MP4_HEAD.length);
         server.serve("/v.mp4", 200, "video/mp4", picture, picture.length);
@@ -311,8 +317,7 @@ public class SaveBoundsTest {
         long twoHoursAgo = System.currentTimeMillis() - 2 * 60 * 60 * 1000L;
         assertTrue(stale.setLastModified(twoHoursAgo));
 
-        Thread running = new Thread(() -> DashSave.save(context, video, audio, new MediaStoreWriter(context, true),
-                policy, Downloader.MAX_BYTES, Downloader.SILENT));
+        Thread running = new Thread(() -> saveDash(video, audio));
         running.start();
         File track = null;
         long deadline = System.nanoTime() + 20_000_000_000L;

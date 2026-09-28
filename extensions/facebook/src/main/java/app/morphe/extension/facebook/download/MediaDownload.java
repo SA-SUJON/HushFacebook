@@ -440,8 +440,7 @@ public final class MediaDownload {
         java.io.File file = null;
         try {
             file = java.io.File.createTempFile(kind.name().toLowerCase(Locale.US), ".part", folder);
-            Downloader.Result fetched = DashSave.fetchWork(url, kind, file, policyFor(application), Downloader.MAX_BYTES,
-                progress);
+            Downloader.Result fetched = DashSave.fetchWork(url, kind, file, policyFor(application), cap(), progress);
             if (!fetched.ok()) return fetched;
             Downloader.Result published = Downloader.publish(file, fetched.mime, writer, progress);
             if (published.ok() && kind == Downloader.Kind.VIDEO) {
@@ -468,6 +467,18 @@ public final class MediaDownload {
         MediaUrlPolicy forced = policyForTests;
         if (forced != null) return forced;
         return new MediaUrlPolicy(MediaUrlPolicy.DNS, url -> !MediaUrlPolicy.proxied(url) && !onVpn(application));
+    }
+
+    /**
+     * The cap every save a test drives holds its files to in place of the real one, so a test can
+     * reach it with small files. Never set on a phone.
+     */
+    static volatile long capForTests;
+
+    /** The most one save may put in the gallery: {@link Downloader#MAX_BYTES} on a phone. */
+    static long cap() {
+        long forced = capForTests;
+        return forced > 0 ? forced : Downloader.MAX_BYTES;
     }
 
     /**
@@ -639,8 +650,8 @@ public final class MediaDownload {
      */
     static Job dashJob(Context application, DashManifest.Track video, DashManifest.Track audio, String fallback) {
         return (writer, progress) -> {
-            Downloader.Result result = DashSave.save(application, video, audio, writer, policyFor(application),
-                Downloader.MAX_BYTES, progress);
+            Downloader.Result result = DashSave.save(application, video, audio, writer, policyFor(application), cap(),
+                progress);
             if (result.ok() || fallback == null || result.status == Downloader.Status.CANCELLED) return result;
 
             failure(() -> "the DASH save ended with " + result + ", saving " + describe(fallback), null);

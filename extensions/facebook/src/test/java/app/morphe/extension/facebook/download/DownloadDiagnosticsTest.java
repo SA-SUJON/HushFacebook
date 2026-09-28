@@ -111,7 +111,7 @@ public class DownloadDiagnosticsTest {
         server.serve("/track.mp4", 200, "video/mp4", mp4(4096), 4096);
         DashManifest.Track track = new DashManifest.Track("video/mp4", "avc1.64001f", 1280, 720, 900_000,
                 origin + "/track.mp4");
-        run((writer, progress) -> DashSave.save(context, track, null, writer, policy));
+        run(MediaDownload.dashJob(context, track, null, null));
 
         // A good file the gallery won't take.
         server.serve("/whole.mp4", 200, "video/mp4", mp4(4096), 4096);
