@@ -639,8 +639,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         // resources that Facebook's APK doesn't have, and untitled they showed as blank rows.
         ExportDiagnosticReportPreference export = new ExportRow(context);
         export.setTitle(L10n.t("Export diagnostic report"));
-        export.setSummary(L10n.t("Copy a quick report or save the full one to Download/Morphe. Names, IDs, links "
-                + "and cookies are omitted."));
+        export.setSummary(L10n.t("Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies "
+                + "and sign-in tokens are left out. Check it for other private text before you share it."));
         hushfacebook.addPreference(mark(export, SettingsIcons.LICENSE));
         ClearLogBufferPreference clear = new ClearRow(context);
         clear.setTitle(L10n.t("Clear diagnostic data"));

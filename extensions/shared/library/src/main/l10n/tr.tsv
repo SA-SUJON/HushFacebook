@@ -27,7 +27,7 @@ Cancel	İptal
 Changing these	Bunları değiştirmek
 Choose a settings file. Before anything is imported, you'll see how many switches it changes and any new download settings.	Bir ayar dosyası seç. İçe aktarmadan önce kaç anahtarın değişeceğini ve yeni indirme ayarlarını görürsün.
 Clear diagnostic data	Tanılama verilerini temizle
-Copy a quick report or save the full one to Download/Morphe. Names, IDs, links and cookies are omitted.	Kısa raporu kopyala veya tam raporu Download/Morphe konumuna kaydet. Adlar, kimlikler, bağlantılar ve çerezler çıkarılır.
+Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Kısa raporu kopyala veya tam raporu Download/Morphe konumuna kaydet. Bağlantılar, kimlikler, çerezler ve oturum belirteçleri çıkarılır. Paylaşmadan önce başka özel bilgi olup olmadığına bak.
 Copy quick report	Hızlı raporu kopyala
 Couldn't import every setting. Check the switches on this screen.	Bazı ayarlar içe aktarılamadı. Bu ekrandaki anahtarları kontrol et.
 Couldn't import the settings. Nothing was changed.	Ayarlar içe aktarılamadı. Hiçbir şey değiştirilmedi.

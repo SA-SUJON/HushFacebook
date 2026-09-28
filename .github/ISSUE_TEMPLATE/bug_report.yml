@@ -112,7 +112,7 @@ body:
       label: Diagnostic report
       description: |
         This answers most of our questions, so please add it if you can. Long-press Facebook's icon, tap Hushfacebook, turn on Debug logging, do the thing that goes wrong, then come back, tap Export diagnostic report and pick Save full report. If you have the new category pages, these controls are under More settings, then Pause, backup and diagnostics. That saves a text file in Download/Morphe on your phone. Drag it into this box. If you can't get the file off your phone, pick Copy quick report instead and paste the shorter report here.
-        The report filters common links and private values, but structured credentials and other private text can escape that filtering. Review it and remove anything private before you post it.
+        The report leaves out links, Facebook addresses, long ID numbers, cookies, sign-in tokens and Authorization headers, JSON included. It can't spot a name or message written anywhere else, so read it and remove anything private before you post it.
   - type: textarea
     id: additional_context
     attributes:

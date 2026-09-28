@@ -197,8 +197,8 @@ public final class L10nTranslations {
                 "Kommentare \u00f6ffnen sich dann in der Reihenfolge, die Facebook ausw\u00e4hlt.");
         table.put("Comments will open with %1$s picked in their sort menu.",
                 "Kommentare \u00f6ffnen sich dann mit %1$s als Auswahl im Sortiermen\u00fc.");
-        table.put("Copy a quick report or save the full one to Download/Morphe. Names, IDs, links and cookies are omitted.",
-                "Kopiere einen Kurzbericht oder speichere den vollst\u00e4ndigen Bericht unter Download/Morphe. Namen, IDs, Links und Cookies werden ausgelassen.");
+        table.put("Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.",
+                "Kopiere einen Kurzbericht oder speichere den vollst\u00e4ndigen Bericht unter Download/Morphe. Links, IDs, Cookies und Anmeldetokens werden ausgelassen. Pr\u00fcfe ihn vor dem Teilen auf andere private Angaben.");
         table.put("Copy a short report to the clipboard.",
                 "Kurzen Bericht in die Zwischenablage kopieren.");
         table.put("Copy quick report",
@@ -982,8 +982,8 @@ public final class L10nTranslations {
                 "Los comentarios se abrir\u00e1n en el orden que elija Facebook.");
         table.put("Comments will open with %1$s picked in their sort menu.",
                 "Los comentarios se abrir\u00e1n con %1$s elegido en su men\u00fa de orden.");
-        table.put("Copy a quick report or save the full one to Download/Morphe. Names, IDs, links and cookies are omitted.",
-                "Copia un informe r\u00e1pido o guarda el completo en Download/Morphe. Se omiten nombres, ID, enlaces y cookies.");
+        table.put("Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.",
+                "Copia un informe r\u00e1pido o guarda el completo en Download/Morphe. Se omiten enlaces, ID, cookies y tokens de inicio de sesi\u00f3n. Revisa si queda otro texto privado antes de compartirlo.");
         table.put("Copy a short report to the clipboard.",
                 "Copia un informe breve en el portapapeles.");
         table.put("Copy quick report",
@@ -1767,8 +1767,8 @@ public final class L10nTranslations {
                 "Komentar akan dibuka dengan urutan yang dipilih Facebook.");
         table.put("Comments will open with %1$s picked in their sort menu.",
                 "Komentar akan dibuka dengan %1$s terpilih di menu urutannya.");
-        table.put("Copy a quick report or save the full one to Download/Morphe. Names, IDs, links and cookies are omitted.",
-                "Salin laporan singkat atau simpan laporan lengkap di Download/Morphe. Nama, ID, tautan, dan cookie dihilangkan.");
+        table.put("Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.",
+                "Salin laporan singkat atau simpan laporan lengkap di Download/Morphe. Tautan, ID, cookie, dan token masuk dihilangkan. Periksa teks pribadi lainnya sebelum membagikannya.");
         table.put("Copy a short report to the clipboard.",
                 "Salin laporan singkat ke papan klip.");
         table.put("Copy quick report",
@@ -2552,8 +2552,8 @@ public final class L10nTranslations {
                 "Os coment\u00e1rios v\u00e3o abrir na ordem que o Facebook escolher.");
         table.put("Comments will open with %1$s picked in their sort menu.",
                 "Os coment\u00e1rios v\u00e3o abrir com %1$s escolhido no menu de ordena\u00e7\u00e3o.");
-        table.put("Copy a quick report or save the full one to Download/Morphe. Names, IDs, links and cookies are omitted.",
-                "Copie um relat\u00f3rio r\u00e1pido ou salve o completo em Download/Morphe. Nomes, IDs, links e cookies s\u00e3o omitidos.");
+        table.put("Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.",
+                "Copie um relat\u00f3rio r\u00e1pido ou salve o completo em Download/Morphe. Links, IDs, cookies e tokens de login s\u00e3o omitidos. Veja se h\u00e1 outro texto privado antes de compartilhar.");
         table.put("Copy a short report to the clipboard.",
                 "Copie um relat\u00f3rio curto para a \u00e1rea de transfer\u00eancia.");
         table.put("Copy quick report",
@@ -3337,8 +3337,8 @@ public final class L10nTranslations {
                 "Yorumlar Facebook'un se\u00e7ti\u011fi s\u0131rayla a\u00e7\u0131lacak.");
         table.put("Comments will open with %1$s picked in their sort menu.",
                 "Yorumlar, s\u0131ralama men\u00fcs\u00fcnde %1$s se\u00e7ili olarak a\u00e7\u0131lacak.");
-        table.put("Copy a quick report or save the full one to Download/Morphe. Names, IDs, links and cookies are omitted.",
-                "K\u0131sa raporu kopyala veya tam raporu Download/Morphe konumuna kaydet. Adlar, kimlikler, ba\u011flant\u0131lar ve \u00e7erezler \u00e7\u0131kar\u0131l\u0131r.");
+        table.put("Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.",
+                "K\u0131sa raporu kopyala veya tam raporu Download/Morphe konumuna kaydet. Ba\u011flant\u0131lar, kimlikler, \u00e7erezler ve oturum belirte\u00e7leri \u00e7\u0131kar\u0131l\u0131r. Payla\u015fmadan \u00f6nce ba\u015fka \u00f6zel bilgi olup olmad\u0131\u011f\u0131na bak.");
         table.put("Copy a short report to the clipboard.",
                 "K\u0131sa raporu panoya kopyalar.");
         table.put("Copy quick report",

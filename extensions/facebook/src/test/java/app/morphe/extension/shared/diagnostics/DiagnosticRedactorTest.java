@@ -188,4 +188,109 @@ public class DiagnosticRedactorTest {
 
         assertEquals(line, DiagnosticRedactor.redact(line));
     }
+
+    /**
+     * Synthetic credentials in the shapes a network, JSON or header dump prints them: quoted and
+     * escaped keys, nested objects, JSON inside a JSON string, odd casing and separators, cookie
+     * headers and whole Authorization values, one of them split over two lines. Each line is
+     * followed by the secrets it carries, and every secret is a string nothing else here holds,
+     * so a survivor is named in the failure.
+     */
+    public static final String[][] CREDENTIAL_CORPUS = {
+            {"{\"access_token\":\"EAABjsonKeyA1\",\"locale\":\"en_US\"}", "EAABjsonKeyA1"},
+            {"{\"data\":{\"viewer\":{\"session\":{\"sessionid\":\"sessNestB2\",\"uid\":\"77\"}}}}", "sessNestB2"},
+            {"{\"auth\":{\"tokens\":{\"access\":\"deepAccessC3\",\"refresh\":\"deepRefreshC4\"}}}",
+                    "deepAccessC3", "deepRefreshC4"},
+            {"body=\"{\\\"access_token\\\":\\\"EAABescapedD5\\\",\\\"post_id\\\":\\\"4242\\\"}\"",
+                    "EAABescapedD5", "4242"},
+            {"body={\\\\\\\"password\\\\\\\":\\\\\\\"twiceEscapedE6\\\\\\\"}", "twiceEscapedE6"},
+            {"{'password': 'correct horse battery'}", "horse", "battery"},
+            {"\"PassWord\" : \"p\\\"ss w0rdF7\"", "w0rdF7"},
+            {"ACCESS-TOKEN=EAABcasingG8.", "EAABcasingG8"},
+            {"accessToken => 'arrowTokenH9'", "arrowTokenH9"},
+            {"fb_dtsg%3AdtsgEncodedI10%26next", "dtsgEncodedI10"},
+            {"Cookie: c_user=100012345678901; xs=12%3AxsCookieJ11; fr=frCookieJ12; sb=sbCookieJ13; datr=datrCookieJ14",
+                    "100012345678901", "xsCookieJ11", "frCookieJ12", "sbCookieJ13", "datrCookieJ14"},
+            {"set-cookie: fr=frSetCookieK15; expires=Sat, 26-Dec-2026 12:00:00 GMT; Max-Age=7776000; secure",
+                    "frSetCookieK15"},
+            {"{\"cookies\":[{\"name\":\"xs\",\"value\":\"xsListL16\"},{\"name\":\"fr\",\"value\":\"frListL17\"}]}",
+                    "xsListL16", "frListL17"},
+            {"Authorization: Bearer EAABbearerM18", "EAABbearerM18"},
+            {"authorization: Basic dXNlcjpiYXNpY1NlY3JldE4xOQ==", "dXNlcjpiYXNpY1NlY3JldE4xOQ=="},
+            {"AUTHORIZATION: Bearer\n    EAABfoldedO20", "EAABfoldedO20"},
+            {"Authorization:\nOAuth EAABnextLineP21", "EAABnextLineP21"},
+            {"{\"Authorization\":\"OAuth EAABquotedQ22\",\"x-fb-friendly-name\":\"FeedQuery\"}", "EAABquotedQ22"},
+            {"Proxy-Authorization: Basic cHJveHlTZWNyZXRSMjM=", "cHJveHlTZWNyZXRSMjM="},
+            {"retrying with Bearer EAABbareS24 after 401", "EAABbareS24"},
+            {"{\"authorization\":\"Bearer\\nEAABjsonBreakT25\"}", "EAABjsonBreakT25"},
+    };
+
+    @Test public void noSyntheticCredentialSurvives() {
+        StringBuilder leaks = new StringBuilder();
+        for (String[] row : CREDENTIAL_CORPUS) {
+            String redacted = DiagnosticRedactor.redact(row[0]);
+            for (int i = 1; i < row.length; i++) {
+                if (redacted.contains(row[i])) {
+                    leaks.append('\n').append(row[i]).append(" survived in: ").append(redacted);
+                }
+            }
+        }
+        assertEquals("", leaks.toString());
+    }
+
+    /** The same corpus as one block of text, the way it reaches the report: nothing leaks between lines. */
+    @Test public void noSyntheticCredentialSurvivesInOneBlock() {
+        StringBuilder block = new StringBuilder();
+        for (String[] row : CREDENTIAL_CORPUS) block.append(row[0]).append('\n');
+        String redacted = DiagnosticRedactor.redact(block.toString());
+        for (String[] row : CREDENTIAL_CORPUS) {
+            for (int i = 1; i < row.length; i++) {
+                assertFalse(row[i] + " survived in:\n" + redacted, redacted.contains(row[i]));
+            }
+        }
+    }
+
+    /**
+     * Short ids behind a quoted or camel-cased name. A post or story id of a few digits is too
+     * short for the bare-number rule, so only its name gives it away.
+     */
+    @Test public void aShortIdGoesWhateverItsNameLooksLike() {
+        assertEquals("{\"story_id=[omitted],\"kind\":\"reel\"}",
+                DiagnosticRedactor.redact("{\"story_id\":\"7\",\"kind\":\"reel\"}"));
+        assertEquals("postId=[omitted] shown", DiagnosticRedactor.redact("postId=12 shown"));
+        assertEquals("{'feedback_id=[omitted]}", DiagnosticRedactor.redact("{'feedback_id': 'ZmVlZGJhY2s6MTI='}"));
+        assertEquals("\\\"video_id=[omitted]}", DiagnosticRedactor.redact("\\\"video_id\\\":\\\"31\\\"}"));
+    }
+
+    /**
+     * What the credential rules must leave: the report's build lines, timestamps, stack frames
+     * (one of them from a class whose name contains "Auth"), ordinary settings and a sentence that
+     * only uses the word Basic.
+     */
+    @Test public void buildDataTimestampsAndStackFramesStay() {
+        String[] lines = {
+                "app: com.facebook.katana 580.0.0.51.74 (475019344)",
+                "abi: app arm64, process 64-bit, device arm64-v8a,armeabi-v7a",
+                "morphe: 0.3.4",
+                "generated_utc: 2026-09-28T12:00:00.000Z",
+                "downloads | 2026-09-28T12:00:01.234Z | main | ReelDownload | INFO | reel download tapped",
+                "\tat app.morphe.extension.facebook.download.Downloader.connect(Downloader.java:120)",
+                "\tat com.facebook.auth.login.AuthStateMachine.run(AuthStateMachine.java:44)",
+                "Caused by: java.net.SocketTimeoutException: timeout=30000 attempts=3",
+                "hide_paid_partnership=on, download_quality=best",
+                "Basic settings opened",
+        };
+        for (String line : lines) assertEquals(line, DiagnosticRedactor.redact(line));
+    }
+
+    /** An Authorization value ends at its line, so the stack trace printed after it stays. */
+    @Test public void aStackTraceAfterAnAuthorizationLineStays() {
+        String trace = "java.io.IOException: 401 for Authorization: Bearer EAABtraceU26\n"
+                + "\tat app.morphe.extension.facebook.download.Downloader.connect(Downloader.java:120)\n"
+                + "\tat java.lang.Thread.run(Thread.java:1012)";
+
+        assertEquals("java.io.IOException: 401 for Authorization=[omitted]\n"
+                + "\tat app.morphe.extension.facebook.download.Downloader.connect(Downloader.java:120)\n"
+                + "\tat java.lang.Thread.run(Thread.java:1012)", DiagnosticRedactor.redact(trace));
+    }
 }

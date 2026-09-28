@@ -27,7 +27,7 @@ Cancel	Abbrechen
 Changing these	So änderst du sie
 Choose a settings file. Before anything is imported, you'll see how many switches it changes and any new download settings.	Wähle eine Einstellungsdatei. Vor dem Import siehst du, wie viele Schalter sie ändert und welche Download-Einstellungen neu sind.
 Clear diagnostic data	Diagnosedaten löschen
-Copy a quick report or save the full one to Download/Morphe. Names, IDs, links and cookies are omitted.	Kopiere einen Kurzbericht oder speichere den vollständigen Bericht unter Download/Morphe. Namen, IDs, Links und Cookies werden ausgelassen.
+Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Kopiere einen Kurzbericht oder speichere den vollständigen Bericht unter Download/Morphe. Links, IDs, Cookies und Anmeldetokens werden ausgelassen. Prüfe ihn vor dem Teilen auf andere private Angaben.
 Copy quick report	Kurzbericht kopieren
 Couldn't import every setting. Check the switches on this screen.	Nicht alle Einstellungen ließen sich importieren. Prüfe die Schalter auf diesem Bildschirm.
 Couldn't import the settings. Nothing was changed.	Die Einstellungen ließen sich nicht importieren. Es wurde nichts geändert.

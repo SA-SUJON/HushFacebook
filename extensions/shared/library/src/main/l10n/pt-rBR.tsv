@@ -27,7 +27,7 @@ Cancel	Cancelar
 Changing these	Como mudar esses itens
 Choose a settings file. Before anything is imported, you'll see how many switches it changes and any new download settings.	Escolha um arquivo de configurações. Antes de importar, você vê quantas opções ele muda e quais configurações de download são novas.
 Clear diagnostic data	Limpar dados de diagnóstico
-Copy a quick report or save the full one to Download/Morphe. Names, IDs, links and cookies are omitted.	Copie um relatório rápido ou salve o completo em Download/Morphe. Nomes, IDs, links e cookies são omitidos.
+Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Copie um relatório rápido ou salve o completo em Download/Morphe. Links, IDs, cookies e tokens de login são omitidos. Veja se há outro texto privado antes de compartilhar.
 Copy quick report	Copiar relatório rápido
 Couldn't import every setting. Check the switches on this screen.	Não foi possível importar todas as configurações. Confira as opções nesta tela.
 Couldn't import the settings. Nothing was changed.	Não foi possível importar as configurações. Nada foi alterado.

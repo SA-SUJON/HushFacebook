@@ -15,13 +15,50 @@ public final class DiagnosticRedactor {
                     + "|fb\\.gg|messenger\\.com|meta\\.com|meta\\.ai)";
     /**
      * Credential and device names. c_user, xs and datr are the cookies that make up a Facebook
-     * session; fb_dtsg is its request token; family_device_id and advertiser_id identify the phone
-     * across Meta's apps. xs is matched whole below, being too short to look for inside a word.
+     * session, and fr and sb go with them; fb_dtsg is its request token; family_device_id and
+     * advertiser_id identify the phone across Meta's apps. xs, fr and sb are matched whole below,
+     * being too short to look for inside a word.
      */
     private static final String CREDENTIAL_NAMES =
             "[a-z0-9_-]*(?:token|session|sessionid|sid|secret|password|passwd|signature|cookie"
                     + "|auth|credential|device_id|deviceid|install_id|installid|iid|openudid"
-                    + "|uid|c_user|datr|fb_dtsg|machine_id|advertiser_id|adid)[a-z0-9_-]*|xs";
+                    + "|uid|c_user|datr|fb_dtsg|machine_id|advertiser_id|adid)[a-z0-9_-]*|xs|fr|sb";
+    /**
+     * What comes between a name and its value: the name's closing quote, escaped once or more when
+     * the JSON is itself inside a string, then =, : or =>, written plain or percent-encoded.
+     */
+    private static final String SEPARATOR = "(?:\\\\*[\"']|%22)?\\s*(?:=>|[=:]|%3[ad])\\s*";
+    /**
+     * A quoted value, whole. A double-quoted one ends at a quote escaped exactly as its opening
+     * one was, so an escaped quote inside a JSON string, or JSON inside a string, doesn't end it
+     * early. An unclosed one runs to the end of its line.
+     */
+    private static final String QUOTED =
+            "(?:(?<q>\\\\*)\"(?:[^\\\\\"\\r\\n]|\\\\++(?!\")|(?!\\k<q>\")\\\\+\")*(?:\\k<q>\")?"
+                    + "|'(?:[^\\\\'\\r\\n]|\\\\.)*'?)";
+    /** An object or list held by a credential's name, nested up to three deep. */
+    private static final String BLOCK;
+    static {
+        String plain = "[^{}\\[\\]\\r\\n]";
+        String block = "(?:\\{" + plain + "*\\}|\\[" + plain + "*\\])";
+        for (int depth = 1; depth < 3; depth++) {
+            String inner = "(?:" + plain + "|" + block + ")*";
+            block = "(?:\\{" + inner + "\\}|\\[" + inner + "\\])";
+        }
+        BLOCK = block;
+    }
+    /**
+     * An Authorization or cookie header, whose whole value is private: every cookie in it, and the
+     * credential after Bearer, Basic or OAuth, not only the scheme's name. An unquoted value runs
+     * to the end of its line; a scheme left alone at a line's end takes the next line's token, and
+     * a folded header takes its indented continuation lines, though never a stack frame.
+     */
+    private static final String HEADER =
+            "(?i)\\b((?:proxy-)?authorization|set-cookie|cookie)" + SEPARATOR + "(?:" + QUOTED
+                    + "|(?:(?:bearer|basic|digest|oauth|negotiate)\\s+)?[^\\r\\n]*"
+                    + "(?:\\r?\\n[ \\t]++(?!at\\s)[^\\r\\n]*)*)";
+    /** A bearer or OAuth credential written with no header name in front of it. */
+    private static final String BARE_SCHEME = "(?i)\\b(bearer|oauth)(?:\\s+|%20)(?!\\[)[a-z0-9._~+/=%-]{8,}";
     /**
      * Names carrying the id of one post, story, comment or message. Each of these resolves to
      * something somebody can open, so a shared report would otherwise carry a slice of what was
@@ -80,10 +117,12 @@ public final class DiagnosticRedactor {
                 .replaceAll(HANDLE, "[handle omitted]")
                 .replaceAll("(?i)\\b[a-z][a-z0-9+.-]*://[^\\s\"'<>]+", "[url omitted]")
                 .replaceAll(HOST, "[host omitted]")
-                .replaceAll("(?i)\\b(" + CREDENTIAL_NAMES + ")\\s*[=:]\\s*\"?[^\\s;,&\"'<>]+",
-                        "$1=[omitted]")
-                .replaceAll("(?i)\\b(" + CONTENT_ID_NAMES + ")\\s*[=:]\\s*" + CONTENT_ID_VALUE,
-                        "$1=[omitted]")
+                .replaceAll(HEADER, "$1=[omitted]")
+                .replaceAll(BARE_SCHEME, "$1 [omitted]")
+                .replaceAll("(?i)\\b(" + CREDENTIAL_NAMES + ")" + SEPARATOR
+                        + "(?:" + QUOTED + "|" + BLOCK + "|[^\\s;,&\"'<>]+)", "$1=[omitted]")
+                .replaceAll("(?i)\\b(" + CONTENT_ID_NAMES + ")" + SEPARATOR
+                        + "(?:" + QUOTED + "|" + CONTENT_ID_VALUE + ")", "$1=[omitted]")
                 .replaceAll(BARE_CONTENT_ID, "[id omitted]");
     }
 }
