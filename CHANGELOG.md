@@ -2,6 +2,10 @@
 
 Every Hushfacebook release, newest first.
 
+## Unreleased
+
+* **Facebook:** `Restore screens on re-signed builds` now works in a copy renamed by Morphe's Clone app patch (issue #16). It used to recognize itself only by the name com.facebook.katana. Now it compares the ID Android gives each installed app, so a clone counts as itself while stock Facebook installed beside it, Messenger and look-alike names keep their own signatures. Dark mode and Active status should open in a clone again, but that hasn't been checked on a phone yet. Nor have sign-in and notifications in a clone.
+
 ## 0.3.4 (2026-09-27)
 
 * **Facebook:** This public release includes all changes recorded below for development builds 0.3.0 through 0.3.3. Those builds weren't published separately. There are now 43 patches, up from 27 in v0.2.0, for the same supported Facebook 580 and 577 bundles. Morphe Manager 1.32.0 or newer is required.
