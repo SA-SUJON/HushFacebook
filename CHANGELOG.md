@@ -37,6 +37,7 @@ Every Hushfacebook release, newest first.
 * **Tooling:** The fixture check, the receipt builder, the phone build and the release check's patch count no longer stop under Windows PowerShell 5.1 when Morphe's command line patcher logs a warning. It writes warnings and errors to standard error, and 5.1 turned the first one into a fatal error before the run's own result was read.
 * **Tooling:** Pushing main together with a new branch no longer gets the release checks meant for publishing a new index. A new branch is read from its whole tree, which always holds the index file, and that counted as main changing it. Only main or a tag that changes the index gets those checks now.
 * **Tooling:** A push now stops when a text file it changes still holds an unresolved merge conflict. One reached this changelog on main and every check let it through. A Markdown heading underlined with equals signs isn't mistaken for one.
+* **Facebook:** The Morphe Manager descriptions of `Marketplace only` and `Open on a chosen tab` now say their switches start off. Marketplace only is in the default selection, so its description read as if patching alone would hide your tabs. Turn either on under Opening Facebook in Hushfacebook's settings.
 
 ## 0.3.4 (2026-09-27)
 

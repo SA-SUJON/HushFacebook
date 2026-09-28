@@ -1349,7 +1349,7 @@
     },
     {
       "name": "Marketplace only",
-      "description": "Leaves only Marketplace, Notifications and your profile or Menu in the tab bar, and opens Facebook on Marketplace. Home with the news feed, Video, Friends, Feeds, Groups, Gaming and Events go. Notifications and links still open where they lead.",
+      "description": "Leaves only Marketplace, Notifications and your profile or Menu in the tab bar, and opens Facebook on Marketplace. Home with the news feed, Video, Friends, Feeds, Groups, Gaming and Events go. Notifications and links still open where they lead. Its switch starts off, so turn it on under Opening Facebook in Hushfacebook's settings.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -1488,7 +1488,7 @@
     },
     {
       "name": "Open on a chosen tab",
-      "description": "Opens Facebook on the tab you pick in Hushfacebook's settings when you start it from its icon. It's Marketplace unless you change it. Notifications and links still open where they lead.",
+      "description": "Opens Facebook on the tab you pick in Hushfacebook's settings when you start it from its icon. It's Marketplace unless you change it. Notifications and links still open where they lead. Its switch starts off, so turn it on under Opening Facebook.",
       "category": "Interface",
       "use": false,
       "dependencies": [
