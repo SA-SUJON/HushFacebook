@@ -12,6 +12,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -49,6 +50,12 @@ final class SettingsNavigation extends BaseAdapter {
     private final Preference empty;
     private String route = "";
     private String query = "";
+    /**
+     * The row Back returns to. With a screen reader on it takes accessibility focus once it's back
+     * on screen: on the S22 TalkBack otherwise held the whole screen, and the person's place in
+     * the list was lost.
+     */
+    private Preference refocus;
     private int homePosition;
     private int homeOffset;
     private int morePosition;
@@ -155,6 +162,7 @@ final class SettingsNavigation extends BaseAdapter {
     }
 
     void navigate(String destination) {
+        refocus = null;
         rememberIndex();
         query = "";
         route = destination;
@@ -176,6 +184,7 @@ final class SettingsNavigation extends BaseAdapter {
 
     void search(String text) {
         if (query.equals(text)) return;
+        refocus = null;
         if (query.isEmpty()) rememberIndex();
         query = text;
         route = "";
@@ -191,11 +200,13 @@ final class SettingsNavigation extends BaseAdapter {
         }
         if (route.isEmpty()) return false;
         Section section = selected();
+        Preference left = section != null ? section.link : more;
         route = section != null && !section.primary ? MORE : "";
         rebuild();
         host.showPage(title(), route.isEmpty(), query);
         showAt(MORE.equals(route) ? morePosition : homePosition,
                 MORE.equals(route) ? moreOffset : homeOffset);
+        refocus = left;
         return true;
     }
 
@@ -253,6 +264,7 @@ final class SettingsNavigation extends BaseAdapter {
                     visible.add(row);
                 }
             }
+            host.showResults(visible.size() - headings());
             if (visible.isEmpty()) visible.add(empty);
         } else if (selected != null) {
             for (int i = 0; i < selected.category.getPreferenceCount(); i++) visible.add(selected.category.getPreference(i));
@@ -264,7 +276,14 @@ final class SettingsNavigation extends BaseAdapter {
             for (Section section : sections) if (section.primary) visible.add(section.link);
             visible.add(more);
         }
+        if (terms.isEmpty()) host.showResults(-1);
         notifyDataSetChanged();
+    }
+
+    private int headings() {
+        int count = 0;
+        for (Preference item : visible) if (item instanceof PreferenceCategory) count++;
+        return count;
     }
 
     private static String normalized(String value) {
@@ -288,6 +307,11 @@ final class SettingsNavigation extends BaseAdapter {
     @Override public View getView(int position, View recycled, ViewGroup parent) {
         Preference item = getItem(position);
         View row = item.getView(null, parent);
+        if (item == refocus) {
+            refocus = null;
+            // Posted from the new row, it runs after this layout has put the row in the window.
+            row.post(() -> row.performAccessibilityAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null));
+        }
         if (!(item instanceof PreferenceCategory)) {
             Object group = group(item);
             boolean first = position == 0 || group(getItem(position - 1)) != group;

@@ -15,6 +15,7 @@ import android.preference.PreferenceCategory;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -152,6 +153,91 @@ public class SettingsNavigationTest {
         assertEquals(9, list().getCount());
     }
 
+    /**
+     * On the S22 with TalkBack, typing a search said only "Edit box": the list changed without a
+     * word. The count now sits in a polite live region, written once the typing settles.
+     */
+    @Test public void searchSpeaksItsResultCountOnceTheTypingSettles() {
+        EditText search = findSearch(dialog.getView());
+        TextView before = resultCount(dialog.getView());
+        assertTrue(before == null || before.getVisibility() == View.GONE);
+        java.util.List<String> spoken = new java.util.ArrayList<>();
+        search.setText("t");
+        TextView count = resultCount(dialog.getView());
+        assertNotNull("a live region for the result count", count);
+        count.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int before, int after) { }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int after) { spoken.add(s.toString()); }
+            @Override public void afterTextChanged(android.text.Editable s) { }
+        });
+        search.setText("ta");
+        search.setText("tap to");
+        search.setText("tap to play");
+        ShadowLooper.idleMainLooper(2, java.util.concurrent.TimeUnit.SECONDS);
+        int rows = 0;
+        for (int i = 0; i < list().getCount(); i++) if (!(list().getItemAtPosition(i) instanceof PreferenceCategory)) rows++;
+        assertTrue(rows > 0);
+        assertEquals(java.util.Collections.singletonList(rows + (rows == 1 ? " setting found" : " settings found")), spoken);
+        assertEquals(View.VISIBLE, count.getVisibility());
+        search.setText("noSuchSetting987654");
+        ShadowLooper.idleMainLooper(2, java.util.concurrent.TimeUnit.SECONDS);
+        assertEquals("0 settings found", count.getText().toString());
+        search.setText("");
+        ShadowLooper.idleMainLooper(2, java.util.concurrent.TimeUnit.SECONDS);
+        assertEquals(View.GONE, count.getVisibility());
+    }
+
+    /**
+     * On the S22, Back left TalkBack's focus on the whole screen, so a screen reader user lost
+     * their place in the list. It goes back to the row the page was opened from. Robolectric's
+     * window has no surface and drops accessibility focus on its next traversal, so the test
+     * reads the focus event the row sent rather than the row's state afterwards.
+     */
+    @Test public void backPutsScreenReaderFocusOnTheRowThePageCameFrom() {
+        android.view.accessibility.AccessibilityManager a11y = controller.get().getSystemService(android.view.accessibility.AccessibilityManager.class);
+        org.robolectric.Shadows.shadowOf(a11y).setEnabled(true);
+        org.robolectric.Shadows.shadowOf(a11y).setTouchExplorationEnabled(true);
+        layout(dialog.getView());
+        page.navigation.navigate("Playback");
+        layout(dialog.getView());
+        page.navigation.back();
+        layout(dialog.getView());
+        assertEquals("Playback", focusedTitle(a11y));
+        page.navigation.navigate("more");
+        layout(dialog.getView());
+        page.navigation.navigate("About");
+        layout(dialog.getView());
+        page.navigation.back();
+        layout(dialog.getView());
+        assertEquals("About", focusedTitle(a11y));
+        page.navigation.back();
+        layout(dialog.getView());
+        assertEquals("More settings", focusedTitle(a11y));
+    }
+
+    /** The first text of the last row that took accessibility focus. */
+    private static String focusedTitle(android.view.accessibility.AccessibilityManager a11y) {
+        String title = null;
+        for (android.view.accessibility.AccessibilityEvent event : org.robolectric.Shadows.shadowOf(a11y).getSentAccessibilityEvents()) {
+            if (event.getEventType() != android.view.accessibility.AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED) continue;
+            title = event.getText().isEmpty() ? null : String.valueOf(event.getText().get(0));
+        }
+        return title;
+    }
+
+    private static TextView resultCount(View view) {
+        if (view instanceof TextView && !(view instanceof EditText)
+                && view.getAccessibilityLiveRegion() == View.ACCESSIBILITY_LIVE_REGION_POLITE) return (TextView) view;
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                TextView found = resultCount(group.getChildAt(i));
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
     @Test public void recreationKeepsTheCategoryAndSearchQuery() {
         page.navigation.open(page.findPreference(Settings.TAP_TO_PLAY.key));
         recreate();
@@ -250,8 +336,10 @@ public class SettingsNavigationTest {
         capture("more-settings");
         page.navigation.back();
         findSearch(dialog.getView()).setText("video");
+        ShadowLooper.idleMainLooper(1, java.util.concurrent.TimeUnit.SECONDS);
         capture("search-results");
         findSearch(dialog.getView()).setText("noSuchSetting987654");
+        ShadowLooper.idleMainLooper(1, java.util.concurrent.TimeUnit.SECONDS);
         capture("search-empty");
         page.navigation.back();
         page.navigation.navigate("Downloads");
