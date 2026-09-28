@@ -292,8 +292,8 @@ Jump to a section	Zu einem Abschnitt springen
 Go straight to one group of settings. Back returns to where you were.	Direkt zu einer Gruppe von Einstellungen. Zurück bringt dich dorthin, wo du warst.
 # context: switch title under Downloads; on, every video save keeps to formats other apps accept
 Save videos other apps can open	Videos speichern, die andere Apps öffnen können
-# context: summary of that switch; H.264, AAC, AV1 and WhatsApp are names and stay as they are
-Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lower than AV1. Without a compatible version, save as usual.	Bevorzugt H.264 mit AAC-Ton für Apps wie WhatsApp. Die Qualität kann unter AV1 liegen. Ohne passende Version wird wie gewohnt gespeichert.
+# context: summary of that switch; WhatsApp is a name and stays as it is, and saves are the videos the user saved to the phone
+For WhatsApp, or a gallery or player that plays saves without sound. May lower quality.	Für WhatsApp oder wenn eine Galerie oder ein Player gespeicherte Videos ohne Ton abspielt. Kann die Qualität senken.
 # context: section title for the Chats settings, named like Facebook's own Chats screen
 Chats	Chats
 # context: switch title under Chats; the card is Facebook's own "Get the Messenger app" card

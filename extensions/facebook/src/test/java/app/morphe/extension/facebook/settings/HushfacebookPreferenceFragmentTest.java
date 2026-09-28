@@ -473,7 +473,8 @@ public class HushfacebookPreferenceFragmentTest {
     /**
      * Saves other apps can open (issue #11) is a switch every save reads, so it's under Downloads
      * with any one download patch in, right above the quality it keeps within, and starts off. Its
-     * summary names WhatsApp, the app that turned an AV1 reel down.
+     * summary names WhatsApp, the app that turned an AV1 reel down, and a gallery or player that
+     * plays a save without sound, since some can't decode the xHE-AAC sound a Best reel can carry.
      */
     @Test
     public void theCompatibleSwitchSitsAboveTheQualityWithAnyDownloadIn() {
@@ -489,8 +490,8 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse(((SwitchPreference) row).isChecked());
                 assertEquals(indexOfKey(rows, Settings.DOWNLOAD_QUALITY.key) - 1, compatible);
                 assertEquals("Save videos other apps can open", String.valueOf(row.getTitle()));
-                assertEquals("Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lower than AV1. "
-                        + "Without a compatible version, save as usual.", String.valueOf(row.getSummary()));
+                assertEquals("For WhatsApp, or a gallery or player that plays saves without sound. May lower quality.",
+                        String.valueOf(row.getSummary()));
             }
         }
 

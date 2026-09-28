@@ -504,7 +504,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             // Every save reads it, a story's and a reel's as much as a feed video's, so it's here
             // whichever download patch is in, above the quality it keeps within.
             downloads.addPreference(toggle(context, Settings.DOWNLOAD_COMPATIBLE, L10n.t("Save videos other apps can open"),
-                    L10n.t("Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lower than AV1. Without a compatible version, save as usual.")));
+                    L10n.t("For WhatsApp, or a gallery or player that plays saves without sound. May lower quality.")));
             downloads.addPreference(qualityRow(context));
             downloads.addPreference(folderRow(context));
             downloads.addPreference(fileNameRow(context));

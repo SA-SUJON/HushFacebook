@@ -292,8 +292,8 @@ Jump to a section	Bir bölüme git
 Go straight to one group of settings. Back returns to where you were.	Doğrudan bir ayar grubuna git. Geri, bulunduğun yere döndürür.
 # context: switch title under Downloads; on, every video save keeps to formats other apps accept
 Save videos other apps can open	Videoları diğer uygulamaların açabileceği biçimde kaydet
-# context: summary of that switch; H.264, AAC, AV1 and WhatsApp are names and stay as they are
-Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lower than AV1. Without a compatible version, save as usual.	WhatsApp gibi uygulamalar için AAC sesli H.264 videoyu tercih eder. Kalite AV1’den düşük olabilir. Uyumlu sürüm yoksa normal kaydeder.
+# context: summary of that switch; WhatsApp is a name and stays as it is, and saves are the videos the user saved to the phone
+For WhatsApp, or a gallery or player that plays saves without sound. May lower quality.	WhatsApp için ya da kaydedilen videoları sessiz oynatan bir galeri veya oynatıcı için. Kaliteyi düşürebilir.
 # context: section title for the Chats settings, named like Facebook's own Chats screen
 Chats	Sohbetler
 # context: switch title under Chats; the card is Facebook's own "Get the Messenger app" card
