@@ -248,6 +248,35 @@ public class DiagnosticRedactorTest {
             {"userid: useridLeakV2", "useridLeakV2"},
             {"{\"userId\":\"camelUserIdLeakV3\",\"kind\":\"reel\"}", "camelUserIdLeakV3"},
             {"X-User-Id: headerUserIdLeakV4", "headerUserIdLeakV4"},
+            // sid, uid, iid, guid and auth at a name's edge, in any case, and the longer names that
+            // hold one of them with no edge.
+            {"sid=sidLeakA1", "sidLeakA1"},
+            {"{\"uid\":\"uidLeakA2\"}", "uidLeakA2"},
+            {"x-fb-iid: iidLeakA3", "iidLeakA3"},
+            {"auth=authLeakA4", "authLeakA4"},
+            {"fb_sid=fbSidLeakA5", "fbSidLeakA5"},
+            {"user-uid: userUidLeakA6", "userUidLeakA6"},
+            {"auth_token=authTokenLeakA7", "authTokenLeakA7"},
+            {"X-AUTH: xAuthLeakA8", "xAuthLeakA8"},
+            {"userAuth=camelAuthLeakA9", "camelAuthLeakA9"},
+            {"accountSid: \"camelSidLeakA10\"", "camelSidLeakA10"},
+            {"sid2=digitSidLeakA11", "digitSidLeakA11"},
+            {"authorization=authorizationLeakA12", "authorizationLeakA12"},
+            {"x_authorization: xAuthorizationLeakA13", "xAuthorizationLeakA13"},
+            {"session_id=sessionIdLeakA14", "sessionIdLeakA14"},
+            {"access_token=accessTokenLeakA16", "accessTokenLeakA16"},
+            {"c_user=cUserLeakA17", "cUserLeakA17"},
+            {"fb_dtsg=dtsgLeakA18", "dtsgLeakA18"},
+            {"x-fb-device-id: deviceIdLeakA19", "deviceIdLeakA19"},
+            {"{\"authorization\":{\"scheme\":\"x\",\"secret\":\"authObjLeakA20\"}}", "authObjLeakA20"},
+            {"{\"auth\":{\"hint\":\"a\",\"value\":\"authObjLeakA21\"}}", "authObjLeakA21"},
+            {"SID=upperSidLeakA22", "upperSidLeakA22"},
+            {"guid=guidLeakA23", "guidLeakA23"},
+            {"device_guid: devGuidLeakA24", "devGuidLeakA24"},
+            {"PHPSESSID=phpLeakA25", "phpLeakA25"},
+            {"uuid=uuidLeakA26", "uuidLeakA26"},
+            {"device_uuid=devUuidLeakA27", "devUuidLeakA27"},
+            {"oauth_verifier=oauthLeakA28", "oauthLeakA28"},
     };
 
     @Test public void noSyntheticCredentialSurvives() {
@@ -359,6 +388,26 @@ public class DiagnosticRedactorTest {
                 "Caused by: java.net.SocketTimeoutException: timeout=30000 attempts=3",
                 "hide_paid_partnership=on, download_quality=best",
                 "Basic settings opened",
+        };
+        for (String line : lines) assertEquals(line, DiagnosticRedactor.redact(line));
+    }
+
+    /**
+     * sid, uid, iid, guid and auth are short enough to sit inside ordinary words, and the value
+     * after such a word is often the fact a report is read for. Only the corpus rows above, where
+     * the short name stands at an edge of its name, lose their value.
+     */
+    @Test public void anOrdinaryWordHoldingAShortCredentialNameKeepsItsValue() {
+        String[] lines = {
+                "inside: 3 rows",
+                "guide=on",
+                "author: 3f9a2c1b0e7d",
+                "residual=12",
+                "{\"inside\":\"kept\",\"authored\":\"kept too\"}",
+                "fluid: true, liquid=2, consider: yes",
+                "Author: reel, AUTHORITY=feed, sidebar=left, isAuthor: false",
+                "guidance: short, misguided=no, fluidity=high",
+                "{\"name\":\"inside\",\"value\":\"kept\"}",
         };
         for (String line : lines) assertEquals(line, DiagnosticRedactor.redact(line));
     }

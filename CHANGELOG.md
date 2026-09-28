@@ -4,6 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Facebook:** The diagnostic report keeps the value after an ordinary word that happens to contain sid, uid, iid or auth. Lines like "inside: 3 rows", "guide=on" or "author: 3f9a2c1b0e7d" used to lose everything after the colon or equals sign. Those short names still count at the edge of a name, as in sid, fb_sid, userAuth or X-AUTH, so their values are still left out. Not yet checked on a phone.
 * **Facebook:** If an import fails after you press Import but before the settings are written, Export settings and Import settings now come back at once with "Couldn't start that. Try again in a moment." Before, the two rows could stay greyed out until Facebook restarted. Nothing in the current build is known to fail there, so this only guards against a future bug. Checked with unit tests, not on a phone.
 * **Facebook:** The diagnostic report now leaves out an account ID written after user_id, userid, userId or user-id, whatever it looks like. Only an ID of 15 digits or more was caught before, so a shorter or non-numeric one could reach a report you share. Not yet checked on a phone.
 * **Facebook:** With the Material You theme in dark mode, the status bar on Android 15 and newer now takes your wallpaper palette, both when Facebook opens and after you come back from Recent Apps. Facebook paints that bar itself on newer Android, and it kept Facebook's own greys. With AMOLED in the same build the bar stays black, and light mode doesn't change. Not yet checked on a phone.

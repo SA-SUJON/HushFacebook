@@ -21,12 +21,20 @@ public final class DiagnosticRedactor {
      * session, and fr and sb go with them; fb_dtsg is its request token; family_device_id,
      * X-FB-Device-ID and advertiser_id identify the phone across Meta's apps. xs, fr, sb and pwd
      * are matched whole below, being too short to look for inside a word.
+     *
+     * <p>sid, uid, iid, guid and auth are short enough to sit inside ordinary words (inside,
+     * guide, author, residual), so they count only at a name's edges: where it starts or ends, at
+     * an underscore, hyphen or digit, or at a camel-case hump ({@code userAuth}). The credential
+     * names that hold one of them with no edge, authorization, oauth, sessid and uuid, are listed
+     * with the longer names.
      */
     private static final String CREDENTIAL_NAMES =
-            "[a-z0-9_-]*(?:token|session|sessionid|sid|secret|password|passwd|passphrase|passcode|signature"
-                    + "|cookie|auth|credential|api_?key|access_?key|private_?key|device[_-]?id|install[_-]?id"
-                    + "|iid|openudid|uid|c_user|datr|fb_dtsg|machine[_-]?id|advertiser[_-]?id"
-                    + "|advertising[_-]?id|adid)[a-z0-9_-]*|xs|fr|sb|pwd";
+            "[a-z0-9_-]*(?:token|session|sessionid|sessid|secret|password|passwd|passphrase|passcode"
+                    + "|signature|cookie|authorization|oauth|credential|api_?key|access_?key|private_?key"
+                    + "|device[_-]?id|install[_-]?id|openudid|uuid|c_user|datr|fb_dtsg|machine[_-]?id"
+                    + "|advertiser[_-]?id|advertising[_-]?id|adid)[a-z0-9_-]*"
+                    + "|(?:[a-z0-9_-]*(?:[0-9_-]|(?-i:[a-z](?=[A-Z]))))?(?:sid|uid|iid|guid|auth)"
+                    + "(?:(?:[0-9_-]|(?-i:(?<=[a-z])(?=[A-Z])))[a-z0-9_-]*)?|xs|fr|sb|pwd";
     /** Names whose unquoted value can hold spaces and semicolons, so it runs to the end of its line. */
     private static final String PASSWORD_NAMES = "[a-z0-9_-]*(?:password|passwd|passphrase|passcode)[a-z0-9_-]*|pwd";
     /**
