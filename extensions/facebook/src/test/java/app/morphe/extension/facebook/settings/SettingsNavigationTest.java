@@ -699,6 +699,36 @@ public class SettingsNavigationTest {
         }
     }
 
+    /**
+     * Brazilian Portuguese runs longer than English (PR #15's wording). Every page still wraps its
+     * whole text at twice the text size, and the table is the one on screen.
+     */
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    @Config(qualifiers = "pt-rBR-w390dp-h844dp-night-xhdpi")
+    public void brazilianPortuguesePagesKeepTheirCompleteText() throws Exception {
+        assertEquals("Feed de not\u00edcias", String.valueOf(page.sections().get(1).getTitle()));
+        capture("pt-br-overview");
+        page.navigation.navigate("News feed");
+        capture("pt-br-news-feed");
+        org.robolectric.RuntimeEnvironment.setFontScale(2f);
+        try {
+            recreate();
+            for (Preference section : page.sections()) {
+                page.navigation.open(section);
+                layout(dialog.getView());
+                assertUncutText(dialog.getView());
+            }
+            page.navigation.navigate("News feed");
+            capture("pt-br-large-news-feed");
+            page.navigation.navigate("Reels and Watch");
+            capture("pt-br-large-reels");
+            page.navigation.navigate("Pause, backup and diagnostics");
+            capture("pt-br-large-pause");
+        } finally {
+            org.robolectric.RuntimeEnvironment.setFontScale(1f);
+        }
+    }
+
     @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
     @Config(qualifiers = "w390dp-h844dp-notnight-xhdpi")
     public void lightThemeUsesTheSameNavigationAndReadableRows() throws Exception {
