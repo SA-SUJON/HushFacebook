@@ -157,7 +157,7 @@ final class MediaStoreWriter implements Downloader.Sink {
                         () -> "the gallery did not remove the unfinished entry", null);
             }
         } catch (Throwable t) {
-            // Left on the list, so the first save of the next process tries again.
+            // Left on the list, so the sweep when Facebook next starts tries again.
             Logger.diagnosticError(DiagnosticCategory.DOWNLOADS, SOURCE, () -> "could not remove the unfinished entry", t);
         }
     }

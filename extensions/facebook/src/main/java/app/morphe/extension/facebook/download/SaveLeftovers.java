@@ -67,12 +67,18 @@ public final class SaveLeftovers {
         synchronized (LOCK) {
             if (swept) return;
             swept = true;
-            int files = removeWorkFiles(application);
-            int rows = removePendingRows(application);
-            int notices = SaveControl.removeStale(application);
-            if (files > 0 || rows > 0 || notices > 0) {
-                MediaDownload.info(() -> "removed what a stopped save left: " + files + " work file(s), "
-                    + rows + " pending gallery row(s), " + notices + " notification(s)");
+            // A save waits on this and goes on after it, so nothing here may throw into that save.
+            // What a failure leaves stays on the list for the next process to try again.
+            try {
+                int files = removeWorkFiles(application);
+                int rows = removePendingRows(application);
+                int notices = SaveControl.removeStale(application);
+                if (files > 0 || rows > 0 || notices > 0) {
+                    MediaDownload.info(() -> "removed what a stopped save left: " + files + " work file(s), "
+                        + rows + " pending gallery row(s), " + notices + " notification(s)");
+                }
+            } catch (Throwable t) {
+                MediaDownload.failure(() -> "could not remove what a stopped save left", t);
             }
         }
     }
