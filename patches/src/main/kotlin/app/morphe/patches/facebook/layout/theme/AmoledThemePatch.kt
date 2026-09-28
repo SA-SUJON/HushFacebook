@@ -11,11 +11,13 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.parameterRegisterNumber
+import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.facebook.misc.extension.requireParameterIntact
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.BytecodePatchContext
+import app.morphe.patcher.patch.PatchException
 import com.android.tools.smali.dexlib2.AccessFlags
 import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
@@ -41,11 +43,17 @@ private const val MAX_CHANNEL = 0x2A
  */
 private const val MAX_SPREAD = 8
 
+/** The framework type of the one parameter FDS's dark check takes. */
+private const val CONTEXT = "Landroid/content/Context;"
+
 /** Opaque black, as the signed int that a colour holds. */
 private const val BLACK = -0x1000000
 
 /** Gets the resolved colour and its token. Gives the colour to draw. */
 internal const val APPLY = "Lapp/morphe/extension/facebook/theme/AmoledTheme;->apply(ILjava/lang/Object;)I"
+
+/** Gets the status bar's colour and whether Facebook's theme is dark. Gives the colour to paint. */
+internal const val STATUS_BAR = "Lapp/morphe/extension/facebook/theme/AmoledTheme;->statusBar(IZ)I"
 
 /** The framework call that turns a colour string, such as `"#FF252728"`, into a colour. */
 internal const val PARSE_COLOR = "Landroid/graphics/Color;->parseColor(Ljava/lang/String;)I"
@@ -141,6 +149,10 @@ val amoledThemePatch = bytecodePatch(
         hookFdsColorsResolvers(target = APPLY)
         fdsViewResolver().hookColorReturns(tokenParameterIndex = 1, target = APPLY)
 
+        // The status bar. A tab's bar colour can come from a resolver route one doesn't reach, so
+        // the method that paints the bar asks the extension first (issue #22).
+        hookStatusBarColour(darkCheck = fdsDarkCheck())
+
         // Route three. The palette tables, the top bar of the feed, the system bars and each Litho
         // component that draws its own chrome all write a colour instead of asking for one, so no
         // resolver and no resource reaches them. The sweep reads every class and rewrites only the
@@ -191,6 +203,65 @@ internal fun BytecodePatchContext.fdsViewResolver(): MutableMethod {
             it.parameterTypes.map(CharSequence::toString) ==
             resolver.parameterTypes.map(CharSequence::toString)
     }
+}
+
+/**
+ * FDS's test for a dark theme, as a method descriptor: the one static method on the view resolver's
+ * class that takes a Context and answers a boolean. It has a Redex name and no literal. The class's
+ * own colour picker asks the same question before it takes a colour's `darkThemeColor`, and
+ * SystemBarsController asks this method for the bar's icons.
+ */
+internal fun BytecodePatchContext.fdsDarkCheck(): String {
+    val resolverClass = fdsViewResolver().definingClass
+    val checks = classDefBy(resolverClass).methods.filter { method ->
+        AccessFlags.STATIC.isSet(method.accessFlags) && method.returnType == "Z" &&
+            method.parameterTypes.map(CharSequence::toString) == listOf(CONTEXT)
+    }
+    val check = checks.singleOrNull() ?: throw PatchException(
+        "The FDS view resolver's class has ${checks.size} static (Context) boolean methods, expected its one dark check",
+    )
+    return "${check.definingClass}->${check.name}($CONTEXT)Z"
+}
+
+/**
+ * Sends the colour of the status bar through the extension, first thing in the method that paints
+ * it: StatusBarUtil's one static `(Window, int)` method that calls `Window.setStatusBarColor`. The
+ * other static `(Window, int)` method sets the bar's icons and paints nothing.
+ *
+ * On Android 15 and newer the framework ignores `setStatusBarColor` for Facebook's target SDK, so
+ * that method paints a view behind the bar as well. It remembers the last colour per window and
+ * skips a colour it already painted. The hook goes in before that cache, so what it remembers is
+ * what the extension answered. The extension blackens only in the dark theme, [darkCheck] answering
+ * for the window's context, because light mode asks the same tokens for the same dark greys.
+ *
+ * `invoke` names its registers in four bits, so the window and the colour are copied down into two
+ * locals first, and the answer goes back into the colour's own parameter register.
+ */
+internal fun BytecodePatchContext.hookStatusBarColour(darkCheck: String) {
+    val painters = mutableClassDefBy(STATUS_BAR_UTIL).methods.filter { method ->
+        AccessFlags.STATIC.isSet(method.accessFlags) && method.returnType == "V" &&
+            method.parameterTypes.map(CharSequence::toString) == listOf("Landroid/view/Window;", "I") &&
+            method.implementation?.instructions?.any {
+                (it as? ReferenceInstruction)?.reference?.toString() == SET_STATUS_BAR_COLOR
+            } == true
+    }
+    val painter = painters.singleOrNull() ?: throw PatchException(
+        "StatusBarUtil has ${painters.size} static (Window, int) methods that call setStatusBarColor, expected one",
+    )
+    painter.requireLocals("AMOLED status bar", 2)
+    painter.addInstructions(
+        0,
+        """
+            move-object/from16 v0, p0
+            invoke-virtual { v0 }, Landroid/view/Window;->getContext()Landroid/content/Context;
+            move-result-object v0
+            invoke-static { v0 }, $darkCheck
+            move-result v0
+            move/from16 v1, p1
+            invoke-static { v1, v0 }, $STATUS_BAR
+            move-result p1
+        """,
+    )
 }
 
 /**

@@ -19,14 +19,16 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
 
 /**
  * Helper for the "[General] AMOLED black theme" patch. It holds the rule for route one and route
- * four. The four routes are described with the patch's fingerprints, in\n * patches/src/main/kotlin/app/morphe/patches/facebook/layout/theme/Fingerprints.kt.
+ * four, and the one for the status bar. The four routes are described with the patch, in
+ * patches/src/main/kotlin/app/morphe/patches/facebook/layout/theme/AmoledThemePatch.kt.
  *
  * <p>The decision needs the token, because a colour alone cannot show the difference between a card
  * and a dark divider. The names of the tokens carry that difference, and R8 cannot rename an enum
  * constant.
  *
  * <p>The decision also needs the colour, because the same tokens serve light mode, where a card is
- * white. Thus the patch needs no test for dark mode.
+ * white. Thus the patch needs no test for dark mode. The status bar is the exception, see
+ * {@link #statusBar}.
  *
  * <p>{@link #apply} runs for each colour on each layout pass. Thus it makes no object and writes no
  * log. The one thing it adds is a count in Hook status, a hash lookup and an increment once the
@@ -47,6 +49,13 @@ public final class AmoledTheme {
      * green or dark brown banner has much more, and it keeps its colour.
      */
     private static final int MAX_SPREAD = 8;
+
+    /**
+     * The largest value that a channel of a status bar colour can have and still turn black. The
+     * bar is chrome, so it goes further than {@link #MAX_CHANNEL}: the Video tab asks for
+     * {@code #333334}, and Facebook's lightest dark chrome grey is {@code #3A3B3C}.
+     */
+    private static final int MAX_BAR_CHANNEL = 0x40;
 
     /**
      * The tokens that name a background area. The short names come from Mig and the long names
@@ -99,7 +108,7 @@ public final class AmoledTheme {
      */
     public static int apply(int color, Object token) {
         HookStatus.invoked(FamilyNames.AMOLED_THEME);
-        if (!isDarkNeutral(color)) return color;
+        if (!isDarkNeutral(color, MAX_CHANNEL)) return color;
         if (!(token instanceof Enum)) return color;
 
         return BACKGROUND_TOKENS.contains(((Enum<?>) token).name()) ? 0xFF000000 : color;
@@ -119,11 +128,31 @@ public final class AmoledTheme {
     public static int parseColor(String text) {
         HookStatus.invoked(FamilyNames.AMOLED_THEME);
         int color = Color.parseColor(text);
-        return isDarkNeutral(color) ? 0xFF000000 : color;
+        return isDarkNeutral(color, MAX_CHANNEL) ? 0xFF000000 : color;
     }
 
-    /** True for an opaque grey with each channel at or below {@link #MAX_CHANNEL}. */
-    private static boolean isDarkNeutral(int color) {
+    /**
+     * The status bar: the colour Facebook is about to paint it, and whether Facebook's theme is dark.
+     *
+     * <p>On Android 15 and newer Facebook paints the bar itself, through one method that also
+     * remembers the last colour per window and skips a colour it already painted. The patch calls
+     * this first thing in that method, so the colour painted and the colour remembered are the same.
+     * A tab's bar colour often comes from a token resolver that route one doesn't reach. Back from
+     * Recent Apps, the Video tab's {@code #333334} (its CARD_BACKGROUND_DARK token) was painted over
+     * the black it had at a fresh launch, issue #22.
+     *
+     * <p>Light mode asks the same token for the same {@code #333334}, so here the colour can't tell
+     * the themes apart, and the patch passes Facebook's own answer for the window.
+     *
+     * @return black for an opaque dark grey in the dark theme, or {@code color} unchanged.
+     */
+    public static int statusBar(int color, boolean dark) {
+        HookStatus.invoked(FamilyNames.AMOLED_THEME);
+        return dark && isDarkNeutral(color, MAX_BAR_CHANNEL) ? 0xFF000000 : color;
+    }
+
+    /** True for an opaque grey with each channel at or below {@code maxChannel}. */
+    private static boolean isDarkNeutral(int color, int maxChannel) {
         if ((color >>> 24) != 0xFF) return false;
 
         int red = (color >> 16) & 0xFF;
@@ -131,6 +160,6 @@ public final class AmoledTheme {
         int blue = color & 0xFF;
         int high = Math.max(red, Math.max(green, blue));
         int low = Math.min(red, Math.min(green, blue));
-        return high <= MAX_CHANNEL && high - low <= MAX_SPREAD;
+        return high <= maxChannel && high - low <= MAX_SPREAD;
     }
 }

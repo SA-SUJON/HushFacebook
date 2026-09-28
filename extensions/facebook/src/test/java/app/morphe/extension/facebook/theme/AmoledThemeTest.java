@@ -47,4 +47,39 @@ public class AmoledThemeTest {
     public void aStringThatIsNoColourThrowsAsBefore() {
         AmoledTheme.parseColor("not a colour");
     }
+
+    /**
+     * Issue #22: back from Recent Apps, the Video tab's bar is painted #333334, the colour its
+     * CARD_BACKGROUND_DARK token resolves to, and Facebook's home bar #252728.
+     */
+    @Test
+    public void aDarkThemeStatusBarTurnsBlack() {
+        assertEquals("the Video tab's bar", BLACK, AmoledTheme.statusBar(0xFF333334, true));
+        assertEquals("the home bar", BLACK, AmoledTheme.statusBar(0xFF252728, true));
+        assertEquals("the lightest chrome grey", BLACK, AmoledTheme.statusBar(0xFF3A3B3C, true));
+    }
+
+    /** Light mode asks the same token for the same #333334, and its bars keep Facebook's colours. */
+    @Test
+    public void aLightThemeStatusBarKeepsItsColour() {
+        assertEquals("the Video tab's bar", 0xFF333334, AmoledTheme.statusBar(0xFF333334, false));
+        assertEquals("a white bar", 0xFFFFFFFF, AmoledTheme.statusBar(0xFFFFFFFF, false));
+    }
+
+    /** The mutation controls for the dark theme: only an opaque dark grey turns black. */
+    @Test
+    public void aDarkThemeStatusBarThatIsNoDarkGreyKeepsItsColour() {
+        assertEquals("edge to edge", 0x00000000, AmoledTheme.statusBar(0x00000000, true));
+        assertEquals("a translucent scrim", 0x80333334, AmoledTheme.statusBar(0x80333334, true));
+        assertEquals("above the bar threshold", 0xFF4B4C4F, AmoledTheme.statusBar(0xFF4B4C4F, true));
+        assertEquals("a dark colour with a hue", 0xFF1A2A10, AmoledTheme.statusBar(0xFF1A2A10, true));
+        assertEquals("a white bar", 0xFFFFFFFF, AmoledTheme.statusBar(0xFFFFFFFF, true));
+    }
+
+    /** The bar's higher threshold stays the bar's: a resolver's #333334 card keeps its colour. */
+    @Test
+    public void theBarThresholdDoesNotReachTheOtherRoutes() {
+        assertEquals(0xFF333334, AmoledTheme.apply(0xFF333334, Token.CARD_BACKGROUND));
+        assertEquals(0xFF333334, AmoledTheme.parseColor("#FF333334"));
+    }
 }

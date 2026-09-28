@@ -27,6 +27,8 @@ import com.android.tools.smali.dexlib2.Opcode
 internal const val DARK_COLOR_SCHEME = "Lcom/facebook/mig/scheme/schemes/DarkColorScheme;"
 internal const val FDS_COLORS = "Lcom/facebook/fds/core/theme/component/FDSColors;"
 internal const val FDS_COLOR_SCHEME = "Lcom/facebook/mig/scheme/schemes/fds/FdsColorScheme;"
+internal const val STATUS_BAR_UTIL = "Lcom/facebook/navigation/statusbar/StatusBarUtil;"
+internal const val SET_STATUS_BAR_COLOR = "Landroid/view/Window;->setStatusBarColor(I)V"
 
 /**
  * The Mig dark scheme resolver. The return type and the interface call remove the three sibling
