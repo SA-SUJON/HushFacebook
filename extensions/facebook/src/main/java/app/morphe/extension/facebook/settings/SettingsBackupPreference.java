@@ -481,33 +481,40 @@ public class SettingsBackupPreference extends Preference {
         if (run == null) return;
         // The page shows what the store now holds rather than reading its own switches back into it.
         AbstractPreferenceFragment.settingImportInProgress = true;
-        // Counted before the write, which makes every change match the store.
-        String done = importedMessage(snapshot.switchChanges(), snapshot.folderChange(), snapshot.qualityChange(),
-                snapshot.fileNameChange(), snapshot.startChange(), snapshot.orderChange(), snapshot.hiddenChange(),
-                snapshot.keptChange());
-        boolean accepted = Utils.runOnBackgroundThread(() -> {
-            try {
-                SettingsBackup.apply(snapshot);
-                Utils.showToastLong(done);
-            } catch (SettingsBackup.ApplyFailed failure) {
-                Logger.printInfo(() -> "Settings import failed: " + failure.getMessage()
-                        + (failure.rolledBack ? ", rolled back" : ", not rolled back"));
-                Utils.showToastLong(failure.rolledBack
-                        ? L10n.t("Couldn't import the settings. Nothing was changed.")
-                        : L10n.t("Couldn't import the settings, and couldn't put back the ones you had. "
-                                + "Check the switches on this screen."));
-            } finally {
-                Utils.runOnMainThread(() -> {
-                    AbstractPreferenceFragment.settingImportInProgress = false;
-                    finish(run);
-                    HushfacebookPreferenceFragment current = latestPage.get();
-                    if (current != null && current.isAdded()) current.refreshSwitches();
-                });
+        boolean accepted = false;
+        try {
+            // Counted before the write, which makes every change match the store.
+            String done = importedMessage(snapshot.switchChanges(), snapshot.folderChange(), snapshot.qualityChange(),
+                    snapshot.fileNameChange(), snapshot.startChange(), snapshot.orderChange(), snapshot.hiddenChange(),
+                    snapshot.keptChange());
+            accepted = Utils.runOnBackgroundThread(() -> {
+                try {
+                    SettingsBackup.apply(snapshot);
+                    Utils.showToastLong(done);
+                } catch (SettingsBackup.ApplyFailed failure) {
+                    Logger.printInfo(() -> "Settings import failed: " + failure.getMessage()
+                            + (failure.rolledBack ? ", rolled back" : ", not rolled back"));
+                    Utils.showToastLong(failure.rolledBack
+                            ? L10n.t("Couldn't import the settings. Nothing was changed.")
+                            : L10n.t("Couldn't import the settings, and couldn't put back the ones you had. "
+                                    + "Check the switches on this screen."));
+                } finally {
+                    Utils.runOnMainThread(() -> {
+                        AbstractPreferenceFragment.settingImportInProgress = false;
+                        finish(run);
+                        HushfacebookPreferenceFragment current = latestPage.get();
+                        if (current != null && current.isAdded()) current.refreshSwitches();
+                    });
+                }
+            });
+        } catch (RuntimeException error) {
+            Logger.printInfo(() -> "Settings import didn't start: " + error.getClass().getSimpleName());
+        } finally {
+            // This path has no wait that runs out, so nothing else would give the rows back.
+            if (!accepted) {
+                AbstractPreferenceFragment.settingImportInProgress = false;
+                notStarted(run);
             }
-        });
-        if (!accepted) {
-            AbstractPreferenceFragment.settingImportInProgress = false;
-            notStarted(run);
         }
     }
 

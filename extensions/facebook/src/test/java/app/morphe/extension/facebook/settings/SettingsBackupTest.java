@@ -1646,6 +1646,50 @@ public class SettingsBackupTest {
         }
     }
 
+    /**
+     * An import that fails after it has claimed the rows, before a worker has it, gives them back
+     * and changes nothing. That path has no wait to run out, so nothing else would: the rows would
+     * stay out of reach until Facebook restarts. Here the folder the toast names can't be read once
+     * Import is pressed, so the toast's text can't be built.
+     */
+    @Test
+    public void anImportThatFailsBeforeItsWorkerStartsGivesTheRowsBack() throws Exception {
+        JSONObject file = new JSONObject(fileWith(Settings.HIDE_SPONSORED_POSTS, false));
+        file.getJSONObject("settings").put(SettingsBackup.FOLDER.key, "Clips");
+        Field value = Setting.class.getDeclaredField("value");
+        value.setAccessible(true);
+        Object folder = value.get(Settings.SAVE_FOLDER);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            deliver(activity, tap(activity, page, IMPORT_ROW), file.toString());
+            AlertDialog preview = shownPreview();
+            RuntimeException escaped = null;
+            // Not a folder name, so no sentence can be worded around it.
+            value.set(Settings.SAVE_FOLDER, 7);
+            try {
+                preview.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                settle();
+            } catch (RuntimeException failure) {
+                escaped = failure;
+            } finally {
+                value.set(Settings.SAVE_FOLDER, folder);
+            }
+            assertTrue("the rows stayed out of reach", page.findPreference(IMPORT_ROW).isEnabled());
+            assertTrue(page.findPreference(EXPORT_ROW).isEnabled());
+            assertFalse(AbstractPreferenceFragment.settingImportInProgress);
+            assertNull("the failure reached Facebook", escaped);
+            assertEquals("Couldn't start that. Try again in a moment.", ShadowToast.getTextOfLatestToast());
+            assertTrue("a switch changed", Settings.HIDE_SPONSORED_POSTS.savedValue());
+
+            // And the next import goes through.
+            deliver(activity, tap(activity, page, IMPORT_ROW), fileWith(Settings.HIDE_SPONSORED_POSTS, false));
+            shownPreview().getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+            settle();
+            assertFalse(Settings.HIDE_SPONSORED_POSTS.savedValue());
+        }
+    }
+
     // ---- The app holding the file ------------------------------------------------------------
 
     private static final String EXPORT_TIMEOUT = "The app holding the settings file is taking too long, so Hushfacebook "
