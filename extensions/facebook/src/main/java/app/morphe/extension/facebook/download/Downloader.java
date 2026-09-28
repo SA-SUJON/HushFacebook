@@ -82,6 +82,14 @@ final class Downloader {
 
         /** Whether the person saving asked to stop. */
         boolean cancelled();
+
+        /** The fetched tracks are being joined into one file. */
+        default void joining() {
+        }
+
+        /** The finished file is being copied into the gallery. */
+        default void saving() {
+        }
     }
 
     /** No one is watching and nothing can cancel. */
@@ -121,6 +129,16 @@ final class Downloader {
             @Override
             public boolean cancelled() {
                 return progress.cancelled();
+            }
+
+            @Override
+            public void joining() {
+                progress.joining();
+            }
+
+            @Override
+            public void saving() {
+                progress.saving();
             }
         };
     }
@@ -411,6 +429,7 @@ final class Downloader {
 
         try (InputStream in = new FileInputStream(file)) {
             if (progress.cancelled()) return cancelled();
+            progress.saving();
             OutputStream out = sink.open(mime);
 
             byte[] buffer = new byte[BUFFER];

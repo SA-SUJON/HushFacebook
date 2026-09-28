@@ -47,12 +47,16 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
+import app.morphe.extension.facebook.download.SaveControl;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -129,6 +133,16 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     @Nullable
     SettingsNavigation navigation;
 
+    /** The Downloads section, where the running saves are listed, or null when no download patch is in. */
+    @Nullable
+    private PreferenceCategory downloads;
+
+    /** The rows of the saves running now, by save number. */
+    private final Map<Integer, SaveRow> saveRows = new HashMap<>();
+
+    /** Keeps the rows in step with the saves while the page is showing. Saves tell it from their own thread. */
+    private final SaveControl.Watcher saves = () -> Utils.runOnMainThread(this::showSaves);
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -166,6 +180,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         SettingsBackupPreference.onPageResumed(this);
         showMarketplaceSettings();
         showSupportedLinks();
+        SaveControl.watch(saves);
+        showSaves();
+    }
+
+    @Override
+    public void onPause() {
+        SaveControl.unwatch(saves);
+        super.onPause();
     }
 
     @Override
@@ -451,6 +473,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (build.contains(PatchFamily.STORY_DOWNLOAD) || build.contains(PatchFamily.REEL_DOWNLOAD)
                 || build.contains(PatchFamily.VIDEO_DOWNLOAD)) {
             PreferenceCategory downloads = category(screen, L10n.t("Downloads"));
+            this.downloads = downloads;
             if (build.contains(PatchFamily.VIDEO_DOWNLOAD)) {
                 downloads.addPreference(toggle(context, Settings.DOWNLOAD_VIDEOS, L10n.t("Download feed and Watch videos"),
                         L10n.t("Add Download to phone to feed and Watch video menus. Uses the quality below. Off or paused, Facebook's menu returns.")));
@@ -693,6 +716,35 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             return true;
         });
         about.addPreference(mark(licenses, SettingsIcons.LICENSE));
+    }
+
+    /**
+     * Lists each save running now at the top of Downloads, and takes a finished one away. The
+     * notification was the only way to follow or stop a save, and with Facebook's notifications or
+     * the saves channel off there wasn't one. A row that stays is changed in place.
+     */
+    void showSaves() {
+        PreferenceCategory group = downloads;
+        if (group == null) return;
+        List<SaveControl.Running> running = SaveControl.running();
+        Set<Integer> now = new HashSet<>();
+        for (SaveControl.Running save : running) now.add(save.id);
+        for (java.util.Iterator<Map.Entry<Integer, SaveRow>> rows = saveRows.entrySet().iterator(); rows.hasNext(); ) {
+            Map.Entry<Integer, SaveRow> row = rows.next();
+            if (now.contains(row.getKey())) continue;
+            group.removePreference(row.getValue());
+            rows.remove();
+        }
+        for (SaveControl.Running save : running) {
+            SaveRow row = saveRows.get(save.id);
+            if (row != null) {
+                row.show(save);
+                continue;
+            }
+            row = new SaveRow(group.getContext(), save);
+            saveRows.put(save.id, row);
+            group.addPreference(row);
+        }
     }
 
     /**
@@ -1440,6 +1492,79 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             showAllText(view);
             ScreenColors.row(view, this);
             view.setAccessibilityDelegate(isSelectable() ? new RowSemantics(this, Button.class) : null);
+        }
+    }
+
+    /**
+     * A running save: what it is, what it's doing, how far it has got, and a Cancel button. Its text
+     * changes in place: a row rebuilt under a finger loses the tap on its button.
+     */
+    static final class SaveRow extends Preference {
+        /** Before every setting of the section, oldest save first. */
+        private static final int FIRST = Integer.MIN_VALUE / 2;
+
+        final int id;
+        private final boolean video;
+        private String status;
+        @Nullable
+        private View bound;
+
+        SaveRow(Context context, SaveControl.Running save) {
+            super(context);
+            id = save.id;
+            video = save.video;
+            status = SaveControl.status(save);
+            setKey("running_save_" + save.id);
+            setPersistent(false);
+            setSelectable(false);
+            setOrder(FIRST + save.id);
+            setTitle(video ? L10n.t("Saving a video") : L10n.t("Saving a photo"));
+        }
+
+        @Override
+        public CharSequence getSummary() {
+            return status;
+        }
+
+        void show(SaveControl.Running save) {
+            String next = SaveControl.status(save);
+            if (next.equals(status)) return;
+            status = next;
+            TextView summary = bound == null ? null : bound.findViewById(android.R.id.summary);
+            if (summary != null) summary.setText(next);
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            bound = view;
+            showAllText(view);
+            ScreenColors.row(view, this);
+            android.view.ViewGroup frame = view.findViewById(android.R.id.widget_frame);
+            if (frame == null) return;
+            frame.removeAllViews();
+            Button cancel = new Button(getContext());
+            cancel.setText(L10n.t("Cancel"));
+            // Two saves can be listed at once, so the button says whose it is.
+            cancel.setContentDescription(video ? L10n.t("Cancel saving this video") : L10n.t("Cancel saving this photo"));
+            cancel.setAllCaps(false);
+            cancel.setTextSize(14);
+            ScreenColors colors = ScreenColors.shown == null ? ScreenColors.DEFAULT : ScreenColors.shown;
+            cancel.setTextColor(colors.heading);
+            cancel.setBackgroundColor(Color.TRANSPARENT);
+            int touch = Math.round(48 * view.getResources().getDisplayMetrics().density);
+            cancel.setMinWidth(touch);
+            cancel.setMinimumWidth(touch);
+            cancel.setMinHeight(touch);
+            cancel.setMinimumHeight(touch);
+            cancel.setPadding(touch / 4, 0, touch / 4, 0);
+            cancel.setOnClickListener(ignored -> {
+                cancel.setEnabled(false);
+                SaveControl.cancel(id);
+            });
+            frame.addView(cancel, new android.widget.LinearLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+            frame.setVisibility(View.VISIBLE);
         }
     }
 

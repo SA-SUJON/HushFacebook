@@ -337,6 +337,7 @@ final class DashSave {
                 audioIn.setDataSource(audio.getPath());
             }
             if (progress.cancelled()) return false;
+            progress.joining();
 
             muxer = new MediaMuxer(out.getPath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 

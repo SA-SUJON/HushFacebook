@@ -24,11 +24,14 @@ Audience Network off	Audience Network nonaktif
 Back	Kembali
 Background ad prefetch blocked	Pramuat iklan di latar belakang diblokir
 Cancel	Batal
+Cancel saving this photo	Batalkan penyimpanan foto ini
+Cancel saving this video	Batalkan penyimpanan video ini
 Changing these	Mengubah pilihan ini
 Choose a settings file. Before anything is imported, you'll see how many switches it changes and any new download settings.	Pilih file pengaturan. Sebelum apa pun diimpor, Anda akan melihat berapa sakelar yang berubah dan pengaturan unduhan yang baru.
 Clear diagnostic data	Hapus data diagnostik
 Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Salin laporan singkat atau simpan laporan lengkap di Download/Morphe. Tautan, ID, cookie, dan token masuk dihilangkan. Periksa teks pribadi lainnya sebelum membagikannya.
 Copy quick report	Salin laporan singkat
+Copying to the gallery	Menyalin ke galeri
 Couldn't import every setting. Check the switches on this screen.	Tidak semua pengaturan dapat diimpor. Periksa sakelar di layar ini.
 Couldn't import the settings. Nothing was changed.	Pengaturan tidak dapat diimpor. Tidak ada yang diubah.
 Couldn't open that file. Nothing was changed.	File itu tidak dapat dibuka. Tidak ada yang diubah.
@@ -48,6 +51,7 @@ Download button on reels	Tombol Unduh di Reels
 Download failed	Unduhan gagal
 Download feed and Watch videos	Unduh video dari Kabar Beranda dan Watch
 Download to phone	Unduh ke ponsel
+Downloading	Mengunduh
 Downloads	Unduhan
 Empties the log and the filter counts a report would include.	Mengosongkan log dan hitungan filter yang akan dimasukkan ke laporan.
 Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.	Semua sakelar kecuali Pencatatan debug dianggap nonaktif, dan yang diatur saat Anda menambal tetap aktif. Pengaturan Anda tetap seperti semula.
@@ -57,6 +61,7 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook tidak mengunduh iklan atau model iklannya di latar belakang.
 Facebook doesn't serve ads to other apps on this phone.	Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Mode gelap Facebook dan halaman ini memakai warna wallpaper Anda. Android 11 memakai biru. Aktifkan mode gelap Facebook untuk melihatnya.
+Joining the picture and sound	Menggabungkan gambar dan suara
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Gunakan emoji ponsel. Reaksi dan stiker tetap sama. Mulai ulang Facebook setelah mengubahnya.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Gunakan font ponsel atau file yang dipilih di bawah. Mulai ulang Facebook setelah mengubahnya.
 Font file	File font

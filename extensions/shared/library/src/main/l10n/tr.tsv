@@ -24,11 +24,14 @@ Audience Network off	Audience Network kapalı
 Back	Geri
 Background ad prefetch blocked	Arka planda reklam indirme engellendi
 Cancel	İptal
+Cancel saving this photo	Bu fotoğrafın kaydedilmesini iptal et
+Cancel saving this video	Bu videonun kaydedilmesini iptal et
 Changing these	Bunları değiştirmek
 Choose a settings file. Before anything is imported, you'll see how many switches it changes and any new download settings.	Bir ayar dosyası seç. İçe aktarmadan önce kaç anahtarın değişeceğini ve yeni indirme ayarlarını görürsün.
 Clear diagnostic data	Tanılama verilerini temizle
 Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Kısa raporu kopyala veya tam raporu Download/Morphe konumuna kaydet. Bağlantılar, kimlikler, çerezler ve oturum belirteçleri çıkarılır. Paylaşmadan önce başka özel bilgi olup olmadığına bak.
 Copy quick report	Hızlı raporu kopyala
+Copying to the gallery	Galeriye kopyalanıyor
 Couldn't import every setting. Check the switches on this screen.	Bazı ayarlar içe aktarılamadı. Bu ekrandaki anahtarları kontrol et.
 Couldn't import the settings. Nothing was changed.	Ayarlar içe aktarılamadı. Hiçbir şey değiştirilmedi.
 Couldn't open that file. Nothing was changed.	Bu dosya açılamadı. Hiçbir şey değiştirilmedi.
@@ -48,6 +51,7 @@ Download button on reels	Reels'teki İndir düğmesi
 Download failed	İndirme başarısız oldu
 Download feed and Watch videos	Akış ve Watch videolarını indir
 Download to phone	Telefona indir
+Downloading	İndiriliyor
 Downloads	İndirmeler
 Empties the log and the filter counts a report would include.	Bir raporun içereceği günlüğü ve filtre sayaçlarını boşaltır.
 Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.	Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır, yamaladığında ayarlananlar ise devrede kalır. Ayarların olduğu gibi kalır.
@@ -57,6 +61,7 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook reklamları veya reklam modelini arka planda indirmez.
 Facebook doesn't serve ads to other apps on this phone.	Facebook bu telefondaki diğer uygulamalara reklam sunmaz.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebook karanlık modu ve bu ekran duvar kâğıdının renklerini kullanır. Android 11 bunun yerine mavi kullanır. Görmek için Facebook karanlık modunu aç.
+Joining the picture and sound	Görüntü ve ses birleştiriliyor
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Telefonunuzun emojilerini kullanır. İfadeler ve çıkartmalar aynı kalır. Değiştirdikten sonra Facebook’u yeniden başlatın.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Telefonunuzun yazı tipini veya aşağıdan seçilen dosyayı kullanır. Değiştirdikten sonra Facebook’u yeniden başlatın.
 Font file	Yazı tipi dosyası

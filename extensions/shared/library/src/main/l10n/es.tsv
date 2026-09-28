@@ -24,11 +24,14 @@ Audience Network off	Sin Audience Network
 Back	Atrás
 Background ad prefetch blocked	Precarga de anuncios en segundo plano bloqueada
 Cancel	Cancelar
+Cancel saving this photo	Cancelar el guardado de esta foto
+Cancel saving this video	Cancelar el guardado de este video
 Changing these	Cómo cambiarlos
 Choose a settings file. Before anything is imported, you'll see how many switches it changes and any new download settings.	Elige un archivo de configuración. Antes de importar nada, verás cuántos interruptores cambia y los ajustes de descarga nuevos.
 Clear diagnostic data	Borrar datos de diagnóstico
 Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Copia un informe rápido o guarda el completo en Download/Morphe. Se omiten enlaces, ID, cookies y tokens de inicio de sesión. Revisa si queda otro texto privado antes de compartirlo.
 Copy quick report	Copiar informe rápido
+Copying to the gallery	Copiando a la galería
 Couldn't import every setting. Check the switches on this screen.	No se pudieron importar todos los ajustes. Revisa los interruptores de esta pantalla.
 Couldn't import the settings. Nothing was changed.	No se pudo importar la configuración. No se cambió nada.
 Couldn't open that file. Nothing was changed.	No se pudo abrir ese archivo. No se cambió nada.
@@ -48,6 +51,7 @@ Download button on reels	Botón de descarga en los reels
 Download failed	No se pudo descargar
 Download feed and Watch videos	Descargar videos del feed y de Watch
 Download to phone	Descargar en el teléfono
+Downloading	Descargando
 Downloads	Descargas
 Empties the log and the filter counts a report would include.	Vacía el registro y los recuentos de filtros que incluiría un informe.
 Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.	Todos los interruptores, salvo el Registro de depuración, funcionan como si estuvieran desactivados, y lo que se aplicó al parchear se mantiene. Tu configuración no cambia.
@@ -57,6 +61,7 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook no descarga anuncios ni su modelo de anuncios en segundo plano.
 Facebook doesn't serve ads to other apps on this phone.	Facebook no envía anuncios a otras apps de este teléfono.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	El modo oscuro de Facebook y esta pantalla usan los colores de tu fondo. Android 11 usa azul en su lugar. Activa el modo oscuro de Facebook para verlo.
+Joining the picture and sound	Uniendo la imagen y el sonido
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Usa los emojis del teléfono. Las reacciones y pegatinas no cambian. Reinicia Facebook después de cambiarlo.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Usa la fuente del teléfono o un archivo elegido abajo. Reinicia Facebook después de cambiarla.
 Font file	Archivo de fuente

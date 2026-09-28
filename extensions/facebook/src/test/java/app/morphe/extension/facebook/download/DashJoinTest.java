@@ -251,6 +251,31 @@ public class DashJoinTest {
         assertEquals(0, workFiles());
     }
 
+    /**
+     * Hushfacebook's settings cancel a save the way its notification does: SaveControl.cancel on a
+     * save they list, here while it's listed as joining. The join stops at its next sample.
+     */
+    @Test
+    public void aCancelFromTheSettingsListStopsTheJoin() throws Exception {
+        java.util.List<SaveControl.Phase> seen = new java.util.ArrayList<>();
+        FaultyMuxer.afterWrite = () -> {
+            if (FaultyMuxer.writes.get() != 1_000) return;
+            for (SaveControl.Running save : SaveControl.running()) {
+                seen.add(save.phase);
+                SaveControl.cancel(save.id);
+            }
+        };
+
+        String report = runOnTheWorker();
+
+        assertEquals("the save wasn't listed as joining", java.util.Collections.singletonList(SaveControl.Phase.JOINING),
+                seen);
+        assertEquals("samples were written after the cancel", 1_000, FaultyMuxer.writes.get());
+        assertTrue("a cancelled save is still listed", SaveControl.running().isEmpty());
+        assertTrue(report, report.contains("save finished: CANCELLED (cancelled during the join)"));
+        assertEquals("both extractors", 2, Samples.released.get());
+    }
+
     /** A muxer that can't stop used to skip both extractors, and hid the failure that came first. */
     @Test
     public void aMuxerThatFailsToStopStillReleasesBothExtractors() throws Exception {
@@ -284,8 +309,8 @@ public class DashJoinTest {
     }
 
     /**
-     * The save as a tap runs it, on its worker with its notification. It ends WRITE_ERROR, and its
-     * job and notification are gone after it.
+     * The save as a tap runs it, on its worker with its notification. Its job and notification are
+     * gone after it, however it ended.
      */
     private String runOnTheWorker() throws InterruptedException {
         MediaDownload.policyForTests = policy;
@@ -400,6 +425,8 @@ public class DashJoinTest {
         static volatile int failWriteAt = -1;
         static volatile boolean failStop;
         static volatile boolean failRelease;
+        /** Run after each sample is written, on the save's thread. */
+        static volatile Runnable afterWrite;
 
         static void reset() {
             writes.set(0);
@@ -409,6 +436,7 @@ public class DashJoinTest {
             failWriteAt = -1;
             failStop = false;
             failRelease = false;
+            afterWrite = null;
         }
 
         @Implementation
@@ -425,6 +453,8 @@ public class DashJoinTest {
             ShadowMediaMuxer.nativeWriteSampleData(nativeObject, trackIndex, byteBuf, offset, size,
                     presentationTimeUs, flags);
             writes.incrementAndGet();
+            Runnable after = afterWrite;
+            if (after != null) after.run();
         }
 
         @Implementation
