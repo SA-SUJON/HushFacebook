@@ -11,12 +11,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.SwitchPreference;
+import android.widget.TextView;
 
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
@@ -37,8 +39,10 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.ShadowToast;
 
@@ -303,8 +307,10 @@ public class HushfacebookPreferenceFragmentTest {
 
     /**
      * The word filter's switch sits in News feed with its two lists under it. Each list keeps what
-     * the filter will read, whatever is typed, and a toast says how many lines were left out,
-     * never which. The rows are there only with the patch in the build.
+     * the filter will read, whatever is typed, and says how many lines were left out, never which.
+     * That's a dialog rather than a toast: Android 12 and later cut a toast to two lines, and the
+     * reasons run past that, most of all at a large text size. The rows are there only with the
+     * patch in the build.
      */
     @Test
     public void theWordRowsKeepCleanListsAndSayHowManyPhrasesTheyHold() {
@@ -323,6 +329,7 @@ public class HushfacebookPreferenceFragmentTest {
             assertFalse("the list's field is one line", hide.getEditText().getMaxLines() == 1);
 
             ShadowToast.reset();
+            ShadowAlertDialog.reset();
             Preference.OnPreferenceChangeListener ok = hide.getOnPreferenceChangeListener();
             assertFalse("a list with lines out of bounds was kept as typed",
                     ok.onPreferenceChange(hide, " spoiler \na\nSPOILER\ngiveaway now\n"));
@@ -330,21 +337,25 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals("spoiler\ngiveaway now", hide.getText());
             assertEquals("spoiler\ngiveaway now", Settings.HIDDEN_WORDS.savedValue());
             assertEquals("2 words or phrases.", String.valueOf(hide.getSummary()));
-            assertEquals("2 lines were left out. A phrase needs 2 to 60 characters, or just one for an emoji, a "
-                    + "Chinese character, a kana or a Hangul syllable. One given twice counts once, and a list "
-                    + "holds 50.", ShadowToast.getTextOfLatestToast());
+            assertLeftOut("Words to hide", "2 lines were left out. A phrase needs 2 to 60 characters, or just one "
+                    + "for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
+                    + "once, and a list holds 50.");
 
-            ShadowToast.reset();
+            ShadowAlertDialog.reset();
             assertTrue("a clean list was changed", ok.onPreferenceChange(hide, "spoiler"));
             assertFalse("only spaces around a phrase", ok.onPreferenceChange(hide, "spoiler  "));
             ShadowLooper.idleMainLooper();
-            assertNull("a list cleaned of spaces alone said something", ShadowToast.getTextOfLatestToast());
+            assertNull("a list cleaned of spaces alone said something", ShadowAlertDialog.getLatestAlertDialog());
+            assertNull(ShadowToast.getTextOfLatestToast());
             assertEquals("spoiler", Settings.HIDDEN_WORDS.savedValue());
 
             assertFalse(keep.getOnPreferenceChangeListener().onPreferenceChange(keep, "my team\nmy team"));
             ShadowLooper.idleMainLooper();
             assertEquals("my team", Settings.KEPT_WORDS.savedValue());
             assertEquals("1 word or phrase.", String.valueOf(keep.getSummary()));
+            assertLeftOut("Words that keep a post", "1 line was left out. A phrase needs 2 to 60 characters, or just "
+                    + "one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
+                    + "once, and a list holds 50.");
         }
 
         PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);
@@ -353,6 +364,25 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals(-1, indexOfKey(rows, Settings.HIDDEN_WORDS.key));
             assertEquals(-1, indexOfKey(rows, Settings.HIDE_POSTS_WITH_WORDS.key));
         }
+    }
+
+    /**
+     * The dialog that says lines were left out: titled with its list, holding the whole message
+     * with nothing cut, and no toast beside it. OK closes it.
+     */
+    private static void assertLeftOut(String list, String message) {
+        AlertDialog shown = ShadowAlertDialog.getLatestAlertDialog();
+        assertNotNull("nothing said lines were left out", shown);
+        assertTrue(shown.isShowing());
+        assertEquals(list, String.valueOf(Shadows.shadowOf(shown).getTitle()));
+        TextView text = shown.findViewById(android.R.id.message);
+        assertEquals(message, String.valueOf(text.getText()));
+        assertEquals("the message is cut to a number of lines", Integer.MAX_VALUE, text.getMaxLines());
+        assertNull("the message is cut short", text.getEllipsize());
+        assertNull("a toast said it too", ShadowToast.getTextOfLatestToast());
+        shown.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        ShadowLooper.idleMainLooper();
+        assertFalse("OK left it open", shown.isShowing());
     }
 
     /** The hide list's row counts the posts it hid since Facebook started, and never names one. */

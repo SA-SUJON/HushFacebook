@@ -1430,7 +1430,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * One of the word filter's two lists: the words that hide a post ([hides]), or the ones that keep
      * it. What's typed is cleaned before it's kept, one phrase per line within the bounds
      * {@link PostWords} holds every list to, so the row, the setting and the filter all read the
-     * same phrases. A toast says how many lines were left out, never which.
+     * same phrases. A dialog says how many lines were left out, never which.
      */
     static WordsRow wordsRow(Context context, StringSetting setting, boolean hides) {
         WordsRow row = new WordsRow(context, hides);
@@ -1465,14 +1465,21 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             int leftOut = PostWords.leftOut(raw);
             ((WordsRow) preference).setText(clean);
             if (leftOut > 0) {
-                Utils.showToastLong(L10n.quantity(leftOut,
+                // A dialog, not a toast: Android 12 and later cut a toast to two lines, and the
+                // reasons run past that, most of all at a large text size.
+                String why = L10n.quantity(leftOut,
                         "%1$d line was left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, "
                                 + "a Chinese character, a kana or a Hangul syllable. One given twice counts once, "
                                 + "and a list holds %4$d.",
                         "%1$d lines were left out. A phrase needs %2$d to %3$d characters, or just one for an "
                                 + "emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
                                 + "once, and a list holds %4$d.",
-                        leftOut, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH, PostWords.MAX_PHRASES));
+                        leftOut, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH, PostWords.MAX_PHRASES);
+                ScreenColors.dialog(new AlertDialog.Builder(preference.getContext())
+                        .setTitle(title)
+                        .setMessage(why)
+                        .setPositiveButton(L10n.t("OK"), null)
+                        .show());
             }
             return false;
         });
