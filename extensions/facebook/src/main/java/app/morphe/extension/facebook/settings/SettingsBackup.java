@@ -620,25 +620,20 @@ public final class SettingsBackup {
      *
      * @return how many settings changed, each setting that isn't a switch counted as one.
      * @throws ApplyFailed when the commit failed. {@link Setting#saveAll} puts the switches
-     *                     back; {@link ApplyFailed#rolledBack} says whether that worked.
+     *                     back, live and stored; {@link ApplyFailed#rolledBack} says whether that
+     *                     worked for every one of them.
      */
     static int apply(Snapshot snapshot) throws ApplyFailed {
         Map<Setting<?>, Object> changes = snapshot.changes();
         if (changes.isEmpty()) return 0;
-        Map<String, ?> before = new HashMap<>(Setting.preferences.preferences.getAll());
         try {
             Setting.saveAll(changes);
             return changes.size();
-        } catch (IOException | RuntimeException error) {
-            throw new ApplyFailed(storeMatches(before), error);
-        }
-    }
-
-    private static boolean storeMatches(Map<String, ?> expected) {
-        try {
-            return expected.equals(Setting.preferences.preferences.getAll());
-        } catch (RuntimeException error) {
-            return false;
+        } catch (Setting.BatchFailed failed) {
+            throw new ApplyFailed(failed.restored, failed);
+        } catch (IOException | RuntimeException refused) {
+            // Refused before anything was written.
+            throw new ApplyFailed(true, refused);
         }
     }
 }

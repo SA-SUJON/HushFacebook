@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
+import android.preference.SwitchPreference;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -29,6 +30,8 @@ import java.util.TreeMap;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.settings.BaseSettings;
+import app.morphe.extension.shared.settings.FailingStore;
+import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 import app.morphe.extension.shared.settings.Setting;
 
@@ -43,6 +46,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.annotation.GraphicsMode;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.shadows.ShadowLooper;
+import org.robolectric.shadows.ShadowToast;
 
 /** Exercises the actual dialog host and its filtered view of the original preference model. */
 @RunWith(RobolectricTestRunner.class)
@@ -115,6 +119,57 @@ public class SettingsNavigationTest {
         assertFalse(BaseSettings.PAUSED.savedValue());
         assertEquals("Pause", statusAction().getText().toString());
         assertFalse(Settings.DOWNLOAD_COMPATIBLE.savedValue());
+    }
+
+    /** A Resume the store can't keep leaves the pause on screen, in storage and in the switch, and says so. */
+    @Test public void aResumeTheStoreCanNotKeepLeavesThePauseAndSaysSo() {
+        BaseSettings.PAUSED.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        recreate();
+        layout(dialog.getView());
+        assertEquals("Resume", statusAction().getText().toString());
+        try (FailingStore ignored = FailingStore.install(FailingStore.Fault.COMMIT_THROWS, FailingStore.Fault.COMMIT_THROWS)) {
+            statusAction().performClick();
+            ShadowLooper.idleMainLooper();
+        }
+        layout(dialog.getView());
+        assertEquals("Couldn't turn Hushfacebook back on. Try again.", ShadowToast.getTextOfLatestToast());
+        assertTrue(BaseSettings.PAUSED.savedValue());
+        assertTrue(Setting.preferences.preferences.getBoolean(BaseSettings.PAUSED.key, false));
+        assertTrue(((SwitchPreference) page.findPreference(BaseSettings.PAUSED.key)).isChecked());
+        assertEquals("Resume", statusAction().getText().toString());
+
+        // The same tap with the store working turns it back on from the next start.
+        statusAction().performClick();
+        ShadowLooper.idleMainLooper();
+        layout(dialog.getView());
+        assertFalse(BaseSettings.PAUSED.savedValue());
+        assertFalse(((SwitchPreference) page.findPreference(BaseSettings.PAUSED.key)).isChecked());
+        assertEquals("Undo", statusAction().getText().toString());
+    }
+
+    /** A marker Resume can't remove keeps the Pause switch on, and the card says both steps. */
+    @Test public void aMarkerResumeCanNotRemoveKeepsTheSwitchAndSaysWhatToDo() throws Exception {
+        File marker = HushfacebookPause.markerFile(controller.get());
+        File held = new File(marker, "held");
+        // A folder with something in it can't be deleted.
+        assertTrue(marker.mkdirs() && held.createNewFile());
+        try {
+            BaseSettings.PAUSED.save(true);
+            PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+            recreate();
+            layout(dialog.getView());
+            statusAction().performClick();
+            ShadowLooper.idleMainLooper();
+            layout(dialog.getView());
+            assertTrue(BaseSettings.PAUSED.savedValue());
+            assertEquals("Resume", statusAction().getText().toString());
+            String line = String.valueOf(((Preference) list().getItemAtPosition(0)).getSummary());
+            assertTrue(line, line.contains("couldn't be removed") && line.endsWith("then tap Resume again."));
+        } finally {
+            held.delete();
+            marker.delete();
+        }
     }
 
     private android.widget.Button statusAction() {

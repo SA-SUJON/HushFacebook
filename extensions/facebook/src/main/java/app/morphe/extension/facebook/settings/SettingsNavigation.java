@@ -339,7 +339,9 @@ final class SettingsNavigation extends BaseAdapter {
         TextView summary = row.findViewById(android.R.id.summary);
         if (!paused && !nextPaused && ReleaseCheck.statusLine() == null) {
             summary.setText(L10n.t("Your controls are active."));
-        } else if (paused && nextPaused && HushfacebookPause.reason() == HushfacebookPause.Reason.SWITCH) {
+        } else if (paused && nextPaused && HushfacebookPause.reason() == HushfacebookPause.Reason.SWITCH
+                && !markerLeft()) {
+            // A marker Resume couldn't remove keeps the card's own line, which says what to do.
             summary.setText(L10n.t("Your choices are saved. Resume after restarting Facebook."));
         }
         ViewGroup frame = row.findViewById(android.R.id.widget_frame);
@@ -366,6 +368,11 @@ final class SettingsNavigation extends BaseAdapter {
         });
         frame.addView(action, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         frame.setVisibility(View.VISIBLE);
+    }
+
+    private boolean markerLeft() {
+        java.io.File marker = HushfacebookPause.markerFile(screen.getContext());
+        return marker != null && marker.exists();
     }
 
     private int dp(int value) { return Math.round(value * screen.getContext().getResources().getDisplayMetrics().density); }

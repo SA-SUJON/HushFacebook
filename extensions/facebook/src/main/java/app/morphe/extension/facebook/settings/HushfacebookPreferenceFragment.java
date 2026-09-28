@@ -895,16 +895,25 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     void resumeFromOverview() {
         Context context = getContext();
         if (context == null || statusCard == null) return;
-        boolean markerGone = HushfacebookPause.turnBackOn(context);
+        HushfacebookPause.Reason still = HushfacebookPause.turnBackOn(context);
+        // The switch shows what was kept. Setting it to off here would write off through the
+        // preference itself when the store had just refused to.
         Preference pause = findPreference(BaseSettings.PAUSED.key);
-        if (pause instanceof SwitchPreference) ((SwitchPreference) pause).setChecked(false);
-        if (markerGone) {
-            showStatus(statusCard, context);
-        } else {
-            statusCard.setSummary(L10n.f("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
-                    L10n.isolate(HushfacebookPause.MARKER_FILE_NAME),
-                    L10n.isolate(markerFolder(context.getPackageName()))));
+        if (pause instanceof SwitchPreference) ((SwitchPreference) pause).setChecked(BaseSettings.PAUSED.savedValue());
+        if (still == HushfacebookPause.Reason.MARKER_FILE) {
+            String file = L10n.isolate(HushfacebookPause.MARKER_FILE_NAME);
+            String folder = L10n.isolate(markerFolder(context.getPackageName()));
+            // The switches stay as they were until the file goes, so say when they still pause.
+            statusCard.setSummary(BaseSettings.PAUSED.savedValue() || BaseSettings.SAFE_MODE.savedValue()
+                    ? L10n.f("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.", file, folder)
+                    : L10n.f("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
+                    file, folder));
+            return;
         }
+        if (still != HushfacebookPause.Reason.NONE) {
+            Utils.showToastLong(L10n.t("Couldn't turn Hushfacebook back on. Try again."));
+        }
+        showStatus(statusCard, context);
     }
 
     /**

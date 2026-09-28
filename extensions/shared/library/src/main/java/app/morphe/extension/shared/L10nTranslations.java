@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(812);
+        Map<String, String> table = new HashMap<>(816);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -229,8 +229,8 @@ public final class L10nTranslations {
                 "Die Tab-Leiste konnte nicht gepr\u00fcft werden. Deine normalen Tabs bleiben verf\u00fcgbar. Starte Facebook neu, um es erneut zu versuchen.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "Die R\u00fcckkehr zur Schriftart deines Handys hat nicht geklappt. Versuche es noch einmal.");
-        table.put("Couldn't import every setting. Check the switches on this screen.",
-                "Nicht alle Einstellungen lie\u00dfen sich importieren. Pr\u00fcfe die Schalter auf diesem Bildschirm.");
+        table.put("Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.",
+                "Die Einstellungen lie\u00dfen sich nicht importieren, und deine vorherigen lie\u00dfen sich nicht wiederherstellen. Pr\u00fcfe die Schalter auf diesem Bildschirm.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "Die Einstellungen lie\u00dfen sich nicht importieren. Es wurde nichts ge\u00e4ndert.");
         table.put("Couldn't open that file. Nothing was changed.",
@@ -255,6 +255,8 @@ public final class L10nTranslations {
                 "Das lie\u00df sich nicht starten. Versuche es gleich noch einmal.");
         table.put("Couldn't start the report export. Try again shortly.",
                 "Der Export des Berichts lie\u00df sich nicht starten. Versuche es gleich noch einmal.");
+        table.put("Couldn't turn Hushfacebook back on. Try again.",
+                "Hushfacebook lie\u00df sich nicht wieder einschalten. Versuche es noch einmal.");
         table.put("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.",
                 "Der Dunkelmodus zeigt Schwarz statt Dunkelgrau. Schalte in Facebook den Dunkelmodus ein, um das zu sehen.");
         table.put("Debug logging",
@@ -297,11 +299,11 @@ public final class L10nTranslations {
                 "Leert das Protokoll und die Filterz\u00e4hler, die ein Bericht enthalten w\u00fcrde.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Jeder Schalter au\u00dfer der Debug-Protokollierung verh\u00e4lt sich, als w\u00e4re er aus, und was beim Patchen festgelegt wurde, bleibt aktiv. Deine Einstellungen bleiben, wie sie sind.");
-        table.put("Everything except Marketplace",
-                "Alles au\u00dfer Marketplace");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Everything except Marketplace",
+                "Alles au\u00dfer Marketplace");
         table.put("Example without post details",
                 "Beispiel ohne Beitragsdetails");
         table.put("Export diagnostic report",
@@ -420,11 +422,11 @@ public final class L10nTranslations {
                 "So blockierst du Reels");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s ist erschienen. Aktualisiere es im Morphe Manager.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Hushfacebook %1$s auf Facebook %2$s");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Hushfacebook %1$s auf Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "Hushfacebook %1$s ist f\u00fcr Facebook %2$s gedacht.");
         table.put("Hushfacebook is on",
@@ -543,11 +545,11 @@ public final class L10nTranslations {
                 "Nur einige Webadressen von Facebook sind f\u00fcr diese App ausgew\u00e4hlt, und Links zu den \u00fcbrigen \u00f6ffnen sich woanders. Tippe, um sie in den Android-Einstellungen auszuw\u00e4hlen.");
         table.put("Open links in your browser",
                 "Links in deinem Browser \u00f6ffnen");
-        table.put("Open on a chosen tab",
-                "Mit einem gew\u00e4hlten Tab starten");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("Open on a chosen tab",
+                "Mit einem gew\u00e4hlten Tab starten");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "\u00d6ffnet Weblinks in deinem Browser. Facebooks eigene Seiten bleiben in der App.");
         table.put("Opening Facebook",
@@ -666,11 +668,11 @@ public final class L10nTranslations {
                 "Suche");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
                 "Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschl\u00e4ge \u201eMeta AI fragen\u201c mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beitr\u00e4ge bleiben, und die Meta AI-Schaltfl\u00e4che \u00f6ffnet Meta AI weiterhin.");
-        table.put("Search settings",
-                "Einstellungen suchen");
     }
 
     private static void fillDe5(Map<String, String> table) {
+        table.put("Search settings",
+                "Einstellungen suchen");
         table.put("Selecting links by hand",
                 "Links von Hand ausw\u00e4hlen");
         table.put("Set when you patched",
@@ -761,6 +763,8 @@ public final class L10nTranslations {
                 "Der Diagnosebericht lie\u00df sich nicht speichern. Versuche es noch einmal.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "Die Datei %1$s lie\u00df sich nicht entfernen. L\u00f6sche sie aus %2$s, um Hushfacebook wieder einzuschalten.");
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "Die Datei %1$s lie\u00df sich nicht entfernen. L\u00f6sche sie aus %2$s und tippe dann noch einmal auf Fortsetzen.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "Die neueste Version von Hushfacebook ist %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
@@ -787,13 +791,13 @@ public final class L10nTranslations {
                 "Dieses Handy hat keine Dateiauswahl, hier l\u00e4sst sich also keine Datei w\u00e4hlen.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Trend-Videos und die Reels, die Facebook f\u00fcr dich ausgew\u00e4hlt hat, tauchen nicht mehr in deinen Benachrichtigungen auf.");
+    }
+
+    private static void fillDe6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Versuch ein anderes Wort oder l\u00f6sche die Suche.");
         table.put("Try again, or go back to Facebook.",
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
-    }
-
-    private static void fillDe6(Map<String, String> table) {
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Facebook schl\u00e4gt Personen in Beitr\u00e4gen und Kommentaren erst nach @ vor. Dein Text bleibt unver\u00e4ndert.");
         table.put("Undo",
@@ -889,7 +893,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(812);
+        Map<String, String> table = new HashMap<>(816);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1074,8 +1078,8 @@ public final class L10nTranslations {
                 "No se pudo comprobar la barra de pesta\u00f1as. Tus pesta\u00f1as normales siguen disponibles. Reinicia Facebook para volver a intentarlo.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "No se pudo volver a la fuente de tu tel\u00e9fono. Int\u00e9ntalo de nuevo.");
-        table.put("Couldn't import every setting. Check the switches on this screen.",
-                "No se pudieron importar todos los ajustes. Revisa los interruptores de esta pantalla.");
+        table.put("Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.",
+                "No se pudo importar la configuraci\u00f3n ni restaurar la que ten\u00edas. Revisa los interruptores de esta pantalla.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "No se pudo importar la configuraci\u00f3n. No se cambi\u00f3 nada.");
         table.put("Couldn't open that file. Nothing was changed.",
@@ -1100,6 +1104,8 @@ public final class L10nTranslations {
                 "No se pudo iniciar. Int\u00e9ntalo de nuevo en un momento.");
         table.put("Couldn't start the report export. Try again shortly.",
                 "No se pudo iniciar la exportaci\u00f3n del informe. Int\u00e9ntalo de nuevo en breve.");
+        table.put("Couldn't turn Hushfacebook back on. Try again.",
+                "No se pudo volver a activar Hushfacebook. Int\u00e9ntalo de nuevo.");
         table.put("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.",
                 "El modo oscuro usa negro en lugar de gris oscuro. Activa el modo oscuro en Facebook para verlo.");
         table.put("Debug logging",
@@ -1142,11 +1148,11 @@ public final class L10nTranslations {
                 "Vac\u00eda el registro y los recuentos de filtros que incluir\u00eda un informe.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Todos los interruptores, salvo el Registro de depuraci\u00f3n, funcionan como si estuvieran desactivados, y lo que se aplic\u00f3 al parchear se mantiene. Tu configuraci\u00f3n no cambia.");
-        table.put("Everything except Marketplace",
-                "Todo menos Marketplace");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Everything except Marketplace",
+                "Todo menos Marketplace");
         table.put("Example without post details",
                 "Ejemplo sin datos de la publicaci\u00f3n");
         table.put("Export diagnostic report",
@@ -1265,11 +1271,11 @@ public final class L10nTranslations {
                 "C\u00f3mo bloquear los reels");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Ya sali\u00f3 Hushfacebook %1$s. Actual\u00edzalo en Morphe Manager.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Hushfacebook %1$s en Facebook %2$s");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Hushfacebook %1$s en Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "Hushfacebook %1$s est\u00e1 pensado para Facebook %2$s.");
         table.put("Hushfacebook is on",
@@ -1388,11 +1394,11 @@ public final class L10nTranslations {
                 "Solo algunas direcciones web de Facebook est\u00e1n seleccionadas para esta app, y los enlaces a las dem\u00e1s se abren en otro sitio. Toca para seleccionarlas en los ajustes de Android.");
         table.put("Open links in your browser",
                 "Abrir enlaces en tu navegador");
-        table.put("Open on a chosen tab",
-                "Abrir en una pesta\u00f1a elegida");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("Open on a chosen tab",
+                "Abrir en una pesta\u00f1a elegida");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "Abre enlaces web en tu navegador. Las p\u00e1ginas de Facebook se quedan en la app.");
         table.put("Opening Facebook",
@@ -1511,11 +1517,11 @@ public final class L10nTranslations {
                 "B\u00fasqueda");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
                 "Los resultados de b\u00fasqueda ya no muestran la respuesta de Meta AI ni las sugerencias para preguntarle a Meta AI, y una sugerencia ya no env\u00eda tu b\u00fasqueda a Meta AI. Las personas, los grupos, las p\u00e1ginas y las publicaciones se mantienen, y el bot\u00f3n de Meta AI sigue abriendo Meta AI.");
-        table.put("Search settings",
-                "Buscar ajustes");
     }
 
     private static void fillEs5(Map<String, String> table) {
+        table.put("Search settings",
+                "Buscar ajustes");
         table.put("Selecting links by hand",
                 "Seleccionar enlaces a mano");
         table.put("Set when you patched",
@@ -1606,6 +1612,8 @@ public final class L10nTranslations {
                 "No se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "No se pudo eliminar el archivo %1$s. B\u00f3rralo de %2$s para volver a activar Hushfacebook.");
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "No se pudo eliminar el archivo %1$s. B\u00f3rralo de %2$s y luego vuelve a tocar Reanudar.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "La versi\u00f3n m\u00e1s reciente de Hushfacebook es la %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
@@ -1632,13 +1640,13 @@ public final class L10nTranslations {
                 "Este tel\u00e9fono no tiene selector de archivos, as\u00ed que aqu\u00ed no hay forma de elegir un archivo.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Los videos en tendencia y los reels que Facebook eligi\u00f3 para ti dejan de aparecer en tus notificaciones.");
+    }
+
+    private static void fillEs6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Prueba otra palabra o borra la b\u00fasqueda.");
         table.put("Try again, or go back to Facebook.",
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
-    }
-
-    private static void fillEs6(Map<String, String> table) {
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Escribe @ para que Facebook sugiera a qui\u00e9n etiquetar en publicaciones o comentarios. Tu texto no cambia.");
         table.put("Undo",
@@ -1734,7 +1742,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(812);
+        Map<String, String> table = new HashMap<>(816);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1919,8 +1927,8 @@ public final class L10nTranslations {
                 "Bilah tab tidak dapat diperiksa. Tab biasa tetap tersedia. Mulai ulang Facebook untuk mencoba lagi.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "Tidak dapat kembali ke font ponsel Anda. Coba lagi.");
-        table.put("Couldn't import every setting. Check the switches on this screen.",
-                "Tidak semua pengaturan dapat diimpor. Periksa sakelar di layar ini.");
+        table.put("Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.",
+                "Pengaturan tidak dapat diimpor, dan pengaturan sebelumnya tidak dapat dikembalikan. Periksa sakelar di layar ini.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "Pengaturan tidak dapat diimpor. Tidak ada yang diubah.");
         table.put("Couldn't open that file. Nothing was changed.",
@@ -1945,6 +1953,8 @@ public final class L10nTranslations {
                 "Tidak dapat dimulai. Coba lagi dalam beberapa saat.");
         table.put("Couldn't start the report export. Try again shortly.",
                 "Ekspor laporan tidak dapat dimulai. Coba lagi dalam beberapa saat.");
+        table.put("Couldn't turn Hushfacebook back on. Try again.",
+                "Hushfacebook tidak dapat diaktifkan lagi. Coba lagi.");
         table.put("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.",
                 "Mode gelap memakai warna hitam, bukan abu-abu gelap. Aktifkan mode gelap di Facebook untuk melihatnya.");
         table.put("Debug logging",
@@ -1987,11 +1997,11 @@ public final class L10nTranslations {
                 "Mengosongkan log dan hitungan filter yang akan dimasukkan ke laporan.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Semua sakelar kecuali Pencatatan debug dianggap nonaktif, dan yang diatur saat Anda menambal tetap aktif. Pengaturan Anda tetap seperti semula.");
-        table.put("Everything except Marketplace",
-                "Semua kecuali Marketplace");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Everything except Marketplace",
+                "Semua kecuali Marketplace");
         table.put("Example without post details",
                 "Contoh tanpa detail postingan");
         table.put("Export diagnostic report",
@@ -2110,11 +2120,11 @@ public final class L10nTranslations {
                 "Cara memblokir Reels");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s sudah dirilis. Perbarui di Morphe Manager.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Hushfacebook %1$s di Facebook %2$s");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Hushfacebook %1$s di Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "Hushfacebook %1$s ditujukan untuk Facebook %2$s.");
         table.put("Hushfacebook is on",
@@ -2233,11 +2243,11 @@ public final class L10nTranslations {
                 "Hanya sebagian alamat web Facebook yang dipilih untuk aplikasi ini, dan tautan ke alamat lainnya terbuka di tempat lain. Ketuk untuk memilihnya di pengaturan Android.");
         table.put("Open links in your browser",
                 "Buka tautan di browser Anda");
-        table.put("Open on a chosen tab",
-                "Buka di tab pilihan");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("Open on a chosen tab",
+                "Buka di tab pilihan");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "Buka tautan web di browser Anda. Halaman Facebook tetap di aplikasi.");
         table.put("Opening Facebook",
@@ -2356,11 +2366,11 @@ public final class L10nTranslations {
                 "Pencarian");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
                 "Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.");
-        table.put("Search settings",
-                "Cari pengaturan");
     }
 
     private static void fillIn5(Map<String, String> table) {
+        table.put("Search settings",
+                "Cari pengaturan");
         table.put("Selecting links by hand",
                 "Memilih tautan secara manual");
         table.put("Set when you patched",
@@ -2451,6 +2461,8 @@ public final class L10nTranslations {
                 "Laporan diagnostik tidak dapat disimpan. Coba lagi.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "File %1$s tidak dapat dihapus. Hapus file itu dari %2$s untuk mengaktifkan Hushfacebook lagi.");
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "File %1$s tidak dapat dihapus. Hapus file itu dari %2$s, lalu ketuk Lanjutkan lagi.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "Rilis Hushfacebook terbaru adalah %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
@@ -2477,13 +2489,13 @@ public final class L10nTranslations {
                 "Ponsel ini tidak memiliki pemilih file, jadi file tidak dapat dipilih di sini.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Video yang sedang tren dan reel yang dipilihkan Facebook untuk Anda tidak lagi muncul di notifikasi Anda.");
+    }
+
+    private static void fillIn6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Coba kata lain atau hapus pencarian.");
         table.put("Try again, or go back to Facebook.",
                 "Coba lagi, atau kembali ke Facebook.");
-    }
-
-    private static void fillIn6(Map<String, String> table) {
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Ketik @ sebelum Facebook menyarankan orang untuk ditandai dalam postingan atau komentar. Teks Anda tidak berubah.");
         table.put("Undo",
@@ -2579,7 +2591,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(812);
+        Map<String, String> table = new HashMap<>(816);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -2764,8 +2776,8 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel verificar a barra de abas. Suas abas normais continuam dispon\u00edveis. Reinicie o Facebook para tentar novamente.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "N\u00e3o foi poss\u00edvel voltar para a fonte do seu celular. Tente de novo.");
-        table.put("Couldn't import every setting. Check the switches on this screen.",
-                "N\u00e3o foi poss\u00edvel importar todas as configura\u00e7\u00f5es. Confira as op\u00e7\u00f5es nesta tela.");
+        table.put("Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.",
+                "N\u00e3o foi poss\u00edvel importar as configura\u00e7\u00f5es nem restaurar as que voc\u00ea tinha. Confira as op\u00e7\u00f5es nesta tela.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "N\u00e3o foi poss\u00edvel importar as configura\u00e7\u00f5es. Nada foi alterado.");
         table.put("Couldn't open that file. Nothing was changed.",
@@ -2790,6 +2802,8 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel iniciar isso. Tente de novo em instantes.");
         table.put("Couldn't start the report export. Try again shortly.",
                 "N\u00e3o foi poss\u00edvel iniciar a exporta\u00e7\u00e3o do relat\u00f3rio. Tente de novo daqui a pouco.");
+        table.put("Couldn't turn Hushfacebook back on. Try again.",
+                "N\u00e3o foi poss\u00edvel reativar o Hushfacebook. Tente novamente.");
         table.put("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.",
                 "O modo escuro fica preto em vez de cinza-escuro. Ative o modo escuro no Facebook para ver.");
         table.put("Debug logging",
@@ -2832,11 +2846,11 @@ public final class L10nTranslations {
                 "Apaga o registro e as contagens dos filtros que iriam para um relat\u00f3rio.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Todas as op\u00e7\u00f5es, menos o Registro de depura\u00e7\u00e3o, funcionam como se estivessem desligadas, e o que foi definido ao aplicar os patches continua ativo. Suas configura\u00e7\u00f5es ficam como est\u00e3o.");
-        table.put("Everything except Marketplace",
-                "Tudo menos o Marketplace");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Everything except Marketplace",
+                "Tudo menos o Marketplace");
         table.put("Example without post details",
                 "Exemplo sem detalhes da publica\u00e7\u00e3o");
         table.put("Export diagnostic report",
@@ -2955,11 +2969,11 @@ public final class L10nTranslations {
                 "Como bloquear os reels");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "O Hushfacebook %1$s saiu. Atualize pelo Morphe Manager.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Hushfacebook %1$s no Facebook %2$s");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Hushfacebook %1$s no Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "O Hushfacebook %1$s \u00e9 feito para o Facebook %2$s.");
         table.put("Hushfacebook is on",
@@ -3078,11 +3092,11 @@ public final class L10nTranslations {
                 "S\u00f3 alguns endere\u00e7os web do Facebook est\u00e3o selecionados para este app, e os links para os outros abrem em outro lugar. Toque para selecion\u00e1-los nas configura\u00e7\u00f5es do Android.");
         table.put("Open links in your browser",
                 "Abrir links no seu navegador");
-        table.put("Open on a chosen tab",
-                "Abrir em uma aba escolhida");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("Open on a chosen tab",
+                "Abrir em uma aba escolhida");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "Abre links da web no navegador. As p\u00e1ginas do Facebook ficam no app.");
         table.put("Opening Facebook",
@@ -3201,11 +3215,11 @@ public final class L10nTranslations {
                 "Pesquisa");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
                 "Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugest\u00f5es para perguntar \u00e0 Meta AI, e uma sugest\u00e3o n\u00e3o envia mais sua pesquisa para a Meta AI. Pessoas, grupos, p\u00e1ginas e publica\u00e7\u00f5es continuam, e o bot\u00e3o da Meta AI ainda abre a Meta AI.");
-        table.put("Search settings",
-                "Buscar configura\u00e7\u00f5es");
     }
 
     private static void fillPt_rBR5(Map<String, String> table) {
+        table.put("Search settings",
+                "Buscar configura\u00e7\u00f5es");
         table.put("Selecting links by hand",
                 "Selecionar links manualmente");
         table.put("Set when you patched",
@@ -3296,6 +3310,8 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel salvar o relat\u00f3rio de diagn\u00f3stico. Tente de novo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "N\u00e3o foi poss\u00edvel remover o arquivo %1$s. Exclua-o de %2$s para reativar o Hushfacebook.");
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "N\u00e3o foi poss\u00edvel remover o arquivo %1$s. Exclua-o de %2$s e toque em Retomar de novo.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "A vers\u00e3o mais recente do Hushfacebook \u00e9 a %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
@@ -3322,13 +3338,13 @@ public final class L10nTranslations {
                 "Este celular n\u00e3o tem seletor de arquivos, ent\u00e3o n\u00e3o d\u00e1 para escolher um arquivo aqui.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "V\u00eddeos em alta e os reels que o Facebook escolheu para voc\u00ea deixam de aparecer nas suas notifica\u00e7\u00f5es.");
+    }
+
+    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Tente outra palavra ou limpe a busca.");
         table.put("Try again, or go back to Facebook.",
                 "Tente de novo ou volte para o Facebook.");
-    }
-
-    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Digite @ para o Facebook sugerir quem marcar em publica\u00e7\u00f5es ou coment\u00e1rios. Seu texto n\u00e3o muda.");
         table.put("Undo",
@@ -3424,7 +3440,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(812);
+        Map<String, String> table = new HashMap<>(816);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -3609,8 +3625,8 @@ public final class L10nTranslations {
                 "Sekme \u00e7ubu\u011fu kontrol edilemedi. Normal sekmeleriniz kullan\u0131labilir. Tekrar denemek i\u00e7in Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Couldn't go back to your phone's font. Try again.",
                 "Telefonunun yaz\u0131 tipine geri d\u00f6n\u00fclemedi. Tekrar dene.");
-        table.put("Couldn't import every setting. Check the switches on this screen.",
-                "Baz\u0131 ayarlar i\u00e7e aktar\u0131lamad\u0131. Bu ekrandaki anahtarlar\u0131 kontrol et.");
+        table.put("Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.",
+                "Ayarlar i\u00e7e aktar\u0131lamad\u0131 ve \u00f6nceki ayarlar\u0131n geri y\u00fcklenemedi. Bu ekrandaki anahtarlar\u0131 kontrol et.");
         table.put("Couldn't import the settings. Nothing was changed.",
                 "Ayarlar i\u00e7e aktar\u0131lamad\u0131. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("Couldn't open that file. Nothing was changed.",
@@ -3635,6 +3651,8 @@ public final class L10nTranslations {
                 "Bu i\u015flem ba\u015flat\u0131lamad\u0131. Birazdan tekrar dene.");
         table.put("Couldn't start the report export. Try again shortly.",
                 "Rapor d\u0131\u015fa aktar\u0131m\u0131 ba\u015flat\u0131lamad\u0131. Birazdan tekrar dene.");
+        table.put("Couldn't turn Hushfacebook back on. Try again.",
+                "Hushfacebook yeniden a\u00e7\u0131lamad\u0131. Tekrar dene.");
         table.put("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.",
                 "Karanl\u0131k mod koyu gri yerine siyah g\u00f6r\u00fcn\u00fcr. G\u00f6rmek i\u00e7in Facebook'ta karanl\u0131k modu a\u00e7.");
         table.put("Debug logging",
@@ -3677,11 +3695,11 @@ public final class L10nTranslations {
                 "Bir raporun i\u00e7erece\u011fi g\u00fcnl\u00fc\u011f\u00fc ve filtre saya\u00e7lar\u0131n\u0131 bo\u015falt\u0131r.");
         table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
                 "Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc d\u0131\u015f\u0131ndaki her anahtar kapal\u0131ym\u0131\u015f gibi davran\u0131r, yamalad\u0131\u011f\u0131nda ayarlananlar ise devrede kal\u0131r. Ayarlar\u0131n oldu\u011fu gibi kal\u0131r.");
-        table.put("Everything except Marketplace",
-                "Marketplace d\u0131\u015f\u0131ndaki her \u015fey");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Everything except Marketplace",
+                "Marketplace d\u0131\u015f\u0131ndaki her \u015fey");
         table.put("Example without post details",
                 "G\u00f6nderi ayr\u0131nt\u0131lar\u0131 olmadan \u00f6rnek");
         table.put("Export diagnostic report",
@@ -3800,11 +3818,11 @@ public final class L10nTranslations {
                 "Reels nas\u0131l engellenir");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s \u00e7\u0131kt\u0131. Morphe Manager'da g\u00fcncelle.");
-        table.put("Hushfacebook %1$s on Facebook %2$s",
-                "Facebook %2$s \u00fczerinde Hushfacebook %1$s");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Hushfacebook %1$s on Facebook %2$s",
+                "Facebook %2$s \u00fczerinde Hushfacebook %1$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
                 "Hushfacebook %1$s, Facebook %2$s i\u00e7in haz\u0131rland\u0131.");
         table.put("Hushfacebook is on",
@@ -3923,11 +3941,11 @@ public final class L10nTranslations {
                 "Facebook'un web adreslerinden yaln\u0131zca baz\u0131lar\u0131 bu uygulama i\u00e7in se\u00e7ili ve di\u011ferlerinin ba\u011flant\u0131lar\u0131 ba\u015fka yerde a\u00e7\u0131l\u0131r. Android ayarlar\u0131nda se\u00e7mek i\u00e7in dokunun.");
         table.put("Open links in your browser",
                 "Ba\u011flant\u0131lar\u0131 taray\u0131c\u0131nda a\u00e7");
-        table.put("Open on a chosen tab",
-                "Se\u00e7ilen sekmede a\u00e7");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("Open on a chosen tab",
+                "Se\u00e7ilen sekmede a\u00e7");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "Web ba\u011flant\u0131lar\u0131n\u0131 taray\u0131c\u0131n\u0131zda a\u00e7ar. Facebook sayfalar\u0131 uygulamada kal\u0131r.");
         table.put("Opening Facebook",
@@ -4046,11 +4064,11 @@ public final class L10nTranslations {
                 "Arama");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
                 "Arama sonu\u00e7lar\u0131nda art\u0131k Meta AI yan\u0131t\u0131 ve Meta AI'a sor \u00f6nerileri g\u00f6r\u00fcnmez, bir \u00f6neri de araman\u0131 art\u0131k Meta AI'a g\u00f6ndermez. Ki\u015filer, gruplar, sayfalar ve g\u00f6nderiler kal\u0131r ve Meta AI d\u00fc\u011fmesi yine Meta AI'\u0131 a\u00e7ar.");
-        table.put("Search settings",
-                "Ayarlarda ara");
     }
 
     private static void fillTr5(Map<String, String> table) {
+        table.put("Search settings",
+                "Ayarlarda ara");
         table.put("Selecting links by hand",
                 "Ba\u011flant\u0131lar\u0131 elle se\u00e7me");
         table.put("Set when you patched",
@@ -4141,6 +4159,8 @@ public final class L10nTranslations {
                 "Tan\u0131lama raporu kaydedilemedi. Tekrar dene.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "%1$s dosyas\u0131 kald\u0131r\u0131lamad\u0131. Hushfacebook'u yeniden a\u00e7mak i\u00e7in onu %2$s i\u00e7inden sil.");
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "%1$s dosyas\u0131 kald\u0131r\u0131lamad\u0131. Onu %2$s i\u00e7inden sil, sonra yeniden Devam et'e dokun.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "En yeni Hushfacebook s\u00fcr\u00fcm\u00fc %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
@@ -4167,13 +4187,13 @@ public final class L10nTranslations {
                 "Bu telefonda dosya se\u00e7ici yok, bu y\u00fczden burada dosya se\u00e7menin bir yolu yok.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Trend videolar ve Facebook'un senin i\u00e7in se\u00e7ti\u011fi reels videolar\u0131 art\u0131k bildirimlerinde g\u00f6r\u00fcnmez.");
+    }
+
+    private static void fillTr6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Ba\u015fka bir kelime deneyin veya aramay\u0131 temizleyin.");
         table.put("Try again, or go back to Facebook.",
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
-    }
-
-    private static void fillTr6(Map<String, String> table) {
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Facebook\u2019un g\u00f6nderi ve yorumlarda etiketlenecek ki\u015fi \u00f6nermesi i\u00e7in @ yaz\u0131n. Metniniz de\u011fi\u015fmez.");
         table.put("Undo",

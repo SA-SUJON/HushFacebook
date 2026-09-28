@@ -32,7 +32,7 @@ Clear diagnostic data	Tanılama verilerini temizle
 Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Kısa raporu kopyala veya tam raporu Download/Morphe konumuna kaydet. Bağlantılar, kimlikler, çerezler ve oturum belirteçleri çıkarılır. Paylaşmadan önce başka özel bilgi olup olmadığına bak.
 Copy quick report	Hızlı raporu kopyala
 Copying to the gallery	Galeriye kopyalanıyor
-Couldn't import every setting. Check the switches on this screen.	Bazı ayarlar içe aktarılamadı. Bu ekrandaki anahtarları kontrol et.
+Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.	Ayarlar içe aktarılamadı ve önceki ayarların geri yüklenemedi. Bu ekrandaki anahtarları kontrol et.
 Couldn't import the settings. Nothing was changed.	Ayarlar içe aktarılamadı. Hiçbir şey değiştirilmedi.
 Couldn't open that file. Nothing was changed.	Bu dosya açılamadı. Hiçbir şey değiştirilmedi.
 Couldn't open the file picker. Try again.	Dosya seçici açılamadı. Tekrar dene.
@@ -41,6 +41,7 @@ Couldn't save the settings file. Try again.	Ayar dosyası kaydedilemedi. Tekrar 
 Couldn't save this video. Play it for a moment, then try again.	Bu video kaydedilemedi. Biraz oynat, sonra tekrar dene.
 Couldn't start that. Try again in a moment.	Bu işlem başlatılamadı. Birazdan tekrar dene.
 Couldn't start the report export. Try again shortly.	Rapor dışa aktarımı başlatılamadı. Birazdan tekrar dene.
+Couldn't turn Hushfacebook back on. Try again.	Hushfacebook yeniden açılamadı. Tekrar dene.
 Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.	Karanlık mod koyu gri yerine siyah görünür. Görmek için Facebook'ta karanlık modu aç.
 Debug logging	Hata ayıklama günlüğü
 Diagnostic data cleared. Tap again to put it back.	Tanılama verileri temizlendi. Geri getirmek için tekrar dokun.
@@ -62,6 +63,7 @@ Facebook doesn't download ads or its ad model in the background.	Facebook reklam
 Facebook doesn't serve ads to other apps on this phone.	Facebook bu telefondaki diğer uygulamalara reklam sunmaz.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebook karanlık modu ve bu ekran duvar kâğıdının renklerini kullanır. Android 11 bunun yerine mavi kullanır. Görmek için Facebook karanlık modunu aç.
 Joining the picture and sound	Görüntü ve ses birleştiriliyor
+The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	%1$s dosyası kaldırılamadı. Onu %2$s içinden sil, sonra yeniden Devam et'e dokun.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Telefonunuzun emojilerini kullanır. İfadeler ve çıkartmalar aynı kalır. Değiştirdikten sonra Facebook’u yeniden başlatın.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Telefonunuzun yazı tipini veya aşağıdan seçilen dosyayı kullanır. Değiştirdikten sonra Facebook’u yeniden başlatın.
 Font file	Yazı tipi dosyası

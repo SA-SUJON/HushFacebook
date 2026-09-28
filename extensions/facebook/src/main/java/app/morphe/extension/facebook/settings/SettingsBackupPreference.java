@@ -426,7 +426,8 @@ public class SettingsBackupPreference extends Preference {
                         + (failure.rolledBack ? ", rolled back" : ", not rolled back"));
                 Utils.showToastLong(failure.rolledBack
                         ? L10n.t("Couldn't import the settings. Nothing was changed.")
-                        : L10n.t("Couldn't import every setting. Check the switches on this screen."));
+                        : L10n.t("Couldn't import the settings, and couldn't put back the ones you had. "
+                                + "Check the switches on this screen."));
             } finally {
                 Utils.runOnMainThread(() -> {
                     AbstractPreferenceFragment.settingImportInProgress = false;

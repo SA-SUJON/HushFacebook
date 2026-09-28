@@ -32,7 +32,7 @@ Clear diagnostic data	Hapus data diagnostik
 Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Salin laporan singkat atau simpan laporan lengkap di Download/Morphe. Tautan, ID, cookie, dan token masuk dihilangkan. Periksa teks pribadi lainnya sebelum membagikannya.
 Copy quick report	Salin laporan singkat
 Copying to the gallery	Menyalin ke galeri
-Couldn't import every setting. Check the switches on this screen.	Tidak semua pengaturan dapat diimpor. Periksa sakelar di layar ini.
+Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.	Pengaturan tidak dapat diimpor, dan pengaturan sebelumnya tidak dapat dikembalikan. Periksa sakelar di layar ini.
 Couldn't import the settings. Nothing was changed.	Pengaturan tidak dapat diimpor. Tidak ada yang diubah.
 Couldn't open that file. Nothing was changed.	File itu tidak dapat dibuka. Tidak ada yang diubah.
 Couldn't open the file picker. Try again.	Pemilih file tidak dapat dibuka. Coba lagi.
@@ -41,6 +41,7 @@ Couldn't save the settings file. Try again.	File pengaturan tidak dapat disimpan
 Couldn't save this video. Play it for a moment, then try again.	Video ini tidak dapat disimpan. Putar sebentar, lalu coba lagi.
 Couldn't start that. Try again in a moment.	Tidak dapat dimulai. Coba lagi dalam beberapa saat.
 Couldn't start the report export. Try again shortly.	Ekspor laporan tidak dapat dimulai. Coba lagi dalam beberapa saat.
+Couldn't turn Hushfacebook back on. Try again.	Hushfacebook tidak dapat diaktifkan lagi. Coba lagi.
 Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.	Mode gelap memakai warna hitam, bukan abu-abu gelap. Aktifkan mode gelap di Facebook untuk melihatnya.
 Debug logging	Pencatatan debug
 Diagnostic data cleared. Tap again to put it back.	Data diagnostik dihapus. Ketuk lagi untuk mengembalikannya.
@@ -62,6 +63,7 @@ Facebook doesn't download ads or its ad model in the background.	Facebook tidak 
 Facebook doesn't serve ads to other apps on this phone.	Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Mode gelap Facebook dan halaman ini memakai warna wallpaper Anda. Android 11 memakai biru. Aktifkan mode gelap Facebook untuk melihatnya.
 Joining the picture and sound	Menggabungkan gambar dan suara
+The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	File %1$s tidak dapat dihapus. Hapus file itu dari %2$s, lalu ketuk Lanjutkan lagi.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Gunakan emoji ponsel. Reaksi dan stiker tetap sama. Mulai ulang Facebook setelah mengubahnya.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Gunakan font ponsel atau file yang dipilih di bawah. Mulai ulang Facebook setelah mengubahnya.
 Font file	File font

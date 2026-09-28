@@ -32,7 +32,7 @@ Clear diagnostic data	Limpar dados de diagnóstico
 Copy a quick report or save the full one to Download/Morphe. Links, IDs, cookies and sign-in tokens are left out. Check it for other private text before you share it.	Copie um relatório rápido ou salve o completo em Download/Morphe. Links, IDs, cookies e tokens de login são omitidos. Veja se há outro texto privado antes de compartilhar.
 Copy quick report	Copiar relatório rápido
 Copying to the gallery	Copiando para a galeria
-Couldn't import every setting. Check the switches on this screen.	Não foi possível importar todas as configurações. Confira as opções nesta tela.
+Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.	Não foi possível importar as configurações nem restaurar as que você tinha. Confira as opções nesta tela.
 Couldn't import the settings. Nothing was changed.	Não foi possível importar as configurações. Nada foi alterado.
 Couldn't open that file. Nothing was changed.	Não foi possível abrir esse arquivo. Nada foi alterado.
 Couldn't open the file picker. Try again.	Não foi possível abrir o seletor de arquivos. Tente de novo.
@@ -41,6 +41,7 @@ Couldn't save the settings file. Try again.	Não foi possível salvar o arquivo 
 Couldn't save this video. Play it for a moment, then try again.	Não foi possível salvar este vídeo. Reproduza por alguns instantes e tente de novo.
 Couldn't start that. Try again in a moment.	Não foi possível iniciar isso. Tente de novo em instantes.
 Couldn't start the report export. Try again shortly.	Não foi possível iniciar a exportação do relatório. Tente de novo daqui a pouco.
+Couldn't turn Hushfacebook back on. Try again.	Não foi possível reativar o Hushfacebook. Tente novamente.
 Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.	O modo escuro fica preto em vez de cinza-escuro. Ative o modo escuro no Facebook para ver.
 Debug logging	Registro de depuração
 Diagnostic data cleared. Tap again to put it back.	Dados de diagnóstico apagados. Toque de novo para restaurá-los.
@@ -62,6 +63,7 @@ Facebook doesn't download ads or its ad model in the background.	O Facebook não
 Facebook doesn't serve ads to other apps on this phone.	O Facebook não envia anúncios para outros apps deste celular.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	O modo escuro do Facebook e esta tela usam as cores do seu papel de parede. O Android 11 usa azul. Ative o modo escuro do Facebook para ver.
 Joining the picture and sound	Juntando a imagem e o som
+The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	Não foi possível remover o arquivo %1$s. Exclua-o de %2$s e toque em Retomar de novo.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Use os emojis do telefone. Reações e figurinhas continuam iguais. Reinicie o Facebook após mudar.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Use a fonte do telefone ou um arquivo escolhido abaixo. Reinicie o Facebook após mudar.
 Font file	Arquivo de fonte

@@ -76,6 +76,7 @@ import app.morphe.extension.shared.WorkerPoolForTests;
 import app.morphe.extension.shared.diagnostics.HookStatus;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
+import app.morphe.extension.shared.settings.FailingStore;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 import app.morphe.extension.shared.settings.Setting;
@@ -412,6 +413,83 @@ public class SettingsBackupTest {
                 });
         assertFalse("a store left changed was reported as put back", failure.rolledBack);
         assertEquals(2, counts.commits.get());
+    }
+
+    /**
+     * An editor that won't open, a value it refuses, a commit that answers false or throws, before
+     * or after landing: each leaves both switches on the value the store still holds, which is what
+     * a restart loads, and only then does the failure say nothing changed.
+     */
+    @Test
+    public void everyFailedWriteLeavesTheLiveSwitchesOnWhatTheStoreKeeps() throws Exception {
+        String file = fileWith(Settings.HIDE_SPONSORED_POSTS, false, Settings.DOWNLOAD_REELS, false);
+        Map<String, ?> before = store();
+        for (FailingStore.Fault fault : new FailingStore.Fault[]{FailingStore.Fault.EDIT_THROWS,
+                FailingStore.Fault.STAGE_THROWS, FailingStore.Fault.COMMIT_FALSE, FailingStore.Fault.COMMIT_THROWS,
+                FailingStore.Fault.COMMIT_THROWS_AFTER_LANDING}) {
+            SettingsBackup.ApplyFailed failure = failedApply(file, fault);
+            assertTrue(fault + " said the switches may have changed", failure.rolledBack);
+            assertEquals(fault + " left the store changed", before, store());
+            assertTrue(fault + " left a live switch changed", Settings.HIDE_SPONSORED_POSTS.savedValue());
+            assertTrue(fault + " left a live switch changed", Settings.DOWNLOAD_REELS.savedValue());
+        }
+    }
+
+    /**
+     * A rollback that doesn't land either says so, and the switches then hold what the store kept,
+     * so the screen and the next start agree.
+     */
+    @Test
+    public void aRollbackThatFailsSaysSoAndTheSwitchesHoldWhatTheStoreKept() throws Exception {
+        String file = fileWith(Settings.HIDE_SPONSORED_POSTS, false, Settings.DOWNLOAD_REELS, false);
+        FailingStore.Fault[][] scripts = {
+                {FailingStore.Fault.COMMIT_FALSE, FailingStore.Fault.LOST},
+                {FailingStore.Fault.COMMIT_THROWS_AFTER_LANDING, FailingStore.Fault.COMMIT_THROWS},
+                {FailingStore.Fault.COMMIT_FALSE, FailingStore.Fault.EDIT_THROWS},
+                {FailingStore.Fault.COMMIT_THROWS_AFTER_LANDING, FailingStore.Fault.STAGE_THROWS}};
+        for (FailingStore.Fault[] script : scripts) {
+            String name = Arrays.toString(script);
+            SettingsBackup.ApplyFailed failure = failedApply(file, script);
+            assertFalse(name + " said the switches are back", failure.rolledBack);
+            assertEquals(name, false, store().get(Settings.HIDE_SPONSORED_POSTS.key));
+            assertFalse(name + " runs a switch the store doesn't hold", Settings.HIDE_SPONSORED_POSTS.savedValue());
+            assertFalse(name + " runs a switch the store doesn't hold", Settings.DOWNLOAD_REELS.savedValue());
+            Settings.HIDE_SPONSORED_POSTS.resetToDefault();
+            Settings.DOWNLOAD_REELS.resetToDefault();
+        }
+    }
+
+    /** What a failed import says is what the screen shows and the store holds. */
+    @Test
+    public void aFailedImportSaysWhatTheStoreKeptAndTheScreenShowsIt() throws Exception {
+        String file = fileWith(Settings.HIDE_SPONSORED_POSTS, false);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            SwitchPreference row = (SwitchPreference) page.findPreference(Settings.HIDE_SPONSORED_POSTS.key);
+
+            deliver(activity, tap(activity, page, IMPORT_ROW), file);
+            try (FailingStore ignored = FailingStore.install(FailingStore.Fault.COMMIT_THROWS)) {
+                shownPreview().getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                settle();
+            }
+            assertEquals("Couldn't import the settings. Nothing was changed.", ShadowToast.getTextOfLatestToast());
+            assertTrue("the process runs a switch the file never managed to set", Settings.HIDE_SPONSORED_POSTS.savedValue());
+            assertTrue(row.isChecked());
+            assertFalse(store().containsKey(Settings.HIDE_SPONSORED_POSTS.key));
+
+            ShadowToast.reset();
+            deliver(activity, tap(activity, page, IMPORT_ROW), file);
+            try (FailingStore ignored = FailingStore.install(FailingStore.Fault.COMMIT_FALSE, FailingStore.Fault.LOST)) {
+                shownPreview().getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                settle();
+            }
+            assertEquals("Couldn't import the settings, and couldn't put back the ones you had. "
+                    + "Check the switches on this screen.", ShadowToast.getTextOfLatestToast());
+            assertEquals(false, store().get(Settings.HIDE_SPONSORED_POSTS.key));
+            assertFalse(Settings.HIDE_SPONSORED_POSTS.savedValue());
+            assertFalse("the screen shows a switch the store doesn't hold", row.isChecked());
+        }
     }
 
     // ---- Refusals ------------------------------------------------------------------------------
@@ -1659,6 +1737,17 @@ public class SettingsBackupTest {
 
     private static Map<String, ?> store() {
         return new HashMap<>(Setting.preferences.preferences.getAll());
+    }
+
+    /** Applies [file] through a store with [faults], and hands back the failure it has to end in. */
+    private static SettingsBackup.ApplyFailed failedApply(String file, FailingStore.Fault... faults) throws Exception {
+        SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+        try (FailingStore ignored = FailingStore.install(faults)) {
+            SettingsBackup.apply(snapshot);
+        } catch (SettingsBackup.ApplyFailed failed) {
+            return failed;
+        }
+        throw new AssertionError("a failed write was reported as written: " + Arrays.toString(faults));
     }
 
     private static Set<String> keys(List<? extends Setting<?>> settings) {
