@@ -142,6 +142,11 @@ public class SettingsBackupTest {
 
     @After
     public void restore() throws Exception {
+        // A test that stopped while the app still held its file would leave that run holding a
+        // worker and the rows for the tests after it. Letting the open go ends the run, and the
+        // rows come back the way they do in the app.
+        CountDownLatch held = SettingsFileProvider.stall;
+        if (held != null) held.countDown();
         Utils.awaitBackgroundTasksForTests();
         ShadowLooper.idleMainLooper();
         for (BooleanSetting setting : SettingsBackup.ALLOWLIST) setting.resetToDefault();
@@ -1816,6 +1821,35 @@ public class SettingsBackupTest {
 
             SettingsFileProvider.stall = null;
             export(activity, page, uri);
+            assertEquals("Settings exported.", ShadowToast.getTextOfLatestToast());
+        }
+    }
+
+    /**
+     * A test that stops while the app still holds its file, as a failed assertion does, leaves the
+     * next test nothing busy. The cleanup lets the open go, so the run ends and gives the rows back
+     * the way it does in the app. A held open used to outlast the cleanup's wait for background
+     * work, which skipped the rest of the cleanup and kept the rows claimed for every later test.
+     */
+    @Test
+    public void aTestThatStopsWhileTheAppHoldsItsFileLeavesTheNextOneFree() throws Exception {
+        SettingsFileProvider.stall = new CountDownLatch(1);
+        Uri held = SettingsFileProvider.put(AUTHORITY, "held.json", SettingsBackup.create().getBytes(StandardCharsets.UTF_8));
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            shadowOf(activity).receiveResult(tap(activity, page, IMPORT_ROW).intent, Activity.RESULT_OK,
+                    new Intent().setData(held));
+            assertFalse(page.findPreference(EXPORT_ROW).isEnabled());
+        }
+        // What runs after a failed test and before the next one.
+        restore();
+        startClean();
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            assertTrue("the next test started with the rows busy", page.findPreference(EXPORT_ROW).isEnabled());
+            export(activity, page, SettingsFileProvider.put(AUTHORITY, "next.json", new byte[0]));
             assertEquals("Settings exported.", ShadowToast.getTextOfLatestToast());
         }
     }
