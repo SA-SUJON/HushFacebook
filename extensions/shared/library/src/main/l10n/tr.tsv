@@ -9,6 +9,7 @@
 %1$s so far	Şimdiye kadar %1$s
 %1$s. It was set when you patched, so Pause can't turn it off. To rule it out, patch again and leave out that patch.	%1$s. Yamaladığında ayarlandığı için Duraklatma bunu kapatamaz. Bunu elemek için yeniden yamala ve o yamayı dışarıda bırak.
 %1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.	%1$s. Yamaladığında ayarlandıkları için Duraklatma bunları kapatamaz. Birini elemek için yeniden yamala ve onun ardından parantez içinde yazan yamayı dışarıda bırak.
+A change here applies after Facebook restarts.	Buradaki bir değişiklik Facebook yeniden başladıktan sonra geçerli olur.
 A diagnostic report is already being saved.	Bir tanılama raporu zaten kaydediliyor.
 Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.	Reels’e indirme kalitenizle İndir düğmesi ekler. Kapalı veya duraklatılmışken Facebook’un kendi düğmeleri geri gelir.
 A file named %1$s in %2$s paused Hushfacebook.	%2$s içindeki %1$s adlı bir dosya Hushfacebook'u duraklattı.
@@ -63,12 +64,14 @@ Facebook doesn't download ads or its ad model in the background.	Facebook reklam
 Facebook doesn't serve ads to other apps on this phone.	Facebook bu telefondaki diğer uygulamalara reklam sunmaz.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebook karanlık modu ve bu ekran duvar kâğıdının renklerini kullanır. Android 11 bunun yerine mavi kullanır. Görmek için Facebook karanlık modunu aç.
 Joining the picture and sound	Görüntü ve ses birleştiriliyor
+From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Sonraki açılıştan itibaren Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır ve tercihlerin kayıtlı kalır.
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Ayarlar dışa aktarıldı. Dosyayı tutan uygulama Hushfacebook'un onu geri okumasına izin vermedi, bu yüzden kontrol edilmedi.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	O dosyayı tutan uygulama çok uzun sürüyor, bu yüzden Hushfacebook beklemeyi bıraktı. Hiçbir şey değiştirilmedi.
 The app holding the last settings file still hasn't answered. Try again later.	Son ayar dosyasını tutan uygulama hâlâ yanıt vermedi. Daha sonra tekrar dene.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Ayar dosyasını tutan uygulama çok uzun sürüyor, bu yüzden Hushfacebook beklemeyi bıraktı. O uygulama kaydetmeyi yine de bitirebilir, bu yüzden dosyaya güvenmeden önce onu kontrol et.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	%1$s dosyası kaldırılamadı. Onu %2$s içinden sil, sonra yeniden Devam et'e dokun.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Ayar dosyası kaydedildi, ancak geri okunduğunda yazılanla aynı değil. Yeni bir dosya olarak tekrar kaydet.
+Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Devam ettirene kadar Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Telefonunuzun emojilerini kullanır. İfadeler ve çıkartmalar aynı kalır. Değiştirdikten sonra Facebook’u yeniden başlatın.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Telefonunuzun yazı tipini veya aşağıdan seçilen dosyayı kullanır. Değiştirdikten sonra Facebook’u yeniden başlatın.
 Font file	Yazı tipi dosyası
@@ -86,7 +89,6 @@ Couldn't save a copy of that font. Check that the phone has room, then try again
 Couldn't open that file. Your font didn't change.	Bu dosya açılamadı. Yazı tipin değişmedi.
 Back to your phone's font. Restart Facebook to see it.	Telefonunun yazı tipine geri dönüldü. Görmek için Facebook'u yeniden başlat.
 Couldn't go back to your phone's font. Try again.	Telefonunun yazı tipine geri dönülemedi. Tekrar dene.
-Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.	Çalışma zamanı özelliklerini sonraki açılıştan itibaren duraklatır. Tercihleriniz kayıtlı kalır. Hata ayıklama günlüğü ve kurulumda uygulanan yamalar çalışmaya devam eder.
 Full report saved to %1$s	Tam rapor şuraya kaydedildi: %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, üzerine kurulduğu projelerin lisans bildirimleriyle
 Hide "People you may know"	“Tanıyor olabileceğin kişiler” bölümünü gizle

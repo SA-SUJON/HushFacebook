@@ -9,6 +9,7 @@
 %1$s so far	Bisher %1$s
 %1$s. It was set when you patched, so Pause can't turn it off. To rule it out, patch again and leave out that patch.	%1$s. Das wurde beim Patchen festgelegt, deshalb kann die Pause es nicht ausschalten. Um es auszuschließen, patche erneut und lass diesen Patch weg.
 %1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.	%1$s. Diese wurden beim Patchen festgelegt, deshalb kann die Pause sie nicht ausschalten. Um eines davon auszuschließen, patche erneut und lass den Patch weg, der in Klammern dahinter steht.
+A change here applies after Facebook restarts.	Eine Änderung hier gilt erst nach einem Neustart von Facebook.
 A diagnostic report is already being saved.	Ein Diagnosebericht wird bereits gespeichert.
 Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.	Fügt Reels einen Download-Button mit deiner Downloadqualität hinzu. Ausgeschaltet oder pausiert erscheinen Facebooks eigene Buttons.
 A file named %1$s in %2$s paused Hushfacebook.	Eine Datei namens %1$s in %2$s hat Hushfacebook pausiert.
@@ -63,12 +64,14 @@ Facebook doesn't download ads or its ad model in the background.	Facebook lädt 
 Facebook doesn't serve ads to other apps on this phone.	Facebook liefert keine Werbung an andere Apps auf diesem Handy aus.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebooks Dunkelmodus und diese Seite nutzen die Farben deines Hintergrundbilds. Android 11 nutzt stattdessen Blau. Aktiviere Facebooks Dunkelmodus, um es zu sehen.
 Joining the picture and sound	Bild und Ton werden zusammengefügt
+From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Ab dem nächsten Start verhält sich jeder Schalter außer der Debug-Protokollierung, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv, und deine Auswahl bleibt gespeichert.
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Einstellungen exportiert. Die App, in der die Datei liegt, ließ Hushfacebook sie nicht zurücklesen, daher wurde sie nicht geprüft.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	Die App, in der die Datei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Es wurde nichts geändert.
 The app holding the last settings file still hasn't answered. Try again later.	Die App mit der letzten Einstellungsdatei hat noch immer nicht geantwortet. Versuche es später noch einmal.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Die App, in der die Einstellungsdatei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Sie kann das Speichern noch abschließen, also prüfe die Datei, bevor du dich darauf verlässt.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	Die Datei %1$s ließ sich nicht entfernen. Lösche sie aus %2$s und tippe dann noch einmal auf Fortsetzen.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zurück, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.
+Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Bis zum Fortsetzen verhält sich jeder Schalter außer der Debug-Protokollierung, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Nutzt die Emoji deines Telefons. Reaktionen und Sticker bleiben gleich. Starte Facebook nach der Änderung neu.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Nutzt die Schrift deines Telefons oder eine unten gewählte Datei. Starte Facebook nach der Änderung neu.
 Font file	Schriftdatei
@@ -86,7 +89,6 @@ Couldn't save a copy of that font. Check that the phone has room, then try again
 Couldn't open that file. Your font didn't change.	Diese Datei ließ sich nicht öffnen. Deine Schriftart wurde nicht geändert.
 Back to your phone's font. Restart Facebook to see it.	Zurück zur Schriftart deines Handys. Starte Facebook neu, um sie zu sehen.
 Couldn't go back to your phone's font. Try again.	Die Rückkehr zur Schriftart deines Handys hat nicht geklappt. Versuche es noch einmal.
-Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.	Pausiert Laufzeitfunktionen ab dem nächsten Start. Deine Auswahl bleibt gespeichert. Debug-Protokollierung und beim Patchen angewendete Änderungen bleiben aktiv.
 Full report saved to %1$s	Vollständiger Bericht gespeichert unter %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, mit den Hinweisen der Projekte, auf denen es aufbaut
 Hide "People you may know"	„Personen, die du kennen könntest“ ausblenden

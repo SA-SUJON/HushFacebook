@@ -668,7 +668,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         // Named for its rows: the screen's own title already says Hushfacebook.
         PreferenceCategory hushfacebook = category(screen, L10n.t("Pause, backup and diagnostics"));
         hushfacebook.addPreference(mark(toggle(context, BaseSettings.PAUSED, L10n.t("Pause Hushfacebook"),
-                L10n.t("Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.")), SettingsIcons.PATCHED));
+                L10n.t("From the next start, every switch but Debug logging acts as if it were off. "
+                        + "Changes made when you patched stay in, and your choices stay saved.")), SettingsIcons.PATCHED));
         String stays = PatchFamily.staysWhilePausedSummary(build);
         // Morphe Manager can export the patch choices and the signing key, not these switches.
         hushfacebook.addPreference(mark(new BackupRow(this, context, SettingsBackupPreference.EXPORT,
@@ -904,10 +905,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             String file = L10n.isolate(HushfacebookPause.MARKER_FILE_NAME);
             String folder = L10n.isolate(markerFolder(context.getPackageName()));
             // The switches stay as they were until the file goes, so say when they still pause.
-            statusCard.setSummary(BaseSettings.PAUSED.savedValue() || BaseSettings.SAFE_MODE.savedValue()
+            String left = BaseSettings.PAUSED.savedValue() || BaseSettings.SAFE_MODE.savedValue()
                     ? L10n.f("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.", file, folder)
                     : L10n.f("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
-                    file, folder));
+                    file, folder);
+            statusCard.setSummary(left);
+            // Resume can be tapped on a category page too, where the card isn't in view.
+            Utils.showToastLong(left);
             return;
         }
         if (still != HushfacebookPause.Reason.NONE) {

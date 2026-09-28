@@ -172,6 +172,180 @@ public class SettingsNavigationTest {
         }
     }
 
+    private static final String PAUSED_LINE = "Until you resume, every switch but Debug logging acts as if it "
+            + "were off. Changes made when you patched stay in.";
+
+    /**
+     * Paused, a category page opens with a short line that says so, and the saved switches keep
+     * showing what was chosen. Resume and Undo act from that line, the page stays where it was, and
+     * Back returns to the overview where it was.
+     */
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    @Config(qualifiers = "w390dp-h600dp-night-xhdpi")
+    public void aPausedCategoryPageSaysSoAndKeepsItsPlaceThroughResumeAndUndo() {
+        BaseSettings.PAUSED.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        recreate();
+        layout(dialog.getView(), 1200);
+        list().scrollListBy(120);
+        int homePosition = list().getFirstVisiblePosition();
+        int homeOffset = list().getChildAt(0).getTop();
+
+        page.navigation.navigate("News feed");
+        layout(dialog.getView(), 1200);
+        Preference line = (Preference) list().getItemAtPosition(0);
+        assertEquals("Hushfacebook is paused", String.valueOf(line.getTitle()));
+        assertEquals(PAUSED_LINE, String.valueOf(line.getSummary()));
+        assertFalse("the line reads as a button of its own", list().getAdapter().isEnabled(0));
+        assertTrue("a saved choice was changed to look paused",
+                ((SwitchPreference) page.findPreference(Settings.HIDE_SPONSORED_POSTS.key)).isChecked());
+        assertTrue(Settings.HIDE_SPONSORED_POSTS.savedValue());
+
+        list().scrollListBy(40);
+        layout(dialog.getView(), 1200);
+        int position = list().getFirstVisiblePosition();
+        int offset = list().getChildAt(0).getTop();
+        android.widget.Button action = pageAction();
+        assertEquals("Resume", action.getText().toString());
+        assertTrue(action.getMinimumHeight() >= Math.round(48 * action.getResources().getDisplayMetrics().density));
+        action.performClick();
+        ShadowLooper.idleMainLooper();
+        layout(dialog.getView(), 1200);
+        assertFalse(BaseSettings.PAUSED.savedValue());
+        assertEquals("Hushfacebook turns back on when Facebook restarts.",
+                String.valueOf(((Preference) list().getItemAtPosition(0)).getSummary()));
+        assertTrue("Resume left the page", contains(Settings.HIDE_SPONSORED_POSTS.key));
+        assertEquals(position, list().getFirstVisiblePosition());
+        assertEquals(offset, list().getChildAt(0).getTop());
+
+        action = pageAction();
+        assertEquals("Undo", action.getText().toString());
+        action.performClick();
+        ShadowLooper.idleMainLooper();
+        layout(dialog.getView(), 1200);
+        assertTrue(BaseSettings.PAUSED.savedValue());
+        assertEquals(PAUSED_LINE, String.valueOf(((Preference) list().getItemAtPosition(0)).getSummary()));
+        assertEquals("Resume", pageAction().getText().toString());
+        assertEquals(position, list().getFirstVisiblePosition());
+        assertEquals(offset, list().getChildAt(0).getTop());
+
+        assertTrue(page.navigation.back());
+        layout(dialog.getView(), 1200);
+        assertEquals(homePosition, list().getFirstVisiblePosition());
+        assertEquals(homeOffset, list().getChildAt(0).getTop());
+    }
+
+    /** Search results say it too, and a page with nothing Pause turns off, like About, doesn't. */
+    @Test public void pausedSearchSaysSoAndPagesPauseDoesNotReachStayAsTheyAre() {
+        BaseSettings.PAUSED.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.CRASH_LOOP);
+        recreate();
+        findSearch(dialog.getView()).setText("Tap to play");
+        ShadowLooper.idleMainLooper();
+        assertEquals(PAUSED_LINE, String.valueOf(((Preference) list().getItemAtPosition(0)).getSummary()));
+        assertTrue(contains(Settings.TAP_TO_PLAY.key));
+        page.navigation.back();
+        for (String quiet : new String[]{"About", "Set when you patched"}) {
+            page.navigation.navigate(quiet);
+            assertEquals(quiet, categoryCount(quiet), list().getCount());
+            while (page.navigation.back()) { }
+        }
+    }
+
+    /**
+     * Pause switched on from its own page is owed a restart: the page says so and Undo takes it
+     * back, after which the line goes. A restart owed for a setting a page shows is said there too.
+     */
+    @Test public void aPauseOrAChangeWaitingOnARestartIsSaidOnItsPage() {
+        page.navigation.navigate("Pause, backup and diagnostics");
+        tap(BaseSettings.PAUSED.key);
+        layout(dialog.getView());
+        Preference line = (Preference) list().getItemAtPosition(0);
+        assertEquals("Hushfacebook is on", String.valueOf(line.getTitle()));
+        assertEquals("Hushfacebook pauses when Facebook restarts.", String.valueOf(line.getSummary()));
+        pageAction().performClick();
+        ShadowLooper.idleMainLooper();
+        layout(dialog.getView());
+        assertFalse(BaseSettings.PAUSED.savedValue());
+        assertEquals(BaseSettings.PAUSED.key, ((Preference) list().getItemAtPosition(0)).getKey());
+
+        page.navigation.back();
+        app.morphe.extension.shared.settings.preference.AbstractPreferenceFragment.restartPending.add(
+                Settings.MARKETPLACE_ONLY.key);
+        page.navigation.navigate("Opening Facebook");
+        layout(dialog.getView());
+        line = (Preference) list().getItemAtPosition(0);
+        assertEquals("A change here applies after Facebook restarts.", String.valueOf(line.getTitle()));
+        android.view.ViewGroup frame = list().getChildAt(0).findViewById(android.R.id.widget_frame);
+        assertTrue("a restart line offered an action", frame == null || frame.getChildCount() == 0);
+        page.navigation.back();
+        page.navigation.navigate("Playback");
+        assertEquals("a restart owed elsewhere was said here", categoryCount("Playback"), list().getCount());
+    }
+
+    /** The paused line on real pages, dark and light, for a look before the phone does. */
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void renderPausedPages() throws Exception {
+        BaseSettings.PAUSED.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        recreate();
+        page.navigation.navigate("News feed");
+        capture("paused-news-feed");
+        assertUncutText(dialog.getView());
+        pageAction().performClick();
+        ShadowLooper.idleMainLooper();
+        capture("paused-news-feed-resume-pending");
+        page.navigation.back();
+        findSearch(dialog.getView()).setText("video");
+        capture("paused-search");
+    }
+
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    @Config(qualifiers = "w390dp-h844dp-notnight-xhdpi")
+    public void renderPausedPageInTheLightTheme() throws Exception {
+        controller.close();
+        PatchFamily.inBuildForTests.add(PatchFamily.MATERIAL_YOU_THEME);
+        BaseSettings.PAUSED.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        controller = Robolectric.buildActivity(Activity.class).setup().visible();
+        dialog = SettingsL10nTest.show(controller.get());
+        page = page(dialog);
+        assertTrue(ScreenColors.shown.light);
+        page.navigation.navigate("Playback");
+        capture("light-paused-playback");
+        assertUncutText(dialog.getView());
+    }
+
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    @Config(qualifiers = "ar-rXB-ldrtl-w390dp-h844dp-night-xhdpi")
+    public void aPausedPageKeepsItsLineWholeAtLargeRightToLeftText() throws Exception {
+        BaseSettings.PAUSED.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        org.robolectric.RuntimeEnvironment.setFontScale(2f);
+        try {
+            recreate();
+            page.navigation.navigate("Playback");
+            layout(dialog.getView());
+            assertUncutText(dialog.getView());
+            capture("large-rtl-paused-playback");
+        } finally {
+            org.robolectric.RuntimeEnvironment.setFontScale(1f);
+        }
+    }
+
+    private android.widget.Button pageAction() {
+        android.view.ViewGroup frame = list().getChildAt(0).findViewById(android.R.id.widget_frame);
+        assertEquals(1, frame.getChildCount());
+        return (android.widget.Button) frame.getChildAt(0);
+    }
+
+    private int categoryCount(String title) {
+        for (Preference section : page.sections()) {
+            if (title.contentEquals(section.getTitle())) return ((PreferenceCategory) section).getPreferenceCount();
+        }
+        throw new AssertionError("No section " + title);
+    }
+
     private android.widget.Button statusAction() {
         android.view.ViewGroup frame = list().getChildAt(0).findViewById(android.R.id.widget_frame);
         assertEquals(1, frame.getChildCount());

@@ -9,6 +9,7 @@
 %1$s so far	%1$s até agora
 %1$s. It was set when you patched, so Pause can't turn it off. To rule it out, patch again and leave out that patch.	%1$s. Isso foi definido quando você aplicou os patches, então a pausa não consegue desligá-lo. Para descartar isso como causa, aplique os patches de novo sem esse patch.
 %1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.	%1$s. Tudo isso foi definido quando você aplicou os patches, então a pausa não consegue desligar nada disso. Para descartar um desses itens como causa, aplique os patches de novo sem o patch que aparece entre parênteses depois dele.
+A change here applies after Facebook restarts.	Uma alteração daqui vale depois que o Facebook reiniciar.
 A diagnostic report is already being saved.	Um relatório de diagnóstico já está sendo salvo.
 Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.	Adiciona Baixar aos reels com sua qualidade de download. Desativado ou pausado, voltam os botões do Facebook.
 A file named %1$s in %2$s paused Hushfacebook.	Um arquivo chamado %1$s em %2$s pausou o Hushfacebook.
@@ -63,12 +64,14 @@ Facebook doesn't download ads or its ad model in the background.	O Facebook não
 Facebook doesn't serve ads to other apps on this phone.	O Facebook não envia anúncios para outros apps deste celular.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	O modo escuro do Facebook e esta tela usam as cores do seu papel de parede. O Android 11 usa azul. Ative o modo escuro do Facebook para ver.
 Joining the picture and sound	Juntando a imagem e o som
+From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	A partir da próxima abertura, todas as opções, menos o Registro de depuração, funcionam como se estivessem desligadas. O que foi definido ao aplicar os patches continua ativo, e suas escolhas ficam salvas.
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Configurações exportadas. O app que guarda o arquivo não deixou o Hushfacebook lê-lo de volta, então ele não foi conferido.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	O app que guarda esse arquivo está demorando demais, então o Hushfacebook parou de esperar. Nada foi alterado.
 The app holding the last settings file still hasn't answered. Try again later.	O app do último arquivo de configurações ainda não respondeu. Tente de novo mais tarde.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	O app que guarda o arquivo de configurações está demorando demais, então o Hushfacebook parou de esperar. Esse app ainda pode terminar de salvá-lo, então confira o arquivo antes de confiar nele.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	Não foi possível remover o arquivo %1$s. Exclua-o de %2$s e toque em Retomar de novo.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	O arquivo de configurações foi salvo, mas ao ser lido de volta não corresponde ao que foi gravado. Salve de novo como um arquivo novo.
+Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Até você retomar, todas as opções, menos o Registro de depuração, funcionam como se estivessem desligadas. O que foi definido ao aplicar os patches continua ativo.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Use os emojis do telefone. Reações e figurinhas continuam iguais. Reinicie o Facebook após mudar.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Use a fonte do telefone ou um arquivo escolhido abaixo. Reinicie o Facebook após mudar.
 Font file	Arquivo de fonte
@@ -86,7 +89,6 @@ Couldn't save a copy of that font. Check that the phone has room, then try again
 Couldn't open that file. Your font didn't change.	Não foi possível abrir esse arquivo. Sua fonte não mudou.
 Back to your phone's font. Restart Facebook to see it.	De volta à fonte do seu celular. Reinicie o Facebook para ver.
 Couldn't go back to your phone's font. Try again.	Não foi possível voltar para a fonte do seu celular. Tente de novo.
-Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.	Pausa os recursos a partir da próxima abertura. Suas escolhas ficam salvas. O registro de depuração e os patches aplicados na instalação continuam ativos.
 Full report saved to %1$s	Relatório completo salvo em %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, com os avisos dos projetos em que o Hushfacebook se baseia
 Hide "People you may know"	Ocultar “Pessoas que você talvez conheça”

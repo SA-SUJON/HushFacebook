@@ -132,7 +132,7 @@ public class HushfacebookPreferenceFragmentTest {
             }
             assertTrue("Debug logging is drawn above the Pause row", indexOfKey(rows, BaseSettings.DEBUG.key) > pause);
             assertTrue(String.valueOf(rows.get(pause).getSummary()),
-                    String.valueOf(rows.get(pause).getSummary()).contains("Debug logging and patches applied during installation keep working"));
+                    String.valueOf(rows.get(pause).getSummary()).contains("every switch but Debug logging acts as if it were off. Changes made when you patched stay in"));
         }
     }
 

@@ -29,6 +29,8 @@ import java.util.Locale;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.HushfacebookPause;
+import app.morphe.extension.shared.settings.Setting;
+import app.morphe.extension.shared.settings.preference.AbstractPreferenceFragment;
 
 /**
  * A view of the complete preference model. Filtering never removes preferences from their
@@ -48,6 +50,10 @@ final class SettingsNavigation extends BaseAdapter {
     private final Preference browse;
     private final Preference more;
     private final Preference empty;
+    /** The line a category or search page starts with while a pause or a restart applies to it. */
+    private final Preference pageStatus;
+    /** Whether that line is about Pause, and so carries Resume or Undo. */
+    private boolean pageAction;
     private String route = "";
     private String query = "";
     /**
@@ -102,6 +108,9 @@ final class SettingsNavigation extends BaseAdapter {
         empty.setSummary(L10n.t("Try a different word or clear the search."));
         empty.setSelectable(false);
         empty.setPersistent(false);
+        pageStatus = new HushfacebookPreferenceFragment.Row(context);
+        pageStatus.setSelectable(false);
+        pageStatus.setPersistent(false);
         Bundle state = saved == null ? null : saved.getBundle(STATE);
         if (state != null) {
             route = state.getString("route", "");
@@ -269,8 +278,10 @@ final class SettingsNavigation extends BaseAdapter {
             }
             host.showResults(visible.size() - headings());
             if (visible.isEmpty()) visible.add(empty);
+            else addPageStatus();
         } else if (selected != null) {
             for (int i = 0; i < selected.category.getPreferenceCount(); i++) visible.add(selected.category.getPreference(i));
+            addPageStatus();
         } else if (MORE.equals(route)) {
             for (Section section : sections) if (!section.primary) visible.add(section.link);
         } else {
@@ -287,6 +298,53 @@ final class SettingsNavigation extends BaseAdapter {
         int count = 0;
         for (Preference item : visible) if (item instanceof PreferenceCategory) count++;
         return count;
+    }
+
+    /**
+     * Starts a category or search page with a short line while Hushfacebook is paused or a pause
+     * or its end waits for a restart, when the page shows a switch Pause reaches, or while a restart
+     * is owed for a setting the page shows. On a paused start the switches keep showing what was
+     * saved, which read as active without it. Nothing here changes a saved choice.
+     */
+    private void addPageStatus() {
+        Context context = screen.getContext();
+        boolean paused = HushfacebookPause.isPaused();
+        boolean nextPaused = HushfacebookPause.pausesNextStart(context);
+        pageAction = (paused || nextPaused) && showsPausable();
+        if (pageAction) {
+            pageStatus.setTitle(paused ? L10n.t("Hushfacebook is paused") : L10n.t("Hushfacebook is on"));
+            // Worded like the Pause switch: Debug logging and what was set when patching stay in.
+            pageStatus.setSummary(paused == nextPaused
+                    ? L10n.t("Until you resume, every switch but Debug logging acts as if it were off. "
+                    + "Changes made when you patched stay in.")
+                    : paused ? L10n.t("Hushfacebook turns back on when Facebook restarts.")
+                    : L10n.t("Hushfacebook pauses when Facebook restarts."));
+            pageStatus.setIcon(SettingsIcons.icon(context, paused ? SettingsIcons.PAUSE : SettingsIcons.PATCHED,
+                    paused ? palette().summary : palette().heading));
+        } else if (showsRestartOwed()) {
+            pageStatus.setTitle(L10n.t("A change here applies after Facebook restarts."));
+            pageStatus.setSummary(null);
+            pageStatus.setIcon(SettingsIcons.icon(context, SettingsIcons.UPDATES, palette().heading));
+        } else {
+            return;
+        }
+        visible.add(0, pageStatus);
+    }
+
+    /** Whether the page shows a setting Pause answers for, or the Pause switch itself. */
+    private boolean showsPausable() {
+        for (Preference row : visible) {
+            Setting<?> setting = row.hasKey() ? Setting.getSettingFromPath(row.getKey()) : null;
+            if (setting != null && (!setting.isKeptWhenPaused() || setting == BaseSettings.PAUSED)) return true;
+        }
+        return false;
+    }
+
+    private boolean showsRestartOwed() {
+        for (Preference row : visible) {
+            if (row.hasKey() && AbstractPreferenceFragment.restartPending.contains(row.getKey())) return true;
+        }
+        return false;
     }
 
     private static String normalized(String value) {
@@ -330,6 +388,9 @@ final class SettingsNavigation extends BaseAdapter {
             if (title != null) title.setTypeface(android.graphics.Typeface.create("sans-serif-medium", 0));
         }
         if (item == screen.getPreference(0)) bindStatus(row);
+        if (item == pageStatus && pageAction) {
+            bindAction(row, HushfacebookPause.isPaused(), HushfacebookPause.pausesNextStart(screen.getContext()));
+        }
         return row;
     }
 
@@ -344,6 +405,14 @@ final class SettingsNavigation extends BaseAdapter {
             // A marker Resume couldn't remove keeps the card's own line, which says what to do.
             summary.setText(L10n.t("Your choices are saved. Resume after restarting Facebook."));
         }
+        bindAction(row, paused, nextPaused);
+    }
+
+    /**
+     * Pause, Resume or Undo in [row], whichever changes the next start. The list keeps its place,
+     * so the page the button is on stays where it was.
+     */
+    private void bindAction(View row, boolean paused, boolean nextPaused) {
         ViewGroup frame = row.findViewById(android.R.id.widget_frame);
         frame.removeAllViews();
         Button action = new Button(screen.getContext());

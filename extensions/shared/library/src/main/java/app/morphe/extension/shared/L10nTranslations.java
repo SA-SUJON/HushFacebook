@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(826);
+        Map<String, String> table = new HashMap<>(830);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -88,6 +88,8 @@ public final class L10nTranslations {
                 "%1$s. Das wurde beim Patchen festgelegt, deshalb kann die Pause es nicht ausschalten. Um es auszuschlie\u00dfen, patche erneut und lass diesen Patch weg.");
         table.put("%1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.",
                 "%1$s. Diese wurden beim Patchen festgelegt, deshalb kann die Pause sie nicht ausschalten. Um eines davon auszuschlie\u00dfen, patche erneut und lass den Patch weg, der in Klammern dahinter steht.");
+        table.put("A change here applies after Facebook restarts.",
+                "Eine \u00c4nderung hier gilt erst nach einem Neustart von Facebook.");
         table.put("A diagnostic report is already being saved.",
                 "Ein Diagnosebericht wird bereits gespeichert.");
         table.put("A file named %1$s in %2$s paused Hushfacebook.",
@@ -174,11 +176,11 @@ public final class L10nTranslations {
                 "Benachrichtigungen zu Trend-Videos blockieren");
         table.put("Browse settings",
                 "Einstellungen durchsuchen");
-        table.put("Cancel",
-                "Abbrechen");
     }
 
     private static void fillDe1(Map<String, String> table) {
+        table.put("Cancel",
+                "Abbrechen");
         table.put("Cancel saving this photo",
                 "Speichern dieses Fotos abbrechen");
         table.put("Cancel saving this video",
@@ -297,11 +299,11 @@ public final class L10nTranslations {
                 "Jedes Video wird in der besten Qualit\u00e4t gespeichert, die der Player streamt.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Leert das Protokoll und die Filterz\u00e4hler, die ein Bericht enthalten w\u00fcrde.");
-        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
-                "Jeder Schalter au\u00dfer der Debug-Protokollierung verh\u00e4lt sich, als w\u00e4re er aus, und was beim Patchen festgelegt wurde, bleibt aktiv. Deine Einstellungen bleiben, wie sie sind.");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
+                "Jeder Schalter au\u00dfer der Debug-Protokollierung verh\u00e4lt sich, als w\u00e4re er aus, und was beim Patchen festgelegt wurde, bleibt aktiv. Deine Einstellungen bleiben, wie sie sind.");
         table.put("Everything except Marketplace",
                 "Alles au\u00dfer Marketplace");
         table.put("Example without post details",
@@ -350,6 +352,8 @@ public final class L10nTranslations {
                 "Freundschaftsvorschl\u00e4ge tauchen nicht mehr in deinen Benachrichtigungen auf. Freundschaftsanfragen kommen weiterhin an.");
         table.put("Friends",
                 "Freunde");
+        table.put("From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.",
+                "Ab dem n\u00e4chsten Start verh\u00e4lt sich jeder Schalter au\u00dfer der Debug-Protokollierung, als w\u00e4re er aus. Was beim Patchen festgelegt wurde, bleibt aktiv, und deine Auswahl bleibt gespeichert.");
         table.put("Full report saved to %1$s",
                 "Vollst\u00e4ndiger Bericht gespeichert unter %1$s");
         table.put("GPL-3.0, with the notices of the projects this is built on",
@@ -418,13 +422,13 @@ public final class L10nTranslations {
                 "Startseite");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Fortschritt beim Speichern eines Fotos oder Videos, mit einem Button zum Abbrechen");
+    }
+
+    private static void fillDe3(Map<String, String> table) {
         table.put("How to block Reels",
                 "So blockierst du Reels");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s ist erschienen. Aktualisiere es im Morphe Manager.");
-    }
-
-    private static void fillDe3(Map<String, String> table) {
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Hushfacebook %1$s auf Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -541,13 +545,13 @@ public final class L10nTranslations {
                 "Ein Wort oder eine Wortfolge pro Zeile");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Ein Wort oder eine Wortfolge pro Zeile, bis zu %1$d, jeweils %2$d bis %3$d Zeichen lang. Gro\u00df- und Kleinschreibung spielt keine Rolle, und eine Wortfolge passt \u00fcberall im Text eines Beitrags, auch mitten in l\u00e4ngeren W\u00f6rtern.");
+    }
+
+    private static void fillDe4(Map<String, String> table) {
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "Nur einige Webadressen von Facebook sind f\u00fcr diese App ausgew\u00e4hlt, und Links zu den \u00fcbrigen \u00f6ffnen sich woanders. Tippe, um sie in den Android-Einstellungen auszuw\u00e4hlen.");
         table.put("Open links in your browser",
                 "Links in deinem Browser \u00f6ffnen");
-    }
-
-    private static void fillDe4(Map<String, String> table) {
         table.put("Open on a chosen tab",
                 "Mit einem gew\u00e4hlten Tab starten");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
@@ -562,8 +566,6 @@ public final class L10nTranslations {
                 "Pausieren");
         table.put("Pause Hushfacebook",
                 "Hushfacebook pausieren");
-        table.put("Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.",
-                "Pausiert Laufzeitfunktionen ab dem n\u00e4chsten Start. Deine Auswahl bleibt gespeichert. Debug-Protokollierung und beim Patchen angewendete \u00c4nderungen bleiben aktiv.");
         table.put("Pause, backup and diagnostics",
                 "Pause, Sicherung und Diagnose");
         table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
@@ -666,11 +668,11 @@ public final class L10nTranslations {
                 "Wird gespeichert \u2026");
         table.put("Search",
                 "Suche");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschl\u00e4ge \u201eMeta AI fragen\u201c mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beitr\u00e4ge bleiben, und die Meta AI-Schaltfl\u00e4che \u00f6ffnet Meta AI weiterhin.");
     }
 
     private static void fillDe5(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschl\u00e4ge \u201eMeta AI fragen\u201c mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beitr\u00e4ge bleiben, und die Meta AI-Schaltfl\u00e4che \u00f6ffnet Meta AI weiterhin.");
         table.put("Search settings",
                 "Einstellungen suchen");
         table.put("Selecting links by hand",
@@ -789,11 +791,11 @@ public final class L10nTranslations {
                 "Die Einstellung lie\u00df sich nicht vollst\u00e4ndig aktualisieren. Der gespeicherte Wert wird angezeigt.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zur\u00fcck, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "Der Schalter wirkt, sobald Facebook neu startet.");
     }
 
     private static void fillDe6(Map<String, String> table) {
+        table.put("The switch takes effect when Facebook restarts.",
+                "Der Schalter wirkt, sobald Facebook neu startet.");
         table.put("There's no diagnostic data to clear.",
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
         table.put("There's no diagnostic data to put back.",
@@ -812,6 +814,8 @@ public final class L10nTranslations {
                 "Facebook schl\u00e4gt Personen in Beitr\u00e4gen und Kommentaren erst nach @ vor. Dein Text bleibt unver\u00e4ndert.");
         table.put("Undo",
                 "R\u00fcckg\u00e4ngig");
+        table.put("Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.",
+                "Bis zum Fortsetzen verh\u00e4lt sich jeder Schalter au\u00dfer der Debug-Protokollierung, als w\u00e4re er aus. Was beim Patchen festgelegt wurde, bleibt aktiv.");
         table.put("Updates",
                 "Updates");
         table.put("Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.",
@@ -903,7 +907,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(826);
+        Map<String, String> table = new HashMap<>(830);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -947,6 +951,8 @@ public final class L10nTranslations {
                 "%1$s. Este cambio se aplic\u00f3 al parchear, as\u00ed que Pausar no puede desactivarlo. Para descartarlo, vuelve a parchear sin ese parche.");
         table.put("%1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.",
                 "%1$s. Estos cambios se aplicaron al parchear, as\u00ed que Pausar no puede desactivarlos. Para descartar uno, vuelve a parchear sin el parche que aparece entre par\u00e9ntesis despu\u00e9s de \u00e9l.");
+        table.put("A change here applies after Facebook restarts.",
+                "Un cambio de aqu\u00ed se aplica cuando Facebook se reinicie.");
         table.put("A diagnostic report is already being saved.",
                 "Ya se est\u00e1 guardando un informe de diagn\u00f3stico.");
         table.put("A file named %1$s in %2$s paused Hushfacebook.",
@@ -1033,11 +1039,11 @@ public final class L10nTranslations {
                 "Bloquear notificaciones de videos en tendencia");
         table.put("Browse settings",
                 "Explorar ajustes");
-        table.put("Cancel",
-                "Cancelar");
     }
 
     private static void fillEs1(Map<String, String> table) {
+        table.put("Cancel",
+                "Cancelar");
         table.put("Cancel saving this photo",
                 "Cancelar el guardado de esta foto");
         table.put("Cancel saving this video",
@@ -1156,11 +1162,11 @@ public final class L10nTranslations {
                 "Cada video se guarda con la mejor calidad que ofrece el reproductor.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Vac\u00eda el registro y los recuentos de filtros que incluir\u00eda un informe.");
-        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
-                "Todos los interruptores, salvo el Registro de depuraci\u00f3n, funcionan como si estuvieran desactivados, y lo que se aplic\u00f3 al parchear se mantiene. Tu configuraci\u00f3n no cambia.");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
+                "Todos los interruptores, salvo el Registro de depuraci\u00f3n, funcionan como si estuvieran desactivados, y lo que se aplic\u00f3 al parchear se mantiene. Tu configuraci\u00f3n no cambia.");
         table.put("Everything except Marketplace",
                 "Todo menos Marketplace");
         table.put("Example without post details",
@@ -1209,6 +1215,8 @@ public final class L10nTranslations {
                 "Las sugerencias de amistad dejan de aparecer en tus notificaciones. Las solicitudes de amistad siguen llegando.");
         table.put("Friends",
                 "Amigos");
+        table.put("From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.",
+                "Desde el pr\u00f3ximo inicio, todos los interruptores, salvo el Registro de depuraci\u00f3n, funcionan como si estuvieran desactivados. Lo que se aplic\u00f3 al parchear se mantiene, y tus preferencias quedan guardadas.");
         table.put("Full report saved to %1$s",
                 "Informe completo guardado en %1$s");
         table.put("GPL-3.0, with the notices of the projects this is built on",
@@ -1277,13 +1285,13 @@ public final class L10nTranslations {
                 "Inicio");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "El progreso de la foto o el video que est\u00e1s guardando, con un bot\u00f3n para cancelar");
+    }
+
+    private static void fillEs3(Map<String, String> table) {
         table.put("How to block Reels",
                 "C\u00f3mo bloquear los reels");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Ya sali\u00f3 Hushfacebook %1$s. Actual\u00edzalo en Morphe Manager.");
-    }
-
-    private static void fillEs3(Map<String, String> table) {
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Hushfacebook %1$s en Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -1400,13 +1408,13 @@ public final class L10nTranslations {
                 "Una palabra o frase por l\u00ednea");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Una palabra o frase por l\u00ednea, hasta %1$d, cada una de %2$d a %3$d caracteres. Las may\u00fasculas no importan, y una frase coincide en cualquier parte del texto de una publicaci\u00f3n, tambi\u00e9n dentro de palabras m\u00e1s largas.");
+    }
+
+    private static void fillEs4(Map<String, String> table) {
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "Solo algunas direcciones web de Facebook est\u00e1n seleccionadas para esta app, y los enlaces a las dem\u00e1s se abren en otro sitio. Toca para seleccionarlas en los ajustes de Android.");
         table.put("Open links in your browser",
                 "Abrir enlaces en tu navegador");
-    }
-
-    private static void fillEs4(Map<String, String> table) {
         table.put("Open on a chosen tab",
                 "Abrir en una pesta\u00f1a elegida");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
@@ -1421,8 +1429,6 @@ public final class L10nTranslations {
                 "Pausar");
         table.put("Pause Hushfacebook",
                 "Pausar Hushfacebook");
-        table.put("Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.",
-                "Pausa las funciones desde el pr\u00f3ximo inicio. Tus preferencias quedan guardadas. El registro de depuraci\u00f3n y los parches aplicados al instalar siguen activos.");
         table.put("Pause, backup and diagnostics",
                 "Pausa, copia de seguridad y diagn\u00f3stico");
         table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
@@ -1525,11 +1531,11 @@ public final class L10nTranslations {
                 "Guardando...");
         table.put("Search",
                 "B\u00fasqueda");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Los resultados de b\u00fasqueda ya no muestran la respuesta de Meta AI ni las sugerencias para preguntarle a Meta AI, y una sugerencia ya no env\u00eda tu b\u00fasqueda a Meta AI. Las personas, los grupos, las p\u00e1ginas y las publicaciones se mantienen, y el bot\u00f3n de Meta AI sigue abriendo Meta AI.");
     }
 
     private static void fillEs5(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Los resultados de b\u00fasqueda ya no muestran la respuesta de Meta AI ni las sugerencias para preguntarle a Meta AI, y una sugerencia ya no env\u00eda tu b\u00fasqueda a Meta AI. Las personas, los grupos, las p\u00e1ginas y las publicaciones se mantienen, y el bot\u00f3n de Meta AI sigue abriendo Meta AI.");
         table.put("Search settings",
                 "Buscar ajustes");
         table.put("Selecting links by hand",
@@ -1648,11 +1654,11 @@ public final class L10nTranslations {
                 "No se pudo terminar de actualizar el ajuste. Se muestra su valor guardado.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "El archivo de configuraci\u00f3n se guard\u00f3, pero al volver a leerlo no coincide con lo que se escribi\u00f3. Gu\u00e1rdalo de nuevo como un archivo nuevo.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "El interruptor surte efecto cuando Facebook se reinicie.");
     }
 
     private static void fillEs6(Map<String, String> table) {
+        table.put("The switch takes effect when Facebook restarts.",
+                "El interruptor surte efecto cuando Facebook se reinicie.");
         table.put("There's no diagnostic data to clear.",
                 "No hay datos de diagn\u00f3stico que borrar.");
         table.put("There's no diagnostic data to put back.",
@@ -1671,6 +1677,8 @@ public final class L10nTranslations {
                 "Escribe @ para que Facebook sugiera a qui\u00e9n etiquetar en publicaciones o comentarios. Tu texto no cambia.");
         table.put("Undo",
                 "Deshacer");
+        table.put("Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.",
+                "Hasta que reanudes, todos los interruptores, salvo el Registro de depuraci\u00f3n, funcionan como si estuvieran desactivados. Lo que se aplic\u00f3 al parchear se mantiene.");
         table.put("Updates",
                 "Actualizaciones");
         table.put("Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.",
@@ -1762,7 +1770,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(826);
+        Map<String, String> table = new HashMap<>(830);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1806,6 +1814,8 @@ public final class L10nTranslations {
                 "%1$s. Ini diatur saat Anda menambal, jadi Jeda tidak dapat mematikannya. Untuk memastikan bukan ini penyebabnya, tambal ulang tanpa tambalan yang tertera dalam kurung setelahnya.");
         table.put("%1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.",
                 "%1$s. Ini diatur saat Anda menambal, jadi Jeda tidak dapat mematikannya. Untuk memastikan bukan ini penyebabnya, tambal ulang tanpa tambalan yang tertera dalam kurung setelahnya.");
+        table.put("A change here applies after Facebook restarts.",
+                "Perubahan di sini berlaku setelah Facebook dimulai ulang.");
         table.put("A diagnostic report is already being saved.",
                 "Sudah ada laporan diagnostik yang sedang disimpan.");
         table.put("A file named %1$s in %2$s paused Hushfacebook.",
@@ -1892,11 +1902,11 @@ public final class L10nTranslations {
                 "Blokir notifikasi video yang sedang tren");
         table.put("Browse settings",
                 "Jelajahi pengaturan");
-        table.put("Cancel",
-                "Batal");
     }
 
     private static void fillIn1(Map<String, String> table) {
+        table.put("Cancel",
+                "Batal");
         table.put("Cancel saving this photo",
                 "Batalkan penyimpanan foto ini");
         table.put("Cancel saving this video",
@@ -2015,11 +2025,11 @@ public final class L10nTranslations {
                 "Setiap video disimpan dengan kualitas streaming terbaik dari pemutar.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Mengosongkan log dan hitungan filter yang akan dimasukkan ke laporan.");
-        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
-                "Semua sakelar kecuali Pencatatan debug dianggap nonaktif, dan yang diatur saat Anda menambal tetap aktif. Pengaturan Anda tetap seperti semula.");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
+                "Semua sakelar kecuali Pencatatan debug dianggap nonaktif, dan yang diatur saat Anda menambal tetap aktif. Pengaturan Anda tetap seperti semula.");
         table.put("Everything except Marketplace",
                 "Semua kecuali Marketplace");
         table.put("Example without post details",
@@ -2068,6 +2078,8 @@ public final class L10nTranslations {
                 "Saran teman tidak lagi muncul di notifikasi Anda. Permintaan pertemanan tetap masuk.");
         table.put("Friends",
                 "Teman");
+        table.put("From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.",
+                "Mulai peluncuran berikutnya, semua sakelar kecuali Pencatatan debug dianggap nonaktif. Yang diatur saat Anda menambal tetap aktif, dan pilihan Anda tetap tersimpan.");
         table.put("Full report saved to %1$s",
                 "Laporan lengkap disimpan ke %1$s");
         table.put("GPL-3.0, with the notices of the projects this is built on",
@@ -2136,13 +2148,13 @@ public final class L10nTranslations {
                 "Beranda");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Progres foto atau video yang sedang Anda simpan, dengan tombol untuk membatalkannya");
+    }
+
+    private static void fillIn3(Map<String, String> table) {
         table.put("How to block Reels",
                 "Cara memblokir Reels");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s sudah dirilis. Perbarui di Morphe Manager.");
-    }
-
-    private static void fillIn3(Map<String, String> table) {
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Hushfacebook %1$s di Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -2259,13 +2271,13 @@ public final class L10nTranslations {
                 "Satu kata atau frasa per baris");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Satu kata atau frasa per baris, hingga %1$d, masing-masing %2$d sampai %3$d karakter. Huruf besar dan kecil tidak berpengaruh, dan frasa cocok di mana saja dalam teks postingan, termasuk di dalam kata yang lebih panjang.");
+    }
+
+    private static void fillIn4(Map<String, String> table) {
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "Hanya sebagian alamat web Facebook yang dipilih untuk aplikasi ini, dan tautan ke alamat lainnya terbuka di tempat lain. Ketuk untuk memilihnya di pengaturan Android.");
         table.put("Open links in your browser",
                 "Buka tautan di browser Anda");
-    }
-
-    private static void fillIn4(Map<String, String> table) {
         table.put("Open on a chosen tab",
                 "Buka di tab pilihan");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
@@ -2280,8 +2292,6 @@ public final class L10nTranslations {
                 "Jeda");
         table.put("Pause Hushfacebook",
                 "Jeda Hushfacebook");
-        table.put("Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.",
-                "Jeda fitur runtime mulai peluncuran berikutnya. Pilihan Anda tersimpan. Log debug dan patch yang diterapkan saat instalasi tetap bekerja.");
         table.put("Pause, backup and diagnostics",
                 "Jeda, cadangan, dan diagnostik");
         table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
@@ -2384,11 +2394,11 @@ public final class L10nTranslations {
                 "Menyimpan...");
         table.put("Search",
                 "Pencarian");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.");
     }
 
     private static void fillIn5(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.");
         table.put("Search settings",
                 "Cari pengaturan");
         table.put("Selecting links by hand",
@@ -2507,11 +2517,11 @@ public final class L10nTranslations {
                 "Pengaturan ini tidak dapat selesai diperbarui. Nilai yang tersimpan ditampilkan.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "File pengaturan sudah disimpan, tetapi isinya saat dibaca kembali tidak sama dengan yang ditulis. Simpan lagi sebagai file baru.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "Sakelar ini berlaku saat Facebook dimulai ulang.");
     }
 
     private static void fillIn6(Map<String, String> table) {
+        table.put("The switch takes effect when Facebook restarts.",
+                "Sakelar ini berlaku saat Facebook dimulai ulang.");
         table.put("There's no diagnostic data to clear.",
                 "Tidak ada data diagnostik yang dapat dihapus.");
         table.put("There's no diagnostic data to put back.",
@@ -2530,6 +2540,8 @@ public final class L10nTranslations {
                 "Ketik @ sebelum Facebook menyarankan orang untuk ditandai dalam postingan atau komentar. Teks Anda tidak berubah.");
         table.put("Undo",
                 "Urungkan");
+        table.put("Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.",
+                "Sampai Anda melanjutkan, semua sakelar kecuali Pencatatan debug dianggap nonaktif. Yang diatur saat Anda menambal tetap aktif.");
         table.put("Updates",
                 "Pembaruan");
         table.put("Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.",
@@ -2621,7 +2633,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(826);
+        Map<String, String> table = new HashMap<>(830);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -2665,6 +2677,8 @@ public final class L10nTranslations {
                 "%1$s. Isso foi definido quando voc\u00ea aplicou os patches, ent\u00e3o a pausa n\u00e3o consegue deslig\u00e1-lo. Para descartar isso como causa, aplique os patches de novo sem esse patch.");
         table.put("%1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.",
                 "%1$s. Tudo isso foi definido quando voc\u00ea aplicou os patches, ent\u00e3o a pausa n\u00e3o consegue desligar nada disso. Para descartar um desses itens como causa, aplique os patches de novo sem o patch que aparece entre par\u00eanteses depois dele.");
+        table.put("A change here applies after Facebook restarts.",
+                "Uma altera\u00e7\u00e3o daqui vale depois que o Facebook reiniciar.");
         table.put("A diagnostic report is already being saved.",
                 "Um relat\u00f3rio de diagn\u00f3stico j\u00e1 est\u00e1 sendo salvo.");
         table.put("A file named %1$s in %2$s paused Hushfacebook.",
@@ -2751,11 +2765,11 @@ public final class L10nTranslations {
                 "Bloquear notifica\u00e7\u00f5es de v\u00eddeos em alta");
         table.put("Browse settings",
                 "Explorar configura\u00e7\u00f5es");
-        table.put("Cancel",
-                "Cancelar");
     }
 
     private static void fillPt_rBR1(Map<String, String> table) {
+        table.put("Cancel",
+                "Cancelar");
         table.put("Cancel saving this photo",
                 "Cancelar o salvamento desta foto");
         table.put("Cancel saving this video",
@@ -2874,11 +2888,11 @@ public final class L10nTranslations {
                 "Cada v\u00eddeo \u00e9 salvo na melhor qualidade que o player reproduz.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Apaga o registro e as contagens dos filtros que iriam para um relat\u00f3rio.");
-        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
-                "Todas as op\u00e7\u00f5es, menos o Registro de depura\u00e7\u00e3o, funcionam como se estivessem desligadas, e o que foi definido ao aplicar os patches continua ativo. Suas configura\u00e7\u00f5es ficam como est\u00e3o.");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
+                "Todas as op\u00e7\u00f5es, menos o Registro de depura\u00e7\u00e3o, funcionam como se estivessem desligadas, e o que foi definido ao aplicar os patches continua ativo. Suas configura\u00e7\u00f5es ficam como est\u00e3o.");
         table.put("Everything except Marketplace",
                 "Tudo menos o Marketplace");
         table.put("Example without post details",
@@ -2927,6 +2941,8 @@ public final class L10nTranslations {
                 "As sugest\u00f5es de amizade deixam de aparecer nas suas notifica\u00e7\u00f5es. As solicita\u00e7\u00f5es de amizade continuam chegando.");
         table.put("Friends",
                 "Amigos");
+        table.put("From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.",
+                "A partir da pr\u00f3xima abertura, todas as op\u00e7\u00f5es, menos o Registro de depura\u00e7\u00e3o, funcionam como se estivessem desligadas. O que foi definido ao aplicar os patches continua ativo, e suas escolhas ficam salvas.");
         table.put("Full report saved to %1$s",
                 "Relat\u00f3rio completo salvo em %1$s");
         table.put("GPL-3.0, with the notices of the projects this is built on",
@@ -2995,13 +3011,13 @@ public final class L10nTranslations {
                 "P\u00e1gina inicial");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "O progresso da foto ou do v\u00eddeo que voc\u00ea est\u00e1 salvando, com um bot\u00e3o para cancelar");
+    }
+
+    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("How to block Reels",
                 "Como bloquear os reels");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "O Hushfacebook %1$s saiu. Atualize pelo Morphe Manager.");
-    }
-
-    private static void fillPt_rBR3(Map<String, String> table) {
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Hushfacebook %1$s no Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -3118,13 +3134,13 @@ public final class L10nTranslations {
                 "Uma palavra ou frase por linha");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Uma palavra ou frase por linha, at\u00e9 %1$d, cada uma com %2$d a %3$d caracteres. Mai\u00fasculas e min\u00fasculas n\u00e3o importam, e uma frase vale em qualquer parte do texto de um post, inclusive dentro de palavras maiores.");
+    }
+
+    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "S\u00f3 alguns endere\u00e7os web do Facebook est\u00e3o selecionados para este app, e os links para os outros abrem em outro lugar. Toque para selecion\u00e1-los nas configura\u00e7\u00f5es do Android.");
         table.put("Open links in your browser",
                 "Abrir links no seu navegador");
-    }
-
-    private static void fillPt_rBR4(Map<String, String> table) {
         table.put("Open on a chosen tab",
                 "Abrir em uma aba escolhida");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
@@ -3139,8 +3155,6 @@ public final class L10nTranslations {
                 "Pausar");
         table.put("Pause Hushfacebook",
                 "Pausar o Hushfacebook");
-        table.put("Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.",
-                "Pausa os recursos a partir da pr\u00f3xima abertura. Suas escolhas ficam salvas. O registro de depura\u00e7\u00e3o e os patches aplicados na instala\u00e7\u00e3o continuam ativos.");
         table.put("Pause, backup and diagnostics",
                 "Pausa, backup e diagn\u00f3stico");
         table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
@@ -3243,11 +3257,11 @@ public final class L10nTranslations {
                 "Salvando...");
         table.put("Search",
                 "Pesquisa");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugest\u00f5es para perguntar \u00e0 Meta AI, e uma sugest\u00e3o n\u00e3o envia mais sua pesquisa para a Meta AI. Pessoas, grupos, p\u00e1ginas e publica\u00e7\u00f5es continuam, e o bot\u00e3o da Meta AI ainda abre a Meta AI.");
     }
 
     private static void fillPt_rBR5(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugest\u00f5es para perguntar \u00e0 Meta AI, e uma sugest\u00e3o n\u00e3o envia mais sua pesquisa para a Meta AI. Pessoas, grupos, p\u00e1ginas e publica\u00e7\u00f5es continuam, e o bot\u00e3o da Meta AI ainda abre a Meta AI.");
         table.put("Search settings",
                 "Buscar configura\u00e7\u00f5es");
         table.put("Selecting links by hand",
@@ -3366,11 +3380,11 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel concluir a atualiza\u00e7\u00e3o da configura\u00e7\u00e3o. O valor salvo est\u00e1 sendo mostrado.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "O arquivo de configura\u00e7\u00f5es foi salvo, mas ao ser lido de volta n\u00e3o corresponde ao que foi gravado. Salve de novo como um arquivo novo.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "A op\u00e7\u00e3o passa a valer quando o Facebook reiniciar.");
     }
 
     private static void fillPt_rBR6(Map<String, String> table) {
+        table.put("The switch takes effect when Facebook restarts.",
+                "A op\u00e7\u00e3o passa a valer quando o Facebook reiniciar.");
         table.put("There's no diagnostic data to clear.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
         table.put("There's no diagnostic data to put back.",
@@ -3389,6 +3403,8 @@ public final class L10nTranslations {
                 "Digite @ para o Facebook sugerir quem marcar em publica\u00e7\u00f5es ou coment\u00e1rios. Seu texto n\u00e3o muda.");
         table.put("Undo",
                 "Desfazer");
+        table.put("Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.",
+                "At\u00e9 voc\u00ea retomar, todas as op\u00e7\u00f5es, menos o Registro de depura\u00e7\u00e3o, funcionam como se estivessem desligadas. O que foi definido ao aplicar os patches continua ativo.");
         table.put("Updates",
                 "Atualiza\u00e7\u00f5es");
         table.put("Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.",
@@ -3480,7 +3496,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(826);
+        Map<String, String> table = new HashMap<>(830);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -3524,6 +3540,8 @@ public final class L10nTranslations {
                 "%1$s. Yamalad\u0131\u011f\u0131nda ayarland\u0131\u011f\u0131 i\u00e7in Duraklatma bunu kapatamaz. Bunu elemek i\u00e7in yeniden yamala ve o yamay\u0131 d\u0131\u015far\u0131da b\u0131rak.");
         table.put("%1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.",
                 "%1$s. Yamalad\u0131\u011f\u0131nda ayarland\u0131klar\u0131 i\u00e7in Duraklatma bunlar\u0131 kapatamaz. Birini elemek i\u00e7in yeniden yamala ve onun ard\u0131ndan parantez i\u00e7inde yazan yamay\u0131 d\u0131\u015far\u0131da b\u0131rak.");
+        table.put("A change here applies after Facebook restarts.",
+                "Buradaki bir de\u011fi\u015fiklik Facebook yeniden ba\u015flad\u0131ktan sonra ge\u00e7erli olur.");
         table.put("A diagnostic report is already being saved.",
                 "Bir tan\u0131lama raporu zaten kaydediliyor.");
         table.put("A file named %1$s in %2$s paused Hushfacebook.",
@@ -3610,11 +3628,11 @@ public final class L10nTranslations {
                 "Trend video bildirimlerini engelle");
         table.put("Browse settings",
                 "Ayarlar\u0131 ke\u015ffet");
-        table.put("Cancel",
-                "\u0130ptal");
     }
 
     private static void fillTr1(Map<String, String> table) {
+        table.put("Cancel",
+                "\u0130ptal");
         table.put("Cancel saving this photo",
                 "Bu foto\u011fraf\u0131n kaydedilmesini iptal et");
         table.put("Cancel saving this video",
@@ -3733,11 +3751,11 @@ public final class L10nTranslations {
                 "Her video, oynat\u0131c\u0131n\u0131n sundu\u011fu en iyi kalitede kaydedilir.");
         table.put("Empties the log and the filter counts a report would include.",
                 "Bir raporun i\u00e7erece\u011fi g\u00fcnl\u00fc\u011f\u00fc ve filtre saya\u00e7lar\u0131n\u0131 bo\u015falt\u0131r.");
-        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
-                "Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc d\u0131\u015f\u0131ndaki her anahtar kapal\u0131ym\u0131\u015f gibi davran\u0131r, yamalad\u0131\u011f\u0131nda ayarlananlar ise devrede kal\u0131r. Ayarlar\u0131n oldu\u011fu gibi kal\u0131r.");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.",
+                "Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc d\u0131\u015f\u0131ndaki her anahtar kapal\u0131ym\u0131\u015f gibi davran\u0131r, yamalad\u0131\u011f\u0131nda ayarlananlar ise devrede kal\u0131r. Ayarlar\u0131n oldu\u011fu gibi kal\u0131r.");
         table.put("Everything except Marketplace",
                 "Marketplace d\u0131\u015f\u0131ndaki her \u015fey");
         table.put("Example without post details",
@@ -3786,6 +3804,8 @@ public final class L10nTranslations {
                 "Arkada\u015f \u00f6nerileri art\u0131k bildirimlerinde g\u00f6r\u00fcnmez. Arkada\u015fl\u0131k istekleri gelmeye devam eder.");
         table.put("Friends",
                 "Arkada\u015flar");
+        table.put("From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.",
+                "Sonraki a\u00e7\u0131l\u0131\u015ftan itibaren Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc d\u0131\u015f\u0131ndaki her anahtar kapal\u0131ym\u0131\u015f gibi davran\u0131r. Yamalad\u0131\u011f\u0131nda ayarlananlar devrede kal\u0131r ve tercihlerin kay\u0131tl\u0131 kal\u0131r.");
         table.put("Full report saved to %1$s",
                 "Tam rapor \u015furaya kaydedildi: %1$s");
         table.put("GPL-3.0, with the notices of the projects this is built on",
@@ -3854,13 +3874,13 @@ public final class L10nTranslations {
                 "Ana Sayfa");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Kaydetti\u011fin foto\u011fraf veya videonun ilerleme durumu ve iptal etmek i\u00e7in bir d\u00fc\u011fme");
+    }
+
+    private static void fillTr3(Map<String, String> table) {
         table.put("How to block Reels",
                 "Reels nas\u0131l engellenir");
         table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
                 "Hushfacebook %1$s \u00e7\u0131kt\u0131. Morphe Manager'da g\u00fcncelle.");
-    }
-
-    private static void fillTr3(Map<String, String> table) {
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Facebook %2$s \u00fczerinde Hushfacebook %1$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -3977,13 +3997,13 @@ public final class L10nTranslations {
                 "Her sat\u0131ra bir kelime veya ifade");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Her sat\u0131ra bir kelime veya ifade, en fazla %1$d tane, her biri %2$d ile %3$d karakter aras\u0131. B\u00fcy\u00fck k\u00fc\u00e7\u00fck harf fark etmez ve bir ifade, g\u00f6nderi metninin herhangi bir yerinde, daha uzun kelimelerin i\u00e7inde bile e\u015fle\u015fir.");
+    }
+
+    private static void fillTr4(Map<String, String> table) {
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "Facebook'un web adreslerinden yaln\u0131zca baz\u0131lar\u0131 bu uygulama i\u00e7in se\u00e7ili ve di\u011ferlerinin ba\u011flant\u0131lar\u0131 ba\u015fka yerde a\u00e7\u0131l\u0131r. Android ayarlar\u0131nda se\u00e7mek i\u00e7in dokunun.");
         table.put("Open links in your browser",
                 "Ba\u011flant\u0131lar\u0131 taray\u0131c\u0131nda a\u00e7");
-    }
-
-    private static void fillTr4(Map<String, String> table) {
         table.put("Open on a chosen tab",
                 "Se\u00e7ilen sekmede a\u00e7");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
@@ -3998,8 +4018,6 @@ public final class L10nTranslations {
                 "Duraklat");
         table.put("Pause Hushfacebook",
                 "Hushfacebook'u duraklat");
-        table.put("Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.",
-                "\u00c7al\u0131\u015fma zaman\u0131 \u00f6zelliklerini sonraki a\u00e7\u0131l\u0131\u015ftan itibaren duraklat\u0131r. Tercihleriniz kay\u0131tl\u0131 kal\u0131r. Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc ve kurulumda uygulanan yamalar \u00e7al\u0131\u015fmaya devam eder.");
         table.put("Pause, backup and diagnostics",
                 "Duraklatma, yedekleme ve tan\u0131lama");
         table.put("Paused with Hushfacebook. Your Marketplace choice stays saved. Tabs already hidden return after a restart while paused.",
@@ -4102,11 +4120,11 @@ public final class L10nTranslations {
                 "Kaydediliyor...");
         table.put("Search",
                 "Arama");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Arama sonu\u00e7lar\u0131nda art\u0131k Meta AI yan\u0131t\u0131 ve Meta AI'a sor \u00f6nerileri g\u00f6r\u00fcnmez, bir \u00f6neri de araman\u0131 art\u0131k Meta AI'a g\u00f6ndermez. Ki\u015filer, gruplar, sayfalar ve g\u00f6nderiler kal\u0131r ve Meta AI d\u00fc\u011fmesi yine Meta AI'\u0131 a\u00e7ar.");
     }
 
     private static void fillTr5(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Arama sonu\u00e7lar\u0131nda art\u0131k Meta AI yan\u0131t\u0131 ve Meta AI'a sor \u00f6nerileri g\u00f6r\u00fcnmez, bir \u00f6neri de araman\u0131 art\u0131k Meta AI'a g\u00f6ndermez. Ki\u015filer, gruplar, sayfalar ve g\u00f6nderiler kal\u0131r ve Meta AI d\u00fc\u011fmesi yine Meta AI'\u0131 a\u00e7ar.");
         table.put("Search settings",
                 "Ayarlarda ara");
         table.put("Selecting links by hand",
@@ -4225,11 +4243,11 @@ public final class L10nTranslations {
                 "Ayar\u0131n g\u00fcncellenmesi tamamlanamad\u0131. Kay\u0131tl\u0131 de\u011feri g\u00f6steriliyor.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "Ayar dosyas\u0131 kaydedildi, ancak geri okundu\u011funda yaz\u0131lanla ayn\u0131 de\u011fil. Yeni bir dosya olarak tekrar kaydet.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "Anahtar, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda etkili olur.");
     }
 
     private static void fillTr6(Map<String, String> table) {
+        table.put("The switch takes effect when Facebook restarts.",
+                "Anahtar, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda etkili olur.");
         table.put("There's no diagnostic data to clear.",
                 "Temizlenecek tan\u0131lama verisi yok.");
         table.put("There's no diagnostic data to put back.",
@@ -4248,6 +4266,8 @@ public final class L10nTranslations {
                 "Facebook\u2019un g\u00f6nderi ve yorumlarda etiketlenecek ki\u015fi \u00f6nermesi i\u00e7in @ yaz\u0131n. Metniniz de\u011fi\u015fmez.");
         table.put("Undo",
                 "Geri al");
+        table.put("Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.",
+                "Devam ettirene kadar Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc d\u0131\u015f\u0131ndaki her anahtar kapal\u0131ym\u0131\u015f gibi davran\u0131r. Yamalad\u0131\u011f\u0131nda ayarlananlar devrede kal\u0131r.");
         table.put("Updates",
                 "G\u00fcncellemeler");
         table.put("Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.",

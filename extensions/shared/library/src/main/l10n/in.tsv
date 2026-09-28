@@ -9,6 +9,7 @@
 %1$s so far	%1$s terunduh
 %1$s. It was set when you patched, so Pause can't turn it off. To rule it out, patch again and leave out that patch.	%1$s. Ini diatur saat Anda menambal, jadi Jeda tidak dapat mematikannya. Untuk memastikan bukan ini penyebabnya, tambal ulang tanpa tambalan yang tertera dalam kurung setelahnya.
 %1$s. They were set when you patched, so Pause can't turn them off. To rule one out, patch again and leave out the patch in brackets after it.	%1$s. Ini diatur saat Anda menambal, jadi Jeda tidak dapat mematikannya. Untuk memastikan bukan ini penyebabnya, tambal ulang tanpa tambalan yang tertera dalam kurung setelahnya.
+A change here applies after Facebook restarts.	Perubahan di sini berlaku setelah Facebook dimulai ulang.
 A diagnostic report is already being saved.	Sudah ada laporan diagnostik yang sedang disimpan.
 Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.	Tambahkan tombol Unduh ke reel dengan kualitas unduhan Anda. Saat mati atau dijeda, tombol asli Facebook kembali.
 A file named %1$s in %2$s paused Hushfacebook.	File bernama %1$s di %2$s menjeda Hushfacebook.
@@ -63,12 +64,14 @@ Facebook doesn't download ads or its ad model in the background.	Facebook tidak 
 Facebook doesn't serve ads to other apps on this phone.	Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Mode gelap Facebook dan halaman ini memakai warna wallpaper Anda. Android 11 memakai biru. Aktifkan mode gelap Facebook untuk melihatnya.
 Joining the picture and sound	Menggabungkan gambar dan suara
+From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Mulai peluncuran berikutnya, semua sakelar kecuali Pencatatan debug dianggap nonaktif. Yang diatur saat Anda menambal tetap aktif, dan pilihan Anda tetap tersimpan.
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Pengaturan diekspor. Aplikasi yang menyimpan file itu tidak mengizinkan Hushfacebook membacanya kembali, jadi file itu tidak diperiksa.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	Aplikasi yang menyimpan file itu terlalu lama, jadi Hushfacebook berhenti menunggu. Tidak ada yang diubah.
 The app holding the last settings file still hasn't answered. Try again later.	Aplikasi yang menyimpan file pengaturan terakhir masih belum merespons. Coba lagi nanti.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Aplikasi yang menyimpan file pengaturan terlalu lama, jadi Hushfacebook berhenti menunggu. Aplikasi itu mungkin masih menyelesaikan penyimpanannya, jadi periksa file itu sebelum mengandalkannya.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	File %1$s tidak dapat dihapus. Hapus file itu dari %2$s, lalu ketuk Lanjutkan lagi.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	File pengaturan sudah disimpan, tetapi isinya saat dibaca kembali tidak sama dengan yang ditulis. Simpan lagi sebagai file baru.
+Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Sampai Anda melanjutkan, semua sakelar kecuali Pencatatan debug dianggap nonaktif. Yang diatur saat Anda menambal tetap aktif.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Gunakan emoji ponsel. Reaksi dan stiker tetap sama. Mulai ulang Facebook setelah mengubahnya.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Gunakan font ponsel atau file yang dipilih di bawah. Mulai ulang Facebook setelah mengubahnya.
 Font file	File font
@@ -86,7 +89,6 @@ Couldn't save a copy of that font. Check that the phone has room, then try again
 Couldn't open that file. Your font didn't change.	File itu tidak dapat dibuka. Font Anda tidak berubah.
 Back to your phone's font. Restart Facebook to see it.	Kembali ke font ponsel Anda. Mulai ulang Facebook untuk melihatnya.
 Couldn't go back to your phone's font. Try again.	Tidak dapat kembali ke font ponsel Anda. Coba lagi.
-Pause runtime features from the next start. Your choices stay saved. Debug logging and patches applied during installation keep working.	Jeda fitur runtime mulai peluncuran berikutnya. Pilihan Anda tersimpan. Log debug dan patch yang diterapkan saat instalasi tetap bekerja.
 Full report saved to %1$s	Laporan lengkap disimpan ke %1$s
 GPL-3.0, with the notices of the projects this is built on	GPL-3.0, beserta pemberitahuan dari proyek yang menjadi dasarnya
 Hide "People you may know"	Sembunyikan “Orang yang Mungkin Anda Kenal”
