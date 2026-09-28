@@ -152,11 +152,21 @@ $argumentFileLines = @($arguments | ForEach-Object {
     $argumentFileLines,
     (New-Object System.Text.UTF8Encoding($false)))
 try {
-    & $Java -jar $DesktopJar "@$argumentFile" 2>&1 | ForEach-Object {
-        $line = [string]$_
-        if ($ShowPatchLog -or $line -match 'SEVERE|ERROR|WARNING|Exception|Saved to') { Write-Host "[device] $line" }
+    # Continue for the call alone: the CLI logs WARNING and SEVERE on stderr, which Windows
+    # PowerShell 5.1 turns into a terminating error under Stop. The exit code decides.
+    $preference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $global:LASTEXITCODE = -1
+        & $Java -jar $DesktopJar "@$argumentFile" 2>&1 | ForEach-Object {
+            $line = [string]$_
+            if ($ShowPatchLog -or $line -match 'SEVERE|ERROR|WARNING|Exception|Saved to') { Write-Host "[device] $line" }
+        }
+        $cliExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $preference
     }
-    if ($LASTEXITCODE -ne 0) { throw "The desktop CLI exited with $LASTEXITCODE" }
+    if ($cliExitCode -ne 0) { throw "The desktop CLI exited with $cliExitCode" }
 } finally {
     Remove-Item -LiteralPath $argumentFile -Force -ErrorAction SilentlyContinue
     # The CLI unpacks the whole APK here and a run against Facebook leaves gigabytes behind.

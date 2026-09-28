@@ -33,6 +33,7 @@ Every Hushfacebook release, newest first.
 * **Tooling:** A release receipt now has to prove each declared Facebook build by its version code as well as its version name. Going by the name alone, another arm64 build of 580 (APKMirror lists several, each with its own code) would have counted as an unforced run of the declared one. The fixture check, the receipt builder and the phone build now treat such a build as undeclared, and their messages name the codes the catalog pins.
 * **Tooling:** The release check now reads the README's version badge and the sentence naming the latest release. A README with both still at 0.1.0 used to pass. Once a release is out, they have to name it and its patch count. While the next version is being prepared, they may name either that version or the published one.
 * **Tooling:** A release whose notes carry development-only entries like this one now passes the release check. Morphe Manager shows these lines to nobody, but the check refused every bullet not scoped to Facebook, so a release had to drop them or relabel them as user-facing changes. It still needs at least one Facebook entry.
+* **Tooling:** The fixture check, the receipt builder, the phone build and the release check's patch count no longer stop under Windows PowerShell 5.1 when Morphe's command line patcher logs a warning. It writes warnings and errors to standard error, and 5.1 turned the first one into a fatal error before the run's own result was read.
 
 ## 0.3.4 (2026-09-27)
 

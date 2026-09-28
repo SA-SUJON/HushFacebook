@@ -724,10 +724,19 @@ if ($VerifyPublishedAsset) {
             $javaCommand = Resolve-Java -Explicit $Java
             $listing = Join-Path ([IO.Path]::GetTempPath()) ("hushfacebook-$([Guid]::NewGuid()).txt")
             try {
-                # --out keeps the list clear of the CLI's own log lines, which share stdout.
-                $global:LASTEXITCODE = 0
-                $cliOutput = & $javaCommand '-jar' $countJar 'list-patches' "--patches=$temporaryArtifact" `
-                    '-d=false' '-i=false' "--out=$listing" 2>&1
+                # --out keeps the list clear of the CLI's own log lines, which share stdout. Continue
+                # for the call alone: the CLI logs WARNING and SEVERE on stderr, which Windows
+                # PowerShell 5.1, the hook's shell wherever pwsh is off the PATH, turns into a
+                # terminating error under Stop. The exit code and the listing decide.
+                $preference = $ErrorActionPreference
+                try {
+                    $ErrorActionPreference = 'Continue'
+                    $global:LASTEXITCODE = -1
+                    $cliOutput = & $javaCommand '-jar' $countJar 'list-patches' "--patches=$temporaryArtifact" `
+                        '-d=false' '-i=false' "--out=$listing" 2>&1
+                } finally {
+                    $ErrorActionPreference = $preference
+                }
                 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $listing -PathType Leaf)) {
                     throw ("Could not list the patches in the published bundle: " +
                         ($cliOutput -join ' '))

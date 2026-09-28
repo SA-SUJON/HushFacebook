@@ -3841,6 +3841,9 @@ try {
         '    set "VIA= merged"',
         ')',
         '>>"!HERE!java.log" echo patch !SRC!!VIA! forced=!FORCED!',
+        'rem The CLI logs WARNING and SEVERE on standard error, which Windows PowerShell 5.1 makes a',
+        'rem terminating error under Stop unless the caller steps down to Continue for the call.',
+        'echo WARNING: a patch named a target this build lacks, and still applied 1>&2',
         'rem A case that needs something to change while a fixture is patched leaves this behind.',
         'if exist "!HERE!during-patch.cmd" call "!HERE!during-patch.cmd"',
         'copy /y "!SRC!.result.json" "!RESULT!" >nul || exit /b 3',
@@ -3861,6 +3864,7 @@ try {
         'rem ResourceTableCheck.java <stock> <patched> <report>: keeps what it was handed as the stock side.',
         ':resources',
         'copy /y "%~5" "!HERE!resource-stock.txt" >nul || exit /b 8',
+        'echo Note: the source launcher compiled with a warning 1>&2',
         'echo [resources] stand-in: every stock resource resolves in the patched table',
         'exit /b 0',
         ':dexdiff',
@@ -4386,6 +4390,7 @@ try {
         'shift',
         'goto next',
         ':list',
+        'echo WARNING: a stand-in warning on standard error 1>&2',
         'copy /y "%HERE%patch-names.txt" "%LISTING%" >nul || exit /b 3',
         'exit /b 0') -join "`r`n") + "`r`n"), [System.Text.Encoding]::ASCII)
     # What GitHub answers: the served bundle, SBOM and receipt, a checksum list naming all three (or
