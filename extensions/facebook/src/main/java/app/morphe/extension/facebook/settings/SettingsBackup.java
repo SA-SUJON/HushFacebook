@@ -94,6 +94,7 @@ public final class SettingsBackup {
             Settings.HIDE_STORIES_TRAY,
             Settings.HIDE_FEED_REELS,
             Settings.BLOCK_RETURN_REFRESH,
+            Settings.RETURN_REFRESH_NO_LIMIT,
             Settings.HIDE_AI_DETECTED_POSTS,
             Settings.HIDE_AI_LABELLED_POSTS,
             Settings.HIDE_AI_DETECTED_REELS,

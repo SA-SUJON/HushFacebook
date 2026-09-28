@@ -61,7 +61,7 @@ public final class ReturnRefresh {
     static synchronized boolean skipAt(long now) {
         long at = hiddenAt;
         hiddenAt = -1;
-        return at >= 0 && now >= at && now - at <= HOLD_MS
-                && Utils.settingsReady() && Settings.BLOCK_RETURN_REFRESH.get();
+        if (at < 0 || now < at || !Utils.settingsReady() || !Settings.BLOCK_RETURN_REFRESH.get()) return false;
+        return now - at <= HOLD_MS || Settings.RETURN_REFRESH_NO_LIMIT.get();
     }
 }

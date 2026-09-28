@@ -27,8 +27,8 @@ private const val SKIP = "$EXTENSION_PACKAGE/feed/ReturnRefresh;->skip()Z"
 @Suppress("unused")
 val blockReturnRefreshPatch = bytecodePatch(
     name = "Block background-return feed refresh",
-    description = "Keeps your feed position when you return to Facebook within ten minutes. " +
-        "Pull to refresh and a fresh launch still work.",
+    description = "Keeps your feed position when you return to Facebook within ten minutes, or " +
+        "for any time away with No time limit on. Pull to refresh and a fresh launch still work.",
     default = false,
 ) {
     category("Feed")

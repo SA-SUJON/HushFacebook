@@ -37,6 +37,7 @@ public class ReturnRefreshTest {
     @After public void restore() {
         PauseForTests.resume();
         Settings.BLOCK_RETURN_REFRESH.resetToDefault();
+        Settings.RETURN_REFRESH_NO_LIMIT.resetToDefault();
         ReturnRefresh.skipAt(Long.MAX_VALUE);
     }
 
@@ -47,6 +48,21 @@ public class ReturnRefreshTest {
         assertFalse(ReturnRefresh.skipAt(1_000 + 10 * 60 * 1000));
         ReturnRefresh.uiHidden(1_000);
         assertFalse(ReturnRefresh.skipAt(1_000 + 10 * 60 * 1000 + 1));
+    }
+
+    /** #23: with No time limit on, a return after any absence keeps the feed, still only once. */
+    @Test public void noTimeLimitKeepsTheFeedAfterAnyAbsence() {
+        Settings.RETURN_REFRESH_NO_LIMIT.save(true);
+        ReturnRefresh.uiHidden(1_000);
+        assertTrue(ReturnRefresh.skipAt(1_000 + 24L * 60 * 60 * 1000));
+        assertFalse(ReturnRefresh.skipAt(1_000 + 24L * 60 * 60 * 1000 + 1));
+        Settings.BLOCK_RETURN_REFRESH.save(false);
+        ReturnRefresh.uiHidden(1_000);
+        assertFalse(ReturnRefresh.skipAt(1_000 + 11 * 60 * 1000));
+        Settings.BLOCK_RETURN_REFRESH.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        ReturnRefresh.uiHidden(1_000);
+        assertFalse(ReturnRefresh.skipAt(1_000 + 11 * 60 * 1000));
     }
 
     @Test public void disabledOrPausedReturnsToFacebookRefresh() {
