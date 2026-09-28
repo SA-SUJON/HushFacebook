@@ -965,6 +965,7 @@ function Test-ReleaseReceiptHere {
         -ExpectedPatcherVersion $expectedToolchain.PatcherVersion `
         -ExpectedManagerFloor $expectedToolchain.ManagerFloor `
         -ExpectedPackageName $receiptTarget.PackageName -ExpectedPackageVersions $receiptTarget.PackageVersions `
+        -ExpectedPackageVersionCodes $receiptTarget.PackageVersionCodes `
         -BundlePath $BundleForComparison -ApprovedManifestDelta $approvedDelta `
         -ActualCommitTimestamp $actualEpoch -ExpectedCommit $expectedCommit `
         -ExpectedSchemaVersion $schema.Version -SbomPath $sbomForComparison

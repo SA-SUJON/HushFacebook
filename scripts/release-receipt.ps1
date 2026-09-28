@@ -1032,6 +1032,10 @@ function Test-ReleaseReceipt {
         # run: the README says the patches were checked on every one of them.
         [Parameter(Mandatory = $true)][string]$ExpectedPackageName,
         [Parameter(Mandatory = $true)][string[]]$ExpectedPackageVersions,
+        # The version codes the catalog pins those versions to (Get-PatchTarget's PackageVersionCodes).
+        # Another build of a declared version isn't the declared build, so a run of it proves nothing
+        # without -f. A version pinned to no code is matched by its name.
+        [System.Collections.IDictionary]$ExpectedPackageVersionCodes,
         [string]$BundlePath,
         [string[]]$ApprovedManifestDelta = @(),
         # When the commit the receipt names was made, read out of git by the caller. Without it
@@ -1200,6 +1204,11 @@ function Test-ReleaseReceipt {
         [string[]]$ExpectedPatchNames, [System.StringComparer]::Ordinal)
     $produced = New-Object System.Collections.Generic.List[string]
     $provedVersions = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    # What Test-DeclaredBuild (patch-target.ps1) reads.
+    $declaredTarget = [pscustomobject]@{
+        PackageVersions = $ExpectedPackageVersions
+        PackageVersionCodes = if ($null -ne $ExpectedPackageVersionCodes) { $ExpectedPackageVersionCodes } else { @{} }
+    }
     foreach ($target in $targets) {
         $label = "$($target.source.package) $($target.source.versionName)"
         if ([string]$target.source.sha256 -notmatch '^[0-9A-F]{64}$') {
@@ -1218,12 +1227,12 @@ function Test-ReleaseReceipt {
         if ($null -eq $forcedProperty -or $forcedProperty.Value -isnot [bool]) {
             return Fail "The receipt does not say whether $label was patched under -f."
         }
-        $atDeclaredVersion = ([System.Collections.Generic.HashSet[string]]::new(
-            [string[]]$ExpectedPackageVersions, [System.StringComparer]::Ordinal)).Contains([string]$target.source.versionName)
+        $atDeclaredVersion = Test-DeclaredBuild -Target $declaredTarget -VersionName ([string]$target.source.versionName) `
+            -VersionCode ([string]$target.source.versionCode)
         if ($forcedProperty.Value -eq $atDeclaredVersion) {
-            return Fail ("The receipt says $label was " +
+            return Fail ("The receipt says $label (version code $($target.source.versionCode)) was " +
                 $(if ($forcedProperty.Value) { 'forced past' } else { 'patched without -f at' }) +
-                " a declared version, but the catalog targets $($ExpectedPackageVersions -join ', ').")
+                " a declared build, but the catalog declares $(Format-DeclaredBuilds -Target $declaredTarget).")
         }
         if ($atDeclaredVersion) { [void]$provedVersions.Add([string]$target.source.versionName) }
         $verdicts = @($target.patches)

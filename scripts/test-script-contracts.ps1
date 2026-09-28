@@ -61,6 +61,22 @@ foreach ($patch in @($catalog.patches)) {
         ((@($target.PackageVersions) | Sort-Object) -join ',')) `
         "$($patch.name) declares other Facebook builds than the rest of the catalog."
 }
+# And the version code each build is pinned to. APKMirror lists several arm64 builds of one Facebook
+# version, each with its own dex, so a name alone doesn't say which of them the patches were proved
+# on. A receipt counted another 580 build (vc 475019283 beside the declared 475019344) as an
+# unforced run of the declared one.
+foreach ($version in @($target.PackageVersions)) {
+    $pinned = @($catalog.patches[0].compatibility | Where-Object { $_.packageName -eq 'com.facebook.katana' } |
+        ForEach-Object { @($_.targets) } | Where-Object { $_.version -eq $version } |
+        ForEach-Object { $_.versionCodes.PSObject.Properties } | ForEach-Object { [string]$_.Value })
+    Assert-True ($pinned.Count -gt 0 -and (@($target.PackageVersionCodes[$version]) -join ',') -eq (($pinned | Sort-Object -Unique) -join ',')) `
+        "The version codes the catalog pins to Facebook $version were not read: $(@($target.PackageVersionCodes[$version]) -join ', ')"
+    Assert-True (Test-DeclaredBuild -Target $target -VersionName $version -VersionCode $pinned[0]) `
+        "Facebook $version at its pinned code $($pinned[0]) was not taken for a declared build."
+    Assert-True (-not (Test-DeclaredBuild -Target $target -VersionName $version -VersionCode "$([long]$pinned[0] - 61)")) `
+        "Another build of Facebook $version, version code $([long]$pinned[0] - 61), was taken for the declared one."
+}
+Assert-True (-not (Test-DeclaredBuild -Target $target -VersionName '1.0.0' -VersionCode '1')) 'An undeclared version was taken for a declared build.'
 
 $threeBuilds = [pscustomobject]@{
     patches = @(
@@ -100,6 +116,19 @@ $uneven = [pscustomobject]@{
 }
 Assert-Throws { Get-PatchTarget -PatchList $uneven } '*newest only*' `
     'A build only some patches declare was accepted as a target of the whole bundle.'
+# The same for the codes: two patches pinning one version to different builds don't declare one.
+function New-PinnedPatch([string]$Name, [int]$Code) {
+    [pscustomobject]@{ name = $Name
+        compatiblePackages = [pscustomobject]@{ 'com.example.app' = @('580.0.0.51.74') }
+        compatibility = @([pscustomobject]@{ packageName = 'com.example.app'
+            targets = @([pscustomobject]@{ version = '580.0.0.51.74'; versionCodes = [pscustomobject]@{ ARM64_V8A = $Code } }) }) }
+}
+Assert-Throws { Get-PatchTarget -PatchList ([pscustomobject]@{ patches = @((New-PinnedPatch 'pinned' 475019344),
+            (New-PinnedPatch 'another build' 475019283)) }) } '*another build declares 580.0.0.51.74 (475019283)*' `
+    'Two patches pinning one version to different builds were read as one declared build.'
+# A catalog that pins no code is read by the version name, as before.
+Assert-True ((Test-DeclaredBuild -Target $three -VersionName '99.1.0.0.1' -VersionCode '12345') -and
+    @($three.PackageVersionCodes['99.1.0.0.1']).Count -eq 0) 'A build declared without a version code was not matched by its name.'
 
 # Both of Meta's signers, on every patch. Facebook rotated its key with a v3.1 lineage, so a
 # phone on Android 13 or newer reports the new signer and an older one the old signer, and Morphe
@@ -544,8 +573,9 @@ try {
     Assert-True ($manifestFacts.patcherVersion -eq '1.12.0') 'The bundle patcher stamp was not read.'
 
     # Two declared builds, the way the Facebook catalog declares the newest release and the one
-    # before it, and a run of each.
+    # before it, each pinned to its version code, and a run of each.
     $declaredBuilds = @('46.7.3', '46.6.1')
+    $declaredCodes = @{ '46.7.3' = [string[]]@('2024607030'); '46.6.1' = [string[]]@('2024606010') }
     $template = [ordered]@{
         schemaVersion = Get-ReleaseReceiptSchemaVersion
         release   = [ordered]@{ version = '9.9.9'; tag = 'v9.9.9'
@@ -588,7 +618,8 @@ try {
         param($Receipt, [string[]]$Approved = @())
         return Test-ReleaseReceipt -Receipt $Receipt -ExpectedVersion '9.9.9' `
             -ExpectedPatchNames @('Alpha', 'Beta') -ExpectedPatcherVersion '1.12.0' `
-            -ExpectedManagerFloor '1.29.0' -ExpectedPackageName 'com.example.host' -ExpectedPackageVersions $declaredBuilds -BundlePath $bundle -ApprovedManifestDelta $Approved
+            -ExpectedManagerFloor '1.29.0' -ExpectedPackageName 'com.example.host' -ExpectedPackageVersions $declaredBuilds `
+            -ExpectedPackageVersionCodes $declaredCodes -BundlePath $bundle -ApprovedManifestDelta $Approved
     }
 
     $valid = Test-TestReceipt -Receipt (New-TestReceipt)
@@ -627,6 +658,7 @@ try {
         'a run of the newest declared build only' = { param($r) $r.targets = @($r.targets[0]) }
         'the older declared build forced'       = { param($r) $r.targets[1].source.forced = $true }
         'both runs at the newest declared build' = { param($r) $r.targets[1].source.versionName = '46.7.3' }
+        'another build of a declared version patched without -f' = { param($r) $r.targets[1].source.versionCode = '2024605949' }
         'a receipt that names no SBOM'          = { param($r) $r.PSObject.Properties.Remove('sbom') }
         'an SBOM named for another version'     = { param($r) $r.sbom.file = 'patches-9.9.8.cdx.json' }
         'an SBOM with no hash'                  = { param($r) $r.sbom.sha256 = 'nope' }
@@ -657,6 +689,19 @@ try {
     }
     $twoTargets = Test-TestReceipt -Receipt $secondTarget
     Assert-True $twoTargets.Valid "A receipt with the declared target beside a forced run was refused: $($twoTargets.Reason)"
+    # Another build of a declared version is a build of its own: patched without -f it is refused
+    # for that, naming the code the catalog pins, and forced beside the declared runs it is fine.
+    $otherBuild = Test-TestReceipt -Receipt (New-TestReceipt -Mutate $mutations['another build of a declared version patched without -f'])
+    Assert-True ($otherBuild.Reason -like '*46.6.1 (version code 2024605949) was patched without -f at a declared build*46.6.1 (2024606010)*') `
+        "Another build of a declared version was refused for the wrong reason: $($otherBuild.Reason)"
+    $forcedOtherBuild = Test-TestReceipt -Receipt (New-TestReceipt -Mutate {
+        param($r)
+        $variant = $r.targets[1] | ConvertTo-Json -Depth 8 | ConvertFrom-Json
+        $variant.source.versionCode = '2024605949'
+        $variant.source.forced = $true
+        $r.targets = @($r.targets[0], $r.targets[1], $variant)
+    })
+    Assert-True $forcedOtherBuild.Valid "Another build of a declared version, forced beside the declared runs, was refused: $($forcedOtherBuild.Reason)"
 
     # The bundle the receipt is about, gone. Every fact above is checked against a file, and a
     # missing file is the one case where there is nothing to disagree with, so an unguarded
@@ -1148,9 +1193,10 @@ try {
     Assert-True ($factsSource -match '-ExpectedPatchNames @\(\$resolvedList\.PatchList\.patches' -and
         $factsSource -match '\$receiptTarget = Get-PatchTarget -PatchList \$resolvedList\.PatchList' -and
         $factsSource -match '-ExpectedPackageName \$receiptTarget\.PackageName' -and
-        $factsSource -match '-ExpectedPackageVersions \$receiptTarget\.PackageVersions(?![\w.\[])') `
+        $factsSource -match '-ExpectedPackageVersions \$receiptTarget\.PackageVersions(?![\w.\[])' -and
+        $factsSource -match '-ExpectedPackageVersionCodes \$receiptTarget\.PackageVersionCodes(?![\w.\[])') `
         ('validate-release-facts.ps1 no longer holds the receipt to the patch list its own commit ' +
-            'carried, or to every build that list declares.')
+            'carried, or to every build that list declares, version codes and all.')
 
     # The manifest delta allowlist, the same way: the one the receipt's own commit carried. An entry
     # added in the working tree and never committed approved a change into a release no commit had
@@ -3567,9 +3613,11 @@ try {
     function Save-ReleaseReceipt([string[]]$Builds, [string]$Commit = $releaseCommit, [long]$Seconds = $releaseSeconds,
             [int]$Schema = (Get-ReleaseReceiptSchemaVersion)) {
         $targets = @(for ($i = 0; $i -lt $Builds.Count; $i++) {
+            # Each build at the version code the catalog pins it to, as a run of the declared build.
+            $code = @(@($releaseTarget.PackageVersionCodes[$Builds[$i]]) + @("47500000$i") | Where-Object { $_ })[0]
             [ordered]@{
                 source        = [ordered]@{ file = "facebook-$($Builds[$i])-arm64-v8a.apkm"
-                    package = $releaseTarget.PackageName; versionName = $Builds[$i]; versionCode = "47500000$i"
+                    package = $releaseTarget.PackageName; versionName = $Builds[$i]; versionCode = $code
                     sha256 = ([string]'ABCDEF'[$i % 6] * 64); forced = $false }
                 patches       = @($releaseNames | ForEach-Object { [ordered]@{ name = $_; applied = $true; reason = $null } })
                 manifestDelta = $approvedDelta
@@ -3776,11 +3824,13 @@ try {
     }
     $dependencyNamesHere = @(Get-PatchDependencyNames -PatchList $releaseCatalog -RequestedNames $releaseNames)
     $fixturePaths = @{}
-    $versionCode = 475119344
     # Beside the declared builds, a newer one the catalog doesn't declare, the kind a release run
-    # patches under -f to see what still applies on it.
+    # patches under -f to see what still applies on it. Each declared build carries the version code
+    # the catalog pins it to; the fixtures used to count down from a code of their own, which only
+    # the version name made declared.
     $newerBuild = "$([int]($releaseTarget.PackageVersion -split '\.')[0] + 1).0.0.1.1"
     foreach ($build in @($newerBuild) + @($releaseTarget.PackageVersions)) {
+        $versionCode = if ($build -eq $newerBuild) { 475119344 } else { [long]@($releaseTarget.PackageVersionCodes[$build])[0] }
         $apkm = Join-Path $fixtures "facebook-$build-arm64-v8a.apkm"
         New-TestBundleArchive -Path $apkm -Entries ([ordered]@{
             'info.json' = "{`"versioncode`":`"$versionCode`"}"
@@ -3799,8 +3849,16 @@ try {
             packageName = $releaseTarget.PackageName
             packageVersion = $build } | ConvertTo-Json -Depth 6)
         $fixturePaths[$build] = $apkm
-        $versionCode -= 100000
     }
+    # And another build of the oldest declared version, as APKMirror lists several arm64 builds of one
+    # Facebook release: the declared name at a code the catalog doesn't pin. Only its base manifest,
+    # since every script has to refuse it before anything is merged or patched.
+    $variantBuild = @($releaseTarget.PackageVersions)[-1]
+    $variantCode = [long]@($releaseTarget.PackageVersionCodes[$variantBuild])[0] - 61
+    $variantApkm = Join-Path $fixtures "facebook-$variantBuild-variant-arm64-v8a.apkm"
+    New-TestBundleArchive -Path $variantApkm -Entries ([ordered]@{
+        'info.json' = "{`"versioncode`":`"$variantCode`"}"
+        'base.apk' = Get-FixtureManifest -Build $variantBuild -Code "$variantCode" })
     $releaseBundle = Get-ReleaseBundlePath -Root $releaseRepo
     New-Item -ItemType Directory -Path (Split-Path -Parent $releaseBundle) -Force | Out-Null
     New-TestBundleArchive -Path $releaseBundle -Entries ([ordered]@{
@@ -3992,6 +4050,19 @@ try {
                 (@(Get-Content -LiteralPath $javaLog) -join '; '))
         }
     }
+    # Another build of the older declared version in its place is no run of it either. The builder
+    # took it by its name, patched it without -f and wrote a receipt proving a build nobody ran.
+    $variantRefusal = "*No fixture is the declared $($releaseTarget.PackageName) $variantBuild*" +
+        "$variantBuild ($(@($releaseTarget.PackageVersionCodes[$variantBuild]) -join ' or '))*" +
+        "$variantBuild ($variantCode)*Nothing was patched*"
+    Assert-Throws { Invoke-ReceiptBuilder -Fixtures @(@($releaseTarget.PackageVersions | Select-Object -SkipLast 1 |
+                ForEach-Object { $fixturePaths[$_] }) + @($variantApkm)) } $variantRefusal `
+        'build-release-receipt.ps1 took another build of a declared version for the declared one.'
+    Assert-True (-not (Test-Path -LiteralPath $javaLog)) 'build-release-receipt.ps1 patched another build of a declared version.'
+    # verify-all-patches.ps1 would patch it as a declared build too, without -f; it needs -Force now.
+    Assert-Throws { Invoke-VerifyAll -Apk $variantApkm } "*$variantBuild, which the bundle does not declare, at version code $variantCode*-Force*" `
+        'verify-all-patches.ps1 patched another build of a declared version as the declared one.'
+    Assert-True (-not (Test-Path -LiteralPath $javaLog)) 'verify-all-patches.ps1 started the CLI on another build of a declared version.'
 
     # The SBOM and what OSV says about it come before anything is patched. The deliberately
     # vulnerable fixture is this bundle with an SBOM listing gson 2.8.8, and no receipt comes of it.
@@ -4133,6 +4204,9 @@ try {
     Assert-Throws { Invoke-DeviceBuild -Apk $fixturePaths[$newerBuild] } "*$newerBuild, which the bundle does not declare*" `
         'patch-for-device.ps1 took a build the catalog does not declare.'
     Assert-True (-not (Test-Path -LiteralPath $javaLog)) 'patch-for-device.ps1 started the CLI on an undeclared build.'
+    Assert-Throws { Invoke-DeviceBuild -Apk $variantApkm } "*$variantBuild, which the bundle does not declare, at version code $variantCode*" `
+        'patch-for-device.ps1 took another build of a declared version.'
+    Assert-True (-not (Test-Path -LiteralPath $javaLog)) 'patch-for-device.ps1 started the CLI on another build of a declared version.'
 
     # Another Meta app at a build the catalog declares. Neither script may hand it to the CLI: each
     # refuses it by name before anything is patched. The builder gets it beside the newest declared

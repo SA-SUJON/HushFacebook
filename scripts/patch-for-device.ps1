@@ -93,10 +93,12 @@ try {
 if ($stock.package -ne $target.PackageName) {
     throw "$(Split-Path -Leaf $Apk) is $($stock.package), not the catalog's target $($target.PackageName)."
 }
-if ($target.PackageVersions -notcontains [string]$stock.versionName) {
+# Its version code as well: another arm64 build of a declared version has its own dex, and nothing
+# proved the patches on it.
+if (-not (Test-DeclaredBuild -Target $target -VersionName ([string]$stock.versionName) -VersionCode ([string]$stock.versionCode))) {
     throw ("$(Split-Path -Leaf $Apk) is $($stock.package) $($stock.versionName), which the bundle does not " +
-        "declare ($($target.PackageVersions -join ', ')). Build for a phone from a declared build; " +
-        'scripts/verify-all-patches.ps1 -Force shows what still applies on another one.')
+        "declare, at version code $($stock.versionCode). It declares $(Format-DeclaredBuilds -Target $target). " +
+        'Build for a phone from a declared build; scripts/verify-all-patches.ps1 -Force shows what still applies on another one.')
 }
 $passwordVariable = 'HUSHFACEBOOK_SIDELOAD_KEYSTORE_PASSWORD'
 $keystorePassword = [Environment]::GetEnvironmentVariable(
