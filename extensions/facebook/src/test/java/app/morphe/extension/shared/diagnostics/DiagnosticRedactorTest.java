@@ -243,6 +243,11 @@ public class DiagnosticRedactorTest {
             {"Authorization: Bearer EAABfirstHalf\nsecondHalfLeak", "EAABfirstHalf", "secondHalfLeak"},
             {"password=p@ss;w0rdSemiLeak", "w0rdSemiLeak"},
             {"password=staple spaced unquotedPassLeak", "staple", "unquotedPassLeak"},
+            // An account id under any spelling of user id, however short.
+            {"user_id=userIdLeakV1&next=1", "userIdLeakV1"},
+            {"userid: useridLeakV2", "useridLeakV2"},
+            {"{\"userId\":\"camelUserIdLeakV3\",\"kind\":\"reel\"}", "camelUserIdLeakV3"},
+            {"X-User-Id: headerUserIdLeakV4", "headerUserIdLeakV4"},
     };
 
     @Test public void noSyntheticCredentialSurvives() {
@@ -282,6 +287,18 @@ public class DiagnosticRedactorTest {
         assertEquals("\\\"video_id=[omitted]}", DiagnosticRedactor.redact("\\\"video_id\\\":\\\"31\\\"}"));
         assertEquals("topLevelPostId=[omitted] kept", DiagnosticRedactor.redact("topLevelPostId: 42 kept"));
         assertEquals("post-id=[omitted] kept", DiagnosticRedactor.redact("post-id: 99 kept"));
+    }
+
+    /**
+     * An account id is only caught by the bare-number rule when it's fifteen digits or more, so a
+     * short or non-numeric one behind user_id reached the report. Its name gives it away.
+     */
+    @Test public void aUserIdGoesWhateverItsNameLooksLike() {
+        assertEquals("user_id=[omitted] kept", DiagnosticRedactor.redact("user_id=abc kept"));
+        assertEquals("userid=[omitted] kept", DiagnosticRedactor.redact("userid=abc kept"));
+        assertEquals("{\"userId=[omitted]}", DiagnosticRedactor.redact("{\"userId\":\"a1b2\"}"));
+        assertEquals("user-id=[omitted] kept", DiagnosticRedactor.redact("user-id: 42 kept"));
+        assertEquals("USER_ID=[omitted] kept", DiagnosticRedactor.redact("USER_ID: 7 kept"));
     }
 
     /**

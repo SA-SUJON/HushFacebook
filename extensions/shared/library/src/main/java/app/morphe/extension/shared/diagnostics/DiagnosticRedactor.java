@@ -96,17 +96,17 @@ public final class DiagnosticRedactor {
     /** How far an object or list is followed before it's cut at the end of its first line. */
     private static final int BLOCK_MAX_CHARS = 8_192;
     /**
-     * Names carrying the id of one post, story, comment or message. Each of these resolves to
-     * something somebody can open, so a shared report would otherwise carry a slice of what was
-     * read. The short ones, aid and cid, are matched whole or after an underscore or hyphen, so an
-     * ordinary setting such as {@code hide_paid_partnership} keeps its value. The longer ones may
-     * follow any prefix, camel case included ({@code topLevelPostId}), and take a hyphen as well as
-     * an underscore.
+     * Names carrying the id of one account, post, story, comment or message. Each of these
+     * resolves to something somebody can open, so a shared report would otherwise carry a slice of
+     * what was read, or who read it. The short ones, aid and cid, are matched whole or after an
+     * underscore or hyphen, so an ordinary setting such as {@code hide_paid_partnership} keeps its
+     * value. The longer ones may follow any prefix, camel case included ({@code topLevelPostId}),
+     * and take a hyphen as well as an underscore.
      */
     private static final String CONTENT_ID_NAMES =
             "(?:[a-z0-9]+[_-])*(?:aid|cid)|[a-z0-9_-]*(?:fbid|story[_-]?id|post[_-]?id|feedback[_-]?id"
                     + "|video[_-]?id|item[_-]?id|group[_-]?id|page[_-]?id|profile[_-]?id|actor[_-]?id"
-                    + "|thread[_-]?id|comment[_-]?id|msg[_-]?id|message[_-]?id)";
+                    + "|user[_-]?id|thread[_-]?id|comment[_-]?id|msg[_-]?id|message[_-]?id)";
     /**
      * Ids are printed in comma separated lists, and the value pattern the credential rule uses
      * stops at the first comma, so everything after the first id stayed in the report.
