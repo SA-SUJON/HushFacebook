@@ -53,9 +53,10 @@ public final class AmoledTheme {
     /**
      * The largest value that a channel of a status bar colour can have and still turn black. The
      * bar is chrome, so it goes further than {@link #MAX_CHANNEL}: the Video tab asks for
-     * {@code #333334}, and Facebook's lightest dark chrome grey is {@code #3A3B3C}.
+     * {@code #333334}, and Facebook's lightest dark chrome grey is {@code #3A3B3C}. The Material
+     * You theme's status bar takes the same band.
      */
-    private static final int MAX_BAR_CHANNEL = 0x40;
+    static final int MAX_BAR_CHANNEL = 0x40;
 
     /**
      * The tokens that name a background area. The short names come from Mig and the long names
@@ -152,7 +153,7 @@ public final class AmoledTheme {
     }
 
     /** True for an opaque grey with each channel at or below {@code maxChannel}. */
-    private static boolean isDarkNeutral(int color, int maxChannel) {
+    static boolean isDarkNeutral(int color, int maxChannel) {
         if ((color >>> 24) != 0xFF) return false;
 
         int red = (color >> 16) & 0xFF;

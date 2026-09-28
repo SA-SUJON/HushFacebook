@@ -224,20 +224,11 @@ internal fun BytecodePatchContext.fdsDarkCheck(): String {
 }
 
 /**
- * Sends the colour of the status bar through the extension, first thing in the method that paints
- * it: StatusBarUtil's one static `(Window, int)` method that calls `Window.setStatusBarColor`. The
- * other static `(Window, int)` method sets the bar's icons and paints nothing.
- *
- * On Android 15 and newer the framework ignores `setStatusBarColor` for Facebook's target SDK, so
- * that method paints a view behind the bar as well. It remembers the last colour per window and
- * skips a colour it already painted. The hook goes in before that cache, so what it remembers is
- * what the extension answered. The extension blackens only in the dark theme, [darkCheck] answering
- * for the window's context, because light mode asks the same tokens for the same dark greys.
- *
- * `invoke` names its registers in four bits, so the window and the colour are copied down into two
- * locals first, and the answer goes back into the colour's own parameter register.
+ * The method that paints the status bar: StatusBarUtil's one static `(Window, int)` method that
+ * calls `Window.setStatusBarColor`. The other static `(Window, int)` method sets the bar's icons
+ * and paints nothing.
  */
-internal fun BytecodePatchContext.hookStatusBarColour(darkCheck: String) {
+internal fun BytecodePatchContext.statusBarPainter(): MutableMethod {
     val painters = mutableClassDefBy(STATUS_BAR_UTIL).methods.filter { method ->
         AccessFlags.STATIC.isSet(method.accessFlags) && method.returnType == "V" &&
             method.parameterTypes.map(CharSequence::toString) == listOf("Landroid/view/Window;", "I") &&
@@ -245,10 +236,30 @@ internal fun BytecodePatchContext.hookStatusBarColour(darkCheck: String) {
                 (it as? ReferenceInstruction)?.reference?.toString() == SET_STATUS_BAR_COLOR
             } == true
     }
-    val painter = painters.singleOrNull() ?: throw PatchException(
+    return painters.singleOrNull() ?: throw PatchException(
         "StatusBarUtil has ${painters.size} static (Window, int) methods that call setStatusBarColor, expected one",
     )
-    painter.requireLocals("AMOLED status bar", 2)
+}
+
+/**
+ * Sends the colour of the status bar through the extension method [target], first thing in the
+ * [statusBarPainter]. [target] takes the colour and whether the theme is dark, and gives the colour
+ * to paint: AmoledTheme.statusBar here, MaterialYouTheme.statusBar when Material You is in the build
+ * without AMOLED.
+ *
+ * On Android 15 and newer the framework ignores `setStatusBarColor` for Facebook's target SDK, so
+ * that method paints a view behind the bar as well. It remembers the last colour per window and
+ * skips a colour it already painted. The hook goes in before that cache, so what it remembers is
+ * what the extension answered. The extension recolours only in the dark theme, [darkCheck]
+ * answering for the window's context, because light mode asks the same tokens for the same dark
+ * greys.
+ *
+ * `invoke` names its registers in four bits, so the window and the colour are copied down into two
+ * locals first, and the answer goes back into the colour's own parameter register.
+ */
+internal fun BytecodePatchContext.hookStatusBarColour(darkCheck: String, target: String = STATUS_BAR) {
+    val painter = statusBarPainter()
+    painter.requireLocals("Status bar colour", 2)
     painter.addInstructions(
         0,
         """
@@ -258,7 +269,7 @@ internal fun BytecodePatchContext.hookStatusBarColour(darkCheck: String) {
             invoke-static { v0 }, $darkCheck
             move-result v0
             move/from16 v1, p1
-            invoke-static { v1, v0 }, $STATUS_BAR
+            invoke-static { v1, v0 }, $target
             move-result p1
         """,
     )

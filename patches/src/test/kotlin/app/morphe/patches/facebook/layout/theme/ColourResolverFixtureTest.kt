@@ -155,4 +155,41 @@ class ColourResolverFixtureTest {
         }
         assertEquals("a declared build has no fixture", versions, checked)
     }
+
+    /**
+     * Material You's status bar on the same painter: its own hook when AMOLED isn't in the build,
+     * and in place of AMOLED's call when it is, so the bar's colour goes through one hook either way.
+     */
+    @Test
+    fun `the Material You status bar hook is first in the painter, with AMOLED or without, on each declared build`() {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        val checked = mutableSetOf<String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                val named = FixtureDex.classes(bundle, setOf(FDS_COLOR_SCHEME, STATUS_BAR_UTIL))
+                val viewResolver = viewResolverClass(named.getValue(FDS_COLOR_SCHEME))
+                val classes = named + FixtureDex.classes(bundle, setOf(viewResolver))
+                for (amoled in listOf(false, true)) {
+                    forgetMatches()
+                    val name = "${bundle.name}${if (amoled) " after AMOLED" else ""}"
+                    val context = PatchContexts.of(classes.values)
+                    val darkCheck = with(context) {
+                        val check = fdsDarkCheck()
+                        if (amoled) hookStatusBarColour(check)
+                        hookMaterialYouStatusBar(check)
+                        check
+                    }
+
+                    val hooked = context.mutableClassDefBy(STATUS_BAR_UTIL).methods
+                        .filter { it.calls(STATUS_BAR_YOU) || it.calls(STATUS_BAR) }
+                    assertEquals("$name: StatusBarUtil methods hooked", 1, hooked.size)
+                    val painter = hooked.single()
+                    val original = classes.getValue(STATUS_BAR_UTIL).methods.single { it.descriptor() == painter.descriptor() }
+                    assertStatusBarHook(name, painter, darkCheck, original.implementation!!.instructions.toList(), STATUS_BAR_YOU)
+                }
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", versions, checked)
+    }
 }

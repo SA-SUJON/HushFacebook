@@ -33,7 +33,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *
  * <p>Light mode is left alone. A colour token is only recoloured when it arrives with the exact
  * colour Facebook's dark theme gives that token ({@link #FDS_DARK}), and a literal or a server
- * colour only when it is one of the dark surfaces no light screen uses ({@link #SURFACES}).
+ * colour only when it is one of the dark surfaces no light screen uses ({@link #SURFACES}). The
+ * status bar asks Facebook's own dark check ({@link #statusBar}).
  *
  * <p>With the AMOLED black theme in the same build, AMOLED goes first. Its black backgrounds
  * reach this class as black, which is no dark-theme colour, so they stay black, and this class
@@ -141,6 +142,32 @@ public final class MaterialYouTheme {
         HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
         int color = SettingsStatus.amoledTheme() ? AmoledTheme.parseColor(text) : Color.parseColor(text);
         return isSurface(color) ? palette().sameLightness(TonePalette.NEUTRAL, color) : color;
+    }
+
+    /**
+     * The status bar: the colour Facebook is about to paint it, and whether Facebook's theme is dark.
+     *
+     * <p>On Android 15 and newer Facebook paints the bar itself, and the patch calls this first thing
+     * in that method. A tab's bar colour often comes from a token that isn't a dark-theme colour at
+     * all: back from Recent Apps the Video tab asks for {@code #333334}, which it asks for in light
+     * mode too. So the colour alone can't say which theme is on, and the patch passes Facebook's own
+     * answer for the window. One of Facebook's dark chrome greys (the band AMOLED blackens) takes the
+     * palette's neutral at the same lightness, as every grey this class recolours does.
+     *
+     * <p>With AMOLED in the build, the patch calls this in place of AMOLED's own hook and AMOLED's
+     * rule goes first. Its black stays black, since black is the palette's darkest tone.
+     *
+     * @return the palette's colour for a dark chrome grey in the dark theme, otherwise {@code color}
+     */
+    public static int statusBar(int color, boolean dark) {
+        return statusBar(color, dark, SettingsStatus.amoledTheme());
+    }
+
+    static int statusBar(int color, boolean dark, boolean amoled) {
+        HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
+        if (amoled) color = AmoledTheme.statusBar(color, dark);
+        if (!dark || !AmoledTheme.isDarkNeutral(color, AmoledTheme.MAX_BAR_CHANNEL)) return color;
+        return palette().sameLightness(TonePalette.NEUTRAL, color);
     }
 
     /** A grey becomes the palette's neutral, a Facebook blue its accent, both at the same lightness. */

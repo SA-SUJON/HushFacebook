@@ -36,12 +36,18 @@ private val COPIES = setOf(
 
 /**
  * Throws unless [method] starts with the status bar hook and then runs [original], its own body,
- * unchanged: the colour parameter goes through AmoledTheme.statusBar with what [darkCheck] answers
- * for the window's context, and the answer is back in the colour parameter before the method's
- * first instruction reads it. Each value is traced to the instruction that wrote it, so the test
- * holds for any choice of scratch registers.
+ * unchanged: the colour parameter goes through [target] (AmoledTheme.statusBar unless named) with
+ * what [darkCheck] answers for the window's context, and the answer is back in the colour parameter
+ * before the method's first instruction reads it. Each value is traced to the instruction that
+ * wrote it, so the test holds for any choice of scratch registers.
  */
-internal fun assertStatusBarHook(label: String, method: Method, darkCheck: String, original: List<Instruction>) {
+internal fun assertStatusBarHook(
+    label: String,
+    method: Method,
+    darkCheck: String,
+    original: List<Instruction>,
+    target: String = STATUS_BAR,
+) {
     val body = method.implementation!!.instructions.toList()
     val window = method.parameterRegisterNumber(0)
     val colour = method.parameterRegisterNumber(1)
@@ -58,8 +64,10 @@ internal fun assertStatusBarHook(label: String, method: Method, darkCheck: Strin
         return copy.opcode in COPIES && (copy as TwoRegisterInstruction).registerB == parameter
     }
 
-    val call = body.indexOfFirst { it.calls(STATUS_BAR) }
-    assertTrue("$label: nothing calls AmoledTheme.statusBar", call >= 0)
+    val call = body.indexOfFirst { it.calls(target) }
+    assertTrue("$label: nothing calls $target", call >= 0)
+    assertEquals("$label: the colour goes through more than one status bar hook", 1,
+        body.count { it.calls(STATUS_BAR) || it.calls(STATUS_BAR_YOU) })
     assertEquals("$label: the hook is all in front of the method's own code", body.size - original.size, call + 2)
     assertEquals("$label: the method's own code changed",
         original.map { it.opcode }, body.drop(call + 2).map { it.opcode })
@@ -164,6 +172,44 @@ class StatusBarHookTest {
         )) {
             val refused = assertThrows(PatchException::class.java) { hook(painter) }
             assertTrue(refused.message, refused.message.orEmpty().contains("0 static (Window, int) methods"))
+        }
+    }
+
+    /** Material You without AMOLED in the build: its own hook, the same shape, first thing in the painter. */
+    @Test
+    fun `Material You hooks the painter itself when AMOLED isn't in the build`() {
+        val painter = method("paint", 13, paints)
+        val context = PatchContexts.of(listOf(statusBarUtil(painter, method("icons", 5, iconsOnly))))
+        with(context) { hookMaterialYouStatusBar(darkCheck) }
+        val hooked = context.mutableClassDefBy(STATUS_BAR_UTIL).methods.associateBy { it.name }
+
+        assertStatusBarHook("paint", hooked.getValue("paint"), darkCheck, painter.body(), STATUS_BAR_YOU)
+        assertEquals("the method that paints nothing is left alone", 2, hooked.getValue("icons").body().size)
+    }
+
+    /**
+     * With AMOLED in the build its hook is already first in the painter. Material You's goes in its
+     * place, reading the same registers, and runs AMOLED's rule itself, so the colour goes through
+     * one hook in AMOLED-then-Material You order.
+     */
+    @Test
+    fun `Material You takes over AMOLED's call when AMOLED went first`() {
+        for (registers in listOf(13, 20)) {
+            val painter = method("paint", registers, paints)
+            val context = PatchContexts.of(listOf(statusBarUtil(painter)))
+            with(context) { hookStatusBarColour(darkCheck) }
+            val amoled = context.mutableClassDefBy(STATUS_BAR_UTIL).methods.single().body()
+            with(context) { hookMaterialYouStatusBar(darkCheck) }
+            val hooked = context.mutableClassDefBy(STATUS_BAR_UTIL).methods.single()
+
+            assertStatusBarHook("paint in $registers", hooked, darkCheck, painter.body(), STATUS_BAR_YOU)
+            val call = amoled.indexOfFirst { it.calls(STATUS_BAR) }
+            assertEquals("only AMOLED's call changed", amoled.filterIndexed { index, _ -> index != call }.map { it.opcode },
+                hooked.body().filterIndexed { index, _ -> index != call }.map { it.opcode })
+            val before = amoled[call] as FiveRegisterInstruction
+            val after = hooked.body()[call] as FiveRegisterInstruction
+            assertEquals("the call reads other registers", listOf(before.registerC, before.registerD),
+                listOf(after.registerC, after.registerD))
         }
     }
 

@@ -110,6 +110,44 @@ public class MaterialYouThemeTest {
         assertEquals("black stays black", 0xFF000000, MaterialYouTheme.mig(0xFF000000, null));
     }
 
+    /**
+     * The status bar on Android 15 and newer. Facebook's dark chrome greys take the palette at the
+     * same lightness, whichever token they came from, and only when Facebook's own check says the
+     * theme is dark: light mode asks the Video tab's token for the same #333334.
+     */
+    @Test
+    public void theStatusBarTakesThePaletteInTheDarkThemeOnly() {
+        for (int grey : new int[]{0xFF252728, 0xFF333334, 0xFF3A3B3C, 0xFF18191A}) {
+            int painted = MaterialYouTheme.statusBar(grey, true, false);
+            assertNotEquals(Integer.toHexString(grey) + " kept Facebook's grey", grey, painted);
+            assertEquals(Integer.toHexString(grey), palette.sameLightness(TonePalette.NEUTRAL, grey), painted);
+            assertSameLightness(Integer.toHexString(grey), grey, painted);
+            assertEquals(Integer.toHexString(grey) + " changed in light mode", grey, MaterialYouTheme.statusBar(grey, false, false));
+        }
+        assertEquals("black stays black", 0xFF000000, MaterialYouTheme.statusBar(0xFF000000, true, false));
+    }
+
+    /** The controls: what isn't one of Facebook's dark chrome greys keeps its colour in the dark theme too. */
+    @Test
+    public void aStatusBarColourItDoesntKnowFailsOpen() {
+        assertEquals("edge to edge", 0x00000000, MaterialYouTheme.statusBar(0x00000000, true, false));
+        assertEquals("a translucent scrim", 0x80333334, MaterialYouTheme.statusBar(0x80333334, true, false));
+        assertEquals("above the bar threshold", 0xFF4B4C4F, MaterialYouTheme.statusBar(0xFF4B4C4F, true, false));
+        assertEquals("a dark colour with a hue", 0xFF1A2A10, MaterialYouTheme.statusBar(0xFF1A2A10, true, false));
+        assertEquals("a blue bar", 0xFF0866FF, MaterialYouTheme.statusBar(0xFF0866FF, true, false));
+        assertEquals("a white bar", 0xFFFFFFFF, MaterialYouTheme.statusBar(0xFFFFFFFF, true, false));
+    }
+
+    /** With AMOLED in the build its rule goes first, and its black is no grey the palette takes. */
+    @Test
+    public void withAmoledTheStatusBarKeepsAmoledsBlack() {
+        assertEquals("the Video tab's bar", 0xFF000000, MaterialYouTheme.statusBar(0xFF333334, true, true));
+        assertEquals("the home bar", 0xFF000000, MaterialYouTheme.statusBar(0xFF252728, true, true));
+        assertEquals("light mode", 0xFF333334, MaterialYouTheme.statusBar(0xFF333334, false, true));
+        assertEquals("unpatched, the hook runs as without AMOLED", MaterialYouTheme.statusBar(0xFF333334, true, false),
+                MaterialYouTheme.statusBar(0xFF333334, true));
+    }
+
     @Test
     public void aServerColourIsRecolouredOnlyWhenItIsAKnownDarkSurface() {
         assertEquals(palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728), MaterialYouTheme.parseColor("#FF252728"));

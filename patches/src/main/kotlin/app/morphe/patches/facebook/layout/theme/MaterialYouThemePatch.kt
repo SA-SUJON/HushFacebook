@@ -4,7 +4,9 @@
  */
 package app.morphe.patches.facebook.layout.theme
 
+import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
+import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
@@ -37,6 +39,25 @@ private const val MIG = "$MATERIAL_YOU->mig(ILjava/lang/Object;)I"
 
 /** Route four: replaces `Color.parseColor`, and AMOLED's replacement of it when AMOLED went first. */
 private const val PARSE_COLOR_YOU = "$MATERIAL_YOU->parseColor(Ljava/lang/String;)I"
+
+/** The status bar: the colour and FDS's dark check. Runs AMOLED's own first when AMOLED is in the build. */
+internal const val STATUS_BAR_YOU = "$MATERIAL_YOU->statusBar(IZ)I"
+
+/**
+ * Sends the status bar's colour through the extension, first thing in the method that paints it,
+ * with [darkCheck]'s answer for the window, like AMOLED's hook. With AMOLED in the build its call
+ * is already there, and it goes to the extension's instead, which runs AMOLED's first: same
+ * signature, same registers, so the `move-result` after it stays right and the bar's colour goes
+ * through one hook in AMOLED-then-Material You order, as route four's parser does.
+ */
+internal fun BytecodePatchContext.hookMaterialYouStatusBar(darkCheck: String) {
+    val painter = statusBarPainter()
+    val amoled = painter.implementation!!.instructions.indexOfFirst { it.referenceText() == STATUS_BAR }
+    if (amoled < 0) return hookStatusBarColour(darkCheck, STATUS_BAR_YOU)
+
+    val call = painter.getInstruction<FiveRegisterInstruction>(amoled)
+    painter.replaceInstruction(amoled, "invoke-static { v${call.registerC}, v${call.registerD} }, $STATUS_BAR_YOU")
+}
 
 /**
  * Route three: the dark surfaces Facebook writes into its code, each read from the extension field
@@ -209,6 +230,10 @@ val materialYouThemePatch = bytecodePatch(
         DarkSchemeResolveFingerprint.method.hookColorReturns(tokenParameterIndex = 0, target = MIG)
         hookFdsColorsResolvers(target = FDS)
         fdsViewResolver().hookColorReturns(tokenParameterIndex = 1, target = FDS)
+
+        // The status bar, which a tab can colour from a token none of route one's rules knows as
+        // dark (issue #22 for AMOLED).
+        hookMaterialYouStatusBar(darkCheck = fdsDarkCheck())
 
         // Route four. AMOLED, when it went first, has sent every call to its own parser, and the
         // extension's parser calls AMOLED's when AMOLED is in the build.
