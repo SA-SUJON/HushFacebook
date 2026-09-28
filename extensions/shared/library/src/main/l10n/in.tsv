@@ -472,3 +472,16 @@ Undo	Urungkan
 
 # context: Settings overview, category navigation and search.
 Example without post details	Contoh tanpa detail postingan
+
+# context: Links section, the Supported links row. It reads Android's own per-app selection of Facebook's web addresses (Android 12 and later) and opens Android's Open by default page for this app. Use the phone's own names for Open supported links, Open by default and App info.
+Supported links	Tautan yang didukung
+Android verified this app for Facebook's web addresses, so their links open here.	Android telah memverifikasi aplikasi ini untuk alamat web Facebook, jadi tautannya terbuka di sini.
+Facebook's web addresses are selected for this app in Android's settings, so their links open here.	Alamat web Facebook dipilih untuk aplikasi ini di pengaturan Android, jadi tautannya terbuka di sini.
+Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.	Hanya sebagian alamat web Facebook yang dipilih untuk aplikasi ini, dan tautan ke alamat lainnya terbuka di tempat lain. Ketuk untuk memilihnya di pengaturan Android.
+None of Facebook's web addresses are selected for this app, so their links open elsewhere. Tap to select them in Android's settings.	Tidak ada alamat web Facebook yang dipilih untuk aplikasi ini, jadi tautannya terbuka di tempat lain. Ketuk untuk memilihnya di pengaturan Android.
+Opening supported links is off for this app in Android's settings. Tap to turn it on.	“Buka link yang didukung” nonaktif untuk aplikasi ini di pengaturan Android. Ketuk untuk mengaktifkannya.
+Android didn't say which links open here. Tap to check in Android's settings.	Android tidak memberi tahu tautan mana yang terbuka di sini. Ketuk untuk memeriksanya di pengaturan Android.
+Android 11 doesn't say which links open here. Tap to open this app's settings, then Open by default.	Android 11 tidak memberi tahu tautan mana yang terbuka di sini. Ketuk untuk membuka pengaturan aplikasi ini, lalu Buka secara default.
+Selecting links by hand	Memilih tautan secara manual
+Android checks Facebook's links against Meta's signing key, which a re-signed build doesn't have. Selecting the addresses sends their links here again. It doesn't restore Meta's verification, and your other link settings stay as they are.	Android memeriksa tautan Facebook dengan kunci penandatanganan Meta, yang tidak dimiliki build yang ditandatangani ulang. Memilih alamatnya akan mengirim tautannya ke sini lagi. Itu tidak memulihkan verifikasi Meta, dan pengaturan tautan Anda yang lain tetap seperti semula.
+Android's settings for this app didn't open. Open App info from Facebook's icon, then Open by default.	Pengaturan Android untuk aplikasi ini tidak terbuka. Buka Info aplikasi dari ikon Facebook, lalu Buka secara default.

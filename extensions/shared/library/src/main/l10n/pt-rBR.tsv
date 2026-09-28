@@ -472,3 +472,16 @@ Undo	Desfazer
 
 # context: Settings overview, category navigation and search.
 Example without post details	Exemplo sem detalhes da publicação
+
+# context: Links section, the Supported links row. It reads Android's own per-app selection of Facebook's web addresses (Android 12 and later) and opens Android's Open by default page for this app. Use the phone's own names for Open supported links, Open by default and App info.
+Supported links	Links compatíveis
+Android verified this app for Facebook's web addresses, so their links open here.	O Android verificou este app para os endereços web do Facebook, então os links deles abrem aqui.
+Facebook's web addresses are selected for this app in Android's settings, so their links open here.	Os endereços web do Facebook estão selecionados para este app nas configurações do Android, então os links deles abrem aqui.
+Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.	Só alguns endereços web do Facebook estão selecionados para este app, e os links para os outros abrem em outro lugar. Toque para selecioná-los nas configurações do Android.
+None of Facebook's web addresses are selected for this app, so their links open elsewhere. Tap to select them in Android's settings.	Nenhum endereço web do Facebook está selecionado para este app, então os links deles abrem em outro lugar. Toque para selecioná-los nas configurações do Android.
+Opening supported links is off for this app in Android's settings. Tap to turn it on.	“Abrir links compatíveis” está desativado para este app nas configurações do Android. Toque para ativar.
+Android didn't say which links open here. Tap to check in Android's settings.	O Android não informou quais links abrem aqui. Toque para conferir nas configurações do Android.
+Android 11 doesn't say which links open here. Tap to open this app's settings, then Open by default.	O Android 11 não informa quais links abrem aqui. Toque para abrir as configurações deste app e depois Abrir por padrão.
+Selecting links by hand	Selecionar links manualmente
+Android checks Facebook's links against Meta's signing key, which a re-signed build doesn't have. Selecting the addresses sends their links here again. It doesn't restore Meta's verification, and your other link settings stay as they are.	O Android confere os links do Facebook com a chave de assinatura da Meta, que uma versão reassinada não tem. Selecionar os endereços faz os links deles voltarem para cá. Isso não restaura a verificação da Meta, e suas outras configurações de links continuam como estão.
+Android's settings for this app didn't open. Open App info from Facebook's icon, then Open by default.	As configurações do Android para este app não abriram. Abra Informações do app pelo ícone do Facebook e depois Abrir por padrão.

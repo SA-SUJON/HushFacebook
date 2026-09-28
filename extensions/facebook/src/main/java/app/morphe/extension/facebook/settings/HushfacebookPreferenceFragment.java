@@ -91,6 +91,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     static final String STAYS_WHILE_PAUSED = "Stays in while paused";
     /** The Check now row's key. It stores nothing: no setting has this name. */
     static final String CHECK_NOW = "action_check_for_release";
+    /** The Supported links row's key. It stores nothing either. */
+    static final String SUPPORTED_LINKS = "action_supported_links";
 
     /** Thrown by the next initialize() and then cleared: how a test reaches the recovery page. */
     static volatile RuntimeException failNextInitialization;
@@ -163,6 +165,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         super.onResume();
         SettingsBackupPreference.onPageResumed(this);
         showMarketplaceSettings();
+        showSupportedLinks();
     }
 
     @Override
@@ -528,19 +531,24 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                             + "split these kinds out.")));
         }
 
-        if (build.contains(PatchFamily.EXTERNAL_BROWSER) || build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {
-            PreferenceCategory links = category(screen, L10n.t("Links"));
-            if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {
-                links.addPreference(toggle(context, Settings.OPEN_LINKS_EXTERNALLY, L10n.t("Open links in your browser"),
-                        L10n.t("Open web links in your browser. Facebook's own pages stay in the app.")));
-            }
-            if (build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {
-                links.addPreference(toggle(context, Settings.SANITIZE_SHARING_LINKS,
-                        L10n.t("Remove tracking from shared links"),
-                        L10n.t("Takes tracking tags such as mibextid off the links you share or copy. A "
-                                + "facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.")));
-            }
+        // In every build: Android checks Facebook's links against Meta's signing key, which no
+        // re-signed build has, whatever its patches.
+        PreferenceCategory links = category(screen, L10n.t("Links"));
+        if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {
+            links.addPreference(toggle(context, Settings.OPEN_LINKS_EXTERNALLY, L10n.t("Open links in your browser"),
+                    L10n.t("Open web links in your browser. Facebook's own pages stay in the app.")));
         }
+        if (build.contains(PatchFamily.SANITIZE_SHARING_LINKS)) {
+            links.addPreference(toggle(context, Settings.SANITIZE_SHARING_LINKS,
+                    L10n.t("Remove tracking from shared links"),
+                    L10n.t("Takes tracking tags such as mibextid off the links you share or copy. A "
+                            + "facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.")));
+        }
+        links.addPreference(supportedLinksRow(context));
+        links.addPreference(info(context, L10n.t("Selecting links by hand"),
+                L10n.t("Android checks Facebook's links against Meta's signing key, which a re-signed build doesn't have. "
+                        + "Selecting the addresses sends their links here again. It doesn't restore Meta's verification, "
+                        + "and your other link settings stay as they are.")));
 
         // In every build: the release check is the settings entry's own, not a patch's. Its switch
         // is one Pause turns off, so it sits above the Pause row with the rest.
@@ -849,6 +857,44 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         });
         checkNowRow = row;
         return row;
+    }
+
+    /**
+     * What Android says about sending Facebook's web addresses here, and the way to its page for
+     * them (Morphe Manager #1028). The page opens over Facebook, so the row reads the state again
+     * on the way back.
+     */
+    private Preference supportedLinksRow(Context context) {
+        Row row = new Row(context);
+        row.setKey(SUPPORTED_LINKS);
+        row.setTitle(L10n.t("Supported links"));
+        row.setPersistent(false);
+        row.setSummary(SupportedLinks.summary(SupportedLinks.read(context)));
+        row.setOnPreferenceClickListener(p -> {
+            openLinkSettings(context);
+            return true;
+        });
+        return row;
+    }
+
+    private void showSupportedLinks() {
+        if (getPreferenceScreen() == null) return;
+        Preference row = findPreference(SUPPORTED_LINKS);
+        if (row != null) row.setSummary(SupportedLinks.summary(SupportedLinks.read(row.getContext())));
+    }
+
+    private void openLinkSettings(Context context) {
+        for (Intent page : SupportedLinks.settingsIntents(context)) {
+            try {
+                startActivity(page);
+                return;
+            } catch (ActivityNotFoundException | SecurityException missing) {
+                // A phone without Open by default still has the app's own page, which leads there.
+            }
+        }
+        Logger.printInfo(() -> "No settings page opened for supported links");
+        Utils.showToastLong(L10n.t("Android's settings for this app didn't open. Open App info from Facebook's icon, "
+                + "then Open by default."));
     }
 
     @Override

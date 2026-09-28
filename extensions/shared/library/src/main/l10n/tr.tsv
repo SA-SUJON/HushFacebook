@@ -472,3 +472,16 @@ Undo	Geri al
 
 # context: Settings overview, category navigation and search.
 Example without post details	Gönderi ayrıntıları olmadan örnek
+
+# context: Links section, the Supported links row. It reads Android's own per-app selection of Facebook's web addresses (Android 12 and later) and opens Android's Open by default page for this app. Use the phone's own names for Open supported links, Open by default and App info.
+Supported links	Desteklenen bağlantılar
+Android verified this app for Facebook's web addresses, so their links open here.	Android bu uygulamayı Facebook'un web adresleri için doğruladı, bu yüzden bağlantıları burada açılır.
+Facebook's web addresses are selected for this app in Android's settings, so their links open here.	Facebook'un web adresleri Android ayarlarında bu uygulama için seçili, bu yüzden bağlantıları burada açılır.
+Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.	Facebook'un web adreslerinden yalnızca bazıları bu uygulama için seçili ve diğerlerinin bağlantıları başka yerde açılır. Android ayarlarında seçmek için dokunun.
+None of Facebook's web addresses are selected for this app, so their links open elsewhere. Tap to select them in Android's settings.	Facebook'un web adreslerinden hiçbiri bu uygulama için seçili değil, bu yüzden bağlantıları başka yerde açılır. Android ayarlarında seçmek için dokunun.
+Opening supported links is off for this app in Android's settings. Tap to turn it on.	“Desteklenen bağlantıları aç” Android ayarlarında bu uygulama için kapalı. Açmak için dokunun.
+Android didn't say which links open here. Tap to check in Android's settings.	Android burada hangi bağlantıların açıldığını bildirmedi. Android ayarlarında kontrol etmek için dokunun.
+Android 11 doesn't say which links open here. Tap to open this app's settings, then Open by default.	Android 11 burada hangi bağlantıların açıldığını bildirmez. Bu uygulamanın ayarlarını açmak için dokunun, ardından Varsayılan olarak aç'a gidin.
+Selecting links by hand	Bağlantıları elle seçme
+Android checks Facebook's links against Meta's signing key, which a re-signed build doesn't have. Selecting the addresses sends their links here again. It doesn't restore Meta's verification, and your other link settings stay as they are.	Android, Facebook'un bağlantılarını Meta'nın imzalama anahtarıyla denetler ve yeniden imzalanmış bir sürümde bu anahtar yoktur. Adresleri seçmek bağlantılarını yeniden buraya gönderir. Bu, Meta'nın doğrulamasını geri getirmez ve diğer bağlantı ayarlarınız olduğu gibi kalır.
+Android's settings for this app didn't open. Open App info from Facebook's icon, then Open by default.	Bu uygulamanın Android ayarları açılamadı. Facebook simgesinden Uygulama bilgileri'ni, ardından Varsayılan olarak aç'ı açın.
