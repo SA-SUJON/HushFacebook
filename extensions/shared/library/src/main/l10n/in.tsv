@@ -226,6 +226,8 @@ Returning to Facebook within ten minutes keeps your place. Pull to refresh still
 No time limit	Tanpa batas waktu
 With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.	Jika sakelar di atas aktif, posisi Anda tetap tersimpan berapa lama pun Anda pergi. Tarik untuk memuat ulang dan membuka ulang aplikasi tetap memuat postingan baru.
 A finished story stays on screen until you tap or swipe. Turn this off for Facebook's timing.	Cerita yang selesai tetap di layar sampai Anda mengetuk atau menggeser. Matikan ini untuk memakai waktu bawaan Facebook.
+View stories anonymously	Lihat cerita secara anonim
+Facebook isn't told which stories you watch, so you stay off their viewer lists. Replying or reacting still shows you, and stories you've watched keep their unwatched ring.	Facebook tidak diberi tahu cerita mana yang kamu tonton, jadi kamu tidak masuk daftar penontonnya. Membalas atau memberi reaksi tetap menunjukkan dirimu, dan cerita yang sudah kamu tonton tetap memakai lingkaran cerita yang belum dilihat.
 Stop Story auto-advance	Hentikan perpindahan otomatis Cerita
 Copy a short report to the clipboard.	Salin laporan singkat ke papan klip.
 Save the full report in Download/Morphe.	Simpan laporan lengkap di Download/Morphe.
@@ -480,7 +482,7 @@ Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook sett
 # context: Settings overview, category navigation and search.
 Marketplace mode and your start tab	Mode Marketplace dan tab awal
 Ads, suggestions and word filters	Iklan, saran, dan filter kata
-Suggestions, saving and auto-advance	Saran, penyimpanan, dan perpindahan otomatis
+Suggestions, saving, auto-advance and viewing anonymously	Saran, penyimpanan, perpindahan otomatis, dan melihat secara anonim
 Cleaner reels and video controls	Reels lebih bersih dan kontrol video
 Tap to play and resume	Ketuk untuk memutar dan melanjutkan
 Quality, format and file names	Kualitas, format, dan nama file

@@ -226,6 +226,8 @@ Returning to Facebook within ten minutes keeps your place. Pull to refresh still
 No time limit	Süre sınırı yok
 With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.	Yukarıdaki anahtar açıkken ne kadar uzun süre uzakta kalırsan kal yerin korunur. Yenilemek için çekmek ve uygulamayı yeniden başlatmak yine yeni gönderileri yükler.
 A finished story stays on screen until you tap or swipe. Turn this off for Facebook's timing.	Biten bir hikaye, dokunana veya kaydırana kadar ekranda kalır. Facebook'un zamanlamasını kullanmak için bunu kapat.
+View stories anonymously	Hikayeleri anonim olarak izle
+Facebook isn't told which stories you watch, so you stay off their viewer lists. Replying or reacting still shows you, and stories you've watched keep their unwatched ring.	Facebook hangi hikayeleri izlediğini öğrenmez, bu yüzden izleyici listelerinde yer almazsın. Yanıt vermek veya tepki bırakmak yine de seni gösterir. İzlediğin hikayeler izlenmemiş halkasını korur.
 Stop Story auto-advance	Hikayelerin otomatik ilerlemesini durdur
 Copy a short report to the clipboard.	Kısa raporu panoya kopyalar.
 Save the full report in Download/Morphe.	Tam raporu Download/Morphe konumuna kaydeder.
@@ -480,7 +482,7 @@ Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook sett
 # context: Settings overview, category navigation and search.
 Marketplace mode and your start tab	Marketplace modu ve başlangıç sekmesi
 Ads, suggestions and word filters	Reklamlar, öneriler ve kelime filtreleri
-Suggestions, saving and auto-advance	Öneriler, kaydetme ve otomatik ilerleme
+Suggestions, saving, auto-advance and viewing anonymously	Öneriler, kaydetme, otomatik ilerleme ve anonim izleme
 Cleaner reels and video controls	Daha sade Reels ve video kontrolleri
 Tap to play and resume	Oynatmak için dokunma ve devam ettirme
 Quality, format and file names	Kalite, biçim ve dosya adları

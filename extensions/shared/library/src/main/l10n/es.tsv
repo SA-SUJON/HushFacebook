@@ -226,6 +226,8 @@ Returning to Facebook within ten minutes keeps your place. Pull to refresh still
 No time limit	Sin límite de tiempo
 With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.	Con el interruptor de arriba activado, tu lugar se mantiene sin importar cuánto tiempo estés fuera. Deslizar para actualizar y abrir la app de nuevo siguen cargando publicaciones nuevas.
 A finished story stays on screen until you tap or swipe. Turn this off for Facebook's timing.	Una historia terminada permanece en pantalla hasta que toques o deslices. Desactiva esto para usar el tiempo de Facebook.
+View stories anonymously	Ver historias de forma anónima
+Facebook isn't told which stories you watch, so you stay off their viewer lists. Replying or reacting still shows you, and stories you've watched keep their unwatched ring.	Facebook no sabe qué historias ves, así que no apareces en sus listas de espectadores. Si respondes o reaccionas, se te sigue viendo, y las historias que ya viste conservan el círculo de historia sin ver.
 Stop Story auto-advance	Detener el avance automático de historias
 Copy a short report to the clipboard.	Copia un informe breve en el portapapeles.
 Save the full report in Download/Morphe.	Guarda el informe completo en Download/Morphe.
@@ -480,7 +482,7 @@ Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook sett
 # context: Settings overview, category navigation and search.
 Marketplace mode and your start tab	Modo Marketplace y pestaña de inicio
 Ads, suggestions and word filters	Anuncios, sugerencias y filtros de palabras
-Suggestions, saving and auto-advance	Sugerencias, guardado y avance automático
+Suggestions, saving, auto-advance and viewing anonymously	Sugerencias, guardado, avance automático y visualización anónima
 Cleaner reels and video controls	Reels más limpios y controles de vídeo
 Tap to play and resume	Tocar para reproducir y reanudar
 Quality, format and file names	Calidad, formato y nombres de archivo

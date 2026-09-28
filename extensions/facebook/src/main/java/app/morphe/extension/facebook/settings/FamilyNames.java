@@ -34,6 +34,7 @@ public final class FamilyNames {
     public static final String SPONSORED_STORIES = "Hide sponsored stories";
     public static final String SUGGESTED_STORIES = "Hide suggested stories";
     public static final String STORY_AUTO_ADVANCE = "Stop Story auto-advance";
+    public static final String STORY_SEEN = "View stories anonymously";
     public static final String SPONSORED_REELS = "Hide sponsored reels";
     public static final String SPONSORED_SEARCH = "Hide sponsored search results";
     public static final String SPONSORED_PROFILE_POSTS = "Hide sponsored profile posts";

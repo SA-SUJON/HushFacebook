@@ -197,6 +197,17 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/stories/StorySeen.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/stories/seen/StorySeenAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/stories/seen/ViewStoriesAnonymouslyPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the switch on the report of viewed stories that Facebook's story viewer sends as DirectSeenMutation, which puts the viewer on a story's viewer list. The patch finds the mutation's query class in Facebook 577 and 580 by its name and root field, the one method that creates it and fills story_ids_list, and the one other method of that class that calls it, and asks the extension first thing in that sender, which returns without sending while the switch is on. Loukious/FacebookAppAdsRemover and gnadgnaoh/NexAlloy-XES offer the same feature; neither is licensed for reuse, so nothing was taken from them."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/reels/**",
         "patches/src/main/kotlin/app/morphe/patches/facebook/reels/**"
       ],

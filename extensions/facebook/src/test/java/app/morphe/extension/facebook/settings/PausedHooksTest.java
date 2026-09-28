@@ -71,6 +71,7 @@ import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
 import app.morphe.extension.facebook.stories.StoryAdvance;
+import app.morphe.extension.facebook.stories.StorySeen;
 import app.morphe.extension.facebook.stories.SuggestedStoriesForTests;
 import app.morphe.extension.facebook.updates.UpdatePrompts;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -241,6 +242,8 @@ public class PausedHooksTest {
         // A tray of a friend's bucket, a suggested one and one labelled SUGGESTED keeps only the friend's.
         probes.put(PatchFamily.SUGGESTED_STORIES, Collections.singletonList(SuggestedStoriesForTests::hidesSuggestions));
         probes.put(PatchFamily.STORY_AUTO_ADVANCE, Collections.singletonList(StoryAdvance::waitForTap));
+        // The story viewer's report of the stories you viewed goes out.
+        probes.put(PatchFamily.STORY_SEEN, Collections.singletonList(StorySeen::holdBack));
         probes.put(PatchFamily.SPONSORED_REELS, Arrays.asList(
                 () -> {
                     VideoAd ad = new VideoAd();

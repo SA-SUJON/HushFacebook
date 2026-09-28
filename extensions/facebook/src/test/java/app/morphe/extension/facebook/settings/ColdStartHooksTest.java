@@ -61,6 +61,7 @@ import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
+import app.morphe.extension.facebook.stories.StorySeen;
 import app.morphe.extension.facebook.stories.SuggestedStoriesForTests;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.PauseForTests;
@@ -172,6 +173,7 @@ public class ColdStartHooksTest {
         assertFalse(ReelDeclutter.skipHotComment());
         assertFalse(ReelDeclutter.skipSocialBubbles());
         assertFalse("a batch of watched reels sent before the context was held back", SeenStateSendForTests.heldBack());
+        assertFalse("stories viewed before the context were kept off their viewer lists", StorySeen.holdBack());
         assertFalse(PlayerSourcesForTests.recordsAPlayer());
         assertFalse("a post menu built before the context got the video item", VideoMenuItemForTests.addsAnItem());
         assertFalse(PlayerSourcesForTests.recordsAVideoPlayer());

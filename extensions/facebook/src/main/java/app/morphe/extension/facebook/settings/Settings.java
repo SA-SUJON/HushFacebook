@@ -158,6 +158,14 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting BLOCK_STORY_AUTO_ADVANCE =
             new BooleanSetting("hushfacebook_block_story_auto_advance", TRUE);
 
+    /**
+     * The batches of viewed story cards the story viewer sends as DirectSeenMutation, which put you
+     * on each story's viewer list. Held back, replies and reactions still show you, and stories you
+     * viewed keep their unwatched ring.
+     */
+    public static final BooleanSetting VIEW_STORIES_ANONYMOUSLY =
+            new BooleanSetting("hushfacebook_view_stories_anonymously", TRUE);
+
     /** The two page filters that take server-inlined ads out of Reels and Watch. */
     public static final BooleanSetting HIDE_SPONSORED_REELS =
             new BooleanSetting("hushfacebook_hide_sponsored_reels", TRUE);

@@ -226,6 +226,8 @@ Returning to Facebook within ten minutes keeps your place. Pull to refresh still
 No time limit	Kein Zeitlimit
 With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.	Wenn der Schalter oben an ist, bleibt deine Stelle erhalten, egal wie lange du weg bist. Zum Aktualisieren ziehen und ein Neustart laden weiterhin neue Beiträge.
 A finished story stays on screen until you tap or swipe. Turn this off for Facebook's timing.	Eine abgeschlossene Story bleibt sichtbar, bis du tippst oder wischst. Schalte dies aus, um Facebooks Zeitsteuerung zu nutzen.
+View stories anonymously	Stories anonym ansehen
+Facebook isn't told which stories you watch, so you stay off their viewer lists. Replying or reacting still shows you, and stories you've watched keep their unwatched ring.	Facebook erfährt nicht, welche Stories du ansiehst, deshalb stehst du nicht in ihren Zuschauerlisten. Wenn du antwortest oder reagierst, sieht man dich trotzdem, und Stories, die du schon angesehen hast, behalten ihren Ring für neue Stories.
 Stop Story auto-advance	Automatisches Weiterspringen bei Stories stoppen
 Copy a short report to the clipboard.	Kurzen Bericht in die Zwischenablage kopieren.
 Save the full report in Download/Morphe.	Vollständigen Bericht unter Download/Morphe speichern.
@@ -480,7 +482,7 @@ Active. Marketplace, Notifications and Profile/Menu stay. Find Hushfacebook sett
 # context: Settings overview, category navigation and search.
 Marketplace mode and your start tab	Marketplace-Modus und Starttab
 Ads, suggestions and word filters	Werbung, Vorschläge und Wortfilter
-Suggestions, saving and auto-advance	Vorschläge, Speichern und automatischer Wechsel
+Suggestions, saving, auto-advance and viewing anonymously	Vorschläge, Speichern, automatischer Wechsel und anonymes Ansehen
 Cleaner reels and video controls	Reels und Videosteuerung
 Tap to play and resume	Antippen zum Abspielen und Fortsetzen
 Quality, format and file names	Qualität, Format und Dateinamen

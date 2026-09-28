@@ -378,7 +378,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         }
 
         if (build.contains(PatchFamily.SPONSORED_STORIES) || build.contains(PatchFamily.SUGGESTED_STORIES)
-                || build.contains(PatchFamily.STORY_AUTO_ADVANCE) || build.contains(PatchFamily.STORY_DOWNLOAD)) {
+                || build.contains(PatchFamily.STORY_AUTO_ADVANCE) || build.contains(PatchFamily.STORY_SEEN)
+                || build.contains(PatchFamily.STORY_DOWNLOAD)) {
             PreferenceCategory stories = category(screen, L10n.t("Stories"));
             if (build.contains(PatchFamily.SPONSORED_STORIES)) {
                 stories.addPreference(toggle(context, Settings.HIDE_SPONSORED_STORIES, L10n.t("Hide sponsored stories"),
@@ -395,6 +396,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 stories.addPreference(toggle(context, Settings.BLOCK_STORY_AUTO_ADVANCE,
                         L10n.t("Stop Story auto-advance"),
                         L10n.t("A finished story stays on screen until you tap or swipe. Turn this off for Facebook's timing.")));
+            }
+            if (build.contains(PatchFamily.STORY_SEEN)) {
+                stories.addPreference(toggle(context, Settings.VIEW_STORIES_ANONYMOUSLY,
+                        L10n.t("View stories anonymously"),
+                        L10n.t("Facebook isn't told which stories you watch, so you stay off their viewer lists. "
+                                + "Replying or reacting still shows you, and stories you've watched keep their "
+                                + "unwatched ring.")));
             }
             if (build.contains(PatchFamily.STORY_DOWNLOAD)) {
                 stories.addPreference(toggle(context, Settings.DOWNLOAD_STORIES, L10n.t("Save any story"),

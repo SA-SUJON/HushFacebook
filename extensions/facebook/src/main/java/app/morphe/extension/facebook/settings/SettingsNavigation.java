@@ -84,7 +84,7 @@ final class SettingsNavigation extends BaseAdapter {
         // Stable English route IDs survive a locale change; the displayed names are localized.
         section("Opening Facebook", L10n.t("Opening Facebook"), L10n.t("Marketplace mode and your start tab"), SettingsIcons.OPENING, true);
         section("News feed", L10n.t("News feed"), L10n.t("Ads, suggestions and word filters"), SettingsIcons.FEED, true);
-        section("Stories", L10n.t("Stories"), L10n.t("Suggestions, saving and auto-advance"), SettingsIcons.STORIES, true);
+        section("Stories", L10n.t("Stories"), L10n.t("Suggestions, saving, auto-advance and viewing anonymously"), SettingsIcons.STORIES, true);
         section("Reels and Watch", L10n.t("Reels and Watch"), L10n.t("Cleaner reels and video controls"), SettingsIcons.REELS, true);
         section("Playback", L10n.t("Playback"), L10n.t("Tap to play and resume"), SettingsIcons.PLAYBACK, true);
         section("Downloads", L10n.t("Downloads"), L10n.t("Quality, format and file names"), SettingsIcons.DOWNLOADS, true);

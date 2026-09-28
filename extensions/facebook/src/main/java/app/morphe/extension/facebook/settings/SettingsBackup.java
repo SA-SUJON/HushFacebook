@@ -102,6 +102,7 @@ public final class SettingsBackup {
             Settings.HIDE_SPONSORED_STORIES,
             Settings.HIDE_SUGGESTED_STORIES,
             Settings.BLOCK_STORY_AUTO_ADVANCE,
+            Settings.VIEW_STORIES_ANONYMOUSLY,
             Settings.HIDE_SPONSORED_REELS,
             Settings.HIDE_SPONSORED_SEARCH_RESULTS,
             Settings.HIDE_SPONSORED_PROFILE_POSTS,
