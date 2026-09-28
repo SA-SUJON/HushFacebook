@@ -701,6 +701,7 @@ function Test-ChangelogManagerEntry {
         reads its own heading pattern, which the bare headings matched.
 
         Only the section being released is held to this. Older sections are frozen as shipped.
+        "* **Tooling:** ..." bullets, the development-only entries, are allowed and not counted.
         Answers @{ Valid; Reason; Date; Bullets }.
     #>
     param(
@@ -742,6 +743,12 @@ function Test-ChangelogManagerEntry {
         if ($line -match '^#{1,2}(?!#)\s') { break }
         if ($line -match '^\s*[*+-]\s') {
             $scope = [regex]::Match($line, $managerScope)
+            # A development-only change, the CHANGELOG's other scope. Manager shows a line only to
+            # the app it's scoped to, so it shows these to nobody: allowed, and not counted.
+            if ($scope.Success -and $scope.Groups[1].Value -ceq 'Tooling') {
+                $previousWasBullet = $true
+                continue
+            }
             if (-not $scope.Success -or -not ($scope.Groups[1].Value -eq $App -or
                     $scope.Groups[1].Value.StartsWith("$App - "))) {
                 return Fail ("Line $($i + 1) is a $ExpectedVersion bullet Morphe Manager does not " +

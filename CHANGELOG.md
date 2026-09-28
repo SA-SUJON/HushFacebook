@@ -32,6 +32,7 @@ Every Hushfacebook release, newest first.
 * **Tooling:** The release check now downloads the published bundle, checksums, SBOM and receipt with `-UseBasicParsing`. Without it, Windows PowerShell 5.1 (the push hook's shell whenever pwsh isn't on the PATH) stops each download to ask a question no hook can answer, so every index push through it failed at the first download. PowerShell 7 ignores the switch.
 * **Tooling:** A release receipt now has to prove each declared Facebook build by its version code as well as its version name. Going by the name alone, another arm64 build of 580 (APKMirror lists several, each with its own code) would have counted as an unforced run of the declared one. The fixture check, the receipt builder and the phone build now treat such a build as undeclared, and their messages name the codes the catalog pins.
 * **Tooling:** The release check now reads the README's version badge and the sentence naming the latest release. A README with both still at 0.1.0 used to pass. Once a release is out, they have to name it and its patch count. While the next version is being prepared, they may name either that version or the published one.
+* **Tooling:** A release whose notes carry development-only entries like this one now passes the release check. Morphe Manager shows these lines to nobody, but the check refused every bullet not scoped to Facebook, so a release had to drop them or relabel them as user-facing changes. It still needs at least one Facebook entry.
 
 ## 0.3.4 (2026-09-27)
 

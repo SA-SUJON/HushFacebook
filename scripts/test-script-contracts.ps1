@@ -3233,6 +3233,22 @@ $otherScope = Test-ChangelogManagerEntry -Current ($readable -replace '\*\*Faceb
     -ExpectedVersion '0.42.0'
 Assert-True (-not $otherScope.Valid) 'A bullet scoped to another app was accepted.'
 
+# A development-only change is written "* **Tooling:** ...", and a release made from the entries
+# under Unreleased carries them. Manager shows a line only to the app it's scoped to, so it shows
+# these to nobody, which is what they're for: allowed, and not counted as Facebook changes. The
+# release check refused every one, so a release had to drop them or relabel them for users.
+$withTooling = Test-ChangelogManagerEntry -Current ($readable -replace '(\* \*\*Facebook:\*\* a third\.)',
+    "`$1`n* **Tooling:** a development-only change.") -ExpectedVersion '0.42.0'
+Assert-True ($withTooling.Valid -and $withTooling.Bullets -eq 3) `
+    "A Tooling bullet in the released entry was refused or counted: $($withTooling.Reason), $($withTooling.Bullets) bullets"
+$toolingOnly = Test-ChangelogManagerEntry -Current "## 0.42.0 (2026-09-20)`n`n* **Tooling:** only this.`n" -ExpectedVersion '0.42.0'
+Assert-True (-not $toolingOnly.Valid -and $toolingOnly.Reason -like '*no "* **Facebook:** " bullet*') `
+    "An entry with Tooling bullets alone, which gets no update badge, was not refused for that: $($toolingOnly.Reason)"
+$wrappedTooling = Test-ChangelogManagerEntry -Current ($readable -replace '(\* \*\*Facebook:\*\* a third\.)',
+    "`$1`n* **Tooling:** a development-only`n  change.") -ExpectedVersion '0.42.0'
+Assert-True ($wrappedTooling.Reason -like '*continues the bullet*') `
+    "A wrapped Tooling bullet was not held to one line like the others: $($wrappedTooling.Reason)"
+
 Assert-True (-not (Test-ChangelogManagerEntry -Current $readable -ExpectedVersion '0.43.0').Valid) `
     'An entry for a version the CHANGELOG does not name was accepted.'
 
