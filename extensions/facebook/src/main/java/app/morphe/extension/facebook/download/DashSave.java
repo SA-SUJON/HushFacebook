@@ -164,7 +164,7 @@ final class DashSave {
 
             if (progress.cancelled()) return Downloader.Result.fail(Downloader.Status.CANCELLED, "cancelled before the join");
             joined = File.createTempFile("joined", ".mp4", folder);
-            join(videoFile, audioFile, joined);
+            if (!join(videoFile, audioFile, joined, progress)) return cancelledJoining();
             // Joining writes boxes of its own, so the file itself is held to the cap as well.
             if (joined.length() > maxBytes) {
                 return Downloader.Result.fail(Downloader.Status.TOO_LARGE,
@@ -173,6 +173,9 @@ final class DashSave {
 
             return Downloader.publish(joined, "video/mp4", sink, progress);
         } catch (Throwable t) {
+            // A cancel can end the join in a failure of its own, a muxer stopped with no sample
+            // for one. It's still the person's cancel.
+            if (progress.cancelled()) return cancelledJoining();
             Logger.diagnosticError(DiagnosticCategory.DOWNLOADS, SOURCE, () -> "the DASH save failed", t);
             return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "the tracks could not be joined");
         } finally {
@@ -184,22 +187,38 @@ final class DashSave {
 
     // ---------------------------------------------------------------- internals
 
+    private static Downloader.Result cancelledJoining() {
+        return Downloader.Result.fail(Downloader.Status.CANCELLED, "cancelled during the join");
+    }
+
     /**
-     * Copy the samples of both files into [out], in order of time.
+     * Copy the samples of both files into [out], in order of time. Answers false when [progress]
+     * was cancelled first.
      *
      * <p>Each step writes the sample that comes first in time, from either track. A file with all
      * of the video before all of the sound also plays. But a player must then seek across the whole
      * file to start, and some players refuse that.
+     *
+     * <p>Cancel is read before every sample, between one native read and write and the next. A
+     * native call that blocks isn't interrupted, so a cancel waits for that one call at most. Under
+     * Robolectric (DashJoinTest) a minute of 720p, 4,384 samples, joined in 37 to 66 ms, and a
+     * cancel half way ended the join within 1 ms. A phone's time per sample isn't measured yet.
      */
-    private static void join(File video, File audio, File out) throws IOException {
-        MediaExtractor videoIn = new MediaExtractor();
-        MediaExtractor audioIn = audio == null ? null : new MediaExtractor();
+    private static boolean join(File video, File audio, File out, Downloader.Progress progress) throws IOException {
+        MediaExtractor videoIn = null;
+        MediaExtractor audioIn = null;
         MediaMuxer muxer = null;
         boolean started = false;
+        Throwable failure = null;
 
         try {
+            videoIn = new MediaExtractor();
             videoIn.setDataSource(video.getPath());
-            if (audioIn != null) audioIn.setDataSource(audio.getPath());
+            if (audio != null) {
+                audioIn = new MediaExtractor();
+                audioIn.setDataSource(audio.getPath());
+            }
+            if (progress.cancelled()) return false;
 
             muxer = new MediaMuxer(out.getPath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 
@@ -237,6 +256,7 @@ final class DashSave {
             boolean audioDone = audioIn == null;
 
             while (!videoDone || !audioDone) {
+                if (progress.cancelled()) return false;
                 boolean takeVideo = !videoDone && (audioDone || videoTime <= audioTime);
                 MediaExtractor from = takeVideo ? videoIn : audioIn;
                 int track = takeVideo ? videoTrack : audioTrack;
@@ -267,17 +287,39 @@ final class DashSave {
                     if (!more) audioDone = true;
                 }
             }
+            return true;
+        } catch (Throwable t) {
+            failure = t;
+            throw t;
         } finally {
+            // Each one is released whatever the one before it did. A muxer that failed to stop used
+            // to skip both extractors, and its failure took the place of the one that came first.
+            Throwable closing = failure;
             if (muxer != null) {
-                try {
-                    if (started) muxer.stop();
-                } finally {
-                    muxer.release();
-                }
+                if (started) closing = attempt(closing, muxer::stop);
+                closing = attempt(closing, muxer::release);
             }
-            videoIn.release();
-            if (audioIn != null) audioIn.release();
+            if (videoIn != null) closing = attempt(closing, videoIn::release);
+            if (audioIn != null) closing = attempt(closing, audioIn::release);
+            if (failure == null && closing != null) {
+                throw new IOException("the joined file could not be finished: " + closing.getClass().getSimpleName(),
+                    closing);
+            }
         }
+    }
+
+    /**
+     * Runs [step], and answers the failure to report: [failure] when there was one, with the step's
+     * own added to it, else the step's.
+     */
+    private static Throwable attempt(Throwable failure, Runnable step) {
+        try {
+            step.run();
+        } catch (Throwable t) {
+            if (failure == null) return t;
+            failure.addSuppressed(t);
+        }
+        return failure;
     }
 
     /** Select the first track of [kind] and return its format, or {@code null}. */
