@@ -2427,6 +2427,23 @@ try {
         Assert-True ($mixedFacts -like 'lag=True skip=True*') `
             "A push of main beside a new branch, neither rewriting main's index, was checked as an index push: $mixedFacts"
 
+        # Nor may a file the push changes hold an unresolved merge conflict. A CHANGELOG reached main
+        # with one in it and every gate passed it. ======= on its own is a Markdown heading's
+        # underline, not a conflict, and passes.
+        Assert-Throws { Push-ListingChange {
+                Set-Content -LiteralPath (Join-Path $listingRepo 'CHANGELOG.md') -Encoding ASCII -Value @(
+                    '## Unreleased', '', '<<<<<<< HEAD', '* **Facebook:** one side.', '||||||| base', '=======',
+                    '* **Facebook:** the other side.', '>>>>>>> 0123abc (the other side)') } } `
+            '*unresolved merge conflict*CHANGELOG.md:3:<<<<<<< HEAD*' 'A push carrying an unresolved merge conflict went out.'
+        $ran = Push-ListingChange {
+            Set-Content -LiteralPath (Join-Path $listingRepo 'CHANGELOG.md') -Encoding ASCII -Value @(
+                '## Unreleased', '', '* **Facebook:** one side.', '* **Facebook:** the other side.')
+            New-Item -ItemType Directory -Path (Join-Path $listingRepo 'docs') -Force | Out-Null
+            Set-Content -LiteralPath (Join-Path $listingRepo 'docs/heading.md') -Encoding ASCII -Value @('A heading', '=======', '', 'Text.')
+        }
+        Assert-True ($ran -eq 'validate-release-facts') `
+            "A push resolving the conflict, beside a heading underlined with =======, ran [$ran] instead of the release check."
+
         # Each end of a move counts where it is.
         $ran = Push-ListingChange {
             New-Item -ItemType Directory -Path (Join-Path $listingRepo 'attic') -Force | Out-Null

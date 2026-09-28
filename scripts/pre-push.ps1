@@ -418,6 +418,30 @@ try {
         Write-Step 'the push publishes no commit, so there is nothing to scan'
     }
 
+    # Nor may a text file the push changes hold an unresolved merge conflict: a line that opens one,
+    # sets off its base or closes it, the way git writes them. A CHANGELOG reached main with a whole
+    # conflict in it and every gate passed it. ======= alone is left out, since Markdown underlines
+    # a heading with it, and a conflict always carries the lines around it. Read from each pushed
+    # tip, which is what the ref will hold, or from the working tree by hand.
+    $conflicts = New-Object System.Collections.Generic.List[string]
+    $sources = if ($PSBoundParameters.ContainsKey('ChangedPaths')) { @('') } else { @($script:pushedCommits) }
+    foreach ($tip in $sources) {
+        $found = @(Invoke-GitQuietly (@('grep', '-n', '-I', '-E', '-e', '^(<<<<<<<|\|\|\|\|\|\|\||>>>>>>>)( |$)') +
+            @($tip | Where-Object { $_ }) + @('--', '.')))
+        # 1 is git grep's "no match". Anything above it means the search did not run.
+        if ($LASTEXITCODE -gt 1) {
+            throw "git grep could not search $(if ($tip) { "commit $tip" } else { 'the tracked files' }) for merge conflicts."
+        }
+        foreach ($line in $found) {
+            $hit = [regex]::Match([string]$line, '^(?:[0-9a-f]{40}:)?(?<path>.+?):\d+:')
+            if ($hit.Success -and $paths.Contains($hit.Groups['path'].Value)) { $conflicts.Add((([string]$line) -replace '\p{Cc}', '?')) }
+        }
+    }
+    if ($conflicts.Count -gt 0) {
+        throw ('A file this push changes holds an unresolved merge conflict. Resolve it and commit again: ' +
+            (@($conflicts | Select-Object -First 5) -join '; '))
+    }
+
     if ($paths.Count -eq 0) {
         Write-Step 'nothing to check'
         exit 0
