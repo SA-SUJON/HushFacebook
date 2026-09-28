@@ -46,7 +46,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
@@ -107,9 +109,18 @@ public class SaveProgressTest {
 
     /** A save on the feature's own worker, as a tap starts one, of [path] into the gallery. */
     private Thread save(String path) {
+        return save(path, new CompletableFuture<>());
+    }
+
+    /** The same, completing [ended] with the save's result as it ends. */
+    private Thread save(String path, CompletableFuture<Downloader.Result> ended) {
         File folder = DashSave.workFolder(context);
-        return MediaDownload.start(context, true, (writer, progress) -> Downloader.save(server.origin() + path,
-                Downloader.Kind.VIDEO, folder, writer, policy, Downloader.MAX_BYTES, progress));
+        return MediaDownload.start(context, true, (writer, progress) -> {
+            Downloader.Result result = Downloader.save(server.origin() + path, Downloader.Kind.VIDEO, folder, writer,
+                    policy, Downloader.MAX_BYTES, progress);
+            ended.complete(result);
+            return result;
+        });
     }
 
     private void finish(Thread worker) throws InterruptedException {
@@ -223,10 +234,14 @@ public class SaveProgressTest {
      */
     @Test
     public void cancelOnOneOfTwoSavesStopsThatOne() throws Exception {
-        server.serveGenerated("/one.mp4", "video/mp4", MP4_HEAD, 100 * MIB, 4 * MIB, release);
-        server.serveGenerated("/two.mp4", "video/mp4", MP4_HEAD, 100 * MIB, 4 * MIB, release);
-        Thread first = save("/one.mp4");
-        Thread second = save("/two.mp4");
+        server.serveGenerated("/one.mp4", "video/mp4", MP4_HEAD, 16 * MIB, MIB, release);
+        server.serveGenerated("/two.mp4", "video/mp4", MP4_HEAD, 16 * MIB, MIB, release);
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(gallery.videoUri(1), published);
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(gallery.videoUri(2), published);
+        CompletableFuture<Downloader.Result> firstEnded = new CompletableFuture<>();
+        CompletableFuture<Downloader.Result> secondEnded = new CompletableFuture<>();
+        Thread first = save("/one.mp4", firstEnded);
+        Thread second = save("/two.mp4", secondEnded);
         List<Integer> ids = new ArrayList<>();
         for (android.service.notification.StatusBarNotification up : notifications().getActiveNotifications()) {
             if (SaveControl.TAG.equals(up.getTag())) ids.add(up.getId());
@@ -240,14 +255,88 @@ public class SaveProgressTest {
 
         firstShown.actions[0].actionIntent.send();
         Shadows.shadowOf(Looper.getMainLooper()).idle();
-        first.join(15_000);
-        assertFalse("Cancel on the first save's notification didn't stop it", first.isAlive());
-        assertTrue("Cancel on the first save's notification stopped the second", second.isAlive());
         assertFalse(shown(SaveControl.TAG, ids.get(0)));
         assertTrue("the second save's notification went with the first", shown(SaveControl.TAG, ids.get(1)));
 
-        assertTrue(SaveControl.cancel(ids.get(1)));
+        // The server sends everything it held back, so a save that Cancel didn't stop runs to the
+        // end and saves. What decides the test is how each save ended, not how soon: a join of a
+        // fixed length once failed a save that did stop, only later than a busy machine allowed.
+        release.countDown();
+        assertEquals("Cancel on the first save's notification didn't stop it",
+                Downloader.Status.CANCELLED, firstEnded.get(60, TimeUnit.SECONDS).status);
+        assertEquals("Cancel on the first save's notification stopped the second",
+                Downloader.Status.OK, secondEnded.get(60, TimeUnit.SECONDS).status);
+        finish(first);
         finish(second);
+    }
+
+    /**
+     * A Cancel pressed as the save opens its connection. Its close came before the connection
+     * existed and closed nothing, on the JDK and on Android alike, so the save went on to wait for
+     * an answer for as long as the read timeout allowed. The test server answers one connection at
+     * a time, and here it's busy with another fetch, the way it was when two saves ran at once and
+     * the second got in first.
+     */
+    @Test
+    public void aCancelAsTheConnectionOpensStopsASaveTheServerHasNotAnswered() throws Exception {
+        server.serveHeld("/busy.mp4", "video/mp4", MP4_HEAD, 2 * MIB, MIB, release);
+        server.serveGenerated("/late.mp4", "video/mp4", MP4_HEAD, 2 * MIB, Long.MAX_VALUE, null);
+        // No read timeout: a save that waits for the answer waits until the server is free.
+        Downloader.readTimeoutMs = 0;
+        File other = File.createTempFile("busy", ".part", context.getCacheDir());
+        Thread busy = new Thread(() -> Downloader.fetch(server.origin() + "/busy.mp4", Downloader.Kind.VIDEO, other,
+                policy, Downloader.MAX_BYTES, Downloader.SILENT));
+        busy.setDaemon(true);
+        try {
+            busy.start();
+            long until = System.currentTimeMillis() + 20_000;
+            while (server.hits("/busy.mp4") == 0 && System.currentTimeMillis() < until) Thread.sleep(20);
+            assertEquals("the server never took the other fetch", 1, server.hits("/busy.mp4"));
+
+            CompletableFuture<Downloader.Result> ended = new CompletableFuture<>();
+            File folder = DashSave.workFolder(context);
+            Thread worker = MediaDownload.start(context, true, (writer, progress) -> {
+                SaveControl.Save save = (SaveControl.Save) progress;
+                CountDownLatch closed = new CountDownLatch(1);
+                Downloader.Result result = Downloader.save(server.origin() + "/late.mp4", Downloader.Kind.VIDEO, folder,
+                        writer, policy, Downloader.MAX_BYTES, new Downloader.Progress() {
+                            @Override public void transferred(long done, long total) {
+                                save.transferred(done, total);
+                            }
+
+                            // Cancel is pressed here, and its close runs before the connection opens.
+                            @Override public void reading(Runnable close) {
+                                save.reading(() -> {
+                                    close.run();
+                                    closed.countDown();
+                                });
+                                SaveControl.cancel(save.id);
+                                try {
+                                    closed.await(20, TimeUnit.SECONDS);
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                }
+                            }
+
+                            @Override public boolean cancelled() {
+                                return save.cancelled();
+                            }
+                        });
+                ended.complete(result);
+                return result;
+            });
+
+            assertEquals("a save cancelled as its connection opened waited for the server",
+                    Downloader.Status.CANCELLED, ended.get(30, TimeUnit.SECONDS).status);
+            finish(worker);
+            assertEquals("Save cancelled", ShadowToast.getTextOfLatestToast());
+            assertEquals(0, gallery.inserts.size());
+        } finally {
+            release.countDown();
+            busy.join(30_000);
+            Downloader.readTimeoutMs = 20_000;
+            Downloader.delete(other);
+        }
     }
 
     /**

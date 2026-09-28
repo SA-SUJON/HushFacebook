@@ -506,6 +506,11 @@ final class Downloader {
                 // disconnect(), never the stream's close(): over HTTPS on Android only disconnect()
                 // ends a read that's waiting (SaveControl.Save.cancel has the measurements).
                 progress.reading(connection::disconnect);
+                // A cancel's close that runs before the connection exists closes nothing, on the
+                // JDK and on Android alike, and the fetch then waited for an answer until the read
+                // timeout. So the flag is read again once connected; a close after that ends the wait.
+                connection.connect();
+                if (progress.cancelled()) return cancelled();
 
                 int code = connection.getResponseCode();
                 if (code != 301 && code != 302 && code != 303 && code != 307 && code != 308) {
