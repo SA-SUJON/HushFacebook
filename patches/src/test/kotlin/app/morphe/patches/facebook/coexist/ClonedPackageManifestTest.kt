@@ -4,6 +4,7 @@
  */
 package app.morphe.patches.facebook.coexist
 
+import app.morphe.patches.facebook.misc.extension.PatchLogCapture
 import java.io.StringReader
 import java.io.StringWriter
 import javax.xml.parsers.DocumentBuilderFactory
@@ -12,6 +13,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.w3c.dom.Attr
 import org.w3c.dom.Document
@@ -218,5 +220,24 @@ class ClonedPackageManifestTest {
 
         assertNull(document.followRenamedPackage(facebook, stockAuthorities))
         assertEquals(before, document.text())
+    }
+
+    /**
+     * Nothing here can tell a plain install apart from a clone whose "Clone app" hasn't finalized
+     * yet (Morphe gives patches no way to see what else was selected), so a selection holding only
+     * patches whose names sort after "Clone app" leaves this step silent and the manifest as Clone
+     * app wrote it (ClonedPackageOrderTest.aSelectionOfOnlyLaterNamedPatchesRunsCloneAppFirst). The
+     * fine message is this step's only way to say what to do about it, without claiming a clone is
+     * actually in play on every ordinary build.
+     */
+    @Test
+    fun aStillStockPackageExplainsWhatToAddForAClone() {
+        val document = patched()
+
+        val messages = PatchLogCapture.fine { document.followRenamedPackage(facebook, stockAuthorities) }
+
+        assertEquals(1, messages.size)
+        assertTrue(messages[0], messages[0].contains("Clone app"))
+        assertTrue(messages[0], messages[0].contains("Block ad telemetry"))
     }
 }

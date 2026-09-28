@@ -35,6 +35,14 @@ import org.w3c.dom.Element
  * and the default selection has patches whose names sort before "Clone app" (ClonedPackageOrderTest
  * holds both). A selection without any of them leaves the manifest as Clone app wrote it. The code
  * half doesn't depend on the order: the extension reads the package at run time.
+ *
+ * There's no way to make this run after "Clone app" whatever the reader picks: Morphe sorts and
+ * finalizes by what got selected, "Clone app" comes from a different bundle this one can't depend
+ * on, and a patch has no way to ask what else was selected. So a selection holding only patches
+ * whose names sort after "Clone app" (ClonedPackageOrderTest.aSelectionOfOnlyLaterNamedPatchesRunsCloneAppFirst
+ * shows one) leaves [followRenamedPackage] running before the rename, with nothing to follow yet.
+ * It can't tell that apart from an ordinary install either, so it says what to add at fine level
+ * instead of warning on every build that was never a clone.
  */
 
 /** The call each of Facebook's own authority literals goes through, into the register it was loaded into. */
@@ -63,11 +71,21 @@ internal data class Followed(val permissions: Int, val authorities: Int)
  * permission this manifest no longer declares at the renamed declaration Clone app made of it, and
  * moves every authority still in [stockAuthorities] under the new package, which is where Clone
  * app's Update providers would have put it. Answers what it moved, or null when the package is
- * still [originalPackage], and then it changes nothing.
+ * still [originalPackage], and then it changes nothing but a fine message, since this could be an
+ * ordinary install as easily as a clone whose "Clone app" hasn't finalized yet.
  */
 internal fun Document.followRenamedPackage(originalPackage: String, stockAuthorities: Set<String>): Followed? {
     val renamedTo = documentElement.getAttribute("package")
-    if (renamedTo.isEmpty() || renamedTo == originalPackage) return null
+    if (renamedTo.isEmpty() || renamedTo == originalPackage) {
+        patchLog.fine(
+            "The package is still $originalPackage, so there's nothing to follow yet. If you're patching " +
+                "with Clone app and the clone still doesn't start beside the app it came from, also select a " +
+                "patch whose name sorts before \"Clone app\", such as Block ad telemetry, which is on by " +
+                "default: Morphe finalizes in reverse name order, and this step has to run after Clone app's " +
+                "to see the renamed manifest.",
+        )
+        return null
+    }
 
     val declared = elements("permission").map { it.getAttribute("android:name") }.toSet()
     fun movedUnder(name: String) = renamedTo + name.removePrefix(originalPackage)

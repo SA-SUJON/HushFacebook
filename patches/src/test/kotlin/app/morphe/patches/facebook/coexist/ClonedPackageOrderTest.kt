@@ -5,6 +5,7 @@
 package app.morphe.patches.facebook.coexist
 
 import app.morphe.patcher.patch.Patch
+import app.morphe.patcher.patch.resourcePatch
 import java.io.File
 import java.lang.reflect.Modifier
 import org.junit.Assert.assertEquals
@@ -33,6 +34,24 @@ class ClonedPackageOrderTest {
 
     private fun Patch<*>.reaches(target: Patch<*>): Boolean = this === target || dependencies.any { it.reaches(target) }
 
+    /**
+     * The order Morphe's own [selection] loop would actually execute patches in: each visited sorted
+     * by name, a patch's dependencies executed (and so recorded) before the patch itself, and a
+     * patch already recorded skipped. This mirrors Patcher.kt's `invoke()` closely enough to say
+     * which of two patches executed first, which is what decides which finalizes last: finalize runs
+     * in the exact reverse of this order.
+     */
+    private fun executionOrder(selection: List<Patch<*>>): List<Patch<*>> {
+        val executed = LinkedHashSet<Patch<*>>()
+        fun visit(patch: Patch<*>) {
+            if (patch in executed) return
+            patch.dependencies.forEach(::visit)
+            executed.add(patch)
+        }
+        selection.sortedBy { it.name }.forEach(::visit)
+        return executed.toList()
+    }
+
     /** Whatever the reader picks, a clone's code reaches its own providers. */
     @Test
     fun everyPatchBringsTheCloneSupport() {
@@ -46,5 +65,30 @@ class ClonedPackageOrderTest {
     fun theDefaultSelectionHasPatchesMorpheRunsBeforeCloneApp() {
         val early = bundlePatches().filter { it.name != null && it.name!! < "Clone app" }.distinct()
         assertTrue("no default patch sorts before Clone app: ${early.map { it.name }}", early.any { it.default })
+    }
+
+    /**
+     * The gap ClonedPackage.kt's finalize can't close: a selection holding only patches whose names
+     * sort after "Clone app" (its own examples, Hide sponsored posts and Use the system font) never
+     * pulls the manifest fix in ahead of it, because a dependency's name doesn't affect the outer
+     * sort, only a selected patch's own does, and there's no selected patch here sorting first. So
+     * "Clone app" executes (and later finalizes last) before the fix has ever run. clonedPackageManifestPatch
+     * is private to that file, but it's always [clonedPackagePatch]'s dependency, and so always
+     * executes before it, so the same comparison against clonedPackagePatch proves it either way.
+     */
+    @Test
+    fun aSelectionOfOnlyLaterNamedPatchesRunsCloneAppFirst() {
+        val cloneApp = resourcePatch(name = "Clone app") { }
+        val bundle = bundlePatches()
+        val hideSponsoredPosts = bundle.single { it.name == "Hide sponsored posts" }
+        val useTheSystemFont = bundle.single { it.name == "Use the system font" }
+
+        val order = executionOrder(listOf(cloneApp, hideSponsoredPosts, useTheSystemFont))
+
+        assertTrue(
+            "expected \"Clone app\" to execute, and so finalize last, before the manifest fix: " +
+                order.map { it.name },
+            order.indexOf(cloneApp) < order.indexOf(clonedPackagePatch),
+        )
     }
 }
