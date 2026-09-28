@@ -385,6 +385,79 @@ public class HushfacebookPreferenceFragmentTest {
         assertFalse("OK left it open", shown.isShowing());
     }
 
+    /**
+     * The page's own dialogs are drawn over its activity's window: the list of sections, Licenses
+     * and a word list's note. Open when the page went, on a rotation, Back or Facebook closing,
+     * they outlived that window, which Android reports as a leaked window, and the note went with it.
+     */
+    @Test
+    public void thePagesDialogsCloseWhenItsViewGoes() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.POST_WORDS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            List<AlertDialog> open = new ArrayList<>();
+            Preference jump = rows.get(indexOfKey(rows, "action_jump_to_section"));
+            jump.getOnPreferenceClickListener().onPreferenceClick(jump);
+            open.add(ShadowAlertDialog.getLatestAlertDialog());
+            Preference licenses = null;
+            for (Preference row : rows) if ("Licenses".contentEquals(row.getTitle())) licenses = row;
+            assertNotNull("no Licenses row", licenses);
+            licenses.getOnPreferenceClickListener().onPreferenceClick(licenses);
+            open.add(ShadowAlertDialog.getLatestAlertDialog());
+            Preference hide = rows.get(indexOfKey(rows, Settings.HIDDEN_WORDS.key));
+            assertFalse(hide.getOnPreferenceChangeListener().onPreferenceChange(hide, "a\nspoiler"));
+            ShadowLooper.idleMainLooper();
+            open.add(ShadowAlertDialog.getLatestAlertDialog());
+
+            List<String> titles = new ArrayList<>();
+            for (AlertDialog dialog : open) {
+                assertTrue(dialog.isShowing());
+                titles.add(String.valueOf(Shadows.shadowOf(dialog).getTitle()));
+            }
+            assertEquals(Arrays.asList("Jump to a section", "Licenses", "Words to hide"), titles);
+
+            controller.recreate();
+            ShadowLooper.idleMainLooper();
+
+            for (AlertDialog dialog : open) {
+                assertFalse(Shadows.shadowOf(dialog).getTitle() + " outlived the page", dialog.isShowing());
+            }
+        }
+    }
+
+    /**
+     * A Save on a word list can land as the activity goes. The button's click and the edit
+     * dialog's close are posted one after the other, and when the activity's end comes between
+     * them, it closes the dialog itself, which still counts as Save. The list's listener then runs
+     * after the page is gone, and its note that lines were left out came up over a window that
+     * was gone with it.
+     */
+    @Test
+    public void aWordListSavedAsTheActivityGoesShowsNoNoteOverIt() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.POST_WORDS);
+        ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup();
+        List<Preference> rows = rowsOf(controller);
+        HushfacebookPreferenceFragment.WordsRow hide =
+                (HushfacebookPreferenceFragment.WordsRow) rows.get(indexOfKey(rows, Settings.HIDDEN_WORDS.key));
+        hide.showDialog(null);
+        AlertDialog edit = (AlertDialog) hide.getDialog();
+        hide.getEditText().setText("a\nspoiler");
+        ShadowLooper.idleMainLooper();
+        ShadowAlertDialog.reset();
+
+        edit.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        // The click runs, and the close waits behind it.
+        ShadowLooper.shadowMainLooper().runOneTask();
+        assertTrue("the edit dialog closed before the activity went", edit.isShowing());
+        controller.pause().stop().destroy();
+        ShadowLooper.idleMainLooper();
+
+        // Only the list's listener puts the cleaned list in the row.
+        assertEquals("the listener never ran, so this checked nothing", "spoiler", hide.getText());
+        AlertDialog note = ShadowAlertDialog.getLatestAlertDialog();
+        assertTrue("a note came up over a destroyed activity", note == null || !note.isShowing());
+    }
+
     /** The hide list's row counts the posts it hid since Facebook started, and never names one. */
     @Test
     public void theHideListSaysHowManyPostsItHid() {

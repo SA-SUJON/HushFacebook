@@ -123,6 +123,9 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     @Nullable
     AlertDialog importPreview;
 
+    /** The page's other dialogs that may still be on screen: the sections, Licenses and a word list's note. */
+    private final List<Dialog> shownDialogs = new ArrayList<>();
+
     /**
      * Where the list was before the last section jump, as its first visible position and that row's
      * top, which Back goes back to once; null when there's been no jump since.
@@ -202,6 +205,9 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         // The preview is drawn over this page's window. It stays unanswered, and the page that
         // replaces this one shows it again.
         SettingsBackupPreference.closePreview(this);
+        // The page's other dialogs are drawn over its window too, and would outlive it.
+        for (Dialog dialog : new ArrayList<>(shownDialogs)) dialog.dismiss();
+        shownDialogs.clear();
         ReleaseCheck.unwatch(this);
         if (navigation != null) navigation.close();
         navigation = null;
@@ -824,11 +830,24 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         List<Preference> sections = sections();
         CharSequence[] titles = new CharSequence[sections.size()];
         for (int i = 0; i < titles.length; i++) titles[i] = sections.get(i).getTitle();
-        ScreenColors.dialog(new AlertDialog.Builder(context)
+        show(new AlertDialog.Builder(context)
                 .setTitle(L10n.t("Jump to a section"))
                 .setItems(titles, (dialog, which) -> jumpTo(sections.get(which)))
-                .setNegativeButton(L10n.t("Cancel"), null)
-                .show());
+                .setNegativeButton(L10n.t("Cancel"), null));
+    }
+
+    /**
+     * Shows [builder]'s dialog in the screen's colours, and closes it with the page's view. Nothing
+     * shows once the view is gone or the activity is finishing: a word list's Save can land as the
+     * activity goes, and its note would come up over a window that's gone.
+     */
+    private void show(AlertDialog.Builder builder) {
+        Activity activity = getActivity();
+        if (getView() == null || activity == null || activity.isFinishing() || activity.isDestroyed()) return;
+        AlertDialog dialog = builder.show();
+        ScreenColors.dialog(dialog);
+        shownDialogs.add(dialog);
+        dialog.setOnDismissListener(shownDialogs::remove);
     }
 
     /** The section headings on the page, in order. */
@@ -1432,7 +1451,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * {@link PostWords} holds every list to, so the row, the setting and the filter all read the
      * same phrases. A dialog says how many lines were left out, never which.
      */
-    static WordsRow wordsRow(Context context, StringSetting setting, boolean hides) {
+    WordsRow wordsRow(Context context, StringSetting setting, boolean hides) {
         WordsRow row = new WordsRow(context, hides);
         row.setKey(setting.key);
         String title = hides ? L10n.t("Words to hide") : L10n.t("Words that keep a post");
@@ -1475,11 +1494,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                                 + "emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
                                 + "once, and a list holds %4$d.",
                         leftOut, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH, PostWords.MAX_PHRASES);
-                ScreenColors.dialog(new AlertDialog.Builder(preference.getContext())
+                show(new AlertDialog.Builder(preference.getContext())
                         .setTitle(title)
                         .setMessage(why)
-                        .setPositiveButton(L10n.t("OK"), null)
-                        .show());
+                        .setPositiveButton(L10n.t("OK"), null));
             }
             return false;
         });
@@ -2099,7 +2117,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * The notice itself stays in English, as the licence texts it carries are: a translation of
      * the GPL is not the licence.
      */
-    private static void showNotice(Context context) {
+    private void showNotice(Context context) {
         TextView text = new TextView(context);
         // NOTICE is hard-wrapped for a source file. Reflow prose on a narrow screen while keeping
         // blank lines, headings, lists and the generated notice itself intact.
@@ -2118,11 +2136,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         text.setTextColor(colors.summary);
         text.setLinkTextColor(colors.heading);
         Linkify.addLinks(text, Linkify.WEB_URLS);
-        ScreenColors.dialog(new AlertDialog.Builder(context)
+        show(new AlertDialog.Builder(context)
                 .setTitle(L10n.t("Licenses"))
                 .setView(scroll)
-                .setPositiveButton(L10n.t("OK"), null)
-                .show());
+                .setPositiveButton(L10n.t("OK"), null));
     }
 
     @Override
