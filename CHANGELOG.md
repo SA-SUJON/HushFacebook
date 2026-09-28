@@ -38,6 +38,7 @@ Every Hushfacebook release, newest first.
 * **Tooling:** Pushing main together with a new branch no longer gets the release checks meant for publishing a new index. A new branch is read from its whole tree, which always holds the index file, and that counted as main changing it. Only main or a tag that changes the index gets those checks now.
 * **Tooling:** A push now stops when a text file it changes still holds an unresolved merge conflict. One reached this changelog on main and every check let it through. A Markdown heading underlined with equals signs isn't mistaken for one.
 * **Facebook:** The Morphe Manager descriptions of `Marketplace only` and `Open on a chosen tab` now say their switches start off. Marketplace only is in the default selection, so its description read as if patching alone would hide your tabs. Turn either on under Opening Facebook in Hushfacebook's settings.
+* **Facebook:** `Hide sponsored reels` can no longer pass an error into Facebook's Reels page. If a page can't be read while it's being filtered, it now goes through as Facebook sent it and the diagnostic report names the hook that failed. The section filter already worked this way. Found in a code audit, not reported by anyone.
 
 ## 0.3.4 (2026-09-27)
 
