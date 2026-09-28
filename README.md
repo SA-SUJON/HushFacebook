@@ -18,7 +18,7 @@
 
 Hushfacebook is a Morphe patch bundle for Android that takes the clutter out of Facebook and puts useful controls back in your hands.
 
-The latest release is [v0.3.4](https://github.com/SysAdminDoc/Hushfacebook/releases/tag/v0.3.4), with 43 patches. It includes all changes since v0.2.0, including searchable settings, Marketplace only and the playback and download fixes in the [changelog](CHANGELOG.md).
+The latest release is [v0.4.0](https://github.com/SysAdminDoc/Hushfacebook/releases/tag/v0.4.0), with 43 patches. It includes all changes since v0.3.4, among them clone and AMOLED fixes, a no-limit feed refresh option and cancellable saves in settings, as the [changelog](CHANGELOG.md) describes.
 
 [Add to Morphe](https://morphe.software/add-source?github=SysAdminDoc%2FHushfacebook) | [Download a release](https://github.com/SysAdminDoc/Hushfacebook/releases/latest) | [Browse the patches](#patches)
 
