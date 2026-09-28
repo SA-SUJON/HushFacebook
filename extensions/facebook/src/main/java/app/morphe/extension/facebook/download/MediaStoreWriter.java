@@ -37,9 +37,8 @@ import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
  *
  * <p>The entry is created with {@code IS_PENDING} set, and it is published only after the last
  * byte arrives. So a failed fetch never leaves a playable looking file of the wrong length in the
- * gallery. A save that the system stops half way through the copy leaves a pending row; the first
- * save of the next process removes it ({@link SaveLeftovers}), and the platform would after about
- * a week.
+ * gallery. A save that the system stops half way through the copy leaves a pending row; the next
+ * start of Facebook removes it ({@link SaveLeftovers}), and the platform would after about a week.
  */
 final class MediaStoreWriter implements Downloader.Sink {
 

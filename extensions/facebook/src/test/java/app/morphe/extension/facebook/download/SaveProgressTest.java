@@ -6,6 +6,7 @@ package app.morphe.extension.facebook.download;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -376,6 +377,95 @@ public class SaveProgressTest {
         assertTrue("a second save in the same process swept again", new File(folder, "video9.part").exists());
     }
 
+    /**
+     * Android ended Facebook in the middle of a save, and Facebook is opened again with no save
+     * after it. Its start removes what that save left, on a worker: the start doesn't wait on the
+     * gallery, a save tapped meanwhile waits for the sweep, and that save's own notification and
+     * work file stay, through a second start too. A finished file, the rest of the cache and a
+     * start in another of Facebook's processes are left alone.
+     */
+    @Test
+    public void startingFacebookRemovesWhatAStoppedSaveLeft() throws Exception {
+        File folder = DashSave.workFolder(context);
+        File partial = new File(folder, "video1.part");
+        File joined = new File(folder, "joined2.mp4");
+        assertTrue(partial.createNewFile());
+        assertTrue(joined.createNewFile());
+        File unrelated = new File(context.getCacheDir(), "image_cache.bin");
+        assertTrue(unrelated.createNewFile());
+        Uri pending = row(1);
+        Uri finished = row(0);
+        SaveLeftovers.pending(context, pending);
+        SaveLeftovers.pending(context, finished);
+        SaveControl.Save stopped = SaveControl.begin(context, true);
+        int stoppedId = stopped.id;
+        stopped.end();
+        notifications().notify(SaveControl.TAG, stoppedId, new Notification.Builder(context, SaveControl.CHANNEL)
+                .setSmallIcon(android.R.drawable.stat_sys_download).setContentTitle("Saving a video")
+                .setOngoing(true).build());
+
+        // A start in another of Facebook's processes leaves it all: only the main one saves.
+        android.content.pm.ApplicationInfo info = context.getApplicationInfo();
+        String mainProcess = info.processName;
+        info.processName = context.getPackageName() + ":adnw";
+        try {
+            app.morphe.extension.facebook.settings.SettingsEntry.onApplicationCreate(context);
+            app.morphe.extension.shared.Utils.awaitBackgroundTasksForTests();
+        } finally {
+            info.processName = mainProcess;
+        }
+        assertTrue("a start in another process swept", gallery.rows.containsKey(ContentUris.parseId(pending)));
+        assertTrue(partial.exists());
+
+        gallery.holdDeletes = new CountDownLatch(1);
+        long before = System.nanoTime();
+        app.morphe.extension.facebook.settings.SettingsEntry.onApplicationCreate(context);
+        long tookMs = (System.nanoTime() - before) / 1_000_000;
+        assertTrue("starting Facebook left what the stopped save left",
+                gallery.deleteAsked.await(10, java.util.concurrent.TimeUnit.SECONDS));
+        assertTrue("Facebook's start waited " + tookMs + " ms on the gallery", tookMs < 2_000);
+
+        server.serveGenerated("/next.mp4", "video/mp4", MP4_HEAD, 100 * MIB, 4 * MIB, release);
+        Thread worker = save("/next.mp4");
+        int runningId = -1;
+        for (android.service.notification.StatusBarNotification up : notifications().getActiveNotifications()) {
+            if (SaveControl.TAG.equals(up.getTag()) && up.getId() != stoppedId) runningId = up.getId();
+        }
+        assertNotEquals("the new save showed no notification", -1, runningId);
+        Thread.sleep(300);
+        assertEquals("a save tapped during the sweep didn't wait for it", 0, server.hits("/next.mp4"));
+
+        gallery.holdDeletes.countDown();
+        long until = System.currentTimeMillis() + 20_000;
+        while (server.hits("/next.mp4") == 0 && System.currentTimeMillis() < until) Thread.sleep(50);
+        assertEquals("the save never went on after the sweep", 1, server.hits("/next.mp4"));
+
+        assertFalse("the pending row a stopped save left is still there", gallery.rows.containsKey(ContentUris.parseId(pending)));
+        assertTrue("a finished file was taken for a leftover", gallery.rows.containsKey(ContentUris.parseId(finished)));
+        assertFalse(partial.exists());
+        assertFalse(joined.exists());
+        assertTrue("a cache file of Facebook's was removed", unrelated.exists());
+        assertTrue(pendingList().isEmpty());
+        assertFalse("the stopped save's notification is still up", shown(SaveControl.TAG, stoppedId));
+        assertTrue("the running save's notification was taken for a leftover", shown(SaveControl.TAG, runningId));
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("removed what a stopped save left: 2 work file(s), 1 pending gallery "
+                + "row(s), 1 notification(s)"));
+
+        // A second start in the same process sweeps nothing: what's there now is the running save's.
+        until = System.currentTimeMillis() + 20_000;
+        while (workFiles() == 0 && System.currentTimeMillis() < until) Thread.sleep(50);
+        assertEquals(1, workFiles());
+        app.morphe.extension.facebook.settings.SettingsEntry.onApplicationCreate(context);
+        app.morphe.extension.shared.Utils.awaitBackgroundTasksForTests();
+        assertEquals("a second start took the running save's work file", 1, workFiles());
+        assertTrue("a second start took the running save's notification", shown(SaveControl.TAG, runningId));
+
+        assertTrue(SaveControl.cancel(runningId));
+        finish(worker);
+        assertEquals(0, workFiles());
+    }
+
     /** Whether a notification with [tag] and [id] is up. */
     private static boolean shown(String tag, int id) {
         for (android.service.notification.StatusBarNotification up : notifications().getActiveNotifications()) {
@@ -642,10 +732,14 @@ public class SaveProgressTest {
 
     /** MediaStore's video table, as a save and the leftover sweep use it. */
     public static final class Gallery extends ContentProvider {
-        final Map<Long, ContentValues> rows = new HashMap<>();
+        /** Read on the test's thread while a sweep deletes from it on a worker. */
+        final Map<Long, ContentValues> rows = new java.util.concurrent.ConcurrentHashMap<>();
         final List<Uri> inserts = new ArrayList<>();
         boolean refuseDeletion;
         boolean throwOnDelete;
+        /** While set, a deletion waits for it: a gallery that's slow while Facebook starts. */
+        volatile CountDownLatch holdDeletes;
+        final CountDownLatch deleteAsked = new CountDownLatch(1);
         private long nextId = 1;
 
         Uri videoUri(long id) {
@@ -678,6 +772,15 @@ public class SaveProgressTest {
 
         /** Honours the one selection the sweep uses, the way MediaStore does for a row named by id. */
         @Override public int delete(Uri uri, String selection, String[] selectionArgs) {
+            deleteAsked.countDown();
+            CountDownLatch hold = holdDeletes;
+            if (hold != null) {
+                try {
+                    hold.await(20, java.util.concurrent.TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
             if (throwOnDelete) throw new IllegalStateException("gallery unavailable");
             if (refuseDeletion) return 0;
             long id = ContentUris.parseId(uri);

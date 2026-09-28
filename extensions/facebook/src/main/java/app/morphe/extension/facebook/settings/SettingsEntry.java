@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.facebook.download.SaveLeftovers;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 
 /**
@@ -83,7 +84,8 @@ public final class SettingsEntry {
      * Injected before each return of the application's {@code onCreate}, after Facebook's own
      * startup. Watches every Facebook activity, so a pending open lands on whichever one resumes next:
      * signed out, the launcher hands straight over to the login screen. Also where the release
-     * check, when it's on, asks at most once a day, on a worker.
+     * check, when it's on, asks at most once a day, on a worker, and where what a save cut short
+     * by Android left behind is removed, on a worker too.
      */
     public static void onApplicationCreate(Context context) {
         try {
@@ -97,6 +99,7 @@ public final class SettingsEntry {
             Logger.printException(() -> "Settings entry: could not watch activities", ex);
         }
         ReleaseCheck.onFacebookStart();
+        SaveLeftovers.sweepAfterStart(context);
         publishShortcut(context);
     }
 

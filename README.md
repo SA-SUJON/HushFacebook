@@ -121,7 +121,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 
 The two themes work alone or together. With both, backgrounds stay true black and the palette colours the cards, text, icons and dividers on top. The Hushfacebook settings screen follows the palette as well, dark or light to match your phone. Without `Material You theme` it stays black.
 
-While a save runs, a notification shows how far it's got, with a Cancel button. Facebook has to be allowed to post notifications for it. You can also turn off its "Hushfacebook saves" channel in Facebook's notification settings, and a save then runs with just a message when it starts and one when it ends. A cancelled save leaves nothing behind. One that Android stops half way leaves nothing in the gallery either, and the next save clears what it left in Facebook's cache.
+While a save runs, a notification shows how far it's got, with a Cancel button. Facebook has to be allowed to post notifications for it. You can also turn off its "Hushfacebook saves" channel in Facebook's notification settings, and a save then runs with just a message when it starts and one when it ends. A cancelled save leaves nothing behind. One that Android stops half way leaves nothing in the gallery either. The next time Facebook starts, it clears what that save left in its cache and takes down its notification.
 
 ## Marketplace settings preview
 
