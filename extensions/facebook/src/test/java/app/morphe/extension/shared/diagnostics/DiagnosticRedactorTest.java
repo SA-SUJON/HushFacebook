@@ -196,6 +196,9 @@ public class DiagnosticRedactorTest {
      * followed by the secrets it carries, and every secret is a string nothing else here holds,
      * so a survivor is named in the failure.
      */
+    /** A quote written as a JSON unicode escape, backslash u 0022, built so no tool decodes it. */
+    private static final String U = "\\" + "u0022";
+
     public static final String[][] CREDENTIAL_CORPUS = {
             {"{\"access_token\":\"EAABjsonKeyA1\",\"locale\":\"en_US\"}", "EAABjsonKeyA1"},
             {"{\"data\":{\"viewer\":{\"session\":{\"sessionid\":\"sessNestB2\",\"uid\":\"77\"}}}}", "sessNestB2"},
@@ -223,6 +226,23 @@ public class DiagnosticRedactorTest {
             {"Proxy-Authorization: Basic cHJveHlTZWNyZXRSMjM=", "cHJveHlTZWNyZXRSMjM="},
             {"retrying with Bearer EAABbareS24 after 401", "EAABbareS24"},
             {"{\"authorization\":\"Bearer\\nEAABjsonBreakT25\"}", "EAABjsonBreakT25"},
+            // What a review found still leaking, one row each.
+            {"{\"name\":\"Authorization\",\"value\":\"Basic dXNlcjpsZWFrQmFzaWMx\"}", "dXNlcjpsZWFrQmFzaWMx"},
+            {"{\"name\":\"xs\",\"value\":\"12%3AxsPairLeak\"}", "xsPairLeak"},
+            {"Authorization -> Basic dXNlcjpsZWFrQXJyb3c=", "dXNlcjpsZWFrQXJyb3c="},
+            {"retried with Basic dXNlcjpiYXJlQmFzaWM5", "dXNlcjpiYXJlQmFzaWM5"},
+            {"{\"auth\":{\"a\":{\"b\":{\"c\":{\"access\":\"leakDeep4\"}}}}}", "leakDeep4"},
+            {"{\"auth\":{\"hint\":\"}\",\"access\":\"leakBrace\"}}", "leakBrace"},
+            {U + "access_token" + U + ":" + U + "EAABuniLeak" + U, "EAABuniLeak"},
+            {"&quot;access_token&quot;:&quot;EAABhtmlLeak&quot;", "EAABhtmlLeak"},
+            {"{\"api_key\":\"apiKeyLeak7\"}", "apiKeyLeak7"},
+            {"{\"pwd\":\"pwdLeak8\"}", "pwdLeak8"},
+            {"advertising_id=adIdLeak9", "adIdLeak9"},
+            {"X-FB-Device-ID: deviceIdLeak10", "deviceIdLeak10"},
+            {"{\"token \": \"spaceKeyLeak\"}", "spaceKeyLeak"},
+            {"Authorization: Bearer EAABfirstHalf\nsecondHalfLeak", "EAABfirstHalf", "secondHalfLeak"},
+            {"password=p@ss;w0rdSemiLeak", "w0rdSemiLeak"},
+            {"password=staple spaced unquotedPassLeak", "staple", "unquotedPassLeak"},
     };
 
     @Test public void noSyntheticCredentialSurvives() {
@@ -260,6 +280,49 @@ public class DiagnosticRedactorTest {
         assertEquals("postId=[omitted] shown", DiagnosticRedactor.redact("postId=12 shown"));
         assertEquals("{'feedback_id=[omitted]}", DiagnosticRedactor.redact("{'feedback_id': 'ZmVlZGJhY2s6MTI='}"));
         assertEquals("\\\"video_id=[omitted]}", DiagnosticRedactor.redact("\\\"video_id\\\":\\\"31\\\"}"));
+        assertEquals("topLevelPostId=[omitted] kept", DiagnosticRedactor.redact("topLevelPostId: 42 kept"));
+        assertEquals("post-id=[omitted] kept", DiagnosticRedactor.redact("post-id: 99 kept"));
+    }
+
+    /**
+     * A header name with nothing after it on its line takes nothing from the next. A Java trace
+     * printed after it keeps every frame and its Suppressed line.
+     */
+    @Test public void anEmptyHeaderValueTakesNoFrameFromTheNextLine() {
+        String emptyCookie = "java.io.IOException: missing Cookie:\n"
+                + "\tat app.Foo.bar(Foo.java:1)\n\tat app.Baz.q(Baz.java:2)";
+        assertEquals("java.io.IOException: missing Cookie=[omitted]\n"
+                + "\tat app.Foo.bar(Foo.java:1)\n\tat app.Baz.q(Baz.java:2)", DiagnosticRedactor.redact(emptyCookie));
+
+        String emptyBearer = "failed with Authorization: Bearer\n\tat app.Foo.bar(Foo.java:1)";
+        assertEquals("failed with Authorization=[omitted]\n\tat app.Foo.bar(Foo.java:1)",
+                DiagnosticRedactor.redact(emptyBearer));
+
+        String suppressed = "java.io.IOException: Cookie: xs=1\n"
+                + "\tSuppressed: java.io.IOException: close failed\n\t\tat app.Foo.close(Foo.java:9)";
+        assertEquals("java.io.IOException: Cookie=[omitted]\n"
+                + "\tSuppressed: java.io.IOException: close failed\n\t\tat app.Foo.close(Foo.java:9)",
+                DiagnosticRedactor.redact(suppressed));
+    }
+
+    /** A word after Bearer or OAuth is a credential only when it looks like one. */
+    @Test public void anOrdinaryWordAfterBearerOrOAuthStays() {
+        for (String line : new String[]{"OAuth callback received", "Bearer credentials expired",
+                "Basic settings opened", "Basic authentication failed"}) {
+            assertEquals(line, DiagnosticRedactor.redact(line));
+        }
+    }
+
+    /** Shapes the rules already handled, kept that way. */
+    @Test public void shapesThatAlreadyWorkedStayWorking() {
+        assertEquals("Install beside Meta's apps: invoked 3, 1 found, 0 missing",
+                DiagnosticRedactor.redact("Install beside Meta's apps: invoked 3, 1 found, 0 missing"));
+        assertEquals("{ \"access_token=[omitted] }", DiagnosticRedactor.redact("{ \"access_token\" : \"EAABspaced12\" }"));
+        assertEquals("access_token=[omitted]&next=1", DiagnosticRedactor.redact("access_token=EAABquery123&next=1"));
+        assertEquals("Authorization=[omitted]", DiagnosticRedactor.redact("Authorization:Bearer EAABnospace12"));
+        assertEquals("sent Bearer [omitted]", DiagnosticRedactor.redact("sent Bearer%20EAABpercent12"));
+        assertEquals("app: com.facebook.katana 580.0.0.51.74 (475019344) at 1790000000000",
+                DiagnosticRedactor.redact("app: com.facebook.katana 580.0.0.51.74 (475019344) at 1790000000000"));
     }
 
     /**
