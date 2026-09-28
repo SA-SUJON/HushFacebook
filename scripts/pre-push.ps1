@@ -65,9 +65,11 @@ $script:pushedCommits = New-Object System.Collections.Generic.List[string]
 $script:publishedCommits = New-Object System.Collections.Generic.List[string]
 # What the remote advertises, read once by Get-RemoteHeld.
 $script:remoteHeld = $null
-# A full-tree gate on a new feature branch still needs to distinguish it from an index push.
-# -ChangedPaths is used by the routing contracts to stand in for a published-file push.
-$script:publishesIndexRef = $PSBoundParameters.ContainsKey('ChangedPaths')
+# Whether a ref to main or a tag changes patches-bundle.json, the index Manager reads: an index
+# push. Decided ref by ref in Get-PushedPaths, since a new branch's whole tree always holds the
+# file, and pooled with main's paths it made a push of both an index push. -ChangedPaths is used
+# by the routing contracts to stand in for a published-file push.
+$script:rewritesIndex = $PSBoundParameters.ContainsKey('ChangedPaths') -and @($ChangedPaths) -contains 'patches-bundle.json'
 
 function Write-Step {
     param([string]$Message)
@@ -94,9 +96,7 @@ function Get-PushedPaths {
         $localSha = $parts[1]
         $remoteSha = $parts[3]
         if ($localSha -eq $zeroObject) { continue }
-        if ($parts[2] -eq 'refs/heads/main' -or $parts[2] -like 'refs/tags/*') {
-            $script:publishesIndexRef = $true
-        }
+        $publishesIndex = $parts[2] -eq 'refs/heads/main' -or $parts[2] -like 'refs/tags/*'
 
         if ($remoteSha -eq $zeroObject) {
             # A new tag of an already hosted branch adds no files. In particular it does not
@@ -132,6 +132,7 @@ function Get-PushedPaths {
         # byte outside ASCII, "extensions/.../\303\234ber.java" in quotes, which matched no route.
         foreach ($name in ((@($names) -join "`n") -split "`0")) {
             if (-not [string]::IsNullOrEmpty($name)) { [void]$paths.Add($name) }
+            if ($publishesIndex -and $name -eq 'patches-bundle.json') { $script:rewritesIndex = $true }
         }
         $commit = Invoke-GitQuietly @('rev-parse', '--verify', "$localSha^{commit}")
         if ($LASTEXITCODE -eq 0 -and $commit -and -not $script:pushedCommits.Contains(([string]$commit).Trim())) {
@@ -731,9 +732,8 @@ try {
         Write-Step 'a published file changed, checking the release facts'
         # The description's test count belongs to the release it describes. Holding this tree to
         # it only means something while the description is being rewritten, which is when
-        # patches-bundle.json is one of the files that moved.
-        $describesThisTree = $script:publishesIndexRef -and
-            @($paths | Where-Object { $_ -eq 'patches-bundle.json' }).Count -gt 0
+        # patches-bundle.json is one of the files that moved, on main or a tag.
+        $describesThisTree = $script:rewritesIndex
         $factsFailed = 'The release facts do not agree. Fix them or push with HUSHFACEBOOK_SKIP_PRE_PUSH=1.'
         if ($describesThisTree) {
             # The index push holds the bundle and the test results this checkout built to the new

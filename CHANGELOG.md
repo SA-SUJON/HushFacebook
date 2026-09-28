@@ -34,6 +34,7 @@ Every Hushfacebook release, newest first.
 * **Tooling:** The release check now reads the README's version badge and the sentence naming the latest release. A README with both still at 0.1.0 used to pass. Once a release is out, they have to name it and its patch count. While the next version is being prepared, they may name either that version or the published one.
 * **Tooling:** A release whose notes carry development-only entries like this one now passes the release check. Morphe Manager shows these lines to nobody, but the check refused every bullet not scoped to Facebook, so a release had to drop them or relabel them as user-facing changes. It still needs at least one Facebook entry.
 * **Tooling:** The fixture check, the receipt builder, the phone build and the release check's patch count no longer stop under Windows PowerShell 5.1 when Morphe's command line patcher logs a warning. It writes warnings and errors to standard error, and 5.1 turned the first one into a fatal error before the run's own result was read.
+* **Tooling:** Pushing main together with a new branch no longer gets the release checks meant for publishing a new index. A new branch is read from its whole tree, which always holds the index file, and that counted as main changing it. Only main or a tag that changes the index gets those checks now.
 
 ## 0.3.4 (2026-09-27)
 

@@ -2411,6 +2411,21 @@ try {
         $featureFacts = Get-Content -LiteralPath (Join-Path $listingRan 'validate-release-facts.txt') -Raw
         Assert-True ($featureFacts -like 'lag=True skip=True*') `
             'A new feature branch was checked as if it published the index.'
+        # The same new branch pushed beside main, whose own change leaves the index alone. Whether a
+        # push rewrites the index is a fact about each ref: pooled, main's ref and the branch's whole
+        # tree, which always holds patches-bundle.json, made one index push of the two.
+        Set-Content -LiteralPath (Join-Path $listingRepo 'README.md') -Encoding ASCII -Value 'readme only'
+        & git -C $listingRepo add -A
+        & git -C $listingRepo commit --quiet -m 'readme only'
+        $readmeTip = (& git -C $listingRepo rev-parse HEAD).Trim()
+        Remove-Item -Path (Join-Path $listingRan '*') -Force -ErrorAction SilentlyContinue
+        $global:LASTEXITCODE = 0
+        & $prePushScript -Root $listingRepo -PushedRefs ("refs/heads/main $readmeTip refs/heads/main $featureTip`n" +
+            "refs/heads/topic $readmeTip refs/heads/topic $('0' * 40)") 6> $null
+        Assert-True ($LASTEXITCODE -eq 0) 'A push of main and a new branch together failed its gate.'
+        $mixedFacts = Get-Content -LiteralPath (Join-Path $listingRan 'validate-release-facts.txt') -Raw
+        Assert-True ($mixedFacts -like 'lag=True skip=True*') `
+            "A push of main beside a new branch, neither rewriting main's index, was checked as an index push: $mixedFacts"
 
         # Each end of a move counts where it is.
         $ran = Push-ListingChange {
