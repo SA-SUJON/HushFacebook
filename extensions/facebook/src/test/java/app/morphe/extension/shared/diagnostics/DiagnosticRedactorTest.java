@@ -18,6 +18,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -207,7 +211,21 @@ public class DiagnosticRedactorTest {
     /** A quote written as a JSON unicode escape, backslash u 0022, built so no tool decodes it. */
     private static final String U = "\\" + "u0022";
 
-    public static final String[][] CREDENTIAL_CORPUS = {
+    /**
+     * Names that run sid, uid, iid, guid or auth into another word with no edge between them, some
+     * behind a run of capitals, which gives no camel-case edge either. Each one goes into the corpus
+     * below in every form a report prints a name in.
+     */
+    private static final String[] RUN_TOGETHER_NAMES = {
+            "authentication", "Authentication", "X-Authentication", "Authentication-Info", "authenticator",
+            "authkey", "AUTHKEY", "authcode", "mfa_authcode", "authdata", "authinfo", "authhash", "authn", "authz",
+            "basicauth", "preauth", "reauth", "userauth", "proxyauth", "twofactorauth", "fbauth",
+            "FBAuth", "XAuth", "HTTPAuth", "FBUID", "DEVICEGUID",
+            "ssid", "SSID", "fbsid", "asid", "SAPISID", "APISID", "HSID", "LSID", "__Secure-3PSID",
+            "fbuid", "cuid", "fbiid", "deviceguid",
+    };
+
+    public static final String[][] CREDENTIAL_CORPUS = inEveryForm(RUN_TOGETHER_NAMES, new String[][]{
             {"{\"access_token\":\"EAABjsonKeyA1\",\"locale\":\"en_US\"}", "EAABjsonKeyA1"},
             {"{\"data\":{\"viewer\":{\"session\":{\"sessionid\":\"sessNestB2\",\"uid\":\"77\"}}}}", "sessNestB2"},
             {"{\"auth\":{\"tokens\":{\"access\":\"deepAccessC3\",\"refresh\":\"deepRefreshC4\"}}}",
@@ -285,6 +303,10 @@ public class DiagnosticRedactorTest {
             {"uuid=uuidLeakA26", "uuidLeakA26"},
             {"device_uuid=devUuidLeakA27", "devUuidLeakA27"},
             {"oauth_verifier=oauthLeakA28", "oauthLeakA28"},
+            // An ordinary word that goes on into more of a name is no longer that word.
+            {"authorId=authorIdLeakA29", "authorIdLeakA29"},
+            {"inside_sid: insideSidLeakA30", "insideSidLeakA30"},
+            {"{\"guideUid\":\"guideUidLeakA31\"}", "guideUidLeakA31"},
             // Glued to a letter outside ASCII, which Android's regex engine counts as part of the word.
             {"étoken=nonAsciiTokenW1", "nonAsciiTokenW1"},
             {"Ücookie: nonAsciiCookieW2", "nonAsciiCookieW2"},
@@ -301,7 +323,26 @@ public class DiagnosticRedactorTest {
             {"é@nonAsciiHandleW12", "nonAsciiHandleW12"},
             // An e followed by a combining double acute, which the JDK's \b also took for part of the word.
             {"e̋token=combiningMarkW13", "combiningMarkW13"},
-    };
+    });
+
+    /**
+     * The rows, then each name as name=, as a header, in upper case, as a JSON key, as the name of
+     * a HAR-style pair and holding a whole object. Every secret carries its name's index and form.
+     */
+    private static String[][] inEveryForm(String[] names, String[][] rows) {
+        List<String[]> all = new ArrayList<>(Arrays.asList(rows));
+        for (int at = 0; at < names.length; at++) {
+            String name = names[at];
+            String secret = "runTogether" + at + "Form";
+            all.add(new String[]{name + "=" + secret + "A", secret + "A"});
+            all.add(new String[]{name + ": " + secret + "B", secret + "B"});
+            all.add(new String[]{name.toUpperCase(Locale.ROOT) + "=" + secret + "C", secret + "C"});
+            all.add(new String[]{"{\"" + name + "\":\"" + secret + "D\"}", secret + "D"});
+            all.add(new String[]{"{\"name\":\"" + name + "\",\"value\":\"" + secret + "E\"}", secret + "E"});
+            all.add(new String[]{"{\"" + name + "\":{\"v\":\"" + secret + "F\"}}", secret + "F"});
+        }
+        return all.toArray(new String[0][]);
+    }
 
     @Test public void noSyntheticCredentialSurvives() {
         StringBuilder leaks = new StringBuilder();
@@ -434,6 +475,24 @@ public class DiagnosticRedactorTest {
                 "{\"name\":\"inside\",\"value\":\"kept\"}",
         };
         for (String line : lines) assertEquals(line, DiagnosticRedactor.redact(line));
+    }
+
+    /**
+     * Every ordinary word the redactor lets through, in each form a report prints a name in. Any
+     * other name holding sid, uid, iid, guid or auth loses its value, so this is the whole list.
+     */
+    @Test public void everyListedOrdinaryWordKeepsItsValue() {
+        String[] words = {"inside", "outside", "beside", "insider", "residual", "residue", "consider",
+                "considered", "president", "residence", "subsidy", "upside", "downside", "aside", "sidebar",
+                "guide", "guided", "guides", "guidance", "misguided", "fluid", "fluidity", "liquid", "squid",
+                "druid", "author", "authors", "authored", "authority", "authorities", "isAuthor", "hasAuthority"};
+        for (String word : words) {
+            for (String line : new String[]{word + ": kept", word.toUpperCase(Locale.ROOT) + "=kept",
+                    "{\"" + word + "\":\"kept\"}", "{\"name\":\"" + word + "\",\"value\":\"kept\"}",
+                    "{\"" + word + "\":{\"v\":\"kept\"}}"}) {
+                assertEquals(line, DiagnosticRedactor.redact(line));
+            }
+        }
     }
 
     /** An Authorization value ends at its line, so the stack trace printed after it stays. */
