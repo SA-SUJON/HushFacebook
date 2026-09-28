@@ -70,8 +70,9 @@ public final class PlayerSources {
     static final String VIDEO_FAMILY = FamilyNames.VIDEO_DOWNLOAD + " (player sources)";
 
     /**
-     * How many sources to keep. A manifest is about 20 KB of text, so 48 sources use about 1 MB.
-     * The app prepares far fewer players than this before the user gets to them.
+     * How many sources to keep. A manifest is about 7 to 20 KB of text, so 48 sources use about 1 MB,
+     * and never more than 48 times {@link DashManifest#MAX_CHARS}. The app prepares far fewer
+     * players than this before the user gets to them.
      */
     private static final int MAX_SOURCES = 48;
 
@@ -147,6 +148,8 @@ public final class PlayerSources {
 
             String hd = RenditionPicker.fieldValue(source, hdField);
             String manifest = RenditionPicker.fieldValue(source, manifestField);
+            // A manifest over the limits a save reads isn't kept either.
+            if (manifest != null && !DashManifest.withinLimits(manifest)) manifest = null;
             if (hd == null && manifest == null) return;
 
             synchronized (SOURCES) {

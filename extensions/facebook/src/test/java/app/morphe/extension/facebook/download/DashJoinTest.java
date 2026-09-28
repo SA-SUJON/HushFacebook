@@ -4,6 +4,7 @@
  */
 package app.morphe.extension.facebook.download;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -15,12 +16,14 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Looper;
+import android.provider.MediaStore;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
@@ -29,6 +32,7 @@ import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.shadows.ShadowMediaMuxer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -130,12 +134,14 @@ public class DashJoinTest {
         }
     }
 
-    /** Records whether the gallery was ever asked for a row. */
-    private static final class Gallery implements Downloader.Sink {
+    /** Records whether the gallery was ever asked for a row, and the work files there were then. */
+    private final class Gallery implements Downloader.Sink {
         boolean opened;
+        int workFilesAtOpen = -1;
 
         @Override public OutputStream open(String mime) {
             opened = true;
+            workFilesAtOpen = workFiles();
             return new NullStream();
         }
 
@@ -189,6 +195,47 @@ public class DashJoinTest {
         assertEquals("both extractors", 2, Samples.released.get());
         assertEquals(1, FaultyMuxer.released.get());
         System.out.println("DashJoinTest: the join ended " + afterCancelMs + " ms after Cancel");
+    }
+
+    /**
+     * The tracks go once they're joined. They used to stay until the gallery had its copy, so a
+     * save held the picture, the sound, the joined file and the gallery's copy all at once.
+     */
+    @Test
+    public void onlyTheJoinedFileIsLeftWhileTheGalleryCopiesIt() {
+        Gallery gallery = new Gallery();
+
+        Downloader.Result result = DashSave.save(context, video, audio, gallery, policy, Downloader.MAX_BYTES,
+                Downloader.SILENT);
+
+        assertEquals(result.toString(), Downloader.Status.OK, result.status);
+        assertEquals("work files while the gallery copied", 1, gallery.workFilesAtOpen);
+    }
+
+    /**
+     * A track can declare any sample size, and the join allocated a buffer of whatever it said. One
+     * that declares more than a join holds fails at once, and the save takes the single file.
+     */
+    @Test
+    public void aTrackDeclaringHugeSamplesFallsBackToTheSingleFile() {
+        Samples.maxInputSize = 1_500_000_000;
+        byte[] single = mp4(4_096);
+        server.serve("/single.mp4", 200, "video/mp4", single, single.length);
+        MediaDownload.policyForTests = policy;
+        MediaSaveTest.Gallery rows = Robolectric.setupContentProvider(MediaSaveTest.Gallery.class, MediaStore.AUTHORITY);
+        ByteArrayOutputStream published = new ByteArrayOutputStream();
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(rows.videoUri(1), published);
+
+        Downloader.Result result = MediaDownload.dashJob(context, video, audio, server.origin() + "/single.mp4")
+                .run(new MediaStoreWriter(context, true), Downloader.SILENT);
+
+        assertEquals(result.toString(), Downloader.Status.OK, result.status);
+        assertArrayEquals("the single file wasn't what reached the gallery", single, published.toByteArray());
+        assertEquals(0, FaultyMuxer.writes.get());
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("declares samples of 1500000000 bytes"));
+        assertFalse(report, report.contains("heap space"));
+        assertEquals(0, workFiles());
     }
 
     /** A cancel that lands once the last sample is written still wins over publication. */
@@ -263,6 +310,8 @@ public class DashJoinTest {
     @Implements(MediaExtractor.class)
     public static class Samples {
         static final AtomicInteger released = new AtomicInteger();
+        /** The largest sample each track declares, or 0 to declare none. */
+        static volatile int maxInputSize;
 
         private boolean picture;
         private boolean selected;
@@ -270,6 +319,7 @@ public class DashJoinTest {
 
         static void reset() {
             released.set(0);
+            maxInputSize = 0;
         }
 
         @Implementation
@@ -286,9 +336,11 @@ public class DashJoinTest {
 
         @Implementation
         protected MediaFormat getTrackFormat(int index) {
-            return picture
+            MediaFormat format = picture
                     ? MediaFormat.createVideoFormat("video/avc", 1280, 720)
                     : MediaFormat.createAudioFormat("audio/mp4a-latm", 44_100, 2);
+            if (maxInputSize > 0) format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, maxInputSize);
+            return format;
         }
 
         @Implementation

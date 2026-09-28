@@ -99,7 +99,7 @@ final class SaveLeftovers {
 
         int removed = 0;
         for (File file : files) {
-            if (file.delete()) removed++;
+            if (!DashSave.inUse(file) && file.delete()) removed++;
         }
         return removed;
     }

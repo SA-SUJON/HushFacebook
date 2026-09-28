@@ -19,6 +19,8 @@ import android.os.Build;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
@@ -49,6 +51,15 @@ final class DashSave {
     private static final long STALE_MS = 60L * 60L * 1000L;
 
     private static final int DEFAULT_SAMPLE_BUFFER = 2 * 1024 * 1024;
+
+    /** The largest sample a join makes room for. A 1080p key frame runs to a megabyte or two. */
+    private static final int MAX_SAMPLE_BUFFER = 16 * 1024 * 1024;
+
+    /** Space the work files leave free on their storage, whatever the running saves want. */
+    static final long KEEP_FREE = 128L * 1024L * 1024L;
+
+    /** The free space a test says the work folder's storage has. Never set on a phone. */
+    static volatile java.util.function.LongSupplier usableForTests;
 
     private static volatile Boolean canWriteAv1;
 
@@ -150,21 +161,31 @@ final class DashSave {
             if (folder == null) return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "no cache folder");
 
             videoFile = File.createTempFile("video", ".mp4", folder);
-            Downloader.Result result = Downloader.fetch(video.url, Downloader.Kind.VIDEO, videoFile, policy, maxBytes,
+            Downloader.Result result = fetchWork(video.url, Downloader.Kind.VIDEO, videoFile, policy, maxBytes,
                 progress);
             if (!result.ok()) return result;
 
             if (audio != null) {
                 audioFile = File.createTempFile("audio", ".mp4", folder);
                 // One count for the pair: the sound's bytes go on from the picture's.
-                result = Downloader.fetch(audio.url, Downloader.Kind.AUDIO, audioFile, policy,
+                result = fetchWork(audio.url, Downloader.Kind.AUDIO, audioFile, policy,
                     maxBytes - videoFile.length(), Downloader.after(videoFile.length(), progress));
                 if (!result.ok()) return result;
             }
 
             if (progress.cancelled()) return Downloader.Result.fail(Downloader.Status.CANCELLED, "cancelled before the join");
             joined = File.createTempFile("joined", ".mp4", folder);
+            // The joined file is about the size of the two tracks, with boxes of its own on top.
+            long tracks = videoFile.length() + (audioFile == null ? 0 : audioFile.length());
+            long room = tracks + tracks / 16 + JOIN_BOXES;
+            if (reserve(joined, room) < room) {
+                return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "not enough free space to join the tracks");
+            }
             if (!join(videoFile, audioFile, joined, progress)) return cancelledJoining();
+            // The tracks are in the joined file now. Kept, they'd sit beside it and the gallery's
+            // copy of it: the video on the phone four times over.
+            videoFile = discard(videoFile);
+            audioFile = discard(audioFile);
             // Joining writes boxes of its own, so the file itself is held to the cap as well.
             if (joined.length() > maxBytes) {
                 return Downloader.Result.fail(Downloader.Status.TOO_LARGE,
@@ -179,10 +200,107 @@ final class DashSave {
             Logger.diagnosticError(DiagnosticCategory.DOWNLOADS, SOURCE, () -> "the DASH save failed", t);
             return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "the tracks could not be joined");
         } finally {
-            Downloader.delete(videoFile);
-            Downloader.delete(audioFile);
-            Downloader.delete(joined);
+            discard(videoFile);
+            discard(audioFile);
+            discard(joined);
         }
+    }
+
+    // ---------------------------------------------------------------- work files
+
+    /** Room a join keeps for the boxes it writes beside the samples. */
+    private static final long JOIN_BOXES = 1024L * 1024L;
+
+    /**
+     * The work files of the running saves, each with the size it may grow to. Up to three saves run
+     * at once, each with up to two tracks and a joined file. A file listed here is one a save is
+     * still using, and cleanup of old files leaves it alone.
+     */
+    private static final Map<String, Long> WORK = new HashMap<>();
+
+    /**
+     * Makes [file] a work file of a running save, which may grow to the answer: at most [wanted],
+     * and no more than the storage has free beyond {@link #KEEP_FREE} and what the other work files
+     * may still grow by. The file stays the save's until {@link #discard}.
+     */
+    static long reserve(File file, long wanted) {
+        synchronized (WORK) {
+            long growing = 0;
+            for (Map.Entry<String, Long> other : WORK.entrySet()) {
+                growing += Math.max(0L, other.getValue() - new File(other.getKey()).length());
+            }
+            java.util.function.LongSupplier forTests = usableForTests;
+            long usable = forTests != null ? forTests.getAsLong() : file.getParentFile().getUsableSpace();
+            long granted = Math.max(0L, Math.min(wanted, usable - KEEP_FREE - growing));
+            WORK.put(file.getAbsolutePath(), granted);
+            return granted;
+        }
+    }
+
+    /** [file] won't grow past [size], so it claims no more than that. */
+    private static void holdTo(File file, long size) {
+        synchronized (WORK) {
+            Long granted = WORK.get(file.getAbsolutePath());
+            if (granted != null && size >= 0 && size < granted) WORK.put(file.getAbsolutePath(), size);
+        }
+    }
+
+    /** Whether a running save still uses [file]. Cleanup of work files leaves such a file alone. */
+    static boolean inUse(File file) {
+        synchronized (WORK) {
+            return WORK.containsKey(file.getAbsolutePath());
+        }
+    }
+
+    /** Deletes [file] and gives up its claim. Answers null, for the variable that held it. */
+    static File discard(File file) {
+        if (file == null) return null;
+        synchronized (WORK) {
+            WORK.remove(file.getAbsolutePath());
+        }
+        Downloader.delete(file);
+        return null;
+    }
+
+    /**
+     * Fetches [url] into the work file [into], which may grow to [cap] as far as the free space
+     * allows ({@link #reserve}). A fetch the free space held below the cap fails for want of room,
+     * not as a file too large to save. The caller discards [into].
+     */
+    static Downloader.Result fetchWork(String url, Downloader.Kind kind, File into, MediaUrlPolicy policy, long cap,
+            Downloader.Progress progress) {
+        long room = reserve(into, cap);
+        if (room <= 0 && cap > 0) {
+            return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "not enough free space for a work file");
+        }
+        Downloader.Result result = Downloader.fetch(url, kind, into, policy, room, new Downloader.Progress() {
+            private boolean sized;
+
+            @Override
+            public void transferred(long done, long total) {
+                // The first report comes once the answer has begun, with its announced size.
+                if (!sized) holdTo(into, total);
+                sized = true;
+                progress.transferred(done, total);
+            }
+
+            @Override
+            public void reading(Runnable close) {
+                progress.reading(close);
+            }
+
+            @Override
+            public boolean cancelled() {
+                return progress.cancelled();
+            }
+        });
+        // Fetched, it grows no more, whatever size was announced or not.
+        holdTo(into, into.length());
+        if (result.status == Downloader.Status.TOO_LARGE && room < cap) {
+            return Downloader.Result.fail(Downloader.Status.WRITE_ERROR,
+                "not enough free space for a work file over " + room + " bytes");
+        }
+        return result;
     }
 
     // ---------------------------------------------------------------- internals
@@ -227,14 +345,14 @@ final class DashSave {
             MediaFormat videoFormat = selectTrack(videoIn, "video/");
             if (videoFormat == null) throw new IOException("the video file holds no video track");
             int videoTrack = muxer.addTrack(videoFormat);
-            bufferSize = Math.max(bufferSize, maxInputSize(videoFormat));
+            bufferSize = Math.max(bufferSize, maxInputSize(videoFormat, "video"));
 
             int audioTrack = -1;
             if (audioIn != null) {
                 MediaFormat audioFormat = selectTrack(audioIn, "audio/");
                 if (audioFormat == null) throw new IOException("the audio file holds no audio track");
                 audioTrack = muxer.addTrack(audioFormat);
-                bufferSize = Math.max(bufferSize, maxInputSize(audioFormat));
+                bufferSize = Math.max(bufferSize, maxInputSize(audioFormat, "audio"));
             }
 
             muxer.start();
@@ -335,14 +453,25 @@ final class DashSave {
         return null;
     }
 
-    private static int maxInputSize(MediaFormat format) {
+    /**
+     * The largest sample [format]'s track declares, or 0. The file says so itself, and the buffer
+     * used to be allocated at whatever it said, so a track over {@link #MAX_SAMPLE_BUFFER} fails the
+     * join and the save goes on to the single file.
+     */
+    private static int maxInputSize(MediaFormat format, String kind) throws IOException {
+        int declared;
         try {
-            return format.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE)
+            declared = format.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE)
                 ? format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE)
                 : 0;
         } catch (Throwable t) {
             return 0;
         }
+        if (declared > MAX_SAMPLE_BUFFER) {
+            throw new IOException("the " + kind + " track declares samples of " + declared + " bytes, more than the "
+                + MAX_SAMPLE_BUFFER + " a join holds");
+        }
+        return declared;
     }
 
     private static void removeStale(File folder) {
@@ -351,7 +480,8 @@ final class DashSave {
 
         long now = System.currentTimeMillis();
         for (File file : files) {
-            if (now - file.lastModified() > STALE_MS) Downloader.delete(file);
+            // A running save still owns its older files: a picture can wait an hour on its sound.
+            if (now - file.lastModified() > STALE_MS && !inUse(file)) Downloader.delete(file);
         }
     }
 }
