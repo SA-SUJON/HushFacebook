@@ -22,17 +22,12 @@ import app.morphe.extension.shared.settings.StringSetting;
 /**
  * The switches behind the hooks that ask before they act.
  *
- * <p>A switch is on by default unless its own comment says it starts off. Picking a patch in Morphe
- * Manager is the choice to use it, and the switch is the way to turn it off again without patching
- * a second time. The ones that start off do for a reason of their own: the AI switches until each
- * rule has been checked on a signed-in feed, every notification switch because it drops a whole
- * kind of notification, the release check because it's the only request Hushfacebook makes for
- * itself, saves other apps can open because they can come out below the sharpest version, the word
- * filter because it has nothing to hide by until someone lists words, and the Marketplace and
- * start tab switches because Marketplace only is picked by default, brings the start tab patch
- * with it, and patching alone mustn't change the tab bar or where Facebook opens. Resuming long
- * videos, and keeping the feed however long Facebook was away, start off too. While Hushfacebook is paused, or in safe mode after three crashed starts, each
- * switch answers off and the hook behind it takes Facebook's own path.
+ * <p>A switch's default is the second argument of its {@link BooleanSetting}. Picking a patch in
+ * Morphe Manager is the choice to use it, and the switch is the way to turn it off again without
+ * patching a second time. While Hushfacebook is paused, safe mode included
+ * ({@link app.morphe.extension.shared.settings.HushfacebookPause}), a switch answers off unless
+ * {@link app.morphe.extension.shared.settings.Setting#keepWhenPaused} marks it, and the hook behind
+ * it takes Facebook's own path.
  */
 @SuppressWarnings("unused")
 public class Settings extends BaseSettings {
