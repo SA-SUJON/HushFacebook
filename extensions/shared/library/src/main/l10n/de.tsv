@@ -63,7 +63,12 @@ Facebook doesn't download ads or its ad model in the background.	Facebook lädt 
 Facebook doesn't serve ads to other apps on this phone.	Facebook liefert keine Werbung an andere Apps auf diesem Handy aus.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebooks Dunkelmodus und diese Seite nutzen die Farben deines Hintergrundbilds. Android 11 nutzt stattdessen Blau. Aktiviere Facebooks Dunkelmodus, um es zu sehen.
 Joining the picture and sound	Bild und Ton werden zusammengefügt
+Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Einstellungen exportiert. Die App, in der die Datei liegt, ließ Hushfacebook sie nicht zurücklesen, daher wurde sie nicht geprüft.
+The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	Die App, in der die Datei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Es wurde nichts geändert.
+The app holding the last settings file still hasn't answered. Try again later.	Die App mit der letzten Einstellungsdatei hat noch immer nicht geantwortet. Versuche es später noch einmal.
+The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Die App, in der die Einstellungsdatei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Sie kann das Speichern noch abschließen, also prüfe die Datei, bevor du dich darauf verlässt.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	Die Datei %1$s ließ sich nicht entfernen. Lösche sie aus %2$s und tippe dann noch einmal auf Fortsetzen.
+The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zurück, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Nutzt die Emoji deines Telefons. Reaktionen und Sticker bleiben gleich. Starte Facebook nach der Änderung neu.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Nutzt die Schrift deines Telefons oder eine unten gewählte Datei. Starte Facebook nach der Änderung neu.
 Font file	Schriftdatei

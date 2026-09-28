@@ -63,7 +63,12 @@ Facebook doesn't download ads or its ad model in the background.	Facebook reklam
 Facebook doesn't serve ads to other apps on this phone.	Facebook bu telefondaki diğer uygulamalara reklam sunmaz.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebook karanlık modu ve bu ekran duvar kâğıdının renklerini kullanır. Android 11 bunun yerine mavi kullanır. Görmek için Facebook karanlık modunu aç.
 Joining the picture and sound	Görüntü ve ses birleştiriliyor
+Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Ayarlar dışa aktarıldı. Dosyayı tutan uygulama Hushfacebook'un onu geri okumasına izin vermedi, bu yüzden kontrol edilmedi.
+The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	O dosyayı tutan uygulama çok uzun sürüyor, bu yüzden Hushfacebook beklemeyi bıraktı. Hiçbir şey değiştirilmedi.
+The app holding the last settings file still hasn't answered. Try again later.	Son ayar dosyasını tutan uygulama hâlâ yanıt vermedi. Daha sonra tekrar dene.
+The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Ayar dosyasını tutan uygulama çok uzun sürüyor, bu yüzden Hushfacebook beklemeyi bıraktı. O uygulama kaydetmeyi yine de bitirebilir, bu yüzden dosyaya güvenmeden önce onu kontrol et.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	%1$s dosyası kaldırılamadı. Onu %2$s içinden sil, sonra yeniden Devam et'e dokun.
+The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Ayar dosyası kaydedildi, ancak geri okunduğunda yazılanla aynı değil. Yeni bir dosya olarak tekrar kaydet.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Telefonunuzun emojilerini kullanır. İfadeler ve çıkartmalar aynı kalır. Değiştirdikten sonra Facebook’u yeniden başlatın.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Telefonunuzun yazı tipini veya aşağıdan seçilen dosyayı kullanır. Değiştirdikten sonra Facebook’u yeniden başlatın.
 Font file	Yazı tipi dosyası

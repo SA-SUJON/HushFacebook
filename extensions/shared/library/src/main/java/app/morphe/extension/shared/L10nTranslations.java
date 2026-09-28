@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(816);
+        Map<String, String> table = new HashMap<>(826);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -683,6 +683,8 @@ public final class L10nTranslations {
                 "Die Einstellungen lie\u00dfen sich nicht vollst\u00e4ndig aktualisieren. \u00d6ffne sie neu und versuche es noch einmal.");
         table.put("Settings exported.",
                 "Einstellungen exportiert.");
+        table.put("Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.",
+                "Einstellungen exportiert. Die App, in der die Datei liegt, lie\u00df Hushfacebook sie nicht zur\u00fccklesen, daher wurde sie nicht gepr\u00fcft.");
         table.put("Settings imported.",
                 "Einstellungen importiert.");
         table.put("Settings imported. %1$d switch changed.",
@@ -753,6 +755,12 @@ public final class L10nTranslations {
                 "Der Reels-Tab");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "Der Bereich \u201eUpgrades\u201c mit seinen Angeboten verschwindet aus dem Facebook-Men\u00fc. Einstellungen, Hilfe und Support und der Rest des Men\u00fcs bleiben.");
+        table.put("The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.",
+                "Die App, in der die Datei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Es wurde nichts ge\u00e4ndert.");
+        table.put("The app holding the last settings file still hasn't answered. Try again later.",
+                "Die App mit der letzten Einstellungsdatei hat noch immer nicht geantwortet. Versuche es sp\u00e4ter noch einmal.");
+        table.put("The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.",
+                "Die App, in der die Einstellungsdatei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Sie kann das Speichern noch abschlie\u00dfen, also pr\u00fcfe die Datei, bevor du dich darauf verl\u00e4sst.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
                 "Die Karte oben in den Chats, die dich bittet, die Messenger-App zu holen, verschwindet, solange Messenger installiert ist. Ohne Messenger bleibt sie, damit du Messenger weiterhin dar\u00fcber installieren kannst.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
@@ -779,8 +787,13 @@ public final class L10nTranslations {
                 "Die Reihen mit Reels zwischen den Beitr\u00e4gen und die Reels, die Facebook dort anh\u00e4ngt, wo dein Feed endet.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Die Einstellung lie\u00df sich nicht vollst\u00e4ndig aktualisieren. Der gespeicherte Wert wird angezeigt.");
+        table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
+                "Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zur\u00fcck, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Der Schalter wirkt, sobald Facebook neu startet.");
+    }
+
+    private static void fillDe6(Map<String, String> table) {
         table.put("There's no diagnostic data to clear.",
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
         table.put("There's no diagnostic data to put back.",
@@ -791,9 +804,6 @@ public final class L10nTranslations {
                 "Dieses Handy hat keine Dateiauswahl, hier l\u00e4sst sich also keine Datei w\u00e4hlen.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Trend-Videos und die Reels, die Facebook f\u00fcr dich ausgew\u00e4hlt hat, tauchen nicht mehr in deinen Benachrichtigungen auf.");
-    }
-
-    private static void fillDe6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Versuch ein anderes Wort oder l\u00f6sche die Suche.");
         table.put("Try again, or go back to Facebook.",
@@ -893,7 +903,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(816);
+        Map<String, String> table = new HashMap<>(826);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1532,6 +1542,8 @@ public final class L10nTranslations {
                 "No se pudo actualizar la configuraci\u00f3n por completo. Vuelve a abrirla e int\u00e9ntalo de nuevo.");
         table.put("Settings exported.",
                 "Configuraci\u00f3n exportada.");
+        table.put("Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.",
+                "Configuraci\u00f3n exportada. La app que guarda el archivo no dej\u00f3 que Hushfacebook lo volviera a leer, as\u00ed que no se comprob\u00f3.");
         table.put("Settings imported.",
                 "Configuraci\u00f3n importada.");
         table.put("Settings imported. %1$d switch changed.",
@@ -1602,6 +1614,12 @@ public final class L10nTranslations {
                 "La pesta\u00f1a Reels");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "La secci\u00f3n \u201cMejoras\u201d y sus ofertas desaparecen del men\u00fa de Facebook. Configuraci\u00f3n, Ayuda y soporte t\u00e9cnico y el resto del men\u00fa se quedan.");
+        table.put("The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.",
+                "La app que guarda ese archivo tarda demasiado, as\u00ed que Hushfacebook dej\u00f3 de esperar. No se cambi\u00f3 nada.");
+        table.put("The app holding the last settings file still hasn't answered. Try again later.",
+                "La app del \u00faltimo archivo de configuraci\u00f3n a\u00fan no ha respondido. Int\u00e9ntalo m\u00e1s tarde.");
+        table.put("The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.",
+                "La app que guarda el archivo de configuraci\u00f3n tarda demasiado, as\u00ed que Hushfacebook dej\u00f3 de esperar. Esa app a\u00fan puede terminar de guardarlo, as\u00ed que revisa el archivo antes de confiar en \u00e9l.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
                 "La tarjeta de la parte superior de Chats que te pide que descargues la app de Messenger desaparece mientras Messenger est\u00e9 instalado. Sin Messenger, se queda para que puedas seguir instal\u00e1ndolo desde ah\u00ed.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
@@ -1628,8 +1646,13 @@ public final class L10nTranslations {
                 "Las filas de reels entre las publicaciones y los reels que Facebook a\u00f1ade donde termina tu feed.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "No se pudo terminar de actualizar el ajuste. Se muestra su valor guardado.");
+        table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
+                "El archivo de configuraci\u00f3n se guard\u00f3, pero al volver a leerlo no coincide con lo que se escribi\u00f3. Gu\u00e1rdalo de nuevo como un archivo nuevo.");
         table.put("The switch takes effect when Facebook restarts.",
                 "El interruptor surte efecto cuando Facebook se reinicie.");
+    }
+
+    private static void fillEs6(Map<String, String> table) {
         table.put("There's no diagnostic data to clear.",
                 "No hay datos de diagn\u00f3stico que borrar.");
         table.put("There's no diagnostic data to put back.",
@@ -1640,9 +1663,6 @@ public final class L10nTranslations {
                 "Este tel\u00e9fono no tiene selector de archivos, as\u00ed que aqu\u00ed no hay forma de elegir un archivo.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Los videos en tendencia y los reels que Facebook eligi\u00f3 para ti dejan de aparecer en tus notificaciones.");
-    }
-
-    private static void fillEs6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Prueba otra palabra o borra la b\u00fasqueda.");
         table.put("Try again, or go back to Facebook.",
@@ -1742,7 +1762,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(816);
+        Map<String, String> table = new HashMap<>(826);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -2381,6 +2401,8 @@ public final class L10nTranslations {
                 "Pengaturan tidak dapat dimuat ulang sepenuhnya. Buka kembali pengaturan lalu coba lagi.");
         table.put("Settings exported.",
                 "Pengaturan diekspor.");
+        table.put("Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.",
+                "Pengaturan diekspor. Aplikasi yang menyimpan file itu tidak mengizinkan Hushfacebook membacanya kembali, jadi file itu tidak diperiksa.");
         table.put("Settings imported.",
                 "Pengaturan diimpor.");
         table.put("Settings imported. %1$d switch changed.",
@@ -2451,6 +2473,12 @@ public final class L10nTranslations {
                 "Tab Reels");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "Bagian \u201cUpgrade\u201d dan penawarannya hilang dari Menu Facebook. Pengaturan, Bantuan & dukungan, dan bagian Menu lainnya tetap ada.");
+        table.put("The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.",
+                "Aplikasi yang menyimpan file itu terlalu lama, jadi Hushfacebook berhenti menunggu. Tidak ada yang diubah.");
+        table.put("The app holding the last settings file still hasn't answered. Try again later.",
+                "Aplikasi yang menyimpan file pengaturan terakhir masih belum merespons. Coba lagi nanti.");
+        table.put("The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.",
+                "Aplikasi yang menyimpan file pengaturan terlalu lama, jadi Hushfacebook berhenti menunggu. Aplikasi itu mungkin masih menyelesaikan penyimpanannya, jadi periksa file itu sebelum mengandalkannya.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
                 "Kartu di bagian atas Chat yang memintamu mendapatkan aplikasi Messenger akan hilang selama Messenger terinstal. Tanpa Messenger, kartu itu tetap ada agar kamu masih bisa menginstalnya dari sana.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
@@ -2477,8 +2505,13 @@ public final class L10nTranslations {
                 "Deretan Reels di antara postingan, dan Reels yang ditambahkan Facebook di akhir Kabar Beranda Anda.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Pengaturan ini tidak dapat selesai diperbarui. Nilai yang tersimpan ditampilkan.");
+        table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
+                "File pengaturan sudah disimpan, tetapi isinya saat dibaca kembali tidak sama dengan yang ditulis. Simpan lagi sebagai file baru.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Sakelar ini berlaku saat Facebook dimulai ulang.");
+    }
+
+    private static void fillIn6(Map<String, String> table) {
         table.put("There's no diagnostic data to clear.",
                 "Tidak ada data diagnostik yang dapat dihapus.");
         table.put("There's no diagnostic data to put back.",
@@ -2489,9 +2522,6 @@ public final class L10nTranslations {
                 "Ponsel ini tidak memiliki pemilih file, jadi file tidak dapat dipilih di sini.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Video yang sedang tren dan reel yang dipilihkan Facebook untuk Anda tidak lagi muncul di notifikasi Anda.");
-    }
-
-    private static void fillIn6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Coba kata lain atau hapus pencarian.");
         table.put("Try again, or go back to Facebook.",
@@ -2591,7 +2621,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(816);
+        Map<String, String> table = new HashMap<>(826);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -3230,6 +3260,8 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel atualizar as configura\u00e7\u00f5es por completo. Reabra as configura\u00e7\u00f5es e tente de novo.");
         table.put("Settings exported.",
                 "Configura\u00e7\u00f5es exportadas.");
+        table.put("Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.",
+                "Configura\u00e7\u00f5es exportadas. O app que guarda o arquivo n\u00e3o deixou o Hushfacebook l\u00ea-lo de volta, ent\u00e3o ele n\u00e3o foi conferido.");
         table.put("Settings imported.",
                 "Configura\u00e7\u00f5es importadas.");
         table.put("Settings imported. %1$d switch changed.",
@@ -3300,6 +3332,12 @@ public final class L10nTranslations {
                 "A aba Reels");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "A se\u00e7\u00e3o \u201cUpgrades\u201d e suas ofertas saem do Menu do Facebook. Configura\u00e7\u00f5es, Ajuda e suporte e o resto do Menu continuam.");
+        table.put("The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.",
+                "O app que guarda esse arquivo est\u00e1 demorando demais, ent\u00e3o o Hushfacebook parou de esperar. Nada foi alterado.");
+        table.put("The app holding the last settings file still hasn't answered. Try again later.",
+                "O app do \u00faltimo arquivo de configura\u00e7\u00f5es ainda n\u00e3o respondeu. Tente de novo mais tarde.");
+        table.put("The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.",
+                "O app que guarda o arquivo de configura\u00e7\u00f5es est\u00e1 demorando demais, ent\u00e3o o Hushfacebook parou de esperar. Esse app ainda pode terminar de salv\u00e1-lo, ent\u00e3o confira o arquivo antes de confiar nele.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
                 "O cart\u00e3o no topo das Conversas que pede para voc\u00ea baixar o app Messenger some enquanto o Messenger estiver instalado. Sem o Messenger, ele continua l\u00e1 para voc\u00ea ainda poder instal\u00e1-lo por ele.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
@@ -3326,8 +3364,13 @@ public final class L10nTranslations {
                 "As fileiras de reels entre as publica\u00e7\u00f5es e os reels que o Facebook adiciona onde o seu feed termina.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "N\u00e3o foi poss\u00edvel concluir a atualiza\u00e7\u00e3o da configura\u00e7\u00e3o. O valor salvo est\u00e1 sendo mostrado.");
+        table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
+                "O arquivo de configura\u00e7\u00f5es foi salvo, mas ao ser lido de volta n\u00e3o corresponde ao que foi gravado. Salve de novo como um arquivo novo.");
         table.put("The switch takes effect when Facebook restarts.",
                 "A op\u00e7\u00e3o passa a valer quando o Facebook reiniciar.");
+    }
+
+    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("There's no diagnostic data to clear.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
         table.put("There's no diagnostic data to put back.",
@@ -3338,9 +3381,6 @@ public final class L10nTranslations {
                 "Este celular n\u00e3o tem seletor de arquivos, ent\u00e3o n\u00e3o d\u00e1 para escolher um arquivo aqui.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "V\u00eddeos em alta e os reels que o Facebook escolheu para voc\u00ea deixam de aparecer nas suas notifica\u00e7\u00f5es.");
-    }
-
-    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Tente outra palavra ou limpe a busca.");
         table.put("Try again, or go back to Facebook.",
@@ -3440,7 +3480,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(816);
+        Map<String, String> table = new HashMap<>(826);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -4079,6 +4119,8 @@ public final class L10nTranslations {
                 "Ayarlar tamamen yenilenemedi. Ayarlar\u0131 yeniden a\u00e7\u0131p tekrar dene.");
         table.put("Settings exported.",
                 "Ayarlar d\u0131\u015fa aktar\u0131ld\u0131.");
+        table.put("Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.",
+                "Ayarlar d\u0131\u015fa aktar\u0131ld\u0131. Dosyay\u0131 tutan uygulama Hushfacebook'un onu geri okumas\u0131na izin vermedi, bu y\u00fczden kontrol edilmedi.");
         table.put("Settings imported.",
                 "Ayarlar i\u00e7e aktar\u0131ld\u0131.");
         table.put("Settings imported. %1$d switch changed.",
@@ -4149,6 +4191,12 @@ public final class L10nTranslations {
                 "Reels sekmesi");
         table.put("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.",
                 "\u201cY\u00fckseltmeler\u201d b\u00f6l\u00fcm\u00fc ve teklifleri Facebook men\u00fcs\u00fcnden kalkar. Ayarlar, Yard\u0131m ve destek ve men\u00fcn\u00fcn geri kalan\u0131 yerinde kal\u0131r.");
+        table.put("The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.",
+                "O dosyay\u0131 tutan uygulama \u00e7ok uzun s\u00fcr\u00fcyor, bu y\u00fczden Hushfacebook beklemeyi b\u0131rakt\u0131. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
+        table.put("The app holding the last settings file still hasn't answered. Try again later.",
+                "Son ayar dosyas\u0131n\u0131 tutan uygulama h\u00e2l\u00e2 yan\u0131t vermedi. Daha sonra tekrar dene.");
+        table.put("The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.",
+                "Ayar dosyas\u0131n\u0131 tutan uygulama \u00e7ok uzun s\u00fcr\u00fcyor, bu y\u00fczden Hushfacebook beklemeyi b\u0131rakt\u0131. O uygulama kaydetmeyi yine de bitirebilir, bu y\u00fczden dosyaya g\u00fcvenmeden \u00f6nce onu kontrol et.");
         table.put("The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.",
                 "Sohbetler'in en \u00fcst\u00fcnde Messenger uygulamas\u0131n\u0131 edinmeni isteyen kart, Messenger y\u00fckl\u00fc oldu\u011fu s\u00fcrece kaybolur. Messenger yoksa kart kal\u0131r, b\u00f6ylece onu yine oradan y\u00fckleyebilirsin.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
@@ -4175,8 +4223,13 @@ public final class L10nTranslations {
                 "G\u00f6nderilerin aras\u0131ndaki Reels s\u0131ralar\u0131 ve Facebook'un ak\u0131\u015f\u0131n\u0131n bitti\u011fi yere ekledi\u011fi Reels videolar\u0131.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
                 "Ayar\u0131n g\u00fcncellenmesi tamamlanamad\u0131. Kay\u0131tl\u0131 de\u011feri g\u00f6steriliyor.");
+        table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
+                "Ayar dosyas\u0131 kaydedildi, ancak geri okundu\u011funda yaz\u0131lanla ayn\u0131 de\u011fil. Yeni bir dosya olarak tekrar kaydet.");
         table.put("The switch takes effect when Facebook restarts.",
                 "Anahtar, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda etkili olur.");
+    }
+
+    private static void fillTr6(Map<String, String> table) {
         table.put("There's no diagnostic data to clear.",
                 "Temizlenecek tan\u0131lama verisi yok.");
         table.put("There's no diagnostic data to put back.",
@@ -4187,9 +4240,6 @@ public final class L10nTranslations {
                 "Bu telefonda dosya se\u00e7ici yok, bu y\u00fczden burada dosya se\u00e7menin bir yolu yok.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
                 "Trend videolar ve Facebook'un senin i\u00e7in se\u00e7ti\u011fi reels videolar\u0131 art\u0131k bildirimlerinde g\u00f6r\u00fcnmez.");
-    }
-
-    private static void fillTr6(Map<String, String> table) {
         table.put("Try a different word or clear the search.",
                 "Ba\u015fka bir kelime deneyin veya aramay\u0131 temizleyin.");
         table.put("Try again, or go back to Facebook.",

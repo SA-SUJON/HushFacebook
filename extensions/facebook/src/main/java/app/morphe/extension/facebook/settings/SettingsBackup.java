@@ -481,7 +481,8 @@ public final class SettingsBackup {
                 buffered.write(buffer, 0, count);
             }
             bytes = buffered.toByteArray();
-        } catch (IOException error) {
+        } catch (IOException | RuntimeException error) {
+            // A provider's stream can fail with a runtime exception as readily as an IOException.
             // The class only: a provider's message can carry the document's name or address.
             throw new Rejected(Reason.UNREADABLE, error.getClass().getSimpleName());
         }
