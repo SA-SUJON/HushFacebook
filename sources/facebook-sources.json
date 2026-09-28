@@ -31,9 +31,9 @@
       "name": "Awesome Morphe",
       "url": "https://github.com/nvbangg/awesome-morphe",
       "hushfacebook": {
-        "status": "not-listed",
-        "checked": "2026-09-25",
-        "submitVia": "https://github.com/nvbangg/awesome-morphe/issues/new?template=bundle-request.yml"
+        "status": "listed",
+        "url": "https://github.com/nvbangg/awesome-morphe/blob/main/data/bundles/SysAdminDoc~Hushfacebook~main.json",
+        "checked": "2026-09-27"
       }
     },
     {
@@ -51,9 +51,9 @@
       "name": "Jman's ReVanced Patch Bundles",
       "url": "https://github.com/Jman-Github/ReVanced-Patch-Bundles",
       "hushfacebook": {
-        "status": "not-listed",
-        "checked": "2026-09-25",
-        "submitVia": "https://github.com/Jman-Github/ReVanced-Patch-Bundles/issues"
+        "status": "listed",
+        "url": "https://github.com/Jman-Github/ReVanced-Patch-Bundles/blob/bundles/patch-bundles/hushfacebook-patch-bundles/hushfacebook-latest-patches-bundle.json",
+        "checked": "2026-09-27"
       }
     },
     {

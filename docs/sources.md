@@ -59,7 +59,7 @@ The widest map of Facebook's ad and clutter code is in LSPosed modules, not patc
 
 ## Where Hushfacebook is listed
 
-The [Morphe Patch Tracker](https://drnx64.github.io/morphe-track-patches/#/bundle/sysadmindoc) and the [Morphe Archive](https://github.com/rushiforai/morphe-archive/tree/main/examplepatches/SysAdminDoc/Hushfacebook) list it. [Awesome Morphe](https://github.com/nvbangg/awesome-morphe) and [Jman's ReVanced Patch Bundles](https://github.com/Jman-Github/ReVanced-Patch-Bundles) didn't list it when we checked on 2026-09-25, and neither did the Morphe community directory. The ledger records each of these with the date it was checked, and a release names the ones that still don't list Hushfacebook.
+The [Morphe Patch Tracker](https://drnx64.github.io/morphe-track-patches/#/bundle/sysadmindoc) and the [Morphe Archive](https://github.com/rushiforai/morphe-archive/tree/main/examplepatches/SysAdminDoc/Hushfacebook) list it. [Awesome Morphe](https://github.com/nvbangg/awesome-morphe/blob/main/data/bundles/SysAdminDoc~Hushfacebook~main.json) and [Jman's ReVanced Patch Bundles](https://github.com/Jman-Github/ReVanced-Patch-Bundles/blob/bundles/patch-bundles/hushfacebook-patch-bundles/hushfacebook-latest-patches-bundle.json) were also confirmed on 2026-09-27. The community directory didn't list it on 2026-09-25; its data returned HTTP 403 on 2026-09-27, so its current status is unverified. The ledger preserves the last confirmed status and date.
 
 ## What we left out
 
