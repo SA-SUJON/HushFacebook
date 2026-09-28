@@ -17,6 +17,15 @@ public final class DiagnosticRedactor {
             "(?:facebook\\.com|facebook\\.net|fbcdn\\.net|fbsbx\\.com|fb\\.com|fb\\.me|fb\\.watch"
                     + "|fb\\.gg|messenger\\.com|meta\\.com|meta\\.ai)";
     /**
+     * A word edge, between an ASCII letter, digit or underscore and anything else, written out for
+     * the rules to use in place of \b. Android runs them on ICU, whose \b takes a letter such as é,
+     * я or 猫 for part of a word, so étoken=secret kept its value on a phone while the JDK the
+     * tests run on dropped it. Spelled in ASCII classes, the edge falls in the same place on both.
+     * Case is switched off inside it, or ICU would fold ſ and the Kelvin sign into s and k.
+     */
+    private static final String EDGE =
+            "(?-i:(?:(?<![A-Za-z0-9_])(?=[A-Za-z0-9_])|(?<=[A-Za-z0-9_])(?![A-Za-z0-9_])))";
+    /**
      * Credential and device names. c_user, xs and datr are the cookies that make up a Facebook
      * session, and fr and sb go with them; fb_dtsg is its request token; family_device_id,
      * X-FB-Device-ID and advertiser_id identify the phone across Meta's apps. xs, fr, sb and pwd
@@ -79,7 +88,7 @@ public final class DiagnosticRedactor {
      * indented continuation lines, but never a Java trace line.
      */
     private static final String HEADER =
-            "(?i)\\b((?:proxy-)?authorization|set-cookie|cookie)" + SEPARATOR + "(?:" + QUOTED
+            "(?i)" + EDGE + "((?:proxy-)?authorization|set-cookie|cookie)" + SEPARATOR + "(?:" + QUOTED
                     + "|(?:\\r?\\n[ \\t]*(?=" + SCHEME + "[ \\t]))?"
                     + "(?:" + SCHEME + "(?:[ \\t]+|[ \\t]*\\r?\\n[ \\t]*" + NOT_TRACE + ")" + TOKEN
                     + "(?:\\r?\\n[ \\t]*" + TOKEN + "(?=[ \\t]*(?:\\r?\\n|$)))?[^\\r\\n]*"
@@ -97,10 +106,10 @@ public final class DiagnosticRedactor {
      * stay as written.
      */
     private static final String BARE_SCHEME =
-            "(?i)\\b(bearer|oauth|basic)(?:[ \\t]+|%20)(?=[a-z._~-]*[0-9+/=%])[a-z0-9._~+/=%-]{8,}";
+            "(?i)" + EDGE + "(bearer|oauth|basic)(?:[ \\t]+|%20)(?=[a-z._~-]*[0-9+/=%])[a-z0-9._~+/=%-]{8,}";
     /** Where a credential's object or list starts: its name, the separator, then { or [. */
     private static final Pattern BLOCK_START =
-            Pattern.compile("(?i)\\b(" + CREDENTIAL_NAMES + ")" + SEPARATOR + "(?=[\\[{])");
+            Pattern.compile("(?i)" + EDGE + "(" + CREDENTIAL_NAMES + ")" + SEPARATOR + "(?=[\\[{])");
     /** How far an object or list is followed before it's cut at the end of its first line. */
     private static final int BLOCK_MAX_CHARS = 8_192;
     /**
@@ -142,16 +151,18 @@ public final class DiagnosticRedactor {
     /**
      * An account handle, which starts with @ and stands on its own. One glued to something in
      * front of it is not a handle: an email address, or the identity hash Java prints after a
-     * class name.
+     * class name. Only ASCII counts as glued, as with {@link #EDGE}, so a handle straight after
+     * text with no spaces, such as Japanese, still goes on both engines.
      */
-    private static final String HANDLE = "(?<![\\w.@/:])@[A-Za-z0-9_.]{2,}";
+    private static final String HANDLE = "(?<![A-Za-z0-9_.@/:])@[A-Za-z0-9_.]{2,}";
     /**
      * One of Facebook's hosts without a scheme, with any port or path after it. The subdomain is
      * optional: the rule asked for one, so {@code facebook.com/dana.q.1987} passed while
      * {@code www.facebook.com/dana.q.1987} didn't. A host has to end at a word edge, so a package
      * name ({@code com.facebook.katana}) and a longer name ({@code facebook.community}) stay.
      */
-    private static final String HOST = "(?i)\\b(?:[a-z0-9-]+\\.)*" + HOST_SUFFIXES + "\\b(?:[:/][^\\s\"'<>]*)?";
+    private static final String HOST =
+            "(?i)" + EDGE + "(?:[a-z0-9-]+\\.)*" + HOST_SUFFIXES + EDGE + "(?:[:/][^\\s\"'<>]*)?";
 
     private DiagnosticRedactor() {
     }
@@ -161,17 +172,17 @@ public final class DiagnosticRedactor {
         String passed = text
                 .replaceAll(ISOLATED_NAME, "[name omitted]")
                 .replaceAll(HANDLE, "[handle omitted]")
-                .replaceAll("(?i)\\b[a-z][a-z0-9+.-]*://[^\\s\"'<>]+", "[url omitted]")
+                .replaceAll("(?i)" + EDGE + "[a-z][a-z0-9+.-]*://[^\\s\"'<>]+", "[url omitted]")
                 .replaceAll(HOST, "[host omitted]")
                 .replaceAll(NAME_VALUE_PAIR, "$1[omitted]")
                 .replaceAll(HEADER, "$1=[omitted]")
                 .replaceAll(BARE_SCHEME, "$1 [omitted]")
-                .replaceAll("(?i)\\b(" + PASSWORD_NAMES + ")" + SEPARATOR + "(?:" + QUOTED + "|[^\\r\\n]*)",
+                .replaceAll("(?i)" + EDGE + "(" + PASSWORD_NAMES + ")" + SEPARATOR + "(?:" + QUOTED + "|[^\\r\\n]*)",
                         "$1=[omitted]");
         return withoutCredentialBlocks(passed)
-                .replaceAll("(?i)\\b(" + CREDENTIAL_NAMES + ")" + SEPARATOR
+                .replaceAll("(?i)" + EDGE + "(" + CREDENTIAL_NAMES + ")" + SEPARATOR
                         + "(?:" + QUOTED + "|[^\\s,&\"'<>]+)", "$1=[omitted]")
-                .replaceAll("(?i)\\b(" + CONTENT_ID_NAMES + ")" + SEPARATOR
+                .replaceAll("(?i)" + EDGE + "(" + CONTENT_ID_NAMES + ")" + SEPARATOR
                         + "(?:" + QUOTED + "|" + CONTENT_ID_VALUE + ")", "$1=[omitted]")
                 .replaceAll(BARE_CONTENT_ID, "[id omitted]");
     }

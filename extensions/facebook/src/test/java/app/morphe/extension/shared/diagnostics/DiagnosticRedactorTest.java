@@ -10,8 +10,16 @@ package app.morphe.extension.shared.diagnostics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A person's name has no shape a pattern can find, and the toast that carries it is written to
@@ -277,6 +285,22 @@ public class DiagnosticRedactorTest {
             {"uuid=uuidLeakA26", "uuidLeakA26"},
             {"device_uuid=devUuidLeakA27", "devUuidLeakA27"},
             {"oauth_verifier=oauthLeakA28", "oauthLeakA28"},
+            // Glued to a letter outside ASCII, which Android's regex engine counts as part of the word.
+            {"étoken=nonAsciiTokenW1", "nonAsciiTokenW1"},
+            {"Ücookie: nonAsciiCookieW2", "nonAsciiCookieW2"},
+            {"naïvepassword=nonAsciiPassW3", "nonAsciiPassW3"},
+            {"ésid: nonAsciiSidW4", "nonAsciiSidW4"},
+            {"éauthorization: Digest nonAsciiDigestW5", "nonAsciiDigestW5"},
+            {"ñbearer EAABnonAsciiW6", "EAABnonAsciiW6"},
+            {"яpost_id=nonAsciiPostW7", "nonAsciiPostW7"},
+            {"çuser_id=nonAsciiUserW8", "nonAsciiUserW8"},
+            {"猫access_token: {\"a\":\"nonAsciiBlockW9\"}", "nonAsciiBlockW9"},
+            {"éhttps://example.com/nonAsciiUrlW10", "nonAsciiUrlW10"},
+            {"éupload.facebook.com/nonAsciiHostW11", "nonAsciiHostW11"},
+            {"at edge.facebook.comé", "edge.facebook"},
+            {"é@nonAsciiHandleW12", "nonAsciiHandleW12"},
+            // An e followed by a combining double acute, which the JDK's \b also took for part of the word.
+            {"e̋token=combiningMarkW13", "combiningMarkW13"},
     };
 
     @Test public void noSyntheticCredentialSurvives() {
@@ -421,5 +445,21 @@ public class DiagnosticRedactorTest {
         assertEquals("java.io.IOException: 401 for Authorization=[omitted]\n"
                 + "\tat app.morphe.extension.facebook.download.Downloader.connect(Downloader.java:120)\n"
                 + "\tat java.lang.Thread.run(Thread.java:1012)", DiagnosticRedactor.redact(trace));
+    }
+
+    /**
+     * Android runs these rules on ICU, whose \b and \w take a letter such as é, я or 猫 for part of
+     * a word. The JDK these tests run on doesn't, so étoken=secret lost its value here and kept it
+     * on a phone. Edges spelled out in ASCII classes read the same on both engines, which is what
+     * lets a result here stand for the phone.
+     */
+    @Test public void noRuleUsesAWordEdgeTheTwoEnginesDrawApart() throws IOException {
+        File root = new File("").getAbsoluteFile();
+        while (!new File(root, "provenance.json").isFile()) root = root.getParentFile();
+        String source = new String(Files.readAllBytes(new File(root, "extensions/shared/library/src/main/java/"
+                + "app/morphe/extension/shared/diagnostics/DiagnosticRedactor.java").toPath()), StandardCharsets.UTF_8);
+        Matcher word = Pattern.compile(".*\\\\\\\\[bBwW].*").matcher(source);
+
+        if (word.find()) fail("a rule leans on \\b or \\w, which ICU reads differently: " + word.group().trim());
     }
 }
