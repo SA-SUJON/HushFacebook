@@ -56,6 +56,23 @@ public final class DiagnosticRedactor {
     /** Names whose unquoted value can hold spaces and semicolons, so it runs to the end of its line. */
     private static final String PASSWORD_NAMES = "[a-z0-9_-]*(?:password|passwd|passphrase|passcode)[a-z0-9_-]*|pwd";
     /**
+     * Names carrying the id of one account, post, story, comment or message. Each of these
+     * resolves to something somebody can open, so a shared report would otherwise carry a slice of
+     * what was read, or who read it. The short ones, aid and cid, are matched whole or after an
+     * underscore or hyphen, so an ordinary setting such as {@code hide_paid_partnership} keeps its
+     * value. The longer ones may follow any prefix, camel case included ({@code topLevelPostId}),
+     * and take a hyphen as well as an underscore. An account's own id is {@link #USER_ID_NAMES}.
+     */
+    private static final String CONTENT_ID_NAMES =
+            "(?:[a-z0-9]+[_-])*(?:aid|cid)|[a-z0-9_-]*(?:fbid|story[_-]?id|post[_-]?id|feedback[_-]?id"
+                    + "|video[_-]?id|item[_-]?id|group[_-]?id|page[_-]?id|profile[_-]?id|actor[_-]?id"
+                    + "|thread[_-]?id|comment[_-]?id|msg[_-]?id|message[_-]?id)";
+    /**
+     * Names carrying the id of an account, or a list of them: user_id, userid, userId, user-id and
+     * their plurals, after any prefix ({@code X-User-Id}).
+     */
+    private static final String USER_ID_NAMES = "[a-z0-9_-]*user[_-]?ids?";
+    /**
      * A quote written as a JSON unicode escape, backslash u 0022. Built in two parts so no tool
      * that reads this file turns the escape into the quote itself.
      */
@@ -104,11 +121,11 @@ public final class DiagnosticRedactor {
                     + "|[^\\r\\n]*(?:\\r?\\n[ \\t]++" + NOT_TRACE + "[^\\r\\n]*)*))";
     /**
      * A name and value pair as HAR files and header dumps print them, {"name": ..., "value": ...},
-     * where the name is a header or cookie the rules know. Only the value goes.
+     * where the name is a header, cookie or id the rules know. Only the value goes.
      */
     private static final String NAME_VALUE_PAIR =
             "(?i)(\\\\*\"name\\\\*\"[ \\t]*:[ \\t]*\\\\*\"(?:(?:proxy-)?authorization|set-cookie|" + CREDENTIAL_NAMES
-                    + ")\\\\*\"[ \\t]*,[ \\t]*\\\\*\"value\\\\*\"[ \\t]*:[ \\t]*)" + QUOTED;
+                    + "|" + USER_ID_NAMES + "|" + CONTENT_ID_NAMES + ")\\\\*\"[ \\t]*,[ \\t]*\\\\*\"value\\\\*\"[ \\t]*:[ \\t]*)" + QUOTED;
     /**
      * A Bearer, OAuth or Basic credential written with no header name in front of it. A word
      * counts as one only with a digit, +, / or = in it, so "OAuth callback" and "Basic settings"
@@ -116,28 +133,25 @@ public final class DiagnosticRedactor {
      */
     private static final String BARE_SCHEME =
             "(?i)" + EDGE + "(bearer|oauth|basic)(?:[ \\t]+|%20)(?=[a-z._~-]*[0-9+/=%])[a-z0-9._~+/=%-]{8,}";
-    /** Where a credential's object or list starts: its name, the separator, then { or [. */
-    private static final Pattern BLOCK_START =
-            Pattern.compile("(?i)" + EDGE + "(" + CREDENTIAL_NAMES + ")" + SEPARATOR + "(?=[\\[{])");
+    /** Where a credential's or an id's object or list starts: its name, the separator, then { or [. */
+    private static final Pattern BLOCK_START = Pattern.compile("(?i)" + EDGE + "(" + CREDENTIAL_NAMES + "|"
+            + USER_ID_NAMES + "|" + CONTENT_ID_NAMES + ")" + SEPARATOR + "(?=[\\[{])");
     /** How far an object or list is followed before it's cut at the end of its first line. */
     private static final int BLOCK_MAX_CHARS = 8_192;
-    /**
-     * Names carrying the id of one account, post, story, comment or message. Each of these
-     * resolves to something somebody can open, so a shared report would otherwise carry a slice of
-     * what was read, or who read it. The short ones, aid and cid, are matched whole or after an
-     * underscore or hyphen, so an ordinary setting such as {@code hide_paid_partnership} keeps its
-     * value. The longer ones may follow any prefix, camel case included ({@code topLevelPostId}),
-     * and take a hyphen as well as an underscore.
-     */
-    private static final String CONTENT_ID_NAMES =
-            "(?:[a-z0-9]+[_-])*(?:aid|cid)|[a-z0-9_-]*(?:fbid|story[_-]?id|post[_-]?id|feedback[_-]?id"
-                    + "|video[_-]?id|item[_-]?id|group[_-]?id|page[_-]?id|profile[_-]?id|actor[_-]?id"
-                    + "|user[_-]?id|thread[_-]?id|comment[_-]?id|msg[_-]?id|message[_-]?id)";
     /**
      * Ids are printed in comma separated lists, and the value pattern the credential rule uses
      * stops at the first comma, so everything after the first id stayed in the report.
      */
     private static final String CONTENT_ID_VALUE = "\"?[^\\s;&\"'<>]+";
+    /**
+     * An account id's unquoted value. A list of them may be written with spaces as well as commas,
+     * so it runs on over spaces and stops only at the next name with a separator after it
+     * ({@code action=hide}), a semicolon, ampersand, quote, closing brace or parenthesis, or the
+     * end of its line. Angle brackets are part of it, as in {@code user_id=<id>}, and so are square
+     * ones, so a list the block rule already cut to {@code [omitted]} is taken whole.
+     */
+    private static final String USER_ID_VALUE = "[^ \\t\\r\\n;&\"')}]*(?:[ \\t]++(?![a-z][a-z0-9_-]*" + SEPARATOR
+            + ")[^ \\t\\r\\n;&\"')}]*)*";
     /**
      * A bare id, for the places that print a list of them with no name in front. Facebook's
      * account ids are fifteen digits (the newer ones seventeen) and its post and story ids run to
@@ -191,13 +205,15 @@ public final class DiagnosticRedactor {
         return withoutCredentialBlocks(passed)
                 .replaceAll("(?i)" + EDGE + "(" + CREDENTIAL_NAMES + ")" + SEPARATOR
                         + "(?:" + QUOTED + "|[^\\s,&\"'<>]+)", "$1=[omitted]")
+                .replaceAll("(?i)" + EDGE + "(" + USER_ID_NAMES + ")" + SEPARATOR
+                        + "(?:" + QUOTED + "|" + USER_ID_VALUE + ")", "$1=[omitted]")
                 .replaceAll("(?i)" + EDGE + "(" + CONTENT_ID_NAMES + ")" + SEPARATOR
                         + "(?:" + QUOTED + "|" + CONTENT_ID_VALUE + ")", "$1=[omitted]")
                 .replaceAll(BARE_CONTENT_ID, "[id omitted]");
     }
 
     /**
-     * Every object or list a credential's name holds, whole, however deep it nests. A pattern can
+     * Every object or list a credential's or an id's name holds, whole, however deep it nests. A pattern can
      * only follow nesting to a depth written into it, and it can't tell a brace inside a quoted
      * string from one that closes the object, so this counts brackets outside quotes instead.
      */

@@ -274,6 +274,22 @@ public class DiagnosticRedactorTest {
             {"userid: useridLeakV2", "useridLeakV2"},
             {"{\"userId\":\"camelUserIdLeakV3\",\"kind\":\"reel\"}", "camelUserIdLeakV3"},
             {"X-User-Id: headerUserIdLeakV4", "headerUserIdLeakV4"},
+            // Account ids as a list, an object, a HAR-style pair, in angle brackets, spaced or plural.
+            {"{\"userId\":[\"arrayFirstV5\",\"arraySecondV6\"]}", "arrayFirstV5", "arraySecondV6"},
+            {"{\"user_id\":{\"id\":\"objectInnerV7\"}}", "objectInnerV7"},
+            {"{\"name\":\"X-User-Id\",\"value\":\"harPairV8\"}", "harPairV8"},
+            {"{\"name\":\"user_id\",\"value\":\"harSnakeV9\"}", "harSnakeV9"},
+            {"user_id=<angleBracketV10>", "angleBracketV10"},
+            {"user_id: spacedFirstV11 spacedSecondV12", "spacedFirstV11", "spacedSecondV12"},
+            {"user_ids=pluralFirstV13,pluralSecondV14", "pluralFirstV13", "pluralSecondV14"},
+            {"userIds: [\"pluralArrayV15\"]", "pluralArrayV15"},
+            {"User-Ids: spacedPluralV16 spacedPluralV17", "spacedPluralV16", "spacedPluralV17"},
+            {"body=\"{\\\"userId\\\":[\\\"escapedArrayV18\\\"]}\"", "escapedArrayV18"},
+            // Every other id name as a HAR-style pair, a list or an object.
+            {"{\"name\":\"story_id\",\"value\":\"storyPairV19\"}", "storyPairV19"},
+            {"{\"name\":\"postId\",\"value\":\"postPairV20\"}", "postPairV20"},
+            {"{\"post_id\":[\"postArrayV21\"]}", "postArrayV21"},
+            {"{\"feedback_id\":{\"id\":\"feedbackObjectV22\"}}", "feedbackObjectV22"},
             // sid, uid, iid, guid and auth at a name's edge, in any case, and the longer names that
             // hold one of them with no edge.
             {"sid=sidLeakA1", "sidLeakA1"},
@@ -385,14 +401,35 @@ public class DiagnosticRedactorTest {
 
     /**
      * An account id is only caught by the bare-number rule when it's fifteen digits or more, so a
-     * short or non-numeric one behind user_id reached the report. Its name gives it away.
+     * short or non-numeric one behind user_id reached the report. Its name gives it away. A word
+     * after the id on its line goes with it, since it can't be told from a second id in a list
+     * written with spaces.
      */
     @Test public void aUserIdGoesWhateverItsNameLooksLike() {
-        assertEquals("user_id=[omitted] kept", DiagnosticRedactor.redact("user_id=abc kept"));
-        assertEquals("userid=[omitted] kept", DiagnosticRedactor.redact("userid=abc kept"));
+        assertEquals("user_id=[omitted]", DiagnosticRedactor.redact("user_id=abc kept"));
+        assertEquals("userid=[omitted]", DiagnosticRedactor.redact("userid=abc kept"));
         assertEquals("{\"userId=[omitted]}", DiagnosticRedactor.redact("{\"userId\":\"a1b2\"}"));
-        assertEquals("user-id=[omitted] kept", DiagnosticRedactor.redact("user-id: 42 kept"));
-        assertEquals("USER_ID=[omitted] kept", DiagnosticRedactor.redact("USER_ID: 7 kept"));
+        assertEquals("user-id=[omitted]", DiagnosticRedactor.redact("user-id: 42 kept"));
+        assertEquals("USER_ID=[omitted]", DiagnosticRedactor.redact("USER_ID: 7 kept"));
+    }
+
+    /**
+     * Account ids in the other shapes a report prints them in. The whole value goes, and the rest
+     * of the line stays from the next name with a separator, or a closing quote or bracket.
+     */
+    @Test public void aListOrObjectOfAccountIdsGoesWhole() {
+        assertEquals("{\"userId=[omitted]}", DiagnosticRedactor.redact("{\"userId\":[\"a\",\"b\"]}"));
+        assertEquals("{\"userId=[omitted]}", DiagnosticRedactor.redact("{\"userId\":{\"id\":\"x\"}}"));
+        assertEquals("{\"name\":\"X-User-Id\",\"value\":[omitted]}",
+                DiagnosticRedactor.redact("{\"name\":\"X-User-Id\",\"value\":\"x\"}"));
+        assertEquals("user_id=[omitted]", DiagnosticRedactor.redact("user_id=<x>"));
+        assertEquals("user_id=[omitted]", DiagnosticRedactor.redact("user_id: a b"));
+        assertEquals("user_ids=[omitted]", DiagnosticRedactor.redact("user_ids=a,b"));
+        assertEquals("user_id=[omitted] action=hide, reason: spam",
+                DiagnosticRedactor.redact("user_id=a b action=hide, reason: spam"));
+        assertEquals("{\"userId=[omitted]\"kind\":\"reel\"}",
+                DiagnosticRedactor.redact("{\"userId\":42,\"kind\":\"reel\"}"));
+        assertEquals("(user_id=[omitted]) next", DiagnosticRedactor.redact("(user_id=7) next"));
     }
 
     /**
