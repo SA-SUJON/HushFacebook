@@ -1698,6 +1698,13 @@ try {
         # build moved with the catalog.
         Copy-Item -LiteralPath (Join-Path $Root 'patches-bundle.json') -Destination (Join-Path $factsRoot 'patches-bundle.json') -Force
         Copy-Item -LiteralPath (Join-Path $Root $bugFormRelative) -Destination (Join-Path $factsRoot $bugFormRelative) -Force
+        # And its README sentence naming that published release, which the sync above moved to the
+        # source's version. The two only match when this checkout's source is the published one.
+        $publishedHere = "$((Get-Content -LiteralPath (Join-Path $Root 'patches-bundle.json') -Raw | ConvertFrom-Json).version)"
+        Set-FactsFile 'README.md' {
+            param($text) $text -replace '(latest (?:published )?release is (?:still )?\[?v)\d+(?:\.\d+)+', "`${1}$publishedHere" `
+                -replace '(latest release is \[v[^\]]*\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', "`${1}$publishedHere"
+        }
         Set-FactsFile $bugFormRelative {
             param($text) $text -replace ('(placeholder:\s*Version \S+ for Facebook )' + [regex]::Escape($newestBuild)), "`${1}$movedBuild"
         }
