@@ -85,6 +85,8 @@ public class MediaSaveTest {
             }
         };
         context = RuntimeEnvironment.getApplication();
+        // A save of one file reads its policy through MediaDownload, as every save does.
+        MediaDownload.policyForTests = policy;
         gallery = Robolectric.setupContentProvider(Gallery.class, MediaStore.AUTHORITY);
         ShadowContentResolver resolver = Shadows.shadowOf(context.getContentResolver());
         resolver.registerOutputStream(gallery.videoUri(1), published);
@@ -94,6 +96,8 @@ public class MediaSaveTest {
     @After
     public void tearDown() throws IOException {
         server.close();
+        MediaDownload.policyForTests = null;
+        DashSave.usableForTests = null;
         LogBufferManager.clearLogBuffer();
         // The join cases tell Robolectric's extractor about their work files, and it keeps that
         // in a static map. Cleared here rather than left to Robolectric's own reset.
@@ -112,11 +116,13 @@ public class MediaSaveTest {
         return body;
     }
 
-    private Downloader.Result save(String path, long max) {
-        File folder = DashSave.workFolder(context);
-        assertNotNull(folder);
-        return Downloader.save(origin + path, Downloader.Kind.VIDEO, folder,
-                new MediaStoreWriter(context, true), policy, max);
+    /** The save of one video file at [path], on the path every single-file save takes. */
+    private Downloader.Result save(String path) {
+        return save(path, new MediaStoreWriter(context, true));
+    }
+
+    private Downloader.Result save(String path, MediaStoreWriter writer) {
+        return MediaDownload.fileJob(context, origin + path, Downloader.Kind.VIDEO).run(writer, Downloader.SILENT);
     }
 
     private void assertNothingWasCreated(String what, Downloader.Result result) {
@@ -130,17 +136,30 @@ public class MediaSaveTest {
     public void refusedAndBrokenFetchesNeverCreateARow() {
         byte[] page = "<html><body>Log in</body></html>".getBytes(StandardCharsets.UTF_8);
         serve("/page.mp4", "video/mp4", page, page.length);
-        assertNothingWasCreated("a page sent as video", save("/page.mp4", Downloader.MAX_BYTES));
+        assertNothingWasCreated("a page sent as video", save("/page.mp4"));
 
+        serve("/login", "text/html", page, page.length);
+        Downloader.Result login = save("/login");
+        assertEquals(login.toString(), Downloader.Status.REFUSED, login.status);
+        assertNothingWasCreated("a login page", login);
+
+        server.serve("/part.mp4", 206, "video/mp4", mp4(4000), 4000);
+        Downloader.Result part = save("/part.mp4");
+        assertEquals(part.toString(), Downloader.Status.HTTP_ERROR, part.status);
+        assertNothingWasCreated("part of a file nobody asked for", part);
+
+        // The work file may grow to 1024 bytes, and a stream with no announced length runs past it.
+        DashSave.usableForTests = () -> DashSave.KEEP_FREE + 1024;
         serve("/big.mp4", "video/mp4", mp4(4096), -1);
-        assertNothingWasCreated("an oversized stream", save("/big.mp4", 1024));
+        assertNothingWasCreated("an oversized stream", save("/big.mp4"));
+        DashSave.usableForTests = null;
 
         serve("/short.mp4", "video/mp4", mp4(1000), 5000);
-        assertNothingWasCreated("a truncated body", save("/short.mp4", Downloader.MAX_BYTES));
+        assertNothingWasCreated("a truncated body", save("/short.mp4"));
 
         server.redirect("/away", "https://scontent.xx.fbcdn.net/v.mp4");
         // The lookup answers 10.9.8.7 for every Meta name here.
-        assertNothingWasCreated("a redirect to a Meta name on a private address", save("/away", Downloader.MAX_BYTES));
+        assertNothingWasCreated("a redirect to a Meta name on a private address", save("/away"));
     }
 
     @Test
@@ -148,7 +167,7 @@ public class MediaSaveTest {
         byte[] body = mp4(64_000);
         serve("/v.mp4", "video/mp4", body, body.length);
 
-        Downloader.Result result = save("/v.mp4", Downloader.MAX_BYTES);
+        Downloader.Result result = save("/v.mp4");
 
         assertEquals(result.toString(), Downloader.Status.OK, result.status);
         assertEquals(1, gallery.inserts.size());
@@ -167,11 +186,13 @@ public class MediaSaveTest {
         serve("/not-published.mp4", "video/mp4", body, body.length);
         gallery.refuseUpdate = true;
 
-        Downloader.Result result = save("/not-published.mp4", Downloader.MAX_BYTES);
+        Downloader.Result result = save("/not-published.mp4");
 
         assertEquals(result.toString(), Downloader.Status.WRITE_ERROR, result.status);
         assertEquals(1, gallery.inserts.size());
         assertTrue("the unpublished row was left behind", gallery.rows.isEmpty());
+        String[] left = DashSave.workFolder(context).list();
+        assertEquals("the work file outlived a failed publish", 0, left == null ? 0 : left.length);
     }
 
     @Test
@@ -186,7 +207,7 @@ public class MediaSaveTest {
             @Override public void close() throws IOException { throw new IOException("gallery write did not finish"); }
         });
 
-        Downloader.Result result = save("/close-fails.mp4", Downloader.MAX_BYTES);
+        Downloader.Result result = save("/close-fails.mp4");
 
         assertEquals(result.toString(), Downloader.Status.WRITE_ERROR, result.status);
         assertEquals(1, gallery.inserts.size());
@@ -489,9 +510,7 @@ public class MediaSaveTest {
         byte[] body = mp4(4096);
         serve("/v.mp4", "video/mp4", body, body.length);
 
-        Downloader.Result result = Downloader.save(origin + "/v.mp4", Downloader.Kind.VIDEO,
-                DashSave.workFolder(context), new MediaStoreWriter(new BrokenLedger(context, throwing), true), policy,
-                Downloader.MAX_BYTES);
+        Downloader.Result result = save("/v.mp4", new MediaStoreWriter(new BrokenLedger(context, throwing), true));
 
         assertEquals(result.toString(), Downloader.Status.WRITE_ERROR, result.status);
         assertEquals("bytes were copied into a row the list doesn't hold", 0, copied.size());
@@ -511,9 +530,7 @@ public class MediaSaveTest {
         byte[] body = mp4(4096);
         serve("/v.mp4", "video/mp4", body, body.length);
 
-        Downloader.Result result = Downloader.save(origin + "/v.mp4", Downloader.Kind.VIDEO,
-                DashSave.workFolder(context), new MediaStoreWriter(new BrokenLedger(context, false), true), policy,
-                Downloader.MAX_BYTES);
+        Downloader.Result result = save("/v.mp4", new MediaStoreWriter(new BrokenLedger(context, false), true));
 
         assertEquals(result.toString(), Downloader.Status.WRITE_ERROR, result.status);
         assertEquals(0, copied.size());
@@ -529,8 +546,8 @@ public class MediaSaveTest {
         serve("/v.mp4", "video/mp4", body, body.length);
         Context broken = new BrokenLedger(context, false);
 
-        Thread worker = MediaDownload.start(broken, true, (writer, progress) -> Downloader.save(origin + "/v.mp4",
-                Downloader.Kind.VIDEO, DashSave.workFolder(context), writer, policy, Downloader.MAX_BYTES, progress));
+        Thread worker = MediaDownload.start(broken, true, MediaDownload.fileJob(broken, origin + "/v.mp4",
+                Downloader.Kind.VIDEO));
         worker.join(30_000);
         assertFalse("the save never finished", worker.isAlive());
         Shadows.shadowOf(Looper.getMainLooper()).idle();
@@ -557,7 +574,7 @@ public class MediaSaveTest {
         byte[] body = mp4(4096);
         serve("/v.mp4", "video/mp4", body, body.length);
 
-        Downloader.Result result = save("/v.mp4", Downloader.MAX_BYTES);
+        Downloader.Result result = save("/v.mp4");
 
         assertEquals(result.toString(), Downloader.Status.OK, result.status);
         assertEquals(java.util.Collections.singletonList(java.util.Collections.singleton(gallery.videoUri(1).toString())),
@@ -617,6 +634,8 @@ public class MediaSaveTest {
     public static final class Gallery extends ContentProvider {
         final Map<Long, ContentValues> rows = new HashMap<>();
         final List<Uri> inserts = new ArrayList<>();
+        /** Every new entry is turned down, the way a full or locked MediaStore does. */
+        boolean refuseInsert;
         boolean refuseUpdate;
         boolean refuseDeletion;
         private long nextId = 1;
@@ -630,6 +649,7 @@ public class MediaSaveTest {
         }
 
         @Override public Uri insert(Uri uri, ContentValues values) {
+            if (refuseInsert) return null;
             long id = nextId++;
             rows.put(id, new ContentValues(values));
             Uri item = ContentUris.withAppendedId(uri, id);

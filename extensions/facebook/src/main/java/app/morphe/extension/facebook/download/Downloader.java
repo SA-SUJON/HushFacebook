@@ -274,54 +274,14 @@ final class Downloader {
     private static final String HEIF = "image/heif";
 
     /**
-     * Fetch [url] into a new file in [folder], check it, and publish it through [sink]. Blocking.
-     * Never throws. The file in [folder] is gone when this returns, whatever happened.
-     */
-    static Result save(String url, Kind kind, File folder, Sink sink) {
-        return save(url, kind, folder, sink, MediaUrlPolicy.META, MAX_BYTES);
-    }
-
-    static Result save(String url, Kind kind, File folder, Sink sink, MediaUrlPolicy policy, long maxBytes) {
-        return save(url, kind, folder, sink, policy, maxBytes, SILENT);
-    }
-
-    static Result save(String url, Kind kind, File folder, Sink sink, MediaUrlPolicy policy, long maxBytes,
-            Progress progress) {
-        File temp = null;
-        try {
-            temp = File.createTempFile(kind.name().toLowerCase(Locale.US), ".part", folder);
-            Result fetched = fetch(url, kind, temp, policy, maxBytes, progress);
-            if (!fetched.ok()) return fetched;
-            return publish(temp, fetched.mime, sink, progress);
-        } catch (Throwable t) {
-            return Result.fail(Status.WRITE_ERROR, "the cache could not hold the file");
-        } finally {
-            delete(temp);
-        }
-    }
-
-    /** {@link #fetch(String, Kind, File, MediaUrlPolicy, long)} with Meta's policy and the real cap. */
-    static Result fetch(String url, Kind kind, File into) {
-        return fetch(url, kind, into, MediaUrlPolicy.META, MAX_BYTES);
-    }
-
-    /** {@link #fetch(String, Kind, File, MediaUrlPolicy, long)} with the real cap. */
-    static Result fetch(String url, Kind kind, File into, MediaUrlPolicy policy) {
-        return fetch(url, kind, into, policy, MAX_BYTES);
-    }
-
-    /**
-     * Fetch [url] into [into]. Blocking. Never throws. On anything but OK, [into] is deleted.
+     * Fetch [url] into [into], reporting to [progress] and stopping with CANCELLED when it says so.
+     * [maxBytes] is the most the file may hold. Blocking. Never throws. On anything but OK, [into]
+     * is deleted.
      *
      * <p>No header is set on the request. A captured address was fetched from an unrelated machine
      * with none at all and answered 200, so a guessed {@code User-Agent} or {@code Referer} can
      * only make a refusal more likely.
      */
-    static Result fetch(String url, Kind kind, File into, MediaUrlPolicy policy, long maxBytes) {
-        return fetch(url, kind, into, policy, maxBytes, SILENT);
-    }
-
-    /** As above, reporting to [progress] and stopping with CANCELLED when it says so. */
     static Result fetch(String url, Kind kind, File into, MediaUrlPolicy policy, long maxBytes, Progress progress) {
         HttpURLConnection connection = null;
         boolean kept = false;
@@ -417,13 +377,8 @@ final class Downloader {
 
     /**
      * Copy a finished, checked [file] into [sink] as [mime]. If anything fails once the sink is
-     * open, the entry is removed again.
+     * open, the entry is removed again, and a cancel before the commit leaves no row.
      */
-    static Result publish(File file, String mime, Sink sink) {
-        return publish(file, mime, sink, SILENT);
-    }
-
-    /** As above, and a cancel before the commit leaves no row. */
     static Result publish(File file, String mime, Sink sink, Progress progress) {
         boolean committed = false;
 

@@ -33,7 +33,6 @@ import org.robolectric.shadows.util.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -79,6 +78,7 @@ public class DownloadDiagnosticsTest {
     @After
     public void tearDown() throws IOException {
         server.close();
+        MediaDownload.policyForTests = null;
         LogBufferManager.clearLogBuffer();
     }
 
@@ -97,31 +97,15 @@ public class DownloadDiagnosticsTest {
         assertFalse("the save never finished", worker.isAlive());
     }
 
-    /** A gallery that refuses every new entry, the way a full or locked MediaStore does. */
-    private static final class RefusingGallery implements Downloader.Sink {
-        @Override
-        public OutputStream open(String mime) throws IOException {
-            throw new IOException("the gallery refused a new entry");
-        }
-
-        @Override
-        public void commit() {
-        }
-
-        @Override
-        public void abandon() {
-        }
-    }
-
     @Test
     public void progressiveDashAndGalleryFailuresReachTheReport() throws Exception {
         // Where Android put Facebook's native code: the ABI it was installed for.
         context.getApplicationInfo().nativeLibraryDir = "/data/app/~~x/com.facebook.katana-y/lib/arm64";
-        File folder = DashSave.workFolder(context);
+        MediaDownload.policyForTests = policy;
+        MediaSaveTest.Gallery gallery = Robolectric.setupContentProvider(MediaSaveTest.Gallery.class, MediaStore.AUTHORITY);
 
         // A progressive save whose address the server no longer has.
-        run((writer, progress) -> Downloader.save(origin + "/gone.mp4", Downloader.Kind.VIDEO, folder, writer, policy,
-                Downloader.MAX_BYTES));
+        run(MediaDownload.fileJob(context, origin + "/gone.mp4", Downloader.Kind.VIDEO));
 
         // A DASH save whose track downloads but can't be joined into a file.
         server.serve("/track.mp4", 200, "video/mp4", mp4(4096), 4096);
@@ -131,8 +115,8 @@ public class DownloadDiagnosticsTest {
 
         // A good file the gallery won't take.
         server.serve("/whole.mp4", 200, "video/mp4", mp4(4096), 4096);
-        run((writer, progress) -> Downloader.save(origin + "/whole.mp4", Downloader.Kind.VIDEO, folder, new RefusingGallery(),
-                policy, Downloader.MAX_BYTES));
+        gallery.refuseInsert = true;
+        run(MediaDownload.fileJob(context, origin + "/whole.mp4", Downloader.Kind.VIDEO));
 
         String report = LogBufferManager.buildExportText();
         assertTrue(report, report.contains("MediaDownload | ERROR | save finished: HTTP_ERROR (the server answered 404)"));

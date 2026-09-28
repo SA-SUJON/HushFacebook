@@ -94,6 +94,8 @@ public class SaveProgressTest {
             }
         };
         context = RuntimeEnvironment.getApplication();
+        // A save of one file reads its policy through MediaDownload, as every save does.
+        MediaDownload.policyForTests = policy;
         gallery = Robolectric.setupContentProvider(Gallery.class, MediaStore.AUTHORITY);
         LogBufferManager.clearLogBuffer();
         // Every save here is the first of its process, as a save after a restart would be.
@@ -115,10 +117,9 @@ public class SaveProgressTest {
 
     /** The same, completing [ended] with the save's result as it ends. */
     private Thread save(String path, CompletableFuture<Downloader.Result> ended) {
-        File folder = DashSave.workFolder(context);
+        MediaDownload.Job job = MediaDownload.fileJob(context, server.origin() + path, Downloader.Kind.VIDEO);
         return MediaDownload.start(context, true, (writer, progress) -> {
-            Downloader.Result result = Downloader.save(server.origin() + path, Downloader.Kind.VIDEO, folder, writer,
-                    policy, Downloader.MAX_BYTES, progress);
+            Downloader.Result result = job.run(writer, progress);
             ended.complete(result);
             return result;
         });
@@ -295,34 +296,33 @@ public class SaveProgressTest {
             assertEquals("the server never took the other fetch", 1, server.hits("/busy.mp4"));
 
             CompletableFuture<Downloader.Result> ended = new CompletableFuture<>();
-            File folder = DashSave.workFolder(context);
+            MediaDownload.Job job = MediaDownload.fileJob(context, server.origin() + "/late.mp4", Downloader.Kind.VIDEO);
             Thread worker = MediaDownload.start(context, true, (writer, progress) -> {
                 SaveControl.Save save = (SaveControl.Save) progress;
                 CountDownLatch closed = new CountDownLatch(1);
-                Downloader.Result result = Downloader.save(server.origin() + "/late.mp4", Downloader.Kind.VIDEO, folder,
-                        writer, policy, Downloader.MAX_BYTES, new Downloader.Progress() {
-                            @Override public void transferred(long done, long total) {
-                                save.transferred(done, total);
-                            }
+                Downloader.Result result = job.run(writer, new Downloader.Progress() {
+                    @Override public void transferred(long done, long total) {
+                        save.transferred(done, total);
+                    }
 
-                            // Cancel is pressed here, and its close runs before the connection opens.
-                            @Override public void reading(Runnable close) {
-                                save.reading(() -> {
-                                    close.run();
-                                    closed.countDown();
-                                });
-                                SaveControl.cancel(save.id);
-                                try {
-                                    closed.await(20, TimeUnit.SECONDS);
-                                } catch (InterruptedException e) {
-                                    Thread.currentThread().interrupt();
-                                }
-                            }
-
-                            @Override public boolean cancelled() {
-                                return save.cancelled();
-                            }
+                    // Cancel is pressed here, and its close runs before the connection opens.
+                    @Override public void reading(Runnable close) {
+                        save.reading(() -> {
+                            close.run();
+                            closed.countDown();
                         });
+                        SaveControl.cancel(save.id);
+                        try {
+                            closed.await(20, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+
+                    @Override public boolean cancelled() {
+                        return save.cancelled();
+                    }
+                });
                 ended.complete(result);
                 return result;
             });

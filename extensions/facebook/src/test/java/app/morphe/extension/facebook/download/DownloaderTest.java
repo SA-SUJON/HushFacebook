@@ -104,7 +104,7 @@ public class DownloaderTest {
     }
 
     private Downloader.Result fetch(String path, Downloader.Kind kind, File into, long max) {
-        return Downloader.fetch(origin + path, kind, into, policy, max);
+        return Downloader.fetch(origin + path, kind, into, policy, max, Downloader.SILENT);
     }
 
     /** A fetch that must fail with [status] and leave no file behind. */
@@ -396,7 +396,7 @@ public class DownloaderTest {
         MediaUrlPolicy offline = new MediaUrlPolicy(host -> { throw new java.net.UnknownHostException(host); });
         File into = temp.newFile();
         Downloader.Result result = Downloader.fetch("https://scontent.xx.fbcdn.net/v.mp4", Downloader.Kind.VIDEO,
-                into, offline, Downloader.MAX_BYTES);
+                into, offline, Downloader.MAX_BYTES, Downloader.SILENT);
         assertEquals(result.toString(), Downloader.Status.NETWORK_ERROR, result.status);
         assertEquals("the address: its host does not resolve", result.reason);
         assertFalse(into.exists());
@@ -433,7 +433,8 @@ public class DownloaderTest {
     @Test
     public void theRealPolicyRefusesPlainHttpWithoutConnecting() throws IOException {
         File into = temp.newFile();
-        Downloader.Result result = Downloader.fetch(origin + "/v.mp4", Downloader.Kind.VIDEO, into);
+        Downloader.Result result = Downloader.fetch(origin + "/v.mp4", Downloader.Kind.VIDEO, into, MediaUrlPolicy.META,
+                Downloader.MAX_BYTES, Downloader.SILENT);
         assertEquals(result.toString(), Downloader.Status.REFUSED, result.status);
         assertEquals(0, hitsOf("/v.mp4"));
         assertFalse(into.exists());
@@ -450,14 +451,6 @@ public class DownloaderTest {
     public void aPartialAnswerNobodyAskedForIsRefused() throws IOException {
         serve("/part.mp4", 206, "video/mp4", mp4(4000), 4000);
         assertRefused(Downloader.Status.HTTP_ERROR, "/part.mp4", Downloader.Kind.VIDEO, Downloader.MAX_BYTES);
-
-        File folder = temp.newFolder();
-        RecordingSink sink = new RecordingSink();
-        Downloader.Result result = Downloader.save(origin + "/part.mp4", Downloader.Kind.VIDEO, folder, sink, policy,
-                Downloader.MAX_BYTES);
-        assertEquals(result.toString(), Downloader.Status.HTTP_ERROR, result.status);
-        assertEquals("the sink was opened for part of a file", 0, sink.opened);
-        assertEquals(0, folder.list().length);
     }
 
     /**
@@ -631,49 +624,40 @@ public class DownloaderTest {
     }
 
     // ------------------------------------------------------------------ the sink
+    // What a save does with a refused fetch, the gallery never reached and no work file left, is
+    // pinned on the save's own path in MediaSaveTest. These are the publish every save ends in.
 
-    @Test
-    public void aRefusedFetchNeverOpensTheSinkAndLeavesTheFolderEmpty() throws IOException {
-        serve("/login", "text/html", HTML);
-        File folder = temp.newFolder();
-        RecordingSink sink = new RecordingSink();
-
-        Downloader.Result result = Downloader.save(origin + "/login", Downloader.Kind.VIDEO, folder, sink, policy, Downloader.MAX_BYTES);
-
-        assertEquals(Downloader.Status.REFUSED, result.status);
-        assertEquals("the sink was opened for a refused fetch", 0, sink.opened);
-        assertEquals(0, folder.list().length);
+    /** A checked file in the cache, as a fetch leaves it. */
+    private File fetched(byte[] body) throws IOException {
+        File file = temp.newFile();
+        Files.write(file.toPath(), body);
+        return file;
     }
 
     @Test
-    public void aGoodFetchIsPublishedWholeAndTheFolderIsLeftEmpty() throws IOException {
+    public void aCheckedFileIsPublishedWhole() throws IOException {
         byte[] body = mp4(50_000);
-        serve("/v.mp4", "video/mp4", body);
-        File folder = temp.newFolder();
         RecordingSink sink = new RecordingSink();
 
-        Downloader.Result result = Downloader.save(origin + "/v.mp4", Downloader.Kind.VIDEO, folder, sink, policy, Downloader.MAX_BYTES);
+        Downloader.Result result = Downloader.publish(fetched(body), "video/mp4", sink, Downloader.SILENT);
 
         assertEquals(result.toString(), Downloader.Status.OK, result.status);
         assertEquals(1, sink.opened);
         assertEquals("video/mp4", sink.mime);
         assertTrue(sink.committed);
+        assertFalse(sink.abandoned);
         assertArrayEquals(body, sink.bytes.toByteArray());
-        assertEquals(0, folder.list().length);
     }
 
     @Test
     public void aSinkThatFailsIsAbandoned() throws IOException {
-        serve("/v.mp4", "video/mp4", mp4(5000));
-        File folder = temp.newFolder();
         RecordingSink sink = new RecordingSink();
         sink.failCommit = true;
 
-        Downloader.Result result = Downloader.save(origin + "/v.mp4", Downloader.Kind.VIDEO, folder, sink, policy, Downloader.MAX_BYTES);
+        Downloader.Result result = Downloader.publish(fetched(mp4(5000)), "video/mp4", sink, Downloader.SILENT);
 
         assertEquals(Downloader.Status.WRITE_ERROR, result.status);
         assertTrue("a failed publish left its entry", sink.abandoned);
-        assertEquals(0, folder.list().length);
     }
 
     /**
@@ -682,16 +666,13 @@ public class DownloaderTest {
      */
     @Test
     public void anEntryWhoseOpenFailedIsAbandoned() throws IOException {
-        serve("/v.mp4", "video/mp4", mp4(5000));
-        File folder = temp.newFolder();
         RecordingSink sink = new RecordingSink();
         sink.failOpen = true;
 
-        Downloader.Result result = Downloader.save(origin + "/v.mp4", Downloader.Kind.VIDEO, folder, sink, policy, Downloader.MAX_BYTES);
+        Downloader.Result result = Downloader.publish(fetched(mp4(5000)), "video/mp4", sink, Downloader.SILENT);
 
         assertEquals(Downloader.Status.WRITE_ERROR, result.status);
         assertTrue("an open that failed after its insert left the entry", sink.abandoned);
-        assertEquals(0, folder.list().length);
     }
 
     private static final class RecordingSink implements Downloader.Sink {
