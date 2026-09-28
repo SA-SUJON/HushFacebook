@@ -170,6 +170,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean messengerIcon() {
+        return false;
+    }
+
     public static boolean menuPromotions() {
         return false;
     }

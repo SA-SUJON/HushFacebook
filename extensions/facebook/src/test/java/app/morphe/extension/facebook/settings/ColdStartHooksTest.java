@@ -36,6 +36,7 @@ import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
+import app.morphe.extension.facebook.chats.MessengerIconForTests;
 import app.morphe.extension.facebook.composer.TagSuggestionsForTests;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
@@ -187,6 +188,8 @@ public class ColdStartHooksTest {
         assertFalse("a list of people open before the context was closed", TagSuggestionsForTests.closesAListLeftOpen());
         assertFalse("a Chats list built before the context lost the Get Messenger card",
                 MessengerCardForTests.hidesWithMessenger());
+        assertFalse("a Messenger icon tapped before the context opened Messenger",
+                MessengerIconForTests.opensMessenger());
         assertFalse("a Menu built before the context lost its Upgrades", MenuSectionsForTests.hidesUpgrades());
         assertFalse("a profile built before the context lost People you may know",
                 ProfileSuggestionsForTests.hidesTheCarousel());

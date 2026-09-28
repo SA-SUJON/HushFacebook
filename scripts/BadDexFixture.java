@@ -23,6 +23,7 @@ import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstructio
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction21t;
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction22c;
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction22t;
+import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction22x;
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction31i;
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction31t;
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction35c;
@@ -75,13 +76,16 @@ import java.util.Set;
  * an executor, the call Don't send reel watch history sends to {@code ReelWatchHistory.send}. And
  * the feed collection manager's swap runnable, whose run() holds the two sizes of its log line and
  * swaps an edge into the feed, with the feed guard's call to {@code FeedFilter.hideSwappedEdge}
- * before the swap. Beside each method a start-call, next-call, sole-call or once-call rule picks
- * sit methods holding part of what it's picked by: the tray controller, the refresh controller's
- * onPause, two other methods naming both surfaces and one holding the emoji provider's log tag
- * alone, as Facebook's do, an instance method holding the emoji pictures' base address, and three
- * top bar, three batcher and three swap runnable methods, which Facebook doesn't have, so neither
- * the logo rule, the watch-history rule nor the swap rule passes with its second string or its
- * shape left out.
+ * before the swap. And the top bar's Messenger icon: its tap, holding both of its entry points,
+ * and the Messenger button handler, holding "long_press", each with Open Messenger from the top
+ * bar's call to {@code MessengerIcon.open} first. Beside each method a start-call, next-call,
+ * sole-call or once-call rule picks sit methods holding part of what it's picked by: the tray
+ * controller, the refresh controller's onPause, two other methods naming both surfaces and one
+ * holding the emoji provider's log tag alone, as Facebook's do, an instance method holding the
+ * emoji pictures' base address, a method of the tap's shape holding one entry point and one of
+ * another shape holding "long_press", and three top bar, three batcher and three swap runnable
+ * methods, which Facebook doesn't have, so neither the logo rule, the watch-history rule nor the
+ * swap rule passes with its second string or its shape left out.
  *
  *   java -cp &lt;cli jar&gt; BadDexFixture.java &lt;outDir&gt;
  */
@@ -146,6 +150,11 @@ public class BadDexFixture {
     private static final String EMOJI_PICTURES = "Lfixture/EmojiPictures;";
     private static final String EMOJI_SIZE = "Lfixture/EmojiSize;";
     private static final String EMOJI_PICTURE_BASE = "https://www.facebook.com/images/mobileemoji";
+
+    private static final String MESSENGER_BAR = "Lfixture/MessengerBar;";
+    private static final String MESSENGER_ICON = "Lapp/morphe/extension/facebook/chats/MessengerIcon;";
+    private static final ImmutableMethodReference MESSENGER_ICON_OPEN =
+            method(MESSENGER_ICON, "open", "Z", "Landroid/content/Context;", "Z");
 
     private static final String SHORTCUT_MANAGER = "Landroid/content/pm/ShortcutManager;";
     private static final String SHORTCUT_INFO = "Landroid/content/pm/ShortcutInfo;";
@@ -755,6 +764,72 @@ public class BadDexFixture {
                 op(Opcode.RETURN_OBJECT, 0));                          // 7
     }
 
+    /**
+     * The top bar's Messenger icon, static methods taking the context, the session, the surface
+     * and the long press, then more flags: v0 and v1 free, v2 the context and v5 the long press
+     * in each. The tap holds both entry points, with [tapPrefix] first, and the button handler,
+     * (Context, FbUserSession, String, Z, Z)V, holds "long_press", with [buttonPrefix] first.
+     * Beside them sit a method of the tap's shape holding the first entry point alone, with
+     * [entryPrefix] first, and one holding "long_press" that takes one flag fewer than the handler,
+     * with [logPrefix] first, as the other 161 methods holding it on 580 have other shapes.
+     */
+    private static ClassDef messengerBar(List<Instruction> tapPrefix, List<Instruction> entryPrefix,
+            List<Instruction> buttonPrefix, List<Instruction> logPrefix) {
+        String surface = "Ljava/lang/String;";
+        return new ImmutableClassDef(MESSENGER_BAR, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Arrays.asList(
+                        define(MESSENGER_BAR, "tap", "V", true, messengerBody(tapPrefix, 6,
+                                "entry_point_navbar_global_icon_", "entry_point_navbar_global_icon_reels_tab"),
+                                CONTEXT, FB_USER_SESSION, surface, "Z"),
+                        define(MESSENGER_BAR, "tapEntry", "V", true, messengerBody(entryPrefix, 6,
+                                "entry_point_navbar_global_icon_"), CONTEXT, FB_USER_SESSION, surface, "Z"),
+                        define(MESSENGER_BAR, "button", "V", true, messengerBody(buttonPrefix, 7, "long_press"),
+                                CONTEXT, FB_USER_SESSION, surface, "Z", "Z"),
+                        define(MESSENGER_BAR, "buttonLog", "V", true, messengerBody(logPrefix, 6, "long_press"),
+                                CONTEXT, FB_USER_SESSION, surface, "Z")));
+    }
+
+    /** [prefix], then each of [strings] in v0 and a return, in [registers] with v0 and v1 free. */
+    private static ImmutableMethodImplementation messengerBody(List<Instruction> prefix, int registers, String... strings) {
+        List<Instruction> instructions = new ArrayList<>(prefix);
+        for (String s : strings) {
+            instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(s)));
+        }
+        instructions.add(op(Opcode.RETURN_VOID));
+        return new ImmutableMethodImplementation(registers, instructions, null, null);
+    }
+
+    /**
+     * What Open Messenger from the top bar puts first in the tap and the handler: the context and
+     * the long press copied down, the question, and a return while Messenger opened. The method's
+     * own code lands at 11.
+     */
+    private static List<Instruction> messengerHook() {
+        return Arrays.asList(
+                new ImmutableInstruction22x(Opcode.MOVE_OBJECT_FROM16, 0, 2), // 0
+                new ImmutableInstruction22x(Opcode.MOVE_FROM16, 1, 5),        // 2
+                invoke(MESSENGER_ICON_OPEN, 0, 1),                            // 4
+                op(Opcode.MOVE_RESULT, 0),                                    // 7
+                ifEqz(0, 3),                                                  // 8 -> 11
+                op(Opcode.RETURN_VOID));                                      // 10
+    }
+
+    /** The hook after a branch on the long press, not first. */
+    private static List<Instruction> lateMessengerHook() {
+        List<Instruction> late = new ArrayList<>();
+        late.add(ifEqz(5, 3));                                            // 0 -> 3
+        late.add(op(Opcode.NOP));                                         // 2
+        late.addAll(messengerHook());                                     // 3
+        return late;
+    }
+
+    private static ClassDef messengerIcon() {
+        return new ImmutableClassDef(MESSENGER_ICON, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
+                OBJECT, null, null, null, null, Collections.singletonList(define(MESSENGER_ICON, "open", "Z", true,
+                        body(3, new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN, 0)),
+                        CONTEXT, "Z")));
+    }
+
     /** [classes] with each of [replacements] in place of the class of its type. */
     private static List<ClassDef> replaced(List<ClassDef> classes, ClassDef... replacements) {
         List<ClassDef> out = new ArrayList<>(classes);
@@ -1216,7 +1291,9 @@ public class BadDexFixture {
                 topBar(false, true, 1), finderStub(FILLED_FINDER_STUB),
                 emojiProvider(emojiHook(), Collections.<Instruction>emptyList()), systemEmoji(),
                 emojiPictures(emojiPicturesHook(), Collections.<Instruction>emptyList()),
-                batcher(heldBack(), false, false), reelWatchHistory(), edgeSwap(swapGuard(), false, false));
+                batcher(heldBack(), false, false), reelWatchHistory(), edgeSwap(swapGuard(), false, false),
+                messengerBar(messengerHook(), Collections.<Instruction>emptyList(), messengerHook(),
+                        Collections.<Instruction>emptyList()), messengerIcon());
     }
 
     /** The clean host, Facebook's classes as they ship, with the batcher's flush making [handOver]. */
@@ -1227,7 +1304,9 @@ public class BadDexFixture {
                 topBar(false, false, 1),
                 emojiProvider(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 emojiPictures(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
-                batcher(handOver, false, false), edgeSwap(Collections.<Instruction>emptyList(), false, false));
+                batcher(handOver, false, false), edgeSwap(Collections.<Instruction>emptyList(), false, false),
+                messengerBar(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList(),
+                        Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()));
     }
 
     /**
@@ -1733,6 +1812,17 @@ public class BadDexFixture {
         dexes.put("bad-emoji-pictures-hook-late", replaced(good(),
                 emojiPictures(lateEmojiPicturesHook, Collections.<Instruction>emptyList())));
 
+        // contract: the Messenger icon's tap and its button handler, each left without Open
+        // Messenger from the top bar's call or with the call after a branch on the long press.
+        List<Instruction> noHook = Collections.<Instruction>emptyList();
+        dexes.put("bad-messenger-tap-hook-missing", replaced(good(), messengerBar(noHook, noHook, messengerHook(), noHook)));
+        dexes.put("bad-messenger-tap-hook-late", replaced(good(),
+                messengerBar(lateMessengerHook(), noHook, messengerHook(), noHook)));
+        dexes.put("bad-messenger-button-hook-missing", replaced(good(),
+                messengerBar(messengerHook(), noHook, noHook, noHook)));
+        dexes.put("bad-messenger-button-hook-late", replaced(good(),
+                messengerBar(messengerHook(), noHook, lateMessengerHook(), noHook)));
+
         // contract: the GenAI reel stub left as the extension ships it, answering its marker.
         dexes.put("bad-finder-stub-not-filled", withFinderStub(good(), UNFILLED_FINDER_STUB));
         // contract: the stub filled with a call that never leaves the extension, not Facebook's finder.
@@ -1819,14 +1909,20 @@ public class BadDexFixture {
         // holds the adapter's start and stop names but not "tofu"; the return-refresh hook in
         // onPause, which holds the controller's name without "onRefresh"; the Follow hook in an
         // instance method naming both surfaces, which isn't the static check; the emoji hook in
-        // a method holding the provider's log tag without its end-to-end flag; and the emoji picture
-        // hook in an instance method holding the pictures' base address, which isn't the maker.
+        // a method holding the provider's log tag without its end-to-end flag; the emoji picture
+        // hook in an instance method holding the pictures' base address, which isn't the maker; and
+        // the two Messenger icon hooks, in a method of the tap's shape holding one entry point and
+        // in one of another shape holding "long_press".
         List<Instruction> none = Collections.<Instruction>emptyList();
         dexes.put("bad-tray-hook-wrong-method", replaced(good(), adapters(trayHook(0), none), trayController(trayHook(1))));
         dexes.put("bad-return-refresh-hook-wrong-method", replaced(good(), returnController(none, returnHook(), false)));
         dexes.put("bad-follow-hook-wrong-method", replaced(good(), followCheck(none, followHook())));
         dexes.put("bad-emoji-hook-wrong-method", replaced(good(), emojiProvider(none, emojiHook())));
         dexes.put("bad-emoji-pictures-hook-wrong-method", replaced(good(), emojiPictures(none, emojiPicturesHook())));
+        dexes.put("bad-messenger-tap-hook-wrong-method", replaced(good(),
+                messengerBar(none, messengerHook(), messengerHook(), none)));
+        dexes.put("bad-messenger-button-hook-wrong-method", replaced(good(),
+                messengerBar(messengerHook(), none, none, messengerHook())));
         // contract: a second method answering the return-refresh rule, so it can't say which one
         // the hook belongs in, although the hook is where it was.
         dexes.put("bad-return-refresh-two-callbacks", replaced(good(), returnController(returnHook(), none, true)));

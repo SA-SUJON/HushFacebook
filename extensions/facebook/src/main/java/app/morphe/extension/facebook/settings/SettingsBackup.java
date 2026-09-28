@@ -129,6 +129,7 @@ public final class SettingsBackup {
             Settings.MARKETPLACE_QUIET_NOTIFICATIONS,
             Settings.MARKETPLACE_SKIP_FEED_PREFETCH,
             Settings.HIDE_GET_MESSENGER_CARD,
+            Settings.OPEN_MESSENGER_APP,
             Settings.HIDE_MENU_UPGRADES,
             Settings.HIDE_MENU_ALSO_FROM_META,
             Settings.HIDE_META_AI_IN_SEARCH,

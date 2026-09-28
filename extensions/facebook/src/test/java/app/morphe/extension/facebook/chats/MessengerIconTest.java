@@ -1,0 +1,216 @@
+/*
+ * Copyright 2026 Hushfacebook contributors
+ * https://github.com/SysAdminDoc/Hushfacebook
+ */
+package app.morphe.extension.facebook.chats;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+
+import java.util.List;
+
+import app.morphe.extension.facebook.settings.FamilyNames;
+import app.morphe.extension.facebook.settings.Settings;
+import app.morphe.extension.shared.SettingsContextRule;
+import app.morphe.extension.shared.diagnostics.HookStatus;
+import app.morphe.extension.shared.settings.HushfacebookPause;
+import app.morphe.extension.shared.settings.PauseForTests;
+
+/**
+ * The hook first in the Messenger icon's tap: while the switch is on and Messenger is installed, a
+ * tap starts Messenger's launcher entry and Facebook's own Chats doesn't open. Every other time,
+ * Facebook handles the tap.
+ */
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = 30)
+public class MessengerIconTest {
+    @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
+
+    private final Context app = RuntimeEnvironment.getApplication();
+
+    @Before
+    public void startClean() {
+        MessengerIconForTests.uninstall();
+        MessengerIconForTests.nextStarted();
+        HookStatus.clear();
+    }
+
+    @After
+    public void restore() {
+        PauseForTests.resume();
+        Settings.OPEN_MESSENGER_APP.resetToDefault();
+        MessengerIconForTests.uninstall();
+        while (MessengerIconForTests.nextStarted() != null) {
+            // Robolectric keeps every start; the next test begins with none.
+        }
+        HookStatus.clear();
+    }
+
+    private static String statusLine() {
+        for (String line : HookStatus.report()) {
+            if (line.startsWith(FamilyNames.MESSENGER_ICON + ":")) return line;
+        }
+        return null;
+    }
+
+    /** Off until it's turned on: a tap with Messenger right there still opens Facebook's Chats. */
+    @Test
+    public void theSwitchStartsOffAndLeavesTheTapToFacebook() {
+        assertFalse("the switch starts on", Settings.OPEN_MESSENGER_APP.get());
+        MessengerIconForTests.install();
+        assertFalse(MessengerIcon.open(app, false));
+        assertNull("something was started", MessengerIconForTests.nextStarted());
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 1, 0 found, 0 missing", statusLine());
+    }
+
+    /**
+     * On, with Messenger installed, a tap starts Messenger's own launcher entry, the intent its home
+     * screen icon sends, in a task of its own. The Messenger here is signed with another key than
+     * this app, as Meta's Messenger is beside a re-signed Facebook, and that doesn't matter.
+     */
+    @Test
+    public void onATapOpensMessengersLauncherEntry() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        PackageManager packages = app.getPackageManager();
+        assertNotEquals("the test Messenger shares the app's key", PackageManager.SIGNATURE_MATCH,
+                packages.checkSignatures(app.getPackageName(), MessengerCard.MESSENGER));
+
+        assertTrue(MessengerIcon.open(app, false));
+        Intent started = MessengerIconForTests.nextStarted();
+        assertNotNull("nothing was started", started);
+        assertEquals(MessengerIconForTests.HOME, started.getComponent());
+        assertEquals(Intent.ACTION_MAIN, started.getAction());
+        assertTrue(started.toString(), started.hasCategory(Intent.CATEGORY_LAUNCHER));
+        assertTrue("Messenger doesn't get a task of its own",
+                (started.getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0);
+        assertNull("the extras of a tap reached Messenger", started.getExtras());
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 1, 0 found, 0 missing. Counted: "
+                + MessengerIcon.OPENED + " 1", statusLine());
+    }
+
+    /** Without Messenger, Facebook's Chats opens as before. */
+    @Test
+    public void withoutMessengerTheTapIsFacebooks() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        assertFalse(MessengerIcon.open(app, false));
+        assertNull(MessengerIconForTests.nextStarted());
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 1, 0 found, 0 missing. Counted: "
+                + MessengerIcon.NO_MESSENGER + " 1", statusLine());
+    }
+
+    /** A Messenger with no home screen entry has nothing public to open, so Chats opens. */
+    @Test
+    public void aMessengerWithNoLauncherEntryIsLeftAlone() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerCardForTests.install(true);
+        assertFalse(MessengerIcon.open(app, false));
+        assertNull(MessengerIconForTests.nextStarted());
+    }
+
+    /** A long press is Facebook's own gesture, so it keeps doing what Facebook does with it. */
+    @Test
+    public void aLongPressIsFacebooks() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        assertFalse(MessengerIcon.open(app, true));
+        assertNull(MessengerIconForTests.nextStarted());
+        assertTrue(MessengerIcon.open(app, false));
+    }
+
+    @Test
+    public void pausedTheTapIsFacebooks() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertFalse(MessengerIcon.open(app, false));
+        PauseForTests.pause(HushfacebookPause.Reason.CRASH_LOOP);
+        assertFalse(MessengerIcon.open(app, false));
+        assertNull(MessengerIconForTests.nextStarted());
+        PauseForTests.resume();
+        assertTrue(MessengerIcon.open(app, false));
+    }
+
+    /** Until the settings are ready, Facebook handles the tap and nothing is looked up. */
+    @Test
+    public void untilTheSettingsAreReadyTheTapIsFacebooks() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        boolean[] opened = {true};
+        SettingsContextRule.withoutContext(() -> opened[0] = MessengerIcon.open(app, false));
+        assertFalse(opened[0]);
+        SettingsContextRule.beforeThePauseIsDecided(() -> opened[0] = MessengerIcon.open(app, false));
+        assertFalse(opened[0]);
+        assertNull(MessengerIconForTests.nextStarted());
+        assertTrue(MessengerIcon.open(app, false));
+    }
+
+    /** No context to start from: Facebook handles the tap. */
+    @Test
+    public void noContextLeavesTheTapToFacebook() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        assertFalse(MessengerIcon.open(null, false));
+    }
+
+    /**
+     * Messenger turning the start down leaves the tap to Facebook, so the tap still opens a chat
+     * list. The report counts it; nothing in the hook failed.
+     */
+    @Test
+    public void aStartMessengerTurnsDownLeavesTheTapToFacebook() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        Context refusing = new ContextWrapper(app) {
+            @Override
+            public void startActivity(Intent intent) {
+                throw new SecurityException("Permission Denial: starting " + intent);
+            }
+        };
+        assertFalse(MessengerIcon.open(refusing, false));
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 1, 0 found, 0 missing. Counted: "
+                + MessengerIcon.REFUSED + " 1", statusLine());
+    }
+
+    /** A failure anywhere else leaves the tap to Facebook, and the report names the hook. */
+    @Test
+    public void aFailureLeavesTheTapToFacebookAndTheReportSaysSo() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        Context broken = new ContextWrapper(app) {
+            @Override
+            public PackageManager getPackageManager() {
+                throw new IllegalStateException("the package manager failed");
+            }
+        };
+        assertFalse(MessengerIcon.open(broken, false));
+        List<String> missing = HookStatus.missing(FamilyNames.MESSENGER_ICON);
+        assertEquals(missing.toString(), 1, missing.size());
+        assertTrue(missing.get(0), missing.get(0).contains(
+                "'Messenger icon' hook (it threw " + IllegalStateException.class.getName() + ")"));
+        assertTrue(MessengerIcon.open(app, false));
+    }
+
+    @Test
+    public void theHookReportsUnderThePatchsName() {
+        assertEquals("Open Messenger from the top bar", FamilyNames.MESSENGER_ICON);
+    }
+}

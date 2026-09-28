@@ -510,11 +510,18 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             downloads.addPreference(fileNameRow(context));
         }
 
-        if (build.contains(PatchFamily.MESSENGER_CARD)) {
+        if (build.contains(PatchFamily.MESSENGER_CARD) || build.contains(PatchFamily.MESSENGER_ICON)) {
             PreferenceCategory chats = category(screen, L10n.t("Chats"));
-            chats.addPreference(toggle(context, Settings.HIDE_GET_MESSENGER_CARD, L10n.t("Hide the Get Messenger card"),
-                    L10n.t("The card at the top of Chats that asks you to get the Messenger app goes while Messenger "
-                            + "is installed. Without Messenger it stays, so you can still install it from there.")));
+            if (build.contains(PatchFamily.MESSENGER_CARD)) {
+                chats.addPreference(toggle(context, Settings.HIDE_GET_MESSENGER_CARD, L10n.t("Hide the Get Messenger card"),
+                        L10n.t("The card at the top of Chats that asks you to get the Messenger app goes while Messenger "
+                                + "is installed. Without Messenger it stays, so you can still install it from there.")));
+            }
+            if (build.contains(PatchFamily.MESSENGER_ICON)) {
+                chats.addPreference(toggle(context, Settings.OPEN_MESSENGER_APP, L10n.t("Open the Messenger app"),
+                        L10n.t("A tap on the Messenger icon at the top of Facebook opens the Messenger app instead "
+                                + "of Chats. Without Messenger installed, Chats opens as before.")));
+            }
         }
 
         if (build.contains(PatchFamily.MENU_PROMOTIONS)) {

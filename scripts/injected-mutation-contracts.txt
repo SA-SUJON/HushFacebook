@@ -61,6 +61,13 @@ start-call Lapp/morphe/extension/facebook/emoji/SystemEmoji;->typeface()Landroid
 # static method answering a String that holds the base address of Meta's emoji pictures. Left out
 # or put later, a chat's big emoji keeps Meta's picture whatever the switch says.
 start-call Lapp/morphe/extension/facebook/emoji/SystemEmoji;->skipRemoteEmoji()Z in static (Ljava/lang/String;*)Ljava/lang/String; holding https://www.facebook.com/images/mobileemoji
+# Open Messenger from the top bar asks the extension first thing in the tap of the top bar's
+# Messenger icon, the one method holding both of its entry points, and in the Messenger button
+# handler the tap goes on to behind a MobileConfig flag, the one static method of the handler's
+# shape holding "long_press" (161 other methods hold it on 580, none with that shape). Left out or
+# put later, the icon opens Facebook's Chats whatever the switch says.
+start-call Lapp/morphe/extension/facebook/chats/MessengerIcon;->open(Landroid/content/Context;Z)Z in static (Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;*)V holding entry_point_navbar_global_icon_ entry_point_navbar_global_icon_reels_tab
+start-call Lapp/morphe/extension/facebook/chats/MessengerIcon;->open(Landroid/content/Context;Z)Z in static (Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;Ljava/lang/String;ZZ)V holding long_press
 # Facebook ranks its own launcher shortcuts ahead of the Hushfacebook one with these calls, so the
 # settings patch sends every one to SettingsEntry, which makes it and puts the Hushfacebook shortcut
 # back in front (#2). One left in Facebook's code would let it drop out of the long-press menu.

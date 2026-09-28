@@ -102,6 +102,8 @@ public enum PatchFamily {
             Settings.MARKETPLACE_ONLY, Settings.MARKETPLACE_QUIET_NOTIFICATIONS, Settings.MARKETPLACE_SKIP_FEED_PREFETCH),
     MESSENGER_CARD(FamilyNames.MESSENGER_CARD, "messengerCard", null,
             Settings.HIDE_GET_MESSENGER_CARD),
+    MESSENGER_ICON(FamilyNames.MESSENGER_ICON, "messengerIcon", null,
+            Settings.OPEN_MESSENGER_APP),
     MENU_PROMOTIONS(FamilyNames.MENU_PROMOTIONS, "menuPromotions", null,
             Settings.HIDE_MENU_UPGRADES, Settings.HIDE_MENU_ALSO_FROM_META),
     META_AI_SEARCH(FamilyNames.META_AI_SEARCH, "metaAiSearch", null,

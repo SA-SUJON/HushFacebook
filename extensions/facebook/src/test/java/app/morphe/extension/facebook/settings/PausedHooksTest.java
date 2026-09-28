@@ -44,6 +44,7 @@ import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
+import app.morphe.extension.facebook.chats.MessengerIconForTests;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
 import app.morphe.extension.facebook.download.ReelDownload;
@@ -343,6 +344,8 @@ public class PausedHooksTest {
                 TagSuggestionsForTests::closesAListLeftOpen));
         // With Messenger installed, the card's show question answers no in Chats.
         probes.put(PatchFamily.MESSENGER_CARD, Collections.singletonList(MessengerCardForTests::hidesWithMessenger));
+        // With Messenger installed, a tap on the top bar's Messenger icon opens Messenger instead of Chats.
+        probes.put(PatchFamily.MESSENGER_ICON, Collections.singletonList(MessengerIconForTests::opensMessenger));
         // The Menu's Upgrades and Also from Meta groups build nothing, in the section Facebook
         // draws and in the one carrying what the server sends.
         probes.put(PatchFamily.MENU_PROMOTIONS, Arrays.asList(

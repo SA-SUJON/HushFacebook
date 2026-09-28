@@ -287,6 +287,8 @@ Prefer H.264 video with AAC sound for apps such as WhatsApp. Quality may be lowe
 Chats	Conversas
 Hide the Get Messenger card	Ocultar o cartão Baixar o Messenger
 The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	O cartão no topo de Conversas que pede para você baixar o aplicativo Messenger desaparece enquanto o Messenger estiver instalado. Sem o Messenger, ele permanece para que você possa instalá-lo por ali.
+Open the Messenger app	Abrir o aplicativo Messenger
+A tap on the Messenger icon at the top of Facebook opens the Messenger app instead of Chats. Without Messenger installed, Chats opens as before.	Tocar no ícone do Messenger no topo do Facebook abre o aplicativo Messenger em vez de Conversas. Sem o Messenger instalado, Conversas abre como antes.
 Playback	Reprodução
 Tap to play	Tocar para reproduzir
 Videos, reels, stories and music wait for your tap. Facebook's Autoplay setting temporarily reads Off.	Vídeos, Reels, Stories e músicas aguardam seu toque. A Reprodução automática do Facebook aparece temporariamente como Desativada.

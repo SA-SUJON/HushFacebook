@@ -300,6 +300,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_get_messenger_card", TRUE);
 
     /**
+     * A tap on the Messenger icon at the top of Facebook opens the Messenger app, while it's
+     * installed, instead of Facebook's own Chats. Starts off. Without Messenger, Chats opens as it
+     * always did.
+     */
+    public static final BooleanSetting OPEN_MESSENGER_APP =
+            new BooleanSetting("hushfacebook_open_messenger_app", FALSE);
+
+    /**
      * The Upgrades section of Facebook's Menu, the group Facebook types UPSELL, with its offers.
      * Only that group goes: Settings, Help and support and the rest of the Menu stay.
      */

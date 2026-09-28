@@ -23,13 +23,15 @@
     stub left unfilled, calling another class, or calling a class that isn't the only one
     answering its type name, Clean up Reels' hook deleted from Facebook's Follow check or put
     after a branch there, Use the phone's emoji's hooks deleted from Facebook's emoji typeface
-    provider and from its maker of emoji picture addresses, or put after a branch there, and the
-    GenAI reel stub left unfilled, filled with a call that stays in the extension, or calling
-    Facebook's finder only after it has returned. Each start-call hook is also put first in a method
-    holding part of what its rule picks by (the tray controller, onPause, another method naming both
-    surfaces, a method holding the emoji provider's log tag alone, an instance method holding the
-    emoji pictures' base address), and one rule is given two methods to choose from; all six fail
-    naming the method the rule picks. The Follow hook is also put first in that other method as
+    provider and from its maker of emoji picture addresses, or put after a branch there, Open
+    Messenger from the top bar's hooks deleted from the Messenger icon's tap and from its button
+    handler, or put after a branch there, and the GenAI reel stub left unfilled, filled with a call
+    that stays in the extension, or calling Facebook's finder only after it has returned. Each
+    start-call hook is also put first in a method holding part of what its rule picks by (the tray
+    controller, onPause, another method naming both surfaces, a method holding the emoji provider's
+    log tag alone, an instance method holding the emoji pictures' base address, a method of the
+    tap's shape holding one entry point, a method of another shape holding "long_press"), and one
+    rule is given two methods to choose from; all eight fail naming the method the rule picks. The Follow hook is also put first in that other method as
     well as in the check. A register out of range fails as its own finding:
     named by a helper added to a host class, as the upper half of a long read from the last
     register, as a long an extension method writes there, and in the feed guard. Each of the five
@@ -615,6 +617,14 @@ try {
             'https://www.facebook.com/images/mobileemoji: first in Lfixture/EmojiPictures;->makeUrl('))) `
         "The good build's emoji picture hook was not first in Facebook's maker of emoji picture addresses.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        ('MessengerIcon;->open(Landroid/content/Context;Z)Z in static (Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;*)V ' +
+            'holding entry_point_navbar_global_icon_ entry_point_navbar_global_icon_reels_tab: first in Lfixture/MessengerBar;->tap('))) `
+        "The good build's Messenger icon hook was not first in the icon's tap.`n$($good.Output -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        ('MessengerIcon;->open(Landroid/content/Context;Z)Z in static (Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;' +
+            'Ljava/lang/String;ZZ)V holding long_press: first in Lfixture/MessengerBar;->button('))) `
+        "The good build's Messenger icon hook was not first in the Messenger button handler.`n$($good.Output -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         'GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside ' +
         'Lapp/morphe/extension/: calls Lfixture/Attributions;->A02(Lfixture/ReelModel;Ljava/lang/String;)Lfixture/Model; ' +
         'before its first return')) `
@@ -784,6 +794,10 @@ try {
         'bad-emoji-hook-late' = 'contract'
         'bad-emoji-pictures-hook-missing' = 'contract'
         'bad-emoji-pictures-hook-late' = 'contract'
+        'bad-messenger-tap-hook-missing' = 'contract'
+        'bad-messenger-tap-hook-late' = 'contract'
+        'bad-messenger-button-hook-missing' = 'contract'
+        'bad-messenger-button-hook-late' = 'contract'
         'bad-logo-hook-missing' = 'contract'
         'bad-logo-hook-other-call' = 'contract'
         'bad-logo-hook-other-view' = 'contract'
@@ -812,6 +826,8 @@ try {
         'bad-follow-hook-wrong-method' = 'contract'
         'bad-emoji-hook-wrong-method' = 'contract'
         'bad-emoji-pictures-hook-wrong-method' = 'contract'
+        'bad-messenger-tap-hook-wrong-method' = 'contract'
+        'bad-messenger-button-hook-wrong-method' = 'contract'
         'bad-follow-hook-also-elsewhere' = 'contract'
         'bad-register-added-helper' = 'register'
         'bad-register-wide-source' = 'register'
@@ -965,6 +981,16 @@ try {
             'is not called in Lfixture/EmojiPictures;->makeUrl(Ljava/lang/String;Lfixture/EmojiSize;Ljava/lang/String;I)Ljava/lang/String;, ' +
             'the one method holding "https://www.facebook.com/images/mobileemoji" with the shape static (Ljava/lang/String;*)Ljava/lang/String;; ' +
             'the host methods that call it: Lfixture/EmojiPictures;->pictureAddress()Ljava/lang/String;'))
+        'bad-messenger-tap-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/chats/MessengerIcon;->open(Landroid/content/Context;Z)Z ' +
+            'is not called in Lfixture/MessengerBar;->tap(Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;Ljava/lang/String;Z)V, ' +
+            'the one method holding "entry_point_navbar_global_icon_" and "entry_point_navbar_global_icon_reels_tab" with the shape ' +
+            'static (Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;*)V; the host methods that call it: ' +
+            '*Lfixture/MessengerBar;->tapEntry(Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;Ljava/lang/String;Z)V*'))
+        'bad-messenger-button-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/chats/MessengerIcon;->open(Landroid/content/Context;Z)Z ' +
+            'is not called in Lfixture/MessengerBar;->button(Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;Ljava/lang/String;ZZ)V, ' +
+            'the one method holding "long_press" with the shape static (Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;' +
+            'Ljava/lang/String;ZZ)V; the host methods that call it: ' +
+            '*Lfixture/MessengerBar;->buttonLog(Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;Ljava/lang/String;Z)V*'))
         'bad-follow-hook-also-elsewhere' = @(('*contract: Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton()Z ' +
             'is called in Lfixture/FollowCheck;->offersFollowHere(Lcom/facebook/auth/usersession/FbUserSession;)Z as well as in ' +
             'Lfixture/FollowCheck;->offersFollow(Lcom/facebook/auth/usersession/FbUserSession;)Z, the one method holding ' +

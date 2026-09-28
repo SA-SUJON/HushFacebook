@@ -300,6 +300,10 @@ Chats	Sohbetler
 Hide the Get Messenger card	Messenger'ı Edin kartını gizle
 # context: summary of that switch; Messenger is the app's name and stays as it is
 The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	Sohbetler'in en üstünde Messenger uygulamasını edinmeni isteyen kart, Messenger yüklü olduğu sürece kaybolur. Messenger yoksa kart kalır, böylece onu yine oradan yükleyebilirsin.
+# context: switch title under Chats; on, Facebook's Messenger icon opens the Messenger app
+Open the Messenger app	Messenger uygulamasını aç
+# context: summary of that switch; Messenger is the app's name, Chats is Facebook's own chat screen as named above
+A tap on the Messenger icon at the top of Facebook opens the Messenger app instead of Chats. Without Messenger installed, Chats opens as before.	Facebook'un üstündeki Messenger simgesine dokunmak, Sohbetler yerine Messenger uygulamasını açar. Messenger yüklü değilse Sohbetler eskisi gibi açılır.
 # context: settings section heading for the Tap to play switch
 Playback	Oynatma
 # context: switch title; on, videos and music wait for a tap before they play

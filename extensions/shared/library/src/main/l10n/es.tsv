@@ -300,6 +300,10 @@ Chats	Chats
 Hide the Get Messenger card	Ocultar la tarjeta para obtener Messenger
 # context: summary of that switch; Messenger is the app's name and stays as it is
 The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	La tarjeta de la parte superior de Chats que te pide que descargues la app de Messenger desaparece mientras Messenger esté instalado. Sin Messenger, se queda para que puedas seguir instalándolo desde ahí.
+# context: switch title under Chats; on, Facebook's Messenger icon opens the Messenger app
+Open the Messenger app	Abrir la app de Messenger
+# context: summary of that switch; Messenger is the app's name, Chats is Facebook's own chat screen as named above
+A tap on the Messenger icon at the top of Facebook opens the Messenger app instead of Chats. Without Messenger installed, Chats opens as before.	Al tocar el icono de Messenger de la parte superior de Facebook se abre la app de Messenger en lugar de Chats. Si Messenger no está instalado, Chats se abre como antes.
 # context: settings section heading for the Tap to play switch
 Playback	Reproducción
 # context: switch title; on, videos and music wait for a tap before they play
