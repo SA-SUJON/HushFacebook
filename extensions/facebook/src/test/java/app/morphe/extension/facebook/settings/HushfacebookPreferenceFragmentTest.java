@@ -330,8 +330,9 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals("spoiler\ngiveaway now", hide.getText());
             assertEquals("spoiler\ngiveaway now", Settings.HIDDEN_WORDS.savedValue());
             assertEquals("2 words or phrases.", String.valueOf(hide.getSummary()));
-            assertEquals("2 lines were left out. A phrase needs 2 to 60 characters, one given twice counts once, "
-                    + "and a list holds 50.", ShadowToast.getTextOfLatestToast());
+            assertEquals("2 lines were left out. A phrase needs 2 to 60 characters, or just one for an emoji, a "
+                    + "Chinese character, a kana or a Hangul syllable. One given twice counts once, and a list "
+                    + "holds 50.", ShadowToast.getTextOfLatestToast());
 
             ShadowToast.reset();
             assertTrue("a clean list was changed", ok.onPreferenceChange(hide, "spoiler"));

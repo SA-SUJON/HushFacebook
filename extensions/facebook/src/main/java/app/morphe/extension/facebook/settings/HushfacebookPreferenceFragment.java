@@ -1424,11 +1424,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setTitle(title);
         row.setDialogTitle(title);
         row.setDialogMessage(hides
-                ? L10n.f("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long. Capital "
-                        + "letters don't matter, and a phrase matches anywhere in a post's text, inside longer "
-                        + "words too.", PostWords.MAX_PHRASES, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH)
+                ? L10n.f("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just "
+                        + "one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters "
+                        + "don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
+                        PostWords.MAX_PHRASES, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH)
                 : L10n.f("A post with any of these stays, even when it also has a word to hide. One per line, up "
-                        + "to %1$d, each %2$d to %3$d characters long.", PostWords.MAX_PHRASES, PostWords.MIN_LENGTH,
+                        + "to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese "
+                        + "character, a kana or a Hangul syllable.", PostWords.MAX_PHRASES, PostWords.MIN_LENGTH,
                         PostWords.MAX_LENGTH));
         row.setPositiveButtonText(L10n.t("Save"));
         // Android's own Cancel follows the activity's language, as the folder row's did.
@@ -1449,9 +1451,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((WordsRow) preference).setText(clean);
             if (leftOut > 0) {
                 Utils.showToastLong(L10n.quantity(leftOut,
-                        "%1$d line was left out. A phrase needs %2$d to %3$d characters, one given twice counts "
-                                + "once, and a list holds %4$d.",
-                        "%1$d lines were left out. A phrase needs %2$d to %3$d characters, one given twice counts "
+                        "%1$d line was left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, "
+                                + "a Chinese character, a kana or a Hangul syllable. One given twice counts once, "
+                                + "and a list holds %4$d.",
+                        "%1$d lines were left out. A phrase needs %2$d to %3$d characters, or just one for an "
+                                + "emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
                                 + "once, and a list holds %4$d.",
                         leftOut, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH, PostWords.MAX_PHRASES));
             }
