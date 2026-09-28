@@ -868,8 +868,8 @@ public final class L10nTranslations {
                 "Du hast die neueste Version von Hushfacebook.");
         table.put("You paused Hushfacebook.",
                 "Du hast Hushfacebook pausiert.");
-        table.put("Your choices are saved. Resume after restarting Facebook.",
-                "Deine Auswahl bleibt gespeichert. Nach einem Neustart von Facebook geht es weiter.");
+        table.put("Your choices are saved. Tap Resume, then restart Facebook.",
+                "Deine Auswahl bleibt gespeichert. Tippe auf Fortsetzen und starte Facebook dann neu.");
         table.put("Your controls are active.",
                 "Deine Einstellungen sind aktiv.");
         table.put("Your list of words that keep a post will be empty.",
@@ -1731,8 +1731,8 @@ public final class L10nTranslations {
                 "Tienes la versi\u00f3n m\u00e1s reciente de Hushfacebook.");
         table.put("You paused Hushfacebook.",
                 "Pausaste Hushfacebook.");
-        table.put("Your choices are saved. Resume after restarting Facebook.",
-                "Tus preferencias est\u00e1n guardadas. Reanuda tras reiniciar Facebook.");
+        table.put("Your choices are saved. Tap Resume, then restart Facebook.",
+                "Tus preferencias est\u00e1n guardadas. Toca Reanudar y luego reinicia Facebook.");
         table.put("Your controls are active.",
                 "Tus controles est\u00e1n activos.");
         table.put("Your list of words that keep a post will be empty.",
@@ -2594,8 +2594,8 @@ public final class L10nTranslations {
                 "Anda sudah memakai rilis Hushfacebook terbaru.");
         table.put("You paused Hushfacebook.",
                 "Anda menjeda Hushfacebook.");
-        table.put("Your choices are saved. Resume after restarting Facebook.",
-                "Pilihan Anda tersimpan. Lanjutkan setelah memulai ulang Facebook.");
+        table.put("Your choices are saved. Tap Resume, then restart Facebook.",
+                "Pilihan Anda tersimpan. Ketuk Lanjutkan, lalu mulai ulang Facebook.");
         table.put("Your controls are active.",
                 "Kontrol Anda aktif.");
         table.put("Your list of words that keep a post will be empty.",
@@ -3457,8 +3457,8 @@ public final class L10nTranslations {
                 "Voc\u00ea j\u00e1 est\u00e1 usando a vers\u00e3o mais nova do Hushfacebook.");
         table.put("You paused Hushfacebook.",
                 "Voc\u00ea pausou o Hushfacebook.");
-        table.put("Your choices are saved. Resume after restarting Facebook.",
-                "Suas escolhas est\u00e3o salvas. Retome ap\u00f3s reiniciar o Facebook.");
+        table.put("Your choices are saved. Tap Resume, then restart Facebook.",
+                "Suas escolhas est\u00e3o salvas. Toque em Retomar e depois reinicie o Facebook.");
         table.put("Your controls are active.",
                 "Seus controles est\u00e3o ativos.");
         table.put("Your list of words that keep a post will be empty.",
@@ -4320,8 +4320,8 @@ public final class L10nTranslations {
                 "En yeni Hushfacebook s\u00fcr\u00fcm\u00fcn\u00fc kullan\u0131yorsun.");
         table.put("You paused Hushfacebook.",
                 "Hushfacebook'u duraklatt\u0131n.");
-        table.put("Your choices are saved. Resume after restarting Facebook.",
-                "Tercihleriniz kay\u0131tl\u0131. Facebook yeniden ba\u015flat\u0131ld\u0131ktan sonra devam eder.");
+        table.put("Your choices are saved. Tap Resume, then restart Facebook.",
+                "Tercihleriniz kay\u0131tl\u0131. Devam et'e dokunun, sonra Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Your controls are active.",
                 "Kontrolleriniz etkin.");
         table.put("Your list of words that keep a post will be empty.",

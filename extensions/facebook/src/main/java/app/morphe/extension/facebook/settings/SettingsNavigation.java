@@ -40,6 +40,8 @@ import app.morphe.extension.shared.settings.preference.AbstractPreferenceFragmen
 final class SettingsNavigation extends BaseAdapter {
     private static final String STATE = "hushfacebook_navigation";
     private static final String MORE = "more";
+    /** Marks the Pause, Resume or Undo button placed under a status row's text, so a rebind replaces it. */
+    private static final String STATUS_ACTION = "hushfacebook_status_action";
     private final HushfacebookPreferenceFragment page;
     private final SettingsDialog host;
     private final ListView list;
@@ -403,7 +405,7 @@ final class SettingsNavigation extends BaseAdapter {
         } else if (paused && nextPaused && HushfacebookPause.reason() == HushfacebookPause.Reason.SWITCH
                 && !markerLeft()) {
             // A marker Resume couldn't remove keeps the card's own line, which says what to do.
-            summary.setText(L10n.t("Your choices are saved. Resume after restarting Facebook."));
+            summary.setText(L10n.t("Your choices are saved. Tap Resume, then restart Facebook."));
         }
         bindAction(row, paused, nextPaused);
     }
@@ -435,6 +437,23 @@ final class SettingsNavigation extends BaseAdapter {
             }
             rebuild();
         });
+        // From one and a half times the text size, a button beside the text leaves the name too
+        // little room and it breaks inside the word, so the button goes under the text there.
+        TextView summary = row.findViewById(android.R.id.summary);
+        if (screen.getContext().getResources().getConfiguration().fontScale >= 1.5f
+                && summary != null && summary.getParent() instanceof android.widget.RelativeLayout) {
+            android.widget.RelativeLayout.LayoutParams place = new android.widget.RelativeLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            place.addRule(android.widget.RelativeLayout.BELOW, android.R.id.summary);
+            place.addRule(android.widget.RelativeLayout.ALIGN_PARENT_START);
+            ViewGroup column = (ViewGroup) summary.getParent();
+            View earlier = column.findViewWithTag(STATUS_ACTION);
+            if (earlier != null) column.removeView(earlier);
+            action.setTag(STATUS_ACTION);
+            column.addView(action, place);
+            frame.setVisibility(View.GONE);
+            return;
+        }
         frame.addView(action, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         frame.setVisibility(View.VISIBLE);
     }

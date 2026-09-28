@@ -346,6 +346,57 @@ public class SettingsNavigationTest {
         throw new AssertionError("No section " + title);
     }
 
+    /** Paused, the overview says what to do in order. It used to read as if a restart came before Resume. */
+    @Test public void aPausedOverviewSaysToTapResumeThenRestart() {
+        BaseSettings.PAUSED.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        recreate();
+        layout(dialog.getView());
+        TextView summary = list().getChildAt(0).findViewById(android.R.id.summary);
+        assertEquals("Your choices are saved. Tap Resume, then restart Facebook.", String.valueOf(summary.getText()));
+    }
+
+    /**
+     * At twice the text size the button beside the status text left the name too little room and
+     * "Hushfacebook" broke inside the word. From one and a half times, the button goes under the text.
+     */
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void atLargeTextTheStatusActionSitsUnderItsText() {
+        org.robolectric.RuntimeEnvironment.setFontScale(2f);
+        try {
+            recreate();
+            layout(dialog.getView());
+            View row = list().getChildAt(0);
+            TextView title = row.findViewById(android.R.id.title);
+            TextView summary = row.findViewById(android.R.id.summary);
+            android.text.Layout lines = title.getLayout();
+            for (int line = 0; line + 1 < lines.getLineCount(); line++) {
+                char last = title.getText().charAt(lines.getLineEnd(line) - 1);
+                assertTrue("\"" + title.getText() + "\" breaks inside a word after line " + line, Character.isWhitespace(last));
+            }
+            assertEquals(View.GONE, row.findViewById(android.R.id.widget_frame).getVisibility());
+            android.widget.Button action = firstButton(row);
+            assertNotNull("no Pause button in the status row", action);
+            assertEquals(summary.getParent(), action.getParent());
+            assertTrue("the button isn't under the text", action.getTop() >= summary.getBottom());
+            assertEquals("Pause", action.getText().toString());
+        } finally {
+            org.robolectric.RuntimeEnvironment.setFontScale(1f);
+        }
+    }
+
+    private static android.widget.Button firstButton(View view) {
+        if (view instanceof android.widget.Button) return (android.widget.Button) view;
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                android.widget.Button found = firstButton(group.getChildAt(i));
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
     private android.widget.Button statusAction() {
         android.view.ViewGroup frame = list().getChildAt(0).findViewById(android.R.id.widget_frame);
         assertEquals(1, frame.getChildCount());
