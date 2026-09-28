@@ -517,7 +517,12 @@ if ($VerifyPublishedAsset) {
     if ($ArtifactIsHosted) { $hostedArtifact = $temporaryArtifact }
     try {
         try {
-            $assetResponse = Invoke-WebRequest -Uri $assetUri -OutFile $temporaryArtifact -MaximumRedirection 5 -TimeoutSec 60 -PassThru
+            # -UseBasicParsing on every download here: Windows PowerShell 5.1, the pre-push hook's
+            # shell wherever pwsh is off the PATH, otherwise hands the reply to the IE parser, and
+            # since its 2025 security update asks first, which a hook can't answer. PowerShell 7
+            # accepts the switch and ignores it.
+            $assetResponse = Invoke-WebRequest -Uri $assetUri -OutFile $temporaryArtifact -MaximumRedirection 5 -TimeoutSec 60 -PassThru `
+                -UseBasicParsing
         } catch {
             throw "Could not download the indexed bundle URL: $($_.Exception.Message)"
         }
@@ -546,7 +551,7 @@ if ($VerifyPublishedAsset) {
 
         $checksumUri = [Uri]::new($assetUri, 'SHA256SUMS.txt')
         try {
-            $checksumResponse = Invoke-WebRequest -Uri $checksumUri -MaximumRedirection 5 -TimeoutSec 60
+            $checksumResponse = Invoke-WebRequest -Uri $checksumUri -MaximumRedirection 5 -TimeoutSec 60 -UseBasicParsing
         } catch {
             throw "Could not download the hosted SHA256SUMS.txt: $($_.Exception.Message)"
         }
@@ -938,7 +943,7 @@ function Test-ReleaseReceiptHere {
         $sbomForComparison = Join-Path $script:hostedSbom $sbomName
         try {
             $sbomResponse = Invoke-WebRequest -Uri ([Uri]::new($assetUri, $sbomName)) -OutFile $sbomForComparison `
-                -MaximumRedirection 5 -TimeoutSec 60 -PassThru
+                -MaximumRedirection 5 -TimeoutSec 60 -PassThru -UseBasicParsing
         } catch {
             throw "Could not download the hosted $sbomName, which the receipt names: $($_.Exception.Message)"
         }
@@ -983,7 +988,7 @@ function Test-ReleaseReceiptHere {
         $hostedReceipt = Join-Path $script:hostedReceiptDir $receiptName
         try {
             $receiptResponse = Invoke-WebRequest -Uri ([Uri]::new($assetUri, $receiptName)) -OutFile $hostedReceipt `
-                -MaximumRedirection 5 -TimeoutSec 60 -PassThru
+                -MaximumRedirection 5 -TimeoutSec 60 -PassThru -UseBasicParsing
         } catch {
             throw "Could not download the hosted $receiptName, which a release publishes beside its bundle: $($_.Exception.Message)"
         }

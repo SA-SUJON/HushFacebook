@@ -4238,6 +4238,10 @@ try {
     $publishedStandIns = {
         function Invoke-WebRequest {
             param($Uri, $Method, $OutFile, $MaximumRedirection, $TimeoutSec, [switch]$PassThru, [switch]$UseBasicParsing)
+            # Windows PowerShell 5.1, the hook's shell wherever pwsh is off the PATH, hands a reply
+            # without -UseBasicParsing to the IE parser, and since its 2025 security update it asks
+            # first. A hook can't answer, so every index push through it stopped at the download.
+            if (-not $UseBasicParsing) { throw "Invoke-WebRequest $Uri without -UseBasicParsing" }
             $receiptServed = if ($servedReceipt) { $servedReceipt } else { $releaseReceipt }
             if ($OutFile) {
                 $served = if ("$Uri" -like '*.cdx.json') { $servedSbom } elseif ("$Uri" -like '*/release-receipt-*.json') {
