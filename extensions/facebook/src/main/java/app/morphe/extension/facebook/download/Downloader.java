@@ -132,6 +132,52 @@ final class Downloader {
         }
     }
 
+    /** The cache file couldn't be opened or written: the phone's storage, not the network. */
+    private static final class StorageFailure extends IOException {
+        StorageFailure(IOException cause) {
+            super(cause);
+        }
+    }
+
+    /**
+     * The file in the cache a fetch lands in, with each of its failures told apart from the
+     * network's. A full or unwritable cache used to reach the person saving as a network failure.
+     */
+    private static final class CacheFile extends OutputStream {
+        private final OutputStream file;
+
+        CacheFile(File into) throws StorageFailure {
+            try {
+                file = new FileOutputStream(into);
+            } catch (IOException e) {
+                throw new StorageFailure(e);
+            }
+        }
+
+        @Override
+        public void write(int value) throws IOException {
+            write(new byte[] { (byte) value }, 0, 1);
+        }
+
+        @Override
+        public void write(byte[] bytes, int offset, int length) throws IOException {
+            try {
+                file.write(bytes, offset, length);
+            } catch (IOException e) {
+                throw new StorageFailure(e);
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            try {
+                file.close();
+            } catch (IOException e) {
+                throw new StorageFailure(e);
+            }
+        }
+    }
+
     /** What a save expects to get. The answer has to say so and look it. */
     enum Kind { VIDEO, AUDIO, IMAGE }
 
@@ -193,6 +239,10 @@ final class Downloader {
     private static final int BUFFER = 64 * 1024;
     static final long MAX_BYTES = 512L * 1024L * 1024L;
     private static final int MAX_REDIRECTS = 5;
+
+    /** The most of an error answer's body that's read, and the longest spent reading it. */
+    private static final int DRAIN_BYTES = 64 * 1024;
+    private static final long DRAIN_NANOS = 3_000_000_000L;
 
     /**
      * Enough of the start of a file to tell a container from a page, and to read the first twelve
@@ -266,11 +316,16 @@ final class Downloader {
 
             int code = connection.getResponseCode();
             if (code == 401 || code == 403 || code == 410) {
-                drain(connection);
+                drain(connection, progress);
+                if (progress.cancelled()) return cancelled();
                 return Result.fail(Status.EXPIRED, "the server answered " + code);
             }
-            if (code < 200 || code > 299) {
-                drain(connection);
+            // Only a 200 is the whole file. A 206 answers a Range request, and none was sent: its
+            // body is part of a file, of just the length it announces, so the length check below
+            // passed it and the gallery got a truncated video that said it saved.
+            if (code != 200) {
+                drain(connection, progress);
+                if (progress.cancelled()) return cancelled();
                 return Result.fail(Status.HTTP_ERROR, "the server answered " + code);
             }
 
@@ -296,7 +351,7 @@ final class Downloader {
             }
 
             long total;
-            try (OutputStream out = new FileOutputStream(into)) {
+            try (OutputStream out = new CacheFile(into)) {
                 out.write(head, 0, headLength);
                 progress.transferred(headLength, expected);
                 total = headLength + copy(in, out, maxBytes - headLength, headLength, expected, progress);
@@ -322,6 +377,10 @@ final class Downloader {
             // A cancel closes the connection under the read, which surfaces here as a socket
             // error. It's still the person's cancel, not a network failure.
             if (progress.cancelled()) return cancelled();
+            if (e instanceof StorageFailure) {
+                return Result.fail(Status.WRITE_ERROR, "the cache could not hold the file: "
+                    + e.getCause().getClass().getSimpleName());
+            }
             return Result.fail(Status.NETWORK_ERROR, "the fetch failed: " + e.getClass().getSimpleName());
         } catch (Throwable t) {
             if (progress.cancelled()) return cancelled();
@@ -415,23 +474,37 @@ final class Downloader {
             }
 
             HttpURLConnection connection = (HttpURLConnection) current.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setInstanceFollowRedirects(false);
-            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
-            connection.setReadTimeout(readTimeoutMs);
-            connection.setUseCaches(false);
-            // disconnect(), never the stream's close(): over HTTPS on Android only disconnect()
-            // ends a read that's waiting (SaveControl.Save.cancel has the measurements).
-            progress.reading(connection::disconnect);
+            // This method's to close until it's handed back, whatever throws: a failure while the
+            // headers came in used to skip the disconnect.
+            boolean handedBack = false;
+            String location;
+            try {
+                connection.setRequestMethod("GET");
+                connection.setInstanceFollowRedirects(false);
+                connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+                connection.setReadTimeout(readTimeoutMs);
+                connection.setUseCaches(false);
+                // disconnect(), never the stream's close(): over HTTPS on Android only disconnect()
+                // ends a read that's waiting (SaveControl.Save.cancel has the measurements).
+                progress.reading(connection::disconnect);
 
-            int code = connection.getResponseCode();
-            if (code != 301 && code != 302 && code != 303 && code != 307 && code != 308) {
-                return connection;
+                int code = connection.getResponseCode();
+                if (code != 301 && code != 302 && code != 303 && code != 307 && code != 308) {
+                    handedBack = true;
+                    return connection;
+                }
+
+                location = connection.getHeaderField("Location");
+                drain(connection, progress);
+            } finally {
+                if (!handedBack) {
+                    try {
+                        connection.disconnect();
+                    } catch (Throwable ignored) {
+                        // Nothing useful to do.
+                    }
+                }
             }
-
-            String location = connection.getHeaderField("Location");
-            drain(connection);
-            connection.disconnect();
 
             if (location == null || location.isEmpty()) {
                 return Result.fail(Status.HTTP_ERROR, "a redirect named no address");
@@ -621,16 +694,27 @@ final class Downloader {
         return mime.isEmpty() ? null : mime;
     }
 
-    /** Read and close the error body, so the connection can go back to the pool. */
-    private static void drain(HttpURLConnection connection) {
+    /**
+     * Read and close the error body, so the connection can go back to the pool: at most
+     * [DRAIN_BYTES] of it, for at most [DRAIN_NANOS], and nothing past a cancel. An error page that
+     * never ended used to hold its save, and one of the three save slots, for as long as it went
+     * on. A read that's waiting ends at the read timeout, or on a cancel, which closes the
+     * connection ({@link Progress#reading}). A redirect has no error body, so none of it is read.
+     */
+    private static void drain(HttpURLConnection connection, Progress progress) {
         InputStream stream = null;
         try {
             stream = connection.getErrorStream();
             if (stream == null) return;
 
             byte[] buffer = new byte[4096];
-            while (stream.read(buffer) > 0) {
+            long until = System.nanoTime() + DRAIN_NANOS;
+            int left = DRAIN_BYTES;
+            int read;
+            while (left > 0 && System.nanoTime() - until < 0 && !progress.cancelled()
+                    && (read = stream.read(buffer, 0, Math.min(buffer.length, left))) > 0) {
                 // Discarded on purpose. Reading it is what releases the connection.
+                left -= read;
             }
         } catch (Throwable ignored) {
             // Nothing useful to do.

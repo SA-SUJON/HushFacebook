@@ -24,6 +24,8 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The fetch against a local server. The policy lets exactly that server through and hands every
@@ -435,6 +437,197 @@ public class DownloaderTest {
         assertEquals(result.toString(), Downloader.Status.REFUSED, result.status);
         assertEquals(0, hitsOf("/v.mp4"));
         assertFalse(into.exists());
+    }
+
+    // ------------------------------------------------------------------ answers that aren't the file
+
+    /**
+     * A 206 answers a Range request, and none was sent. Its body is part of a file, of just the
+     * length it announces, so the length check passed it and the gallery got a truncated video
+     * that said it saved.
+     */
+    @Test
+    public void aPartialAnswerNobodyAskedForIsRefused() throws IOException {
+        serve("/part.mp4", 206, "video/mp4", mp4(4000), 4000);
+        assertRefused(Downloader.Status.HTTP_ERROR, "/part.mp4", Downloader.Kind.VIDEO, Downloader.MAX_BYTES);
+
+        File folder = temp.newFolder();
+        RecordingSink sink = new RecordingSink();
+        Downloader.Result result = Downloader.save(origin + "/part.mp4", Downloader.Kind.VIDEO, folder, sink, policy,
+                Downloader.MAX_BYTES);
+        assertEquals(result.toString(), Downloader.Status.HTTP_ERROR, result.status);
+        assertEquals("the sink was opened for part of a file", 0, sink.opened);
+        assertEquals(0, folder.list().length);
+    }
+
+    /**
+     * An error page that never ends held its fetch, and one of the three save slots, for as long
+     * as it went on: the body was read to its end before the connection was let go. Only so much
+     * of it is read now, and the connection is closed.
+     */
+    @Test
+    public void anErrorPageThatNeverEndsIsReadOnlySoFar() throws Exception {
+        server.serveEndless("/denied.mp4", 403, "text/html", 64 * 1024);
+        File into = temp.newFile();
+
+        Downloader.Result result = within(15_000,
+                () -> fetch("/denied.mp4", Downloader.Kind.VIDEO, into, Downloader.MAX_BYTES));
+
+        assertEquals(result.toString(), Downloader.Status.EXPIRED, result.status);
+        assertTrue("the connection stayed open", server.letGoWithin("/denied.mp4", 5_000));
+        assertFalse(into.exists());
+    }
+
+    /** One that trickles too slowly to reach that much is read only for so long. */
+    @Test
+    public void aSlowErrorPageIsReadOnlySoLong() throws Exception {
+        server.serveEndless("/broken.mp4", 500, "text/html", 16);
+        File into = temp.newFile();
+
+        Downloader.Result result = within(15_000,
+                () -> fetch("/broken.mp4", Downloader.Kind.VIDEO, into, Downloader.MAX_BYTES));
+
+        assertEquals(result.toString(), Downloader.Status.HTTP_ERROR, result.status);
+        assertTrue("the connection stayed open", server.letGoWithin("/broken.mp4", 5_000));
+    }
+
+    /**
+     * A cancel stops the reading of an error page between two reads, well before the time limit,
+     * and the save ends cancelled rather than failed. A read that's waiting is ended by the closer
+     * the fetch handed over, which the JDK these tests run on can't show (see readTimeoutMs).
+     */
+    @Test
+    public void aCancelStopsTheReadingOfAnErrorPage() throws Exception {
+        server.serveEndless("/slow.mp4", 500, "text/html", 16);
+        java.util.concurrent.atomic.AtomicBoolean stop = new java.util.concurrent.atomic.AtomicBoolean();
+        Downloader.Progress progress = new Downloader.Progress() {
+            @Override public void transferred(long done, long total) {
+            }
+
+            @Override public void reading(Runnable close) {
+            }
+
+            @Override public boolean cancelled() {
+                return stop.get();
+            }
+        };
+        Thread canceller = new Thread(() -> {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ignored) {
+                return;
+            }
+            stop.set(true);
+        });
+        File into = temp.newFile();
+
+        long before = System.nanoTime();
+        canceller.start();
+        Downloader.Result result = within(15_000, () -> Downloader.fetch(origin + "/slow.mp4", Downloader.Kind.VIDEO,
+                into, policy, Downloader.MAX_BYTES, progress));
+        long tookMs = (System.nanoTime() - before) / 1_000_000;
+
+        assertEquals(result.toString(), Downloader.Status.CANCELLED, result.status);
+        assertTrue("the error page was read for " + tookMs + " ms, past the cancel", tookMs < 2_000);
+    }
+
+    /** A redirect's body isn't read at all, so one that never ends doesn't hold the hop. */
+    @Test
+    public void aRedirectWhoseBodyNeverEndsIsFollowed() throws Exception {
+        serve("/final.mp4", "video/mp4", mp4(4000));
+        server.redirectEndless("/hop", origin + "/final.mp4", 16);
+        File into = temp.newFile();
+
+        Downloader.Result result = within(15_000, () -> fetch("/hop", Downloader.Kind.VIDEO, into, Downloader.MAX_BYTES));
+
+        assertEquals(result.toString(), Downloader.Status.OK, result.status);
+        assertTrue("the redirect's connection stayed open", server.letGoWithin("/hop", 5_000));
+    }
+
+    /**
+     * An answer that never starts ends the fetch at the read timeout, as a network failure, while
+     * the headers are read and before the connection is handed back to the fetch's own cleanup.
+     * It's closed all the same. The closer handed over for a cancel can run afterwards, twice,
+     * without harm.
+     */
+    @Test
+    public void anAnswerThatNeverStartsLeavesNoConnectionOpen() throws Exception {
+        server.neverAnswer("/stuck.mp4");
+        List<Runnable> closers = new ArrayList<>();
+        File into = temp.newFile();
+
+        Downloader.readTimeoutMs = 500;
+        Downloader.Result result;
+        try {
+            result = within(15_000, () -> Downloader.fetch(origin + "/stuck.mp4", Downloader.Kind.VIDEO, into, policy,
+                    Downloader.MAX_BYTES, recording(closers)));
+        } finally {
+            Downloader.readTimeoutMs = 20_000;
+        }
+
+        assertEquals(result.toString(), Downloader.Status.NETWORK_ERROR, result.status);
+        assertTrue("the connection stayed open", server.letGoWithin("/stuck.mp4", 5_000));
+        assertFalse(into.exists());
+        assertEquals(1, closers.size());
+        for (Runnable close : closers) {
+            close.run();
+            close.run();
+        }
+    }
+
+    /**
+     * A cache that can't take the file is the phone's storage, not the network, and the fetch
+     * says so. It used to end as a network failure. The connection is let go all the same, and
+     * running its closer again afterwards is harmless.
+     */
+    @Test
+    public void aCacheThatCannotTakeTheFileIsAStorageFailure() throws Exception {
+        server.serveGenerated("/v.mp4", "video/mp4", mp4(64), 8L * 1024 * 1024, 64 * 1024,
+                new java.util.concurrent.CountDownLatch(1));
+        File into = new File(temp.getRoot(), "gone/video.part");
+        List<Runnable> closers = new ArrayList<>();
+
+        Downloader.Result result = within(15_000, () -> Downloader.fetch(origin + "/v.mp4", Downloader.Kind.VIDEO, into,
+                policy, Downloader.MAX_BYTES, recording(closers)));
+
+        assertEquals(result.toString(), Downloader.Status.WRITE_ERROR, result.status);
+        assertTrue(result.reason, result.reason.startsWith("the cache could not hold the file"));
+        assertTrue("the connection stayed open", server.letGoWithin("/v.mp4", 5_000));
+        assertFalse(into.exists());
+        for (Runnable close : closers) {
+            close.run();
+            close.run();
+        }
+    }
+
+    /** A progress that keeps every closer the fetch hands over, and never cancels. */
+    private static Downloader.Progress recording(List<Runnable> closers) {
+        return new Downloader.Progress() {
+            @Override public void transferred(long done, long total) {
+            }
+
+            @Override public void reading(Runnable close) {
+                closers.add(close);
+            }
+
+            @Override public boolean cancelled() {
+                return false;
+            }
+        };
+    }
+
+    /** [fetch] on a thread of its own, so a fetch that never ends fails the test rather than hangs it. */
+    private static Downloader.Result within(long ms, java.util.concurrent.Callable<Downloader.Result> fetch)
+            throws Exception {
+        java.util.concurrent.FutureTask<Downloader.Result> task = new java.util.concurrent.FutureTask<>(fetch);
+        Thread thread = new Thread(task, "fetch");
+        thread.setDaemon(true);
+        thread.start();
+        try {
+            return task.get(ms, java.util.concurrent.TimeUnit.MILLISECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            throw new AssertionError("the fetch was still going after " + ms + " ms");
+        }
     }
 
     // ------------------------------------------------------------------ the sink
