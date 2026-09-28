@@ -171,8 +171,14 @@ public class DashJoinTest {
         assertEquals(result.toString(), Downloader.Status.OK, result.status);
         assertEquals(PICTURES + SOUNDS, FaultyMuxer.writes.get());
         assertEquals("both extractors", 2, Samples.released.get());
+        assertEquals("the extractor that read the joined file back", 1, Samples.readBack.get());
         assertEquals(1, FaultyMuxer.released.get());
         assertEquals(0, workFiles());
+        // Read back from the joined file: these tracks declare no profile and no duration, and
+        // unknown is what the report says of them.
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("the saved file holds video/avc profile unknown 1280x720 duration unknown, "
+                + "audio/mp4a-latm AAC object type unknown 44100 Hz 2 ch duration unknown"));
         System.out.println("DashJoinTest: a " + (PICTURES + SOUNDS) + "-sample join took " + tookMs + " ms");
     }
 
@@ -235,6 +241,8 @@ public class DashJoinTest {
         String report = LogBufferManager.buildExportText();
         assertTrue(report, report.contains("declares samples of 1500000000 bytes"));
         assertFalse(report, report.contains("heap space"));
+        assertTrue(report, report.contains("Saved in place of the manifest's tracks because the DASH save ended with "
+                + "WRITE_ERROR (the tracks could not be joined)"));
         assertEquals(0, workFiles());
     }
 
@@ -335,15 +343,20 @@ public class DashJoinTest {
     @Implements(MediaExtractor.class)
     public static class Samples {
         static final AtomicInteger released = new AtomicInteger();
+        /** Releases of extractors that read a joined file back for the report. */
+        static final AtomicInteger readBack = new AtomicInteger();
         /** The largest sample each track declares, or 0 to declare none. */
         static volatile int maxInputSize;
 
         private boolean picture;
+        /** A joined file: the picture's track, then the sound's. */
+        private boolean joined;
         private boolean selected;
         private int at;
 
         static void reset() {
             released.set(0);
+            readBack.set(0);
             maxInputSize = 0;
         }
 
@@ -351,17 +364,18 @@ public class DashJoinTest {
         protected void setDataSource(String path) throws IOException {
             String name = new File(path).getName();
             if (name.startsWith("video")) picture = true;
+            else if (name.startsWith("joined")) joined = true;
             else if (!name.startsWith("audio")) throw new IOException("not a track: " + name);
         }
 
         @Implementation
         protected int getTrackCount() {
-            return 1;
+            return joined ? 2 : 1;
         }
 
         @Implementation
         protected MediaFormat getTrackFormat(int index) {
-            MediaFormat format = picture
+            MediaFormat format = picture || (joined && index == 0)
                     ? MediaFormat.createVideoFormat("video/avc", 1280, 720)
                     : MediaFormat.createAudioFormat("audio/mp4a-latm", 44_100, 2);
             if (maxInputSize > 0) format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, maxInputSize);
@@ -405,7 +419,7 @@ public class DashJoinTest {
 
         @Implementation
         protected void release() {
-            released.incrementAndGet();
+            (joined ? readBack : released).incrementAndGet();
         }
     }
 

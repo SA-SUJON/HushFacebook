@@ -4,12 +4,16 @@
  */
 package app.morphe.extension.facebook.download;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.media.MediaCodecInfo;
+import android.media.MediaFormat;
+import android.provider.MediaStore;
 
 import com.facebook.video.engine.api.VideoDataSource;
 
@@ -18,15 +22,22 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowMediaExtractor;
+import org.robolectric.shadows.util.DataSource;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.diagnostics.HookStatus;
@@ -236,6 +247,74 @@ public class DownloadDiagnosticsTest {
         assertTrue(hooks, hooks.contains("field " + NoSource.class.getName() + "#com.facebook.video.engine.api.VideoDataSource"));
         assertTrue(hooks, HookStatus.missing("Download any reel").contains("a single field " + TwoSources.class.getName()
                 + "#com.facebook.video.engine.api.VideoDataSource (found 2)"));
+    }
+
+    /**
+     * A policy that lets the local server through and, as a save's address is checked, describes
+     * its work file to Robolectric's extractor with [formats]. The work file exists by then, under
+     * a random name the save chose, which goes into [names] so the report can be searched for it.
+     */
+    private MediaUrlPolicy describing(List<String> names, MediaFormat... formats) {
+        int port = server.port();
+        return new MediaUrlPolicy(host -> new InetAddress[] { InetAddress.getByName("10.9.8.7") }) {
+            @Override
+            Refusal refusal(URL url) {
+                for (File file : DashSave.workFolder(context).listFiles()) {
+                    if (!file.getName().endsWith(".part") || names.contains(file.getName())) continue;
+                    names.add(file.getName());
+                    for (MediaFormat format : formats) {
+                        ShadowMediaExtractor.addTrack(DataSource.toDataSource(file.getPath()), format, new byte[1]);
+                    }
+                }
+                if (url.getHost().equals("127.0.0.1") && url.getPort() == port) return null;
+                return super.refusal(url);
+            }
+        };
+    }
+
+    /**
+     * #11 and #14 couldn't be settled from a candidate's address, its quality label or its MP4 type.
+     * A saved video's line now says what the file itself holds, codec facts only. What the file
+     * doesn't say stays unknown, and the line names no file, folder or address.
+     */
+    @Test
+    public void aSavedVideoSaysWhatTheFileHolds() throws Exception {
+        MediaSaveTest.Gallery gallery = Robolectric.setupContentProvider(MediaSaveTest.Gallery.class, MediaStore.AUTHORITY);
+        for (long row = 1; row <= 2; row++) {
+            Shadows.shadowOf(context.getContentResolver()).registerOutputStream(gallery.videoUri(row),
+                    new ByteArrayOutputStream());
+        }
+        server.serve("/known.mp4", 200, "video/mp4", mp4(4096), 4096);
+        server.serve("/bare.mp4", 200, "video/mp4", mp4(4096), 4096);
+        List<String> names = new ArrayList<>();
+        try {
+            MediaFormat picture = MediaFormat.createVideoFormat("video/avc", 1280, 720);
+            picture.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+            picture.setLong(MediaFormat.KEY_DURATION, 64_814_812L);
+            MediaFormat sound = MediaFormat.createAudioFormat("audio/mp4a-latm", 48_000, 2);
+            sound.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectHE);
+            sound.setLong(MediaFormat.KEY_DURATION, 64_800_000L);
+            MediaDownload.policyForTests = describing(names, picture, sound);
+            run(MediaDownload.fileJob(context, origin + "/known.mp4", Downloader.Kind.VIDEO));
+
+            MediaFormat bare = new MediaFormat();
+            bare.setString(MediaFormat.KEY_MIME, "video/av01");
+            MediaDownload.policyForTests = describing(names, bare);
+            run(MediaDownload.fileJob(context, origin + "/bare.mp4", Downloader.Kind.VIDEO));
+        } finally {
+            MediaDownload.policyForTests = null;
+            ShadowMediaExtractor.reset();
+        }
+
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("the saved file holds video/avc profile High (8) 1280x720 64.81 s, "
+                + "audio/mp4a-latm AAC object type 5 (HE-AAC) 48000 Hz 2 ch 64.80 s\n"));
+        assertTrue(report, report.contains("the saved file holds video/av01 profile unknown size unknown duration unknown\n"));
+        assertEquals(report, 2, names.size());
+        for (String name : names) assertFalse(report, report.contains(name));
+        assertFalse(report, report.contains(context.getCacheDir().getPath()));
+        assertFalse(report, report.contains("127.0.0.1"));
+        assertFalse(report, report.contains("http"));
     }
 
     /** Counts and findings recorded before a clear come back with Undo, beside the ones since. */

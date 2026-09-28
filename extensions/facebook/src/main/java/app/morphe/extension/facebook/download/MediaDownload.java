@@ -413,14 +413,16 @@ public final class MediaDownload {
 
     /** The save of one single file at [url]: the job every save of a single file runs. */
     static Job fileJob(Context application, String url, Downloader.Kind kind) {
-        return (writer, progress) -> saveFile(application, url, kind, writer, progress);
+        return (writer, progress) -> saveFile(application, url, kind, null, writer, progress);
     }
 
     /**
      * One checked file, fetched into the cache and then published. Its work file keeps, with those
-     * of every other running save, to the free space ({@link DashSave#fetchWork}).
+     * of every other running save, to the free space ({@link DashSave#fetchWork}). A saved video's
+     * report line says what the file holds, and [why] when a manifest's tracks were passed over
+     * for it (bounded; null when the file was simply the pick).
      */
-    private static Downloader.Result saveFile(Context application, String url, Downloader.Kind kind,
+    private static Downloader.Result saveFile(Context application, String url, Downloader.Kind kind, String why,
             MediaStoreWriter writer, Downloader.Progress progress) {
         java.io.File folder = DashSave.workFolder(application);
         if (folder == null) return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "no cache folder");
@@ -430,7 +432,13 @@ public final class MediaDownload {
             Downloader.Result fetched = DashSave.fetchWork(url, kind, file, policyFor(application), Downloader.MAX_BYTES,
                 progress);
             if (!fetched.ok()) return fetched;
-            return Downloader.publish(file, fetched.mime, writer, progress);
+            Downloader.Result published = Downloader.publish(file, fetched.mime, writer, progress);
+            if (published.ok() && kind == Downloader.Kind.VIDEO) {
+                String holds = DashSave.savedFormat(file);
+                info(() -> "the saved file holds " + holds + (why == null ? "" : ". Saved in place of the manifest's "
+                    + "tracks because " + bounded(why)));
+            }
+            return published;
         } catch (Throwable t) {
             return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "the cache could not hold the file");
         } finally {
@@ -520,7 +528,8 @@ public final class MediaDownload {
         if (!DashManifest.withinLimits(manifest)) {
             info(() -> "the manifest of " + label + " is over the limits a save reads (" + manifest.length()
                 + " characters), saving the single file");
-            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, writer, progress);
+            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, "the manifest is over the limits a save reads",
+                writer, progress);
         }
         List<DashManifest.Track> tracks = new ArrayList<>();
         for (DashManifest.Track track : DashManifest.parse(manifest)) {
@@ -550,7 +559,8 @@ public final class MediaDownload {
             if (usual != null && fallback != null) {
                 info(() -> "the manifest of " + label + " has no H.264 video with AAC-LC or HE-AAC sound, "
                     + "saving the single file instead");
-                return saveSingleVideo(application, urls, leftToFile, writer, progress);
+                return saveSingleVideo(application, urls, leftToFile,
+                    "the manifest has no H.264 video with AAC-LC or HE-AAC sound", writer, progress);
             }
             if (usual != null) {
                 info(() -> "nothing of " + label + " is in a format other apps can open, saving it as the switch "
@@ -561,7 +571,8 @@ public final class MediaDownload {
 
         if (pick == null) {
             info(() -> "the manifest of " + label + " has no track to save: " + tracks);
-            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, writer, progress);
+            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, "the manifest has no track to save", writer,
+                progress);
         }
 
         DashManifest.Track video = pick.video;
@@ -569,7 +580,7 @@ public final class MediaDownload {
         boolean keptCompatible = kept != null && compatible;
 
         if (!keptCompatible && !beatsFile(video, fallback, fallbackQuality, quality)) {
-            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, writer, progress);
+            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, null, writer, progress);
         }
 
         info(() -> "saving " + label + " from its DASH manifest: " + video
@@ -581,10 +592,11 @@ public final class MediaDownload {
     }
 
     /**
-     * The best single video file of [urls], for a save whose manifest didn't win: [dash] says why.
-     * A video only, since the save was started as one.
+     * The best single video file of [urls], for a save whose manifest didn't win: [dash] says why
+     * for the save line, and [why] for the line of what was saved, or null when the file was simply
+     * the better pick. A video only, since the save was started as one.
      */
-    private static Downloader.Result saveSingleVideo(Context application, List<String> urls, Dash dash,
+    private static Downloader.Result saveSingleVideo(Context application, List<String> urls, Dash dash, String why,
             MediaStoreWriter writer, Downloader.Progress progress) {
         List<String> meta = metaOnly(urls);
         DownloadQuality quality = quality();
@@ -596,7 +608,7 @@ public final class MediaDownload {
             return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "nothing to save");
         }
         saving(true, video, meta, quality, dash);
-        return saveFile(application, video, Downloader.Kind.VIDEO, writer, progress);
+        return saveFile(application, video, Downloader.Kind.VIDEO, why, writer, progress);
     }
 
     /**
@@ -621,7 +633,8 @@ public final class MediaDownload {
             if (result.ok() || fallback == null || result.status == Downloader.Status.CANCELLED) return result;
 
             failure(() -> "the DASH save ended with " + result + ", saving " + describe(fallback), null);
-            return saveFile(application, fallback, Downloader.Kind.VIDEO, writer, progress);
+            return saveFile(application, fallback, Downloader.Kind.VIDEO, "the DASH save ended with " + result, writer,
+                progress);
         };
     }
 
@@ -707,6 +720,11 @@ public final class MediaDownload {
         worker.setPriority(Thread.NORM_PRIORITY - 1);
         worker.start();
         return worker;
+    }
+
+    /** A reason for the report, cut to 160 characters. */
+    private static String bounded(String reason) {
+        return reason.length() <= 160 ? reason : reason.substring(0, 157) + "...";
     }
 
     /** What the toast at the end of a save says, in the phone's language. */

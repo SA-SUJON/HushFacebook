@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import app.morphe.extension.shared.Logger;
@@ -192,7 +193,12 @@ final class DashSave {
                     "the joined file is " + joined.length() + " bytes, more than " + maxBytes);
             }
 
-            return Downloader.publish(joined, "video/mp4", sink, progress);
+            Downloader.Result published = Downloader.publish(joined, "video/mp4", sink, progress);
+            if (published.ok()) {
+                String holds = savedFormat(joined);
+                MediaDownload.info(() -> "the saved file holds " + holds);
+            }
+            return published;
         } catch (Throwable t) {
             // A cancel can end the join in a failure of its own, a muxer stopped with no sample
             // for one. It's still the person's cancel.
@@ -439,6 +445,130 @@ final class DashSave {
             failure.addSuppressed(t);
         }
         return failure;
+    }
+
+    // ---------------------------------------------------------------- what a saved file holds
+
+    /** The most tracks a saved file's report line describes. */
+    private static final int MAX_DESCRIBED_TRACKS = 4;
+
+    /**
+     * What [file] holds, read back from the file itself: each track's codec and profile, its size or
+     * its sample rate and channels, and its duration. Reports like #11 and #14 can't be settled from
+     * a candidate's address, its quality label or an MP4 type. What the file doesn't say is
+     * "unknown", never a guess: an AAC track names the object type its header declares, which for
+     * HE-AAC with implicit signalling is the LC core. Only codec facts go in, cut to a fixed size,
+     * and never an address, a path, a name or an id.
+     */
+    static String savedFormat(File file) {
+        MediaExtractor extractor = null;
+        try {
+            extractor = new MediaExtractor();
+            extractor.setDataSource(file.getPath());
+            int count = extractor.getTrackCount();
+            if (count <= 0) return "no track the phone could read";
+            StringBuilder tracks = new StringBuilder();
+            for (int i = 0; i < Math.min(count, MAX_DESCRIBED_TRACKS); i++) {
+                if (tracks.length() > 0) tracks.append(", ");
+                tracks.append(describe(extractor.getTrackFormat(i)));
+            }
+            if (count > MAX_DESCRIBED_TRACKS) tracks.append(", ").append(count - MAX_DESCRIBED_TRACKS).append(" more track(s)");
+            return tracks.toString();
+        } catch (Throwable t) {
+            return "nothing the phone could read (" + t.getClass().getSimpleName() + ")";
+        } finally {
+            if (extractor != null) attempt(null, extractor::release);
+        }
+    }
+
+    private static String describe(MediaFormat format) {
+        String mime = token(text(format, MediaFormat.KEY_MIME));
+        StringBuilder track = new StringBuilder(mime == null ? "a track of unknown type" : mime);
+        String codecs = token(text(format, MediaFormat.KEY_CODECS_STRING));
+        if (codecs != null) track.append(" (").append(codecs).append(')');
+        if (mime != null && mime.startsWith("video/")) {
+            track.append(' ').append(videoProfile(mime, number(format, MediaFormat.KEY_PROFILE)));
+            Integer width = number(format, MediaFormat.KEY_WIDTH);
+            Integer height = number(format, MediaFormat.KEY_HEIGHT);
+            track.append(' ').append(width == null || height == null ? "size unknown" : width + "x" + height);
+        } else if (mime != null && mime.startsWith("audio/")) {
+            if (mime.equals("audio/mp4a-latm")) {
+                Integer type = number(format, MediaFormat.KEY_AAC_PROFILE);
+                if (type == null) type = number(format, MediaFormat.KEY_PROFILE);
+                track.append(' ').append(type == null ? "AAC object type unknown" : "AAC object type " + type + aacName(type));
+            }
+            Integer rate = number(format, MediaFormat.KEY_SAMPLE_RATE);
+            Integer channels = number(format, MediaFormat.KEY_CHANNEL_COUNT);
+            track.append(' ').append(rate == null ? "rate unknown" : rate + " Hz");
+            track.append(' ').append(channels == null ? "channels unknown" : channels + " ch");
+        }
+        Long duration = null;
+        try {
+            if (format.containsKey(MediaFormat.KEY_DURATION)) duration = format.getLong(MediaFormat.KEY_DURATION);
+        } catch (Throwable ignored) {
+            // Stored as something other than a long: unknown.
+        }
+        track.append(' ').append(duration == null || duration < 0 ? "duration unknown"
+            : String.format(Locale.US, "%.2f s", duration / 1_000_000.0));
+        return track.toString();
+    }
+
+    /** The profile of a video track, named where it's one of the common ones. */
+    private static String videoProfile(String mime, Integer profile) {
+        if (profile == null) return "profile unknown";
+        String name = null;
+        switch (mime) {
+            case "video/avc":
+                if (profile == MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline) name = "Baseline";
+                else if (profile == MediaCodecInfo.CodecProfileLevel.AVCProfileConstrainedBaseline) name = "Constrained Baseline";
+                else if (profile == MediaCodecInfo.CodecProfileLevel.AVCProfileMain) name = "Main";
+                else if (profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh) name = "High";
+                else if (profile == MediaCodecInfo.CodecProfileLevel.AVCProfileConstrainedHigh) name = "Constrained High";
+                break;
+            case "video/hevc":
+                if (profile == MediaCodecInfo.CodecProfileLevel.HEVCProfileMain) name = "Main";
+                else if (profile == MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10) name = "Main 10";
+                break;
+            case "video/av01":
+                if (profile == MediaCodecInfo.CodecProfileLevel.AV1ProfileMain8) name = "Main 8-bit";
+                else if (profile == MediaCodecInfo.CodecProfileLevel.AV1ProfileMain10) name = "Main 10-bit";
+                break;
+            default:
+                break;
+        }
+        return "profile " + (name == null ? String.valueOf(profile) : name + " (" + profile + ")");
+    }
+
+    /** The name of the AAC object type a track declares, for the common ones. */
+    private static String aacName(int type) {
+        if (type == MediaCodecInfo.CodecProfileLevel.AACObjectLC) return " (LC)";
+        if (type == MediaCodecInfo.CodecProfileLevel.AACObjectHE) return " (HE-AAC)";
+        if (type == MediaCodecInfo.CodecProfileLevel.AACObjectHE_PS) return " (HE-AAC v2)";
+        if (type == MediaCodecInfo.CodecProfileLevel.AACObjectXHE) return " (xHE-AAC)";
+        return "";
+    }
+
+    private static String text(MediaFormat format, String key) {
+        try {
+            return format.containsKey(key) ? format.getString(key) : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    private static Integer number(MediaFormat format, String key) {
+        try {
+            return format.containsKey(key) ? format.getInteger(key) : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** [value] as a codec token of at most 40 characters, or null when it's anything else. */
+    private static String token(String value) {
+        if (value == null) return null;
+        String token = value.trim().toLowerCase(Locale.US);
+        return token.matches("[a-z0-9][a-z0-9./+-]{0,39}") ? token : null;
     }
 
     /** Select the first track of [kind] and return its format, or {@code null}. */
