@@ -46,6 +46,7 @@ import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
+import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
@@ -135,6 +136,13 @@ public class ColdStartHooksTest {
         assertFalse(FeedGuardForTests.hidesReels(Category.FB_SHORTS, new Object()));
         assertFalse(FeedGuardForTests.hidesShowcaseReels(Category.SHOWCASE, ShowcaseStoryType.SHOWCASE_SHORT_VIDEO));
         assertFalse(FeedFilter.hidePreEofReels());
+        ReturnRefresh.uiHidden();
+        assertFalse("a return before the context kept the feed on resume", ReturnRefresh.skip());
+        ReturnRefresh.uiHidden();
+        assertFalse("a return before the context kept the feed at its warm start", ReturnRefresh.holdWarmStart());
+        ReturnRefresh.uiHidden();
+        assertFalse("a return before the context held the foreground auto-scroll", ReturnRefresh.holdAutoScroll());
+        assertFalse("a feed left before the context skipped its teardown", ReturnRefresh.keepFeedWhileAway());
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.detectedInfo(true)));
         assertFalse(FeedGuardForTests.hidesLabelled(Category.ORGANIC, new GraphQLStory(),
                 FeedGuardForTests.detectedInfo(false), FeedGuardForTests.selfDisclosureInfo(true)));

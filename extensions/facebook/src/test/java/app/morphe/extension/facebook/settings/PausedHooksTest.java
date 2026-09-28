@@ -215,10 +215,22 @@ public class PausedHooksTest {
                 () -> FeedGuardForTests.hidesReels(Category.FB_SHORTS, new Object()),
                 () -> FeedGuardForTests.hidesShowcaseReels(Category.SHOWCASE, ShowcaseStoryType.SHOWCASE_SHORT_VIDEO),
                 FeedFilter::hidePreEofReels));
-        probes.put(PatchFamily.RETURN_REFRESH, Collections.singletonList(() -> {
-            ReturnRefresh.uiHidden();
-            return ReturnRefresh.skip();
-        }));
+        // The refresh controller's resume callback, the feed's warm-start check and the foreground
+        // auto-scroll, each the first check of a return, and the feed teardown while away.
+        probes.put(PatchFamily.RETURN_REFRESH, Arrays.asList(
+                () -> {
+                    ReturnRefresh.uiHidden();
+                    return ReturnRefresh.skip();
+                },
+                () -> {
+                    ReturnRefresh.uiHidden();
+                    return ReturnRefresh.holdWarmStart();
+                },
+                () -> {
+                    ReturnRefresh.uiHidden();
+                    return ReturnRefresh.holdAutoScroll();
+                },
+                ReturnRefresh::keepFeedWhileAway));
         // A story Facebook's own detection marked as made with AI, one only its creator labelled as AI,
         // and a reel whose GenAI attribution carries the detected flag, at both levels a page of reels
         // enters.
