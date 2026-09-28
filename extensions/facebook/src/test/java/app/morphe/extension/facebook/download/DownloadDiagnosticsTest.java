@@ -301,6 +301,34 @@ public class DownloadDiagnosticsTest {
         assertFalse(report, report.contains("http"));
     }
 
+    /**
+     * A saved file whose sound declares AAC object type 42 is named xHE-AAC, as the S22's 1080p
+     * AV1 reel was on 2026-09-28: the codec some players can't play (#14).
+     */
+    @Test
+    public void aSavedFileWithXheAacSoundSaysSo() throws Exception {
+        MediaSaveTest.Gallery gallery = Robolectric.setupContentProvider(MediaSaveTest.Gallery.class, MediaStore.AUTHORITY);
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(gallery.videoUri(1),
+                new ByteArrayOutputStream());
+        server.serve("/xhe.mp4", 200, "video/mp4", mp4(4096), 4096);
+        try {
+            MediaFormat picture = MediaFormat.createVideoFormat("video/av01", 1080, 1920);
+            picture.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AV1ProfileMain8);
+            MediaFormat sound = MediaFormat.createAudioFormat("audio/mp4a-latm", 44_100, 2);
+            sound.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectXHE);
+            sound.setLong(MediaFormat.KEY_DURATION, 19_390_000L);
+            MediaDownload.policyForTests = describing(new ArrayList<>(), picture, sound);
+            run(MediaDownload.fileJob(context, origin + "/xhe.mp4", Downloader.Kind.VIDEO));
+        } finally {
+            MediaDownload.policyForTests = null;
+            ShadowMediaExtractor.reset();
+        }
+
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("the saved file holds video/av01 profile Main 8-bit (1) 1080x1920 "
+                + "duration unknown, audio/mp4a-latm AAC object type 42 (xHE-AAC) 44100 Hz 2 ch 19.39 s\n"));
+    }
+
     /** Counts and findings recorded before a clear come back with Undo, beside the ones since. */
     @Test
     public void invocationsSurviveAClearThatIsUndone() {

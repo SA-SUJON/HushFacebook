@@ -393,6 +393,17 @@ public final class MediaDownload {
     }
 
     /**
+     * What the report adds to a DASH save line whose sound is xHE-AAC ({@code mp4a.40.42}).
+     * {@link DashManifest#bestAudio} takes it only when the manifest offers no AAC-LC or HE-AAC, as
+     * a 580 reel with AV1 pictures and four xHE-AAC tracks did, and some players can't play it (#14).
+     */
+    private static String soundNote(DashManifest.Track audio) {
+        return audio != null && audio.codecs.trim().equals("mp4a.40.42")
+            ? ", the sound is xHE-AAC because the manifest offers no AAC-LC or HE-AAC, and some players can't play xHE-AAC"
+            : "";
+    }
+
+    /**
      * What the report adds to a single file's save line when saves other apps can open took it over
      * tracks the manifest would otherwise have saved. The single file's own formats aren't read, so
      * the line says why it was taken, not what it holds.
@@ -586,7 +597,7 @@ public final class MediaDownload {
         info(() -> "saving " + label + " from its DASH manifest: " + video
             + (audio == null ? ", no sound track" : " + " + audio)
             + ", instead of " + (fallback == null ? "nothing" : describe(fallback))
-            + qualityNote(quality) + compatibleNote(keptCompatible));
+            + qualityNote(quality) + compatibleNote(keptCompatible) + soundNote(audio));
 
         return dashJob(application, video, audio, fallback).run(writer, progress);
     }
