@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowProcess;
 
 import java.security.MessageDigest;
 import java.util.List;
@@ -122,6 +123,26 @@ public class FacebookSignatureTest {
         noName.packageName = null;
         keepsItsOwn(noName);
         assertNull(statusLine());
+    }
+
+    /**
+     * An isolated process, like the in-app browser's renderers or a service started from Facebook's
+     * app zygote, runs under a uid of its own rather than the app's. There only the name is known,
+     * and the answer stays the one builds before the clone fix gave. A clone can't be told apart
+     * there, which is no worse than before.
+     */
+    @Test
+    public void inAnIsolatedProcessOnlyFacebooksNameIsAnswered() throws Exception {
+        int app = Process.myUid();
+        try {
+            ShadowProcess.setUid(99001);
+            answers(installed("com.facebook.katana", app));
+            keepsItsOwn(installed("com.facebook.katana.morphe", app));
+            keepsItsOwn(installed("com.facebook.orca", OTHER_UID));
+            keepsItsOwn(installed("com.facebook.katanax", app));
+        } finally {
+            ShadowProcess.setUid(app);
+        }
     }
 
     /**

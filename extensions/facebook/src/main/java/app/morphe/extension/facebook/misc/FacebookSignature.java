@@ -76,12 +76,14 @@ public final class FacebookSignature {
      * Whether [info] describes the running app, under Facebook's name or a clone's. A package with
      * another uid is another app, whatever its name. PackageManager always fills in the
      * ApplicationInfo; without one only the name is known, and the answer stays the one builds
-     * before the clone fix gave.
+     * before the clone fix gave. The same goes for an isolated process, like the browser's
+     * renderers or a service from Facebook's app zygote: it runs under a uid of its own, not the
+     * app's, so a clone can't be told apart there.
      */
     private static boolean isThisApp(PackageInfo info) {
         if (info == null || info.packageName == null) return false;
         ApplicationInfo app = info.applicationInfo;
-        if (app == null) return PACKAGE.equals(info.packageName);
+        if (app == null || Process.isIsolated()) return PACKAGE.equals(info.packageName);
         return app.uid == Process.myUid() && info.packageName.equals(app.packageName);
     }
 }
