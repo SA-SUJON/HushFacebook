@@ -187,9 +187,11 @@ public class PausedHooksTest {
 
     private static Map<PatchFamily, List<Probe>> probes() {
         Map<PatchFamily, List<Probe>> probes = new EnumMap<>(PatchFamily.class);
+        // A sponsored and a promoted edge at the funnel, and an ad swapped into the feed over another edge.
         probes.put(PatchFamily.SPONSORED_POSTS, Arrays.asList(
                 () -> FeedGuardForTests.hides(Category.SPONSORED, new Object()),
-                () -> FeedGuardForTests.hides(Category.PROMOTION, new Object())));
+                () -> FeedGuardForTests.hides(Category.PROMOTION, new Object()),
+                () -> FeedGuardForTests.swapHides(Category.SPONSORED, new Object())));
         probes.put(PatchFamily.SUGGESTED_POSTS, Arrays.asList(
                 () -> FeedGuardForTests.hides(Category.ORGANIC, new GraphQLPagesYouMayLikeFeedUnit()),
                 // A story Facebook's own recommendation flag marks as suggested for you.

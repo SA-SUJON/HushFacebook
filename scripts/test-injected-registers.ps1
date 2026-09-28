@@ -48,7 +48,11 @@
     registers the wrong way round, and a second flush answers the rule, a build each, each failing
     the sole-call rule for its own reason; a clean build whose flush makes no such call fails the
     good build's stand-in for want of one to stand in for, and the contract file may hold no other
-    sole-call rule.
+    sole-call rule. The feed guard's call in the runnable that swaps an edge into the feed is left
+    out, sent to another method of the runnable holding the first size of its log line with run()
+    left alone, sent there as well as in run(), sent twice, and a second run() answers the rule, a
+    build each, each failing the once-call rule for its own reason; the contract file may hold no
+    other once-call rule.
     The good build carries the joins, copies and reads ART accepts, a zero tested against
     an object among them, so a check made stricter still has to pass them. Each bad build has to
     fail with findings of its own category only, so a check that fires for the wrong reason fails
@@ -676,6 +680,19 @@ try {
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         "contract $watchRule`: in place of it on v2, v1 in $watchFlush")) `
         "The good build's watch-history hook was not reported in place of the executor call.`n$($good.Output -join "`n")"
+    # The feed guard asks the extension once in the runnable that swaps an edge into the feed. The
+    # contract file's one once-call rule is that guard, so a rule this suite builds no bad fixtures
+    # for can't pass on a count nobody checks.
+    $swapHook = 'Lapp/morphe/extension/facebook/feed/FeedFilter;->hideSwappedEdge(Ljava/lang/Object;Ljava/lang/Object;)Z'
+    $swapRun = 'Lfixture/EdgeSwap;->run()V'
+    $swapHeld = '"sizeBefore" and "sizeAfter" with the shape instance ()V'
+    $swapRule = "once-call $swapHook in instance ()V holding sizeBefore sizeAfter"
+    $onceCallRules = @(Get-Content -LiteralPath $contracts | Where-Object { $_ -match '^\s*once-call\s' } |
+        ForEach-Object { ($_.Trim() -split '\s+') -join ' ' })
+    Assert-True ($onceCallRules.Count -eq 1 -and $onceCallRules[0] -ceq $swapRule) `
+        "The contract file's once-call rules are not the swap guard this suite builds bad fixtures for:`n$($onceCallRules -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape("contract $swapRule`: once in $swapRun")) `
+        "The good build's swap guard was not reported once in the swap runnable.`n$($good.Output -join "`n")"
 
     $bad = [ordered]@{
         'bad-branch' = 'branch'
@@ -781,6 +798,11 @@ try {
         'bad-watch-execute-left' = 'contract'
         'bad-watch-hook-other-registers' = 'contract'
         'bad-watch-two-flushes' = 'contract'
+        'bad-swap-hook-missing' = 'contract'
+        'bad-swap-hook-decoy' = 'contract'
+        'bad-swap-hook-also-elsewhere' = 'contract'
+        'bad-swap-hook-twice' = 'contract'
+        'bad-swap-two-runs' = 'contract'
         'bad-finder-stub-not-filled' = 'contract'
         'bad-finder-stub-extension-call' = 'contract'
         'bad-finder-stub-call-after-return' = 'contract'
@@ -878,6 +900,25 @@ try {
         $fails = @((Get-Findings $badResults[$case.Key]).Fails)
         Assert-True ($fails.Count -eq 1 -and $fails[0] -ceq $case.Value) `
             "$($case.Key) did not fail with its own watch-history finding alone.`nExpected: $($case.Value)`nGot:`n$($fails -join "`n")"
+    }
+    # Each swap build fails on the once-call rule alone, for its own reason: no guard, one in another
+    # method of the runnable holding the first size, one there as well as in run(), two, or a
+    # second run().
+    $swapDescribe = 'Lfixture/EdgeSwap;->describe()V'
+    $swapFails = [ordered]@{
+        'bad-swap-hook-missing' = "[diff] FAIL: contract: $swapHook is not called in $swapRun, the one method holding $swapHeld"
+        'bad-swap-hook-decoy' = "[diff] FAIL: contract: $swapHook is not called in $swapRun, the one method holding " +
+            "$swapHeld; the host methods that call it: $swapDescribe"
+        'bad-swap-hook-also-elsewhere' = "[diff] FAIL: contract: $swapHook is called in $swapDescribe as well as in " +
+            "$swapRun, the one method holding $swapHeld"
+        'bad-swap-hook-twice' = "[diff] FAIL: contract: $swapHook has 2 call sites in $swapRun, and must have exactly one"
+        'bad-swap-two-runs' = "[diff] FAIL: contract: 2 methods hold $swapHeld, and exactly one must, so the rule " +
+            "can't say which one calls ${swapHook}: $swapRun, Lfixture/EdgeSwap;->runAgain()V"
+    }
+    foreach ($case in $swapFails.GetEnumerator()) {
+        $fails = @((Get-Findings $badResults[$case.Key]).Fails)
+        Assert-True ($fails.Count -eq 1 -and $fails[0] -ceq $case.Value) `
+            "$($case.Key) did not fail with its own swap finding alone.`nExpected: $($case.Value)`nGot:`n$($fails -join "`n")"
     }
     # And against a clean build whose flush makes no executor call, the good build's stand-in has
     # nothing it took the place of.
@@ -1013,7 +1054,14 @@ try {
             "sole-call $watchSend replacing $watchExecute holding",
             "sole-call $watchSend replacing $watchExecute holding video_ids video_ids",
             "sole-call $watchSend replacing $watchExecute in instance holding video_ids",
-            "sole-call $watchSend replacing $watchExecute in instance ()V")) {
+            "sole-call $watchSend replacing $watchExecute in instance ()V",
+            "once-call hideSwappedEdge holding sizeBefore sizeAfter",
+            "once-call $swapHook holding",
+            "once-call $swapHook holding sizeBefore sizeBefore",
+            "once-call $swapHook after $watchExecute holding sizeBefore",
+            "once-call $swapHook in instance ()V",
+            "once-call $swapHook in sometimes ()V holding sizeBefore",
+            "once-call $swapHook in instance holding sizeBefore")) {
         [System.IO.File]::WriteAllText($badContract, "# a comment line first`n$line`n")
         $unreadableFirstCall = Invoke-DexDiff -Clean $cleanApk -Patched (Join-Path $caseRoot 'good.apk') `
             -Allowlist $emptyAllowlist -Name 'bad-first-call-contract' -Contracts $badContract

@@ -72,13 +72,16 @@ import java.util.Set;
  * addresses, holding the pictures' base address, with the call to {@code SystemEmoji.skipRemoteEmoji}
  * first. And the Reels viewer's batcher of
  * watched reels, whose flush holds the mutation's name and its input field and hands each batch to
- * an executor, the call Don't send reel watch history sends to {@code ReelWatchHistory.send}.
- * Beside each method a start-call, next-call or sole-call rule picks sit methods holding part of
- * what it's picked by: the tray controller, the refresh controller's onPause, two other methods
- * naming both surfaces and one holding the emoji provider's log tag alone, as Facebook's do, an
- * instance method holding the emoji pictures' base address, and
- * three top bar and three batcher methods, which Facebook doesn't have, so neither the logo rule
- * nor the watch-history rule passes with its second string or its shape left out.
+ * an executor, the call Don't send reel watch history sends to {@code ReelWatchHistory.send}. And
+ * the feed collection manager's swap runnable, whose run() holds the two sizes of its log line and
+ * swaps an edge into the feed, with the feed guard's call to {@code FeedFilter.hideSwappedEdge}
+ * before the swap. Beside each method a start-call, next-call, sole-call or once-call rule picks
+ * sit methods holding part of what it's picked by: the tray controller, the refresh controller's
+ * onPause, two other methods naming both surfaces and one holding the emoji provider's log tag
+ * alone, as Facebook's do, an instance method holding the emoji pictures' base address, and three
+ * top bar, three batcher and three swap runnable methods, which Facebook doesn't have, so neither
+ * the logo rule, the watch-history rule nor the swap rule passes with its second string or its
+ * shape left out.
  *
  *   java -cp &lt;cli jar&gt; BadDexFixture.java &lt;outDir&gt;
  */
@@ -178,6 +181,17 @@ public class BadDexFixture {
     private static final ImmutableMethodReference WATCH_SEND = method(REEL_WATCH_HISTORY, "send", "V", EXECUTOR, RUNNABLE);
     /** The mutation's name and its input field, which the watch-history rule picks the flush by. */
     private static final List<String> SEEN_STATE = Arrays.asList("FbShortsSeenStateMutation", "video_ids");
+
+    /** FeedUnitCollectionManager's swap runnable, a class Redex renames, and the feed collection it swaps into. */
+    private static final String EDGE_SWAP = "Lfixture/EdgeSwap;";
+    private static final String FEED_COLLECTION = "Lfixture/FeedCollection;";
+    private static final String FEED_UNIT_EDGE = "Lcom/facebook/graphql/model/GraphQLFeedUnitEdge;";
+    private static final ImmutableMethodReference REPLACE_EDGE =
+            method(FEED_COLLECTION, "replace", "V", FEED_UNIT_EDGE, "Ljava/lang/String;");
+    private static final ImmutableMethodReference HIDE_SWAPPED_EDGE =
+            method(FILTER, "hideSwappedEdge", "Z", OBJECT, OBJECT);
+    /** The two sizes the swap log line reports, which the swap rule picks the runnable by. */
+    private static final List<String> SWAP_SIZES = Arrays.asList("sizeBefore", "sizeAfter");
 
     /**
      * One of the ShortcutManager calls the settings patch sends to SettingsEntry: its name, what it
@@ -983,6 +997,58 @@ public class BadDexFixture {
                         body(2, execute(0, 1), op(Opcode.RETURN_VOID)), EXECUTOR, RUNNABLE)));
     }
 
+    /**
+     * An instance method of the swap runnable taking nothing, this in v4: it loads [names] into v1,
+     * reads the incoming edge into v0, makes [guard], then reads the collection into v2 and the old
+     * edge's key into v3 and has the collection replace the old edge with the new one.
+     */
+    private static Method swapMethod(String name, List<String> names, List<Instruction> guard) {
+        List<Instruction> instructions = new ArrayList<>();
+        for (String held : names) {
+            instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 1, new ImmutableStringReference(held)));
+        }
+        instructions.add(new ImmutableInstruction22c(Opcode.IGET_OBJECT, 0, 4, new ImmutableFieldReference(EDGE_SWAP, "edge", FEED_UNIT_EDGE)));
+        instructions.addAll(guard);
+        instructions.add(new ImmutableInstruction22c(Opcode.IGET_OBJECT, 2, 4, new ImmutableFieldReference(EDGE_SWAP, "collection", FEED_COLLECTION)));
+        instructions.add(new ImmutableInstruction22c(Opcode.IGET_OBJECT, 3, 4, new ImmutableFieldReference(EDGE_SWAP, "key", "Ljava/lang/String;")));
+        instructions.add(new ImmutableInstruction35c(Opcode.INVOKE_INTERFACE, 3, 2, 0, 3, 0, 0, REPLACE_EDGE));
+        instructions.add(op(Opcode.RETURN_VOID));
+        return define(EDGE_SWAP, name, "V", false, new ImmutableMethodImplementation(5, instructions, null, null));
+    }
+
+    /**
+     * The feed guard's call about the incoming edge in v0, as the patch writes it cut down: asked,
+     * and a return before the swap when it answers true.
+     */
+    private static List<Instruction> swapGuard() {
+        return Arrays.asList(
+                invoke(HIDE_SWAPPED_EDGE, 0, 0),    // 0
+                op(Opcode.MOVE_RESULT, 1),           // 3
+                ifEqz(1, 3),                         // 4 -> 7
+                op(Opcode.RETURN_VOID));             // 6
+    }
+
+    /**
+     * FeedUnitCollectionManager's swap runnable. Its run(), an instance method taking nothing, holds
+     * the two sizes its log line reports and makes [guard] before the swap. Facebook's runnable has
+     * nothing else holding either, but beside run() here sit three methods holding part of what the
+     * swap rule picks it by, so a rule naming less would pass a hook in one of them: one taking
+     * nothing that holds the first size alone and, with [describeSent], asks the guard too, one
+     * holding both that is static, and one holding both that takes an int. With [secondRun] a
+     * second method answers the rule, without the guard.
+     */
+    private static ClassDef edgeSwap(List<Instruction> guard, boolean describeSent, boolean secondRun) {
+        List<Method> methods = new ArrayList<>();
+        methods.add(swapMethod("run", SWAP_SIZES, guard));
+        methods.add(swapMethod("describe", SWAP_SIZES.subList(0, 1),
+                describeSent ? swapGuard() : Collections.<Instruction>emptyList()));
+        methods.add(holding(EDGE_SWAP, "runAll", true, SWAP_SIZES));
+        methods.add(holding(EDGE_SWAP, "runSome", false, SWAP_SIZES, "I"));
+        if (secondRun) methods.add(swapMethod("runAgain", SWAP_SIZES, Collections.<Instruction>emptyList()));
+        return new ImmutableClassDef(EDGE_SWAP, AccessFlags.PUBLIC.getValue(), OBJECT,
+                Collections.singletonList(RUNNABLE), null, null, null, methods);
+    }
+
     /** [classes] with the top bar replaced by [topBar]. */
     private static List<ClassDef> withTopBar(List<ClassDef> classes, ClassDef topBar) {
         List<ClassDef> replaced = new ArrayList<>(classes);
@@ -1021,6 +1087,8 @@ public class BadDexFixture {
                         new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN, 0)), "I"),
                 define(FILTER, "hidePreEofReels", "Z", true, body(1,
                         new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN, 0))),
+                define(FILTER, "hideSwappedEdge", "Z", true, body(2,
+                        new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN, 0)), OBJECT, OBJECT),
                 define(FILTER, "wide", "V", true, body(2, op(Opcode.RETURN_VOID)), "J"),
                 define(FILTER, "reuse", "V", true, body(1,
                         new ImmutableInstruction10t(Opcode.GOTO, 5),                            // 0 -> 5
@@ -1148,7 +1216,7 @@ public class BadDexFixture {
                 topBar(false, true, 1), finderStub(FILLED_FINDER_STUB),
                 emojiProvider(emojiHook(), Collections.<Instruction>emptyList()), systemEmoji(),
                 emojiPictures(emojiPicturesHook(), Collections.<Instruction>emptyList()),
-                batcher(heldBack(), false, false), reelWatchHistory());
+                batcher(heldBack(), false, false), reelWatchHistory(), edgeSwap(swapGuard(), false, false));
     }
 
     /** The clean host, Facebook's classes as they ship, with the batcher's flush making [handOver]. */
@@ -1159,7 +1227,7 @@ public class BadDexFixture {
                 topBar(false, false, 1),
                 emojiProvider(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 emojiPictures(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
-                batcher(handOver, false, false));
+                batcher(handOver, false, false), edgeSwap(Collections.<Instruction>emptyList(), false, false));
     }
 
     /**
@@ -1729,6 +1797,21 @@ public class BadDexFixture {
         // contract: a second method answering the watch-history rule, so it can't say which one
         // the hook belongs in, although the hook is where it was.
         dexes.put("bad-watch-two-flushes", replaced(good(), batcher(heldBack(), false, true)));
+
+        // contract: the swap runnable with no feed guard, so every edge it swaps in goes in unchecked.
+        dexes.put("bad-swap-hook-missing", replaced(good(), edgeSwap(Collections.<Instruction>emptyList(), false, false)));
+        // contract: the guard in the method holding the first size alone, and run() left as
+        // Facebook makes it.
+        dexes.put("bad-swap-hook-decoy", replaced(good(), edgeSwap(Collections.<Instruction>emptyList(), true, false)));
+        // contract: the guard in run() and in that other method too.
+        dexes.put("bad-swap-hook-also-elsewhere", replaced(good(), edgeSwap(swapGuard(), true, false)));
+        // contract: the guard twice in run().
+        List<Instruction> twice = new ArrayList<>(swapGuard());
+        twice.addAll(swapGuard());
+        dexes.put("bad-swap-hook-twice", replaced(good(), edgeSwap(twice, false, false)));
+        // contract: a second method answering the swap rule, so it can't say which one the guard
+        // belongs in, although the guard is where it was.
+        dexes.put("bad-swap-two-runs", replaced(good(), edgeSwap(swapGuard(), false, true)));
 
         // contract: each start-call hook put first in a method that holds the rule's first string
         // but isn't the one the patch hooks. A rule naming only that string counted any method

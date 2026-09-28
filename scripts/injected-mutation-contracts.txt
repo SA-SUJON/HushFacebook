@@ -7,12 +7,20 @@
 #   no-call <method reference> outside <package prefix>
 #   next-call <method reference> after <method reference> [in [static|instance] <shape>] holding <string> [<string> ...]
 #   sole-call <method reference> replacing <method reference> [in [static|instance] <shape>] holding <string> [<string> ...]
-# A start-call, next-call or sole-call rule picks its method by every string it names and its
-# shape, and exactly one of Facebook's methods may answer that; name as much as the patch itself
-# finds the method by.
+#   once-call <method reference> [in [static|instance] <shape>] holding <string> [<string> ...]
+# A start-call, next-call, sole-call or once-call rule picks its method by every string it names
+# and its shape, and exactly one of Facebook's methods may answer that; name as much as the patch
+# itself finds the method by.
 # Two feed guards stacked on addNewEdgeToCollection is the shape that broke builds before, and a
 # guard anywhere else filters nothing.
 single-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideEdge(Ljava/lang/Object;Ljava/lang/Object;)Z in addNewEdgeToCollection
+# An edge swapped in over another one never reaches that funnel. The runnable that makes the swap,
+# FeedUnitCollectionManager's onEdgeSwapped, asks the extension about the incoming edge once, after
+# reading it and before the swap, so the guard can't come first. Its run() holds the swap log line's
+# "Edge swap dropped", which a rule can't name for its spaces, and the two sizes the line reports,
+# which no other method of 580 or 577 loads. Left out, every ad Facebook hot-swaps into the feed goes
+# in unchecked; twice or anywhere else, it's no longer the one guard the patch wrote.
+once-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideSwappedEdge(Ljava/lang/Object;Ljava/lang/Object;)Z in instance ()V holding sizeBefore sizeAfter
 # Each story-flag stub has to call GraphQLStory's renamed accessor before it returns. A patch that
 # stops filling one leaves the stub answering its marker, and the rule keeps every post.
 first-call Lapp/morphe/extension/facebook/feed/GenAiLabel;->detectedInfo(Ljava/lang/Object;)Ljava/lang/Object; on Lcom/facebook/graphql/model/GraphQLStory;
