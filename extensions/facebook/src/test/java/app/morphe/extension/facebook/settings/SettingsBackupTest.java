@@ -1749,6 +1749,7 @@ public class SettingsBackupTest {
                         new Intent().setData(uri));
                 ShadowLooper.idleMainLooper();
                 assertFalse(importRow.isEnabled());
+                awaitHeldOpen();
                 waitOut();
                 assertEquals(IMPORT_TIMEOUT, ShadowToast.getTextOfLatestToast());
                 assertTrue(importRow.isEnabled());
@@ -1791,6 +1792,7 @@ public class SettingsBackupTest {
             shadowOf(activity).receiveResult(tap(activity, page, EXPORT_ROW).intent, Activity.RESULT_OK,
                     new Intent().setData(uri));
             ShadowLooper.idleMainLooper();
+            awaitHeldOpen();
             waitOut();
             assertEquals(EXPORT_TIMEOUT, ShadowToast.getTextOfLatestToast());
             assertEquals(1, SettingsFileProvider.cancels.get());
@@ -1805,6 +1807,7 @@ public class SettingsBackupTest {
                 shadowOf(activity).receiveResult(tap(activity, page, EXPORT_ROW).intent, Activity.RESULT_OK,
                         new Intent().setData(uri));
                 ShadowLooper.idleMainLooper();
+                awaitHeldOpen();
                 waitOut();
                 assertEquals(EXPORT_TIMEOUT, ShadowToast.getTextOfLatestToast());
                 ShadowToast.reset();
@@ -1841,6 +1844,7 @@ public class SettingsBackupTest {
             shadowOf(activity).receiveResult(tap(activity, page, IMPORT_ROW).intent, Activity.RESULT_OK,
                     new Intent().setData(held));
             assertFalse(page.findPreference(EXPORT_ROW).isEnabled());
+            awaitHeldOpen();
         }
         // What runs after a failed test and before the next one.
         restore();
@@ -1878,6 +1882,15 @@ public class SettingsBackupTest {
     /** Lets the screen's wait for the file's app run out. */
     private static void waitOut() {
         ShadowLooper.idleMainLooper(SettingsBackupPreference.timeoutMs, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Waits until the app holds the open with its cancel listener in place, as it has long before
+     * 30 seconds run out on a phone. waitOut moves only the main thread's clock, so without this the
+     * worker may not have reached the app when the cancel goes out, and the app never counts it.
+     */
+    private static void awaitHeldOpen() throws InterruptedException {
+        assertTrue("the app never got the open", SettingsFileProvider.holding.tryAcquire(5, TimeUnit.SECONDS));
     }
 
     /** Answers a picker with a file holding [text], and waits for what that sets off. */

@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,6 +44,8 @@ public final class SettingsFileProvider extends ContentProvider {
     static final AtomicInteger cancels = new AtomicInteger();
     /** Opens that returned, cancelled ones excluded. */
     static final AtomicInteger opened = new AtomicInteger();
+    /** A permit for each open the stall holds, given once its cancel listener is in place. */
+    static final Semaphore holding = new Semaphore(0);
 
     private static File folder;
 
@@ -54,6 +57,7 @@ public final class SettingsFileProvider extends ContentProvider {
         ignoresCancel = false;
         cancels.set(0);
         opened.set(0);
+        holding.drainPermits();
         folder = new File(RuntimeEnvironment.getApplication().getCacheDir(), "settings-files-" + System.nanoTime());
         if (!folder.mkdirs()) throw new IllegalStateException("No folder for the test files");
         Robolectric.setupContentProvider(SettingsFileProvider.class, authority);
@@ -87,6 +91,7 @@ public final class SettingsFileProvider extends ContentProvider {
                 cancels.incrementAndGet();
                 cancelled.countDown();
             });
+            holding.release();
             long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
             try {
                 while (!held.await(10, TimeUnit.MILLISECONDS)) {

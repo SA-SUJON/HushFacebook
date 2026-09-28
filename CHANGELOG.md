@@ -13,6 +13,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** Brazilian Portuguese reads more naturally, thanks to @ViictorNunes (PR #15). Their fixes are in every row the settings still show, and rows added since then now use the same words, like publicação for post and aplicativo for app. A few slips were corrected along the way, such as "um publicação" and "patrocinadass". Checked in offscreen renders at normal and double text size, not on a phone.
 * **Facebook:** The status card on the settings overview, and the paused line on each category page, put their Pause, Resume or Undo button under the text once the text size is 150% or more. Beside the text it left so little room that "Hushfacebook" broke in the middle of the word. While paused, the card now says to tap Resume and then restart Facebook, where it used to read as if the restart came first.
 * **Tooling:** When a settings backup test fails while its stand-in file app still holds a file open, the tests after it now start clean. The cleanup used to time out waiting for that file before it reset anything, so every later test found the Export and Import rows still busy and failed as well, which hid the one that broke. It now lets the file go first.
+* **Tooling:** The two settings backup tests where a file app stops answering now wait until the stand-in app is really holding the file before they let the 30 seconds run out. On a busy machine the timeout could fire before the file was even opened, and the check that the cancel reached the app failed now and then.
 
 ## 0.4.0 (2026-09-28)
 
