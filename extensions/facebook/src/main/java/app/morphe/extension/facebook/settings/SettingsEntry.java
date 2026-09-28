@@ -37,6 +37,7 @@ import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.facebook.download.SaveLeftovers;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
+import app.morphe.extension.facebook.media.ResumePlayback;
 
 /**
  * How the Hushfacebook screen is reached.
@@ -100,6 +101,7 @@ public final class SettingsEntry {
         }
         ReleaseCheck.onFacebookStart();
         SaveLeftovers.sweepAfterStart(context);
+        ResumePlayback.onFacebookStart();
         publishShortcut(context);
     }
 

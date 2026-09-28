@@ -241,7 +241,8 @@ public class Settings extends BaseSettings {
      * A video longer than two minutes that was left partway picks up where it was left, once, the
      * next time a player starts it ({@link app.morphe.extension.facebook.media.ResumePlayback}).
      * Starts off. Off or paused, nothing is saved or looked up and videos start as Facebook starts
-     * them; the points already saved stay until they're 30 days old.
+     * them; the points already saved stay until they're 30 days old, and Facebook's start drops
+     * them after that either way.
      */
     public static final BooleanSetting RESUME_LONG_VIDEOS =
             new BooleanSetting("hushfacebook_resume_long_videos", FALSE);
