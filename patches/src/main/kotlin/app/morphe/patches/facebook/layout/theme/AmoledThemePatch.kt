@@ -145,9 +145,7 @@ val amoledThemePatch = bytecodePatch(
     execute {
         // Route one. Four methods and six returns. Each hook keeps the body of the method and
         // sends the value through the extension before the method returns it.
-        DarkSchemeResolveFingerprint.method.hookColorReturns(tokenParameterIndex = 0, target = APPLY)
-        hookFdsColorsResolvers(target = APPLY)
-        fdsViewResolver().hookColorReturns(tokenParameterIndex = 1, target = APPLY)
+        hookColourResolvers(mig = APPLY, fds = APPLY)
 
         // The status bar. A tab's bar colour can come from a resolver route one doesn't reach, so
         // the method that paints the bar asks the extension first (issue #22).
@@ -185,8 +183,20 @@ val amoledThemePatch = bytecodePatch(
 }
 
 /**
+ * Route one: the Mig dark scheme's resolver sends its colours to [mig], and the FDS resolvers send
+ * theirs to [fds]: each resolver on FDSColors and the [fdsThemeResolver]. Both themes run it, AMOLED
+ * from its execute block and Material You after it.
+ */
+internal fun BytecodePatchContext.hookColourResolvers(mig: String, fds: String) {
+    DarkSchemeResolveFingerprint.method.hookColorReturns(tokenParameterIndex = 0, target = mig)
+    hookFdsColorsResolvers(target = fds)
+    fdsThemeResolver().hookColorReturns(tokenParameterIndex = 1, target = fds)
+}
+
+/**
  * The resolver of the view code, which takes a Context and the FDS token. It has a Redex name, thus
- * its descriptor comes from the wrapper in `FdsColorScheme` that calls it.
+ * its descriptor comes from the wrapper in `FdsColorScheme` that calls it. It hands both on to the
+ * [fdsThemeResolver], and its class holds FDS's dark check.
  */
 internal fun BytecodePatchContext.fdsViewResolver(): MutableMethod {
     val resolverCall = FdsSchemeResolveFingerprint.instructionMatches[1].instruction
@@ -202,6 +212,31 @@ internal fun BytecodePatchContext.fdsViewResolver(): MutableMethod {
             it.returnType == "I" &&
             it.parameterTypes.map(CharSequence::toString) ==
             resolver.parameterTypes.map(CharSequence::toString)
+    }
+}
+
+/**
+ * The FDS theme resolver: the one method the [fdsViewResolver] calls that answers an int, taking the
+ * same Context and token. The view resolver only checks the context and returns its answer, and
+ * most of the view code calls it directly, the code that makes the system bars' own views on
+ * Android 15 and newer included: the navigation bar is made with NAV_BAR_BACKGROUND's colour from
+ * here (on 577, through a static that returns its answer). So route one hooks this and not the
+ * view resolver, and every colour the view resolver gave still goes through the hook, once.
+ */
+internal fun BytecodePatchContext.fdsThemeResolver(): MutableMethod {
+    val viewResolver = fdsViewResolver()
+    val calls = viewResolver.implementation!!.instructions
+        .mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
+        .filter { it.returnType == "I" }
+    val resolver = calls.singleOrNull() ?: throw PatchException(
+        "The FDS view resolver calls ${calls.size} methods that answer an int, expected the theme resolver",
+    )
+    val parameters = viewResolver.parameterTypes.map(CharSequence::toString)
+    if (resolver.parameterTypes.map(CharSequence::toString) != parameters) {
+        throw PatchException("The FDS theme resolver $resolver doesn't take the view resolver's $parameters")
+    }
+    return mutableClassDefBy(resolver.definingClass.toString()).methods.single {
+        it.name == resolver.name && it.returnType == "I" && it.parameterTypes.map(CharSequence::toString) == parameters
     }
 }
 

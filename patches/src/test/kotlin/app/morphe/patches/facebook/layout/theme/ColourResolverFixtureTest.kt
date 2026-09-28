@@ -9,9 +9,14 @@ import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.shared.compat.AppCompatibilities
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -21,6 +26,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 
 /**
  * Route one of the AMOLED and Material You themes as the patch runs it, on each declared build's
@@ -37,8 +43,8 @@ class ColourResolverFixtureTest {
         FdsSchemeResolveFingerprint.clearMatch()
     }
 
-    /** The class the FdsColorScheme wrapper hands the context and token to: the view resolver's. */
-    private fun viewResolverClass(scheme: ClassDef): String = scheme.methods.mapNotNull { method ->
+    /** The call the FdsColorScheme wrapper hands the context and token to: the view resolver. */
+    private fun viewResolver(scheme: ClassDef): MethodReference = scheme.methods.mapNotNull { method ->
         val instructions = method.implementation?.instructions?.toList() ?: return@mapNotNull null
         val readsContext = instructions.any {
             ((it as? ReferenceInstruction)?.reference as? FieldReference)?.let { field ->
@@ -49,9 +55,28 @@ class ColourResolverFixtureTest {
         instructions.firstNotNullOfOrNull { instruction ->
             ((instruction as? ReferenceInstruction)?.reference as? MethodReference)
                 ?.takeIf { instruction.opcode == Opcode.INVOKE_STATIC && it.returnType == "I" }
-                ?.definingClass
         }
-    }.distinct().single()
+    }.distinctBy { it.toString() }.single()
+
+    /** The class the FdsColorScheme wrapper hands the context and token to: the view resolver's. */
+    private fun viewResolverClass(scheme: ClassDef): String = viewResolver(scheme).definingClass
+
+    /** The methods [method] calls that answer an int. */
+    private fun intCalls(method: Method): List<MethodReference> = method.implementation!!.instructions
+        .mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
+        .filter { it.returnType == "I" }
+
+    /**
+     * Every class route one reads in [bundle]: the Mig dark scheme, FDSColors, the FdsColorScheme
+     * wrapper, the view resolver's class and the class of the resolver the view resolver asks.
+     */
+    private fun routeOneClasses(bundle: File): Map<String, ClassDef> {
+        val named = FixtureDex.classes(bundle, setOf(DARK_COLOR_SCHEME, FDS_COLORS, FDS_COLOR_SCHEME))
+        val view = viewResolver(named.getValue(FDS_COLOR_SCHEME))
+        val viewClass = FixtureDex.classes(bundle, setOf(view.definingClass))
+        val asked = intCalls(viewClass.getValue(view.definingClass).methods.single { it.descriptor() == view.toString() }).single()
+        return named + viewClass + FixtureDex.classes(bundle, setOf(asked.definingClass))
+    }
 
     @Test
     fun `route one hooks four resolvers and six returns, each token intact, on each declared build`() {
@@ -60,16 +85,10 @@ class ColourResolverFixtureTest {
         for (version in versions) {
             for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
                 forgetMatches()
-                val named = FixtureDex.classes(bundle, setOf(DARK_COLOR_SCHEME, FDS_COLORS, FDS_COLOR_SCHEME))
-                val viewResolver = viewResolverClass(named.getValue(FDS_COLOR_SCHEME))
-                val classes = named + FixtureDex.classes(bundle, setOf(viewResolver))
+                val classes = routeOneClasses(bundle)
                 val context = PatchContexts.of(classes.values)
 
-                with(context) {
-                    DarkSchemeResolveFingerprint.method.hookColorReturns(tokenParameterIndex = 0, target = APPLY)
-                    hookFdsColorsResolvers(target = APPLY)
-                    fdsViewResolver().hookColorReturns(tokenParameterIndex = 1, target = APPLY)
-                }
+                with(context) { hookColourResolvers(mig = APPLY, fds = APPLY) }
 
                 val hooked = classes.keys.flatMap { type -> context.mutableClassDefBy(type).methods }
                     .associate { method ->
@@ -187,6 +206,78 @@ class ColourResolverFixtureTest {
                     val original = classes.getValue(STATUS_BAR_UTIL).methods.single { it.descriptor() == painter.descriptor() }
                     assertStatusBarHook(name, painter, darkCheck, original.implementation!!.instructions.toList(), STATUS_BAR_YOU)
                 }
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", versions, checked)
+    }
+
+    private fun Instruction.calls(descriptor: String) = (this as? ReferenceInstruction)?.reference?.toString() == descriptor
+
+    /** The literal in [register] at instruction [at]: what the last instruction before it that wrote the register loaded. */
+    private fun literalAt(body: List<Instruction>, register: Int, at: Int): Int? = (at - 1 downTo 0).map { body[it] }
+        .firstOrNull { it.opcode.setsRegister() && (it as? OneRegisterInstruction)?.registerA == register }
+        .let { (it as? NarrowLiteralInstruction)?.narrowLiteral }
+
+    /**
+     * The navigation bar on Android 15 and newer. Facebook 577 and 580 draw it as a view of their own
+     * in the content frame, and SystemNavigationBarUtil.setNavigationBarColor (the one static
+     * (Activity, Window, int) method that calls setNavigationBarColor) repaints that view by its id
+     * when a tab asks. The colour the view is made with, NAV_BAR_BACKGROUND's, stays until then. The
+     * method that makes it asks the resolver behind the view code's own (580) or a static that just
+     * returns that resolver's answer (577), so route one, as both themes run it, has to reach that
+     * resolver for the bar to match the page from the start.
+     */
+    @Test
+    fun `the navigation bar's view is made with a colour route one reaches, on each declared build`() {
+        val setNavigationBarColor = "Landroid/view/Window;->setNavigationBarColor(I)V"
+        val findViewById = "Landroid/view/Window;->findViewById(I)Landroid/view/View;"
+        val setId = "Landroid/view/View;->setId(I)V"
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        val checked = mutableSetOf<String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                forgetMatches()
+                val name = bundle.name
+                val painters = FixtureDex.methodsWhere(bundle, { dex -> dex.methodSection.any { it.toString() == setNavigationBarColor } }) {
+                    AccessFlags.STATIC.isSet(it.accessFlags) && it.returnType == "V" &&
+                        it.parameterTypes.map(CharSequence::toString) ==
+                        listOf("Landroid/app/Activity;", "Landroid/view/Window;", "I") &&
+                        it.calls(setNavigationBarColor)
+                }
+                assertEquals("$name: SystemNavigationBarUtil painters, ${painters.map { it.descriptor() }}", 1, painters.size)
+                val painted = painters.single().implementation!!.instructions.toList()
+                val lookup = painted.indexOfFirst { it.calls(findViewById) }
+                assertTrue("$name: the painter looks up no view", lookup >= 0)
+                val id = checkNotNull(literalAt(painted, (painted[lookup] as FiveRegisterInstruction).registerD, lookup)) {
+                    "$name: the painter looks its view up by no literal id"
+                }
+
+                val makers = FixtureDex.methodsWhere(bundle, { dex -> dex.methodSection.any { it.toString() == setId } }) { method ->
+                    val body = method.implementation?.instructions?.toList() ?: return@methodsWhere false
+                    body.indices.any { at ->
+                        val call = body[at] as? FiveRegisterInstruction
+                        call != null && body[at].calls(setId) && literalAt(body, call.registerD, at) == id
+                    }
+                }
+                assertEquals("$name: methods giving a view the navigation bar's id, ${makers.map { it.descriptor() }}", 1, makers.size)
+                val asked = intCalls(makers.single()).single { it.parameterTypes.firstOrNull()?.toString() == "Landroid/content/Context;" }
+
+                val routeOne = routeOneClasses(bundle)
+                val classes = routeOne + FixtureDex.classes(bundle, setOf(asked.definingClass) - routeOne.keys)
+                val context = PatchContexts.of(classes.values)
+                with(context) { hookColourResolvers(mig = APPLY, fds = APPLY) }
+                val hooked = classes.keys.flatMap { context.mutableClassDefBy(it).methods }
+                    .filter { it.calls(APPLY) }.map { it.descriptor() }.toSet()
+
+                // The view's colour comes from a hooked resolver, or from a static in front of one
+                // that asks one resolver and returns its answer as it is.
+                val front = classes.getValue(asked.definingClass).methods.single { it.descriptor() == asked.toString() }
+                val passesOn = AccessFlags.STATIC.isSet(front.accessFlags) && intCalls(front).size == 1 &&
+                    front.implementation!!.instructions.toList().takeLast(2).map { it.opcode } == listOf(Opcode.MOVE_RESULT, Opcode.RETURN)
+                val answered = if (asked.toString() !in hooked && passesOn) intCalls(front).single().toString() else asked.toString()
+                assertTrue("$name: the navigation bar's view is made with $answered, which route one doesn't reach ($hooked)",
+                    answered in hooked)
                 checked += version
             }
         }

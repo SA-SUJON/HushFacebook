@@ -226,10 +226,8 @@ val materialYouThemePatch = bytecodePatch(
     // there: each hook here goes after AMOLED's and gets AMOLED's colour, and AMOLED's black is no
     // dark-theme colour this recolours.
     finalize {
-        // Route one: the Mig dark scheme, the FDSColors resolvers and the view code's resolver.
-        DarkSchemeResolveFingerprint.method.hookColorReturns(tokenParameterIndex = 0, target = MIG)
-        hookFdsColorsResolvers(target = FDS)
-        fdsViewResolver().hookColorReturns(tokenParameterIndex = 1, target = FDS)
+        // Route one: the Mig dark scheme, the FDSColors resolvers and the view code's theme resolver.
+        hookColourResolvers(mig = MIG, fds = FDS)
 
         // The status bar, which a tab can colour from a token none of route one's rules knows as
         // dark (issue #22 for AMOLED).

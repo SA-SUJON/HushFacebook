@@ -18,7 +18,8 @@ import com.android.tools.smali.dexlib2.Opcode
  *
  * Facebook has two colour systems and they share no code. Mig is the older one, and each of its
  * ~120 getters ends in one method per colour scheme. FDS is the newer one and carries most of the
- * app: `FDSColors` answers Litho, `LX/1tK` answers the view code.
+ * app: `FDSColors` answers Litho, and a theme resolver with a Redex name (`LX/1tN` on 577, `LX/20i`
+ * on 580) answers the view code, found through the view resolver in front of it.
  *
  * R8 keeps the owner class names but renames the methods on every release. Thus each fingerprint
  * uses the class, the return type, the parameters and the shape of the body, and never a name.
