@@ -686,8 +686,15 @@ public final class MediaDownload {
         java.util.function.Consumer<PostDetails> watching = detailsForTests;
         if (watching != null) watching.accept(known);
         IN_FLIGHT.incrementAndGet();
-        Feedback.show(application, L10n.t(application, "Saving..."), false);
         SaveControl.Save save = SaveControl.begin(application, video);
+        // With no notification to cancel it from, the list of saves in the settings is the only way
+        // to stop it, so the start says where that is, for long enough to read.
+        if (save.manager != null) {
+            Feedback.show(application, L10n.t(application, "Saving..."), false);
+        } else {
+            Feedback.show(application,
+                L10n.t(application, "Saving... To cancel, open Downloads in Hushfacebook's settings."), true);
+        }
 
         Thread worker = new Thread(() -> {
             MediaStoreWriter writer = new MediaStoreWriter(application, video, known);

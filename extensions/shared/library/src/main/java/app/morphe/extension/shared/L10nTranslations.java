@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(838);
+        Map<String, String> table = new HashMap<>(840);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -675,6 +675,8 @@ public final class L10nTranslations {
                 "Einstellungsdatei wird gespeichert");
         table.put("Saving...",
                 "Wird gespeichert \u2026");
+        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
+                "Wird gespeichert \u2026 Zum Abbrechen \u00f6ffne Downloads in den Hushfacebook-Einstellungen.");
         table.put("Search",
                 "Suche");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -789,11 +791,11 @@ public final class L10nTranslations {
                 "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen und die auf deinem eigenen Profil.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Die Reihe mit Gruppen zum Beitreten zwischen den Beitr\u00e4gen, samt ihrem Button \u201eWeitere Gruppen entdecken\u201c. Beitr\u00e4ge aus deinen Gruppen bleiben.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "Die Reihe mit Stories oben im Feed, \u201eStory erstellen\u201c eingeschlossen.");
     }
 
     private static void fillDe6(Map<String, String> table) {
+        table.put("The row of stories at the top of the feed, Create story included.",
+                "Die Reihe mit Stories oben im Feed, \u201eStory erstellen\u201c eingeschlossen.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "Die Reihen mit Reels zwischen den Beitr\u00e4gen und die Reels, die Facebook dort anh\u00e4ngt, wo dein Feed endet.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
@@ -915,7 +917,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(838);
+        Map<String, String> table = new HashMap<>(840);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1546,6 +1548,8 @@ public final class L10nTranslations {
                 "Guardando el archivo de configuraci\u00f3n");
         table.put("Saving...",
                 "Guardando...");
+        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
+                "Guardando... Para cancelar, abre Descargas en la configuraci\u00f3n de Hushfacebook.");
         table.put("Search",
                 "B\u00fasqueda");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -1660,11 +1664,11 @@ public final class L10nTranslations {
                 "La fila de sugerencias de amistad entre las publicaciones y la de tu propio perfil.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "La fila de grupos para unirte entre las publicaciones, con su bot\u00f3n Descubrir m\u00e1s grupos. Las publicaciones de tus grupos se quedan.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "La fila de historias en la parte superior del feed, con \u201cCrear historia\u201d incluida.");
     }
 
     private static void fillEs6(Map<String, String> table) {
+        table.put("The row of stories at the top of the feed, Create story included.",
+                "La fila de historias en la parte superior del feed, con \u201cCrear historia\u201d incluida.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "Las filas de reels entre las publicaciones y los reels que Facebook a\u00f1ade donde termina tu feed.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
@@ -1786,7 +1790,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(838);
+        Map<String, String> table = new HashMap<>(840);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -2417,6 +2421,8 @@ public final class L10nTranslations {
                 "Menyimpan file pengaturan");
         table.put("Saving...",
                 "Menyimpan...");
+        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
+                "Menyimpan... Untuk membatalkan, buka Unduhan di Pengaturan Hushfacebook.");
         table.put("Search",
                 "Pencarian");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -2531,11 +2537,11 @@ public final class L10nTranslations {
                 "Deretan saran pertemanan di antara postingan, dan deretan di profilmu sendiri.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Deretan grup untuk diikuti di antara postingan, beserta tombol Temukan grup lainnya. Postingan dari grup tempat Anda bergabung tetap ada.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "Deretan cerita di bagian atas Kabar Beranda, termasuk \u201cBuat cerita\u201d.");
     }
 
     private static void fillIn6(Map<String, String> table) {
+        table.put("The row of stories at the top of the feed, Create story included.",
+                "Deretan cerita di bagian atas Kabar Beranda, termasuk \u201cBuat cerita\u201d.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "Deretan Reels di antara postingan, dan Reels yang ditambahkan Facebook di akhir Kabar Beranda Anda.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
@@ -2657,7 +2663,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(838);
+        Map<String, String> table = new HashMap<>(840);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -3288,6 +3294,8 @@ public final class L10nTranslations {
                 "Salvando o arquivo de configura\u00e7\u00f5es");
         table.put("Saving...",
                 "Salvando...");
+        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
+                "Salvando... Para cancelar, abra Downloads nas Configura\u00e7\u00f5es do Hushfacebook.");
         table.put("Search",
                 "Pesquisa");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -3402,11 +3410,11 @@ public final class L10nTranslations {
                 "A linha de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es e a linha no seu pr\u00f3prio perfil.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "A linha de grupos sugeridos para participa\u00e7\u00e3o entre as publica\u00e7\u00f5es, com o bot\u00e3o \u201cDescobrir mais grupos\u201d. As publica\u00e7\u00f5es dos grupos dos quais voc\u00ea participa permanecem.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "A linha de Stories no topo do feed, incluindo \u201cCriar Story\u201d.");
     }
 
     private static void fillPt_rBR6(Map<String, String> table) {
+        table.put("The row of stories at the top of the feed, Create story included.",
+                "A linha de Stories no topo do feed, incluindo \u201cCriar Story\u201d.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "As linhas de Reels entre as publica\u00e7\u00f5es e os Reels que o Facebook adiciona ao final do feed.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
@@ -3528,7 +3536,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(838);
+        Map<String, String> table = new HashMap<>(840);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -4159,6 +4167,8 @@ public final class L10nTranslations {
                 "Ayar dosyas\u0131 kaydediliyor");
         table.put("Saving...",
                 "Kaydediliyor...");
+        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
+                "Kaydediliyor... \u0130ptal etmek i\u00e7in Hushfacebook ayarlar\u0131nda \u0130ndirmeler b\u00f6l\u00fcm\u00fcn\u00fc a\u00e7.");
         table.put("Search",
                 "Arama");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -4273,11 +4283,11 @@ public final class L10nTranslations {
                 "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131 ve kendi profilindeki sat\u0131r.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "G\u00f6nderilerin aras\u0131ndaki kat\u0131labilece\u011fin gruplar sat\u0131r\u0131 ve Daha fazla grup ke\u015ffet d\u00fc\u011fmesi. \u00dcyesi oldu\u011fun gruplar\u0131n g\u00f6nderileri kal\u0131r.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "Ak\u0131\u015f\u0131n en \u00fcst\u00fcndeki hikaye \u015feridi, \u201cHikaye olu\u015ftur\u201d da dahil.");
     }
 
     private static void fillTr6(Map<String, String> table) {
+        table.put("The row of stories at the top of the feed, Create story included.",
+                "Ak\u0131\u015f\u0131n en \u00fcst\u00fcndeki hikaye \u015feridi, \u201cHikaye olu\u015ftur\u201d da dahil.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "G\u00f6nderilerin aras\u0131ndaki Reels s\u0131ralar\u0131 ve Facebook'un ak\u0131\u015f\u0131n\u0131n bitti\u011fi yere ekledi\u011fi Reels videolar\u0131.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",

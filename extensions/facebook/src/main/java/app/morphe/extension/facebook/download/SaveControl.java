@@ -42,9 +42,9 @@ import app.morphe.extension.shared.L10n;
  * carries a token this process made up, and a broadcast without it is ignored.
  *
  * <p>With Facebook's notifications off, or this channel switched off, a save shows a toast at each
- * end and no notification. Hushfacebook's settings list every running save under Downloads, with
- * what it's doing and a Cancel of its own ({@link #running}, {@link #watch}), so a save can be
- * stopped either way. Nothing of a save outlives it there: no address, no name, no history.
+ * end and no notification, and the first toast says where to cancel it. Hushfacebook's settings
+ * list every running save under Downloads, with what it's doing and a Cancel of its own
+ * ({@link #running}, {@link #watch}), so a save can be stopped either way. Nothing of a save outlives it there: no address, no name, no history.
  */
 public final class SaveControl {
 

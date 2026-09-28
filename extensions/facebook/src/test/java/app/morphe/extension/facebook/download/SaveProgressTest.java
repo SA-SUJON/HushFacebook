@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -416,6 +417,44 @@ public class SaveProgressTest {
 
         assertEquals("Saved to " + L10n.isolate("Movies/Facebook"), ShadowToast.getTextOfLatestToast());
         assertEquals(0, Shadows.shadowOf(notifications()).getAllNotifications().size());
+    }
+
+    /**
+     * A save that can't show its notification says where else it can be cancelled as it starts:
+     * with Facebook's notifications off, or with only the saves channel switched off. With its
+     * notification showing, the start says only that it's saving.
+     */
+    @Test
+    public void aSaveWithNoNotificationSaysWhereToCancelIt() throws Exception {
+        String elsewhere = "Saving... To cancel, open Downloads in Hushfacebook's settings.";
+        assertEquals("Saving...", startMessage());
+
+        Shadows.shadowOf(notifications()).setNotificationsEnabled(false);
+        assertEquals(elsewhere, startMessage());
+
+        Shadows.shadowOf(notifications()).setNotificationsEnabled(true);
+        notifications().createNotificationChannel(new NotificationChannel(SaveControl.CHANNEL, "Hushfacebook saves",
+                NotificationManager.IMPORTANCE_NONE));
+        assertEquals(elsewhere, startMessage());
+    }
+
+    /** What a save says as it starts. It runs until that's been read, then ends cancelled. */
+    private String startMessage() throws InterruptedException {
+        ShadowToast.reset();
+        CountDownLatch read = new CountDownLatch(1);
+        Thread worker = MediaDownload.start(context, true, (writer, progress) -> {
+            try {
+                read.await(20, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return Downloader.Result.fail(Downloader.Status.CANCELLED, "cancelled");
+        });
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        String said = ShadowToast.getTextOfLatestToast();
+        read.countDown();
+        finish(worker);
+        return said;
     }
 
     /**
