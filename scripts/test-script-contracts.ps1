@@ -1626,15 +1626,34 @@ try {
         }
     }
 
+    # And the README's version badge and the sentence naming the latest release, which a release
+    # moves with the index: the fixture's version, and its catalog's count.
+    function Sync-FixtureReadme {
+        $fixtureVersion = ((Get-Content -LiteralPath (Join-Path $factsRoot 'gradle.properties')) `
+            -match '^version\s*=' | Select-Object -First 1) -replace '^version\s*=\s*', ''
+        $count = @((Get-Content -LiteralPath (Join-Path $factsRoot 'patches-list.json') -Raw | ConvertFrom-Json).patches).Count
+        $readmePath = Join-Path $factsRoot 'README.md'
+        $text = Get-Content -LiteralPath $readmePath -Raw
+        $synced = $text -replace 'badge/version-\d+(?:\.\d+)+-', "badge/version-$fixtureVersion-" `
+            -replace 'alt="Version \d+(?:\.\d+)+"', "alt=`"Version $fixtureVersion`"" `
+            -replace '(latest (?:published )?release is (?:still )?\[?v)\d+(?:\.\d+)+', "`${1}$fixtureVersion" `
+            -replace '(latest release is \[v[^\]]*\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', "`${1}$fixtureVersion" `
+            -replace '(latest release is \[v[^\]]*\]\([^)\s]*\), with )\d+( patches)', "`${1}$count`${2}"
+        if ($synced -ceq $text) { return }
+        Set-FactsFile 'README.md' { param($unused) $synced }
+    }
+
     function Reset-FactsFile {
         param([string]$Name)
         Copy-Item -LiteralPath (Join-Path $Root $Name) -Destination (Join-Path $factsRoot $Name) -Force
         if ($Name -eq 'patches-bundle.json') { Sync-FixtureIndex }
         if ($Name -eq $bugFormRelative) { Sync-FixtureBugForm }
+        if ($Name -eq 'README.md') { Sync-FixtureReadme }
     }
 
     Sync-FixtureIndex
     Sync-FixtureBugForm
+    Sync-FixtureReadme
 
     # The control. Everything below is this same tree with one fact moved, so a failure there is
     # the moved fact talking and not the fixture being wrong.
@@ -1667,6 +1686,11 @@ try {
                 param($text) ([regex]'(?m)^## ').Replace($text,
                     "## $nextVersion (2026-09-26)`n`n* **Facebook:** Moves the patches to Facebook $movedBuild.`n`n## ", 1)
             }
+            # The badge moves with the source; the sentence naming the latest release waits for it.
+            Set-FactsFile 'README.md' {
+                param($text) $text -replace 'badge/version-\d+(?:\.\d+)+-', "badge/version-$nextVersion-" `
+                    -replace 'alt="Version \d+(?:\.\d+)+"', "alt=`"Version $nextVersion`""
+            }
         }
         Set-FactsFile 'patches-list.json' { param($text) $text.Replace($newestBuild, $movedBuild) }
         Set-FactsFile 'README.md' { param($text) $text.Replace($newestBuild, $movedBuild) }
@@ -1680,8 +1704,19 @@ try {
         $global:LASTEXITCODE = 0
         & $factsScript -Root $factsRoot -SkipDescriptionTestCount -AllowPublishedIndexLag -SkipUrlCheck 6> $null
         Assert-True ($LASTEXITCODE -eq 0) "The gate refused the $window tree this case is built on, so it proves nothing."
+        # Lagging, the README may name the source's version or the published one, and no other.
+        $windowReadme = Get-Content -LiteralPath (Join-Path $factsRoot 'README.md') -Raw
+        foreach ($stale in @(
+                @{ Pattern = '*version badge names 0.1.0*'; Edit = { param($text) $text -replace 'badge/version-\d+(?:\.\d+)+-', 'badge/version-0.1.0-' } },
+                @{ Pattern = '*latest release is v0.1.0*'; Edit = { param($text) $text -replace '(latest release is \[v)\d+(?:\.\d+)+', '${1}0.1.0' } })) {
+            Set-FactsFile 'README.md' $stale.Edit
+            Assert-Throws { & $factsScript -Root $factsRoot -SkipDescriptionTestCount -AllowPublishedIndexLag -SkipUrlCheck 6> $null } `
+                $stale.Pattern "The gate accepted a $window README naming a version that is neither the source's nor the published one."
+            Set-FactsFile 'README.md' { param($unused) $windowReadme }
+        }
         Sync-FixtureIndex
         Sync-FixtureBugForm
+        Sync-FixtureReadme
         try {
             Invoke-Facts
         } catch {
@@ -1800,6 +1835,36 @@ try {
     }
     Assert-Throws { Invoke-Facts } '*' 'A README counting patches the catalog does not have was accepted.'
     Reset-FactsFile 'README.md'
+
+    # The version badge and the sentence naming the latest release, which open the README and which
+    # nothing read: a copy with both at 0.1.0 passed. Each is held to the release, on both paths.
+    foreach ($case in @(
+            @{ Name = 'a badge picture naming another version'; Pattern = '*version badge names*0.1.0*'
+                Edit = { param($text) $text -replace 'badge/version-\d+(?:\.\d+)+-', 'badge/version-0.1.0-' } },
+            @{ Name = 'a badge alt text naming another version'; Pattern = '*version badge names*0.1.0*'
+                Edit = { param($text) $text -replace 'alt="Version \d+(?:\.\d+)+"', 'alt="Version 0.1.0"' } },
+            @{ Name = 'no version badge'; Pattern = '*no version badge*'
+                Edit = { param($text) $text -replace '<img src="https://img\.shields\.io/badge/version-[^>]*>', '' } },
+            @{ Name = 'a latest release of another version'; Pattern = '*latest release is v0.1.0*'
+                Edit = { param($text) $text -replace '(latest release is \[v)\d+(?:\.\d+)+(\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', '${1}0.1.0${2}0.1.0' } },
+            @{ Name = 'a latest release linked to another tag'; Pattern = '*links it to*/tag/v0.1.0*'
+                Edit = { param($text) $text -replace '(latest release is \[v\d+(?:\.\d+)+\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', '${1}0.1.0' } },
+            @{ Name = 'a latest release counting other patches'; Pattern = '*latest release has 13 patches*'
+                Edit = { param($text) $text -replace '(latest release is \[v[^\]]+\]\([^)\s]*\), with )\d+( patches)', '${1}13${2}' } },
+            @{ Name = 'no sentence naming the latest release'; Pattern = '*does not say which release is the latest*'
+                Edit = { param($text) $text -replace 'The latest release is \[v[^\]]+\]\([^)\s]*\), with \d+ patches\.', 'Releases are on GitHub.' } })) {
+        $unedited = Get-Content -LiteralPath (Join-Path $factsRoot 'README.md') -Raw
+        Set-FactsFile 'README.md' $case.Edit
+        try {
+            Assert-True ((Get-Content -LiteralPath (Join-Path $factsRoot 'README.md') -Raw) -cne $unedited) `
+                "The README case '$($case.Name)' changed nothing, so it proves nothing."
+            Assert-Throws { Invoke-Facts } $case.Pattern "A README with $($case.Name) was accepted."
+            Assert-Throws { & $factsScript -Root $factsRoot -SkipDescriptionTestCount -AllowPublishedIndexLag -SkipUrlCheck 6> $null } `
+                $case.Pattern "The lenient check accepted a README with $($case.Name)."
+        } finally {
+            Reset-FactsFile 'README.md'
+        }
+    }
 
     # The Manager floor in the README is what stops somebody being told to use a Manager that
     # refuses the bundle, so it is held to the patcher the catalog pins.
@@ -3563,6 +3628,16 @@ try {
         '(placeholder:\s*Version \S+ for Facebook )\d+(?:\.\d+)+',
         "`${1}$($releaseTargetForIndex.PackageVersion)"
     Set-Content -LiteralPath $releaseBugFormPath -Encoding UTF8 -NoNewline -Value $releaseBugFormText
+    # And the README's version badge and the sentence naming the latest release, which the release
+    # moves with the index.
+    $releaseReadmePath = Join-Path $releaseRepo 'README.md'
+    $releaseReadmeText = (Get-Content -LiteralPath $releaseReadmePath -Raw) -replace
+        'badge/version-\d+(?:\.\d+)+-', "badge/version-$releaseVersionForIndex-" -replace
+        'alt="Version \d+(?:\.\d+)+"', "alt=`"Version $releaseVersionForIndex`"" -replace
+        '(latest (?:published )?release is (?:still )?\[?v)\d+(?:\.\d+)+', "`${1}$releaseVersionForIndex" -replace
+        '(latest release is \[v[^\]]*\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', "`${1}$releaseVersionForIndex" -replace
+        '(latest release is \[v[^\]]*\]\([^)\s]*\), with )\d+( patches)', "`${1}$releasePatchCountForIndex`${2}"
+    Set-Content -LiteralPath $releaseReadmePath -Encoding UTF8 -NoNewline -Value $releaseReadmeText
     # Through Invoke-FixtureGit, with the git directory proved before anything is written, for
     # the reason the toolchain fixture above gives.
     Invoke-FixtureGit -Root $releaseRepo -Arguments @('init', '--quiet') | Out-Null

@@ -283,6 +283,48 @@ if ($indexLagsSource) {
     }
 }
 
+# The version badge and the sentence naming the latest release open the README, and nothing read
+# them: a copy with both at 0.1.0 passed. They're held to the release this tree describes. While a
+# newer source is prepared over the published index, or a catalog change is held at the published
+# version, they may name the source's version and count or the published ones (the badge moves with
+# the source, the sentence with the release), and nothing else.
+$readmeVersions = @(@($releaseVersion, $publishedVersion) | Select-Object -Unique)
+$readmeCounts = @(@($patchCount, $descriptionPatchCount) | Select-Object -Unique)
+$readmeExpected = if ($readmeVersions.Count -eq 1) { "this release is $releaseVersion" } else {
+    "the source is $releaseVersion and the published release $publishedVersion"
+}
+$badgeImage = @([regex]::Matches($readme, 'img\.shields\.io/badge/version-(\d+(?:\.\d+)+)-') | ForEach-Object { $_.Groups[1].Value })
+$badgeAlt = @([regex]::Matches($readme, '\balt="Version (\d+(?:\.\d+)+)"') | ForEach-Object { $_.Groups[1].Value })
+if ($badgeImage.Count -eq 0 -or $badgeAlt.Count -eq 0) {
+    throw "README has no version badge: an img.shields.io/badge/version-$releaseVersion picture with the alt text `"Version $releaseVersion`"."
+}
+$badgeNamed = @(@($badgeImage) + @($badgeAlt) | Select-Object -Unique)
+if ($badgeNamed.Count -gt 1 -or $readmeVersions -notcontains $badgeNamed[0]) {
+    throw "README's version badge names $($badgeNamed -join ' and '), but $readmeExpected."
+}
+$latestSaid = @([regex]::Matches($readme, ('(?i)\blatest (?:published )?release is (?:still )?' +
+    '(?:\[v(?<version>\d+(?:\.\d+)+)\]\((?<link>[^)\s]*)\)|v(?<version>\d+(?:\.\d+)+))(?:,? with (?<count>\d+) patches)?')))
+if ($latestSaid.Count -eq 0) {
+    throw ("README does not say which release is the latest. It says so in one sentence: `"The latest release is " +
+        "[v$publishedVersion](<release page>), with $descriptionPatchCount patches.`"")
+}
+foreach ($said in $latestSaid) {
+    $saidVersion = $said.Groups['version'].Value
+    if ($readmeVersions -notcontains $saidVersion) {
+        throw "README says the latest release is v$saidVersion, but $readmeExpected."
+    }
+    if ($said.Groups['link'].Success -and $said.Groups['link'].Value -notmatch "/releases/tag/v$([regex]::Escape($saidVersion))$") {
+        throw "README says the latest release is v$saidVersion and links it to $($said.Groups['link'].Value)."
+    }
+    if ($said.Groups['count'].Success -and $readmeCounts -notcontains [int]$said.Groups['count'].Value) {
+        throw ("README says the latest release has $($said.Groups['count'].Value) patches, but it has " +
+            "$($readmeCounts -join ' or ').")
+    }
+}
+Write-Host ("[release] README's version badge names $($badgeNamed[0]), and it names v" +
+    (@($latestSaid | ForEach-Object { $_.Groups['version'].Value } | Select-Object -Unique) -join ' and v') +
+    ' as the latest release')
+
 # The one line GitHub shows above the README, which is also what search results, the awesome
 # lists and the Manager's community button repeat. Nothing here read it until now, and it had
 # gone two releases and two patches stale before anyone noticed. The repository it reads is the
