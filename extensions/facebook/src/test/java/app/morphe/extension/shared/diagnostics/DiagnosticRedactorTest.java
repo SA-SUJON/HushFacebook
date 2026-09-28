@@ -124,6 +124,19 @@ public class DiagnosticRedactorTest {
                 + " and mentioned [handle omitted]", text);
     }
 
+    /**
+     * A handle glued to a character outside ASCII goes after every other rule. Taken first, it took
+     * the name out of a credential, an id or a host and left the value, path or signature behind.
+     * A handle on its own, or after ASCII, goes first as before.
+     */
+    @Test public void aHandleGluedToALetterOutsideAsciiGoesAfterTheNameItHolds() {
+        assertEquals("é[handle omitted]=[omitted]", DiagnosticRedactor.redact("é@token=x1"));
+        assertEquals("josé@[host omitted]", DiagnosticRedactor.redact("josé@facebook.com/dana.q.1987"));
+        assertEquals("ユーザー[handle omitted] をブロック", DiagnosticRedactor.redact("ユーザー@dana_q をブロック"));
+        assertEquals("[handle omitted] said hi to [handle omitted]",
+                DiagnosticRedactor.redact("@dana.q said hi to @dana_q2"));
+    }
+
     @Test public void theStoryReferenceLineKeepsThePseudonymAndDropsThePostId() {
         String line = DiagnosticRedactor.redact(
                 "Hidden story: author 3f9a2c1b0e7d story_fbid=1022345678901234567");
@@ -355,6 +368,18 @@ public class DiagnosticRedactorTest {
             {"paßword=sharp spaced X6", "sharp spaced X6"},
             {"to" + KELVIN + "en=kelvinX7", "kelvinX7"},
             {"in" + (char) 0xFB06 + "all_id=ligatureX8", "ligatureX8"},
+            // An @ glued to a character outside ASCII in front of a name, a host or a CDN address.
+            {"é@token=gluedTokenH1", "gluedTokenH1"},
+            {"é@access_token=EAABgluedH2", "EAABgluedH2"},
+            {"é@c_user=gluedCUserH3", "gluedCUserH3"},
+            {"я@user_id=gluedUserIdH4", "gluedUserIdH4"},
+            {"josé@facebook.com/gluedPathH5", "gluedPathH5"},
+            {"Ошибка@fbcdn.net/v/t1/1.jpg?oh=00_gluedOhH6&oe=gluedOeH7", "gluedOhH6", "gluedOeH7"},
+            {"日@xs=gluedXsH8", "gluedXsH8"},
+            {"٣@sid=gluedDigitH9", "gluedDigitH9"},
+            {new String(Character.toChars(0x20000)) + "@token=gluedSupplementaryH10", "gluedSupplementaryH10"},
+            {LONG_S + "@token=gluedLongSH11", "gluedLongSH11"},
+            {"ユーザー@gluedHandleH12 をブロック", "gluedHandleH12"},
     });
 
     /** The digits of [ascii] written from the zero at [zero] on, as another script writes them. */
