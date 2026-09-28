@@ -456,6 +456,9 @@ public class HushfacebookPreferenceFragmentTest {
         assertEquals("the listener never ran, so this checked nothing", "spoiler", hide.getText());
         AlertDialog note = ShadowAlertDialog.getLatestAlertDialog();
         assertTrue("a note came up over a destroyed activity", note == null || !note.isShowing());
+        // The row can show the clean list while the filter still runs the old one: only the
+        // shared preferences listener carries a save into the running Setting.
+        assertEquals("the filter kept the old list", "spoiler", Settings.HIDDEN_WORDS.get());
     }
 
     /** The hide list's row counts the posts it hid since Facebook started, and never names one. */
