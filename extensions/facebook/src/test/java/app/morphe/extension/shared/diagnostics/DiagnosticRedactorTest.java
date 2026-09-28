@@ -225,6 +225,13 @@ public class DiagnosticRedactorTest {
             "fbuid", "cuid", "fbiid", "deviceguid",
     };
 
+    /** A no-break space, the long s and the Kelvin sign, built from code points so no editor swaps them. */
+    private static final String NBSP = String.valueOf((char) 0xA0);
+    private static final String LONG_S = String.valueOf((char) 0x17F);
+    private static final String KELVIN = String.valueOf((char) 0x212A);
+    /** An account id in Arabic-Indic digits, the way some languages print a number. */
+    private static final String ARABIC_INDIC_ID = inDigitsFrom(0x660, "100012345678901");
+
     public static final String[][] CREDENTIAL_CORPUS = inEveryForm(RUN_TOGETHER_NAMES, new String[][]{
             {"{\"access_token\":\"EAABjsonKeyA1\",\"locale\":\"en_US\"}", "EAABjsonKeyA1"},
             {"{\"data\":{\"viewer\":{\"session\":{\"sessionid\":\"sessNestB2\",\"uid\":\"77\"}}}}", "sessNestB2"},
@@ -339,7 +346,23 @@ public class DiagnosticRedactorTest {
             {"é@nonAsciiHandleW12", "nonAsciiHandleW12"},
             // An e followed by a combining double acute, which the JDK's \b also took for part of the word.
             {"e̋token=combiningMarkW13", "combiningMarkW13"},
+            // Spaces, digits and letters Android's engine reads another way than the JDK's.
+            {"access_token=nbspFirstX1" + NBSP + "nbspSecondX2", "nbspFirstX1", "nbspSecondX2"},
+            {"https://example.com/a" + NBSP + "nbspUrlX3", "nbspUrlX3"},
+            {"token:" + NBSP + "nbspAfterSeparatorX4", "nbspAfterSeparatorX4"},
+            {"seen " + ARABIC_INDIC_ID, ARABIC_INDIC_ID},
+            {LONG_S + "ecret=longSX5", "longSX5"},
+            {"paßword=sharp spaced X6", "sharp spaced X6"},
+            {"to" + KELVIN + "en=kelvinX7", "kelvinX7"},
+            {"in" + (char) 0xFB06 + "all_id=ligatureX8", "ligatureX8"},
     });
+
+    /** The digits of [ascii] written from the zero at [zero] on, as another script writes them. */
+    private static String inDigitsFrom(int zero, String ascii) {
+        StringBuilder digits = new StringBuilder(ascii.length());
+        for (int at = 0; at < ascii.length(); at++) digits.append((char) (zero + ascii.charAt(at) - '0'));
+        return digits.toString();
+    }
 
     /**
      * The rows, then each name as name=, as a header, in upper case, as a JSON key, as the name of
@@ -557,5 +580,42 @@ public class DiagnosticRedactorTest {
         Matcher word = Pattern.compile(".*\\\\\\\\[bBwW].*").matcher(source);
 
         if (word.find()) fail("a rule leans on \\b or \\w, which ICU reads differently: " + word.group().trim());
+    }
+
+    /**
+     * ICU's \s also takes a no-break space and its \d takes any script's digits, where the JDK's
+     * take ASCII only, so on a phone a value holding a no-break space lost only its first part. The
+     * rules spell spaces out in ASCII and write a digit as \p{Nd}, which both engines read alike.
+     */
+    @Test public void noRuleUsesASpaceOrDigitClassTheTwoEnginesReadApart() throws IOException {
+        File root = new File("").getAbsoluteFile();
+        while (!new File(root, "provenance.json").isFile()) root = root.getParentFile();
+        String source = new String(Files.readAllBytes(new File(root, "extensions/shared/library/src/main/java/"
+                + "app/morphe/extension/shared/diagnostics/DiagnosticRedactor.java").toPath()), StandardCharsets.UTF_8);
+        Matcher shorthand = Pattern.compile(".*\\\\\\\\[sSdD].*").matcher(source);
+
+        if (shorthand.find()) fail("a rule uses \\s or \\d, which ICU reads differently: " + shorthand.group().trim());
+    }
+
+    /**
+     * A letter ICU folds into ASCII when it ignores case is read both ways on both engines: as the
+     * letters it folds to, so ſecret is secret, and as an edge, like any letter outside ASCII, so
+     * the aid in ſaid is still a name. The cost shows in the report: ß comes out as ss.
+     */
+    @Test public void aNameReadsTheSameWhateverLettersSpellIt() {
+        assertEquals("secret=[omitted]", DiagnosticRedactor.redact(LONG_S + "ecret=x"));
+        assertEquals("password=[omitted]", DiagnosticRedactor.redact("paßword=a b"));
+        assertEquals("toKen=[omitted] next", DiagnosticRedactor.redact("to" + KELVIN + "en=x next"));
+        assertEquals("said=[omitted] next", DiagnosticRedactor.redact(LONG_S + "aid=x next"));
+        assertEquals("Grösse: 3 MB", DiagnosticRedactor.redact("Größe: 3 MB"));
+    }
+
+    /** A no-break space is part of a value, and an id in another script's digits is still an id. */
+    @Test public void aNoBreakSpaceOrAnotherScriptsDigitsHideNothing() {
+        assertEquals("access_token=[omitted] next", DiagnosticRedactor.redact("access_token=a" + NBSP + "b next"));
+        assertEquals("seen [id omitted] at 1790000000000",
+                DiagnosticRedactor.redact("seen " + ARABIC_INDIC_ID + " at 1790000000000"));
+        assertEquals("Hidden " + inDigitsFrom(0x660, "3") + " rows",
+                DiagnosticRedactor.redact("Hidden " + inDigitsFrom(0x660, "3") + " rows"));
     }
 }

@@ -26,6 +26,32 @@ public final class DiagnosticRedactor {
     private static final String EDGE =
             "(?-i:(?:(?<![A-Za-z0-9_])(?=[A-Za-z0-9_])|(?<=[A-Za-z0-9_])(?![A-Za-z0-9_])))";
     /**
+     * The spaces the JDK's \s means, spelled out for use inside a class in its place. ICU's \s
+     * also takes a no-break space and the other Unicode spaces, so on Android a value holding one
+     * lost only its first part. Spelled in ASCII, a value runs on past them on both engines, which
+     * leaves more out rather than less.
+     */
+    private static final String SPACE = " \\t\\n\\x0B\\f\\r";
+    /**
+     * Every letter ICU folds into plain ASCII when it ignores case and the JDK doesn't: the sharp
+     * s, its capital, the long s, the Kelvin sign and the Latin ligatures. ICU read paßword as
+     * password and toKen as token where the JDK didn't, and neither found ſecret. A letter like
+     * these can also stand where any letter outside ASCII does, before a name (ſaid=), which only
+     * the JDK's reading caught. So the rules run first with each one as an edge, then, if any is
+     * left, again with it written out as {@link #PLAIN_LETTERS}. Both engines read the text the
+     * same way in each pass, and whatever either reading finds goes. ß left in a report comes out
+     * as ss.
+     */
+    private static final String FOLDING = new String(new char[]{
+            0x00DF, 0x1E9E, 0x017F, 0x212A, 0xFB00, 0xFB01, 0xFB02, 0xFB03, 0xFB04, 0xFB05, 0xFB06});
+    /** What each letter in {@link #FOLDING} folds to. */
+    private static final String[] PLAIN_LETTERS = {"ss", "SS", "s", "K", "ff", "fi", "fl", "ffi", "ffl", "st", "st"};
+    /**
+     * The first of the noncharacters that stand in for the letters in {@link #FOLDING} during the
+     * first pass. Unicode keeps them for a program's own use, so text never carries them.
+     */
+    private static final char STAND_IN = 0xFDD0;
+    /**
      * English words holding sid, uid, iid, guid or auth, which a name may be as a whole and keep its
      * value, alone or as a yes-or-no flag ({@code isAuthor}). Not authentic or authenticate: those
      * name credentials.
@@ -99,13 +125,14 @@ public final class DiagnosticRedactor {
                     + "|'(?:[^\\\\'\\r\\n]|\\\\.)*'?"
                     + "|" + ESCAPED_QUOTE + "(?:(?!" + ESCAPED_QUOTE + ")[^\\r\\n])*(?:" + ESCAPED_QUOTE + ")?"
                     + "|&quot;(?:(?!&quot;)[^\\r\\n])*(?:&quot;)?"
-                    + "|%22(?:(?!%22)[^\\s&])*(?:%22)?)";
+                    + "|%22(?:(?!%22)[^" + SPACE + "&])*(?:%22)?)";
     /** The schemes an Authorization value names before its credential. */
     private static final String SCHEME = "(?:bearer|basic|digest|oauth|negotiate)";
     /** A credential's characters: the token68 of RFC 9110, and percent signs. */
     private static final String TOKEN = "[a-z0-9._~+/=%-]+";
     /** An indented line Java prints for a trace, which a header's continuation must never take. */
-    private static final String NOT_TRACE = "(?!at\\s|caused by:|suppressed:|\\.\\.\\.\\s)";
+    private static final String NOT_TRACE =
+            "(?!at[" + SPACE + "]|caused by:|suppressed:|\\.\\.\\.[" + SPACE + "])";
     /**
      * An Authorization or cookie header, whose whole value is private: every cookie in it, and the
      * credential after Bearer, Basic or OAuth, not only the scheme's name. A value may start on
@@ -142,7 +169,7 @@ public final class DiagnosticRedactor {
      * Ids are printed in comma separated lists, and the value pattern the credential rule uses
      * stops at the first comma, so everything after the first id stayed in the report.
      */
-    private static final String CONTENT_ID_VALUE = "\"?[^\\s;&\"'<>]+";
+    private static final String CONTENT_ID_VALUE = "\"?[^" + SPACE + ";&\"'<>]+";
     /**
      * An account id's unquoted value. A list of them may be written with spaces as well as commas,
      * so it runs on over spaces and stops only at the next name with a separator after it
@@ -161,8 +188,12 @@ public final class DiagnosticRedactor {
      * <p>Bounded by digits rather than by word edges. A CDN file name joins its ids with
      * underscores ({@code 475148478_1134540631592283_1316146539584337463_n.jpg}), an underscore is
      * a word character, and a word-bounded rule found no edge there.
+     *
+     * <p>A digit is any script's decimal digit on both engines, which is what ICU's \d means and
+     * the JDK's isn't: an id printed in Arabic-Indic digits, as some languages print numbers, went
+     * on a phone and stayed in the tests.
      */
-    private static final String BARE_CONTENT_ID = "(?<!\\d)\\d{15,21}(?!\\d)";
+    private static final String BARE_CONTENT_ID = "(?<!\\p{Nd})\\p{Nd}{15,21}(?!\\p{Nd})";
     /**
      * A creator's name, as the bundle writes it into a toast or a banner: between Unicode's
      * first-strong isolate U+2068 and its pop U+2069. Every toast is written to the buffer as it
@@ -185,17 +216,24 @@ public final class DiagnosticRedactor {
      * name ({@code com.facebook.katana}) and a longer name ({@code facebook.community}) stay.
      */
     private static final String HOST =
-            "(?i)" + EDGE + "(?:[a-z0-9-]+\\.)*" + HOST_SUFFIXES + EDGE + "(?:[:/][^\\s\"'<>]*)?";
+            "(?i)" + EDGE + "(?:[a-z0-9-]+\\.)*" + HOST_SUFFIXES + EDGE + "(?:[:/][^" + SPACE + "\"'<>]*)?";
 
     private DiagnosticRedactor() {
     }
 
     public static String redact(String text) {
         if (text == null || text.isEmpty()) return "";
+        String once = withoutPrivateValues(withStandIns(text));
+        String plain = withPlainLetters(once);
+        return plain == once ? once : withoutPrivateValues(plain);
+    }
+
+    /** Every rule, in order. */
+    private static String withoutPrivateValues(String text) {
         String passed = text
                 .replaceAll(ISOLATED_NAME, "[name omitted]")
                 .replaceAll(HANDLE, "[handle omitted]")
-                .replaceAll("(?i)" + EDGE + "[a-z][a-z0-9+.-]*://[^\\s\"'<>]+", "[url omitted]")
+                .replaceAll("(?i)" + EDGE + "[a-z][a-z0-9+.-]*://[^" + SPACE + "\"'<>]+", "[url omitted]")
                 .replaceAll(HOST, "[host omitted]")
                 .replaceAll(NAME_VALUE_PAIR, "$1[omitted]")
                 .replaceAll(HEADER, "$1=[omitted]")
@@ -204,12 +242,52 @@ public final class DiagnosticRedactor {
                         "$1=[omitted]");
         return withoutCredentialBlocks(passed)
                 .replaceAll("(?i)" + EDGE + "(" + CREDENTIAL_NAMES + ")" + SEPARATOR
-                        + "(?:" + QUOTED + "|[^\\s,&\"'<>]+)", "$1=[omitted]")
+                        + "(?:" + QUOTED + "|[^" + SPACE + ",&\"'<>]+)", "$1=[omitted]")
                 .replaceAll("(?i)" + EDGE + "(" + USER_ID_NAMES + ")" + SEPARATOR
                         + "(?:" + QUOTED + "|" + USER_ID_VALUE + ")", "$1=[omitted]")
                 .replaceAll("(?i)" + EDGE + "(" + CONTENT_ID_NAMES + ")" + SEPARATOR
                         + "(?:" + QUOTED + "|" + CONTENT_ID_VALUE + ")", "$1=[omitted]")
                 .replaceAll(BARE_CONTENT_ID, "[id omitted]");
+    }
+
+    /**
+     * The text with each letter in {@link #FOLDING} swapped for its stand-in, and any stand-in it
+     * already held (they never belong in text) for U+FFFD. Neither engine folds a stand-in into
+     * anything, and it counts as an edge, like any letter outside ASCII.
+     */
+    private static String withStandIns(String text) {
+        StringBuilder out = null;
+        for (int at = 0; at < text.length(); at++) {
+            char letter = text.charAt(at);
+            int folding = FOLDING.indexOf(letter);
+            char put;
+            if (folding >= 0) {
+                put = (char) (STAND_IN + folding);
+            } else if (letter >= STAND_IN && letter < STAND_IN + FOLDING.length()) {
+                put = (char) 0xFFFD;
+            } else {
+                if (out != null) out.append(letter);
+                continue;
+            }
+            if (out == null) out = new StringBuilder(text.length()).append(text, 0, at);
+            out.append(put);
+        }
+        return out == null ? text : out.toString();
+    }
+
+    /** The text with every stand-in left in it written out as the plain letters its letter folds to. */
+    private static String withPlainLetters(String text) {
+        StringBuilder out = null;
+        for (int at = 0; at < text.length(); at++) {
+            char letter = text.charAt(at);
+            if (letter < STAND_IN || letter >= STAND_IN + FOLDING.length()) {
+                if (out != null) out.append(letter);
+                continue;
+            }
+            if (out == null) out = new StringBuilder(text.length() + 16).append(text, 0, at);
+            out.append(PLAIN_LETTERS[letter - STAND_IN]);
+        }
+        return out == null ? text : out.toString();
     }
 
     /**
