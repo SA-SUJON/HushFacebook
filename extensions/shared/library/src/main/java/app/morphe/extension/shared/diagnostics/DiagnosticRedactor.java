@@ -203,19 +203,39 @@ public final class DiagnosticRedactor {
      */
     private static final String ISOLATED_NAME = "⁨[^⁩\\n]*⁩?";
     /**
+     * A name right after @ that the credential, user id or content id rules would otherwise
+     * redact: {@code @token}, {@code @access_token}, {@code @c_user}, {@code @user_id}. Left to
+     * {@link #HANDLE}, taken first, it took the name out of {@code @token=secret} and left the
+     * value behind, the same way a name glued to a non-ASCII letter did. {@link #NAMED_HANDLE}
+     * waits for those rules instead.
+     */
+    private static final String KNOWN_HANDLE_NAME =
+            "(?:" + CREDENTIAL_NAMES + "|" + USER_ID_NAMES + "|" + CONTENT_ID_NAMES + ")";
+    /**
      * An account handle, which starts with @ and stands on its own. One glued to something in
      * front of it is not a handle: an email address, or the identity hash Java prints after a
      * class name. Only ASCII counts as glued, as with {@link #EDGE}, so a handle straight after
      * text with no spaces, such as Japanese, still goes on both engines. That one waits for
      * {@link #GLUED_HANDLE}, since the name it holds may be a credential's ({@code é@token=}).
+     * One naming a credential or an id the redactor knows waits for {@link #NAMED_HANDLE}
+     * instead, so the value behind {@code @token=secret} is not left holding the name's = sign.
      */
-    private static final String HANDLE = "(?<![A-Za-z0-9_.@/:])(?<![^\\x00-\\x7F])@[A-Za-z0-9_.]{2,}";
+    private static final String HANDLE = "(?<![A-Za-z0-9_.@/:])(?<![^\\x00-\\x7F])@(?!(?i:"
+            + KNOWN_HANDLE_NAME + "))[A-Za-z0-9_.]{2,}";
     /**
      * A handle straight after a character outside ASCII, taken last. Taken first, it took the
      * name out of {@code é@token=secret} or {@code josé@facebook.com/dana.q.1987} and left the
      * secret or the path behind, so the credential, id and host rules see it before it goes.
      */
     private static final String GLUED_HANDLE = "(?<=[^\\x00-\\x7F])@[A-Za-z0-9_.]{2,}";
+    /**
+     * A handle naming a credential, a user id or a content id, taken last for the same reason as
+     * {@link #GLUED_HANDLE}: taken first, it left {@code @token=secret}, {@code @c_user=100012}
+     * and {@code @user_id=100012} holding their values, since the name behind the @ was gone by
+     * the time the credential, user id and content id rules ran.
+     */
+    private static final String NAMED_HANDLE = "(?<![A-Za-z0-9_.@/:])(?<![^\\x00-\\x7F])@(?=(?i:"
+            + KNOWN_HANDLE_NAME + "))[A-Za-z0-9_.]{2,}";
     /**
      * One of Facebook's hosts without a scheme, with any port or path after it. The subdomain is
      * optional: the rule asked for one, so {@code facebook.com/dana.q.1987} passed while
@@ -255,6 +275,7 @@ public final class DiagnosticRedactor {
                 .replaceAll("(?i)" + EDGE + "(" + CONTENT_ID_NAMES + ")" + SEPARATOR
                         + "(?:" + QUOTED + "|" + CONTENT_ID_VALUE + ")", "$1=[omitted]")
                 .replaceAll(BARE_CONTENT_ID, "[id omitted]")
+                .replaceAll(NAMED_HANDLE, "[handle omitted]")
                 .replaceAll(GLUED_HANDLE, "[handle omitted]");
     }
 

@@ -137,6 +137,22 @@ public class DiagnosticRedactorTest {
                 DiagnosticRedactor.redact("@dana.q said hi to @dana_q2"));
     }
 
+    /**
+     * An ASCII @ with nothing in front of it also goes first, before the credential and id rules,
+     * so @token, @access_token, @c_user and @user_id took the name for a handle and left the value
+     * behind: [handle omitted]=secret. An ordinary handle naming nothing the redactor knows still
+     * goes first as before, credential or not.
+     */
+    @Test public void aHandleNamingACredentialOrIdGoesAfterTheNameItHolds() {
+        assertEquals("[handle omitted]=[omitted]", DiagnosticRedactor.redact("@token=asciiHandleH13"));
+        assertEquals("[handle omitted]=[omitted]", DiagnosticRedactor.redact("@access_token=EAABasciiHandleH14"));
+        assertEquals("[handle omitted]=[omitted]", DiagnosticRedactor.redact("@c_user=asciiHandleH15"));
+        assertEquals("[handle omitted]=[omitted]", DiagnosticRedactor.redact("@user_id=asciiHandleH16"));
+        assertEquals("thanks [handle omitted] for the tip",
+                DiagnosticRedactor.redact("thanks @dana.q for the tip"));
+        assertEquals("mentioned [handle omitted]", DiagnosticRedactor.redact("mentioned @facebook"));
+    }
+
     @Test public void theStoryReferenceLineKeepsThePseudonymAndDropsThePostId() {
         String line = DiagnosticRedactor.redact(
                 "Hidden story: author 3f9a2c1b0e7d story_fbid=1022345678901234567");
@@ -380,6 +396,11 @@ public class DiagnosticRedactorTest {
             {new String(Character.toChars(0x20000)) + "@token=gluedSupplementaryH10", "gluedSupplementaryH10"},
             {LONG_S + "@token=gluedLongSH11", "gluedLongSH11"},
             {"ユーザー@gluedHandleH12 をブロック", "gluedHandleH12"},
+            // An @ with nothing in front of it, in front of a name the redactor knows.
+            {"@token=asciiHandleH13", "asciiHandleH13"},
+            {"@access_token=asciiHandleH14", "asciiHandleH14"},
+            {"@c_user=asciiHandleH15", "asciiHandleH15"},
+            {"@user_id=asciiHandleH16", "asciiHandleH16"},
     });
 
     /** The digits of [ascii] written from the zero at [zero] on, as another script writes them. */
