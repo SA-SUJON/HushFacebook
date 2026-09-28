@@ -39,6 +39,7 @@ Every Hushfacebook release, newest first.
 * **Tooling:** A push now stops when a text file it changes still holds an unresolved merge conflict. One reached this changelog on main and every check let it through. A Markdown heading underlined with equals signs isn't mistaken for one.
 * **Facebook:** The Morphe Manager descriptions of `Marketplace only` and `Open on a chosen tab` now say their switches start off. Marketplace only is in the default selection, so its description read as if patching alone would hide your tabs. Turn either on under Opening Facebook in Hushfacebook's settings.
 * **Facebook:** `Hide sponsored reels` can no longer pass an error into Facebook's Reels page. If a page can't be read while it's being filtered, it now goes through as Facebook sent it and the diagnostic report names the hook that failed. The section filter already worked this way. Found in a code audit, not reported by anyone.
+* **Facebook:** `Hide AI-detected reels and videos` now reads both of the signals Facebook's own Reels menu uses to offer its "AI info" row: the reel's AI attribution and the detection result on the reel itself. Before, reels on the Reels tab were checked only for the second and other reels only for the first, so a reel Facebook had flagged one way could stay. It still hides only what Facebook's detection marked, never a reel only its creator labelled. It hasn't been checked on a flagged reel yet.
 
 ## 0.3.4 (2026-09-27)
 
