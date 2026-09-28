@@ -123,6 +123,18 @@ Profiles and some Settings pages open again on this re-signed build.	Perfis e al
 Re-signed build fix	Correção para versão reassinada
 Reading the settings file	Lendo o arquivo de configurações
 Reels and Watch	Reels e Watch
+# context: the How to block Reels map at the top of Reels and Watch; the last row's %1$s is a patch name as Morphe Manager shows it, kept in English
+How to block Reels	Como bloquear os reels
+Reels show up in four places, and each one has its own control.	Os reels aparecem em quatro lugares, e cada um tem seu próprio controle.
+Reels in the feed	Reels no feed
+In News feed, Hide Reels in the feed blocks the rows of reels between posts.	Em Feed de notícias, “Ocultar reels no feed” bloqueia as fileiras de reels entre as publicações.
+Reels that play by themselves	Reels que tocam sozinhos
+In Playback, Tap to play blocks autoplay, so reels and other videos wait for your tap.	Em Reprodução, “Tocar para reproduzir” bloqueia a reprodução automática, então os reels e outros vídeos esperam seu toque.
+The Reels tab	A aba Reels
+Facebook's own setting blocks it. Open Settings, Tab bar, Customize the bar and choose Hide next to Reels, which some accounts call Video. If neither is listed, Facebook hasn't given your account that option, and Hushfacebook has no switch for the tab.	A própria configuração do Facebook bloqueia a aba. Abra Configurações, Barra de abas, Personalizar a barra e escolha Ocultar ao lado de Reels, que em algumas contas se chama Vídeo. Se nenhum dos dois aparecer, o Facebook não deu essa opção à sua conta, e o Hushfacebook não tem uma opção para a aba.
+Everything except Marketplace	Tudo menos o Marketplace
+In Opening Facebook, Marketplace only blocks the feed, the Reels tab and the other social tabs after a restart.	Em “Ao abrir o Facebook”, “Só Marketplace” bloqueia o feed, a aba Reels e as outras abas sociais depois de reiniciar.
+Not in this build. To block this, choose the %1$s patch in Morphe Manager and patch again.	Não faz parte desta versão. Para bloquear isso, escolha o patch %1$s no Morphe Manager e aplique os patches de novo.
 Remove tracking from shared links	Remover o rastreamento dos links compartilhados
 Retry	Tentar novamente
 Save any story	Salvar qualquer story

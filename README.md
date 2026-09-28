@@ -173,6 +173,19 @@ Everything Hushfacebook shows, from the settings screen to the save notification
 
 Hushfacebook pauses itself when Facebook crashes or freezes within a minute of starting three times in a row, and the screen says so. If you can't reach the screen at all, an empty file named `hushfacebook-safe-mode` in `Android/data/com.facebook.katana/files` pauses it too. It has to be in that `files` folder, not the one above it. Safe mode is the same pause. It changes what the switches answer, but every patch's code stays in place, so if Facebook keeps closing in safe mode, the cause can be Facebook itself or any patch, whichever row of the table below it's in. To find it, patch again without the patch you suspect, or with fewer patches.
 
+### Blocking Reels
+
+Reels turn up in four places, and no one switch covers them all. The Reels and Watch page opens with a short map of which control does what, and searching the settings for "block reels" finds it. Tap a line to jump straight to its setting. Looking doesn't change anything you've saved.
+
+| Where Reels show up | What blocks them |
+|---|---|
+| Rows of reels between posts in your feed | **Hide Reels in the feed**, under News feed. |
+| Reels and videos that start playing by themselves | **Tap to play**, under Playback. |
+| The Reels tab in Facebook's tab bar | Facebook's own setting: Settings, Tab bar, Customize the bar, then Hide next to Reels. Some accounts call that tab Video. |
+| Everything except Marketplace | **Marketplace only**, under Opening Facebook. After a restart it keeps Marketplace, Notifications and Profile/Menu and drops the feed, the Reels tab and the other social tabs. |
+
+Hushfacebook has no switch of its own for the Reels tab. If Customize the bar doesn't list Reels or Video, Facebook hasn't given your account that option, and Marketplace only is the one way left to lose the tab. When a patch from the table isn't in your build, its line on the map says so and names the patch to pick in Morphe Manager before you patch again. Ads inside Reels, the buttons under a reel and AI-flagged reels have switches further down the same page.
+
 ### What Pause turns off
 
 | Patch | While paused |

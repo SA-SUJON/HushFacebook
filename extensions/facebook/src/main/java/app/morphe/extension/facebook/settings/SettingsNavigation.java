@@ -177,6 +177,9 @@ final class SettingsNavigation extends BaseAdapter {
         for (Section section : sections) {
             if (preference != section.category && preference.getParent() != section.category) continue;
             navigate(section.id);
+            // A link to one setting lands on its row rather than the top of a long page.
+            int row = visible.indexOf(preference);
+            if (row > 0) showAt(row, 0);
             return true;
         }
         return false;

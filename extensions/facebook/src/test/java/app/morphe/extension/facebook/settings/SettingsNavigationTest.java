@@ -19,11 +19,18 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.PauseForTests;
+import app.morphe.extension.shared.settings.Setting;
 
 import org.junit.After;
 import org.junit.Before;
@@ -238,6 +245,66 @@ public class SettingsNavigationTest {
         return null;
     }
 
+    /**
+     * Discussion #17 asked how to block Reels. The words people type reach the map, each line whose
+     * patch is in opens its setting's page on that setting's row, and nothing saved changes.
+     */
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void blockReelsFindsTheMapAndEachLinkOpensItsSettingWithoutChangingOne() throws Exception {
+        Map<String, Object> before = savedValues();
+        findSearch(dialog.getView()).setText("block reels");
+        capture("search-block-reels");
+        assertTrue(titles().toString(), titles().containsAll(Arrays.asList("How to block Reels", "Reels in the feed",
+                "Reels that play by themselves", "The Reels tab", "Everything except Marketplace")));
+        findSearch(dialog.getView()).setText("reels");
+        assertTrue(titles().toString(), titles().contains("How to block Reels"));
+        page.navigation.back();
+
+        String[][] links = {
+                {Settings.HIDE_FEED_REELS.key, "News feed"},
+                {Settings.TAP_TO_PLAY.key, "Playback"},
+                {Settings.MARKETPLACE_ONLY.key, "Opening Facebook"}};
+        for (String[] link : links) {
+            page.navigation.navigate("Reels and Watch");
+            tap("action_show_" + link[0]);
+            layout(dialog.getView(), 1200);
+            int row = position(link[0]);
+            assertTrue(link[0] + " wasn't opened", row >= 0);
+            assertEquals(link[1], String.valueOf(((Preference) list().getItemAtPosition(row)).getParent().getTitle()));
+            assertTrue(link[0] + " is off screen at " + row + " of " + list().getFirstVisiblePosition() + ".."
+                            + list().getLastVisiblePosition(),
+                    row >= list().getFirstVisiblePosition() && row <= list().getLastVisiblePosition());
+            while (page.navigation.back()) { }
+        }
+        assertEquals(before, savedValues());
+    }
+
+    /** Without its patch a line names the patch to add, can't be tapped and says nothing is installed. */
+    @Test public void aMapLineWithoutItsPatchNamesThePatchAndGoesNowhere() {
+        controller.close();
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);
+        controller = Robolectric.buildActivity(Activity.class).setup().visible();
+        dialog = SettingsL10nTest.show(controller.get());
+        page = page(dialog);
+        Map<String, Object> before = savedValues();
+        page.navigation.navigate("Reels and Watch");
+        assertEquals(Arrays.asList("How to block Reels", "Reels in the feed", "Reels that play by themselves",
+                "The Reels tab", "Everything except Marketplace"), titles());
+        String[][] missing = {
+                {"Reels in the feed", "Hide Reels in the feed"},
+                {"Reels that play by themselves", "Tap to play"},
+                {"Everything except Marketplace", "Marketplace only"}};
+        for (String[] line : missing) {
+            int row = titles().indexOf(line[0]);
+            assertFalse(line[0] + " can be tapped", list().getAdapter().isEnabled(row));
+            assertEquals("Not in this build. To block this, choose the " + L10n.isolate(line[1])
+                    + " patch in Morphe Manager and patch again.",
+                    String.valueOf(((Preference) list().getItemAtPosition(row)).getSummary()));
+        }
+        assertNull(page.findPreference(Settings.HIDE_FEED_REELS.key));
+        assertEquals(before, savedValues());
+    }
+
     @Test public void recreationKeepsTheCategoryAndSearchQuery() {
         page.navigation.open(page.findPreference(Settings.TAP_TO_PLAY.key));
         recreate();
@@ -318,7 +385,8 @@ public class SettingsNavigationTest {
         page.navigation.back();
         findSearch(dialog.getView()).setText("Tap to play");
         layout(dialog.getView());
-        View toggle = list().getChildAt(1);
+        // The Reels map's autoplay line names the switch too, so it's found by its key, not its place.
+        View toggle = list().getChildAt(position(Settings.TAP_TO_PLAY.key) - list().getFirstVisiblePosition());
         assertEquals(android.widget.Switch.class.getName(), toggle.createAccessibilityNodeInfo().getClassName());
         assertTrue(toggle.performAccessibilityAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK, null));
         assertFalse(Settings.TAP_TO_PLAY.savedValue());
@@ -502,10 +570,26 @@ public class SettingsNavigationTest {
     private ListView list() { return dialog.getView().findViewById(android.R.id.list); }
 
     private boolean contains(String key) {
+        return position(key) >= 0;
+    }
+
+    private int position(String key) {
         for (int i = 0; i < list().getCount(); i++) {
-            if (key.equals(((Preference) list().getItemAtPosition(i)).getKey())) return true;
+            if (key.equals(((Preference) list().getItemAtPosition(i)).getKey())) return i;
         }
-        return false;
+        return -1;
+    }
+
+    private List<String> titles() {
+        List<String> titles = new ArrayList<>();
+        for (int i = 0; i < list().getCount(); i++) titles.add(String.valueOf(((Preference) list().getItemAtPosition(i)).getTitle()));
+        return titles;
+    }
+
+    private static Map<String, Object> savedValues() {
+        Map<String, Object> values = new TreeMap<>();
+        for (Setting<?> setting : Setting.allLoadedSettings()) values.put(setting.key, setting.savedValue());
+        return values;
     }
 
     private void tap(String key) {

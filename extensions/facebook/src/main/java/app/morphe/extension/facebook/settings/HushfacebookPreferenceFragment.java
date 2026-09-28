@@ -402,46 +402,61 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
         }
 
-        if (build.contains(PatchFamily.SPONSORED_REELS) || build.contains(PatchFamily.AI_DETECTED_POSTS)
-                || build.contains(PatchFamily.REEL_DECLUTTER) || build.contains(PatchFamily.REEL_WATCH_HISTORY)
-                || build.contains(PatchFamily.REEL_DOWNLOAD)) {
-            PreferenceCategory reels = category(screen, L10n.t("Reels and Watch"));
-            // Both reel filters work on each batch of reels as it arrives, so a change leaves the
-            // reels already loaded as they are, and the rows say so.
-            if (build.contains(PatchFamily.SPONSORED_REELS)) {
-                reels.addPreference(toggle(context, Settings.HIDE_SPONSORED_REELS, L10n.t("Hide sponsored reels"),
-                        L10n.t("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls "
-                                + "and app-inserted ads stay blocked even while paused.")));
-            }
-            if (build.contains(PatchFamily.AI_DETECTED_POSTS)) {
-                reels.addPreference(toggle(context, Settings.HIDE_AI_DETECTED_REELS,
-                        L10n.t("Hide AI-detected reels and videos"),
-                        L10n.t("Reels and Watch videos that Facebook's own detection marks as made with AI, starting "
-                                + "with the next batch Facebook loads. One that only its creator labelled as AI stays. "
-                                + "It's off by default because it hasn't been tested on a real account yet.")));
-            }
-            if (build.contains(PatchFamily.REEL_DECLUTTER)) {
-                reels.addPreference(toggle(context, Settings.HIDE_REEL_CHIPS,
-                        L10n.t("Hide prompts and promos under reels"),
-                        L10n.t("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps "
-                                + "and outside links. The song and other labels stay.")));
-                reels.addPreference(toggle(context, Settings.HIDE_REEL_FOLLOW_BUTTON,
-                        L10n.t("Hide the Follow button on reels"),
-                        L10n.t("The Follow button next to the reel's author. You can still follow them from their profile.")));
-                reels.addPreference(toggle(context, Settings.HIDE_REEL_SOCIAL_FOOTER,
-                        L10n.t("Hide comment and reaction previews"),
-                        L10n.t("The comment Facebook previews under a reel and the bubbles of friends who reacted. "
-                                + "Open the comments to see them all.")));
-            }
-            if (build.contains(PatchFamily.REEL_WATCH_HISTORY)) {
-                reels.addPreference(toggle(context, Settings.DONT_SEND_REEL_WATCH_HISTORY,
-                        L10n.t("Don't send reel watch history"),
-                        L10n.t("Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.")));
-            }
-            if (build.contains(PatchFamily.REEL_DOWNLOAD)) {
-                reels.addPreference(toggle(context, Settings.DOWNLOAD_REELS, L10n.t("Download button on reels"),
-                        L10n.t("Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.")));
-            }
+        // In every build: "How do I block Reels?" has four answers in four places (discussion #17),
+        // and the tab's answer is Facebook's own setting, so the map is here whatever was patched.
+        PreferenceCategory reels = category(screen, L10n.t("Reels and Watch"));
+        reels.addPreference(info(context, L10n.t("How to block Reels"),
+                L10n.t("Reels show up in four places, and each one has its own control.")));
+        reels.addPreference(reelsLink(context, build, PatchFamily.FEED_REELS, Settings.HIDE_FEED_REELS,
+                L10n.t("Reels in the feed"),
+                L10n.t("In News feed, Hide Reels in the feed blocks the rows of reels between posts.")));
+        reels.addPreference(reelsLink(context, build, PatchFamily.TAP_TO_PLAY, Settings.TAP_TO_PLAY,
+                L10n.t("Reels that play by themselves"),
+                L10n.t("In Playback, Tap to play blocks autoplay, so reels and other videos wait for your tap.")));
+        // No patch hides the tab. Facebook's own Hide does, on the accounts that have it.
+        reels.addPreference(info(context, L10n.t("The Reels tab"),
+                L10n.t("Facebook's own setting blocks it. Open Settings, Tab bar, Customize the bar and choose Hide "
+                        + "next to Reels, which some accounts call Video. If neither is listed, Facebook hasn't given "
+                        + "your account that option, and Hushfacebook has no switch for the tab.")));
+        reels.addPreference(reelsLink(context, build, PatchFamily.MARKETPLACE_ONLY, Settings.MARKETPLACE_ONLY,
+                L10n.t("Everything except Marketplace"),
+                L10n.t("In Opening Facebook, Marketplace only blocks the feed, the Reels tab and the other social "
+                        + "tabs after a restart.")));
+        // Both reel filters work on each batch of reels as it arrives, so a change leaves the
+        // reels already loaded as they are, and the rows say so.
+        if (build.contains(PatchFamily.SPONSORED_REELS)) {
+            reels.addPreference(toggle(context, Settings.HIDE_SPONSORED_REELS, L10n.t("Hide sponsored reels"),
+                    L10n.t("Ads inside Reels, starting with the next batch Facebook loads. Banners, mid-rolls "
+                            + "and app-inserted ads stay blocked even while paused.")));
+        }
+        if (build.contains(PatchFamily.AI_DETECTED_POSTS)) {
+            reels.addPreference(toggle(context, Settings.HIDE_AI_DETECTED_REELS,
+                    L10n.t("Hide AI-detected reels and videos"),
+                    L10n.t("Reels and Watch videos that Facebook's own detection marks as made with AI, starting "
+                            + "with the next batch Facebook loads. One that only its creator labelled as AI stays. "
+                            + "It's off by default because it hasn't been tested on a real account yet.")));
+        }
+        if (build.contains(PatchFamily.REEL_DECLUTTER)) {
+            reels.addPreference(toggle(context, Settings.HIDE_REEL_CHIPS,
+                    L10n.t("Hide prompts and promos under reels"),
+                    L10n.t("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps "
+                            + "and outside links. The song and other labels stay.")));
+            reels.addPreference(toggle(context, Settings.HIDE_REEL_FOLLOW_BUTTON,
+                    L10n.t("Hide the Follow button on reels"),
+                    L10n.t("The Follow button next to the reel's author. You can still follow them from their profile.")));
+            reels.addPreference(toggle(context, Settings.HIDE_REEL_SOCIAL_FOOTER,
+                    L10n.t("Hide comment and reaction previews"),
+                    L10n.t("The comment Facebook previews under a reel and the bubbles of friends who reacted. "
+                            + "Open the comments to see them all.")));
+        }
+        if (build.contains(PatchFamily.REEL_WATCH_HISTORY)) {
+            reels.addPreference(toggle(context, Settings.DONT_SEND_REEL_WATCH_HISTORY,
+                    L10n.t("Don't send reel watch history"),
+                    L10n.t("Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.")));
+        }
+        if (build.contains(PatchFamily.REEL_DOWNLOAD)) {
+            reels.addPreference(toggle(context, Settings.DOWNLOAD_REELS, L10n.t("Download button on reels"),
+                    L10n.t("Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.")));
         }
 
         if (build.contains(PatchFamily.DEFAULT_COMMENT_ORDER)) {
@@ -761,6 +776,29 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setOnPreferenceClickListener(p -> {
             showSections(context);
             return true;
+        });
+        return row;
+    }
+
+    /**
+     * One line of the Reels map. A tap goes to [setting]'s own row, and changes nothing. Without
+     * [family] in the build there's no row to go to, so the line names the patch to add instead
+     * and can't be tapped.
+     */
+    private Preference reelsLink(Context context, Set<PatchFamily> build, PatchFamily family, BooleanSetting setting,
+                                 String title, String summary) {
+        if (!build.contains(family)) {
+            return info(context, title, L10n.f("Not in this build. To block this, choose the %1$s patch in "
+                    + "Morphe Manager and patch again.", L10n.isolate(family.patchName)));
+        }
+        Row row = new Row(context);
+        row.setKey("action_show_" + setting.key);
+        row.setPersistent(false);
+        row.setTitle(title);
+        row.setSummary(summary);
+        row.setOnPreferenceClickListener(ignored -> {
+            Preference target = findPreference(setting.key);
+            return target != null && jumpTo(target);
         });
         return row;
     }
