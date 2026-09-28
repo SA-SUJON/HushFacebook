@@ -579,6 +579,12 @@ public class DiagnosticRedactorTest {
                 "Author: reel, AUTHORITY=feed, sidebar=left, isAuthor: false",
                 "guidance: short, misguided=no, fluidity=high",
                 "{\"name\":\"inside\",\"value\":\"kept\"}",
+                "authorized=true",
+                "unauthorized=true",
+                "authorize=allow",
+                "considering=x",
+                "reconsider=x",
+                "insides: kept, residuals: kept, guiding=kept, authoring=kept",
         };
         for (String line : lines) assertEquals(line, DiagnosticRedactor.redact(line));
     }
@@ -588,10 +594,12 @@ public class DiagnosticRedactorTest {
      * other name holding sid, uid, iid, guid or auth loses its value, so this is the whole list.
      */
     @Test public void everyListedOrdinaryWordKeepsItsValue() {
-        String[] words = {"inside", "outside", "beside", "insider", "residual", "residue", "consider",
-                "considered", "president", "residence", "subsidy", "upside", "downside", "aside", "sidebar",
-                "guide", "guided", "guides", "guidance", "misguided", "fluid", "fluidity", "liquid", "squid",
-                "druid", "author", "authors", "authored", "authority", "authorities", "isAuthor", "hasAuthority"};
+        String[] words = {"inside", "insides", "outside", "beside", "insider", "residual", "residuals", "residue",
+                "consider", "considers", "considering", "considered", "reconsider", "president", "residence",
+                "subsidy", "upside", "downside", "aside", "sidebar", "guide", "guided", "guides", "guiding",
+                "guidance", "misguided", "fluid", "fluidity", "liquid", "squid", "druid", "author", "authors",
+                "authored", "authoring", "authorize", "authorized", "authorizes", "authorizing", "unauthorized",
+                "authority", "authorities", "isAuthor", "hasAuthority"};
         for (String word : words) {
             for (String line : new String[]{word + ": kept", word.toUpperCase(Locale.ROOT) + "=kept",
                     "{\"" + word + "\":\"kept\"}", "{\"name\":\"" + word + "\",\"value\":\"kept\"}",

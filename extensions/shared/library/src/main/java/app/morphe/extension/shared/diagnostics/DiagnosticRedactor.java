@@ -57,9 +57,11 @@ public final class DiagnosticRedactor {
      * name credentials.
      */
     private static final String ORDINARY_WORDS =
-            "(?:is|has)?(?:inside|outside|beside|insider|residual|residue|considered|consider|president"
-                    + "|residence|subsidy|upside|downside|aside|sidebar|guided|guides|guidance|guide|misguided"
-                    + "|fluidity|fluid|liquid|squid|druid|authors|authored|author|authorities|authority)";
+            "(?:is|has)?(?:inside|insides|outside|beside|insider|residual|residuals|residue|considered|considers"
+                    + "|considering|consider|reconsider|president|residence|subsidy|upside|downside|aside|sidebar"
+                    + "|guided|guides|guiding|guidance|guide|misguided|fluidity|fluid|liquid|squid|druid|authors"
+                    + "|authored|authoring|author|authorize|authorized|authorizes|authorizing|unauthorized"
+                    + "|authorities|authority)";
     /**
      * Credential and device names. c_user, xs and datr are the cookies that make up a Facebook
      * session, and fr and sb go with them; fb_dtsg is its request token; family_device_id,
