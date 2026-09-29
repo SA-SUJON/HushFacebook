@@ -14,8 +14,8 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.extension.parameterRegister
-import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.findMutableMethodOf
@@ -57,6 +57,17 @@ val turnOffDoubleTapLikePatch = bytecodePatch(
         // view or a reader partway through can't stay in the APK while a later anchor is missing.
         val reelLikeAnchors = findReelLikeAnchors()
         val gestureViewAnchors = findGestureViewAnchors()
+        // The two hooks read different classes in every build seen so far; if a reader the gesture
+        // view hook would change ever turned out to live in the helper or the attachment, changing
+        // one hook would shift the read positions the other already recorded. Refuse rather than
+        // risk that, instead of assuming the classes stay apart.
+        val reelLikeClasses = setOf(reelLikeAnchors.helperType, reelLikeAnchors.attachment.definingClass)
+        gestureViewAnchors.plans.firstOrNull { it.reader.definingClass in reelLikeClasses }?.let {
+            refuse(
+                "${it.reader.definingClass}->${it.reader.name} is both a gesture view reader and part of the " +
+                    "reel like hooks; the two hooks can't be told apart",
+            )
+        }
         applyReelLikeAnchors(reelLikeAnchors)
         applyGestureViewAnchors(gestureViewAnchors)
         enableStatus("doubleTapLike")
@@ -97,7 +108,18 @@ private fun BytecodePatchContext.findReelLikeAnchors(): ReelLikeAnchors {
         "expected one onDoubleTap asking the reel like helper's double-tap like and loading \"$HEART_RISE\", " +
             "found ${attachments.size}",
     )
+    // Both hooks below borrow v0 at index 0, which only a method with a free local can spare.
+    // Checked here, before either mutation runs, so a method with none of its own refuses the whole
+    // hook rather than leaving the other one already changed.
+    like.requireOneLocal()
+    attachment.requireOneLocal()
     return ReelLikeAnchors(helper.type, like, doubleTapLike, key, attachment)
+}
+
+/** Throws unless [this] has at least one local register, which an injection at index 0 may borrow. */
+private fun Method.requireOneLocal() {
+    val locals = localRegisterCount()
+    if (locals < 1) refuse("$definingClass->$name has $locals local register(s), needs 1")
 }
 
 private fun BytecodePatchContext.applyReelLikeAnchors(anchors: ReelLikeAnchors) {
@@ -179,10 +201,10 @@ private fun MutableMethod.askAfterRead(read: Int, handler: FieldReference, hook:
 
 /**
  * First thing in the reel like helper's like: hand the extension the source, the last parameter,
- * and return while it holds a double tap's like back. v0 is free at index 0.
+ * and return while it holds a double tap's like back. v0 is free at index 0, checked by
+ * [requireOneLocal] before this or any other hook of this patch changes anything.
  */
 private fun MutableMethod.holdBackDoubleTapLike() {
-    requireLocals(PATCH, 1)
     addInstructionsWithLabels(
         0,
         """
@@ -215,10 +237,10 @@ private fun MutableMethod.emptyKeyAfter(taken: Int) {
 
 /**
  * First thing in the feed attachment's onDoubleTap: answer false, the tap not handled, while the
- * switch holds it back. v0 is free at index 0.
+ * switch holds it back. v0 is free at index 0, checked by [requireOneLocal] before this or any
+ * other hook of this patch changes anything.
  */
 private fun MutableMethod.leaveDoubleTapUnhandled() {
-    requireLocals(PATCH, 1)
     addInstructionsWithLabels(
         0,
         """

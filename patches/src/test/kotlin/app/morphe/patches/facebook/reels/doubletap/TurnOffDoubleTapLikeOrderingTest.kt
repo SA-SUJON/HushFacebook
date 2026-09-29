@@ -86,7 +86,8 @@ class TurnOffDoubleTapLikeOrderingTest {
         ),
     )
 
-    private fun attachment() = classDef(
+    /** [registers] lets a test shrink this to exactly its parameters, leaving no local to borrow. */
+    private fun attachment(registers: Int = 8) = classDef(
         attachmentClass,
         method(
             attachmentClass, "onDoubleTap", listOf(MOTION_EVENT), "Z",
@@ -97,6 +98,7 @@ class TurnOffDoubleTapLikeOrderingTest {
                 const/4 v0, 0x0
                 return v0
             """,
+            registers = registers,
         ),
     )
 
@@ -169,9 +171,9 @@ class TurnOffDoubleTapLikeOrderingTest {
         ),
     )
 
-    private fun build(eventSubscriberChecked: Boolean = true): BytecodePatchContext = PatchContexts.of(
+    private fun build(eventSubscriberChecked: Boolean = true, attachmentRegisters: Int = 8): BytecodePatchContext = PatchContexts.of(
         listOf(
-            helperClass(), attachment(), componentClass(), gestureView(), listenerClass(),
+            helperClass(), attachment(attachmentRegisters), componentClass(), gestureView(), listenerClass(),
             eventSubscriberClass(eventSubscriberChecked), ExtensionDex.classDef(SETTINGS_STATUS),
         ),
     )
@@ -213,6 +215,89 @@ class TurnOffDoubleTapLikeOrderingTest {
         before.forEach { (ownerAndName, originalCount) ->
             val (owner, name) = ownerAndName
             assertEquals("$owner->$name changed even though a later anchor refused", originalCount, instructionCount(context, owner, name))
+        }
+    }
+
+    /**
+     * The attachment, a later anchor than the helper's own like and double-tap like, has no free
+     * local for its hook to borrow. The whole hook must refuse before touching anything: the
+     * helper's like and double-tap like, found and checked before the attachment, must not have
+     * been changed, and neither must the gesture view, found only once the reel like anchors pass.
+     */
+    @Test
+    fun `a later anchor with no free local leaves everything unchanged`() {
+        val context = build(attachmentRegisters = 2)
+        val before = listOf(helper to "like", helper to "doubleTapLike", attachmentClass to "onDoubleTap",
+            view to "heart", listener to "onDoubleTap", eventSubscriber to "onEvent")
+            .associateWith { (owner, name) -> instructionCount(context, owner, name) }
+
+        val message = assertThrows(PatchException::class.java) { turnOffDoubleTapLikePatch.execute(context) }.message!!
+        assertTrue(message, message.contains("$attachmentClass->onDoubleTap has 0 local register(s), needs 1"))
+
+        before.forEach { (ownerAndName, originalCount) ->
+            val (owner, name) = ownerAndName
+            assertEquals("$owner->$name changed even though a later anchor had no free local", originalCount,
+                instructionCount(context, owner, name))
+        }
+    }
+
+    /**
+     * A build where the feed attachment's own class is also what the gesture view hook would
+     * change: the component mounts it instead of a separate event subscriber, and its onDoubleTap
+     * reads the handler field too, checked, so findGestureViewAnchors alone would accept it as a
+     * reader. The whole hook must still refuse: applying the reel like hook to this class would
+     * shift the read position the gesture view hook already recorded for it.
+     */
+    @Test
+    fun `a class that is both a reel like anchor and a gesture view reader refuses`() {
+        val collidingComponent = classDef(
+            component,
+            method(component, "<init>", emptyList(), "V", """
+                const-string v0, "$GESTURE_REACTION"
+                return-void
+            """),
+            method(component, "onCreateMountContent", listOf("Landroid/content/Context;"), "Ljava/lang/Object;", """
+                new-instance v0, $view
+                return-object v0
+            """),
+            // Mounts the attachment class itself, instead of a separate event subscriber.
+            method(component, "onMount", listOf("Ljava/lang/Object;"), "V", """
+                new-instance v0, $attachmentClass
+                return-void
+            """),
+        )
+        val collidingAttachment = classDef(
+            attachmentClass,
+            method(
+                attachmentClass, "onDoubleTap", listOf(MOTION_EVENT), "Z",
+                """
+                    iget-object v0, p0, $handlerField
+                    if-eqz v0, :none
+                    :none
+                    const-string v1, "$HEART_RISE"
+                    const/4 v2, 0x0
+                    invoke-virtual {v2, v2, v2, v2}, $helper->doubleTapLike(Ljava/lang/Object;Ljava/lang/Object;Z)V
+                    const/4 v0, 0x0
+                    return v0
+                """,
+                registers = 10,
+            ),
+        )
+        val context = PatchContexts.of(
+            listOf(helperClass(), collidingAttachment, collidingComponent, gestureView(), listenerClass(),
+                eventSubscriberClass(checked = true), ExtensionDex.classDef(SETTINGS_STATUS)),
+        )
+        val before = listOf(helper to "like", helper to "doubleTapLike", attachmentClass to "onDoubleTap",
+            view to "heart", listener to "onDoubleTap")
+            .associateWith { (owner, name) -> instructionCount(context, owner, name) }
+
+        val message = assertThrows(PatchException::class.java) { turnOffDoubleTapLikePatch.execute(context) }.message!!
+        assertTrue(message, message.contains("is both a gesture view reader and part of the reel like hooks"))
+
+        before.forEach { (ownerAndName, originalCount) ->
+            val (owner, name) = ownerAndName
+            assertEquals("$owner->$name changed even though the two hooks collided", originalCount,
+                instructionCount(context, owner, name))
         }
     }
 }
