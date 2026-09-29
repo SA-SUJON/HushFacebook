@@ -352,7 +352,7 @@ Every source file says where it came from in its header, and [provenance.json](p
 
 ## Building from source
 
-You need JDK 17 or newer and the Android SDK. The Morphe patcher comes from GitHub Packages, so you also need a GitHub token with `read:packages`.
+You need JDK 17 or newer and the Android SDK. The Morphe patcher comes from GitHub Packages, so you also need a GitHub token with `read:packages`. On Windows, run the unit tests on JDK 25 or newer, such as the JBR that comes with Android Studio. Older JDKs there can't rename a file over an existing one, and one of the tests needs that.
 
 ```bash
 export GITHUB_ACTOR=<your GitHub user>
