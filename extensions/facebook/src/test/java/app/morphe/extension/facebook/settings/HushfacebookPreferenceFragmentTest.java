@@ -567,7 +567,8 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse(((SwitchPreference) row).isChecked());
                 assertEquals(indexOfKey(rows, Settings.DOWNLOAD_QUALITY.key) - 1, compatible);
                 assertEquals("Save videos other apps can open", String.valueOf(row.getTitle()));
-                assertEquals("For WhatsApp, or a gallery or player that plays saves without sound. May lower quality.",
+                assertEquals("For WhatsApp, video editors such as CapCut and InShot, or a gallery or player that plays saves "
+                        + "without sound. May lower quality.",
                         String.valueOf(row.getSummary()));
             }
         }

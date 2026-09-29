@@ -304,7 +304,7 @@ Go straight to one group of settings. Back returns to where you were.	Doğrudan 
 # context: switch title under Downloads; on, every video save keeps to formats other apps accept
 Save videos other apps can open	Videoları diğer uygulamaların açabileceği biçimde kaydet
 # context: summary of that switch; WhatsApp is a name and stays as it is, and saves are the videos the user saved to the phone
-For WhatsApp, or a gallery or player that plays saves without sound. May lower quality.	WhatsApp için ya da kaydedilen videoları sessiz oynatan bir galeri veya oynatıcı için. Kaliteyi düşürebilir.
+For WhatsApp, video editors such as CapCut and InShot, or a gallery or player that plays saves without sound. May lower quality.	WhatsApp, CapCut ve InShot gibi video düzenleyiciler ya da kaydedilen videoları sessiz oynatan bir galeri veya oynatıcı için. Kaliteyi düşürebilir.
 # context: section title for the Chats settings, named like Facebook's own Chats screen
 Chats	Sohbetler
 # context: switch title under Chats; the card is Facebook's own "Get the Messenger app" card
