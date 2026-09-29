@@ -32,7 +32,7 @@ Three more GPL-3.0 repositories carry Froggo's work for 573. [ArunTS96/FroggoMor
 ## Older and smaller Facebook sources
 
 - [ReVanced](https://gitlab.com/ReVanced/revanced-patches) (GPL-3.0) has two Facebook patches, still pinned to 490.0.0.63.82, and the four Messenger patches most of the Messenger work descends from. Its [GitHub home](https://github.com/ReVanced/revanced-patches) has been blocked by a DMCA notice since March, so GitLab holds it for now.
-- [RookieEnough/De-Vanced](https://github.com/RookieEnough/De-Vanced) (GPL-3.0) carries the ReVanced pair for Facebook plus eight Messenger patches.
+- [RookieEnough/De-Vanced](https://github.com/RookieEnough/De-Vanced) (GPL-3.0). Its v1.5.0-dev.1 (commit 7c900296, 2026-09-28) replaced the old ReVanced pair with 15 Facebook patches for 580, built on runtime method search and hooking rather than fingerprints, plus eight Messenger patches. Ten of the Facebook ones match patches here. Analytics blocking beyond ads, playback quality, hold for 2x, picture-in-picture and its performance trims aren't here yet.
 - [meridianfresco/morphe-meta-patches](https://github.com/meridianfresco/morphe-meta-patches) (GPL-3.0) is a Morphe port of the ReVanced pair.
 - [chirag127/morphe-patches](https://github.com/chirag127/morphe-patches) has one Facebook patch, labelled STUB, and [Astronaut10/facebook-morphe-patches](https://github.com/Astronaut10/facebook-morphe-patches) is still the unmodified Morphe template. Both are rejected.
 
