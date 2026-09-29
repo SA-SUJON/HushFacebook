@@ -34,7 +34,7 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * <p>Light mode is left alone. A colour token is only recoloured when it arrives with the exact
  * colour Facebook's dark theme gives that token ({@link #FDS_DARK}), and a literal or a server
  * colour only when it is one of the dark surfaces no light screen uses ({@link #SURFACES}). The
- * status bar asks Facebook's own dark check ({@link #statusBar}).
+ * system bars ask Facebook's own dark check ({@link #statusBar}, {@link #navigationBar}).
  *
  * <p>With the AMOLED black theme in the same build, AMOLED goes first. Its black backgrounds
  * reach this class as black, which is no dark-theme colour, so they stay black, and this class
@@ -167,6 +167,26 @@ public final class MaterialYouTheme {
         HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
         if (amoled) color = AmoledTheme.statusBar(color, dark);
         if (!dark || !AmoledTheme.isDarkNeutral(color, AmoledTheme.MAX_BAR_CHANNEL)) return color;
+        return palette().sameLightness(TonePalette.NEUTRAL, color);
+    }
+
+    /**
+     * The navigation bar, as {@link #statusBar} does it: the Video tab writes its bars'
+     * {@code #252728} into code for both themes, and route three leaves a colour a method hands to
+     * a system bar for this hook. A dark grey in AMOLED's band for the bar takes the palette's
+     * neutral at the same lightness in the dark theme only. With AMOLED in the build its rule goes
+     * first.
+     *
+     * @return the palette's colour for a dark grey in the dark theme, otherwise {@code color}
+     */
+    public static int navigationBar(int color, boolean dark) {
+        return navigationBar(color, dark, SettingsStatus.amoledTheme());
+    }
+
+    static int navigationBar(int color, boolean dark, boolean amoled) {
+        HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
+        if (amoled) color = AmoledTheme.navigationBar(color, dark);
+        if (!dark || !AmoledTheme.isDarkNeutral(color, AmoledTheme.MAX_CHANNEL)) return color;
         return palette().sameLightness(TonePalette.NEUTRAL, color);
     }
 

@@ -4,6 +4,7 @@
  */
 package app.morphe.patches.facebook.layout.theme
 
+import app.morphe.ExtensionDex
 import app.morphe.Fixtures
 import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
@@ -41,6 +42,7 @@ class ColourResolverFixtureTest {
     fun forgetMatches() {
         DarkSchemeResolveFingerprint.clearMatch()
         FdsSchemeResolveFingerprint.clearMatch()
+        NavigationBarPainterFingerprint.clearMatch()
     }
 
     /** The call the FdsColorScheme wrapper hands the context and token to: the view resolver. */
@@ -278,6 +280,117 @@ class ColourResolverFixtureTest {
                 val answered = if (asked.toString() !in hooked && passesOn) intCalls(front).single().toString() else asked.toString()
                 assertTrue("$name: the navigation bar's view is made with $answered, which route one doesn't reach ($hooked)",
                     answered in hooked)
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", versions, checked)
+    }
+
+    /** The one static (Activity, Window, int) method of [bundle] that calls setNavigationBarColor: the navigation bar's painter. */
+    private fun navigationPainterOf(bundle: File): Method {
+        val setNavigationBarColor = "Landroid/view/Window;->setNavigationBarColor(I)V"
+        return FixtureDex.methodsWhere(bundle, { dex -> dex.methodSection.any { it.toString() == setNavigationBarColor } }) {
+            AccessFlags.STATIC.isSet(it.accessFlags) && it.returnType == "V" &&
+                it.parameterTypes.map(CharSequence::toString) == listOf("Landroid/app/Activity;", "Landroid/view/Window;", "I") &&
+                it.calls(setNavigationBarColor)
+        }.single()
+    }
+
+    /**
+     * The navigation bar's painter takes the bar hook on each declared build, on its window and its
+     * colour: AMOLED's, Material You's, and Material You's in place of AMOLED's when both are in.
+     */
+    @Test
+    fun `the navigation bar painter takes the bar hook, with AMOLED, Material You or both, on each declared build`() {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        val checked = mutableSetOf<String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                val painter = navigationPainterOf(bundle)
+                val named = FixtureDex.classes(bundle, setOf(FDS_COLOR_SCHEME, painter.definingClass))
+                val classes = named + FixtureDex.classes(bundle, setOf(viewResolverClass(named.getValue(FDS_COLOR_SCHEME))))
+                for ((amoled, you) in listOf(true to false, false to true, true to true)) {
+                    forgetMatches()
+                    val name = "${bundle.name}, AMOLED $amoled, Material You $you"
+                    val context = PatchContexts.of(classes.values)
+                    val darkCheck = with(context) {
+                        val check = fdsDarkCheck()
+                        if (amoled) hookNavigationBarColour(check)
+                        if (you) hookMaterialYouNavigationBar(check)
+                        check
+                    }
+                    val hooked = context.mutableClassDefBy(painter.definingClass).methods.single { it.descriptor() == painter.descriptor() }
+                    assertStatusBarHook(name, hooked, darkCheck, painter.implementation!!.instructions.toList(),
+                        if (you) NAVIGATION_BAR_YOU else NAVIGATION_BAR, 1, 2, setOf(NAVIGATION_BAR, NAVIGATION_BAR_YOU))
+                }
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", versions, checked)
+    }
+
+    /**
+     * Light mode on the Video tab. That tab keeps a dark surface in both themes, and Facebook writes
+     * its bars' #252728 into code: in the tab's SystemBarsController config and in the calls that
+     * paint its status bar and its navigation bar. Route three, as AMOLED, Material You or both run
+     * it, leaves those for the bar hooks, which ask Facebook's theme, and still rewrites every other
+     * #252728 in the same classes.
+     */
+    @Test
+    fun `the Video tab's bar colour reaches the bar painters as Facebook wrote it, on each declared build`() {
+        val videoGrey = -0xdad8d8
+        fun Method.writesVideoGrey() = implementation?.instructions?.count {
+            it.opcode == Opcode.CONST && (it as NarrowLiteralInstruction).narrowLiteral == videoGrey
+        } ?: 0
+
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        val checked = mutableSetOf<String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                val name = bundle.name
+                val navigation = navigationPainterOf(bundle)
+                val named = FixtureDex.classes(bundle, setOf(STATUS_BAR_UTIL, SYSTEM_BARS_CONTROLLER, navigation.definingClass))
+                val status = named.getValue(STATUS_BAR_UTIL).methods.single {
+                    AccessFlags.STATIC.isSet(it.accessFlags) && it.calls(SET_STATUS_BAR_COLOR)
+                }.descriptor()
+                val config = named.getValue(SYSTEM_BARS_CONTROLLER).methods.single {
+                    holdsString(it, "applyConfig: skipped (same as current for window)")
+                }.parameterTypes[1].toString()
+                val painters = named.getValue(navigation.definingClass).methods.map { it.descriptor() }
+                    .filter { it.endsWith("I)V") }.toSet() + status
+
+                val bars = FixtureDex.methodsWhere(bundle, { dex ->
+                    dex.methodSection.any { it.toString() in painters || it.definingClass == config && it.name == "<init>" }
+                }) { method ->
+                    method.writesVideoGrey() > 0 && method.implementation!!.instructions.any {
+                        val reference = (it as? ReferenceInstruction)?.reference
+                        reference.toString() in painters || it.opcode == Opcode.NEW_INSTANCE && reference.toString() == config
+                    }
+                }
+                val barNames = bars.map { it.descriptor() }.toSet()
+                assertTrue("$name: Facebook writes the Video tab's bar colour in $barNames", bars.size >= 3)
+                assertTrue("$name: FbChromeFragment's bar config isn't in $barNames",
+                    bars.any { it.definingClass == "Lcom/facebook/katana/fragment/FbChromeFragment;" && it.name == "getSystemBarsConfig" })
+                assertTrue("$name: no Video tab painter in $barNames",
+                    bars.any { it.definingClass == "Lcom/facebook/video/videohome/fragment/VideoHomeRootFragment;" })
+
+                val classes = named + FixtureDex.classes(bundle, bars.map { it.definingClass }.toSet() - named.keys) +
+                    (MATERIAL_YOU to ExtensionDex.classDef(MATERIAL_YOU))
+                for ((amoled, you) in listOf(true to false, false to true, true to true)) {
+                    forgetMatches()
+                    val themes = "$name, AMOLED $amoled, Material You $you"
+                    val context = PatchContexts.of(classes.values)
+                    with(context) {
+                        if (amoled) blackenColourLiterals()
+                        if (you) readSurfaceLiterals()
+                    }
+                    for (type in classes.keys - MATERIAL_YOU) {
+                        for (method in context.mutableClassDefBy(type).methods) {
+                            val bar = bars.singleOrNull { it.descriptor() == method.descriptor() }
+                            assertEquals("$themes: ${method.descriptor()} writes #252728", bar?.writesVideoGrey() ?: 0, method.writesVideoGrey())
+                        }
+                    }
+                }
                 checked += version
             }
         }

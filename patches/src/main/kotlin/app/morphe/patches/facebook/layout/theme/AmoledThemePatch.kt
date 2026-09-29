@@ -31,6 +31,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import org.w3c.dom.Element
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 
@@ -54,6 +55,12 @@ internal const val APPLY = "Lapp/morphe/extension/facebook/theme/AmoledTheme;->a
 
 /** Gets the status bar's colour and whether Facebook's theme is dark. Gives the colour to paint. */
 internal const val STATUS_BAR = "Lapp/morphe/extension/facebook/theme/AmoledTheme;->statusBar(IZ)I"
+
+/** The same for the navigation bar. */
+internal const val NAVIGATION_BAR = "Lapp/morphe/extension/facebook/theme/AmoledTheme;->navigationBar(IZ)I"
+
+/** The framework type of the window each bar painter takes. */
+private const val WINDOW = "Landroid/view/Window;"
 
 /** The framework call that turns a colour string, such as `"#FF252728"`, into a colour. */
 internal const val PARSE_COLOR = "Landroid/graphics/Color;->parseColor(Ljava/lang/String;)I"
@@ -79,9 +86,10 @@ private fun isDarkNeutral(red: Int, green: Int, blue: Int): Boolean {
  * The first route is a resolver: a component asks the design system, and the bytecode half hooks
  * the four methods that answer. The second is a resource: a view reads a colour by id, so no int
  * passes a hook, and the resource half below rewrites it. The third is a literal written in code,
- * which the bytecode half rewrites in place. The fourth is a string that the server sends, which
- * the app parses with `Color.parseColor`. The bytecode half sends each of those calls through the
- * extension.
+ * which the bytecode half rewrites in place, except where a method hands it to a system bar: the bar
+ * painters' hooks decide those, since they ask Facebook's theme. The fourth is a string that the
+ * server sends, which the app parses with `Color.parseColor`. The bytecode half sends each of those
+ * calls through the extension.
  *
  * Routes two, three and four match on the **value** or on a framework call, with no class, method
  * or resource name.
@@ -147,23 +155,17 @@ val amoledThemePatch = bytecodePatch(
         // sends the value through the extension before the method returns it.
         hookColourResolvers(mig = APPLY, fds = APPLY)
 
-        // The status bar. A tab's bar colour can come from a resolver route one doesn't reach, so
-        // the method that paints the bar asks the extension first (issue #22).
-        hookStatusBarColour(darkCheck = fdsDarkCheck())
+        // The system bars. A tab's bar colour can come from a resolver route one doesn't reach, or
+        // be written in code for both themes, so the methods that paint the bars ask the extension
+        // first, with Facebook's answer for whether the theme is dark (issue #22).
+        val darkCheck = fdsDarkCheck()
+        hookStatusBarColour(darkCheck)
+        hookNavigationBarColour(darkCheck)
 
-        // Route three. The palette tables, the top bar of the feed, the system bars and each Litho
-        // component that draws its own chrome all write a colour instead of asking for one, so no
-        // resolver and no resource reaches them. The sweep reads every class and rewrites only the
-        // classes that hold one, which takes about 30 seconds.
-        val owners = mutableSetOf<String>()
-        classDefForEach { classDef ->
-            if (classDef.methods.any { it.hasDarkColor() }) owners += classDef.type
-        }
-
-        val rewritten = owners.sumOf { type ->
-            mutableClassDefByOrNull(type)?.methods?.sumOf { it.blackenDarkColors() } ?: 0
-        }
-        check(rewritten > 0) { "No dark colour written in code, so the chrome would stay grey" }
+        // Route three. The palette tables, the top bar of the feed and each Litho component that
+        // draws its own chrome all write a colour instead of asking for one, so no resolver and no
+        // resource reaches them.
+        check(blackenColourLiterals() > 0) { "No dark colour written in code, so the chrome would stay grey" }
 
         // Route four. The server sends some colours as strings, and the app parses them with
         // Color.parseColor. Each of those calls goes to the extension instead.
@@ -277,6 +279,17 @@ internal fun BytecodePatchContext.statusBarPainter(): MutableMethod {
 }
 
 /**
+ * The method that paints the navigation bar: [NavigationBarPainterFingerprint], which has to match
+ * one method only.
+ */
+internal fun BytecodePatchContext.navigationBarPainter(): MutableMethod {
+    val painters = NavigationBarPainterFingerprint.matchAllOrNull().orEmpty()
+    return painters.singleOrNull()?.method ?: throw PatchException(
+        "${painters.size} static (Activity, Window, int) methods call setNavigationBarColor, expected one",
+    )
+}
+
+/**
  * Sends the colour of the status bar through the extension method [target], first thing in the
  * [statusBarPainter]. [target] takes the colour and whether the theme is dark, and gives the colour
  * to paint: AmoledTheme.statusBar here, MaterialYouTheme.statusBar when Material You is in the build
@@ -288,26 +301,75 @@ internal fun BytecodePatchContext.statusBarPainter(): MutableMethod {
  * what the extension answered. The extension recolours only in the dark theme, [darkCheck]
  * answering for the window's context, because light mode asks the same tokens for the same dark
  * greys.
+ */
+internal fun BytecodePatchContext.hookStatusBarColour(darkCheck: String, target: String = STATUS_BAR) =
+    statusBarPainter().hookBarColour("Status bar colour", window = 0, colour = 1, darkCheck, target)
+
+/**
+ * The same for the [navigationBarPainter], whose window and colour are its second and third
+ * parameters. [target] is AmoledTheme.navigationBar here, MaterialYouTheme.navigationBar when
+ * Material You is in the build without AMOLED.
+ */
+internal fun BytecodePatchContext.hookNavigationBarColour(darkCheck: String, target: String = NAVIGATION_BAR) =
+    navigationBarPainter().hookBarColour("Navigation bar colour", window = 1, colour = 2, darkCheck, target)
+
+/**
+ * Puts the bar hook first in this painter: the colour in parameter [colour] goes through [target]
+ * with [darkCheck]'s answer for the context of the window in parameter [window].
  *
  * `invoke` names its registers in four bits, so the window and the colour are copied down into two
  * locals first, and the answer goes back into the colour's own parameter register.
  */
-internal fun BytecodePatchContext.hookStatusBarColour(darkCheck: String, target: String = STATUS_BAR) {
-    val painter = statusBarPainter()
-    painter.requireLocals("Status bar colour", 2)
-    painter.addInstructions(
+private fun MutableMethod.hookBarColour(what: String, window: Int, colour: Int, darkCheck: String, target: String) {
+    requireLocals(what, 2)
+    addInstructions(
         0,
         """
-            move-object/from16 v0, p0
-            invoke-virtual { v0 }, Landroid/view/Window;->getContext()Landroid/content/Context;
+            move-object/from16 v0, p$window
+            invoke-virtual { v0 }, $WINDOW->getContext()Landroid/content/Context;
             move-result-object v0
             invoke-static { v0 }, $darkCheck
             move-result v0
-            move/from16 v1, p1
+            move/from16 v1, p$colour
             invoke-static { v1, v0 }, $target
-            move-result p1
+            move-result p$colour
         """,
     )
+}
+
+/**
+ * The methods that hand a colour to a system bar: each one that calls the [statusBarPainter], the
+ * [navigationBarPainter] or a method of its class that passes a colour on to it, or makes the config
+ * SystemBarsController applies, whose colour the controller hands to the status bar's painter.
+ *
+ * Route three leaves their colours as Facebook wrote them, for the painters' hooks to decide. The
+ * Video tab keeps a dark surface in light mode as well, and writes its bars' #252728 into code for
+ * both themes. A literal can't say which theme is on, and the hooks ask Facebook.
+ */
+internal fun BytecodePatchContext.systemBarColourMethods(): (Method) -> Boolean {
+    fun Method.descriptor() = "$definingClass->$name(${parameterTypes.joinToString("")})$returnType"
+    fun Method.calls(descriptors: Set<String>) = implementation?.instructions?.any {
+        ((it as? ReferenceInstruction)?.reference as? MethodReference)?.toString() in descriptors
+    } == true
+
+    val status = statusBarPainter().descriptor()
+    val navigation = navigationBarPainter()
+    val passesOn = classDefBy(navigation.definingClass).methods
+        .filter { it.parameterTypes.lastOrNull()?.toString() == "I" && it.calls(setOf(navigation.descriptor())) }
+    val painters = passesOn.map { it.descriptor() }.toSet() + navigation.descriptor() + status
+
+    val applies = classDefBy(SYSTEM_BARS_CONTROLLER).methods.filter {
+        it.parameterTypes.size == 2 && it.parameterTypes[0].toString() == WINDOW && it.calls(setOf(status))
+    }
+    val config = applies.singleOrNull()?.parameterTypes?.get(1)?.toString() ?: throw PatchException(
+        "SystemBarsController has ${applies.size} (Window, config) methods that paint the status bar, expected one",
+    )
+
+    return { method ->
+        method.calls(painters) || method.implementation?.instructions?.any {
+            it.opcode == Opcode.NEW_INSTANCE && ((it as ReferenceInstruction).reference as? TypeReference)?.type == config
+        } == true
+    }
 }
 
 /**
@@ -341,6 +403,22 @@ internal fun BytecodePatchContext.hookFdsColorsResolvers(target: String) {
             tokenParameterIndex = method.parameterTypes.indexOfFirst { it.toString() == tokenType },
             target = target,
         )
+    }
+}
+
+/**
+ * Route three over the whole app: each dark grey written in code turns black, except in the
+ * [systemBarColourMethods]. The sweep reads every class and rewrites only the classes that hold one,
+ * which takes about 30 seconds. Answers how many it rewrote.
+ */
+internal fun BytecodePatchContext.blackenColourLiterals(): Int {
+    val handsToBar = systemBarColourMethods()
+    val owners = mutableSetOf<String>()
+    classDefForEach { classDef ->
+        if (classDef.methods.any { it.hasDarkColor() }) owners += classDef.type
+    }
+    return owners.sumOf { type ->
+        mutableClassDefByOrNull(type)?.methods?.sumOf { if (handsToBar(it)) 0 else it.blackenDarkColors() } ?: 0
     }
 }
 

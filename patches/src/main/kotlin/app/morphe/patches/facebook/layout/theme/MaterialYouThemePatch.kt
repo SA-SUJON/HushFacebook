@@ -43,6 +43,9 @@ private const val PARSE_COLOR_YOU = "$MATERIAL_YOU->parseColor(Ljava/lang/String
 /** The status bar: the colour and FDS's dark check. Runs AMOLED's own first when AMOLED is in the build. */
 internal const val STATUS_BAR_YOU = "$MATERIAL_YOU->statusBar(IZ)I"
 
+/** The same for the navigation bar. */
+internal const val NAVIGATION_BAR_YOU = "$MATERIAL_YOU->navigationBar(IZ)I"
+
 /**
  * Sends the status bar's colour through the extension, first thing in the method that paints it,
  * with [darkCheck]'s answer for the window, like AMOLED's hook. With AMOLED in the build its call
@@ -51,12 +54,24 @@ internal const val STATUS_BAR_YOU = "$MATERIAL_YOU->statusBar(IZ)I"
  * through one hook in AMOLED-then-Material You order, as route four's parser does.
  */
 internal fun BytecodePatchContext.hookMaterialYouStatusBar(darkCheck: String) {
-    val painter = statusBarPainter()
-    val amoled = painter.implementation!!.instructions.indexOfFirst { it.referenceText() == STATUS_BAR }
-    if (amoled < 0) return hookStatusBarColour(darkCheck, STATUS_BAR_YOU)
+    if (!statusBarPainter().takeOverCall(STATUS_BAR, STATUS_BAR_YOU)) hookStatusBarColour(darkCheck, STATUS_BAR_YOU)
+}
 
-    val call = painter.getInstruction<FiveRegisterInstruction>(amoled)
-    painter.replaceInstruction(amoled, "invoke-static { v${call.registerC}, v${call.registerD} }, $STATUS_BAR_YOU")
+/** The same for the navigation bar's painter. */
+internal fun BytecodePatchContext.hookMaterialYouNavigationBar(darkCheck: String) {
+    if (!navigationBarPainter().takeOverCall(NAVIGATION_BAR, NAVIGATION_BAR_YOU)) {
+        hookNavigationBarColour(darkCheck, NAVIGATION_BAR_YOU)
+    }
+}
+
+/** Sends this method's call to AMOLED's [amoled] to [you] instead, on the same registers. False when there's none. */
+private fun MutableMethod.takeOverCall(amoled: String, you: String): Boolean {
+    val index = implementation!!.instructions.indexOfFirst { it.referenceText() == amoled }
+    if (index < 0) return false
+
+    val call = getInstruction<FiveRegisterInstruction>(index)
+    replaceInstruction(index, "invoke-static { v${call.registerC}, v${call.registerD} }, $you")
+    return true
 }
 
 /**
@@ -229,9 +244,11 @@ val materialYouThemePatch = bytecodePatch(
         // Route one: the Mig dark scheme, the FDSColors resolvers and the view code's theme resolver.
         hookColourResolvers(mig = MIG, fds = FDS)
 
-        // The status bar, which a tab can colour from a token none of route one's rules knows as
-        // dark (issue #22 for AMOLED).
-        hookMaterialYouStatusBar(darkCheck = fdsDarkCheck())
+        // The system bars, which a tab can colour from a token none of route one's rules knows as
+        // dark (issue #22 for AMOLED), or from a colour it writes in code for both themes.
+        val darkCheck = fdsDarkCheck()
+        hookMaterialYouStatusBar(darkCheck)
+        hookMaterialYouNavigationBar(darkCheck)
 
         // Route four. AMOLED, when it went first, has sent every call to its own parser, and the
         // extension's parser calls AMOLED's when AMOLED is in the build.
@@ -252,22 +269,32 @@ val materialYouThemePatch = bytecodePatch(
 
         // Route three. AMOLED, when it went first, has blackened all but one of these, which is why
         // finding none is fine then.
-        val fields = classDefBy(MATERIAL_YOU).fields
-            .filter { AccessFlags.STATIC.isSet(it.accessFlags) && it.type == "I" }
-            .map { it.name }
-            .toSet()
-        SURFACE_FIELDS.values.forEach { field ->
-            check(field in fields) { "$MATERIAL_YOU has no static int $field for route three to read" }
-        }
-        val owners = mutableSetOf<String>()
-        classDefForEach { classDef ->
-            if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@classDefForEach
-            if (classDef.methods.any { it.writesSurface() }) owners += classDef.type
-        }
-        val read = owners.sumOf { type ->
-            mutableClassDefByOrNull(type)?.methods?.sumOf { it.readSurfaceFields() } ?: 0
-        }
+        val read = readSurfaceLiterals()
         check(read > 0 || amoledParsers > 0) { "No dark surface written in code, so the chrome would stay grey" }
+    }
+}
+
+/**
+ * Route three over the whole app: each dark surface written in code is read from the extension field
+ * of the same name instead, except in the [systemBarColourMethods], whose colours the bar hooks
+ * decide. Answers how many it replaced.
+ */
+internal fun BytecodePatchContext.readSurfaceLiterals(): Int {
+    val handsToBar = systemBarColourMethods()
+    val fields = classDefBy(MATERIAL_YOU).fields
+        .filter { AccessFlags.STATIC.isSet(it.accessFlags) && it.type == "I" }
+        .map { it.name }
+        .toSet()
+    SURFACE_FIELDS.values.forEach { field ->
+        check(field in fields) { "$MATERIAL_YOU has no static int $field for route three to read" }
+    }
+    val owners = mutableSetOf<String>()
+    classDefForEach { classDef ->
+        if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@classDefForEach
+        if (classDef.methods.any { it.writesSurface() }) owners += classDef.type
+    }
+    return owners.sumOf { type ->
+        mutableClassDefByOrNull(type)?.methods?.sumOf { if (handsToBar(it)) 0 else it.readSurfaceFields() } ?: 0
     }
 }
 

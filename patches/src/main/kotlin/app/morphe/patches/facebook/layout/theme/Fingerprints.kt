@@ -11,6 +11,7 @@ import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.fieldAccess
 import app.morphe.patcher.methodCall
 import app.morphe.patcher.opcode
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 
 /**
@@ -30,6 +31,22 @@ internal const val FDS_COLORS = "Lcom/facebook/fds/core/theme/component/FDSColor
 internal const val FDS_COLOR_SCHEME = "Lcom/facebook/mig/scheme/schemes/fds/FdsColorScheme;"
 internal const val STATUS_BAR_UTIL = "Lcom/facebook/navigation/statusbar/StatusBarUtil;"
 internal const val SET_STATUS_BAR_COLOR = "Landroid/view/Window;->setStatusBarColor(I)V"
+internal const val SYSTEM_BARS_CONTROLLER = "Lcom/facebook/navigation/statusbar/controller/SystemBarsController;"
+
+/**
+ * The navigation bar's painter: SystemNavigationBarUtil's static (Activity, Window, int) method that
+ * calls `Window.setNavigationBarColor`, and on Android 15 and newer paints Facebook's own navigation
+ * bar view instead. Its class has a Redex name, so the fingerprint uses the shape and the framework
+ * call.
+ */
+internal object NavigationBarPainterFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC, AccessFlags.FINAL),
+    returnType = "V",
+    parameters = listOf("Landroid/app/Activity;", "Landroid/view/Window;", "I"),
+    filters = listOf(
+        methodCall(definingClass = "Landroid/view/Window;", name = "setNavigationBarColor"),
+    ),
+)
 
 /**
  * The Mig dark scheme resolver. The return type and the interface call remove the three sibling

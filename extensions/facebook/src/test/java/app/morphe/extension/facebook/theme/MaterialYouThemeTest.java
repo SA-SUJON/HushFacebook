@@ -148,6 +148,30 @@ public class MaterialYouThemeTest {
                 MaterialYouTheme.statusBar(0xFF333334, true));
     }
 
+    /**
+     * The Video tab writes #252728 for its bars in both themes, and route three leaves it for the bar
+     * hooks: light mode keeps Facebook's colour, the dark theme takes the palette's.
+     */
+    @Test
+    public void theVideoTabsWrittenBarColourKeepsFacebooksColourInLightMode() {
+        assertEquals("status bar", 0xFF252728, MaterialYouTheme.statusBar(0xFF252728, false, false));
+        assertEquals("navigation bar", 0xFF252728, MaterialYouTheme.navigationBar(0xFF252728, false, false));
+        assertEquals("with AMOLED", 0xFF252728, MaterialYouTheme.navigationBar(0xFF252728, false, true));
+        assertEquals("navigation bar, dark", palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728),
+                MaterialYouTheme.navigationBar(0xFF252728, true, false));
+    }
+
+    /** The navigation bar keeps route three's band: a sheet's lighter grey and anything else keep theirs. */
+    @Test
+    public void aNavigationBarColourOutsideTheBandFailsOpen() {
+        assertEquals("a sheet's grey", 0xFF333334, MaterialYouTheme.navigationBar(0xFF333334, true, false));
+        assertEquals("translucent", 0x26C9CCD1, MaterialYouTheme.navigationBar(0x26C9CCD1, true, false));
+        assertEquals("a dark colour with a hue", 0xFF1A2A10, MaterialYouTheme.navigationBar(0xFF1A2A10, true, false));
+        assertEquals("a white bar", 0xFFFFFFFF, MaterialYouTheme.navigationBar(0xFFFFFFFF, true, false));
+        assertEquals("black stays black", 0xFF000000, MaterialYouTheme.navigationBar(0xFF000000, true, false));
+        assertEquals("with AMOLED, its black", 0xFF000000, MaterialYouTheme.navigationBar(0xFF252728, true, true));
+    }
+
     @Test
     public void aServerColourIsRecolouredOnlyWhenItIsAKnownDarkSurface() {
         assertEquals(palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728), MaterialYouTheme.parseColor("#FF252728"));

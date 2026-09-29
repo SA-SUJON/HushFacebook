@@ -76,6 +76,26 @@ public class AmoledThemeTest {
         assertEquals("a white bar", 0xFFFFFFFF, AmoledTheme.statusBar(0xFFFFFFFF, true));
     }
 
+    /**
+     * The Video tab keeps a dark surface in light mode and writes its bars' #252728 into code for
+     * both themes. Route three leaves that colour for the bar hooks, which keep it in light mode.
+     */
+    @Test
+    public void lightModeKeepsTheVideoTabsWrittenBarColour() {
+        assertEquals("status bar", 0xFF252728, AmoledTheme.statusBar(0xFF252728, false));
+        assertEquals("navigation bar", 0xFF252728, AmoledTheme.navigationBar(0xFF252728, false));
+        assertEquals("navigation bar, dark", BLACK, AmoledTheme.navigationBar(0xFF252728, true));
+    }
+
+    /** The navigation bar keeps route three's band: the lighter grey under a sheet keeps its colour. */
+    @Test
+    public void aDarkThemeNavigationBarThatIsNoDarkGreyKeepsItsColour() {
+        assertEquals("a sheet's grey", 0xFF333334, AmoledTheme.navigationBar(0xFF333334, true));
+        assertEquals("translucent", 0x26C9CCD1, AmoledTheme.navigationBar(0x26C9CCD1, true));
+        assertEquals("a dark colour with a hue", 0xFF1A2A10, AmoledTheme.navigationBar(0xFF1A2A10, true));
+        assertEquals("a white bar", 0xFFFFFFFF, AmoledTheme.navigationBar(0xFFFFFFFF, true));
+    }
+
     /** The bar's higher threshold stays the bar's: a resolver's #333334 card keeps its colour. */
     @Test
     public void theBarThresholdDoesNotReachTheOtherRoutes() {

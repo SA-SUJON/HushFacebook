@@ -19,7 +19,7 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
 
 /**
  * Helper for the "[General] AMOLED black theme" patch. It holds the rule for route one and route
- * four, and the one for the status bar. The four routes are described with the patch, in
+ * four, and the ones for the two system bars. The four routes are described with the patch, in
  * patches/src/main/kotlin/app/morphe/patches/facebook/layout/theme/AmoledThemePatch.kt.
  *
  * <p>The decision needs the token, because a colour alone cannot show the difference between a card
@@ -42,7 +42,7 @@ public final class AmoledTheme {
      * The largest value that a channel can have and still count as a background. Measured on a
      * device: a card is {@code #252728}, but a divider is {@code #3A3B3C}.
      */
-    private static final int MAX_CHANNEL = 0x2A;
+    static final int MAX_CHANNEL = 0x2A;
 
     /**
      * The largest difference between the channels of a background. A grey has almost none. A dark
@@ -150,6 +150,22 @@ public final class AmoledTheme {
     public static int statusBar(int color, boolean dark) {
         HookStatus.invoked(FamilyNames.AMOLED_THEME);
         return dark && isDarkNeutral(color, MAX_BAR_CHANNEL) ? 0xFF000000 : color;
+    }
+
+    /**
+     * The navigation bar: the colour Facebook is about to paint it, and whether Facebook's theme is
+     * dark. The patch calls this first thing in the method that paints it.
+     *
+     * <p>The Video tab keeps a dark surface in light mode too, and writes its bars' {@code #252728}
+     * into code for both themes. Route three leaves a colour a method hands to a system bar alone,
+     * so light mode keeps it, and this hook turns it black in the dark theme. The band is route
+     * three's own: the lighter greys Facebook gives the bar under a sheet keep theirs.
+     *
+     * @return black for an opaque dark grey in the dark theme, or {@code color} unchanged.
+     */
+    public static int navigationBar(int color, boolean dark) {
+        HookStatus.invoked(FamilyNames.AMOLED_THEME);
+        return dark && isDarkNeutral(color, MAX_CHANNEL) ? 0xFF000000 : color;
     }
 
     /** True for an opaque grey with each channel at or below {@code maxChannel}. */
