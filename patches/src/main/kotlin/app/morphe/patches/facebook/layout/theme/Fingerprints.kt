@@ -33,6 +33,23 @@ internal const val STATUS_BAR_UTIL = "Lcom/facebook/navigation/statusbar/StatusB
 internal const val SET_STATUS_BAR_COLOR = "Landroid/view/Window;->setStatusBarColor(I)V"
 internal const val SYSTEM_BARS_CONTROLLER = "Lcom/facebook/navigation/statusbar/controller/SystemBarsController;"
 
+internal const val THEME_PREFERENCES_STATE = "Lcom/facebook/prefs/theme/ThemePreferences\$State;"
+
+/**
+ * Facebook's dark mode controller answering whether its dark mode is on, for the whole app: the
+ * Dark mode setting, or the system's night mode when the setting follows the system (580
+ * `LX/1QV;->A05`, 577 `LX/1L7;->A05`). It's the only method holding the end-to-end tests' dark
+ * mode switch, and it reads the setting's ThemePreferences state. An activity's own theme can force
+ * dark or light without it, which is why the answer comes from here and not from the method that
+ * applies an activity's theme.
+ */
+internal object DarkModeFingerprint : Fingerprint(
+    returnType = "Z",
+    parameters = listOf(),
+    strings = listOf("fb.e2e.enable_dark_mode"),
+    filters = listOf(fieldAccess(type = THEME_PREFERENCES_STATE)),
+)
+
 /**
  * The navigation bar's painter: SystemNavigationBarUtil's static (Activity, Window, int) method that
  * calls `Window.setNavigationBarColor`, and on Android 15 and newer paints Facebook's own navigation

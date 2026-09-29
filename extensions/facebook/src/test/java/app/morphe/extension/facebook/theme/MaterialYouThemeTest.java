@@ -19,6 +19,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import java.util.Collections;
+
 /**
  * The Material You theme's rules: what it recolours, that a colour keeps its lightness, and that
  * everything else, light mode included, is left as Facebook sent it.
@@ -53,6 +55,7 @@ public class MaterialYouThemeTest {
 
     @After
     public void restore() {
+        DarkMode.answer(true);
         MaterialYouTheme.use(TonePalette.fallback(), false);
     }
 
@@ -205,6 +208,50 @@ public class MaterialYouThemeTest {
         MaterialYouTheme.use(other, false);
         assertEquals("the fields follow a new palette", other.sameLightness(TonePalette.NEUTRAL, 0xFF252728),
                 MaterialYouTheme.DARK_252728);
+    }
+
+    /**
+     * Light mode on the Video tab. The tab stays dark there: its themed context asks FDS's dark style,
+     * whose surface is the #252728 of dark mode, its bottom bar reads that colour's resource, and its
+     * top bar writes it into code. With Facebook's own dark mode off, a colour from the forced-dark
+     * Video context keeps its value on every route.
+     */
+    @Test
+    public void lightModeKeepsAColourFromTheForcedDarkVideoContext() {
+        DarkMode.answer(false);
+        Context context = ColourResources.context(Collections.singletonMap(ColourResources.VIDEO_BAR, 0xFF252728));
+
+        assertEquals("a resolver's colour", 0xFF252728, MaterialYouTheme.fds(0xFF252728, Token.SURFACE_BACKGROUND));
+        assertEquals("the Mig dark scheme", 0xFF3A3B3C, MaterialYouTheme.mig(0xFF3A3B3C, null));
+        assertEquals("the bottom bar, Context.getColor", 0xFF252728,
+                MaterialYouTheme.getColor(context, ColourResources.VIDEO_BAR, false));
+        assertEquals("Resources.getColor", 0xFF252728,
+                MaterialYouTheme.getColor(context.getResources(), ColourResources.VIDEO_BAR, false));
+        assertEquals("a server colour", 0xFF252728, MaterialYouTheme.parseColor("#FF252728"));
+        assertEquals("a colour written in code", 0xFF252728, MaterialYouTheme.DARK_252728);
+        assertEquals("another written in code", 0xFF101011, MaterialYouTheme.DARK_101011);
+    }
+
+    /**
+     * Dark mode on the Video tab: the bottom bar Facebook reads straight from its #252728 resource
+     * takes the palette, as Home's bar does through a token. With AMOLED in the build its black stays.
+     */
+    @Test
+    public void darkModeTintsTheVideoTabsBottomBar() {
+        DarkMode.answer(false);
+        DarkMode.answer(true);
+        Context context = ColourResources.context(Collections.singletonMap(ColourResources.VIDEO_BAR, 0xFF252728));
+        int tinted = palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728);
+
+        assertEquals("the bottom bar", tinted, MaterialYouTheme.getColor(context, ColourResources.VIDEO_BAR, false));
+        assertEquals("Resources.getColor with a theme", tinted,
+                MaterialYouTheme.getColor(context.getResources(), ColourResources.VIDEO_BAR, context.getTheme(), false));
+        assertEquals("the fields hold the palette's again", tinted, MaterialYouTheme.DARK_252728);
+        assertEquals("a colour that is no dark surface", 0xFFFFFFFF,
+                MaterialYouTheme.getColor(context, android.R.color.white, false));
+
+        Context amoled = ColourResources.context(Collections.singletonMap(ColourResources.VIDEO_BAR, 0xFF000000));
+        assertEquals("AMOLED's black", 0xFF000000, MaterialYouTheme.getColor(amoled, ColourResources.VIDEO_BAR, true));
     }
 
     @Test

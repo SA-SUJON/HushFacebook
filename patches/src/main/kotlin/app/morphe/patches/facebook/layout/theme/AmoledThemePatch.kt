@@ -20,7 +20,9 @@ import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import com.android.tools.smali.dexlib2.AccessFlags
 import app.morphe.patcher.patch.resourcePatch
+import app.morphe.patcher.resource.ResourceType
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
+import app.morphe.util.returnEarly
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
@@ -71,6 +73,47 @@ internal const val PARSE_COLOR_DARK = "Lapp/morphe/extension/facebook/theme/Amol
 /** The classes of the extension. Route four skips them, because the replacement calls the original. */
 internal const val EXTENSION_PACKAGE = "Lapp/morphe/extension/"
 
+private const val AMOLED = "Lapp/morphe/extension/facebook/theme/AmoledTheme;"
+
+/** Facebook's answer for whether its dark mode is on goes through this on its way back. */
+internal const val DARK_MODE_ANSWER = "Lapp/morphe/extension/facebook/theme/DarkMode;->answer(Z)Z"
+
+/** The framework calls that read a colour resource, which route two's rewrites reach code through. */
+internal const val CONTEXT_GET_COLOR = "Landroid/content/Context;->getColor(I)I"
+internal const val RESOURCES_GET_COLOR = "Landroid/content/res/Resources;->getColor(I)I"
+internal const val RESOURCES_GET_THEMED_COLOR =
+    "Landroid/content/res/Resources;->getColor(ILandroid/content/res/Resources\$Theme;)I"
+internal const val TYPED_ARRAY_GET_COLOR = "Landroid/content/res/TypedArray;->getColor(II)I"
+
+/**
+ * The static method of [owner] that stands in for the framework call [framework]: same name and
+ * parameters, with the object a virtual call was made on in front. `Color.parseColor` is static
+ * itself and has nothing in front.
+ */
+internal fun standIn(owner: String, framework: String): String {
+    val receiver = framework.substringBefore("->")
+    val call = framework.substringAfter("->")
+    return if (framework == PARSE_COLOR) {
+        "$owner->$call"
+    } else {
+        "$owner->${call.substringBefore("(")}($receiver${call.substringAfter("(")}"
+    }
+}
+
+/**
+ * Where AMOLED sends each framework colour call: route four's `Color.parseColor`, and the reads of
+ * a colour resource, which in light mode give a black route two wrote back as Facebook's colour.
+ */
+internal val AMOLED_COLOUR_CALLS: Map<String, String> =
+    listOf(PARSE_COLOR, CONTEXT_GET_COLOR, RESOURCES_GET_COLOR, RESOURCES_GET_THEMED_COLOR, TYPED_ARRAY_GET_COLOR)
+        .associateWith { standIn(AMOLED, it) }
+
+/**
+ * Route two's table for the extension, which the resource half writes and the bytecode half puts
+ * in AmoledTheme.routeTwoColours: each colour resource it wrote black over, with Facebook's colour.
+ */
+internal var routeTwoRestores = ""
+
 /**
  * True for a dark grey, which is what a background uses. False for a dark colour with a hue, which
  * is a banner and keeps its colour. The extension holds the same rule for the colours it gets.
@@ -79,6 +122,9 @@ private fun isDarkNeutral(red: Int, green: Int, blue: Int): Boolean {
     val high = maxOf(red, green, blue)
     return high <= MAX_CHANNEL && high - minOf(red, green, blue) <= MAX_SPREAD
 }
+
+private const val DEFAULT_COLORS = "res/values/colors.xml"
+private const val NIGHT_COLORS = "res/values-night/colors.xml"
 
 /**
  * A colour reaches the screen by four routes, and this patch covers all four with one rule.
@@ -91,6 +137,11 @@ private fun isDarkNeutral(red: Int, green: Int, blue: Int): Boolean {
  * server sends, which the app parses with `Color.parseColor`. The bytecode half sends each of those
  * calls through the extension.
  *
+ * The Video tab stays dark in light mode, from the same dark style and the same colour resources as
+ * dark mode, so the extension also asks Facebook's own answer for dark mode ([hookDarkModeAnswer]).
+ * In light mode routes one and four leave Facebook's colour, and the code's reads of a colour
+ * resource get back what route two wrote black over ([routeTwoTable], [rerouteColourCalls]).
+ *
  * Routes two, three and four match on the **value** or on a framework call, with no class, method
  * or resource name.
  * Facebook strips resource names and renames its classes about every two weeks, so a name is not an
@@ -99,15 +150,22 @@ private fun isDarkNeutral(red: Int, green: Int, blue: Int): Boolean {
 private val amoledThemeResourcePatch = resourcePatch {
     execute {
         var changed = 0
+        val rewritten = mutableMapOf<String, Int>()
+        val rewrittenAtNight = mutableSetOf<String>()
+        val references = mutableMapOf<String, String>()
 
-        listOf("res/values/colors.xml", "res/values-night/colors.xml")
+        listOf(DEFAULT_COLORS, NIGHT_COLORS)
             .filter { get(it, false).exists() }
             .forEach { path ->
                 document(path).use { document ->
                     val colors = document.getElementsByTagName("color")
                     for (index in 0 until colors.length) {
                         val color = colors.item(index) as? Element ?: continue
-                        if (!isDarkBackground(color.textContent)) continue
+                        val name = color.getAttribute("name")
+                        val value = color.textContent.trim()
+                        if (path == DEFAULT_COLORS && value.startsWith("@color/")) references[name] = value.removePrefix("@color/")
+                        if (!isDarkBackground(value)) continue
+                        if (path == DEFAULT_COLORS) rewritten[name] = checkNotNull(argb(value)) else rewrittenAtNight += name
                         color.textContent = "#ff000000"
                         changed++
                     }
@@ -115,7 +173,61 @@ private val amoledThemeResourcePatch = resourcePatch {
             }
 
         check(changed > 0) { "No dark colour resource found, so the theme would stay grey" }
+
+        routeTwoRestores = routeTwoTable(rewritten, rewrittenAtNight, references) { name ->
+            resourceIds.getOrNull(ResourceType.COLOR, name) ?: decodedColourId(name)
+        }
+        check(routeTwoRestores.isNotEmpty()) {
+            "No colour route two rewrote has a resource id, so light mode's Video tab would stay black"
+        }
     }
+}
+
+/**
+ * Route two's table for AmoledTheme.routeTwoColours: each default colour it wrote black over, with
+ * the colour Facebook had there, and each default colour that only points at one of those, as
+ * `"id=colour;..."` in hex and sorted by id.
+ *
+ * Facebook keeps its dark palette in the default configuration: the dark style points at it, and so
+ * does the Video tab, which stays dark in light mode. In light mode the extension reads a black from
+ * one of these as Facebook's colour again. A colour route two also wrote over at night is left out,
+ * since there a black could be the night one, and so is one that was black already.
+ */
+internal fun routeTwoTable(
+    rewritten: Map<String, Int>,
+    rewrittenAtNight: Set<String>,
+    references: Map<String, String>,
+    id: (String) -> Long?,
+): String {
+    val restorable = rewritten.filter { (name, colour) -> name !in rewrittenAtNight && colour != BLACK }
+    val pointing = references.mapNotNull { (name, target) ->
+        restorable[target]?.takeIf { name !in rewrittenAtNight }?.let { name to it }
+    }
+    return (restorable + pointing).mapNotNull { (name, colour) -> id(name)?.let { it to colour } }
+        .sortedBy { it.first }
+        .joinToString(";") { (id, colour) -> "%x=%08x".format(id, colour) }
+}
+
+/**
+ * The id in the name the resource decoder gives a colour whose name Facebook stripped, such as
+ * `color_0x7f0601f4` for 0x7f0601f4. The patcher's own id table only knows names the APK carries,
+ * and Facebook's dark palette carries none.
+ */
+internal fun decodedColourId(name: String): Long? =
+    Regex("color_0x([0-9a-f]{8})").matchEntire(name)?.groupValues?.get(1)?.toLong(16)
+
+/**
+ * A resource colour's value as an int, for `#rgb`, `#argb`, `#rrggbb` and `#aarrggbb`, or null for
+ * anything else, a reference such as `@color/foo` included.
+ */
+private fun argb(value: String): Int? {
+    val hex = value.trim().removePrefix("#")
+    if (hex.length !in setOf(3, 4, 6, 8)) return null
+    if (!hex.all { it.isDigit() || it.lowercaseChar() in 'a'..'f' }) return null
+
+    // Widen #rgb and #argb to two digits for each channel.
+    val wide = if (hex.length <= 4) hex.map { "$it$it" }.joinToString("") else hex
+    return (if (wide.length == 6) "ff$wide" else wide).toLong(16).toInt()
 }
 
 /**
@@ -123,16 +235,9 @@ private val amoledThemeResourcePatch = resourcePatch {
  * false, and so does a translucent value, which is a scrim and not a background.
  */
 private fun isDarkBackground(value: String): Boolean {
-    val hex = value.trim().removePrefix("#")
-    if (hex.length !in setOf(3, 4, 6, 8)) return false
-    if (!hex.all { it.isDigit() || it.lowercaseChar() in 'a'..'f' }) return false
-
-    // Widen #rgb and #argb to two digits for each channel.
-    val wide = if (hex.length <= 4) hex.map { "$it$it" }.joinToString("") else hex
-    if (wide.length == 8 && wide.take(2).toInt(16) != 0xFF) return false
-
-    val (red, green, blue) = wide.takeLast(6).chunked(2).map { it.toInt(16) }
-    return isDarkNeutral(red, green, blue)
+    val colour = argb(value) ?: return false
+    if (colour ushr 24 != 0xFF) return false
+    return isDarkNeutral((colour shr 16) and 0xFF, (colour shr 8) and 0xFF, colour and 0xFF)
 }
 
 @Suppress("unused")
@@ -151,6 +256,10 @@ val amoledThemePatch = bytecodePatch(
     dependsOn(facebookExtensionPatch)
 
     execute {
+        // Facebook's own answer for whether its dark mode is on, which every route asks: the Video
+        // tab stays dark in light mode, from the same dark style and colour resources.
+        hookDarkModeAnswer()
+
         // Route one. Four methods and six returns. Each hook keeps the body of the method and
         // sends the value through the extension before the method returns it.
         hookColourResolvers(mig = APPLY, fds = APPLY)
@@ -168,17 +277,15 @@ val amoledThemePatch = bytecodePatch(
         check(blackenColourLiterals() > 0) { "No dark colour written in code, so the chrome would stay grey" }
 
         // Route four. The server sends some colours as strings, and the app parses them with
-        // Color.parseColor. Each of those calls goes to the extension instead.
-        val parsers = mutableSetOf<String>()
-        classDefForEach { classDef ->
-            if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@classDefForEach
-            if (classDef.methods.any { it.callsParseColor() }) parsers += classDef.type
+        // Color.parseColor. Each of those calls goes to the extension instead, and so does each
+        // read of a colour resource, where light mode gets back what route two wrote black over.
+        val rerouted = rerouteColourCalls(AMOLED_COLOUR_CALLS)
+        check(rerouted.getValue(PARSE_COLOR) > 0) { "No call to Color.parseColor found, so server colours would stay grey" }
+        check(rerouted.getValue(CONTEXT_GET_COLOR) > 0) {
+            "No call to Context.getColor found, so light mode's Video tab would keep route two's black"
         }
-
-        val rerouted = parsers.sumOf { type ->
-            mutableClassDefByOrNull(type)?.methods?.sumOf { it.rerouteParseColor() } ?: 0
-        }
-        check(rerouted > 0) { "No call to Color.parseColor found, so server colours would stay grey" }
+        check(routeTwoRestores.isNotEmpty()) { "Route two's table is empty, so light mode's Video tab would stay black" }
+        fillRouteTwoTable(routeTwoRestores)
 
         enableStatus("amoledTheme")
     }
@@ -433,36 +540,87 @@ private fun Instruction.isDarkColor(): Boolean {
     )
 }
 
-/** True when this instruction calls `Color.parseColor`. */
-internal fun Instruction.isParseColorCall(): Boolean =
-    (this as? ReferenceInstruction)?.reference?.toString() == PARSE_COLOR
-
-/** True when this method calls `Color.parseColor`. It only reads, thus it needs no proxy. */
-private fun Method.callsParseColor(): Boolean =
-    implementation?.instructions?.any { it.isParseColorCall() } == true
+/** The framework call this instruction makes, when it's one [rerouteColourCalls] may move. */
+private fun Instruction.movableCall(): String? = when (opcode) {
+    // Only calls that dispatch as before once the extension makes them. A super call inside an
+    // override would come back to the override and never end.
+    Opcode.INVOKE_VIRTUAL, Opcode.INVOKE_VIRTUAL_RANGE, Opcode.INVOKE_STATIC, Opcode.INVOKE_STATIC_RANGE ->
+        (this as ReferenceInstruction).reference.toString()
+    else -> null
+}
 
 /**
- * Sends each call to `Color.parseColor` in this method to the extension. Answers how many it sent.
+ * Route four and route two's read back, over the whole app: each call to a key of [calls] goes to
+ * the extension method it maps to instead. Answers how many calls it sent, for each key.
  *
- * The replacement has the same signature and reads the same register, so the `move-result` that
- * follows stays correct. A call in the range form stays in the range form, because its register
- * can be above v15.
+ * One sweep reads every class and rewrites only the classes that make one of the calls. The
+ * extension is skipped, because its methods make the framework calls themselves.
  */
-private fun MutableMethod.rerouteParseColor(): Int {
-    val sites = (implementation ?: return 0).instructions.withIndex()
-        .filter { it.value.isParseColorCall() }
+internal fun BytecodePatchContext.rerouteColourCalls(calls: Map<String, String>): Map<String, Int> {
+    val owners = mutableSetOf<String>()
+    classDefForEach { classDef ->
+        if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@classDefForEach
+        if (classDef.methods.any { method -> method.implementation?.instructions?.any { it.movableCall() in calls } == true }) {
+            owners += classDef.type
+        }
+    }
+    val counts = calls.keys.associateWith { 0 }.toMutableMap()
+    owners.forEach { type -> mutableClassDefByOrNull(type)?.methods?.forEach { it.rerouteColourCalls(calls, counts) } }
+    return counts
+}
 
-    sites.asReversed().forEach { (index, instruction) ->
+/**
+ * Sends each call to a key of [calls] in this method to the extension method it maps to, and counts
+ * it in [counts].
+ *
+ * The stand-in is static, takes the object a virtual call was made on as its first parameter and
+ * has the call's own parameters after it, so it reads the same registers in the same order and the
+ * `move-result` that follows stays correct. A call in the range form stays in the range form,
+ * because its registers can be above v15.
+ */
+internal fun MutableMethod.rerouteColourCalls(calls: Map<String, String>, counts: MutableMap<String, Int>) {
+    val sites = (implementation ?: return).instructions.withIndex()
+        .mapNotNull { (index, instruction) -> instruction.movableCall()?.takeIf { it in calls }?.let { Triple(index, instruction, it) } }
+
+    sites.asReversed().forEach { (index, instruction, framework) ->
+        val target = calls.getValue(framework)
         val call = when (instruction) {
-            is RegisterRangeInstruction ->
-                "invoke-static/range { v${instruction.startRegister} .. v${instruction.startRegister} }, " +
-                    PARSE_COLOR_DARK
-            is FiveRegisterInstruction -> "invoke-static { v${instruction.registerC} }, $PARSE_COLOR_DARK"
+            is RegisterRangeInstruction -> {
+                val last = instruction.startRegister + instruction.registerCount - 1
+                "invoke-static/range { v${instruction.startRegister} .. v$last }, $target"
+            }
+            is FiveRegisterInstruction -> {
+                val registers = listOf(instruction.registerC, instruction.registerD, instruction.registerE,
+                    instruction.registerF, instruction.registerG).take(instruction.registerCount)
+                "invoke-static { ${registers.joinToString { "v$it" }} }, $target"
+            }
             else -> error("$definingClass->$name: unexpected call form ${instruction.opcode}")
         }
         replaceInstruction(index, call)
+        counts[framework] = counts.getValue(framework) + 1
     }
-    return sites.size
+}
+
+/** Puts route two's [table] in AmoledTheme.routeTwoColours, for light mode to read colours back. */
+internal fun BytecodePatchContext.fillRouteTwoTable(table: String) {
+    val stub = mutableClassDefBy(AMOLED).methods.singleOrNull {
+        it.name == "routeTwoColours" && it.parameterTypes.isEmpty() && it.returnType == "Ljava/lang/String;"
+    } ?: throw PatchException("AmoledTheme has no routeTwoColours() for route two's table")
+    stub.returnEarly(table)
+}
+
+/**
+ * Sends each answer of Facebook's dark mode controller through [DARK_MODE_ANSWER], right before
+ * [DarkModeFingerprint]'s method returns it. Facebook asks that method as each activity applies its
+ * theme, and again after the setting or the system's night mode changes, so the extension always
+ * has its latest answer. Both themes call this, and the second finds the hook already there.
+ */
+internal fun BytecodePatchContext.hookDarkModeAnswer() {
+    val method = DarkModeFingerprint.method
+    if (method.implementation!!.instructions.any { (it as? ReferenceInstruction)?.reference?.toString() == DARK_MODE_ANSWER }) {
+        return
+    }
+    method.hookReturns("dark mode answer") { register -> "invoke-static { v$register }, $DARK_MODE_ANSWER" }
 }
 
 /** True when this method writes a dark grey. It only reads, thus it needs no proxy of the class. */
@@ -511,6 +669,21 @@ internal fun MutableMethod.blackenDarkColors(): Int {
  * just the same and recolours by the wrong token.
  */
 internal fun MutableMethod.hookColorReturns(tokenParameterIndex: Int, target: String) {
+    val tokenRegister = parameterRegisterNumber(tokenParameterIndex)
+
+    check(tokenRegister < 16) {
+        "$definingClass->$name: token register v$tokenRegister is out of invoke-static range"
+    }
+    requireParameterIntact("Colour token hook", tokenParameterIndex, returnSites("int to recolour").map { it.first })
+
+    hookReturns("int to recolour") { register -> "invoke-static { v$register, v$tokenRegister }, $target" }
+}
+
+/**
+ * Each `return` of this method, with the register it returns, checked for a hook before it: none
+ * is a branch target, and each register fits `invoke-static`. [what] names what the method returns.
+ */
+private fun MutableMethod.returnSites(what: String): List<Pair<Int, Int>> {
     val implementation = checkNotNull(implementation) { "$definingClass->$name has no body" }
     val instructions = implementation.instructions.toList()
 
@@ -528,26 +701,29 @@ internal fun MutableMethod.hookColorReturns(tokenParameterIndex: Int, target: St
         .filter { it.value.opcode == Opcode.RETURN }
         .map { it.index to (it.value as OneRegisterInstruction).registerA }
 
-    check(returns.isNotEmpty()) { "$definingClass->$name returns no int to recolour" }
-
-    val tokenRegister = parameterRegisterNumber(tokenParameterIndex)
-
-    check(tokenRegister < 16) {
-        "$definingClass->$name: token register v$tokenRegister is out of invoke-static range"
-    }
-    requireParameterIntact("Colour token hook", tokenParameterIndex, returns.map { it.first })
-
-    returns.asReversed().forEach { (index, register) ->
+    check(returns.isNotEmpty()) { "$definingClass->$name returns no $what" }
+    returns.forEach { (index, register) ->
         check(register < 16) {
             "$definingClass->$name: return register v$register is out of invoke-static range"
         }
         check(index !in branchTargets) {
             "$definingClass->$name: the return at index $index is a branch target"
         }
+    }
+    return returns
+}
+
+/**
+ * Puts [call] (made on the returned register) and a `move-result` into it before each `return` of
+ * this method, so what it returns is what the call answers. The hooks go in from last to first,
+ * because an insert moves every later index.
+ */
+private fun MutableMethod.hookReturns(what: String, call: (register: Int) -> String) {
+    returnSites(what).asReversed().forEach { (index, register) ->
         addInstructions(
             index,
             """
-                invoke-static { v$register, v$tokenRegister }, $target
+                ${call(register)}
                 move-result v$register
             """,
         )
