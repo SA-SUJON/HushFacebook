@@ -622,11 +622,13 @@ public class MediaSaveTest {
     }
 
     /**
-     * The single-file path used to weigh "lower" against a guess read off the chosen address
-     * ({@link RenditionPicker#qualityOf}). Here the fallback's address claims 1080p, exactly what
-     * the manifest's own track states too, so the old guess-based compare found nothing above it
-     * and said nothing was lower. The file that's actually fetched measures 360p, and the person
-     * saving must be told regardless of what its address claimed.
+     * The single-file path used to weigh the report's "below the manifest's" note only against a
+     * guess read off the chosen address ({@link RenditionPicker#qualityOf}), before anything was
+     * fetched. Here the fallback's address claims 1080p, exactly what the manifest's own track
+     * states too, so that guess-based compare found nothing above it and the note never appeared,
+     * even though the file that's actually fetched measures 360p. The old assertion below pinned
+     * that gap as if it were correct; the note must appear, built from what the file measures, not
+     * the address it happened to be named after.
      */
     @Test
     public void aMisleadingFileNameDoesNotHideAShortfall() throws InterruptedException {
@@ -655,8 +657,44 @@ public class MediaSaveTest {
         String toast = String.valueOf(ShadowToast.getTextOfLatestToast());
         assertTrue(toast, toast.startsWith("Saved to ") && toast.endsWith(" in lower quality than on Facebook"));
         String report = LogBufferManager.buildExportText();
-        assertFalse("the guess-based line found nothing above an address that (falsely) already claimed 1080p",
-                report.contains("below the manifest's"));
+        assertTrue("the report now measures the saved file instead of trusting the address it was fetched from",
+                report.contains("below the manifest's video/mp4 vp09.00.40.08 1080x1920 2000kbps 1080p"));
+    }
+
+    /**
+     * A DASH save of a writable H.264 track can fail for reasons that have nothing to do with what
+     * the phone can write, such as a dropped connection ({@link #aSaveBelowTheManifestsPictureSaysSoWhenItEnds}).
+     * The fallback single file here measures exactly two thirds of that track's picture, the exact
+     * boundary {@link MediaDownload#noticeablyLower} leaves alone for a picture nothing could have
+     * written. That tolerance doesn't apply here: the phone could write the 1080p track, so the
+     * person saving is told regardless of where the boundary falls.
+     */
+    @Test
+    public void aWritableTracksShortfallIsToldEvenAtTheTwoThirdsBoundary() throws InterruptedException {
+        byte[] body = mp4(4096);
+        serve("/clip_720p.mp4", "video/mp4", body, body.length);
+        DashManifest.Track video = new DashManifest.Track("video/mp4", "avc1.64001f", 1080, 1920, 3_000_000,
+                origin + "/gone.mp4", 1080);
+        int port = server.port();
+        MediaUrlPolicy measuring = new MediaUrlPolicy(host -> new InetAddress[] { InetAddress.getByName("10.9.8.7") }) {
+            @Override
+            Refusal refusal(URL url) {
+                if (url.getPath().equals("/clip_720p.mp4")) describeSavedVideoWorkFile(1280, 720);
+                if (url.getHost().equals("127.0.0.1") && url.getPort() == port) return null;
+                return super.refusal(url);
+            }
+        };
+        MediaDownload.policyForTests = measuring;
+
+        Thread worker = MediaDownload.start(context, true, MediaDownload.dashJob(context, video, null,
+                origin + "/clip_720p.mp4"));
+        worker.join(30_000);
+        assertFalse("the save never finished", worker.isAlive());
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+
+        assertEquals(1, gallery.inserts.size());
+        String toast = String.valueOf(ShadowToast.getTextOfLatestToast());
+        assertTrue(toast, toast.startsWith("Saved to ") && toast.endsWith(" in lower quality than on Facebook"));
     }
 
     /**
