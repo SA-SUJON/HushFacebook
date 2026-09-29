@@ -370,9 +370,12 @@ public final class MediaDownload {
      * The largest picture of [tracks] that fits [quality] and is larger than a saved one of quality
      * [saved], whatever its format, or null: the picture Facebook's player can show that the save
      * didn't keep. VP9 is one, since an MP4 can't hold it, and so is AV1 before Android 14. For
-     * the smallest file there's never one, and a saved quality nobody stated has none either.
+     * the smallest file there's never one, and a saved quality nobody stated has none either. Purely
+     * informational: this doesn't ask whether the phone could have written [better], only whether
+     * the manifest offered it. {@link #noticeablyLower} is what decides whether the person saving
+     * is told.
      */
-    private static DashManifest.Track better(List<DashManifest.Track> tracks, int saved, DownloadQuality quality) {
+    static DashManifest.Track better(List<DashManifest.Track> tracks, int saved, DownloadQuality quality) {
         DashManifest.Track better = null;
         for (DashManifest.Track track : tracks) {
             if (!track.isVideo()) continue;
@@ -384,8 +387,21 @@ public final class MediaDownload {
     }
 
     /** A track's quality as [quality] weighs it: its short side at the best, else its label. */
-    private static int picture(DashManifest.Track track, DownloadQuality quality) {
+    static int picture(DashManifest.Track track, DownloadQuality quality) {
         return quality == DownloadQuality.BEST ? track.shortSide() : track.quality();
+    }
+
+    /**
+     * Whether a saved picture of [saved] pixels on its short side is far enough below [best], the
+     * manifest's best within the Download quality, that the person saving should be told. Below
+     * 720, or below two thirds of [best]: a 720p save whose only bigger rendition is a codec nothing
+     * on the phone could turn into a file isn't told, since 720 is what the phone would have saved
+     * either way, but a 360p save with a real 1080p rendition on offer is. The gap is what's judged,
+     * never whether the phone could write [best]: {@link #better} already found it regardless of
+     * that, and the report names it either way.
+     */
+    static boolean noticeablyLower(int saved, int best) {
+        return saved > 0 && best > saved && (saved < 720 || (long) saved * 3 < (long) best * 2);
     }
 
     /**
@@ -459,18 +475,21 @@ public final class MediaDownload {
 
     /** The save of one single file at [url]: the job every save of a single file runs. */
     static Job fileJob(Context application, String url, Downloader.Kind kind) {
-        return (writer, progress) -> saveFile(application, url, kind, null, false, writer, progress);
+        return (writer, progress) -> saveFile(application, url, kind, null, java.util.Collections.emptyList(),
+            writer, progress);
     }
 
     /**
      * One checked file, fetched into the cache and then published. Its work file keeps, with those
      * of every other running save, to the free space ({@link DashSave#fetchWork}). A saved video's
      * report line says what the file holds, and [why] when a manifest's tracks were passed over
-     * for it (bounded; null when the file was simply the pick). [lower] when the file is below the
-     * manifest's picture, so the person saving is told.
+     * for it (bounded; null when the file was simply the pick). [offered] is what the person saving
+     * is told against, once the file is down: the saved picture is measured from the file itself,
+     * never guessed from its address, and weighed against [offered] to decide whether the save is
+     * told it's lower than what Facebook offered.
      */
     private static Downloader.Result saveFile(Context application, String url, Downloader.Kind kind, String why,
-            boolean lower, MediaStoreWriter writer, Downloader.Progress progress) {
+            List<DashManifest.Track> offered, MediaStoreWriter writer, Downloader.Progress progress) {
         java.io.File folder = DashSave.workFolder(application);
         if (folder == null) return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "no cache folder");
         java.io.File file = null;
@@ -479,10 +498,16 @@ public final class MediaDownload {
             Downloader.Result fetched = DashSave.fetchWork(url, kind, file, policyFor(application), cap(), progress);
             if (!fetched.ok()) return fetched;
             Downloader.Result published = Downloader.publish(file, fetched.mime, writer, progress);
+            boolean lower = false;
             if (published.ok() && kind == Downloader.Kind.VIDEO) {
                 String holds = DashSave.savedFormat(file);
                 info(() -> "the saved file holds " + holds + (why == null ? "" : ". Saved in place of the manifest's "
                     + "tracks because " + bounded(why)));
+                if (!offered.isEmpty()) {
+                    int savedShortSide = DashSave.savedVideoShortSide(file);
+                    DashManifest.Track better = better(offered, savedShortSide, quality());
+                    lower = better != null && noticeablyLower(savedShortSide, better.shortSide());
+                }
             }
             return published.ok() && lower ? published.lower() : published;
         } catch (Throwable t) {
@@ -653,14 +678,17 @@ public final class MediaDownload {
             + qualityNote(quality) + compatibleNote(keptCompatible) + soundNote(audio) + belowNote(better));
 
         Downloader.Result result = dashJob(application, video, audio, fallback).run(writer, progress);
-        return result.ok() && better != null ? result.lower() : result;
+        boolean lower = better != null && noticeablyLower(picture(video, quality), better.shortSide());
+        return result.ok() && lower ? result.lower() : result;
     }
 
     /**
      * The best single video file of [urls], for a save whose manifest didn't win: [dash] says why
      * for the save line, and [why] for the line of what was saved, or null when the file was simply
-     * the better pick. A video only, since the save was started as one. Below a picture of the
-     * manifest's [tracks], the report and the person saving are told.
+     * the better pick. A video only, since the save was started as one. The save line below reports
+     * against a guess of [video]'s own quality, since nothing has been fetched yet to measure; once
+     * the file is down, {@link #saveFile} weighs the person saving's "lower" note against what it
+     * actually measures, not this guess.
      */
     private static Downloader.Result saveSingleVideo(Context application, List<String> urls,
             List<DashManifest.Track> tracks, Dash dash, String why, MediaStoreWriter writer,
@@ -676,7 +704,7 @@ public final class MediaDownload {
         }
         DashManifest.Track better = better(tracks, RenditionPicker.qualityOf(video), quality);
         saving(true, video, meta, quality, dash, better);
-        return saveFile(application, video, Downloader.Kind.VIDEO, why, better != null, writer, progress);
+        return saveFile(application, video, Downloader.Kind.VIDEO, why, tracks, writer, progress);
     }
 
     /**
@@ -706,7 +734,7 @@ public final class MediaDownload {
             failure(() -> "the DASH save ended with " + result + ", saving " + describe(fallback) + belowNote(better),
                 null);
             return saveFile(application, fallback, Downloader.Kind.VIDEO, "the DASH save ended with " + result,
-                better != null, writer, progress);
+                java.util.Collections.singletonList(video), writer, progress);
         };
     }
 

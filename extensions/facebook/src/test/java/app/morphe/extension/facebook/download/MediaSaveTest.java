@@ -576,7 +576,9 @@ public class MediaSaveTest {
     /**
      * A DASH save whose tracks couldn't be fetched falls back to the single file, which is below the
      * picture the manifest offered. The person saving is told it's lower than on Facebook, not just
-     * that it was saved; a single file that was simply the pick is told nothing more.
+     * that it was saved; a single file that was simply the pick is told nothing more. The "lower"
+     * note is weighed against what the saved file actually measures, so the policy here tells the
+     * shadow extractor what the fetched file holds, the way a real save's own read of it would.
      */
     @Test
     public void aSaveBelowTheManifestsPictureSaysSoWhenItEnds() throws InterruptedException {
@@ -584,6 +586,16 @@ public class MediaSaveTest {
         serve("/clip_360p.mp4", "video/mp4", body, body.length);
         DashManifest.Track video = new DashManifest.Track("video/mp4", "avc1.64001f", 1080, 1920, 3_000_000,
                 origin + "/gone.mp4", 1080);
+        int port = server.port();
+        MediaUrlPolicy measuring = new MediaUrlPolicy(host -> new InetAddress[] { InetAddress.getByName("10.9.8.7") }) {
+            @Override
+            Refusal refusal(URL url) {
+                if (url.getPath().equals("/clip_360p.mp4")) describeSavedVideoWorkFile(640, 360);
+                if (url.getHost().equals("127.0.0.1") && url.getPort() == port) return null;
+                return super.refusal(url);
+            }
+        };
+        MediaDownload.policyForTests = measuring;
 
         Thread worker = MediaDownload.start(context, true, MediaDownload.dashJob(context, video, null,
                 origin + "/clip_360p.mp4"));
@@ -607,6 +619,59 @@ public class MediaSaveTest {
         Shadows.shadowOf(Looper.getMainLooper()).idle();
         toast = String.valueOf(ShadowToast.getTextOfLatestToast());
         assertTrue(toast, toast.startsWith("Saved to ") && !toast.contains("lower quality"));
+    }
+
+    /**
+     * The single-file path used to weigh "lower" against a guess read off the chosen address
+     * ({@link RenditionPicker#qualityOf}). Here the fallback's address claims 1080p, exactly what
+     * the manifest's own track states too, so the old guess-based compare found nothing above it
+     * and said nothing was lower. The file that's actually fetched measures 360p, and the person
+     * saving must be told regardless of what its address claimed.
+     */
+    @Test
+    public void aMisleadingFileNameDoesNotHideAShortfall() throws InterruptedException {
+        byte[] body = mp4(4096);
+        serve("/clip_1080p.mp4", "video/mp4", body, body.length);
+        DashManifest.Track video = new DashManifest.Track("video/mp4", "vp09.00.40.08", 1080, 1920, 2_000_000,
+                origin + "/vp9.mp4", 1080);
+        int port = server.port();
+        MediaUrlPolicy measuring = new MediaUrlPolicy(host -> new InetAddress[] { InetAddress.getByName("10.9.8.7") }) {
+            @Override
+            Refusal refusal(URL url) {
+                if (url.getPath().equals("/clip_1080p.mp4")) describeSavedVideoWorkFile(640, 360);
+                if (url.getHost().equals("127.0.0.1") && url.getPort() == port) return null;
+                return super.refusal(url);
+            }
+        };
+        MediaDownload.policyForTests = measuring;
+
+        Thread worker = MediaDownload.start(context, true, MediaDownload.dashJob(context, video, null,
+                origin + "/clip_1080p.mp4"));
+        worker.join(30_000);
+        assertFalse("the save never finished", worker.isAlive());
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+
+        assertEquals(1, gallery.inserts.size());
+        String toast = String.valueOf(ShadowToast.getTextOfLatestToast());
+        assertTrue(toast, toast.startsWith("Saved to ") && toast.endsWith(" in lower quality than on Facebook"));
+        String report = LogBufferManager.buildExportText();
+        assertFalse("the guess-based line found nothing above an address that (falsely) already claimed 1080p",
+                report.contains("below the manifest's"));
+    }
+
+    /**
+     * Gives the next single-file save's temp video the measured size a real save reads back, the
+     * way {@link #describeWorkFiles} does for a join's own work files.
+     */
+    private void describeSavedVideoWorkFile(int width, int height) {
+        File[] files = DashSave.workFolder(context).listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            if (file.getName().startsWith("video")) {
+                ShadowMediaExtractor.addTrack(DataSource.toDataSource(file.getPath()),
+                        MediaFormat.createVideoFormat("video/avc", width, height), new byte[0]);
+            }
+        }
     }
 
     /** A save the list can hold has its row on it before the first byte, as a stopped save needs. */

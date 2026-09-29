@@ -422,6 +422,28 @@ final class DashSave {
     private static final int MAX_DESCRIBED_TRACKS = 4;
 
     /**
+     * The short side of the first video track [file] holds, in pixels, or 0 when it has none or the
+     * phone can't read it. What a save's "lower" note is weighed against: the file that actually
+     * reached the gallery, never a label read off its address or a track's own declared size.
+     */
+    static int savedVideoShortSide(File file) {
+        MediaExtractor extractor = null;
+        try {
+            extractor = new MediaExtractor();
+            extractor.setDataSource(file.getPath());
+            MediaFormat format = selectTrack(extractor, "video/");
+            if (format == null) return 0;
+            Integer width = number(format, MediaFormat.KEY_WIDTH);
+            Integer height = number(format, MediaFormat.KEY_HEIGHT);
+            return width == null || height == null ? 0 : Math.min(width, height);
+        } catch (Throwable t) {
+            return 0;
+        } finally {
+            if (extractor != null) attempt(null, extractor::release);
+        }
+    }
+
+    /**
      * What [file] holds, read back from the file itself: each track's codec and profile, its size or
      * its sample rate and channels, and its duration. Reports like #11 and #14 can't be settled from
      * a candidate's address, its quality label or an MP4 type. What the file doesn't say is

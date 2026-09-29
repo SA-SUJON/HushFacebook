@@ -293,6 +293,42 @@ public class SaveQualityTest {
         }
     }
 
+    /**
+     * What a DASH save's own "lower" note weighs. {@link MediaDownload#better} finds the manifest's
+     * biggest offered picture regardless of whether the phone could ever write it, so the report can
+     * always name it; {@link MediaDownload#noticeablyLower} is the separate gate that decides whether
+     * the person saving is bothered by it. A 720p save whose only bigger rendition is an AV1 track
+     * the phone can't mux isn't told: 720 is what the phone would have saved either way. A 480p save
+     * under the same manifest is, whatever wrote the bigger track.
+     */
+    @Test
+    public void aWritableSaveIsNotToldOverAGapNothingCouldClose() {
+        DashManifest.Track av1 = new DashManifest.Track("video/mp4", "av01.0.09m.08", 1920, 1080, 2_500_000,
+                "https://video-iad3-1.xx.fbcdn.net/o1/v/t2/f2/m69/av1.mp4?oh=1&oe=2", 1080);
+        java.util.List<DashManifest.Track> offered = java.util.Collections.singletonList(av1);
+
+        DashManifest.Track better = MediaDownload.better(offered, 720, DownloadQuality.BEST);
+        assertSame("the report still names the AV1 rendition, whether or not the phone can write it", av1, better);
+        assertFalse("a 720p save is what the phone would have saved either way",
+                MediaDownload.noticeablyLower(720, better.shortSide()));
+
+        better = MediaDownload.better(offered, 480, DownloadQuality.BEST);
+        assertSame(av1, better);
+        assertTrue("a real gap is still worth telling, whatever wrote the bigger track",
+                MediaDownload.noticeablyLower(480, better.shortSide()));
+    }
+
+    /** The exact boundary {@link MediaDownload#noticeablyLower} draws: below 720, or below two thirds of the best. */
+    @Test
+    public void noticeablyLowerDrawsTheLineAtTwoThirdsOr720() {
+        assertFalse("720 of 1080 is exactly two thirds: not a gap worth a nag", MediaDownload.noticeablyLower(720, 1080));
+        assertTrue("719 is a hair under 720, so it's told", MediaDownload.noticeablyLower(719, 1080));
+        assertTrue("360 of 1080 is a real shortfall", MediaDownload.noticeablyLower(360, 1080));
+        assertFalse("nothing measured means nothing to compare", MediaDownload.noticeablyLower(0, 1080));
+        assertFalse("nothing bigger on offer means nothing to tell", MediaDownload.noticeablyLower(720, 720));
+        assertFalse("721 clears both the floor and two thirds of 1080", MediaDownload.noticeablyLower(721, 1080));
+    }
+
     /** Before the settings can be read, a save asks for the best, as every save did before. */
     @Test
     public void beforeTheSettingsAreReadyASaveAsksForTheBest() {
