@@ -205,19 +205,30 @@ final class Downloader {
         final String reason;
         /** The type of what was fetched, once it is known to be one. */
         final String mime;
+        /**
+         * The saved picture is below the best one the manifest offered within the quality setting,
+         * the one Facebook's player can show, so the person saving is told.
+         */
+        final boolean lower;
 
-        private Result(Status status, String reason, String mime) {
+        private Result(Status status, String reason, String mime, boolean lower) {
             this.status = status;
             this.reason = reason;
             this.mime = mime;
+            this.lower = lower;
         }
 
         static Result ok(String mime) {
-            return new Result(Status.OK, null, mime);
+            return new Result(Status.OK, null, mime, false);
         }
 
         static Result fail(Status status, String reason) {
-            return new Result(status, reason, null);
+            return new Result(status, reason, null, false);
+        }
+
+        /** This result, told that the saved picture is below the manifest's. */
+        Result lower() {
+            return new Result(status, reason, mime, true);
         }
 
         boolean ok() {

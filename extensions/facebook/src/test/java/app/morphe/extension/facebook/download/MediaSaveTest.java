@@ -573,6 +573,42 @@ public class MediaSaveTest {
         assertEquals(0, published.size());
     }
 
+    /**
+     * A DASH save whose tracks couldn't be fetched falls back to the single file, which is below the
+     * picture the manifest offered. The person saving is told it's lower than on Facebook, not just
+     * that it was saved; a single file that was simply the pick is told nothing more.
+     */
+    @Test
+    public void aSaveBelowTheManifestsPictureSaysSoWhenItEnds() throws InterruptedException {
+        byte[] body = mp4(4096);
+        serve("/clip_360p.mp4", "video/mp4", body, body.length);
+        DashManifest.Track video = new DashManifest.Track("video/mp4", "avc1.64001f", 1080, 1920, 3_000_000,
+                origin + "/gone.mp4", 1080);
+
+        Thread worker = MediaDownload.start(context, true, MediaDownload.dashJob(context, video, null,
+                origin + "/clip_360p.mp4"));
+        worker.join(30_000);
+        assertFalse("the save never finished", worker.isAlive());
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+
+        assertEquals(1, gallery.inserts.size());
+        String toast = String.valueOf(ShadowToast.getTextOfLatestToast());
+        assertTrue(toast, toast.startsWith("Saved to ") && toast.endsWith(" in lower quality than on Facebook"));
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("below the manifest's video/mp4 avc1.64001f 1080x1920 3000kbps 1080p, "
+                + "the best it offers within the Download quality"));
+
+        ShadowToast.reset();
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(gallery.videoUri(2),
+                new ByteArrayOutputStream());
+        Thread plain = MediaDownload.start(context, true, MediaDownload.fileJob(context, origin + "/clip_360p.mp4",
+                Downloader.Kind.VIDEO));
+        plain.join(30_000);
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        toast = String.valueOf(ShadowToast.getTextOfLatestToast());
+        assertTrue(toast, toast.startsWith("Saved to ") && !toast.contains("lower quality"));
+    }
+
     /** A save the list can hold has its row on it before the first byte, as a stopped save needs. */
     @Test
     public void aGoodSaveListsItsRowBeforeTheFirstByte() {

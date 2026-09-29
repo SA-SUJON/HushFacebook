@@ -152,6 +152,8 @@ Save folder	Kayıt klasörü
 Save full report	Tam raporu kaydet
 Saved to %1$s	Şuraya kaydedildi: %1$s
 Saved to the gallery	Galeriye kaydedildi
+Saved to %1$s in lower quality than on Facebook	Şuraya Facebook'takinden düşük kalitede kaydedildi: %1$s
+Saved to the gallery in lower quality than on Facebook	Galeriye Facebook'takinden düşük kalitede kaydedildi
 Saved. Restart Facebook to apply this change.	Kaydedildi. Bu değişikliği uygulamak için Facebook'u yeniden başlat.
 Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.	Anahtarlarını ve indirme ayarlarını bir dosyaya kaydet. Duraklatma ve Hata ayıklama günlüğü dahil edilmez, sürüm denetimi de edilmez.
 # The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.

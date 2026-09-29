@@ -152,6 +152,8 @@ Save folder	Folder simpan
 Save full report	Simpan laporan lengkap
 Saved to %1$s	Disimpan ke %1$s
 Saved to the gallery	Disimpan ke galeri
+Saved to %1$s in lower quality than on Facebook	Disimpan ke %1$s dengan kualitas lebih rendah daripada di Facebook
+Saved to the gallery in lower quality than on Facebook	Disimpan ke galeri dengan kualitas lebih rendah daripada di Facebook
 Saved. Restart Facebook to apply this change.	Tersimpan. Mulai ulang Facebook untuk menerapkan perubahan ini.
 Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.	Simpan sakelar dan pengaturan unduhan Anda ke sebuah file. Jeda dan Pencatatan debug tidak disertakan, begitu pula pemeriksaan rilis.
 # The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.

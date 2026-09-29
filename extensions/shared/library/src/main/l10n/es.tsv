@@ -152,6 +152,8 @@ Save folder	Carpeta de guardado
 Save full report	Guardar informe completo
 Saved to %1$s	Se guardó en %1$s
 Saved to the gallery	Se guardó en la galería
+Saved to %1$s in lower quality than on Facebook	Se guardó en %1$s con menos calidad que en Facebook
+Saved to the gallery in lower quality than on Facebook	Se guardó en la galería con menos calidad que en Facebook
 Saved. Restart Facebook to apply this change.	Guardado. Reinicia Facebook para aplicar este cambio.
 Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.	Guarda tus interruptores y los ajustes de descarga en un archivo. La pausa y el Registro de depuración no se incluyen, y la búsqueda de nuevas versiones tampoco.
 # The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.

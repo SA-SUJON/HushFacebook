@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(840);
+        Map<String, String> table = new HashMap<>(844);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -52,6 +52,7 @@ public final class L10nTranslations {
         fillDe4(table);
         fillDe5(table);
         fillDe6(table);
+        fillDe7(table);
         return table;
     }
 
@@ -656,21 +657,25 @@ public final class L10nTranslations {
                 "Speichert deine Schalter und die Download-Einstellungen in einer Datei. Pause und Debug-Protokollierung sind nicht enthalten, die Suche nach neuen Versionen auch nicht.");
         table.put("Saved to %1$s",
                 "Gespeichert unter %1$s");
+        table.put("Saved to %1$s in lower quality than on Facebook",
+                "Gespeichert unter %1$s, in geringerer Qualit\u00e4t als auf Facebook");
         table.put("Saved to the gallery",
                 "In der Galerie gespeichert");
+        table.put("Saved to the gallery in lower quality than on Facebook",
+                "In der Galerie gespeichert, in geringerer Qualit\u00e4t als auf Facebook");
         table.put("Saved videos will be named %1$s.",
                 "Gespeicherte Videos hei\u00dfen dann %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Gespeichert. Starte Facebook neu, um diese \u00c4nderung zu \u00fcbernehmen.");
         table.put("Saves will go to a folder named %1$s.",
                 "Was du speicherst, landet dann in einem Ordner namens %1$s.");
+    }
+
+    private static void fillDe5(Map<String, String> table) {
         table.put("Saving a photo",
                 "Foto wird gespeichert");
         table.put("Saving a video",
                 "Video wird gespeichert");
-    }
-
-    private static void fillDe5(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Einstellungsdatei wird gespeichert");
         table.put("Saving...",
@@ -787,13 +792,13 @@ public final class L10nTranslations {
                 "Die neueste Version von Hushfacebook ist %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Die Reihe mit Stories von Personen, mit denen du nicht verbunden bist, die Facebook zwischen die Beitr\u00e4ge setzt. Die Stories deiner Freunde und die Stories-Leiste bleiben.");
+    }
+
+    private static void fillDe6(Map<String, String> table) {
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen und die auf deinem eigenen Profil.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Die Reihe mit Gruppen zum Beitreten zwischen den Beitr\u00e4gen, samt ihrem Button \u201eWeitere Gruppen entdecken\u201c. Beitr\u00e4ge aus deinen Gruppen bleiben.");
-    }
-
-    private static void fillDe6(Map<String, String> table) {
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Die Reihe mit Stories oben im Feed, \u201eStory erstellen\u201c eingeschlossen.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -910,6 +915,9 @@ public final class L10nTranslations {
                 "der Fix f\u00fcr neu signierte Builds");
         table.put("the recoloured dark mode",
                 "die Umf\u00e4rbung des Dunkelmodus");
+    }
+
+    private static void fillDe7(Map<String, String> table) {
         table.put("the rename of the shared permissions",
                 "die Umbenennung der gemeinsamen Berechtigungen");
         table.put("the settings row in Facebook's Menu",
@@ -917,7 +925,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(840);
+        Map<String, String> table = new HashMap<>(844);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -925,6 +933,7 @@ public final class L10nTranslations {
         fillEs4(table);
         fillEs5(table);
         fillEs6(table);
+        fillEs7(table);
         return table;
     }
 
@@ -1529,21 +1538,25 @@ public final class L10nTranslations {
                 "Guarda tus interruptores y los ajustes de descarga en un archivo. La pausa y el Registro de depuraci\u00f3n no se incluyen, y la b\u00fasqueda de nuevas versiones tampoco.");
         table.put("Saved to %1$s",
                 "Se guard\u00f3 en %1$s");
+        table.put("Saved to %1$s in lower quality than on Facebook",
+                "Se guard\u00f3 en %1$s con menos calidad que en Facebook");
         table.put("Saved to the gallery",
                 "Se guard\u00f3 en la galer\u00eda");
+        table.put("Saved to the gallery in lower quality than on Facebook",
+                "Se guard\u00f3 en la galer\u00eda con menos calidad que en Facebook");
         table.put("Saved videos will be named %1$s.",
                 "Los videos guardados se llamar\u00e1n %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Guardado. Reinicia Facebook para aplicar este cambio.");
         table.put("Saves will go to a folder named %1$s.",
                 "Lo que guardes ir\u00e1 a una carpeta llamada %1$s.");
+    }
+
+    private static void fillEs5(Map<String, String> table) {
         table.put("Saving a photo",
                 "Guardando una foto");
         table.put("Saving a video",
                 "Guardando un video");
-    }
-
-    private static void fillEs5(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Guardando el archivo de configuraci\u00f3n");
         table.put("Saving...",
@@ -1660,13 +1673,13 @@ public final class L10nTranslations {
                 "La versi\u00f3n m\u00e1s reciente de Hushfacebook es la %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "La fila de historias de personas con las que no tienes conexi\u00f3n que Facebook pone entre las publicaciones. Las historias de tus amigos y la bandeja de historias se quedan.");
+    }
+
+    private static void fillEs6(Map<String, String> table) {
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "La fila de sugerencias de amistad entre las publicaciones y la de tu propio perfil.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "La fila de grupos para unirte entre las publicaciones, con su bot\u00f3n Descubrir m\u00e1s grupos. Las publicaciones de tus grupos se quedan.");
-    }
-
-    private static void fillEs6(Map<String, String> table) {
         table.put("The row of stories at the top of the feed, Create story included.",
                 "La fila de historias en la parte superior del feed, con \u201cCrear historia\u201d incluida.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -1783,6 +1796,9 @@ public final class L10nTranslations {
                 "el arreglo para la nueva firma");
         table.put("the recoloured dark mode",
                 "el cambio de colores del modo oscuro");
+    }
+
+    private static void fillEs7(Map<String, String> table) {
         table.put("the rename of the shared permissions",
                 "el cambio de nombre de los permisos compartidos");
         table.put("the settings row in Facebook's Menu",
@@ -1790,7 +1806,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(840);
+        Map<String, String> table = new HashMap<>(844);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -1798,6 +1814,7 @@ public final class L10nTranslations {
         fillIn4(table);
         fillIn5(table);
         fillIn6(table);
+        fillIn7(table);
         return table;
     }
 
@@ -2402,21 +2419,25 @@ public final class L10nTranslations {
                 "Simpan sakelar dan pengaturan unduhan Anda ke sebuah file. Jeda dan Pencatatan debug tidak disertakan, begitu pula pemeriksaan rilis.");
         table.put("Saved to %1$s",
                 "Disimpan ke %1$s");
+        table.put("Saved to %1$s in lower quality than on Facebook",
+                "Disimpan ke %1$s dengan kualitas lebih rendah daripada di Facebook");
         table.put("Saved to the gallery",
                 "Disimpan ke galeri");
+        table.put("Saved to the gallery in lower quality than on Facebook",
+                "Disimpan ke galeri dengan kualitas lebih rendah daripada di Facebook");
         table.put("Saved videos will be named %1$s.",
                 "Video yang disimpan akan diberi nama %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Tersimpan. Mulai ulang Facebook untuk menerapkan perubahan ini.");
         table.put("Saves will go to a folder named %1$s.",
                 "Semua yang Anda simpan akan masuk ke folder bernama %1$s.");
+    }
+
+    private static void fillIn5(Map<String, String> table) {
         table.put("Saving a photo",
                 "Menyimpan foto");
         table.put("Saving a video",
                 "Menyimpan video");
-    }
-
-    private static void fillIn5(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Menyimpan file pengaturan");
         table.put("Saving...",
@@ -2533,13 +2554,13 @@ public final class L10nTranslations {
                 "Rilis Hushfacebook terbaru adalah %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Deretan Cerita dari orang yang tidak terhubung dengan Anda, yang diselipkan Facebook di antara postingan. Cerita teman Anda dan deretan Cerita tetap ada.");
+    }
+
+    private static void fillIn6(Map<String, String> table) {
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "Deretan saran pertemanan di antara postingan, dan deretan di profilmu sendiri.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Deretan grup untuk diikuti di antara postingan, beserta tombol Temukan grup lainnya. Postingan dari grup tempat Anda bergabung tetap ada.");
-    }
-
-    private static void fillIn6(Map<String, String> table) {
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Deretan cerita di bagian atas Kabar Beranda, termasuk \u201cBuat cerita\u201d.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -2656,6 +2677,9 @@ public final class L10nTranslations {
                 "perbaikan build yang ditandatangani ulang");
         table.put("the recoloured dark mode",
                 "mode gelap yang diwarnai ulang");
+    }
+
+    private static void fillIn7(Map<String, String> table) {
         table.put("the rename of the shared permissions",
                 "penggantian nama izin bersama");
         table.put("the settings row in Facebook's Menu",
@@ -2663,7 +2687,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(840);
+        Map<String, String> table = new HashMap<>(844);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -2671,6 +2695,7 @@ public final class L10nTranslations {
         fillPt_rBR4(table);
         fillPt_rBR5(table);
         fillPt_rBR6(table);
+        fillPt_rBR7(table);
         return table;
     }
 
@@ -3275,21 +3300,25 @@ public final class L10nTranslations {
                 "Salve suas op\u00e7\u00f5es e configura\u00e7\u00f5es de download em um arquivo. Pausa e Registro de depura\u00e7\u00e3o n\u00e3o s\u00e3o inclu\u00eddos, nem a verifica\u00e7\u00e3o de novas vers\u00f5es.");
         table.put("Saved to %1$s",
                 "Salvo em %1$s");
+        table.put("Saved to %1$s in lower quality than on Facebook",
+                "Salvo em %1$s com qualidade menor que no Facebook");
         table.put("Saved to the gallery",
                 "Salvo na galeria");
+        table.put("Saved to the gallery in lower quality than on Facebook",
+                "Salvo na galeria com qualidade menor que no Facebook");
         table.put("Saved videos will be named %1$s.",
                 "Os v\u00eddeos salvos ser\u00e3o nomeados como %1$s.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Salvo. Reinicie o Facebook para aplicar esta altera\u00e7\u00e3o.");
         table.put("Saves will go to a folder named %1$s.",
                 "Os arquivos ser\u00e3o salvos em uma pasta chamada %1$s.");
+    }
+
+    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Saving a photo",
                 "Salvando uma foto");
         table.put("Saving a video",
                 "Salvando um v\u00eddeo");
-    }
-
-    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Salvando o arquivo de configura\u00e7\u00f5es");
         table.put("Saving...",
@@ -3406,13 +3435,13 @@ public final class L10nTranslations {
                 "A vers\u00e3o mais nova do Hushfacebook \u00e9 %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "A linha de Stories de pessoas com quem voc\u00ea n\u00e3o tem conex\u00e3o, que o Facebook insere entre as publica\u00e7\u00f5es. Os Stories dos seus amigos e a bandeja de Stories permanecem.");
+    }
+
+    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "A linha de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es e a linha no seu pr\u00f3prio perfil.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "A linha de grupos sugeridos para participa\u00e7\u00e3o entre as publica\u00e7\u00f5es, com o bot\u00e3o \u201cDescobrir mais grupos\u201d. As publica\u00e7\u00f5es dos grupos dos quais voc\u00ea participa permanecem.");
-    }
-
-    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("The row of stories at the top of the feed, Create story included.",
                 "A linha de Stories no topo do feed, incluindo \u201cCriar Story\u201d.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -3529,6 +3558,9 @@ public final class L10nTranslations {
                 "a corre\u00e7\u00e3o para vers\u00e3o reassinada");
         table.put("the recoloured dark mode",
                 "a nova colora\u00e7\u00e3o do modo escuro");
+    }
+
+    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("the rename of the shared permissions",
                 "a renomea\u00e7\u00e3o das permiss\u00f5es compartilhadas");
         table.put("the settings row in Facebook's Menu",
@@ -3536,7 +3568,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(840);
+        Map<String, String> table = new HashMap<>(844);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -3544,6 +3576,7 @@ public final class L10nTranslations {
         fillTr4(table);
         fillTr5(table);
         fillTr6(table);
+        fillTr7(table);
         return table;
     }
 
@@ -4148,21 +4181,25 @@ public final class L10nTranslations {
                 "Anahtarlar\u0131n\u0131 ve indirme ayarlar\u0131n\u0131 bir dosyaya kaydet. Duraklatma ve Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc dahil edilmez, s\u00fcr\u00fcm denetimi de edilmez.");
         table.put("Saved to %1$s",
                 "\u015euraya kaydedildi: %1$s");
+        table.put("Saved to %1$s in lower quality than on Facebook",
+                "\u015euraya Facebook'takinden d\u00fc\u015f\u00fck kalitede kaydedildi: %1$s");
         table.put("Saved to the gallery",
                 "Galeriye kaydedildi");
+        table.put("Saved to the gallery in lower quality than on Facebook",
+                "Galeriye Facebook'takinden d\u00fc\u015f\u00fck kalitede kaydedildi");
         table.put("Saved videos will be named %1$s.",
                 "Kaydedilen videolar\u0131n ad\u0131 %1$s olacak.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Kaydedildi. Bu de\u011fi\u015fikli\u011fi uygulamak i\u00e7in Facebook'u yeniden ba\u015flat.");
         table.put("Saves will go to a folder named %1$s.",
                 "Kaydettiklerin %1$s adl\u0131 bir klas\u00f6re gidecek.");
+    }
+
+    private static void fillTr5(Map<String, String> table) {
         table.put("Saving a photo",
                 "Foto\u011fraf kaydediliyor");
         table.put("Saving a video",
                 "Video kaydediliyor");
-    }
-
-    private static void fillTr5(Map<String, String> table) {
         table.put("Saving the settings file",
                 "Ayar dosyas\u0131 kaydediliyor");
         table.put("Saving...",
@@ -4279,13 +4316,13 @@ public final class L10nTranslations {
                 "En yeni Hushfacebook s\u00fcr\u00fcm\u00fc %1$s.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Facebook'un g\u00f6nderilerin aras\u0131na koydu\u011fu, ba\u011flant\u0131n olmayan ki\u015filerin hikayelerinden olu\u015fan sat\u0131r. Arkada\u015flar\u0131n\u0131n hikayeleri ve hikaye \u015feridi kal\u0131r.");
+    }
+
+    private static void fillTr6(Map<String, String> table) {
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
                 "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131 ve kendi profilindeki sat\u0131r.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "G\u00f6nderilerin aras\u0131ndaki kat\u0131labilece\u011fin gruplar sat\u0131r\u0131 ve Daha fazla grup ke\u015ffet d\u00fc\u011fmesi. \u00dcyesi oldu\u011fun gruplar\u0131n g\u00f6nderileri kal\u0131r.");
-    }
-
-    private static void fillTr6(Map<String, String> table) {
         table.put("The row of stories at the top of the feed, Create story included.",
                 "Ak\u0131\u015f\u0131n en \u00fcst\u00fcndeki hikaye \u015feridi, \u201cHikaye olu\u015ftur\u201d da dahil.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
@@ -4402,6 +4439,9 @@ public final class L10nTranslations {
                 "yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
         table.put("the recoloured dark mode",
                 "yeniden renklendirilmi\u015f karanl\u0131k mod");
+    }
+
+    private static void fillTr7(Map<String, String> table) {
         table.put("the rename of the shared permissions",
                 "payla\u015f\u0131lan izinlerin yeniden adland\u0131r\u0131lmas\u0131");
         table.put("the settings row in Facebook's Menu",

@@ -105,7 +105,13 @@ public final class MediaDownload {
             // would unpatched.
             if (!Utils.settingsReady() || !Settings.DOWNLOAD_STORIES.get()) return false;
 
-            List<String> urls = collectStoryUrls(host);
+            // getMedia is one of the few names on the card that Facebook keeps, so it's worth trying
+            // before a walk. When it answers, the walks start from the media rather than from the
+            // card, which keeps them away from everything else the card holds.
+            Object media = call(host, "getMedia");
+            Object from = media != null ? media : host;
+            int depth = media != null ? 1 : 2;
+            List<String> urls = RenditionPicker.harvest(from, depth);
 
             // The card holds one video address, and it is 360p. The player of the same video can
             // hold a better one. So the save tries the recorded source of the player first. The
@@ -113,10 +119,24 @@ public final class MediaDownload {
             // says who posted the story and when.
             PlayerSources.Source source = PlayerSources.find(host);
             PostDetails details = PostDetails.ofCard(source == null ? null : source.videoId, host);
-            if (source != null) {
-                addIfUsable(urls, source.hdUrl);
-                if (source.manifest != null) return beginDash(context, "the story video", source.manifest, urls, details);
+            if (source != null) addIfUsable(urls, source.hdUrl);
+            String manifest = source == null ? null : source.manifest;
+
+            // No player was recorded when it was built before Save any story was turned on, or
+            // before the recorder ran. The media carries the manifest as text anyway: Facebook
+            // builds the story's player from the media's own playlist (577 and 580).
+            if (manifest == null) {
+                manifest = RenditionPicker.manifestIn(from, depth);
+                final String why = source == null ? "no player of the story was recorded"
+                    : "its player was recorded without a manifest";
+                if (manifest != null) {
+                    info(() -> why + ", so the save reads the manifest its card carries, the one its player plays from");
+                } else if (RenditionPicker.bestVideo(metaOnly(urls), DownloadQuality.BEST) != null) {
+                    info(() -> why + " and its card carries no manifest, so the save takes the card's own file, "
+                        + "the one its player plays");
+                }
             }
+            if (manifest != null) return beginDash(context, "the story video", manifest, urls, details);
 
             return begin(context, urls, true, details);
         } catch (Throwable t) {
@@ -255,20 +275,6 @@ public final class MediaDownload {
         return urls;
     }
 
-    /**
-     * Every address the story card can reach.
-     *
-     * <p>{@code getMedia} is one of the few names on this class that Facebook keeps, so it is
-     * worth trying before the walk. When it answers, the walk starts from the media rather than
-     * from the card, which keeps it away from everything else the card holds.
-     */
-    private static List<String> collectStoryUrls(Object host) {
-        Object media = call(host, "getMedia");
-        Object from = media != null ? media : host;
-
-        return RenditionPicker.harvest(from, media != null ? 1 : 2);
-    }
-
     private static void addIfUsable(List<String> urls, String url) {
         if (url != null && RenditionPicker.isHttpUrl(url)) urls.add(url);
     }
@@ -326,7 +332,7 @@ public final class MediaDownload {
         Context safe = ready(context);
         if (safe == null) return false;
 
-        saving(isVideo, chosen, urls, quality, Dash.SINGLE_FILE);
+        saving(isVideo, chosen, urls, quality, Dash.SINGLE_FILE, null);
         Downloader.Kind kind = isVideo ? Downloader.Kind.VIDEO : Downloader.Kind.IMAGE;
         start(safe, isVideo, details, fileJob(safe, chosen, kind));
         return true;
@@ -337,9 +343,11 @@ public final class MediaDownload {
      * so a saved file that is smaller than expected can be told apart from a ranking that chose
      * badly. Each as its kind of file and quality, never its name or address: a whole address is a
      * signed, working handle to the user's content, a CDN file name carries the object's id, and
-     * the report is pasted into public issues.
+     * the report is pasted into public issues. [better] is the manifest's picture the file is
+     * below, or null.
      */
-    private static void saving(boolean isVideo, String chosen, List<String> urls, DownloadQuality quality, Dash dash) {
+    private static void saving(boolean isVideo, String chosen, List<String> urls, DownloadQuality quality, Dash dash,
+            DashManifest.Track better) {
         StringBuilder all = new StringBuilder();
         for (String url : urls) {
             if (all.length() > 0) all.append(", ");
@@ -350,7 +358,34 @@ public final class MediaDownload {
         info(() -> "saving " + (isVideo ? "video" : "image")
             + " " + describe(chosen)
             + " from " + candidates + " candidate(s): " + all
-            + (isVideo ? qualityNote(quality) + singleFileNote(dash) : ""));
+            + (isVideo ? qualityNote(quality) + singleFileNote(dash) + belowNote(better) : ""));
+    }
+
+    /** What the report adds to a save line whose picture is below the manifest's [better], or nothing. */
+    private static String belowNote(DashManifest.Track better) {
+        return better == null ? "" : ", below the manifest's " + better + ", the best it offers within the Download quality";
+    }
+
+    /**
+     * The largest picture of [tracks] that fits [quality] and is larger than a saved one of quality
+     * [saved], whatever its format, or null: the picture Facebook's player can show that the save
+     * didn't keep. VP9 is one, since an MP4 can't hold it, and so is AV1 before Android 14. For
+     * the smallest file there's never one, and a saved quality nobody stated has none either.
+     */
+    private static DashManifest.Track better(List<DashManifest.Track> tracks, int saved, DownloadQuality quality) {
+        DashManifest.Track better = null;
+        for (DashManifest.Track track : tracks) {
+            if (!track.isVideo()) continue;
+            int picture = picture(track, quality);
+            if (saved <= 0 || picture <= saved || picture > quality.ceiling) continue;
+            if (better == null || picture > picture(better, quality)) better = track;
+        }
+        return better;
+    }
+
+    /** A track's quality as [quality] weighs it: its short side at the best, else its label. */
+    private static int picture(DashManifest.Track track, DownloadQuality quality) {
+        return quality == DownloadQuality.BEST ? track.shortSide() : track.quality();
     }
 
     /**
@@ -424,17 +459,18 @@ public final class MediaDownload {
 
     /** The save of one single file at [url]: the job every save of a single file runs. */
     static Job fileJob(Context application, String url, Downloader.Kind kind) {
-        return (writer, progress) -> saveFile(application, url, kind, null, writer, progress);
+        return (writer, progress) -> saveFile(application, url, kind, null, false, writer, progress);
     }
 
     /**
      * One checked file, fetched into the cache and then published. Its work file keeps, with those
      * of every other running save, to the free space ({@link DashSave#fetchWork}). A saved video's
      * report line says what the file holds, and [why] when a manifest's tracks were passed over
-     * for it (bounded; null when the file was simply the pick).
+     * for it (bounded; null when the file was simply the pick). [lower] when the file is below the
+     * manifest's picture, so the person saving is told.
      */
     private static Downloader.Result saveFile(Context application, String url, Downloader.Kind kind, String why,
-            MediaStoreWriter writer, Downloader.Progress progress) {
+            boolean lower, MediaStoreWriter writer, Downloader.Progress progress) {
         java.io.File folder = DashSave.workFolder(application);
         if (folder == null) return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "no cache folder");
         java.io.File file = null;
@@ -448,7 +484,7 @@ public final class MediaDownload {
                 info(() -> "the saved file holds " + holds + (why == null ? "" : ". Saved in place of the manifest's "
                     + "tracks because " + bounded(why)));
             }
-            return published;
+            return published.ok() && lower ? published.lower() : published;
         } catch (Throwable t) {
             return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "the cache could not hold the file");
         } finally {
@@ -550,8 +586,8 @@ public final class MediaDownload {
         if (!DashManifest.withinLimits(manifest)) {
             info(() -> "the manifest of " + label + " is over the limits a save reads (" + manifest.length()
                 + " characters), saving the single file");
-            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, "the manifest is over the limits a save reads",
-                writer, progress);
+            return saveSingleVideo(application, urls, java.util.Collections.emptyList(), Dash.SINGLE_FILE,
+                "the manifest is over the limits a save reads", writer, progress);
         }
         List<DashManifest.Track> tracks = new ArrayList<>();
         for (DashManifest.Track track : DashManifest.parse(manifest)) {
@@ -561,6 +597,10 @@ public final class MediaDownload {
         DownloadQuality quality = quality();
         boolean compatible = compatibleSaves();
         boolean allowAv1 = DashSave.canWriteAv1();
+        // What a save below is weighed against when it tells the person it's lower. Not with saves
+        // other apps can open on: that switch passes better pictures over by choice, and its own
+        // report lines say so.
+        List<DashManifest.Track> offered = compatible ? java.util.Collections.emptyList() : tracks;
 
         // What the pick below chose from, as each track's type, codec, size and bitrate. Never its
         // address: the report is pasted into public issues.
@@ -581,7 +621,7 @@ public final class MediaDownload {
             if (usual != null && fallback != null) {
                 info(() -> "the manifest of " + label + " has no H.264 video with AAC-LC or HE-AAC sound, "
                     + "saving the single file instead");
-                return saveSingleVideo(application, urls, leftToFile,
+                return saveSingleVideo(application, urls, offered, leftToFile,
                     "the manifest has no H.264 video with AAC-LC or HE-AAC sound", writer, progress);
             }
             if (usual != null) {
@@ -593,8 +633,8 @@ public final class MediaDownload {
 
         if (pick == null) {
             info(() -> "the manifest of " + label + " has no track to save: " + tracks);
-            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, "the manifest has no track to save", writer,
-                progress);
+            return saveSingleVideo(application, urls, offered, Dash.SINGLE_FILE, "the manifest has no track to save",
+                writer, progress);
         }
 
         DashManifest.Track video = pick.video;
@@ -602,24 +642,29 @@ public final class MediaDownload {
         boolean keptCompatible = kept != null && compatible;
 
         if (!keptCompatible && !beatsFile(video, fallback, fallbackQuality, quality)) {
-            return saveSingleVideo(application, urls, Dash.SINGLE_FILE, null, writer, progress);
+            return saveSingleVideo(application, urls, offered, Dash.SINGLE_FILE, null, writer, progress);
         }
 
+        // A track the muxer can't write can be a larger picture than the one saved.
+        DashManifest.Track better = better(offered, picture(video, quality), quality);
         info(() -> "saving " + label + " from its DASH manifest: " + video
             + (audio == null ? ", no sound track" : " + " + audio)
             + ", instead of " + (fallback == null ? "nothing" : describe(fallback))
-            + qualityNote(quality) + compatibleNote(keptCompatible) + soundNote(audio));
+            + qualityNote(quality) + compatibleNote(keptCompatible) + soundNote(audio) + belowNote(better));
 
-        return dashJob(application, video, audio, fallback).run(writer, progress);
+        Downloader.Result result = dashJob(application, video, audio, fallback).run(writer, progress);
+        return result.ok() && better != null ? result.lower() : result;
     }
 
     /**
      * The best single video file of [urls], for a save whose manifest didn't win: [dash] says why
      * for the save line, and [why] for the line of what was saved, or null when the file was simply
-     * the better pick. A video only, since the save was started as one.
+     * the better pick. A video only, since the save was started as one. Below a picture of the
+     * manifest's [tracks], the report and the person saving are told.
      */
-    private static Downloader.Result saveSingleVideo(Context application, List<String> urls, Dash dash, String why,
-            MediaStoreWriter writer, Downloader.Progress progress) {
+    private static Downloader.Result saveSingleVideo(Context application, List<String> urls,
+            List<DashManifest.Track> tracks, Dash dash, String why, MediaStoreWriter writer,
+            Downloader.Progress progress) {
         List<String> meta = metaOnly(urls);
         DownloadQuality quality = quality();
         String video = RenditionPicker.bestVideo(meta, quality);
@@ -629,8 +674,9 @@ public final class MediaDownload {
                 + " addresses was a video file on Meta's media servers", null);
             return Downloader.Result.fail(Downloader.Status.WRITE_ERROR, "nothing to save");
         }
-        saving(true, video, meta, quality, dash);
-        return saveFile(application, video, Downloader.Kind.VIDEO, why, writer, progress);
+        DashManifest.Track better = better(tracks, RenditionPicker.qualityOf(video), quality);
+        saving(true, video, meta, quality, dash, better);
+        return saveFile(application, video, Downloader.Kind.VIDEO, why, better != null, writer, progress);
     }
 
     /**
@@ -646,7 +692,8 @@ public final class MediaDownload {
 
     /**
      * The DASH save of [video] and [audio], then the single file [fallback] when that fails. Not
-     * when the person cancelled it, though: the fallback would start the save over.
+     * when the person cancelled it, though: the fallback would start the save over. A fallback
+     * below [video]'s picture says so.
      */
     static Job dashJob(Context application, DashManifest.Track video, DashManifest.Track audio, String fallback) {
         return (writer, progress) -> {
@@ -654,9 +701,12 @@ public final class MediaDownload {
                 progress);
             if (result.ok() || fallback == null || result.status == Downloader.Status.CANCELLED) return result;
 
-            failure(() -> "the DASH save ended with " + result + ", saving " + describe(fallback), null);
-            return saveFile(application, fallback, Downloader.Kind.VIDEO, "the DASH save ended with " + result, writer,
-                progress);
+            DashManifest.Track better = better(java.util.Collections.singletonList(video),
+                RenditionPicker.qualityOf(fallback), quality());
+            failure(() -> "the DASH save ended with " + result + ", saving " + describe(fallback) + belowNote(better),
+                null);
+            return saveFile(application, fallback, Downloader.Kind.VIDEO, "the DASH save ended with " + result,
+                better != null, writer, progress);
         };
     }
 
@@ -730,7 +780,7 @@ public final class MediaDownload {
                 boolean cancelled = result.status == Downloader.Status.CANCELLED;
                 if (result.ok() || cancelled) info(() -> "save finished: " + result);
                 else failure(() -> "save finished: " + result, null);
-                Feedback.show(application, message(application, result.status, writer.savedLocation()),
+                Feedback.show(application, message(application, result.status, writer.savedLocation(), result.lower),
                     !result.ok() && !cancelled);
             } catch (Throwable t) {
                 // Nothing can leave this thread. Facebook installs its own handler for uncaught
@@ -756,10 +806,18 @@ public final class MediaDownload {
         return reason.length() <= 160 ? reason : reason.substring(0, 157) + "...";
     }
 
-    /** What the toast at the end of a save says, in the phone's language. */
-    static String message(Context application, Downloader.Status status, String location) {
+    /**
+     * What the toast at the end of a save says, in the phone's language. [lower] when the saved
+     * picture is below the best one Facebook offered within the quality setting.
+     */
+    static String message(Context application, Downloader.Status status, String location, boolean lower) {
         switch (status) {
             case OK:
+                if (lower) {
+                    return location == null
+                        ? L10n.t(application, "Saved to the gallery in lower quality than on Facebook")
+                        : L10n.f(application, "Saved to %1$s in lower quality than on Facebook", L10n.isolate(location));
+                }
                 return location == null
                     ? L10n.t(application, "Saved to the gallery")
                     : L10n.f(application, "Saved to %1$s", L10n.isolate(location));

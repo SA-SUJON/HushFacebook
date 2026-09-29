@@ -152,6 +152,8 @@ Save folder	Speicherordner
 Save full report	Vollständigen Bericht speichern
 Saved to %1$s	Gespeichert unter %1$s
 Saved to the gallery	In der Galerie gespeichert
+Saved to %1$s in lower quality than on Facebook	Gespeichert unter %1$s, in geringerer Qualität als auf Facebook
+Saved to the gallery in lower quality than on Facebook	In der Galerie gespeichert, in geringerer Qualität als auf Facebook
 Saved. Restart Facebook to apply this change.	Gespeichert. Starte Facebook neu, um diese Änderung zu übernehmen.
 Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.	Speichert deine Schalter und die Download-Einstellungen in einer Datei. Pause und Debug-Protokollierung sind nicht enthalten, die Suche nach neuen Versionen auch nicht.
 # The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.
