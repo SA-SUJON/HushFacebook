@@ -11,8 +11,12 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
+import app.morphe.patches.facebook.media.reelspeed.speedSetters
 import app.morphe.patches.facebook.media.taptoplay.FRAGMENT_ACTIVITY
+import app.morphe.patches.facebook.media.taptoplay.GROOT_PLAY
 import app.morphe.patches.facebook.media.taptoplay.MOTION_EVENT
+import app.morphe.patches.facebook.media.taptoplay.grootPlays
 import app.morphe.patches.facebook.media.taptoplay.touchDispatches
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.parameterRegister
@@ -34,9 +38,10 @@ internal const val PATCH = "Hold a reel for 2x"
  *
  * The long-press handlers' speed-up flag, the overlay's check of it before it gives a reel its
  * release listener, the release listeners' two flags and the edge check each hand their answer to
- * the extension on its way out. Each handler tells the extension when it takes the speed-up path,
- * and every touch on a Facebook screen when a gesture starts and ends, so the release listener
- * puts the speed back only after a hold.
+ * the extension on its way out, and so does the read of the hold speed. Each handler tells the
+ * extension when it takes the speed-up path, every touch on a Facebook screen when a gesture starts
+ * and ends, so the release listener puts the speed back only after a hold, and FbGrootPlayer's
+ * speed setter each speed it gets, for the debug log.
  *
  * Off in the default selection: while its switch is on, a hold on a reel speeds it up instead of
  * opening Facebook's long-press menu, which is a choice to make. Picked, its switch starts on.
@@ -75,6 +80,8 @@ internal class ReelHoldAnchors(
     val edgeCheck: Method,
     val dispatch: Method,
     val speedUpPaths: List<Method>,
+    val holdSpeed: Method,
+    val setter: Method,
 )
 
 /** The long-press handlers and their speed-up paths, the release listeners, the overlay's check, the edge check and the touch dispatch. */
@@ -131,19 +138,37 @@ internal fun BytecodePatchContext.findReelHoldAnchors(): ReelHoldAnchors {
         ?: refuse("the edge check $edgeCall has no body in this build")
     if (edgeCheck.implementation!!.instructions.none { it.opcode == Opcode.RETURN }) refuse("the edge check never returns")
 
+    // FbGrootPlayer's speed setter, and the one double both speed-ups read from the config and set it to.
+    val plays = classDefByStrings(GROOT_PLAY, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }.flatMap(::grootPlays)
+    val player = classDefBy(plays.singleOrNull()?.definingClass ?: refuse("expected one player play holding \"$GROOT_PLAY\", found ${plays.size}"))
+    val setter = speedSetters(player).singleOrNull() ?: refuse("expected one speed setter in ${player.type}")
+    val setterKey = "${player.type}->${setter.name}(F)V"
+    val configClass = classDefByOrNull(config) ?: refuse("this build has no $config")
+    val configAnswers = configClass.methods.filter { it.parameterTypes.isEmpty() }.map { it.returnType }.toSet()
+    val speedReads = SPEED_UP_COMPONENTS.flatMap { classDefByStrings(it, StringComparisonType.EQUALS) }.distinctBy { it.type }
+        .flatMap { component -> component.methods.flatMap { holdSpeedReads(it, setterKey, configAnswers) } }
+        .distinctBy { it.toString() }
+    val speedRead = speedReads.singleOrNull()
+        ?: refuse("expected the speed-ups to set the speed from one read of the config, found ${speedReads.map { it.toString() }}")
+    val holdSpeed = classDefByOrNull(speedRead.definingClass)?.methods?.singleOrNull { isMethod(it, speedRead) }
+        ?: refuse("the hold speed $speedRead has no body in this build")
+    if (holdSpeed.implementation!!.instructions.none { it.opcode == Opcode.RETURN_WIDE }) refuse("the hold speed never returns")
+
     val activity = classDefByOrNull(FRAGMENT_ACTIVITY) ?: refuse("this build has no $FRAGMENT_ACTIVITY")
     val dispatch = touchDispatches(activity).singleOrNull()
         ?: refuse("expected $FRAGMENT_ACTIVITY to declare one dispatchTouchEvent($MOTION_EVENT)Z")
     return ReelHoldAnchors(config, speedUpFlag, releaseFlag, handlerPlans + listenerPlans + builderPlans, edgeCheck, dispatch,
-        speedUpPaths)
+        speedUpPaths, holdSpeed, setter)
 }
 
 /**
  * After each flag call's move-result, the extension's answer in its place, in the same register,
  * which the range form names whatever its number; the branch that follows reads it as Facebook's.
- * Before each of the edge check's returns, the same. Straight after each handler's "speed_up" load,
- * which falls through to it, a call naming no register. First in the touch dispatch, the event,
- * which the extension only reads.
+ * Before each of the edge check's returns, the same, and before each of the hold speed's, for its
+ * register pair. Straight after each handler's "speed_up" load, which falls through to it, a call
+ * naming no register. First in the touch dispatch, the event, and first in the speed setter, the
+ * speed, both of which the extension only reads.
  */
 internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors) {
     for (plan in anchors.plans) {
@@ -175,6 +200,20 @@ internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors)
                 """,
             )
         }
+    val speed = mutableClassDefBy(anchors.holdSpeed.definingClass).findMutableMethodOf(anchors.holdSpeed)
+    speed.implementation!!.instructions.withIndex().filter { it.value.opcode == Opcode.RETURN_WIDE }.map { it.index }
+        .asReversed().forEach { index ->
+            val register = speed.getInstruction<OneRegisterInstruction>(index).registerA
+            speed.addInstructionsAtControlFlowLabel(
+                index,
+                """
+                    invoke-static/range { v$register .. v${register + 1} }, $HOLD_SPEED
+                    move-result-wide v$register
+                """,
+            )
+        }
+    mutableClassDefBy(anchors.setter.definingClass).findMutableMethodOf(anchors.setter)
+        .addInstruction(0, "invoke-static/range { p1 .. p1 }, $SPEED_SET")
     val dispatch = mutableClassDefBy(FRAGMENT_ACTIVITY).findMutableMethodOf(anchors.dispatch)
     val event = dispatch.parameterRegister(0)
     dispatch.addInstruction(0, "invoke-static/range { $event .. $event }, $TOUCH")

@@ -23,8 +23,10 @@ import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.diagnostics.HookStatus;
+import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
+import app.morphe.extension.shared.settings.preference.LogBufferManager;
 
 /**
  * Hold a reel for 2x: while the switch is on, a long press on a reel goes to Facebook's own
@@ -47,8 +49,10 @@ public class ReelHoldTest {
     public void restore() {
         PauseForTests.resume();
         Settings.HOLD_REEL_FOR_2X.resetToDefault();
+        BaseSettings.DEBUG.resetToDefault();
         ReelHold.forget();
         HookStatus.clear();
+        LogBufferManager.clearLogBuffer();
     }
 
     private static void finger(int action) {
@@ -192,6 +196,52 @@ public class ReelHoldTest {
         }
         PauseForTests.resume();
         assertTrue(ReelHold.longPress(false));
+    }
+
+    /**
+     * Outside the Video tab Facebook holds at a fixed 2x, but where an account's Reels live in the
+     * Video tab the hold speed is a server value, which may say normal speed for an account the
+     * server never gave the feature. While on, a hold speed that isn't faster than normal is 2x, and
+     * a faster one the server picked stays.
+     */
+    @Test
+    public void aHoldSpeedThatIsNoSpeedUpBecomes2x() {
+        assertEquals(2.0, ReelHold.holdSpeed(1.0), 0.0);
+        assertEquals(2.0, ReelHold.holdSpeed(0.0), 0.0);
+        assertEquals(2.0, ReelHold.holdSpeed(Double.NaN), 0.0);
+        assertEquals(2.0, ReelHold.holdSpeed(2.0), 0.0);
+        assertEquals(1.5, ReelHold.holdSpeed(1.5), 0.0);
+        assertEquals(3.0, ReelHold.holdSpeed(3.0), 0.0);
+
+        Settings.HOLD_REEL_FOR_2X.save(false);
+        assertEquals("off, Facebook's hold speed changed", 1.0, ReelHold.holdSpeed(1.0), 0.0);
+        Settings.HOLD_REEL_FOR_2X.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertEquals("paused, Facebook's hold speed changed", 1.0, ReelHold.holdSpeed(1.0), 0.0);
+    }
+
+    /**
+     * With Debug logging on, the speed Facebook's speed setter gets when a hold speeds a reel up and
+     * when its lift puts the speed back has a line each, for a phone check where the reel is muted.
+     * Other speeds set don't.
+     */
+    @Test
+    public void debugLoggingSaysWhatSpeedAHoldSetAndWhatItWentBackTo() {
+        BaseSettings.DEBUG.save(true);
+        LogBufferManager.clearLogBuffer();
+        finger(MotionEvent.ACTION_DOWN);
+        hold();
+        ReelHold.speedSet(2.0f);
+        finger(MotionEvent.ACTION_UP);
+        ReelHold.release(false);
+        ReelHold.release(false);
+        ReelHold.speedSet(1.5f);
+        finger(MotionEvent.ACTION_DOWN);
+        ReelHold.speedSet(1.25f);
+        String report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("Reel hold: speed 2.0x"));
+        assertTrue(report, report.contains("Reel hold: back to 1.5x"));
+        assertTrue(report, !report.contains("1.25"));
     }
 
     /**

@@ -29,6 +29,11 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *       the edge check. That's a hold.</li>
  *   <li>{@link #anywhere}: the check of whether the press landed on an edge. Yes while the switch
  *       is on, so a hold anywhere on the reel counts.</li>
+ *   <li>{@link #holdSpeed}: the speed a hold plays at, which the speed-up, the speed the lift puts
+ *       back and the 2x label all read. Outside the Video tab Facebook answers a fixed 2x, and where
+ *       an account's Reels live in the Video tab it answers a server value, which may say normal
+ *       speed where the server never gave the feature. While on, anything not faster than normal
+ *       is 2x.</li>
  *   <li>{@link #speedUp}: the speed-up flag where the controls decide whether to give a reel its
  *       release listener. Yes while the switch is on, so every reel has one.</li>
  *   <li>{@link #release}: both flags the release listener asks before it puts the speed back.
@@ -41,13 +46,18 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *       gesture start and end first.</li>
  * </ul>
  *
- * <p>A tap still plays or pauses, a double tap and the side buttons work as before, and reels that
+ * <p>With Debug logging on, {@link #speedSet} logs the speed Facebook's speed setter gets when a
+ * hold speeds a reel up and when its lift puts the speed back, which tells what a muted reel plays
+ * at. A tap still plays or pauses, a double tap and the side buttons work as before, and reels that
  * are ads keep Facebook's long-press menu. Off, paused, before the settings are ready, or when
  * anything here fails, every answer is Facebook's own.
  */
 public final class ReelHold {
     /** Counted under the patch's name for each long press on a reel that went to the speed-up while the switch is on. */
     static final String HELD = "hold on a reel";
+
+    /** The hold speed while on, where Facebook's isn't faster than normal. */
+    static final double DOUBLE_SPEED = 2.0;
 
     private static final String FAMILY = FamilyNames.HOLD_REEL_FOR_2X;
 
@@ -59,6 +69,10 @@ public final class ReelHold {
 
     /** Whether the release listener heard a lift during a hold, so the speed went back. The next gesture ends the hold. */
     private static volatile boolean restored;
+
+    /** Whether the next speed the setter gets is a hold's speed-up, or its lift's, for the debug log. */
+    private static volatile boolean speedUpNext;
+    private static volatile boolean backNext;
 
     private ReelHold() {
     }
@@ -76,6 +90,8 @@ public final class ReelHold {
                 if (restored) holding = false;
                 restored = false;
                 lifted = false;
+                speedUpNext = false;
+                backNext = false;
             } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
                 lifted = true;
             }
@@ -99,8 +115,37 @@ public final class ReelHold {
         if (!on("hold")) return;
         holding = true;
         restored = false;
+        speedUpNext = true;
         HookStatus.counted(FAMILY, HELD);
         Logger.printDebug(() -> "Reel hold: a long press on a reel went to the speed-up");
+    }
+
+    /**
+     * The hook, first thing in FbGrootPlayer's speed setter, whoever calls it. It only logs, with
+     * Debug logging on, the speed a hold's speed-up sets and the speed its lift puts back.
+     */
+    public static void speedSet(float speed) {
+        try {
+            HookStatus.invoked(FAMILY);
+            if (!on("speed set")) return;
+            if (speedUpNext) {
+                speedUpNext = false;
+                Logger.printDebug(() -> "Reel hold: speed " + speed + "x");
+            } else if (backNext) {
+                backNext = false;
+                Logger.printDebug(() -> "Reel hold: back to " + speed + "x");
+            }
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "speed set", failure);
+        }
+    }
+
+    /** Before Facebook's hold speed goes out. While on, one that isn't faster than normal is 2x. */
+    public static double holdSpeed(double facebooks) {
+        HookStatus.invoked(FAMILY);
+        if (!on("hold speed") || facebooks > 1.0) return facebooks;
+        Logger.printDebug(() -> "Reel hold: Facebook's hold speed is " + facebooks + "x, holding at " + DOUBLE_SPEED + "x");
+        return DOUBLE_SPEED;
     }
 
     /** After Facebook's check of whether a long press landed on a reel's edge. Yes while on. */
@@ -122,7 +167,10 @@ public final class ReelHold {
     public static boolean release(boolean facebooks) {
         HookStatus.invoked(FAMILY);
         if (!on("release")) return facebooks;
-        if (holding && lifted) restored = true;
+        if (holding && lifted && !restored) {
+            restored = true;
+            backNext = true;
+        }
         return holding;
     }
 
@@ -143,5 +191,7 @@ public final class ReelHold {
         holding = false;
         lifted = false;
         restored = false;
+        speedUpNext = false;
+        backNext = false;
     }
 }

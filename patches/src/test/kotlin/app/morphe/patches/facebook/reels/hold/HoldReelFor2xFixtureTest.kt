@@ -8,7 +8,11 @@ import app.morphe.ExtensionDex
 import app.morphe.Fixtures
 import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
+import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
+import app.morphe.patches.facebook.media.reelspeed.speedSetters
 import app.morphe.patches.facebook.media.taptoplay.FRAGMENT_ACTIVITY
+import app.morphe.patches.facebook.media.taptoplay.GROOT_PLAY
+import app.morphe.patches.facebook.media.taptoplay.grootPlays
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -34,10 +38,13 @@ import java.io.File
  * listeners, which ask a second flag straight before that one; the overlay's one check of the
  * speed-up flag before it gives a reel its release listener; the one edge check of the build, which
  * a handler calls; and nothing else in the build asking either flag but three places the patch
- * leaves alone, none of which makes a handler or a listener. Then the patch itself, run on those
+ * leaves alone, none of which makes a handler or a listener; and the two speed-ups, one in each of
+ * FbShortsVideoControlComponent and UddPlayerControlComponent, setting FbGrootPlayer's speed from
+ * one read of the config. Then the patch itself, run on those
  * classes: every flag call's answer through the extension in the same register before its branch,
- * every return of the edge check through the extension, the hold's start straight after each
- * "speed_up" load, and the touch dispatch handing the event over first. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
+ * every return of the edge check and of the hold speed through the extension, the hold's start
+ * straight after each "speed_up" load, and the touch dispatch and the speed setter handing the event
+ * and the speed over first. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class HoldReelFor2xFixtureTest {
     private val Instruction.call: MethodReference?
@@ -115,10 +122,28 @@ class HoldReelFor2xFixtureTest {
                 val edgeClass = FixtureDex.classes(bundle, setOf(edgeCalls.single().definingClass)).values.single()
                 val edge = edgeClass.methods.single { isMethod(it, edgeCalls.single()) }
 
+                // The speed-ups set FbGrootPlayer's speed from one double read of the config's answer.
+                val playerHolders = FixtureDex.classesHolding(bundle, GROOT_PLAY).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+                val play = playerHolders.flatMap(::grootPlays).single()
+                val player = playerHolders.single { it.type == play.definingClass }
+                val setter = speedSetters(player).single()
+                val configClass = FixtureDex.classes(bundle, setOf(config)).values.single()
+                val configAnswers = configClass.methods.filter { it.parameterTypes.isEmpty() }.map { it.returnType }.toSet()
+                val speedUpClasses = SPEED_UP_COMPONENTS.flatMap { FixtureDex.classesHolding(bundle, it) }.distinctBy { it.type }
+                val reads = speedUpClasses.flatMap { c ->
+                    c.methods.flatMap { m -> holdSpeedReads(m, "${player.type}->${setter.name}(F)V", configAnswers).map { m to it } }
+                }
+                assertEquals("$name: speed-ups setting the speed from a read of the config: ${reads.map { key(it.first) }}", 2, reads.size)
+                assertEquals("$name: the speed-ups' components", 2, reads.map { it.first.definingClass }.toSet().size)
+                val speedRead = reads.map { it.second.toString() }.toSet().single()
+                val speedClass = FixtureDex.classes(bundle, setOf(reads.first().second.definingClass)).values.single()
+                val holdSpeed = speedClass.methods.single { isMethod(it, reads.first().second) }
+
                 val activity = FixtureDex.classes(bundle, setOf(FRAGMENT_ACTIVITY)).values.single()
                 val componentClasses = components.filter { c -> checks.any { it.definingClass == c.type } }
-                val classes: List<ClassDef> = (handlers + listeners + componentClasses + edgeClass + activity +
-                    ExtensionDex.classDef(REEL_HOLD) + ExtensionDex.classDef(SETTINGS_STATUS)).distinctBy { it.type }
+                val classes: List<ClassDef> = (handlers + listeners + componentClasses + edgeClass + activity + player + configClass +
+                    speedUpClasses + speedClass + ExtensionDex.classDef(REEL_HOLD) + ExtensionDex.classDef(SETTINGS_STATUS))
+                    .distinctBy { it.type }
                 val context = PatchContexts.of(classes)
                 holdReelFor2xPatch.execute(context)
 
@@ -179,6 +204,22 @@ class HoldReelFor2xFixtureTest {
                     assertEquals("$name: the edge check takes the answer back", register,
                         (edgeAfter[index - 1] as OneRegisterInstruction).registerA)
                 }
+
+                val speedBefore = holdSpeed.code()
+                val speedAfter = patched(holdSpeed)
+                val wideReturns = speedAfter.withIndex().filter { it.value.opcode == Opcode.RETURN_WIDE }
+                assertEquals("$name: $speedRead's returns", speedBefore.count { it.opcode == Opcode.RETURN_WIDE }, wideReturns.size)
+                for ((index, instruction) in wideReturns) {
+                    val register = (instruction as OneRegisterInstruction).registerA
+                    assertEquals("$name: before the hold speed's return at $index", HOLD_SPEED, speedAfter[index - 2].call.toString())
+                    assertEquals("$name: the register pair the hold speed hands over", listOf(register, register + 1),
+                        speedAfter[index - 2].registers())
+                    assertEquals("$name: the hold speed takes the answer back", Opcode.MOVE_RESULT_WIDE, speedAfter[index - 1].opcode)
+                    assertEquals("$name: the hold speed's answer register", register, (speedAfter[index - 1] as OneRegisterInstruction).registerA)
+                }
+                val setterFirst = patched(setter)[0]
+                assertEquals("$name: the speed setter's first call", SPEED_SET, setterFirst.call.toString())
+                assertEquals("$name: the speed the setter hands over", listOf(setter.localRegisterCount() + 1), setterFirst.registers())
 
                 val dispatch = activity.methods.single { it.name == "dispatchTouchEvent" && it.implementation != null }
                 val first = patched(dispatch)[0]

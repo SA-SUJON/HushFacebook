@@ -302,11 +302,12 @@ public class PausedHooksTest {
                 () -> DoubleTapLike.holdBackLike("DOUBLE_TAP"),
                 DoubleTapLike::holdBackTap));
         // A long press on a reel goes to Facebook's speed-up wherever it lands, the reel gets its
-        // release listener, and the lift of a hold puts the speed back.
+        // release listener, a hold speed of normal becomes 2x, and the lift of a hold puts the speed back.
         probes.put(PatchFamily.REEL_HOLD, Arrays.asList(
                 () -> ReelHold.longPress(false),
                 () -> ReelHold.anywhere(false),
                 () -> ReelHold.speedUp(false),
+                () -> ReelHold.holdSpeed(1.0) != 1.0,
                 () -> {
                     ReelHold.held();
                     return ReelHold.release(false);

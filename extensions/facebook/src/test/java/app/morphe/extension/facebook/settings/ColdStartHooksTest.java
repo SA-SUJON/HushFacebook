@@ -198,6 +198,8 @@ public class ColdStartHooksTest {
         assertFalse("a hold before the context counted anywhere on a reel", ReelHold.anywhere(false));
         assertFalse("a reel before the context got a release listener", ReelHold.speedUp(false));
         ReelHold.held();
+        ReelHold.speedSet(2f);
+        assertEquals("a hold speed read before the context changed", 1.0, ReelHold.holdSpeed(1.0), 0.0);
         assertFalse("a lift after a hold before the context put a speed back", ReelHold.release(false));
         assertFalse("stories viewed before the context were kept off their viewer lists", StorySeen.holdBack());
         assertFalse(PlayerSourcesForTests.recordsAPlayer());

@@ -12,8 +12,12 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
@@ -49,6 +53,13 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  *   reaches a listener holding the old values. Its own check of the hold flag is behind a third
  *   config answer (580 AhA, 577 AjY) that every implementation on both builds answers no, so on
  *   these builds every listener asks both flags on every touch.
+ * - The hold speed: the speed-ups in FbShortsVideoControlComponent (580 LX/83J;->A0H) and
+ *   UddPlayerControlComponent (580 LX/T9a;->A05) set FbGrootPlayer's speed to a double they read
+ *   from the object the config's no-argument CIr() answers (580 LX/4Xa;->A0R), made a float. The
+ *   same read gives the speed the helper that remembers the pre-hold speed compares with, and a
+ *   2x label. Outside the Video tab it answers a fixed 2.0; where an account's Reels live in the
+ *   Video tab (the object's surface is FB_SHORTS_IN_WATCH_TAB) it answers MobileConfig double
+ *   0x104003303ee0017, whose default no code sets.
  * - The overlay component's render (580 LX/83D;->A1F, 577 LX/7H5;->A1N) gives a reel its release
  *   listener only when the speed-up flag says yes. The control component gives it one regardless.
  *   Three other places read the speed-up flag (a Watch fragment's setup and an auto-advance guard);
@@ -62,12 +73,15 @@ internal const val ANYWHERE = "$REEL_HOLD->anywhere(Z)Z"
 internal const val SPEED_UP = "$REEL_HOLD->speedUp(Z)Z"
 internal const val RELEASE = "$REEL_HOLD->release(Z)Z"
 internal const val HELD = "$REEL_HOLD->held()V"
+internal const val HOLD_SPEED = "$REEL_HOLD->holdSpeed(D)D"
+internal const val SPEED_SET = "$REEL_HOLD->speedSet(F)V"
 
 internal const val SPEED_UP_LOG = "speed_up"
 internal const val CONFIG_FIELD = "\$immersiveFeedPlayerConfig"
 internal const val DISPATCH_DIRECTLY_FIELD = "\$shouldDispatchLongPressEventDirectly"
 internal const val IN_LONG_PRESS_FIELD = "\$isInLongPress2xPlaybackSpeed"
 internal val CONTROL_COMPONENTS = listOf("FbShortsVideoControlComponent", "FbShortsViewerOverlayComponent")
+internal val SPEED_UP_COMPONENTS = listOf("FbShortsVideoControlComponent", "UddPlayerControlComponent")
 
 private const val VIEW = "Landroid/view/View;"
 
@@ -140,6 +154,34 @@ internal fun isMethod(method: Method, reference: MethodReference): Boolean =
 internal fun speedUpLoads(method: Method): List<Int> = method.code.withIndex().filter { (_, instruction) ->
     ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string == SPEED_UP_LOG
 }.map { it.index }
+
+private fun Instruction.registers(): List<Int> = when (this) {
+    is RegisterRangeInstruction -> (startRegister until startRegister + registerCount).toList()
+    is FiveRegisterInstruction -> listOf(registerC, registerD, registerE, registerF, registerG).take(registerCount)
+    else -> emptyList()
+}
+
+/**
+ * The hold speed reads in [method]: a no-argument double method of one of [configAnswers], whose
+ * answer the next instructions take, make a float and hand to [setter] ("class->name(F)V") as its
+ * speed.
+ */
+internal fun holdSpeedReads(method: Method, setter: String, configAnswers: Set<String>): List<MethodReference> {
+    val code = method.code
+    return code.indices.mapNotNull { index ->
+        val call = (code[index] as? ReferenceInstruction)?.reference as? MethodReference ?: return@mapNotNull null
+        if ("${call.definingClass}->${call.name}(${call.parameterTypes.joinToString("")})${call.returnType}" != setter) {
+            return@mapNotNull null
+        }
+        val speed = code[index].registers().getOrNull(1) ?: return@mapNotNull null
+        val convert = code.getOrNull(index - 1)?.takeIf { it.opcode == Opcode.DOUBLE_TO_FLOAT } as? TwoRegisterInstruction
+        if (convert == null || convert.registerA != speed) return@mapNotNull null
+        val taken = code.getOrNull(index - 2)?.takeIf { it.opcode == Opcode.MOVE_RESULT_WIDE } as? OneRegisterInstruction
+        if (taken == null || taken.registerA != convert.registerB) return@mapNotNull null
+        val read = (code.getOrNull(index - 3) as? ReferenceInstruction)?.reference as? MethodReference ?: return@mapNotNull null
+        read.takeIf { it.returnType == "D" && it.parameterTypes.isEmpty() && it.definingClass in configAnswers }
+    }
+}
 
 /** Whether the instruction after the call at [index] in [method] takes its boolean answer. */
 internal fun answerTakenAt(method: Method, index: Int): Int? =
