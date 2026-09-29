@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import app.morphe.extension.facebook.coexist.MessengerLinkCheck;
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
@@ -743,6 +744,20 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         // Debug logging also fills the exported report and turns on error toasts (Logger).
         hushfacebook.addPreference(mark(toggle(context, BaseSettings.DEBUG, L10n.t("Debug logging"),
                 L10n.t("Record patch activity and show errors for a bug report. Leave off during normal use.")), SettingsIcons.BUG));
+        // A test for Debug logging only: a Messenger patched with this build's key, asked now
+        // instead of on Facebook's own schedule. Restore screens fills it in.
+        if (build.contains(PatchFamily.RESTORE_TRUST) && BaseSettings.DEBUG.get() && MessengerLinkCheck.available()) {
+            Preference link = new Row(context);
+            link.setTitle(L10n.t("Test the Messenger link"));
+            link.setSummary(L10n.t("Runs the two reads Facebook makes of Messenger at startup, now, and shows whether "
+                    + "each one answered. Shown while Debug logging is on."));
+            link.setPersistent(false);
+            link.setOnPreferenceClickListener(p -> {
+                MessengerLinkCheck.start(context);
+                return true;
+            });
+            hushfacebook.addPreference(mark(link, SettingsIcons.BUG));
+        }
         // Both rows come without a title of their own: Hushfeed's gave them one from string
         // resources that Facebook's APK doesn't have, and untitled they showed as blank rows.
         ExportDiagnosticReportPreference export = new ExportRow(context);

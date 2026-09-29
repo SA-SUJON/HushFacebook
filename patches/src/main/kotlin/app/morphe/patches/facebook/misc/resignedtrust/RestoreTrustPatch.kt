@@ -10,9 +10,11 @@ package app.morphe.patches.facebook.misc.resignedtrust
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
@@ -57,6 +59,14 @@ val restoreTrustPatch = bytecodePatch(
         check(constructor != null) { "$signers has no (List, boolean, boolean) constructor" }
 
         method.answerOriginalSigners(packageInfo, signers)
+
+        // The Debug logging test of a same-key Messenger's link. A build without its anchors still
+        // gets the fix, and the settings screen then shows no test row.
+        try {
+            fillMessengerLinkStubs(findMessengerLinkAnchors())
+        } catch (missing: PatchException) {
+            patchLog.warning("Restore screens on re-signed builds: ${missing.message}. The Messenger link test is left out.")
+        }
 
         enableStatus("restoreTrust")
     }

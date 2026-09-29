@@ -269,6 +269,15 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/resignedtrust/MessengerLinkAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the anchors and stub fills behind the Debug logging test of a same-key Messenger's link, which finds Facebook's message expiration flag reader and one of its Context-to-session lookups on Facebook 577 and 580 and has the extension call them on request."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/emoji/**",
         "patches/src/main/kotlin/app/morphe/patches/facebook/emoji/**"
       ],

@@ -450,3 +450,21 @@ Videos play at the best quality up to %1$s that Facebook offers for each, or the
 Videos play at the highest quality Facebook offers for each.	Os vídeos são reproduzidos na maior qualidade que o Facebook oferece para cada um.
 Facebook will pick the quality videos play at.	O Facebook vai escolher a qualidade de reprodução dos vídeos.
 Playback quality will be set to %1$s.	A qualidade de reprodução será %1$s.
+# context: row title under Pause, backup and diagnostics, shown only while Debug logging is on
+Test the Messenger link	Testar a conexão com o Messenger
+# context: summary of that row; Debug logging is the switch's name as this table gives it
+Runs the two reads Facebook makes of Messenger at startup, now, and shows whether each one answered. Shown while Debug logging is on.	Faz agora as duas leituras que o Facebook faz do Messenger ao iniciar e mostra se cada uma respondeu. Visível enquanto Registro de depuração está ativado.
+# context: toast when the test can't begin
+The Messenger link test couldn't start.	O teste da conexão com o Messenger não pôde começar.
+# context: toast on a build without the test
+This build can't run the Messenger link test.	Esta versão não pode fazer o teste da conexão com o Messenger.
+# context: toast when Facebook has no signed-in account
+No signed-in account to test with.	Nenhuma conta conectada para o teste.
+# context: toast with the test's result; each placeholder is one of: answered, no answer, failed (...)
+Opt-out read: %1$s. Triggered read: %2$s.	Leitura de exclusão: %1$s. Leitura de ativação: %2$s.
+# context: a read's result in that toast
+no answer	sem resposta
+# context: a read's result in that toast
+answered	respondeu
+# context: a read's result in that toast; the placeholder is an error's class name, left in English
+failed (%1$s)	falhou (%1$s)

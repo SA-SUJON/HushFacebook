@@ -556,3 +556,21 @@ Videos play at the best quality up to %1$s that Facebook offers for each, or the
 Videos play at the highest quality Facebook offers for each.	Videolar, Facebook'un her biri için sunduğu en yüksek kalitede oynatılır.
 Facebook will pick the quality videos play at.	Videoların oynatma kalitesini Facebook seçecek.
 Playback quality will be set to %1$s.	Oynatma kalitesi %1$s olarak ayarlanacak.
+# context: row title under Pause, backup and diagnostics, shown only while Debug logging is on
+Test the Messenger link	Messenger bağlantısını test et
+# context: summary of that row; Debug logging is the switch's name as this table gives it
+Runs the two reads Facebook makes of Messenger at startup, now, and shows whether each one answered. Shown while Debug logging is on.	Facebook'un açılışta Messenger'dan yaptığı iki okumayı şimdi yapar ve her birinin yanıt verip vermediğini gösterir. Hata ayıklama günlüğü açıkken görünür.
+# context: toast when the test can't begin
+The Messenger link test couldn't start.	Messenger bağlantı testi başlatılamadı.
+# context: toast on a build without the test
+This build can't run the Messenger link test.	Bu sürüm Messenger bağlantı testini çalıştıramaz.
+# context: toast when Facebook has no signed-in account
+No signed-in account to test with.	Test için oturum açmış hesap yok.
+# context: toast with the test's result; each placeholder is one of: answered, no answer, failed (...)
+Opt-out read: %1$s. Triggered read: %2$s.	Vazgeçme okuması: %1$s. Tetikleme okuması: %2$s.
+# context: a read's result in that toast
+no answer	yanıt yok
+# context: a read's result in that toast
+answered	yanıt verdi
+# context: a read's result in that toast; the placeholder is an error's class name, left in English
+failed (%1$s)	başarısız (%1$s)
