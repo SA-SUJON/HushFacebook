@@ -68,6 +68,7 @@ import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
+import app.morphe.extension.facebook.reels.DoubleTapLike;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
@@ -287,6 +288,14 @@ public class PausedHooksTest {
                 ReelDeclutter::skipSocialBubbles));
         // The Reels batcher's send of the reels you watched never reaches its executor.
         probes.put(PatchFamily.REEL_WATCH_HISTORY, Collections.singletonList(SeenStateSendForTests::heldBack));
+        // A double tap on a reel finds no handler and no heart, the reel like helper finds no key and
+        // sends no like from a double tap, and a feed attachment leaves its double tap unhandled.
+        probes.put(PatchFamily.DOUBLE_TAP_LIKE, Arrays.asList(
+                () -> DoubleTapLike.handler(new Object()) == null,
+                () -> DoubleTapLike.heart(new Object()) == null,
+                () -> DoubleTapLike.likeKey("reel") == null,
+                () -> DoubleTapLike.holdBackLike("DOUBLE_TAP"),
+                DoubleTapLike::holdBackTap));
         // A player's start with no tap before it is held, and Facebook's Autoplay setting reads Off.
         probes.put(PatchFamily.TAP_TO_PLAY, Arrays.asList(
                 () -> {

@@ -524,3 +524,7 @@ Android checks Facebook's links against Meta's signing key, which a re-signed bu
 Android's settings for this app didn't open. Open App info from Facebook's icon, then Open by default.	Bu uygulamanın Android ayarları açılamadı. Facebook simgesinden Uygulama bilgileri'ni, ardından Varsayılan olarak aç'ı açın.
 # context: message when a save starts and its notification can't show (Facebook's notifications or the saves channel are off); Downloads is the settings section that lists running saves, each with its own Cancel
 Saving... Cancel: Downloads in Hushfacebook.	Kaydediliyor... İptal: Hushfacebook'ta İndirmeler.
+# context: switch title under Reels and Watch; on, a double tap on a reel or a video doesn't like it
+Turn off double tap to like	Beğenmek için çift dokunmayı kapat
+# context: summary of that switch; Like is the name of Facebook's own button, as Facebook shows it in this language
+A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like button work as before.	Bir reel'e veya videoya çift dokunmak artık onu beğenmez ve kalp göstermez. Tek dokunuş ve Beğen düğmesi eskisi gibi çalışır.

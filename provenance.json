@@ -422,6 +422,17 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: resume long videos. FacebookAppAdsRemover describes the behavior and has no licence, so nothing was taken from its code. The patch finds FbGrootPlayer in Facebook 577 and 580 by its play trace, then its kept-name maybeTrackVideoStart and maybeTrackVideoStop, its release, bind and static seek by the trace strings they keep, its public seek as the one that hands on to that seek, its position reader as the one int method of the interface that declares isPlaying, and its length reader as the other int method its own remaining-time sum asks. VideoPlayerParams' field names come from the debug dump that reports each under its real name. The extension saves where a video longer than two minutes stopped, up to 200 of them for 30 days in a preferences file of its own, forgets one stopped near its end, and seeks back once on the video's next first start unless a seek came first or Facebook placed the start itself."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/reels/DoubleTapLike.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/reels/doubletap/DoubleTapAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/reels/doubletap/TurnOffDoubleTapLikePatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the switch on liking a reel or a video with a double tap. The patch finds, in Facebook 577 and 580, the reel like helper by its kept trace FbShortsMutationUtil.mutateViewerLikeReaction, its double-tap like as its one instance method taking two objects and a boolean, GestureReactionComponent by the name its constructor gives it, that component's gesture view through onCreateMountContent, the view's heart by the shortFormVideoUnit key it logs, and the feed attachment's own double tap as the one onDoubleTap animating translationY. It hands the extension the gesture view's double-tap handler after every read of it, the double-tap like's key for the reel, the helper like's source and the attachment's double tap. While the switch is on the extension answers that there's no handler and no key, holds back a like whose source is DOUBLE_TAP and leaves the attachment's double tap unhandled, and otherwise hands back what Facebook handed over."
     }
   ]
 }

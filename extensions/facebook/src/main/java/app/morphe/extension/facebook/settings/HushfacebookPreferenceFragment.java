@@ -468,6 +468,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                     L10n.t("Don't send reel watch history"),
                     L10n.t("Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.")));
         }
+        if (build.contains(PatchFamily.DOUBLE_TAP_LIKE)) {
+            reels.addPreference(toggle(context, Settings.TURN_OFF_DOUBLE_TAP_LIKE,
+                    L10n.t("Turn off double tap to like"),
+                    L10n.t("A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like "
+                            + "button work as before.")));
+        }
         if (build.contains(PatchFamily.REEL_DOWNLOAD)) {
             reels.addPreference(toggle(context, Settings.DOWNLOAD_REELS, L10n.t("Download button on reels"),
                     L10n.t("Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.")));

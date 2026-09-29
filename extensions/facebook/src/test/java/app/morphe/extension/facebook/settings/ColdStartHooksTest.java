@@ -6,6 +6,7 @@ package app.morphe.extension.facebook.settings;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -60,6 +61,7 @@ import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
+import app.morphe.extension.facebook.reels.DoubleTapLike;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
@@ -182,6 +184,11 @@ public class ColdStartHooksTest {
         assertFalse(ReelDeclutter.skipHotComment());
         assertFalse(ReelDeclutter.skipSocialBubbles());
         assertFalse("a batch of watched reels sent before the context was held back", SeenStateSendForTests.heldBack());
+        assertNotNull("a double tap before the context lost its handler", DoubleTapLike.handler(new Object()));
+        assertNotNull("a double tap before the context lost its heart", DoubleTapLike.heart(new Object()));
+        assertNotNull("a double tap like before the context lost its key", DoubleTapLike.likeKey("reel"));
+        assertFalse("a like from a double tap before the context was held back", DoubleTapLike.holdBackLike("DOUBLE_TAP"));
+        assertFalse("an attachment's double tap before the context was left unhandled", DoubleTapLike.holdBackTap());
         assertFalse("stories viewed before the context were kept off their viewer lists", StorySeen.holdBack());
         assertFalse(PlayerSourcesForTests.recordsAPlayer());
         assertFalse("a post menu built before the context got the video item", VideoMenuItemForTests.addsAnItem());

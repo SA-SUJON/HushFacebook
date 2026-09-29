@@ -524,3 +524,7 @@ Android checks Facebook's links against Meta's signing key, which a re-signed bu
 Android's settings for this app didn't open. Open App info from Facebook's icon, then Open by default.	No se abrieron los ajustes de Android para esta app. Abre Información de la app desde el icono de Facebook y luego Abrir de forma predeterminada.
 # context: message when a save starts and its notification can't show (Facebook's notifications or the saves channel are off); Downloads is the settings section that lists running saves, each with its own Cancel
 Saving... Cancel: Downloads in Hushfacebook.	Guardando... Cancelar: Descargas en Hushfacebook.
+# context: switch title under Reels and Watch; on, a double tap on a reel or a video doesn't like it
+Turn off double tap to like	Desactivar tocar dos veces para dar Me gusta
+# context: summary of that switch; Like is the name of Facebook's own button, as Facebook shows it in this language
+A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like button work as before.	Tocar dos veces un reel o un vídeo ya no le da Me gusta ni muestra un corazón. Un toque y el botón Me gusta funcionan como antes.
