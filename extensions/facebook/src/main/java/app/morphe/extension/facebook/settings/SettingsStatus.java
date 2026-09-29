@@ -90,6 +90,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean keepReelSpeed() {
+        return false;
+    }
+
     public static boolean defaultCommentOrder() {
         return false;
     }

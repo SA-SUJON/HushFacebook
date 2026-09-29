@@ -487,6 +487,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                     L10n.t("A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like "
                             + "button work as before.")));
         }
+        if (build.contains(PatchFamily.KEEP_REEL_SPEED)) {
+            reels.addPreference(toggle(context, Settings.KEEP_REEL_SPEED, L10n.t("Keep the reel speed"),
+                    L10n.t("A playback speed you pick in a reel's menu stays for the next reels until you pick another "
+                            + "or Facebook restarts. Off, every reel starts at normal speed.")));
+        }
         if (build.contains(PatchFamily.REEL_DOWNLOAD)) {
             reels.addPreference(toggle(context, Settings.DOWNLOAD_REELS, L10n.t("Download button on reels"),
                     L10n.t("Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.")));

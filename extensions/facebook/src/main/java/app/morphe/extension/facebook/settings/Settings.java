@@ -223,6 +223,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_turn_off_double_tap_like", TRUE);
 
     /**
+     * A speed picked in a reel's menu stays for the next reels in that viewer until another is
+     * picked or Facebook restarts ({@link app.morphe.extension.facebook.media.ReelSpeed}). Nothing is
+     * stored. Off or paused, each reel starts at the speed Facebook starts it at.
+     */
+    public static final BooleanSetting KEEP_REEL_SPEED =
+            new BooleanSetting("hushfacebook_keep_reel_speed", TRUE);
+
+    /**
      * Comment sheets ask for the order in {@link #COMMENT_ORDER} where Facebook's servers would
      * choose one, and an order picked in a post's comments stays for that post until Facebook
      * restarts ({@link app.morphe.extension.facebook.comments.DefaultCommentOrder}). A request that

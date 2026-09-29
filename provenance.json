@@ -436,6 +436,17 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the switch on liking a reel or a video with a double tap. The patch finds, in Facebook 577 and 580, the reel like helper by its kept trace FbShortsMutationUtil.mutateViewerLikeReaction, its double-tap like as its one instance method taking two objects and a boolean, GestureReactionComponent by the name its constructor gives it, that component's gesture view through onCreateMountContent, the view's heart by the shortFormVideoUnit key it logs, and the feed attachment's own double tap as the one onDoubleTap animating translationY. It hands the extension the gesture view's double-tap handler after every read of it, the double-tap like's key for the reel, the helper like's source and the attachment's double tap. While the switch is on the extension answers that there's no handler and no key, holds back a like whose source is DOUBLE_TAP and leaves the attachment's double tap unhandled, and otherwise hands back what Facebook handed over."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/ReelSpeed.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/reelspeed/KeepReelSpeedPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/reelspeed/ReelSpeedAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: keep the reel speed. The patch finds, in Facebook 577 and 580, FbGrootPlayer by its play trace, then its speed setter as the one instance (F)V method reading HeroPlayerSetting.enableLastPlaybackSpeedCacheUpdate, its PlayerOrigin getter as the one method answering a PlayerOrigin, its bind by its bindVideoSources trace and its kept-name maybeTrackVideoStart, and the Reels menu's speed toast as the one static (Context, float) method holding InlinePlaybackSpeedAttributeSelector. The setter, the bind, the start and the toast hand the extension their arguments first thing, and the extension's stubs are filled with the setter and the origin getter. The extension keeps a speed picked in the Reels menu, in memory only, with the origin of the player it was set on, and sets it on the first start after each bind of a player with that origin."
     }
   ]
 }

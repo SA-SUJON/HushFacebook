@@ -537,3 +537,6 @@ Saving... Cancel: Downloads in Hushfacebook.	Wird gespeichert … Abbrechen: Dow
 Turn off double tap to like	Doppeltippen zum Liken ausschalten
 # context: summary of that switch; Like is the name of Facebook's own button, as Facebook shows it in this language
 A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like button work as before.	Doppeltippen auf ein Reel oder Video markiert es nicht mehr mit „Gefällt mir“ und zeigt kein Herz. Einmal tippen und der „Gefällt mir“-Button funktionieren wie bisher.
+Keep the reel speed	Reel-Geschwindigkeit beibehalten
+# context: summary of that switch
+A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. Off, every reel starts at normal speed.	Eine Wiedergabegeschwindigkeit, die du im Menü eines Reels wählst, bleibt für die nächsten Reels, bis du eine andere wählst oder Facebook neu startet. Aus startet jedes Reel mit normaler Geschwindigkeit.

@@ -80,13 +80,16 @@ import java.util.Set;
  * and the Messenger button handler, holding "long_press", each with Open Messenger from the top
  * bar's call to {@code MessengerIcon.open} first. And the reel like helper's like, holding its
  * trace, and the feed attachment's onDoubleTap, holding "translationY", each with Turn off double
- * tap to like's call to {@code DoubleTapLike} first. Beside each method a start-call, next-call,
+ * tap to like's call to {@code DoubleTapLike} first. And the Reels menu's speed toast, holding its
+ * selector's name, with Keep the reel speed's call to {@code ReelSpeed.picked} first. Beside each
+ * method a start-call, next-call,
  * sole-call or once-call rule picks sit methods holding part of what it's picked by: the tray
  * controller, the refresh controller's onPause, two other methods naming both surfaces and one
  * holding the emoji provider's log tag alone, as Facebook's do, an instance method holding the
  * emoji pictures' base address, a method of the tap's shape holding one entry point and one of
  * another shape holding "long_press", a static method holding the like's trace and one holding
- * "translationY", and three top bar, three batcher and three swap runnable
+ * "translationY", an instance method holding the toast's selector name, and three top bar, three
+ * batcher and three swap runnable
  * methods, which Facebook doesn't have, so neither the logo rule, the watch-history rule nor the
  * swap rule passes with its second string or its shape left out.
  *
@@ -166,6 +169,10 @@ public class BadDexFixture {
     private static final ImmutableMethodReference HOLD_BACK_LIKE =
             method(DOUBLE_TAP_LIKE, "holdBackLike", "Z", "Ljava/lang/String;");
     private static final ImmutableMethodReference HOLD_BACK_TAP = method(DOUBLE_TAP_LIKE, "holdBackTap", "Z");
+
+    private static final String SPEED_TOAST = "Lfixture/SpeedToast;";
+    private static final String REEL_SPEED = "Lapp/morphe/extension/facebook/media/ReelSpeed;";
+    private static final ImmutableMethodReference PICKED = method(REEL_SPEED, "picked", "V", "F");
 
     private static final String SHORTCUT_MANAGER = "Landroid/content/pm/ShortcutManager;";
     private static final String SHORTCUT_INFO = "Landroid/content/pm/ShortcutInfo;";
@@ -931,6 +938,49 @@ public class BadDexFixture {
                         define(DOUBLE_TAP_LIKE, "holdBackTap", "Z", true, no)));
     }
 
+    /**
+     * The Reels menu's speed toast: its show, a static method taking a context and the speed (v0
+     * and v1 free, v2 the context, v3 the speed), holding the selector's name with [showPrefix]
+     * first, and an instance method of the same parameters holding it too (v3 the context, v4 the
+     * speed), with [instancePrefix] first, as Facebook has only the static one.
+     */
+    private static ClassDef speedToast(List<Instruction> showPrefix, List<Instruction> instancePrefix) {
+        return new ImmutableClassDef(SPEED_TOAST, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Arrays.asList(
+                        define(SPEED_TOAST, "show", "V", true, toastBody(showPrefix, 4), CONTEXT, "F"),
+                        define(SPEED_TOAST, "showOver", "V", false, toastBody(instancePrefix, 5), CONTEXT, "F")));
+    }
+
+    /** [prefix], then the selector's name in v0 and a return, in [registers] registers. */
+    private static ImmutableMethodImplementation toastBody(List<Instruction> prefix, int registers) {
+        List<Instruction> instructions = new ArrayList<>(prefix);
+        instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0,
+                new ImmutableStringReference("InlinePlaybackSpeedAttributeSelector")));
+        instructions.add(op(Opcode.RETURN_VOID));
+        return new ImmutableMethodImplementation(registers, instructions, null, null);
+    }
+
+    /** What Keep the reel speed puts first in the toast: the speed in [register] handed over as a range. */
+    private static List<Instruction> toastHook(int register) {
+        return Collections.<Instruction>singletonList(
+                new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, register, 1, PICKED));
+    }
+
+    /** The toast's hook after a branch on the context, not first. */
+    private static List<Instruction> lateToastHook() {
+        List<Instruction> late = new ArrayList<>();
+        late.add(ifEqz(2, 3));                                            // 0 -> 3
+        late.add(op(Opcode.NOP));                                         // 2
+        late.addAll(toastHook(3));                                        // 3
+        return late;
+    }
+
+    private static ClassDef reelSpeed() {
+        return new ImmutableClassDef(REEL_SPEED, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
+                OBJECT, null, null, null, null, Collections.singletonList(
+                        define(REEL_SPEED, "picked", "V", true, body(1, op(Opcode.RETURN_VOID)), "F")));
+    }
+
     /** [classes] with each of [replacements] in place of the class of its type. */
     private static List<ClassDef> replaced(List<ClassDef> classes, ClassDef... replacements) {
         List<ClassDef> out = new ArrayList<>(classes);
@@ -1396,7 +1446,8 @@ public class BadDexFixture {
                 messengerBar(messengerHook(), Collections.<Instruction>emptyList(), messengerHook(),
                         Collections.<Instruction>emptyList()), messengerIcon(),
                 reelLikeHelper(likeHook(), Collections.<Instruction>emptyList()),
-                attachmentTap(tapHook(), Collections.<Instruction>emptyList()), doubleTapLike());
+                attachmentTap(tapHook(), Collections.<Instruction>emptyList()), doubleTapLike(),
+                speedToast(toastHook(3), Collections.<Instruction>emptyList()), reelSpeed());
     }
 
     /** The clean host, Facebook's classes as they ship, with the batcher's flush making [handOver]. */
@@ -1411,7 +1462,8 @@ public class BadDexFixture {
                 messengerBar(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList(),
                         Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 reelLikeHelper(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
-                attachmentTap(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()));
+                attachmentTap(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
+                speedToast(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()));
     }
 
     /**
@@ -1935,6 +1987,11 @@ public class BadDexFixture {
         dexes.put("bad-double-tap-tap-hook-missing", replaced(good(), attachmentTap(noHook, noHook)));
         dexes.put("bad-double-tap-tap-hook-late", replaced(good(), attachmentTap(lateTapHook(), noHook)));
 
+        // contract: the Reels menu's speed toast left without Keep the reel speed's call or with the
+        // call after a branch.
+        dexes.put("bad-reel-speed-hook-missing", replaced(good(), speedToast(noHook, noHook)));
+        dexes.put("bad-reel-speed-hook-late", replaced(good(), speedToast(lateToastHook(), noHook)));
+
         // contract: the GenAI reel stub left as the extension ships it, answering its marker.
         dexes.put("bad-finder-stub-not-filled", withFinderStub(good(), UNFILLED_FINDER_STUB));
         // contract: the stub filled with a call that never leaves the extension, not Facebook's finder.
@@ -2038,6 +2095,7 @@ public class BadDexFixture {
                 messengerBar(messengerHook(), none, none, messengerHook())));
         dexes.put("bad-double-tap-like-hook-wrong-method", replaced(good(), reelLikeHelper(none, likeHook())));
         dexes.put("bad-double-tap-tap-hook-wrong-method", replaced(good(), attachmentTap(none, tapHook())));
+        dexes.put("bad-reel-speed-hook-wrong-method", replaced(good(), speedToast(none, toastHook(4))));
         // contract: a second method answering the return-refresh rule, so it can't say which one
         // the hook belongs in, although the hook is where it was.
         dexes.put("bad-return-refresh-two-callbacks", replaced(good(), returnController(returnHook(), none, true)));
