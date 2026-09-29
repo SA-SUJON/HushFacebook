@@ -11,11 +11,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.SystemClock;
+import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
@@ -53,6 +55,10 @@ public class MessengerIconTest {
 
     @Before
     public void startClean() {
+        // Each test starts as a screen does after a gesture is called off, with nothing left from
+        // another test's fingers or taps.
+        long now = SystemClock.uptimeMillis();
+        MessengerIcon.touch(MotionEvent.obtain(now, now, MotionEvent.ACTION_CANCEL, 0, 0, 0));
         MessengerIconForTests.uninstall();
         MessengerIconForTests.nextStarted();
         HookStatus.clear();
@@ -85,6 +91,33 @@ public class MessengerIconTest {
         MessengerIcon.touch(MotionEvent.obtain(down, down, MotionEvent.ACTION_DOWN, 40, 40, 0));
         ShadowSystemClock.advanceBy(heldMs, TimeUnit.MILLISECONDS);
         MessengerIcon.touch(MotionEvent.obtain(down, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 40, 40, 0));
+    }
+
+    /** Pointer ids: a finger resting somewhere else on the screen, and one on the icon. */
+    private static final int RESTING = 0;
+    private static final int ON_ICON = 1;
+
+    /**
+     * Now, the finger at {@code index} of {@code ids} landing or lifting ({@code action}), with every
+     * finger in {@code ids} on the screen, in a gesture whose first finger went down at {@code start}.
+     */
+    private static MotionEvent fingers(long start, int action, int index, int... ids) {
+        MotionEvent.PointerProperties[] properties = new MotionEvent.PointerProperties[ids.length];
+        MotionEvent.PointerCoords[] coords = new MotionEvent.PointerCoords[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            properties[i] = new MotionEvent.PointerProperties();
+            properties[i].id = ids[i];
+            properties[i].toolType = MotionEvent.TOOL_TYPE_FINGER;
+            coords[i] = new MotionEvent.PointerCoords();
+            coords[i].x = 40 + 300 * ids[i];
+            coords[i].y = 40;
+        }
+        return MotionEvent.obtain(start, SystemClock.uptimeMillis(), action | index << MotionEvent.ACTION_POINTER_INDEX_SHIFT,
+                ids.length, properties, coords, 0, 0, 1, 1, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0);
+    }
+
+    private static void advance(long ms) {
+        ShadowSystemClock.advanceBy(ms, TimeUnit.MILLISECONDS);
     }
 
     /** Off until it's turned on: a tap with Messenger right there still opens Facebook's Chats. */
@@ -215,6 +248,112 @@ public class MessengerIconTest {
         assertEquals(List.of(), HookStatus.missing(FamilyNames.MESSENGER_ICON));
     }
 
+    /**
+     * A finger resting elsewhere doesn't make a quick tap on the icon a long press. When the tap's
+     * finger lifts last, its lift carries the time the resting finger went down, so each finger is
+     * timed from its own landing.
+     */
+    @Test
+    public void aQuickTapWhileAnotherFingerRestsIsATap() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        long start = SystemClock.uptimeMillis();
+        MessengerIcon.touch(fingers(start, MotionEvent.ACTION_DOWN, 0, RESTING));
+        advance(ViewConfiguration.getLongPressTimeout() + 100);
+        MessengerIcon.touch(fingers(start, MotionEvent.ACTION_POINTER_DOWN, 1, RESTING, ON_ICON));
+        advance(40);
+        MessengerIcon.touch(fingers(start, MotionEvent.ACTION_POINTER_UP, 0, RESTING, ON_ICON));
+        advance(40);
+        MessengerIcon.touch(fingers(start, MotionEvent.ACTION_UP, 0, ON_ICON));
+        assertTrue("an 80 ms tap was taken as held", MessengerIcon.open(app, false));
+        assertNotNull(MessengerIconForTests.nextStarted());
+    }
+
+    /**
+     * A press held on the icon while another finger is down lifts as one pointer going up, not as
+     * the gesture's end. It's still a long press, and stays Facebook's.
+     */
+    @Test
+    public void aPressHeldOnTheIconWhileAnotherFingerIsDownStaysFacebooks() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        long start = SystemClock.uptimeMillis();
+        MessengerIcon.touch(fingers(start, MotionEvent.ACTION_DOWN, 0, RESTING));
+        advance(20);
+        MessengerIcon.touch(fingers(start, MotionEvent.ACTION_POINTER_DOWN, 1, RESTING, ON_ICON));
+        advance(ViewConfiguration.getLongPressTimeout() + 100);
+        MessengerIcon.touch(fingers(start, MotionEvent.ACTION_POINTER_UP, 1, RESTING, ON_ICON));
+        assertFalse("a held press opened Messenger", MessengerIcon.open(app, false));
+        assertNull("something was started", MessengerIconForTests.nextStarted());
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 1, 1 found, 0 missing. Counted: "
+                + MessengerIcon.LONG_PRESS + " 1", statusLine());
+    }
+
+    /**
+     * Where MobileConfig sends the tap on to the Messenger button handler, the handler's hook asks
+     * again straight after and gets the same answer. That's still one long press, whether the tap
+     * learns it from the lift or is told while the finger is down, and a tap that opens Messenger
+     * after it counts once too.
+     */
+    @Test
+    public void aLongPressThatAsksTwiceCountsOnce() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        press(ViewConfiguration.getLongPressTimeout() + 100);
+        assertFalse(MessengerIcon.open(app, false));
+        assertFalse("the handler's ask opened Messenger", MessengerIcon.open(app, false));
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 2, 1 found, 0 missing. Counted: "
+                + MessengerIcon.LONG_PRESS + " 1", statusLine());
+
+        long down = SystemClock.uptimeMillis();
+        MessengerIcon.touch(MotionEvent.obtain(down, down, MotionEvent.ACTION_DOWN, 40, 40, 0));
+        advance(ViewConfiguration.getLongPressTimeout());
+        assertFalse(MessengerIcon.open(app, true));
+        assertFalse(MessengerIcon.open(app, true));
+        advance(100);
+        MessengerIcon.touch(MotionEvent.obtain(down, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 40, 40, 0));
+        assertNull("something was started", MessengerIconForTests.nextStarted());
+
+        press(60);
+        assertTrue(MessengerIcon.open(app, false));
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 5, 1 found, 0 missing. Counted: "
+                + MessengerIcon.LONG_PRESS + " 2, " + MessengerIcon.OPENED + " 1", statusLine());
+    }
+
+    /**
+     * Without Messenger, the tap and the handler it goes on to each find none, and that's one tap.
+     * A second tap straight after is a tap of its own.
+     */
+    @Test
+    public void aTapThatAsksTwiceWithoutMessengerCountsOnce() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        press(60);
+        assertFalse(MessengerIcon.open(app, false));
+        assertFalse(MessengerIcon.open(app, false));
+        press(60);
+        assertFalse(MessengerIcon.open(app, false));
+        assertFalse(MessengerIcon.open(app, false));
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 4, 1 found, 0 missing. Counted: "
+                + MessengerIcon.NO_MESSENGER + " 2", statusLine());
+    }
+
+    /**
+     * Taps no finger made, accessibility clicks say, come with no touch to tell them apart. Two
+     * further apart than one tap's two asks are two taps, each asking twice.
+     */
+    @Test
+    public void tapsNoFingerMadeCountOnceEach() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        assertFalse(MessengerIcon.open(app, true));
+        assertFalse(MessengerIcon.open(app, true));
+        advance(MessengerIcon.SAME_TAP_MS + 1);
+        assertFalse(MessengerIcon.open(app, true));
+        assertFalse(MessengerIcon.open(app, true));
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 4, 0 found, 0 missing. Counted: "
+                + MessengerIcon.LONG_PRESS + " 2", statusLine());
+    }
+
     @Test
     public void pausedTheTapIsFacebooks() {
         Settings.OPEN_MESSENGER_APP.save(true);
@@ -266,6 +405,24 @@ public class MessengerIconTest {
         };
         assertFalse(MessengerIcon.open(refusing, false));
         assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 1, 0 found, 0 missing. Counted: "
+                + MessengerIcon.REFUSED + " 1", statusLine());
+    }
+
+    /** The handler MobileConfig sends the tap on to asks again and is turned down again: one tap. */
+    @Test
+    public void aStartTurnedDownTwiceInOneTapCountsOnce() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        Context refusing = new ContextWrapper(app) {
+            @Override
+            public void startActivity(Intent intent) {
+                throw new ActivityNotFoundException("No Activity found to handle " + intent);
+            }
+        };
+        press(60);
+        assertFalse(MessengerIcon.open(refusing, false));
+        assertFalse(MessengerIcon.open(refusing, false));
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 2, 1 found, 0 missing. Counted: "
                 + MessengerIcon.REFUSED + " 1", statusLine());
     }
 

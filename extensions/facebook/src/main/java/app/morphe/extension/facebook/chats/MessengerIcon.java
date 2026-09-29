@@ -13,6 +13,8 @@ import android.view.ViewConfiguration;
 
 import androidx.annotation.Nullable;
 
+import java.util.Arrays;
+
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.Logger;
@@ -38,8 +40,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * MobileConfig flag decides, the tap is told so. Where it doesn't, the top bar takes a press held on
  * the icon as a plain tap once the finger lifts, and Facebook opens Chats for it. The tap can't tell
  * that one apart, so the patch also hands {@link #touch} every touch on a Facebook screen before
- * Facebook sees it. A tap that comes as the release of a finger held past the long-press time is
- * left to Facebook too.
+ * Facebook sees it. A tap that comes as the release of a finger held past the long-press time,
+ * timed from that finger's own landing whatever other fingers do, is left to Facebook too.
  */
 public final class MessengerIcon {
     /** Counted under the patch's name when a tap opened Messenger. */
@@ -60,35 +62,88 @@ public final class MessengerIcon {
     /** The source every event of this hook carries in the diagnostic report. */
     private static final String SOURCE = "MessengerIcon";
 
+    /**
+     * How soon after a counted ask another one, with no finger landing or lifting between, is the
+     * same tap asking again from the Messenger button handler. That ask comes straight after, and
+     * no second tap comes this quickly.
+     */
+    static final long SAME_TAP_MS = 250;
+
     private static final long NONE = Long.MIN_VALUE;
 
     /** When the hook saw the last finger lift after a long press, on the uptime clock, or NONE. */
     private static volatile long heldReleaseSeenAt = NONE;
+
+    /**
+     * When each finger now down landed, by pointer id (0 to 31), on the event clock, or NONE. Main
+     * thread only, as the dispatch is, and made once so a touch allocates nothing.
+     */
+    private static final long[] downAt = new long[32];
+
+    /** When a decline was last counted, on the uptime clock, or NONE. Main thread only. */
+    private static long declineCountedAt = NONE;
+
+    static {
+        Arrays.fill(downAt, NONE);
+    }
 
     private MessengerIcon() {
     }
 
     /**
      * Injection point, first thing in FbFragmentActivity.dispatchTouchEvent: notes when a finger
-     * lifts after staying down for the long-press time, and forgets it when the next one goes down.
-     * It only reads the event. Never throws.
+     * lifts after staying down for the long-press time, and forgets it when a new gesture starts or
+     * one is called off. It only reads the event. Never throws.
      */
     public static void touch(@Nullable MotionEvent event) {
         try {
             if (event == null) return;
             int action = event.getActionMasked();
-            if (action == MotionEvent.ACTION_DOWN) {
-                HookStatus.bound(FamilyNames.MESSENGER_ICON, "touches");
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_CANCEL) {
+                Arrays.fill(downAt, NONE);
                 heldReleaseSeenAt = NONE;
-            } else if (action == MotionEvent.ACTION_UP) {
-                // Held for as long as the event says, but timed from when it got here, so a busy
-                // main thread that hands the lift on late doesn't push the tap out of the window.
-                boolean held = event.getEventTime() - event.getDownTime() >= ViewConfiguration.getLongPressTimeout();
-                heldReleaseSeenAt = held ? SystemClock.uptimeMillis() : NONE;
+                declineCountedAt = NONE;
+                if (action == MotionEvent.ACTION_CANCEL) return;
+                HookStatus.bound(FamilyNames.MESSENGER_ICON, "touches");
             }
+            boolean landed = action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN;
+            if (!landed && action != MotionEvent.ACTION_UP && action != MotionEvent.ACTION_POINTER_UP) return;
+            int pointer = event.getPointerId(event.getActionIndex());
+            if (pointer < 0 || pointer >= downAt.length) return;
+            // A finger landing or lifting makes the next ask another tap's.
+            declineCountedAt = NONE;
+            if (landed) {
+                downAt[pointer] = event.getEventTime();
+                return;
+            }
+            // Each finger is timed from its own landing: a lift's getDownTime() is when the
+            // gesture's first finger went down, another finger's once two are down. A lift whose
+            // landing the hook missed is timed from that, which leaves the doubt to Facebook.
+            long down = downAt[pointer];
+            downAt[pointer] = NONE;
+            if (down == NONE) down = event.getDownTime();
+            // The latest lift decides, as the tap it makes is the next thing to ask. Held for as long
+            // as the events say, but timed from when the lift got here, so a busy main thread that
+            // hands it on late doesn't push the tap out of the window.
+            boolean held = event.getEventTime() - down >= ViewConfiguration.getLongPressTimeout();
+            heldReleaseSeenAt = held ? SystemClock.uptimeMillis() : NONE;
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.MESSENGER_ICON, "Messenger icon touches", failure);
         }
+    }
+
+    /**
+     * Counts why a tap was left to Facebook, once per tap, and says whether it did. Where MobileConfig
+     * sends the tap on to the Messenger button handler, that handler's hook asks again straight
+     * after and gets the same answer, with no finger landing or lifting between.
+     */
+    private static boolean countDecline(String why) {
+        long now = SystemClock.uptimeMillis();
+        long last = declineCountedAt;
+        declineCountedAt = now;
+        if (last != NONE && now >= last && now - last <= SAME_TAP_MS) return false;
+        HookStatus.counted(FamilyNames.MESSENGER_ICON, why);
+        return true;
     }
 
     /** Whether a finger held past the long-press time lifted no more than the window before {@code now}. */
@@ -110,14 +165,14 @@ public final class MessengerIcon {
             if (context == null) return false;
             if (!Utils.settingsReady() || !Settings.OPEN_MESSENGER_APP.get()) return false;
             if (longPress || heldPressJustLifted(SystemClock.uptimeMillis())) {
-                HookStatus.counted(FamilyNames.MESSENGER_ICON, LONG_PRESS);
+                countDecline(LONG_PRESS);
                 return false;
             }
             // Null unless Messenger is installed, enabled and has a MAIN/LAUNCHER (or INFO) activity.
             // The intent comes with FLAG_ACTIVITY_NEW_TASK, so Messenger opens in its own task.
             Intent launch = context.getPackageManager().getLaunchIntentForPackage(MessengerCard.MESSENGER);
             if (launch == null) {
-                HookStatus.counted(FamilyNames.MESSENGER_ICON, NO_MESSENGER);
+                countDecline(NO_MESSENGER);
                 return false;
             }
             try {
@@ -125,7 +180,7 @@ public final class MessengerIcon {
             } catch (ActivityNotFoundException | SecurityException refused) {
                 // Messenger went away since the lookup, or the start was refused. Only the class is
                 // reported: the exception's own text quotes the intent.
-                HookStatus.counted(FamilyNames.MESSENGER_ICON, REFUSED);
+                if (!countDecline(REFUSED)) return false;
                 final String kind = refused.getClass().getSimpleName();
                 Logger.diagnosticError(DiagnosticCategory.FEED_AND_NAVIGATION, SOURCE,
                         () -> "Messenger didn't start (" + kind + "). Facebook's Chats opens instead.", null);
