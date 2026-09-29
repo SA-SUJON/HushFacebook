@@ -54,7 +54,11 @@ public class ReelsShortcutTest {
     }
 
     @After
-    public void restore() {
+    public void restore() throws Exception {
+        // SettingsEntry's shortcut checks run on background threads, and Robolectric's
+        // ShortcutManager isn't thread-safe the way the real one is: each call in these tests
+        // waits for them before the next one touches it, and so does the next test.
+        Utils.awaitBackgroundTasksForTests();
         ReelsTabForTests.inBuild(null);
         ReelsTabForTests.forget();
         PauseForTests.resume();
@@ -90,6 +94,7 @@ public class ReelsShortcutTest {
         manager.pushDynamicShortcut(facebooks(ReelsTabForTests.SHORTCUT_ID));
 
         SettingsEntry.pushDynamicShortcut(manager, facebooks(ReelsTabForTests.SHORTCUT_ID));
+        Utils.awaitBackgroundTasksForTests();
         SettingsEntry.pushDynamicShortcut(manager, facebooks("shortcut_notification_tab"));
         Utils.awaitBackgroundTasksForTests();
         assertNull("the Reels shortcut published before stayed", published(ReelsTabForTests.SHORTCUT_ID));
@@ -109,6 +114,7 @@ public class ReelsShortcutTest {
         assertNotNull("the Hushfacebook shortcut wasn't published again", published(SettingsEntry.SHORTCUT_ID));
 
         assertTrue(SettingsEntry.updateShortcuts(manager, Collections.singletonList(facebooks(ReelsTabForTests.SHORTCUT_ID))));
+        Utils.awaitBackgroundTasksForTests();
         assertNull("an update put the Reels shortcut back", published(ReelsTabForTests.SHORTCUT_ID));
         assertEquals("pushes held back, counted", 4, counted());
     }
@@ -139,6 +145,7 @@ public class ReelsShortcutTest {
             PauseForTests.pause(reason);
             assertTrue(SettingsEntry.setDynamicShortcuts(manager,
                     Collections.singletonList(facebooks(ReelsTabForTests.SHORTCUT_ID))));
+            Utils.awaitBackgroundTasksForTests();
             SettingsEntry.publishShortcut(context);
             Utils.awaitBackgroundTasksForTests();
             assertNotNull("a Hushfacebook paused by " + reason + " held the shortcut back",
