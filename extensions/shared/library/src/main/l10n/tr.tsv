@@ -499,7 +499,7 @@ Marketplace mode and your start tab	Marketplace modu ve başlangıç sekmesi
 Ads, suggestions and word filters	Reklamlar, öneriler ve kelime filtreleri
 Suggestions, saving, auto-advance and viewing anonymously	Öneriler, kaydetme, otomatik ilerleme ve anonim izleme
 Cleaner reels and video controls	Daha sade Reels ve video kontrolleri
-Tap to play and resume	Oynatmak için dokunma ve devam ettirme
+Tap to play, quality and resume	Oynatmak için dokunma, kalite ve devam ettirme
 Quality, format and file names	Kalite, biçim ve dosya adları
 Browse settings	Ayarları keşfet
 More settings	Diğer ayarlar
@@ -543,3 +543,16 @@ A playback speed you pick in a reel's menu stays for the next reels until you pi
 Hold a reel for 2x	2x için reel'e basılı tut
 # context: summary of that switch; more button is the reel's own button with three dots
 Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.	Bir reel'e basılı tutmak, bırakana kadar onu iki kat hızda oynatır ve Facebook'un uzun basma menüsünün yerini alır. Reel'in daha fazla düğmesi bu menüyü açmaya devam eder.
+Default playback quality	Varsayılan oynatma kalitesi
+Play videos, reels and stories at the quality below. A quality picked in a video's own menu still wins.	Videoları, Reels'i ve hikayeleri aşağıdaki kalitede oynatın. Bir videonun kendi menüsünde seçilen kalite yine önceliklidir.
+Playback quality	Oynatma kalitesi
+Auto	Otomatik
+Data saver	Veri tasarrufu
+Up to %1$s	En fazla %1$s
+Highest	En yüksek
+Facebook picks the quality as each video plays, from your connection.	Facebook, her video oynatılırken kaliteyi bağlantınıza göre seçer.
+Videos play at the lowest quality Facebook offers for each.	Videolar, Facebook'un her biri için sunduğu en düşük kalitede oynatılır.
+Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.	Videolar, Facebook'un her biri için sunduğu en fazla %1$s olan en iyi kalitede ya da hemen üstündekinde oynatılır.
+Videos play at the highest quality Facebook offers for each.	Videolar, Facebook'un her biri için sunduğu en yüksek kalitede oynatılır.
+Facebook will pick the quality videos play at.	Videoların oynatma kalitesini Facebook seçecek.
+Playback quality will be set to %1$s.	Oynatma kalitesi %1$s olarak ayarlanacak.

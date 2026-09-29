@@ -13,6 +13,7 @@ import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
@@ -280,6 +281,16 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_resume_long_videos", FALSE);
 
     /**
+     * Videos, reels and video stories start at the quality in {@link #PLAYBACK_QUALITY}, through
+     * the same per-video choice Facebook's own quality menu makes
+     * ({@link app.morphe.extension.facebook.media.QualityChoice}). A pick in that menu still wins
+     * for its video. With the quality left as Facebook's, the switch changes nothing, and off or
+     * paused, Facebook picks the quality as it plays.
+     */
+    public static final BooleanSetting DEFAULT_PLAYBACK_QUALITY =
+            new BooleanSetting("hushfacebook_default_playback_quality", TRUE);
+
+    /**
      * Facebook's own text, React Native screens' included, drawn in the font {@link #FONT_SOURCE}
      * names instead of Meta's Optimistic, at the same weight and slant. A typeface already on
      * screen keeps its font until Facebook restarts.
@@ -499,6 +510,14 @@ public class Settings extends BaseSettings {
      */
     public static final EnumSetting<CommentOrder> COMMENT_ORDER =
             new EnumSetting<>("hushfacebook_comment_order", CommentOrder.FACEBOOK);
+
+    /**
+     * The quality videos start at while {@link #DEFAULT_PLAYBACK_QUALITY} is on: Facebook's own
+     * choice until someone picks another, so picking the patch changes nothing on its own. It isn't
+     * a switch, and a paused Facebook picks the quality itself.
+     */
+    public static final EnumSetting<PlaybackQuality> PLAYBACK_QUALITY =
+            new EnumSetting<>("hushfacebook_playback_quality", PlaybackQuality.AUTO);
 
     /**
      * Where {@link #USE_SYSTEM_FONT} takes its font from: empty for the phone's own, or the name of

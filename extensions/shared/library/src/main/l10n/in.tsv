@@ -499,7 +499,7 @@ Marketplace mode and your start tab	Mode Marketplace dan tab awal
 Ads, suggestions and word filters	Iklan, saran, dan filter kata
 Suggestions, saving, auto-advance and viewing anonymously	Saran, penyimpanan, perpindahan otomatis, dan melihat secara anonim
 Cleaner reels and video controls	Reels lebih bersih dan kontrol video
-Tap to play and resume	Ketuk untuk memutar dan melanjutkan
+Tap to play, quality and resume	Ketuk untuk memutar, kualitas, dan melanjutkan
 Quality, format and file names	Kualitas, format, dan nama file
 Browse settings	Jelajahi pengaturan
 More settings	Pengaturan lainnya
@@ -543,3 +543,16 @@ A playback speed you pick in a reel's menu stays for the next reels until you pi
 Hold a reel for 2x	Tahan reel untuk 2x
 # context: summary of that switch; more button is the reel's own button with three dots
 Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.	Menahan reel memutarnya dengan kecepatan dua kali lipat sampai kamu melepaskannya, sebagai ganti menu tekan lama Facebook. Tombol lainnya pada reel tetap membuka menu itu.
+Default playback quality	Kualitas pemutaran default
+Play videos, reels and stories at the quality below. A quality picked in a video's own menu still wins.	Putar video, reel, dan cerita dengan kualitas di bawah. Kualitas yang dipilih di menu video itu sendiri tetap diutamakan.
+Playback quality	Kualitas pemutaran
+Auto	Otomatis
+Data saver	Penghemat data
+Up to %1$s	Hingga %1$s
+Highest	Tertinggi
+Facebook picks the quality as each video plays, from your connection.	Facebook memilih kualitas saat setiap video diputar, sesuai koneksi Anda.
+Videos play at the lowest quality Facebook offers for each.	Video diputar dengan kualitas terendah yang ditawarkan Facebook untuk masing-masing.
+Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.	Video diputar dengan kualitas terbaik hingga %1$s yang ditawarkan Facebook untuk masing-masing, atau yang terdekat di atasnya.
+Videos play at the highest quality Facebook offers for each.	Video diputar dengan kualitas tertinggi yang ditawarkan Facebook untuk masing-masing.
+Facebook will pick the quality videos play at.	Facebook akan memilih kualitas pemutaran video.
+Playback quality will be set to %1$s.	Kualitas pemutaran akan diatur ke %1$s.

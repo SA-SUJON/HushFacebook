@@ -36,6 +36,7 @@ import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.feed.PostWords;
+import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.EnumSetting;
@@ -52,16 +53,16 @@ import app.morphe.extension.shared.settings.StringSetting;
  *
  * <p>Only the switches in {@link #ALLOWLIST} and the settings in {@link #VALUES} (the word
  * filter's two lists, the save folder, the save quality, the video file name, the tab Facebook
- * opens on and the order comments open in) go out or come in. Pause, safe mode, the debug
- * settings, the app language and the counters Hushfacebook keeps for itself stay out, and so do
- * the log, the diagnostic data and anything about the person or the phone: a file is a format
- * name, a version number, one true or false per switch, two word lists, one folder name, one
- * quality, one file name template, one tab and one comment order. The word lists go only into the
- * file the person picks, with the rest. An import applies what it read in one preference commit.
- * A file that is too large, isn't JSON, names something twice, holds a value of the wrong type, a
- * word list that isn't one clean list, a folder or a template that isn't one clean name, or a
- * quality, tab or comment order this build doesn't offer, or comes from a newer version changes
- * nothing.
+ * opens on, the order comments open in and the quality videos play at) go out or come in. Pause,
+ * safe mode, the debug settings, the app language and the counters Hushfacebook keeps for itself
+ * stay out, and so do the log, the diagnostic data and anything about the person or the phone: a
+ * file is a format name, a version number, one true or false per switch, two word lists, one
+ * folder name, one save quality, one file name template, one tab, one comment order and one
+ * playback quality. The word lists go only into the file the person picks, with the rest. An
+ * import applies what it read in one preference commit. A file that is too large, isn't JSON,
+ * names something twice, holds a value of the wrong type, a word list that isn't one clean list, a
+ * folder or a template that isn't one clean name, or a quality, tab or comment order this build
+ * doesn't offer, or comes from a newer version changes nothing.
  * <p>The release check stays out of the file: it puts the phone online, so it's switched on
  * from the phone's own screen, never by a file.
  *
@@ -118,6 +119,7 @@ public final class SettingsBackup {
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
             Settings.TAP_TO_PLAY,
             Settings.RESUME_LONG_VIDEOS,
+            Settings.DEFAULT_PLAYBACK_QUALITY,
             Settings.USE_SYSTEM_FONT,
             Settings.USE_SYSTEM_EMOJI,
             Settings.OPEN_LINKS_EXTERNALLY,
@@ -187,9 +189,15 @@ public final class SettingsBackup {
      */
     static final EnumSetting<CommentOrder> ORDER = Settings.COMMENT_ORDER;
 
+    /**
+     * The quality videos play at, held in a file as its {@link PlaybackQuality#fileValue}. Anything
+     * else refuses the whole file, as a comment order does.
+     */
+    static final EnumSetting<PlaybackQuality> PLAYBACK = Settings.PLAYBACK_QUALITY;
+
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(HIDDEN, KEPT, FOLDER, QUALITY, FILE_NAME, START, ORDER));
+            Arrays.<Setting<?>>asList(HIDDEN, KEPT, FOLDER, QUALITY, FILE_NAME, START, ORDER, PLAYBACK));
 
     /**
      * Bounds for the parser, well past anything this class writes, so a file built to be
@@ -249,7 +257,8 @@ public final class SettingsBackup {
 
     /**
      * What a file says: a value for each switch it names, the folder, the quality, the file name,
-     * the start tab and the comment order when it names them, and how many other names it holds.
+     * the start tab, the comment order and the playback quality when it names them, and how many
+     * other names it holds.
      */
     public static final class Snapshot {
         private static final String SWITCHES = "switches";
@@ -261,6 +270,7 @@ public final class SettingsBackup {
         private static final String ORDER_NAME = "comment_order";
         private static final String HIDDEN_NAME = "hidden_words";
         private static final String KEPT_NAME = "kept_words";
+        private static final String PLAYBACK_NAME = "playback_quality";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -285,6 +295,9 @@ public final class SettingsBackup {
         /** The clean list of words that keep a post the file holds, or null when it names none. */
         @Nullable
         final String kept;
+        /** The quality videos play at that the file holds, or null when it names none. */
+        @Nullable
+        final PlaybackQuality playback;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -296,6 +309,12 @@ public final class SettingsBackup {
         Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
                  @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
                  @Nullable String hidden, @Nullable String kept, int unknown) {
+            this(values, folder, quality, fileName, start, order, hidden, kept, null, unknown);
+        }
+
+        Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                 @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
@@ -304,6 +323,7 @@ public final class SettingsBackup {
             this.order = order;
             this.hidden = hidden;
             this.kept = kept;
+            this.playback = playback;
             this.unknown = unknown;
         }
 
@@ -332,6 +352,8 @@ public final class SettingsBackup {
             if (hiddenChange != null) changes.put(HIDDEN, hiddenChange);
             String keptChange = keptChange();
             if (keptChange != null) changes.put(KEPT, keptChange);
+            PlaybackQuality playbackChange = playbackChange();
+            if (playbackChange != null) changes.put(PLAYBACK, playbackChange);
             return changes;
         }
 
@@ -379,6 +401,12 @@ public final class SettingsBackup {
             return order == null || order == ORDER.savedValue() ? null : order;
         }
 
+        /** The playback quality this file sets, or null when it names none or the one already set. */
+        @Nullable
+        PlaybackQuality playbackChange() {
+            return playback == null || playback == PLAYBACK.savedValue() ? null : playback;
+        }
+
         /** The list of words to hide this file sets, or null when it names none or the one already set. */
         @Nullable
         String hiddenChange() {
@@ -412,6 +440,7 @@ public final class SettingsBackup {
             if (order != null) state.putString(ORDER_NAME, order.fileValue);
             if (hidden != null) state.putString(HIDDEN_NAME, hidden);
             if (kept != null) state.putString(KEPT_NAME, kept);
+            if (playback != null) state.putString(PLAYBACK_NAME, playback.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -441,7 +470,8 @@ public final class SettingsBackup {
                     fileName instanceof String && FileNameTemplate.isClean((String) fileName) ? (String) fileName : null,
                     StartTab.fromFile(state.get(START_NAME)), CommentOrder.fromFile(state.get(ORDER_NAME)),
                     hidden instanceof String && PostWords.isClean((String) hidden) ? (String) hidden : null,
-                    kept instanceof String && PostWords.isClean((String) kept) ? (String) kept : null, unknown);
+                    kept instanceof String && PostWords.isClean((String) kept) ? (String) kept : null,
+                    PlaybackQuality.fromFile(state.get(PLAYBACK_NAME)), unknown);
         }
     }
 
@@ -460,6 +490,7 @@ public final class SettingsBackup {
         switches.put(FILE_NAME.key, FileNameTemplate.sanitize(FILE_NAME.savedValue()));
         switches.put(START.key, START.savedValue().fileValue);
         switches.put(ORDER.key, ORDER.savedValue().fileValue);
+        switches.put(PLAYBACK.key, PLAYBACK.savedValue().fileValue);
         // The lists the filter reads, so a file never carries one an import would refuse.
         switches.put(HIDDEN.key, PostWords.clean(HIDDEN.savedValue()));
         switches.put(KEPT.key, PostWords.clean(KEPT.savedValue()));
@@ -554,6 +585,7 @@ public final class SettingsBackup {
         CommentOrder order = null;
         String hidden = null;
         String kept = null;
+        PlaybackQuality playback = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -590,6 +622,11 @@ public final class SettingsBackup {
                 if (order == null) throw new Rejected(Reason.VALUE, "Not a comment order: " + name);
                 continue;
             }
+            if (PLAYBACK.key.equals(name)) {
+                playback = PlaybackQuality.fromFile(values.opt(name));
+                if (playback == null) throw new Rejected(Reason.VALUE, "Not a playback quality: " + name);
+                continue;
+            }
             if (HIDDEN.key.equals(name) || KEPT.key.equals(name)) {
                 Object value = values.opt(name);
                 // The setting's name only: a list's words stay out of what a refusal says.
@@ -618,7 +655,7 @@ public final class SettingsBackup {
             Boolean value = found.get(setting);
             if (value != null) ordered.put(setting, value);
         }
-        return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, unknown);
+        return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, unknown);
     }
 
     /**

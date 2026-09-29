@@ -499,7 +499,7 @@ Marketplace mode and your start tab	Marketplace-Modus und Starttab
 Ads, suggestions and word filters	Werbung, Vorschläge und Wortfilter
 Suggestions, saving, auto-advance and viewing anonymously	Vorschläge, Speichern, automatischer Wechsel und anonymes Ansehen
 Cleaner reels and video controls	Reels und Videosteuerung
-Tap to play and resume	Antippen zum Abspielen und Fortsetzen
+Tap to play, quality and resume	Antippen zum Abspielen, Qualität und Fortsetzen
 Quality, format and file names	Qualität, Format und Dateinamen
 Browse settings	Einstellungen durchsuchen
 More settings	Weitere Einstellungen
@@ -543,3 +543,16 @@ A playback speed you pick in a reel's menu stays for the next reels until you pi
 Hold a reel for 2x	Reel für 2x gedrückt halten
 # context: summary of that switch; more button is the reel's own button with three dots
 Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.	Wenn du ein Reel gedrückt hältst, läuft es mit doppelter Geschwindigkeit, bis du loslässt, statt Facebooks Menü für langes Drücken zu öffnen. Die Mehr-Schaltfläche des Reels öffnet das Menü weiterhin.
+Default playback quality	Standard-Wiedergabequalität
+Play videos, reels and stories at the quality below. A quality picked in a video's own menu still wins.	Videos, Reels und Storys in der Qualität unten abspielen. Eine im Menü eines Videos gewählte Qualität hat weiter Vorrang.
+Playback quality	Wiedergabequalität
+Auto	Automatisch
+Data saver	Datensparmodus
+Up to %1$s	Bis %1$s
+Highest	Höchste
+Facebook picks the quality as each video plays, from your connection.	Facebook wählt die Qualität beim Abspielen jedes Videos passend zu deiner Verbindung.
+Videos play at the lowest quality Facebook offers for each.	Videos laufen in der niedrigsten Qualität, die Facebook für sie anbietet.
+Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.	Videos laufen in der besten Qualität bis %1$s, die Facebook für sie anbietet, oder der nächsthöheren.
+Videos play at the highest quality Facebook offers for each.	Videos laufen in der höchsten Qualität, die Facebook für sie anbietet.
+Facebook will pick the quality videos play at.	Facebook wählt die Qualität, in der Videos laufen.
+Playback quality will be set to %1$s.	Die Wiedergabequalität wird auf %1$s gesetzt.

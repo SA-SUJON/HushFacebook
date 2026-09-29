@@ -598,7 +598,8 @@ public class SettingsNavigationTest {
         page.navigation.open(page.findPreference(Settings.TAP_TO_PLAY.key));
         recreate();
         assertTrue(contains(Settings.TAP_TO_PLAY.key));
-        assertEquals(2, list().getCount());
+        // Playback: Tap to play, Resume long videos, Default playback quality and its Playback quality list.
+        assertEquals(4, list().getCount());
         page.navigation.back();
         findSearch(dialog.getView()).setText("other apps");
         recreate();

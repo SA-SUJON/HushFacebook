@@ -59,6 +59,7 @@ import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveControl;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.feed.PostWords;
+import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.navigation.MarketplaceOnly;
 import app.morphe.extension.shared.L10n;
@@ -516,7 +517,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                     L10n.t("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.")));
         }
 
-        if (build.contains(PatchFamily.TAP_TO_PLAY) || build.contains(PatchFamily.RESUME_LONG_VIDEOS)) {
+        if (build.contains(PatchFamily.TAP_TO_PLAY) || build.contains(PatchFamily.RESUME_LONG_VIDEOS)
+                || build.contains(PatchFamily.PLAYBACK_QUALITY)) {
             PreferenceCategory playback = category(screen, L10n.t("Playback"));
             if (build.contains(PatchFamily.TAP_TO_PLAY)) {
                 playback.addPreference(toggle(context, Settings.TAP_TO_PLAY, L10n.t("Tap to play"),
@@ -525,6 +527,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             if (build.contains(PatchFamily.RESUME_LONG_VIDEOS)) {
                 playback.addPreference(toggle(context, Settings.RESUME_LONG_VIDEOS, L10n.t("Resume long videos"),
                         L10n.t("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.")));
+            }
+            if (build.contains(PatchFamily.PLAYBACK_QUALITY)) {
+                playback.addPreference(toggle(context, Settings.DEFAULT_PLAYBACK_QUALITY, L10n.t("Default playback quality"),
+                        L10n.t("Play videos, reels and stories at the quality below. A quality picked in a video's own menu still wins.")));
+                playback.addPreference(playbackQualityRow(context));
             }
         }
 
@@ -1389,7 +1396,68 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 commentOrderLabel(order));
     }
 
-    /** The quality, start tab and comment order rows' summaries are sentences of their own rather than the chosen entry. */
+    /**
+     * The quality videos play at. Like the comment order row, its values are the setting's own
+     * names and its summary says what the choice does.
+     */
+    static PlaybackQualityRow playbackQualityRow(Context context) {
+        PlaybackQualityRow row = new PlaybackQualityRow(context);
+        row.setKey(Settings.PLAYBACK_QUALITY.key);
+        row.setTitle(L10n.t("Playback quality"));
+        row.setDialogTitle(L10n.t("Playback quality"));
+        // Android's own Cancel follows the activity's language, as the other lists' did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        PlaybackQuality[] qualities = PlaybackQuality.values();
+        CharSequence[] entries = new CharSequence[qualities.length];
+        CharSequence[] values = new CharSequence[qualities.length];
+        for (int i = 0; i < qualities.length; i++) {
+            entries[i] = playbackQualityLabel(qualities[i]);
+            values[i] = qualities[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.PLAYBACK_QUALITY.savedValue().name());
+        return row;
+    }
+
+    /** What the list calls [quality]: Auto, as Facebook's own quality menu calls it, and a ceiling by its label. */
+    static String playbackQualityLabel(PlaybackQuality quality) {
+        switch (quality) {
+            case DATA_SAVER:
+                return L10n.t("Data saver");
+            case P480:
+            case P720:
+                return L10n.f("Up to %1$s", L10n.isolate(quality.fileValue));
+            case HIGHEST:
+                return L10n.t("Highest");
+            default:
+                return L10n.t("Auto");
+        }
+    }
+
+    /**
+     * What a video does with [quality], for the row's summary. The rungs are the ones Facebook offers
+     * for each video, so the summary says the video has to offer the quality rather than promise it.
+     */
+    static String playbackQualitySummary(PlaybackQuality quality) {
+        switch (quality) {
+            case DATA_SAVER:
+                return L10n.t("Videos play at the lowest quality Facebook offers for each.");
+            case P480:
+            case P720:
+                return L10n.f("Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.",
+                        L10n.isolate(quality.fileValue));
+            case HIGHEST:
+                return L10n.t("Videos play at the highest quality Facebook offers for each.");
+            default:
+                return L10n.t("Facebook picks the quality as each video plays, from your connection.");
+        }
+    }
+
+    /**
+     * The quality, start tab, comment order and playback quality rows' summaries are sentences of
+     * their own rather than the chosen entry.
+     */
     @Override
     protected void updateListPreferenceSummary(ListPreference listPreference, Setting<?> setting) {
         if (listPreference instanceof QualityRow) {
@@ -1398,6 +1466,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((StartTabRow) listPreference).showSummary();
         } else if (listPreference instanceof CommentOrderRow) {
             ((CommentOrderRow) listPreference).showSummary();
+        } else if (listPreference instanceof PlaybackQualityRow) {
+            ((PlaybackQualityRow) listPreference).showSummary();
         } else {
             super.updateListPreferenceSummary(listPreference, setting);
         }
@@ -1988,6 +2058,45 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 if (candidate.name().equals(getValue())) order = candidate;
             }
             setSummary(commentOrderSummary(order));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The playback quality's row. Its summary follows its value, whoever sets it: the person, the
+     * shared page syncing it from the setting, or an import.
+     */
+    static final class PlaybackQualityRow extends ListPreference {
+        PlaybackQualityRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            PlaybackQuality quality = PlaybackQuality.AUTO;
+            for (PlaybackQuality candidate : PlaybackQuality.values()) {
+                if (candidate.name().equals(getValue())) quality = candidate;
+            }
+            setSummary(playbackQualitySummary(quality));
         }
 
         @Override

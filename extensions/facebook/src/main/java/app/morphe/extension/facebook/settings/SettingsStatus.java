@@ -110,6 +110,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean defaultPlaybackQuality() {
+        return false;
+    }
+
     public static boolean systemFont() {
         return false;
     }

@@ -397,7 +397,7 @@ Marketplace mode and your start tab	Modo Marketplace e aba inicial
 Ads, suggestions and word filters	Anúncios, sugestões e filtros de palavras
 Suggestions, saving, auto-advance and viewing anonymously	Sugestões, salvamento, avanço automático e visualização anônima
 Cleaner reels and video controls	Reels mais limpos e controles de vídeo
-Tap to play and resume	Tocar para reproduzir e retomar
+Tap to play, quality and resume	Tocar para reproduzir, qualidade e retomar
 Quality, format and file names	Qualidade, formato e nomes de arquivos
 Browse settings	Explorar configurações
 More settings	Mais configurações
@@ -437,3 +437,16 @@ A playback speed you pick in a reel's menu stays for the next reels until you pi
 Hold a reel for 2x	Segurar um reel para 2x
 # context: summary of that switch; more button is the reel's own button with three dots
 Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.	Segurar um reel faz ele tocar no dobro da velocidade até você soltar, no lugar do menu de toque longo do Facebook. O botão Mais do reel ainda abre esse menu.
+Default playback quality	Qualidade de reprodução padrão
+Play videos, reels and stories at the quality below. A quality picked in a video's own menu still wins.	Reproduz vídeos, Reels e Stories na qualidade abaixo. Uma qualidade escolhida no menu do próprio vídeo ainda tem prioridade.
+Playback quality	Qualidade de reprodução
+Auto	Automática
+Data saver	Economia de dados
+Up to %1$s	Até %1$s
+Highest	A mais alta
+Facebook picks the quality as each video plays, from your connection.	O Facebook escolhe a qualidade enquanto cada vídeo é reproduzido, de acordo com sua conexão.
+Videos play at the lowest quality Facebook offers for each.	Os vídeos são reproduzidos na menor qualidade que o Facebook oferece para cada um.
+Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.	Os vídeos são reproduzidos na melhor qualidade até %1$s que o Facebook oferece para cada um, ou na mais próxima acima.
+Videos play at the highest quality Facebook offers for each.	Os vídeos são reproduzidos na maior qualidade que o Facebook oferece para cada um.
+Facebook will pick the quality videos play at.	O Facebook vai escolher a qualidade de reprodução dos vídeos.
+Playback quality will be set to %1$s.	A qualidade de reprodução será %1$s.

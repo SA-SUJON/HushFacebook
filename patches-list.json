@@ -318,6 +318,50 @@
       "options": []
     },
     {
+      "name": "Default playback quality",
+      "description": "Plays videos, reels and video stories at the quality you choose in Hushfacebook's settings, such as Data saver or up to 720p, instead of the one Facebook picks as it plays. A quality you pick in a video's own menu still wins for that video.",
+      "category": "Interface",
+      "use": false,
+      "dependencies": [
+        "Hushfacebook settings"
+      ],
+      "compatiblePackages": {
+        "com.facebook.katana": [
+          "580.0.0.51.74",
+          "577.0.0.50.72"
+        ]
+      },
+      "compatibility": [
+        {
+          "name": "Facebook",
+          "packageName": "com.facebook.katana",
+          "description": null,
+          "appIconColor": 550655,
+          "signatures": [
+            "911d604446084ca7f4760b775bfc160fa8702441240a7258645d7a72c4312d27",
+            "e3f9e1e0cf99d0e56a055ba65e241b3399f7cea524326b0cdd6ec1327ed0fdc1"
+          ],
+          "targets": [
+            {
+              "version": "580.0.0.51.74",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 475019344
+              }
+            },
+            {
+              "version": "577.0.0.50.72",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 474426275
+              }
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Disable Audience Network",
       "description": "Stops Facebook serving ads to other apps. Those apps then show their own ads or none, and rewarded ads can fail.",
       "category": "Ads",
