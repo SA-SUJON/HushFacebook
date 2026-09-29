@@ -51,8 +51,14 @@ val turnOffDoubleTapLikePatch = bytecodePatch(
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {
-        hookReelLikes()
-        hookGestureView()
+        // Every anchor of both hooks is found, and every reader that would refuse the gesture-view
+        // hook is checked, before either hook changes a single instruction. A build that fails
+        // anywhere in the find phase is refused with nothing patched: the like hooks, the gesture
+        // view or a reader partway through can't stay in the APK while a later anchor is missing.
+        val reelLikeAnchors = findReelLikeAnchors()
+        val gestureViewAnchors = findGestureViewAnchors()
+        applyReelLikeAnchors(reelLikeAnchors)
+        applyGestureViewAnchors(gestureViewAnchors)
         enableStatus("doubleTapLike")
     }
 }
@@ -63,11 +69,20 @@ private fun Method.isSameAs(other: Method): Boolean =
     name == other.name && returnType == other.returnType &&
         parameterTypes.map(Any::toString) == other.parameterTypes.map(Any::toString)
 
+/** What [findReelLikeAnchors] found, for [applyReelLikeAnchors] to change. */
+private class ReelLikeAnchors(
+    val helperType: String,
+    val like: Method,
+    val doubleTapLike: Method,
+    val key: Int,
+    val attachment: Method,
+)
+
 /**
  * The reel like helper: its like holds back a double tap's, its double-tap like finds no key, and
- * the feed attachment asking it leaves its double tap unhandled.
+ * the feed attachment asking it leaves its double tap unhandled. Finds every anchor; changes none.
  */
-private fun BytecodePatchContext.hookReelLikes() {
+private fun BytecodePatchContext.findReelLikeAnchors(): ReelLikeAnchors {
     val likes = classDefByStrings(MUTATE_LIKE, StringComparisonType.EQUALS).flatMap { owner -> owner.methods.filter(::isReelLike) }
     val like = likes.singleOrNull()
         ?: refuse("expected one reel like holding \"$MUTATE_LIKE\" and taking the session first and the source last, found ${likes.size}")
@@ -82,18 +97,28 @@ private fun BytecodePatchContext.hookReelLikes() {
         "expected one onDoubleTap asking the reel like helper's double-tap like and loading \"$HEART_RISE\", " +
             "found ${attachments.size}",
     )
-
-    val mutableHelper = mutableClassDefBy(helper.type)
-    mutableHelper.methods.single { it.isSameAs(like) }.holdBackDoubleTapLike()
-    mutableHelper.methods.single { it.isSameAs(doubleTapLike) }.emptyKeyAfter(key)
-    mutableClassDefBy(attachment.definingClass).methods.single { it.isSameAs(attachment) }.leaveDoubleTapUnhandled()
+    return ReelLikeAnchors(helper.type, like, doubleTapLike, key, attachment)
 }
+
+private fun BytecodePatchContext.applyReelLikeAnchors(anchors: ReelLikeAnchors) {
+    val mutableHelper = mutableClassDefBy(anchors.helperType)
+    mutableHelper.methods.single { it.isSameAs(anchors.like) }.holdBackDoubleTapLike()
+    mutableHelper.methods.single { it.isSameAs(anchors.doubleTapLike) }.emptyKeyAfter(anchors.key)
+    mutableClassDefBy(anchors.attachment.definingClass).methods.single { it.isSameAs(anchors.attachment) }.leaveDoubleTapUnhandled()
+}
+
+/** What [findGestureViewAnchors] found for one reader: where its hook goes and which reads it covers. */
+private class GestureViewReaderPlan(val reader: Method, val hook: String, val reads: List<Int>)
+
+/** What [findGestureViewAnchors] found, for [applyGestureViewAnchors] to change. */
+private class GestureViewAnchors(val handler: FieldReference, val plans: List<GestureViewReaderPlan>)
 
 /**
  * GestureReactionComponent's view: the heart and each hand-over read the double-tap handler as
- * absent.
+ * absent. Finds every reader and checks every one of them before any changes; a reader that can't
+ * be trusted refuses here, with every other reader still exactly as Facebook built it.
  */
-private fun BytecodePatchContext.hookGestureView() {
+private fun BytecodePatchContext.findGestureViewAnchors(): GestureViewAnchors {
     val components = classDefByStrings(GESTURE_REACTION, StringComparisonType.EQUALS).filter(::isGestureReactionComponent)
     val component = components.singleOrNull()
         ?: refuse("expected one class whose constructor holds \"$GESTURE_REACTION\", found ${components.size}")
@@ -113,15 +138,25 @@ private fun BytecodePatchContext.hookGestureView() {
         refuse("the gesture view's heart doesn't read $handler")
     }
     if (readers.none { it.name == "onDoubleTap" }) refuse("no onDoubleTap of the gesture view's listener reads $handler")
-    for (reader in readers) {
+
+    // Every reader is checked here, before the loop that changes one; a reader that fails its check
+    // stops the whole hook with every reader before it still unread.
+    val plans = readers.map { reader ->
         val reads = readsOf(reader, handler)
         reads.firstOrNull { !isCheckedRead(reader, it) }?.let {
             refuse("${reader.definingClass}->${reader.name} reads $handler at $it without checking it for null straight away")
         }
         val hook = if (reader.definingClass == heart.definingClass && reader.isSameAs(heart)) HEART else HANDLER
-        val mutable = mutableClassDefBy(reader.definingClass).findMutableMethodOf(reader)
+        GestureViewReaderPlan(reader, hook, reads)
+    }
+    return GestureViewAnchors(handler, plans)
+}
+
+private fun BytecodePatchContext.applyGestureViewAnchors(anchors: GestureViewAnchors) {
+    for (plan in anchors.plans) {
+        val mutable = mutableClassDefBy(plan.reader.definingClass).findMutableMethodOf(plan.reader)
         // Last read first, so each index still names its read.
-        reads.sortedDescending().forEach { mutable.askAfterRead(it, handler, hook) }
+        plan.reads.sortedDescending().forEach { mutable.askAfterRead(it, anchors.handler, plan.hook) }
     }
 }
 
