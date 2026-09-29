@@ -219,6 +219,40 @@ public class ReturnRefreshTest {
     }
 
     /**
+     * A check that lets Facebook refresh counts too, under one shared label, so a report from
+     * someone whose feed keeps resetting isn't just "invoked N, 0 found, 0 missing" with nothing
+     * else to read.
+     */
+    @Test public void everyDecisionCountsBothWaysInTheReport() {
+        HookStatus.clear();
+        try {
+            ReturnRefresh.uiHidden();
+            assertTrue(ReturnRefresh.keepFeedWhileAway());
+            assertTrue(ReturnRefresh.skip());
+            assertTrue(ReturnRefresh.holdWarmStart());
+            assertTrue(ReturnRefresh.holdAutoScroll());
+            String kept = String.join("\n", HookStatus.report());
+            assertTrue(kept, kept.contains(FamilyNames.RETURN_REFRESH + ": invoked 4"));
+            assertTrue(kept, kept.contains("kept the feed loaded while away 1, kept the feed on resume 1, "
+                    + "kept the feed at warm start 1, kept the feed from the foreground auto-scroll 1"));
+
+            HookStatus.clear();
+            Settings.BLOCK_RETURN_REFRESH.save(false);
+            assertFalse(ReturnRefresh.keepFeedWhileAway());
+            ReturnRefresh.uiHidden();
+            assertFalse(ReturnRefresh.skip());
+            assertFalse(ReturnRefresh.holdWarmStart());
+            assertFalse(ReturnRefresh.holdAutoScroll());
+            String refused = String.join("\n", HookStatus.report());
+            assertTrue(refused, refused.contains(FamilyNames.RETURN_REFRESH + ": invoked 4"));
+            assertTrue(refused, refused.contains("let Facebook refresh 4"));
+        } finally {
+            Settings.BLOCK_RETURN_REFRESH.resetToDefault();
+            HookStatus.clear();
+        }
+    }
+
+    /**
      * A failure inside the check lets Facebook refresh, as it would unpatched, and the report
      * names the hook that threw. The clock is what the check asks first once it has counted the
      * call, so a clock that fails once stands in for anything that can throw there.

@@ -42,6 +42,8 @@ public final class ReturnRefresh {
     private static final String KEPT_ON_WARM_START = "kept the feed at warm start";
     private static final String KEPT_ON_AUTO_SCROLL = "kept the feed from the foreground auto-scroll";
     private static final String KEPT_WHILE_AWAY = "kept the feed loaded while away";
+    /** Counted for the negative answer of every decision here, kept under one label. */
+    private static final String LET_FACEBOOK_REFRESH = "let Facebook refresh";
     private static long hiddenAt = -1;
     private static long decidedAt = -1;
     private static boolean holding;
@@ -114,7 +116,7 @@ public final class ReturnRefresh {
             String off = offBecause();
             Logger.printDebug(() -> "Return refresh: feed teardown while away"
                     + (off == null ? ": skipped, keeping the feed" : ": Facebook tears the feed down, " + off));
-            if (off == null) HookStatus.counted(FamilyNames.RETURN_REFRESH, KEPT_WHILE_AWAY);
+            HookStatus.counted(FamilyNames.RETURN_REFRESH, off == null ? KEPT_WHILE_AWAY : LET_FACEBOOK_REFRESH);
             return off == null;
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.RETURN_REFRESH, "feed teardown", failure);
@@ -138,7 +140,7 @@ public final class ReturnRefresh {
         try {
             HookStatus.invoked(FamilyNames.RETURN_REFRESH);
             boolean hold = askAt(SystemClock.elapsedRealtime(), check);
-            if (hold) HookStatus.counted(FamilyNames.RETURN_REFRESH, kept);
+            HookStatus.counted(FamilyNames.RETURN_REFRESH, hold ? kept : LET_FACEBOOK_REFRESH);
             return hold;
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.RETURN_REFRESH, check, failure);
