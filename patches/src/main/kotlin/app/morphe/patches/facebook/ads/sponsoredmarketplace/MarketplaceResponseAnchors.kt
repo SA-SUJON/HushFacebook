@@ -43,7 +43,14 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  * So the hook goes in right after each text lands: it reads the tracking name off the state, hands
  * the text, the name and (for pieces) the state to the extension, and the answer replaces the text.
  * The state is the same object for every piece of one answer, which is how the extension keeps a
- * payload that's split across pieces together. None of the names above is used here.
+ * payload that's split across pieces together.
+ *
+ * The start of a payload waits in the extension for the piece that finishes it, so an answer in
+ * pieces that ends before its last payload does would leave that text behind. onEOM reports every
+ * answer complete through the emitter of "didCompleteNetworkResponse" (`A02`), with the same context
+ * and request id off the state and the request's number (577 `LX/7X2;->A00`, 580 `LX/7Uz;->A00`).
+ * Right before that call the extension is asked for what still waits, and anything it hands back
+ * goes to the piece emitter as one last piece. None of the names above is used here.
  */
 
 /** Kept name. The Tigon callbacks Facebook's Networking module gives each request it sends. */
@@ -53,25 +60,34 @@ internal const val CALLBACKS = "Lcom/facebook/fbreactmodules/network/FBTigonRequ
 internal const val PIECE_EVENT = "didReceiveNetworkIncrementalData"
 internal const val WHOLE_EVENT = "didReceiveNetworkData"
 
-/** The extension's answers to a piece of text and to a whole one. */
+/** Kept literal. React Native's event for the end of an answer. */
+internal const val END_EVENT = "didCompleteNetworkResponse"
+
+/** The extension's answers to a piece of text and to a whole one, and what still waits at the end. */
 internal const val RESPONSE_PIECE = "$EXTENSION_PACKAGE/ads/MarketplaceAdFilter;->" +
     "responsePiece(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/String;"
 internal const val RESPONSE_WHOLE = "$EXTENSION_PACKAGE/ads/MarketplaceAdFilter;->" +
     "responseWhole(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+internal const val RESPONSE_END = "$EXTENSION_PACKAGE/ads/MarketplaceAdFilter;->" +
+    "responseEnd(Ljava/lang/Object;)Ljava/lang/String;"
 
 private const val TO_STRING = "Ljava/lang/Object;->toString()Ljava/lang/String;"
 
-/** The emitters' parameters after the React context: request id, text, then the rest. */
+/**
+ * The emitters' parameters after the React context: request id, text, then the rest. The piece
+ * emitter's rest is the request's number and two lengths; the end emitter's is the number and one.
+ */
 private val PIECE_PARAMETERS = listOf(STRING, STRING, "I", "J", "J")
 private val WHOLE_PARAMETERS = listOf(STRING, STRING, STRING, "I")
+private val END_PARAMETERS = listOf(STRING, "I", "J")
 
 /** The text's place among an emitter's parameters. Both put two one-register ones before it. */
 private const val TEXT_PARAMETER = 2
 
 /**
  * Where a callbacks method hands an answer's text to JavaScript: the move-result that lands the
- * text, its register, the register holding the request's state and that state's class, and whether
- * it's the whole text or a piece of it.
+ * text, its register, the register holding the request's state and that state's class, whether it's
+ * the whole text or a piece of it, and the emitter it goes to.
  */
 internal data class TextHandOff(
     val method: Method,
@@ -80,6 +96,22 @@ internal data class TextHandOff(
     val state: Int,
     val stateType: String,
     val whole: Boolean,
+    val emitter: MethodReference,
+)
+
+/**
+ * Where a callbacks method reports an answer complete: the emitter call, the registers holding the
+ * React context, the request id and the request's number it's given, and the register holding the
+ * request's state.
+ */
+internal data class AnswerEnd(
+    val method: Method,
+    val call: Int,
+    val context: Int,
+    val id: Int,
+    val number: Int,
+    val state: Int,
+    val emitter: MethodReference,
 )
 
 /**
@@ -140,7 +172,55 @@ internal fun textHandOffs(callbacks: ClassDef, emitter: (MethodReference) -> Met
                 continue
             }
             if (text > 15 || state > 15 || text == state) continue
-            found += TextHandOff(method, landed, text, state, stateType, whole)
+            found += TextHandOff(method, landed, text, state, stateType, whole, reference)
+        }
+    }
+    return found
+}
+
+/**
+ * Every place in [callbacks] where an answer is reported complete to JavaScript with a request's
+ * state of [stateType] at hand. [emitter] finds a called method in the build. A place counts when:
+ *
+ * - the call is static, to a method returning void that takes an object and then a String, an int
+ *   and a long, and holds [END_EVENT];
+ * - the call is reached only from the instruction before it, so code put in front of it runs on
+ *   every way there;
+ * - the one write of the context's register that can reach the call reads a field of a
+ *   [stateType], and every write of that object's register that can reach the call reads a field
+ *   of that type.
+ */
+internal fun answerEnds(callbacks: ClassDef, stateType: String, emitter: (MethodReference) -> Method?): List<AnswerEnd> {
+    val found = mutableListOf<AnswerEnd>()
+    for (method in callbacks.methods) {
+        if (method.implementation == null) continue
+        val flow = ControlFlow.of(method)
+        val code = flow.instructions
+        for (call in code.indices) {
+            val instruction = code[call]
+            if (instruction.opcode != Opcode.INVOKE_STATIC && instruction.opcode != Opcode.INVOKE_STATIC_RANGE) continue
+            val reference = (instruction as ReferenceInstruction).reference as? MethodReference ?: continue
+            val parameters = reference.parameterTypes.map { it.toString() }
+            if (reference.returnType != "V" || parameters.isEmpty() || !parameters[0].startsWith("L")) continue
+            if (parameters.drop(1) != END_PARAMETERS) continue
+            val target = emitter(reference) ?: continue
+            if (!holdsString(target, END_EVENT)) continue
+            if (code.indices.filter { call in flow.normal[it] || call in flow.exceptional[it] } != listOf(call - 1)) continue
+
+            val registers = instruction.namedRegisters()
+            val contextRead = flow.writesReaching(call, registers[0])?.singleOrNull() ?: continue
+            if (code[contextRead].opcode != Opcode.IGET_OBJECT) continue
+            if (((code[contextRead] as ReferenceInstruction).reference as FieldReference).definingClass != stateType) continue
+            val state = (code[contextRead] as TwoRegisterInstruction).registerB
+            val stateWrites = flow.writesReaching(call, state) ?: continue
+            if (stateWrites.isEmpty() || !stateWrites.all { at ->
+                    code[at].opcode == Opcode.IGET_OBJECT &&
+                        ((code[at] as ReferenceInstruction).reference as FieldReference).type == stateType
+                }
+            ) {
+                continue
+            }
+            found += AnswerEnd(method, call, registers[0], registers[1], registers[2], state, reference)
         }
     }
     return found

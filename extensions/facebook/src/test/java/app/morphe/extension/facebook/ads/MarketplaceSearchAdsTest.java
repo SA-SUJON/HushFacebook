@@ -47,6 +47,9 @@ public class MarketplaceSearchAdsTest {
     private static final String HEAD = "MarketplaceSearchApp_MarketplaceSearchFeedHeadQuery";
     private static final String EDGES = "\"marketplace_search\",\"feed_units\",\"edges\"";
 
+    /** What takes a streamed ad's place: no data, and the ad's own extensions. */
+    private static final String NO_DATA = "{\"data\":null,\"extensions\":{\"is_final\":false}}";
+
     @Before
     public void inBuild() {
         MarketplaceAdFilterForTests.inBuild(Boolean.TRUE);
@@ -179,9 +182,10 @@ public class MarketplaceSearchAdsTest {
     }
 
     /**
-     * A streamed ad isn't passed on, and every later index of its list, streamed results and deferred
-     * fields alike, moves down past the ads taken out. A deferred part of an ad goes where no result
-     * is. Everything else in each payload stays.
+     * A streamed ad's place is taken by a payload with no data and the ad's extensions, which Relay
+     * passes over, and every later index of its list, streamed results and deferred fields alike,
+     * moves down past the ads taken out. A deferred part of an ad goes where no result is. Everything
+     * else in each payload stays.
      */
     @Test
     public void aStreamedListStaysContiguous() {
@@ -198,10 +202,10 @@ public class MarketplaceSearchAdsTest {
         };
         String[] expected = {
                 answer(listing(0)),
-                "",
+                NO_DATA,
                 streamed(1, listing(3)),
                 deferred(MarketplaceSearchAds.NOWHERE + 1),
-                "",
+                NO_DATA,
                 streamed(2, listing(5)),
                 deferred(1),
                 deferred(2),
@@ -218,12 +222,163 @@ public class MarketplaceSearchAdsTest {
         assertEquals(String.join("\r\n", expected), MarketplaceAdFilterForTests.responseWhole(HEAD, whole));
     }
 
-    /** Relay's payloads sent together as one list come out as one list, less the streamed ads. */
+    /** Relay's payloads sent together as one list come out as one list, each streamed ad emptied. */
     @Test
     public void aListOfPayloadsIsReadPayloadByPayload() {
         String batch = "[" + answer(listing(0), adStory(1)) + "," + streamed(2, adStory(2)) + "," + streamed(3, listing(3)) + "]";
-        assertEquals("[" + answer(listing(0)) + "," + streamed(1, listing(3)) + "]",
+        assertEquals("[" + answer(listing(0)) + "," + NO_DATA + "," + streamed(1, listing(3)) + "]",
                 MarketplaceAdFilterForTests.responseWhole(HEAD, batch));
+    }
+
+    /**
+     * A streamed ad keeps what Relay reads besides its data, is_final and hasNext above all, in a
+     * payload with null data, never an empty part between two line breaks. Its label and path go, so
+     * Relay doesn't read it as a result, and so do its errors, which beside null data would fail the
+     * whole search.
+     */
+    @Test
+    public void aStreamedAdLeavesItsEndMarkerBehind() {
+        String label = "{\"label\":\"MarketplaceSearchFeed$stream$edges\",\"path\":[" + EDGES + ",";
+        String[] payloads = {
+                answer(listing(0)),
+                label + "1],\"data\":" + adStory(1) + ",\"errors\":[{\"message\":\"m\"}],\"hasNext\":true}",
+                label + "2],\"data\":" + adStory(2) + ",\"extensions\":null}",
+                label + "3],\"data\":" + adStory(3) + ",\"extensions\":{\"is_final\":true}}",
+        };
+        Object request = new Object();
+        StringBuilder out = new StringBuilder();
+        for (String payload : payloads) out.append(MarketplaceAdFilterForTests.responsePiece(HEAD, payload + "\r\n", request));
+        assertEquals(answer(listing(0)) + "\r\n"
+                + "{\"data\":null,\"hasNext\":true,\"extensions\":{}}\r\n"
+                + "{\"data\":null,\"extensions\":{}}\r\n"
+                + "{\"data\":null,\"extensions\":{\"is_final\":true}}\r\n", out.toString());
+        assertEquals("no part is left empty", 0, occurrences(out.toString(), "\r\n\r\n"));
+    }
+
+    /**
+     * Negative control: sponsored_data that names no ad, empty or with a null ad id, leaves its
+     * listing where it is. The ad story type and an ad id still take one out.
+     */
+    @Test
+    public void sponsoredDataWithoutAnAdIdStays() {
+        String empty = "{\"node\":{\"__typename\":\"MarketplaceFeedListingStoryObject\",\"story\":{\"sponsored_data\":{}}},\"cursor\":\"a\"}";
+        String nullId = "{\"node\":{\"__typename\":\"MarketplaceFeedListingStoryObject\","
+                + "\"sponsored_data\":{\"ad_id\":null,\"client_token\":null}},\"cursor\":\"b\"}";
+        String blankId = "{\"node\":{\"__typename\":\"MarketplaceFeedListingStoryObject\",\"story\":{\"sponsored_data\":{\"ad_id\":\"\"}}}}";
+        String whole = answer(listing(1), empty, nullId, blankId);
+        assertSame(whole, MarketplaceAdFilterForTests.responseWhole(HEAD, whole));
+        String numbered = "{\"node\":{\"__typename\":\"MarketplaceFeedListingStoryObject\",\"sponsored_data\":{\"ad_id\":7}}}";
+        assertEquals(answer(listing(1), empty), MarketplaceAdFilterForTests.responseWhole(HEAD,
+                answer(listing(1), numbered, empty, adStory(2), sponsoredListing(3))));
+    }
+
+    /** A payload nested [depth] deep, deeper than a thread's stack can read. */
+    private static String nested(int depth) {
+        StringBuilder text = new StringBuilder("{\"data\":{\"deep\":");
+        for (int i = 0; i < depth; i++) text.append('[');
+        for (int i = 0; i < depth; i++) text.append(']');
+        return text.append("}}").toString();
+    }
+
+    /**
+     * A payload whose reading fails goes on whole, with what an earlier piece held of it, and what
+     * came before it in the same piece goes on as it was read. The failure is reported.
+     */
+    @Test
+    public void aPayloadThatFailsGoesOnWhole() {
+        String deep = nested(300_000);
+        String text = answer(listing(0), adStory(1)) + "\r\n" + deep + "\r\n";
+        int cut = text.length() - 200_013;
+        Object request = new Object();
+        String first = MarketplaceAdFilterForTests.responsePiece(HEAD, text.substring(0, cut), request);
+        assertEquals(answer(listing(0)) + "\r\n", first);
+        String second = MarketplaceAdFilterForTests.responsePiece(HEAD, text.substring(cut), request);
+        assertEquals("nothing went missing", deep.length() + 2, second.length());
+        assertTrue(second.equals(deep + "\r\n"));
+        assertTrue(statusLine(), statusLine().contains("threw java.lang.StackOverflowError"));
+    }
+
+    /**
+     * After a failure nothing more is taken out of that answer, but every later index still moves
+     * past the ads already taken out, so the list Relay builds has no hole. With none taken out
+     * before, the rest of the answer goes on untouched.
+     */
+    @Test
+    public void afterAFailureTheListStaysContiguous() {
+        String deep = nested(300_000);
+        String[] payloads = {
+                answer(listing(0), adStory(1)),
+                streamed(2, listing(2)),
+                deep,
+                streamed(3, adStory(3)),
+                deferred(1),
+                deferred(3),
+                streamed(4, listing(4)),
+        };
+        String[] expected = {
+                answer(listing(0)),
+                streamed(1, listing(2)),
+                deep,
+                streamed(2, adStory(3)),
+                deferred(MarketplaceSearchAds.NOWHERE + 1),
+                deferred(2),
+                streamed(3, listing(4)),
+        };
+        Object request = new Object();
+        for (int i = 0; i < payloads.length; i++) {
+            String out = MarketplaceAdFilterForTests.responsePiece(HEAD, payloads[i] + "\r\n", request);
+            if (i == 2) assertTrue("the failed payload went on as it came", out.equals(deep + "\r\n"));
+            else assertEquals("payload " + i, expected[i] + "\r\n", out);
+        }
+
+        Object untouched = new Object();
+        assertEquals(answer(listing(0)), MarketplaceAdFilterForTests.responsePiece(HEAD, answer(listing(0)), untouched));
+        assertTrue(MarketplaceAdFilterForTests.responsePiece(HEAD, deep, untouched).equals(deep));
+        String after = streamed(1, adStory(1));
+        assertSame(after, MarketplaceAdFilterForTests.responsePiece(HEAD, after, untouched));
+    }
+
+    /**
+     * A payload too long to wait for goes on as it comes, what was held of it first. Nothing more is
+     * taken out after it, and the next payload's index still moves past the ad taken out before.
+     */
+    @Test
+    public void aPayloadTooLongToWaitForGoesOnAsItComes() {
+        Object request = new Object();
+        assertEquals(answer(listing(0)) + "\r\n",
+                MarketplaceAdFilterForTests.responsePiece(HEAD, answer(listing(0), adStory(1)) + "\r\n", request));
+        StringBuilder filler = new StringBuilder(MarketplaceSearchAds.MAX_WAITING_CHARS);
+        while (filler.length() < MarketplaceSearchAds.MAX_WAITING_CHARS) filler.append("0123456789");
+        String start = "{\"data\":{\"filler\":\"" + filler.substring(0, filler.length() / 2);
+        assertEquals("", MarketplaceAdFilterForTests.responsePiece(HEAD, start, request));
+        String more = filler.substring(filler.length() / 2);
+        assertTrue("the start and this piece go on", MarketplaceAdFilterForTests.responsePiece(HEAD, more, request).equals(start + more));
+        String tail = "\"}}\r\n" + streamed(3, adStory(3)) + "\r\n";
+        assertEquals("\"}}\r\n" + streamed(2, adStory(3)) + "\r\n", MarketplaceAdFilterForTests.responsePiece(HEAD, tail, request));
+        assertNull("nothing left waiting", MarketplaceAdFilter.responseEnd(request));
+    }
+
+    /**
+     * Text still waiting for its payload to finish when an answer in pieces ends goes on as it came,
+     * handed back once for the patch to pass to JavaScript before the answer is reported complete.
+     */
+    @Test
+    public void whatWaitsWhenAnAnswerEndsGoesOnAsItCame() {
+        Object request = new Object();
+        String cut = answer(listing(1), adStory(2)).substring(0, 60);
+        assertEquals("", MarketplaceAdFilterForTests.responsePiece(HEAD, cut, request));
+        assertEquals(cut, MarketplaceAdFilter.responseEnd(request));
+        assertNull("handed back once", MarketplaceAdFilter.responseEnd(request));
+
+        Object error = new Object();
+        assertEquals("Error ", MarketplaceAdFilterForTests.responsePiece(HEAD, "Error [503", error));
+        assertEquals("[503", MarketplaceAdFilter.responseEnd(error));
+
+        Object whole = new Object();
+        assertEquals(answer(listing(1)), MarketplaceAdFilterForTests.responsePiece(HEAD, answer(listing(1), adStory(2)), whole));
+        assertNull("nothing waits", MarketplaceAdFilter.responseEnd(whole));
+        assertNull("never read", MarketplaceAdFilter.responseEnd(new Object()));
+        assertNull(MarketplaceAdFilter.responseEnd(null));
     }
 
     /** Negative control: listings whose text or empty fields look like an ad's stay, and so does a list of other things. */

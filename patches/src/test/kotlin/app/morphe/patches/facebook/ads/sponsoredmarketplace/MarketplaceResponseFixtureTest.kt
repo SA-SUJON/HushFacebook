@@ -9,9 +9,11 @@ import app.morphe.Fixtures
 import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
+import app.morphe.patches.facebook.misc.extension.liveAcrossInjection
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.namedRegisters
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.builder.BuilderOffsetInstruction
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
@@ -22,6 +24,7 @@ import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -73,10 +76,14 @@ class MarketplaceResponseFixtureTest {
                 assertEquals("$name: the whole text goes on at the end", "onEOM", handOffs.single { it.whole }.method.name)
                 val stateType = handOffs.map { it.stateType }.distinct().singleOrNull()
                 assertNotNull("$name: the two hand-offs read different request states: $handOffs", stateType)
+                val ends = answerEnds(callbacks, stateType!!, lookup)
+                assertEquals("$name: answers reported complete", 1, ends.size)
+                val end = ends.single()
+                assertEquals("$name: the answer is reported complete at the end", "onEOM", end.method.name)
 
                 val owners = FixtureDex.classesHolding(bundle, NETWORKING_TAG)
                 val send = owners.flatMap { owner -> owner.methods.filter(::isSendRequest) }.single()
-                val tracking = trackingField(send, stateType!!, lookup)
+                val tracking = trackingField(send, stateType, lookup)
                 assertNotNull("$name: sendRequest builds $stateType with no field keeping the tracking name", tracking)
                 tracking!!
                 assertEquals("$name: the field's class", stateType, tracking.definingClass)
@@ -108,9 +115,38 @@ class MarketplaceResponseFixtureTest {
                     assertEquals(Opcode.MOVE_RESULT_OBJECT, patched[at + 2].opcode)
                     assertEquals("$name ${original.name}: where the answer goes", handOff.text,
                         (patched[at + 2] as OneRegisterInstruction).registerA)
+                    // onEOM also gets the end's nine instructions, which the whole text's three moved down.
+                    val flush = if (original.name == end.method.name) end.call + 3..end.call + 11 else IntRange.EMPTY
                     assertEquals("$name ${original.name}: the rest of it", original.body().map { it.opcode },
-                        patched.filterIndexed { index, _ -> index !in at..at + 2 }.map { it.opcode })
+                        patched.filterIndexed { index, _ -> index !in at..at + 2 && index !in flush }.map { it.opcode })
                 }
+
+                // What still waits goes to the piece emitter right before the answer is reported complete.
+                val eom = context.mutableClassDefBy(CALLBACKS).methods.single {
+                    it.name == end.method.name && it.parameters() == end.method.parameters()
+                }.body()
+                val at = end.call + 3
+                val complete = end.method.body()[end.call]
+                assertEquals("$name: the end call", (complete as ReferenceInstruction).reference.toString(),
+                    (eom[at + 9] as ReferenceInstruction).reference.toString())
+                assertEquals("$name: the end call's registers", complete.namedRegisters(), eom[at + 9].namedRegisters())
+                assertEquals("$name: the ask", RESPONSE_END, (eom[at] as ReferenceInstruction).reference.toString())
+                assertEquals("$name: off the state", listOf(end.state), eom[at].namedRegisters())
+                val text = (eom[at + 1] as OneRegisterInstruction).registerA
+                assertEquals("$name: nothing waits, straight on", listOf(Opcode.IF_EQZ, text),
+                    listOf(eom[at + 2].opcode, (eom[at + 2] as OneRegisterInstruction).registerA))
+                assertSame("$name: to the end call", eom[at + 9], (eom[at + 2] as BuilderOffsetInstruction).target.location.instruction)
+                val last = eom[at + 8]
+                assertEquals("$name: the last piece", handOffs.single { !it.whole }.emitter.toString(),
+                    (last as ReferenceInstruction).reference.toString())
+                val run = last.namedRegisters()
+                assertEquals("$name: eight in a row", (run[0]..run[0] + 7).toList(), run)
+                assertEquals("$name: the text third", run[2], text)
+                assertEquals("$name: the context, the id and the number the end call is given",
+                    listOf(listOf(run[0], end.context), listOf(run[1], end.id), listOf(run[3], end.number)),
+                    (3..5).map { eom[at + it].namedRegisters() })
+                val live = end.method.liveAcrossInjection(end.call)
+                assertTrue("$name: $run are read after the end call: $live", run.none { it in live })
                 checked += version
             }
         }

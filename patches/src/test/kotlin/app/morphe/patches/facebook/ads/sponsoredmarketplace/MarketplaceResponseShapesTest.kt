@@ -13,6 +13,7 @@ import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.util.namedRegisters
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.builder.BuilderOffsetInstruction
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
@@ -27,6 +28,7 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -43,8 +45,9 @@ internal object ResponseStandIns {
     const val CONTEXT = "Lfixture/ReactContext;"
     const val TRACKING = "$STATE->tracking:Ljava/lang/String;"
 
-    private const val PIECE = "$EMITTERS->piece($CONTEXT${"Ljava/lang/String;"}Ljava/lang/String;IJJ)V"
+    const val PIECE = "$EMITTERS->piece($CONTEXT${"Ljava/lang/String;"}Ljava/lang/String;IJJ)V"
     private const val WHOLE = "$EMITTERS->whole($CONTEXT${"Ljava/lang/String;"}Ljava/lang/String;Ljava/lang/String;I)V"
+    const val END = "$EMITTERS->end($CONTEXT${"Ljava/lang/String;"}IJ)V"
 
     fun method(
         owner: String,
@@ -97,9 +100,12 @@ internal object ResponseStandIns {
         """,
     )
 
-    /** onEOM: the StringBuilder's toString() goes to the whole emitter. */
-    fun onEom() = method(
-        CALLBACKS, "onEOM", emptyList(), 6, """
+    /**
+     * onEOM: the StringBuilder's toString() goes to the whole emitter, then the answer is reported
+     * complete with the state's context and id, the request's number and a length.
+     */
+    fun onEom(end: Boolean = true, endContextFrom: String = "state", jumpToEnd: Boolean = false, locals: Int = 15) = method(
+        CALLBACKS, "onEOM", emptyList(), locals, """
             iget-object v2, p0, $CALLBACKS->this${'$'}0:$REQUEST
             iget-object v5, v2, $REQUEST->state:$STATE
             iget-object v0, p0, $CALLBACKS->mDataBuilder:Ljava/lang/StringBuilder;
@@ -110,17 +116,28 @@ internal object ResponseStandIns {
             const-string v0, "text"
             const/4 v4, 0x0
             invoke-static { v2, v1, v3, v0, v4 }, $WHOLE
+            ${if (!end) "" else """
+                ${if (endContextFrom == "state") "iget-object v0, v5, $STATE->context:$CONTEXT" else "sget-object v0, $EMITTERS->context:$CONTEXT"}
+                iget-object v1, v5, $STATE->id:Ljava/lang/String;
+                const/4 v2, 0x1
+                const-wide/16 v3, 0x0
+                ${if (jumpToEnd) "if-eqz v5, :end\nconst/4 v6, 0x0" else ""}
+                :end
+                invoke-static { v0, v1, v2, v3, v4 }, $END
+            """}
             return-void
         """,
     )
 
     /** React Native's emitters, each holding its event's name unless told otherwise. */
-    fun emitters(pieceEvent: String = PIECE_EVENT) = classOf(
+    fun emitters(pieceEvent: String = PIECE_EVENT, endEvent: String = END_EVENT) = classOf(
         EMITTERS,
         method(EMITTERS, "piece", listOf(CONTEXT, "Ljava/lang/String;", "Ljava/lang/String;", "I", "J", "J"), 1,
             "const-string v0, \"$pieceEvent\"\nreturn-void", static = true),
         method(EMITTERS, "whole", listOf(CONTEXT, "Ljava/lang/String;", "Ljava/lang/String;", "Ljava/lang/String;", "I"), 1,
             "const-string v0, \"$WHOLE_EVENT\"\nreturn-void", static = true),
+        method(EMITTERS, "end", listOf(CONTEXT, "Ljava/lang/String;", "I", "J"), 1,
+            "const-string v0, \"$endEvent\"\nreturn-void", static = true),
     )
 
     /** The state's constructor: the body, then the tracking name, each kept in a field. */
@@ -235,9 +252,55 @@ class MarketplaceResponseShapesTest {
             assertEquals(call, (patched[at + 1] as ReferenceInstruction).reference.toString())
             assertEquals(if (call == RESPONSE_WHOLE) listOf(text, 0) else listOf(text, 0, state), patched[at + 1].namedRegisters())
             assertEquals(text, (patched[at + 2] as OneRegisterInstruction).registerA)
+            // onEOM also gets the end's nine instructions, right before its end call (which moved down three).
+            val end = original.body().indexOfFirst { (it as? ReferenceInstruction)?.reference?.toString() == ResponseStandIns.END }
+            val flush = if (end < 0) IntRange.EMPTY else end + 3..end + 11
             assertEquals("$name: nothing else changes", original.body().map { it.opcode },
-                patched.filterIndexed { index, _ -> index !in at..at + 2 }.map { it.opcode })
+                patched.filterIndexed { index, _ -> index !in at..at + 2 && index !in flush }.map { it.opcode })
         }
+    }
+
+    @Test
+    fun `what still waits at the end goes to JavaScript as one last piece before the answer is reported complete`() {
+        val end = answerEnds(ResponseStandIns.classOf(CALLBACKS, ResponseStandIns.onBody(), ResponseStandIns.onEom()),
+            ResponseStandIns.STATE, lookup(ResponseStandIns.emitters())).single()
+        assertEquals("onEOM", end.method.name)
+        assertEquals(listOf(14, 0, 1, 2, 5), listOf(end.call, end.context, end.id, end.number, end.state))
+
+        val context = PatchContexts.of(
+            listOf(ResponseStandIns.classOf(module, sendRequestWithBody()), ExtensionDex.classDef(SETTINGS_STATUS)) + ResponseStandIns.classes(),
+        )
+        hideSponsoredMarketplaceListingsPatch.execute(context)
+        val patched = context.mutableClassDefBy(CALLBACKS).methods.single { it.name == "onEOM" }.body()
+        // The whole text's three instructions went in above it, so the end's start moved down three.
+        val at = end.call + 3
+        assertEquals(RESPONSE_END, (patched[at] as ReferenceInstruction).reference.toString())
+        assertEquals("the state", listOf(5), patched[at].namedRegisters())
+        // The end call reads v0 to v4 and nothing reads anything after it, so v5 to v12 carry the last piece.
+        assertEquals(listOf(Opcode.MOVE_RESULT_OBJECT, Opcode.IF_EQZ), listOf(patched[at + 1].opcode, patched[at + 2].opcode))
+        assertEquals(listOf(7), patched[at + 1].namedRegisters())
+        assertEquals(listOf(7), patched[at + 2].namedRegisters())
+        assertSame("nothing waits: straight on to the end call", patched[at + 9],
+            (patched[at + 2] as BuilderOffsetInstruction).target.location.instruction)
+        assertEquals("the context, the id and the number the end call is given",
+            listOf(listOf(5, 0), listOf(6, 1), listOf(8, 2)), (3..5).map { patched[at + it].namedRegisters() })
+        assertEquals(listOf(Opcode.MOVE_OBJECT_FROM16, Opcode.MOVE_OBJECT_FROM16, Opcode.MOVE_FROM16, Opcode.CONST_WIDE_16,
+            Opcode.CONST_WIDE_16, Opcode.INVOKE_STATIC_RANGE), (3..8).map { patched[at + it].opcode })
+        assertEquals(ResponseStandIns.PIECE, (patched[at + 8] as ReferenceInstruction).reference.toString())
+        assertEquals((5..12).toList(), patched[at + 8].namedRegisters())
+        assertEquals(ResponseStandIns.END, (patched[at + 9] as ReferenceInstruction).reference.toString())
+    }
+
+    @Test
+    fun `an end that isn't found the way the hook needs it is left alone`() {
+        fun ends(onEom: Method, emitters: ClassDef = ResponseStandIns.emitters()) =
+            answerEnds(ResponseStandIns.classOf(CALLBACKS, onEom), ResponseStandIns.STATE, lookup(emitters)).size
+        assertEquals(1, ends(ResponseStandIns.onEom()))
+        assertEquals("an emitter without its event", 0, ends(ResponseStandIns.onEom(), ResponseStandIns.emitters(endEvent = "other")))
+        assertEquals("a context from somewhere else", 0, ends(ResponseStandIns.onEom(endContextFrom = "static")))
+        assertEquals("a jump straight to the call", 0, ends(ResponseStandIns.onEom(jumpToEnd = true)))
+        assertEquals("another state", 0, answerEnds(ResponseStandIns.classOf(CALLBACKS, ResponseStandIns.onEom()), "Lfixture/Other;",
+            lookup(ResponseStandIns.emitters())).size)
     }
 
     @Test
@@ -255,6 +318,12 @@ class MarketplaceResponseShapesTest {
         val unkept = refusal(listOf(ResponseStandIns.classOf(CALLBACKS, ResponseStandIns.onBody(), ResponseStandIns.onEom()),
             ResponseStandIns.classOf(ResponseStandIns.STATE, ResponseStandIns.stateInit(storesTwice = true)), ResponseStandIns.emitters()))
         assertTrue(unkept, unkept.contains("kept in one String field"))
+        val endless = refusal(ResponseStandIns.classes(ResponseStandIns.classOf(CALLBACKS, ResponseStandIns.onBody(),
+            ResponseStandIns.onEom(end = false))))
+        assertTrue(endless, endless.contains("report an answer complete once, with the request's state at hand, found 0"))
+        val cramped = refusal(ResponseStandIns.classes(ResponseStandIns.classOf(CALLBACKS, ResponseStandIns.onBody(),
+            ResponseStandIns.onEom(locals = 12))))
+        assertTrue(cramped, cramped.contains("no eight locals in a row"))
     }
 
     private data class Hand(val name: String, val original: Method, val call: String, val text: Int, val state: Int)

@@ -14,9 +14,11 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
 import app.morphe.extension.shared.diagnostics.FeedFilterCounters;
+import app.morphe.extension.shared.diagnostics.HookStatus;
 
 /**
  * What Hide sponsored Marketplace listings takes out of Marketplace search's answers, on their way
@@ -32,14 +34,18 @@ import app.morphe.extension.shared.diagnostics.FeedFilterCounters;
  * whose path ends at its index in that list, and fields Relay defers come in payloads whose path runs
  * through the result they belong to. A result is an ad when its node is a story of an ad type
  * ({@code __typename} ending "AdStory", as MarketplaceFeedAdStory does) or carries a
- * {@code sponsored_data} object, on the node itself or one object down. An ad's edge leaves its
- * list, a streamed ad isn't passed on, and every later index of that list moves down past the ads
- * taken out, so the list stays contiguous and no tile is left empty. Deferred fields of an ad go to
- * an index no list reaches, where Relay never applies them.
+ * {@code sponsored_data} object naming an ad id, on the node itself or one object down. An ad's edge
+ * leaves its list, a streamed ad's payload gives way to one with no data that keeps its extensions
+ * (Relay passes over it but still reads is_final), and every later index of that list moves down
+ * past the ads taken out, so the list stays contiguous and no tile is left empty. Deferred fields of
+ * an ad go to an index no list reaches, where Relay never applies them.
  *
  * <p>Only a whole payload can be read, so the start of one that hasn't finished arriving waits for
- * the rest. Text between payloads goes straight on, and so does every byte of a payload outside the
- * ads taken out and the indices moved.
+ * the rest, and what still waits when the answer ends goes on as it came. Text between payloads goes
+ * straight on, and so does every byte of a payload outside the ads taken out and the indices moved.
+ * A payload whose reading fails, or that grows too long to wait for, goes on as it came, and nothing
+ * more is taken out of that answer; later indices still move past the ads already taken out, so the
+ * list keeps no hole.
  */
 final class MarketplaceSearchAds {
     /** The diagnostic counter route: each list of results, each result's type, and each ad taken out. */
@@ -58,6 +64,9 @@ final class MarketplaceSearchAds {
     static final String AD_STORY = "AdStory";
 
     static final String SPONSORED_DATA = "sponsored_data";
+
+    /** What names the ad in sponsored data. */
+    static final String AD_ID = "ad_id";
 
     /** Parts of answers logged one by one before the log only counts them. */
     static final int LOGGED_ONE_BY_ONE = 40;
@@ -78,6 +87,13 @@ final class MarketplaceSearchAds {
     static final class Answer {
         private final String query;
         private boolean reading;
+        /**
+         * False once a payload failed to be read or grew too long to wait for: nothing more is taken
+         * out, and later indices only move past the ads already taken out.
+         */
+        private boolean removing = true;
+        /** The payload coming in grew too long to wait for, and goes on as it comes. */
+        private boolean passing;
         private final StringBuilder waiting = new StringBuilder();
         private int depth;
         private boolean inString;
@@ -103,7 +119,11 @@ final class MarketplaceSearchAds {
                 failNextPieceForTests = null;
                 throw failure;
             }
-            boolean same = waiting.length() == 0;
+            // What earlier pieces left waiting stays there until this piece has been read through, so
+            // a failure can still pass it on (giveUp).
+            boolean held = waiting.length() > 0;
+            boolean used = false;
+            boolean same = !held;
             StringBuilder out = new StringBuilder(piece.length());
             int from = 0;
             int length = piece.length();
@@ -124,23 +144,47 @@ final class MarketplaceSearchAds {
                 } else if (c == '{' || c == '[') {
                     depth++;
                 } else if ((c == '}' || c == ']') && --depth == 0) {
-                    waiting.append(piece, from, i + 1);
-                    String text = waiting.toString();
-                    waiting.setLength(0);
-                    String read = payload(text);
+                    if (passing) {
+                        // The end of a payload too long to wait for, which went on as it came.
+                        passing = false;
+                        continue;
+                    }
+                    String text = held ? waiting + piece.substring(from, i + 1) : piece.substring(from, i + 1);
+                    used |= held;
+                    held = false;
+                    Map<String, TreeSet<Integer>> before = new HashMap<>();
+                    for (Map.Entry<String, TreeSet<Integer>> list : taken.entrySet()) {
+                        before.put(list.getKey(), new TreeSet<>(list.getValue()));
+                    }
+                    String read;
+                    try {
+                        read = payload(text);
+                    } catch (Throwable failed) {
+                        // It goes on as it came, so nothing it took out counts as taken out.
+                        taken.clear();
+                        taken.putAll(before);
+                        removing = false;
+                        HookStatus.threw(FamilyNames.SPONSORED_MARKETPLACE, MarketplaceAdFilter.SEARCH_ANSWER, failed);
+                        log(query + " answer: a payload failed to be read (" + failed.getClass().getSimpleName()
+                                + ") and went on as it came. Nothing more comes out of this answer.");
+                        read = text;
+                    }
                     if (read != text) same = false;
                     out.append(read);
                     from = i + 1;
                 }
             }
-            if (depth > 0) {
+            if (used) waiting.setLength(0);
+            if (depth > 0 && !passing) {
                 waiting.append(piece, from, length);
                 same = false;
                 if (waiting.length() > MAX_WAITING_CHARS) {
-                    log(query + " answer went on unread past part " + parts + ", a payload is too long.");
+                    log(query + " answer: a payload after part " + parts + " is too long to wait for and goes on as it comes."
+                            + " Nothing more comes out of this answer.");
                     out.append(waiting);
                     waiting.setLength(0);
-                    reading = false;
+                    passing = true;
+                    removing = false;
                 }
             } else {
                 out.append(piece, from, length);
@@ -155,14 +199,31 @@ final class MarketplaceSearchAds {
             return rest;
         }
 
-        /** [piece] after what was waiting, as they came, with nothing read from here on. For a failure. */
+        /**
+         * [piece] after what earlier pieces left waiting, as they came, with nothing read from here
+         * on. For a failure outside a payload's reading.
+         */
         String giveUp(String piece) {
             reading = false;
             return rest() + piece;
         }
 
-        /** [text], one whole payload or a list of them, with its ads taken out. The same string when none were. */
+        /** The end of an answer that came in pieces: what still waits, as it came, or null when nothing does. */
+        @Nullable
+        String end() {
+            reading = false;
+            String rest = rest();
+            if (rest.isEmpty()) return null;
+            log(query + " answer ended with " + rest.length() + " characters of a payload that never finished. They went on as they came.");
+            return rest;
+        }
+
+        /**
+         * [text], one whole payload or a list of them, with its ads taken out, or once nothing more
+         * comes out, only its indices moved. The same string when nothing changed.
+         */
         private String payload(String text) {
+            if (!removing && !moved()) return text;
             Value root;
             try {
                 root = Parser.whole(text);
@@ -178,11 +239,19 @@ final class MarketplaceSearchAds {
             } else if (root.kind == '{') {
                 one(text, root);
             }
-            if (root.gone) return "";
+            if (root.replacement != null) return root.replacement;
             if (!root.changed) return text;
             StringBuilder out = new StringBuilder(text.length());
             root.write(text, out);
             return out.toString();
+        }
+
+        /** Whether a list has had results taken out, so later indices of it move. */
+        private boolean moved() {
+            for (TreeSet<Integer> list : taken.values()) {
+                if (!list.isEmpty()) return true;
+            }
+            return false;
         }
 
         /** One payload: a streamed result, deferred fields, or data with lists of results in it. */
@@ -203,25 +272,27 @@ final class MarketplaceSearchAds {
                     log(query + " answer, part " + parts + ": more of listing " + index + ", which was taken out.");
                     return;
                 }
-                FeedFilterCounters.sawList(ROUTE, 1);
-                String why = adReason(s, data);
-                if (why != null) {
-                    out.add(index);
-                    payload.remove();
-                    FeedFilterCounters.removed(ROUTE, 1, REMOVED);
-                    log(query + " answer, part " + parts + ": streamed listing " + index + ", took it out (" + why + ").");
-                    return;
+                if (removing) {
+                    FeedFilterCounters.sawList(ROUTE, 1);
+                    String why = adReason(s, data);
+                    if (why != null) {
+                        out.add(index);
+                        payload.replace(emptied(s, payload));
+                        FeedFilterCounters.removed(ROUTE, 1, REMOVED);
+                        log(query + " answer, part " + parts + ": streamed listing " + index + ", took it out (" + why + ").");
+                        return;
+                    }
                 }
                 int moved = index - out.headSet(index).size();
                 if (moved != index) path.items.get(at.size() - 1).replace(Integer.toString(moved));
-                clean(s, data, at, part);
+                if (removing) clean(s, data, at, part);
                 log(query + " answer, part " + parts + ": streamed listing " + index
                         + (moved != index ? ", now " + moved : "") + part.said(false) + ".");
                 return;
             }
             if (path != null && at != null) renumber(path, at);
-            if (data != null) clean(s, data, at, part);
-            log(query + " answer, part " + parts + ": " + part.said(true) + ".");
+            if (data != null && removing) clean(s, data, at, part);
+            log(query + " answer, part " + parts + ": " + (removing ? part.said(true) : "only its indices were read") + ".");
         }
 
         /** Moves each index of [at], a deferred payload's path, the way its list's results moved. */
@@ -340,9 +411,38 @@ final class MarketplaceSearchAds {
         return null;
     }
 
+    /** Whether [object]'s sponsored data names an ad: an ad id that's a number or a string with something in it. */
     private static boolean sponsored(String s, Value object) {
         Value data = object.member(s, SPONSORED_DATA);
-        return data != null && data.kind == '{';
+        Value id = data != null && data.kind == '{' ? data.member(s, AD_ID) : null;
+        if (id == null) return false;
+        if (id.kind == '"') return id.end - id.start > 2;
+        char first = s.charAt(id.start);
+        return id.kind == '0' && first >= '0' && first <= '9';
+    }
+
+    /**
+     * What takes a streamed ad's payload's place: data null, and what else it carries, is_final and
+     * hasNext above all. Relay passes over a payload whose data is null when its extensions aren't
+     * null and it has no errors, and still reads is_final off it. So an extensions object goes in
+     * when there's none, and the errors go, as do the label and the path that would make Relay read
+     * it as a result.
+     */
+    static String emptied(String s, Value payload) {
+        StringBuilder out = new StringBuilder("{\"data\":null");
+        boolean extensions = false;
+        for (int i = 0; i < payload.items.size(); i++) {
+            String name = s.substring(payload.names.get(i)[0], payload.names.get(i)[1]);
+            Value value = payload.items.get(i);
+            if (name.equals("data") || name.equals("label") || name.equals("path") || name.equals("errors")) continue;
+            if (name.equals("extensions")) {
+                if (value.kind != '{') continue;
+                extensions = true;
+            }
+            out.append(",\"").append(name).append("\":").append(s, value.start, value.end);
+        }
+        if (!extensions) out.append(",\"extensions\":{}");
+        return out.append('}').toString();
     }
 
     /** The steps of a payload's path, names and indices, or null when one is neither. */

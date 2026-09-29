@@ -6,13 +6,18 @@ package app.morphe.patches.facebook.ads.sponsoredmarketplace
 
 import app.morphe.patcher.StringComparisonType
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
+import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
+import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.freeLocalsAt
+import app.morphe.patches.facebook.misc.extension.liveAcrossInjection
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.findMutableMethodOf
@@ -71,7 +76,21 @@ val hideSponsoredMarketplaceListingsPatch = bytecodePatch(
             "$PATCH: ${send.definingClass}->$SEND_REQUEST no longer builds $stateType with the \"$TRACKING_NAME\" it " +
                 "reads, kept in one String field",
         )
+        val ends = answerEnds(callbacks, stateType, inBuild)
+        val end = ends.singleOrNull() ?: throw PatchException(
+            "$PATCH: expected $CALLBACKS to report an answer complete once, with the request's state at hand, " +
+                "found ${ends.size}",
+        )
+        val piece = handOffs.single { !it.whole }
+        if (end.emitter.parameterTypes.first().toString() != piece.emitter.parameterTypes.first().toString()) {
+            throw PatchException("$PATCH: ${end.emitter} and ${piece.emitter} take different contexts")
+        }
+        // The end goes in first. A hand-off after it in the same method would lose its place.
+        if (handOffs.any { it.method == end.method && it.landed >= end.call }) {
+            throw PatchException("$PATCH: ${end.method.name} hands text on after it reports the answer complete")
+        }
         val mutableCallbacks = mutableClassDefBy(CALLBACKS)
+        mutableCallbacks.findMutableMethodOf(end.method).handTheRestOver(end, piece.emitter)
         handOffs.forEach { mutableCallbacks.findMutableMethodOf(it.method).handTheTextOver(it, tracking) }
         enableStatus("sponsoredMarketplace")
     }
@@ -121,5 +140,33 @@ internal fun MutableMethod.handTheTextOver(handOff: TextHandOff, tracking: Field
             $call
             move-result-object v${handOff.text}
         """,
+    )
+}
+
+/**
+ * Right before [end]'s call reports an answer complete, the extension is asked for the text still
+ * waiting there for a payload to finish. When it hands some back, the text goes to JavaScript
+ * through [emitter], the piece emitter, as one last piece, with the context, the request id and the
+ * request's number the end call is given and no length. It takes eight locals in a row that nothing
+ * reads afterwards; the end call and the rest of the method run as they did.
+ */
+internal fun MutableMethod.handTheRestOver(end: AnswerEnd, emitter: MethodReference) {
+    val live = liveAcrossInjection(end.call)
+    val first = (0..minOf(localRegisterCount(), 256) - 8).firstOrNull { start -> (start until start + 8).none { it in live } }
+        ?: throw PatchException("$PATCH: $definingClass->$name has no eight locals in a row free before instruction ${end.call}")
+    addInstructionsWithLabels(
+        end.call,
+        """
+            invoke-static/range { v${end.state} .. v${end.state} }, $RESPONSE_END
+            move-result-object v${first + 2}
+            if-eqz v${first + 2}, :complete
+            move-object/from16 v$first, v${end.context}
+            move-object/from16 v${first + 1}, v${end.id}
+            move/from16 v${first + 3}, v${end.number}
+            const-wide/16 v${first + 4}, 0x0
+            const-wide/16 v${first + 6}, 0x0
+            invoke-static/range { v$first .. v${first + 7} }, $emitter
+        """,
+        ExternalLabel("complete", getInstruction(end.call)),
     )
 }

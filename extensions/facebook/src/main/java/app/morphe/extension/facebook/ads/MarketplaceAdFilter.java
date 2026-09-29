@@ -49,7 +49,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * <p>Marketplace search has no ads-only query and no variable that asks to skip them: its results
  * query brings the ads back among the listings. So the answers of Marketplace's search queries are
  * read on their way back, where the module's Tigon callbacks hand the text to JavaScript ({@link
- * #responsePiece}, {@link #responseWhole}), and {@link MarketplaceSearchAds} takes the ads out.
+ * #responsePiece}, {@link #responseWhole}, and {@link #responseEnd} for what still waits when an
+ * answer in pieces ends), and {@link MarketplaceSearchAds} takes the ads out.
  *
  * <p>It fails open: with the patch not in the build, the switch off, Hushfacebook paused, the
  * settings not ready yet, a body it can't read, or any failure in here, the request is Facebook's
@@ -233,6 +234,27 @@ public final class MarketplaceAdFilter {
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.SPONSORED_MARKETPLACE, SEARCH_ANSWER, failure);
             return text;
+        }
+    }
+
+    /**
+     * Injection point, in the same callbacks right before a response that came in pieces is reported
+     * complete to JavaScript. [request] is the module's record of it, as {@link #responsePiece} got
+     * it. Answers the text still waiting there for a payload to finish, as it came, for the patch to
+     * hand on as one last piece, or null when nothing waits. The answer is done with. Never throws.
+     */
+    @Nullable
+    public static String responseEnd(@Nullable Object request) {
+        try {
+            if (request == null) return null;
+            MarketplaceSearchAds.Answer answer;
+            synchronized (answers) {
+                answer = answers.remove(request);
+            }
+            return answer != null ? answer.end() : null;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.SPONSORED_MARKETPLACE, SEARCH_ANSWER, failure);
+            return null;
         }
     }
 
