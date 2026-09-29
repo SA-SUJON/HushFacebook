@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
+import app.morphe.extension.facebook.settings.SettingsStatus;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.diagnostics.HookStatus;
@@ -100,13 +101,24 @@ public final class FamilySignatureTrust {
      */
     static volatile Set<String> ownSigners;
 
+    /** Whether the patch is in this build, when a test says so instead of {@link SettingsStatus}. */
+    @Nullable
+    static volatile Boolean inBuildForTests;
+
+    /** Whether this build carries Install beside Meta's apps. */
+    static boolean inBuild() {
+        Boolean forced = inBuildForTests;
+        return forced != null ? forced : SettingsStatus.installBesideMetaApps();
+    }
+
     /**
      * Whether [callerInfo] describes a Meta family app, re-signed with this build's own key, that is
-     * the app now calling a guarded component. True only when [callerInfo]'s package is one of {@link
-     * #FAMILY_PACKAGES} by an exact name and is owned by the calling uid, this build is re-signed, and
-     * the caller's current signing certificate equals this build's. Any missing fact, any other
-     * signer or name, a caller that isn't the calling app, a build that still carries Meta's key, and
-     * any error all answer false, so Facebook's own answer stands.
+     * the app now calling a guarded component. True only when this build carries Install beside Meta's
+     * apps, [callerInfo]'s package is one of {@link #FAMILY_PACKAGES} by an exact name and is owned by
+     * the calling uid, this build is re-signed, and the caller's current signing certificate equals
+     * this build's. Any missing fact, any other signer or name, a caller that isn't the calling app, a
+     * build that still carries Meta's key, a build without the patch, and any error all answer false,
+     * so Facebook's own answer stands.
      *
      * <p>Facebook reads a package's signers for its own app, for the calling app, and for others it
      * looks up. Only the calling app's read is widened: a package that isn't a family name, or a
@@ -114,6 +126,10 @@ public final class FamilySignatureTrust {
      * the time and none of them is the cross-app sign-in this stands in for.
      */
     public static boolean isSameKeyFamilyCaller(@Nullable PackageInfo callerInfo) {
+        // Restore screens carries the reader that asks this, with or without Install beside Meta's
+        // apps. A build without Install beside keeps the reader as it was, and counts nothing under a
+        // patch it doesn't carry. No Pause check: like the renamed permissions, this stays in.
+        if (!inBuild()) return false;
         if (callerInfo == null) return false;
         String caller = callerInfo.packageName;
         if (caller == null || !FAMILY_PACKAGES.contains(caller)) return false;

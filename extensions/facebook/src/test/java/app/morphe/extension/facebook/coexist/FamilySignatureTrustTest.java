@@ -38,6 +38,8 @@ import app.morphe.extension.facebook.misc.FacebookSignature;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.diagnostics.HookStatus;
+import app.morphe.extension.shared.settings.HushfacebookPause;
+import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
  * Who a patched Facebook answers Meta's certificate for when it reads a caller's signers to build the
@@ -70,6 +72,8 @@ public class FamilySignatureTrustTest {
         packages = shadowOf(context.getPackageManager());
         install(context.getPackageName(), Process.myUid(), OUR_KEY);
         FamilySignatureTrust.ownSigners = null;
+        // Install beside Meta's apps is in the build unless a test says otherwise.
+        FamilySignatureTrust.inBuildForTests = Boolean.TRUE;
         HookStatus.clear();
     }
 
@@ -77,6 +81,8 @@ public class FamilySignatureTrustTest {
     public void tearDown() {
         ShadowBinder.reset();
         FamilySignatureTrust.ownSigners = null;
+        FamilySignatureTrust.inBuildForTests = null;
+        PauseForTests.resume();
         HookStatus.clear();
     }
 
@@ -132,8 +138,12 @@ public class FamilySignatureTrustTest {
     }
 
     private static String familyLine() {
+        return statusLine(FamilyNames.INSTALL_BESIDE_META_APPS);
+    }
+
+    private static String statusLine(String family) {
         for (String line : HookStatus.report("")) {
-            if (line.startsWith(FamilyNames.INSTALL_BESIDE_META_APPS + ":")) return line;
+            if (line.startsWith(family + ":")) return line;
         }
         return null;
     }
@@ -173,6 +183,38 @@ public class FamilySignatureTrustTest {
         List<Signature> signers = FacebookSignature.originalSigners(messenger);
         assertNotNull("a same-key Messenger caller gets Facebook's certificate", signers);
         assertEquals(metaCertificate(), signers.get(0));
+    }
+
+    // -- Which builds it runs in --------------------------------------------------------------
+
+    /**
+     * The reader this rides on belongs to Restore screens on re-signed builds, which a build can carry
+     * without Install beside Meta's apps: Install beside pulls Restore screens in, not the other way
+     * round. Such a build answers a same-key Messenger its own signers, as it did before the reader
+     * learned about callers, and counts nothing under a patch it doesn't carry.
+     */
+    @Test
+    public void withoutInstallBesideASameKeyMessengerKeepsItsOwnSigners() {
+        // SettingsStatus answers as it does in a build the patch didn't switch on.
+        FamilySignatureTrust.inBuildForTests = null;
+        PackageInfo messenger = caller(MESSENGER, OUR_KEY);
+        assertNull("Restore screens alone gave a same-key Messenger Facebook's certificate",
+                FacebookSignature.originalSigners(messenger));
+        assertFalse(callerCheck(messenger));
+        assertNull("counted under a patch this build doesn't carry", familyLine());
+        assertNull("counted a read Restore screens didn't answer", statusLine(FamilyNames.RESTORE_TRUST));
+    }
+
+    /**
+     * Pause can't undo Install beside's manifest, and SharedPermissions keeps naming the renamed
+     * permissions while paused. A same-key Messenger that signs in through Facebook keeps doing so.
+     */
+    @Test
+    public void pauseChangesNothing() {
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertTrue("paused by the switch", callerCheck(caller(MESSENGER, OUR_KEY)));
+        PauseForTests.pause(HushfacebookPause.Reason.CRASH_LOOP);
+        assertTrue("paused by safe mode", callerCheck(caller(MESSENGER, OUR_KEY)));
     }
 
     // -- The caller keeps Facebook's own answer --------------------------------------------------
