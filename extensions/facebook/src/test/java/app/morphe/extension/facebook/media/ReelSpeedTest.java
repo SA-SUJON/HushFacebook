@@ -328,6 +328,30 @@ public class ReelSpeedTest {
         assertEquals(List.of(IN_FEED + " 2.0", REELS + " 1.5"), players.set);
     }
 
+    /**
+     * Normal picked on a video already at normal, an ad in the Reels viewer say, sets no speed, so
+     * its toast has no player to go by. It forgets the speed of the viewer whose video started last,
+     * the one on screen, and no other. With nothing started yet it forgets nothing.
+     */
+    @Test
+    public void normalPickedOnAVideoAtNormalForgetsOnlyTheViewerOnScreen() {
+        Object inFeed = players.player(IN_FEED + "::newsfeed");
+        pick(inFeed, 2f);
+        ReelSpeed.picked(1f);
+        assertEquals("normal with nothing on screen forgot a speed", 2f, ReelSpeed.kept(IN_FEED), 0f);
+
+        Object reel = players.player(REELS);
+        play(reel);
+        pick(reel, 1.5f);
+        play(players.player(REELS, AD));
+        ReelSpeed.picked(1f);
+        assertEquals("normal in the Reels viewer kept its speed", 1f, ReelSpeed.kept(REELS), 0f);
+        assertEquals("normal in the Reels viewer forgot the feed's speed", 2f, ReelSpeed.kept(IN_FEED), 0f);
+        play(players.player(REELS));
+        play(players.player(IN_FEED));
+        assertEquals(List.of(IN_FEED + " 2.0"), players.set);
+    }
+
     @Test
     public void aPlayerInAnotherViewerStartsAtFacebooksSpeed() {
         Object reel = players.player(REELS);

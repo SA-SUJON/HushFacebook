@@ -126,6 +126,10 @@ public final class ReelSpeed {
     private static float lastSetSpeed = NORMAL;
     private static long lastSetAt = Long.MIN_VALUE;
 
+    /** The player that last started playing, weakly: the reel on screen when its menu opens. */
+    @Nullable
+    private static WeakReference<Object> lastStartedPlayer;
+
     private ReelSpeed() {
     }
 
@@ -196,10 +200,21 @@ public final class ReelSpeed {
             String origin = player == null ? null : originName(player);
             if (origin == null) {
                 if (same(speed, NORMAL)) {
+                    // Normal picked on a reel already at normal sets nothing, so no player names the
+                    // viewer. The reel on screen is the one that started last: only its viewer forgets.
+                    Object onScreen;
                     synchronized (LOCK) {
-                        KEPT.clear();
+                        onScreen = lastStartedPlayer == null ? null : lastStartedPlayer.get();
                     }
-                    Logger.printDebug(() -> "Reel speed: normal speed picked, reels start as Facebook starts them");
+                    String viewer = onScreen == null ? null : originName(onScreen);
+                    if (viewer != null) {
+                        synchronized (LOCK) {
+                            KEPT.remove(viewer);
+                        }
+                    }
+                    Logger.printDebug(() -> viewer != null
+                            ? "Reel speed: normal speed picked, reels in " + viewer + " start as Facebook starts them"
+                            : "Reel speed: normal speed picked, but no reel is known to be on screen; kept speeds stay");
                 } else {
                     Logger.printDebug(() -> "Reel speed: " + speed + "x picked, but no reel player took it");
                 }
@@ -235,6 +250,7 @@ public final class ReelSpeed {
             String origin = originName(player);
             Float kept;
             synchronized (LOCK) {
+                lastStartedPlayer = new WeakReference<>(player);
                 kept = origin == null ? null : KEPT.get(origin);
             }
             // Nothing kept for this viewer yet: a later start of the same video can still get a pick.
@@ -321,6 +337,7 @@ public final class ReelSpeed {
             lastSetPlayer = null;
             lastSetSpeed = NORMAL;
             lastSetAt = Long.MIN_VALUE;
+            lastStartedPlayer = null;
             KEPT.clear();
             HANDLED.clear();
         }
