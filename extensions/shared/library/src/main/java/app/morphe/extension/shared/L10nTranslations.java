@@ -676,7 +676,7 @@ public final class L10nTranslations {
         table.put("Saving...",
                 "Wird gespeichert \u2026");
         table.put("Saving... Cancel: Downloads in Hushfacebook.",
-                "Wird gespeichert... Abbrechen: Downloads in Hushfacebook.");
+                "Wird gespeichert \u2026 Abbrechen: Downloads in Hushfacebook.");
         table.put("Search",
                 "Suche");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -2422,7 +2422,7 @@ public final class L10nTranslations {
         table.put("Saving...",
                 "Menyimpan...");
         table.put("Saving... Cancel: Downloads in Hushfacebook.",
-                "Menyimpan... Batalkan: Unduhan di Hushfacebook.");
+                "Menyimpan... Batal: Unduhan di Hushfacebook.");
         table.put("Search",
                 "Pencarian");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
