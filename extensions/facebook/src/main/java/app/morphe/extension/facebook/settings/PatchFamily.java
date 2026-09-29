@@ -76,6 +76,8 @@ public enum PatchFamily {
             Settings.TURN_OFF_DOUBLE_TAP_LIKE),
     KEEP_REEL_SPEED(FamilyNames.KEEP_REEL_SPEED, "keepReelSpeed", null,
             Settings.KEEP_REEL_SPEED),
+    REEL_HOLD(FamilyNames.HOLD_REEL_FOR_2X, "reelHold", null,
+            Settings.HOLD_REEL_FOR_2X),
     DEFAULT_COMMENT_ORDER(FamilyNames.DEFAULT_COMMENT_ORDER, "defaultCommentOrder", null,
             Settings.DEFAULT_COMMENT_ORDER),
     TAG_SUGGESTIONS(FamilyNames.TAG_SUGGESTIONS, "tagSuggestions", null,

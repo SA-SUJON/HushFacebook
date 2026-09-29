@@ -113,6 +113,7 @@ public final class SettingsBackup {
             Settings.DONT_SEND_REEL_WATCH_HISTORY,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE,
             Settings.KEEP_REEL_SPEED,
+            Settings.HOLD_REEL_FOR_2X,
             Settings.DEFAULT_COMMENT_ORDER,
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
             Settings.TAP_TO_PLAY,

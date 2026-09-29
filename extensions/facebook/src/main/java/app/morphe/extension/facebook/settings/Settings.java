@@ -231,6 +231,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_keep_reel_speed", TRUE);
 
     /**
+     * A reel you hold plays at double speed until you let go, through the speed-up Facebook's Reels
+     * controls already have, in place of Facebook's long-press menu
+     * ({@link app.morphe.extension.facebook.reels.ReelHold}). On once the patch is picked, since
+     * picking it is the choice. Off or paused, a long press opens Facebook's menu.
+     */
+    public static final BooleanSetting HOLD_REEL_FOR_2X =
+            new BooleanSetting("hushfacebook_hold_reel_for_2x", TRUE);
+
+    /**
      * Comment sheets ask for the order in {@link #COMMENT_ORDER} where Facebook's servers would
      * choose one, and an order picked in a post's comments stays for that post until Facebook
      * restarts ({@link app.morphe.extension.facebook.comments.DefaultCommentOrder}). A request that

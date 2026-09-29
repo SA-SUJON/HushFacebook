@@ -540,3 +540,6 @@ A double tap on a reel or video no longer likes it or shows a heart. A single ta
 Keep the reel speed	Reel hızını koru
 # context: summary of that switch
 A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. Off, every reel starts at normal speed.	Bir reel'in menüsünde seçtiğin oynatma hızı, başka bir hız seçene veya Facebook yeniden başlayana kadar sonraki reel'lerde kalır. Kapalıyken her reel normal hızda başlar.
+Hold a reel for 2x	2x için reel'e basılı tut
+# context: summary of that switch; more button is the reel's own button with three dots
+Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.	Bir reel'e basılı tutmak, bırakana kadar onu iki kat hızda oynatır ve Facebook'un uzun basma menüsünün yerini alır. Reel'in daha fazla düğmesi bu menüyü açmaya devam eder.

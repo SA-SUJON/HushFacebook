@@ -434,3 +434,6 @@ A double tap on a reel or video no longer likes it or shows a heart. A single ta
 Keep the reel speed	Manter a velocidade dos reels
 # context: summary of that switch
 A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. Off, every reel starts at normal speed.	A velocidade de reprodução que você escolhe no menu de um reel continua nos próximos reels até você escolher outra ou o Facebook reiniciar. Desativado, cada reel começa na velocidade normal.
+Hold a reel for 2x	Segurar um reel para 2x
+# context: summary of that switch; more button is the reel's own button with three dots
+Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.	Segurar um reel faz ele tocar no dobro da velocidade até você soltar, no lugar do menu de toque longo do Facebook. O botão Mais do reel ainda abre esse menu.

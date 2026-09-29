@@ -447,6 +447,17 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: keep the reel speed. The patch finds, in Facebook 577 and 580, FbGrootPlayer by its play trace, then its speed setter as the one instance (F)V method reading HeroPlayerSetting.enableLastPlaybackSpeedCacheUpdate, its PlayerOrigin getter as the one method answering a PlayerOrigin, its bind by its bindVideoSources trace and its kept-name maybeTrackVideoStart, and the Reels menu's speed toast as the one static (Context, float) method holding InlinePlaybackSpeedAttributeSelector. The setter, the bind, the start and the toast hand the extension their arguments first thing, and the extension's stubs are filled with the setter and the origin getter. The extension keeps a speed picked in the Reels menu, in memory only, with the origin of the player it was set on, and sets it on the first start after each bind of a player with that origin."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/reels/ReelHold.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/reels/hold/HoldReelFor2xPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/reels/hold/ReelHoldAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: hold a reel for 2x, using the hold-to-speed-up Facebook's Reels controls already have behind server flags. The patch finds, in Facebook 577 and 580, the long-press handlers as the lambdas keeping $shouldDispatchLongPressEventDirectly and $immersiveFeedPlayerConfig and holding \"speed_up\", the release listeners as the lambdas keeping $isInLongPress2xPlaybackSpeed and that config, the speed-up flag as the one flag the handlers ask the config, the release flag as the one the listeners ask straight before it, the renders of FbShortsVideoControlComponent and FbShortsViewerOverlayComponent that make those lambdas, the edge check as the one method of its shape the handlers call, and FbFragmentActivity.dispatchTouchEvent. Each flag answer the handlers, the listeners and the renders take, and each answer of the edge check, goes through the extension, which says yes while the switch is on, the listeners' yes only during a gesture that began a hold, which it tells from the touches it reads."
     }
   ]
 }

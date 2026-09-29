@@ -94,6 +94,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean reelHold() {
+        return false;
+    }
+
     public static boolean defaultCommentOrder() {
         return false;
     }

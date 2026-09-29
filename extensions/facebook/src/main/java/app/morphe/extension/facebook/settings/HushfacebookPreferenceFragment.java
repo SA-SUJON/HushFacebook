@@ -492,6 +492,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                     L10n.t("A playback speed you pick in a reel's menu stays for the next reels until you pick another "
                             + "or Facebook restarts. Off, every reel starts at normal speed.")));
         }
+        if (build.contains(PatchFamily.REEL_HOLD)) {
+            reels.addPreference(toggle(context, Settings.HOLD_REEL_FOR_2X, L10n.t("Hold a reel for 2x"),
+                    L10n.t("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press "
+                            + "menu. The reel's more button still opens that menu.")));
+        }
         if (build.contains(PatchFamily.REEL_DOWNLOAD)) {
             reels.addPreference(toggle(context, Settings.DOWNLOAD_REELS, L10n.t("Download button on reels"),
                     L10n.t("Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.")));

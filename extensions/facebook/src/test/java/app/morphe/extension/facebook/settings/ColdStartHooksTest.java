@@ -64,6 +64,7 @@ import app.morphe.extension.facebook.navigation.ReelsTabForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
 import app.morphe.extension.facebook.reels.DoubleTapLike;
+import app.morphe.extension.facebook.reels.ReelHold;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
@@ -193,6 +194,10 @@ public class ColdStartHooksTest {
         assertNotNull("a double tap like before the context lost its key", DoubleTapLike.likeKey("reel"));
         assertFalse("a like from a double tap before the context was held back", DoubleTapLike.holdBackLike("DOUBLE_TAP"));
         assertFalse("an attachment's double tap before the context was left unhandled", DoubleTapLike.holdBackTap());
+        assertFalse("a long press on a reel before the context went to the speed-up", ReelHold.longPress(false));
+        assertFalse("a hold before the context counted anywhere on a reel", ReelHold.anywhere(false));
+        assertFalse("a reel before the context got a release listener", ReelHold.speedUp(false));
+        assertFalse("a lift before the context put a speed back", ReelHold.release(false));
         assertFalse("stories viewed before the context were kept off their viewer lists", StorySeen.holdBack());
         assertFalse(PlayerSourcesForTests.recordsAPlayer());
         assertFalse("a post menu built before the context got the video item", VideoMenuItemForTests.addsAnItem());

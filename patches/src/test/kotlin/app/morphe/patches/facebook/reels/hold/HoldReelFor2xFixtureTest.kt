@@ -1,0 +1,177 @@
+/*
+ * Copyright 2026 Hushfacebook contributors
+ * https://github.com/SysAdminDoc/Hushfacebook
+ */
+package app.morphe.patches.facebook.reels.hold
+
+import app.morphe.ExtensionDex
+import app.morphe.Fixtures
+import app.morphe.PatchContexts
+import app.morphe.patches.facebook.feed.FixtureDex
+import app.morphe.patches.facebook.media.taptoplay.FRAGMENT_ACTIVITY
+import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
+import app.morphe.patches.shared.compat.AppCompatibilities
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.ClassDef
+import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.io.File
+
+/**
+ * Hold a reel for 2x's anchors on every Facebook build the bundle declares: two long-press
+ * handlers holding "speed_up", which ask the immersive player config one flag; two release
+ * listeners, which ask a second flag straight before that one; the overlay's one check of the
+ * speed-up flag before it gives a reel its release listener; the one edge check of the build, which
+ * a handler calls; and nothing else in the build asking either flag but three places the patch
+ * leaves alone, none of which makes a handler or a listener. Then the patch itself, run on those
+ * classes: every flag call's answer through the extension in the same register before its branch,
+ * every return of the edge check through the extension, and the touch dispatch handing the event
+ * over first. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
+ */
+class HoldReelFor2xFixtureTest {
+    private val Instruction.call: MethodReference?
+        get() = (this as? ReferenceInstruction)?.reference as? MethodReference
+
+    private fun Instruction.registers(): List<Int> = when (this) {
+        is RegisterRangeInstruction -> (startRegister until startRegister + registerCount).toList()
+        is FiveRegisterInstruction -> listOf(registerC, registerD, registerE, registerF, registerG).take(registerCount)
+        else -> emptyList()
+    }
+
+    private fun key(method: Method) =
+        method.definingClass + "->" + method.name + method.parameterTypes.joinToString("", "(", ")") + method.returnType
+
+    private fun Method.code(): List<Instruction> = implementation!!.instructions.toList()
+
+    private fun declaredBundles(): Map<String, List<File>> {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        assertTrue("the bundle declares no Facebook build", versions.isNotEmpty())
+        return versions.associateWith { version -> Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") } }
+    }
+
+    @Test
+    fun `each declared build has every anchor, and the patch goes in on its own classes`() {
+        val checked = mutableSetOf<String>()
+        for ((version, bundles) in declaredBundles()) {
+            for (bundle in bundles) {
+                val name = bundle.name
+                val handlers = FixtureDex.classesHolding(bundle, SPEED_UP_LOG).filter(::isLongPressHandler)
+                assertEquals("$name: long-press handlers", 2, handlers.size)
+                val config = handlers.mapNotNull(::configType).toSet().single()
+                val speedUp = handlers.flatMap { h -> h.methods.flatMap { flagCalls(it, config).values } }.toSet().single()
+
+                val listenerTypes = mutableSetOf<String>()
+                FixtureDex.forEach(bundle) { dex ->
+                    dex.classes.filter { isReleaseListener(it) && configType(it) == config }.forEach { listenerTypes += it.type }
+                }
+                assertEquals("$name: release listeners", 2, listenerTypes.size)
+                val listeners = FixtureDex.classes(bundle, listenerTypes).values.toList()
+                val release = listeners.flatMap { l -> l.methods.flatMap { flagsBefore(it, config, speedUp) } }.toSet().single()
+                assertTrue("$name: the release flag is the speed-up flag", release != speedUp)
+                for (listener in listeners) {
+                    val asks = listener.methods.flatMap { flagsBefore(it, config, speedUp) }
+                    assertEquals("$name: ${listener.type} asks the release flag before the speed-up flag", listOf(release), asks)
+                }
+
+                val lambdas = (handlers + listeners).map { it.type }.toSet()
+                val components = CONTROL_COMPONENTS.flatMap { FixtureDex.classesHolding(bundle, it) }.distinctBy { it.type }
+                val builders = components.flatMap { c -> c.methods.filter { makesOneOf(it, lambdas) } }
+                val flags = setOf(speedUp, release)
+                val checks = builders.filter { flagCalls(it, config).values.any { flag -> flag in flags } }
+                assertEquals("$name: component renders asking either flag", 1, checks.size)
+                assertEquals("$name: the render's calls of either flag", listOf(speedUp),
+                    flagCalls(checks.single(), config).values.filter { it in flags })
+
+                // Everything else in the build that asks either flag, left alone: none of it makes a
+                // handler or a listener, and there are three.
+                val flagKeys = setOf("$config->$speedUp()Z", "$config->$release()Z")
+                val askers = FixtureDex.methodsWhere(bundle, dexFilter = { dex ->
+                    dex.methodSection.any { it.definingClass == config && (it.name == speedUp || it.name == release) }
+                }) { method -> method.implementation?.instructions?.any { it.call?.toString() in flagKeys } == true }
+                val patched = (handlers + listeners).map { it.type }.toSet()
+                val others = askers.filter { it.definingClass !in patched && checks.none { c -> key(c) == key(it) } }
+                assertEquals("$name: other methods asking the flags: ${others.map(::key)}", 3, others.size)
+                assertTrue("$name: another method makes a handler or a listener", others.none { makesOneOf(it, lambdas) })
+                assertTrue("$name: the release flag is asked outside the release listeners",
+                    others.none { m -> m.code().any { it.call?.toString() == "$config->$release()Z" } })
+
+                val edgeCalls = handlers.flatMap { h -> h.methods.flatMap { edgeChecksCalled(it, config) } }.distinctBy { it.toString() }
+                assertEquals("$name: edge checks the handlers call", 1, edgeCalls.size)
+                val shaped = FixtureDex.methodsWhere(bundle, dexFilter = { dex -> dex.typeSection.any { it == config } }) {
+                    isEdgeCheckShape(it.parameterTypes.map(CharSequence::toString), it.returnType, config)
+                }
+                assertEquals("$name: methods of the edge check's shape", 1, shaped.size)
+                val edgeClass = FixtureDex.classes(bundle, setOf(edgeCalls.single().definingClass)).values.single()
+                val edge = edgeClass.methods.single { isMethod(it, edgeCalls.single()) }
+
+                val activity = FixtureDex.classes(bundle, setOf(FRAGMENT_ACTIVITY)).values.single()
+                val componentClasses = components.filter { c -> checks.any { it.definingClass == c.type } }
+                val classes: List<ClassDef> = (handlers + listeners + componentClasses + edgeClass + activity +
+                    ExtensionDex.classDef(REEL_HOLD) + ExtensionDex.classDef(SETTINGS_STATUS)).distinctBy { it.type }
+                val context = PatchContexts.of(classes)
+                holdReelFor2xPatch.execute(context)
+
+                fun patched(method: Method): List<Instruction> = context.mutableClassDefBy(method.definingClass).methods.single {
+                    key(it) == key(method)
+                }.code()
+
+                fun assertAnswers(method: Method, hook: String, flags: Set<String>) {
+                    val before = method.code()
+                    val after = patched(method)
+                    val calls = flagCalls(method, config).filterValues { it in flags }.keys
+                        .filter { answerTakenAt(method, it) != null }.sorted()
+                    assertTrue("$name: ${key(method)} asks none of $flags", calls.isNotEmpty())
+                    calls.forEachIndexed { hooked, call ->
+                        val at = call + 2 * hooked
+                        val register = (before[call + 1] as OneRegisterInstruction).registerA
+                        assertEquals("$name: ${key(method)} lost its flag call", before[call].call.toString(), after[at].call.toString())
+                        assertEquals("$name: ${key(method)} after the flag's answer", hook, after[at + 2].call.toString())
+                        assertEquals("$name: ${key(method)} hands over another register", listOf(register), after[at + 2].registers())
+                        assertEquals("$name: ${key(method)} takes the answer back", register,
+                            (after[at + 3] as OneRegisterInstruction).registerA)
+                        assertEquals("$name: ${key(method)} lost what came after the answer", before[call + 2].opcode, after[at + 4].opcode)
+                    }
+                    assertEquals("$name: ${key(method)} hooks", calls.size, after.count { it.call?.toString() == hook })
+                }
+                handlers.flatMap { it.methods }.filter { flagCalls(it, config).isNotEmpty() }
+                    .forEach { assertAnswers(it, LONG_PRESS, setOf(speedUp)) }
+                listeners.flatMap { it.methods }.filter { flagCalls(it, config).isNotEmpty() }
+                    .forEach { assertAnswers(it, RELEASE, setOf(speedUp, release)) }
+                assertAnswers(checks.single(), SPEED_UP, setOf(speedUp, release))
+
+                val edgeBefore = edge.code()
+                val edgeAfter = patched(edge)
+                val returns = edgeAfter.withIndex().filter { it.value.opcode == Opcode.RETURN }
+                assertEquals("$name: the edge check's returns", edgeBefore.count { it.opcode == Opcode.RETURN }, returns.size)
+                for ((index, instruction) in returns) {
+                    val register = (instruction as OneRegisterInstruction).registerA
+                    assertEquals("$name: before the edge check's return at $index", ANYWHERE, edgeAfter[index - 2].call.toString())
+                    assertEquals("$name: the register the edge check hands over", listOf(register), edgeAfter[index - 2].registers())
+                    assertEquals("$name: the edge check takes the answer back", register,
+                        (edgeAfter[index - 1] as OneRegisterInstruction).registerA)
+                }
+
+                val dispatch = activity.methods.single { it.name == "dispatchTouchEvent" && it.implementation != null }
+                val first = patched(dispatch)[0]
+                assertEquals("$name: the touch dispatch's first call", TOUCH, first.call.toString())
+                assertEquals("$name: the event the dispatch hands over", listOf(dispatch.localRegisterCount() + 1), first.registers())
+
+                val status = context.mutableClassDefBy(SETTINGS_STATUS).methods.single { it.name == "reelHold" }
+                assertEquals("$name: SettingsStatus.reelHold() isn't switched on", 1,
+                    (status.code()[0] as NarrowLiteralInstruction).narrowLiteral)
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", declaredBundles().keys, checked)
+    }
+}
