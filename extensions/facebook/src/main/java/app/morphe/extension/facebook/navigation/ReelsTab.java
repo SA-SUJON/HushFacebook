@@ -4,10 +4,16 @@
  */
 package app.morphe.extension.facebook.navigation;
 
+import android.content.Context;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
@@ -32,6 +38,13 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * their own screens, and a start or a notification asking for the missing tab opens the bar's first
  * tab, as Facebook does for any tab its bar hasn't got.
  *
+ * <p>Facebook also pushes a Reels shortcut into the long-press menu of its launcher icon. The
+ * settings patch sends each of Facebook's shortcut calls through SettingsEntry, which asks
+ * {@link #dropsShortcut} and {@link #withoutShortcut} first, so with the switch on that shortcut is
+ * held back and one already published is removed, and each start clears one left from before
+ * ({@link #removePublished}). With the switch off, Facebook's next push of its shortcuts brings it
+ * back.
+ *
  * <p>It fails open: with the patch not in the build, the switch off, Hushfacebook paused, the
  * settings not ready yet, or a failure in here, the tab bar is Facebook's own.
  */
@@ -41,6 +54,12 @@ public final class ReelsTab {
 
     /** What every line of this hook starts with, for a person reading the log. */
     static final String PREFIX = "Reels tab: ";
+
+    /** The id of Facebook's launcher shortcut to the Reels tab, which its code calls video home. */
+    static final String SHORTCUT_ID = "shortcut_video_home";
+
+    /** Counted under the patch's name each time Facebook's Reels shortcut is held back or removed. */
+    static final String SHORTCUT_HELD = "Reels shortcut held back";
 
     /** Whether the patch is in this build, when a test says so instead of {@link SettingsStatus}. */
     @Nullable
@@ -125,6 +144,73 @@ public final class ReelsTab {
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.REELS_TAB, "tab bar", failure);
             return hidden;
+        }
+    }
+
+    /**
+     * Asked by SettingsEntry before Facebook pushes [shortcut]. True when it's the Reels shortcut and
+     * the switch is on: the push is dropped, and a Reels shortcut already published is removed.
+     * Never throws.
+     */
+    public static boolean dropsShortcut(@Nullable ShortcutManager manager, @Nullable ShortcutInfo shortcut) {
+        try {
+            if (manager == null || shortcut == null || !SHORTCUT_ID.equals(shortcut.getId()) || !on()) return false;
+            removeFrom(manager);
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.REELS_TAB, "launcher shortcut", failure);
+            return false;
+        }
+    }
+
+    /**
+     * Asked by SettingsEntry before Facebook adds, replaces or updates [shortcuts]. With the switch
+     * on, answers them without the Reels shortcut, and removes a published one; otherwise answers
+     * the same list. Never throws.
+     */
+    public static List<ShortcutInfo> withoutShortcut(@Nullable ShortcutManager manager, List<ShortcutInfo> shortcuts) {
+        try {
+            if (manager == null || shortcuts == null) return shortcuts;
+            List<ShortcutInfo> kept = new ArrayList<>(shortcuts.size());
+            for (ShortcutInfo shortcut : shortcuts) {
+                if (shortcut == null || !SHORTCUT_ID.equals(shortcut.getId())) kept.add(shortcut);
+            }
+            if (kept.size() == shortcuts.size() || !on()) return shortcuts;
+            removeFrom(manager);
+            return kept;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.REELS_TAB, "launcher shortcut", failure);
+            return shortcuts;
+        }
+    }
+
+    /**
+     * Run at each start, off the main thread, before SettingsEntry checks its own shortcut: with the
+     * switch on, removes a Reels shortcut Facebook published before it went on, which otherwise
+     * stays until Facebook pushes its shortcuts again. Never throws.
+     */
+    public static void removePublished(Context context) {
+        try {
+            if (!on()) return;
+            ShortcutManager manager = context.getSystemService(ShortcutManager.class);
+            if (manager == null) return;
+            for (ShortcutInfo shortcut : manager.getDynamicShortcuts()) {
+                if (SHORTCUT_ID.equals(shortcut.getId())) {
+                    removeFrom(manager);
+                    return;
+                }
+            }
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.REELS_TAB, "launcher shortcut", failure);
+        }
+    }
+
+    private static void removeFrom(ShortcutManager manager) {
+        manager.removeDynamicShortcuts(Collections.singletonList(SHORTCUT_ID));
+        HookStatus.counted(FamilyNames.REELS_TAB, SHORTCUT_HELD);
+        if (logged.add("shortcut")) {
+            Logger.diagnosticDebug(DiagnosticCategory.FEED_AND_NAVIGATION, SOURCE,
+                    () -> PREFIX + "kept Facebook's Reels shortcut out of its icon's long-press menu.");
         }
     }
 

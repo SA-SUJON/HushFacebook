@@ -17,6 +17,8 @@ import app.morphe.patches.shared.compat.AppCompatibilities
  * keeps for that tab, WatchTab, while the switch is on. A tab Facebook's own tab bar settings hide
  * stays theirs. Nothing else of Reels is touched, so reel links, reels in the feed and the Reels
  * viewer still open, and Open on a chosen tab sends a start meant for the hidden tab to Home.
+ * Facebook's Reels shortcut on its launcher icon goes too: the settings patch already sends each of
+ * Facebook's ShortcutManager calls through SettingsEntry, which asks ReelsTab to leave that one out.
  *
  * Out of the default selection, like Hide Reels in the feed: picking it is the choice, and its
  * switch starts on.
@@ -24,9 +26,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 @Suppress("unused")
 val hideReelsTabPatch = bytecodePatch(
     name = "Hide the Reels tab",
-    description = "Takes the Reels tab, which some accounts call Video, off the tab bar. Reel links and the " +
-        "reels in your feed still open. Facebook's own Hide in its tab bar settings keeps working, and a " +
-        "change to the switch shows once Facebook restarts.",
+    description = "Takes the Reels tab, which some accounts call Video, off the tab bar, and its shortcut out " +
+        "of the long-press menu of Facebook's icon. Reel links and the reels in your feed still open. Facebook's " +
+        "own Hide in its tab bar settings keeps working, and a change to the switch shows once Facebook restarts.",
     default = false,
 ) {
     category("Interface")

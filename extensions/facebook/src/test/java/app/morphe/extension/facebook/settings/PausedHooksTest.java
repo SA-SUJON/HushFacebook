@@ -380,7 +380,9 @@ public class PausedHooksTest {
                 MarketplaceOnlyForTests::hidesHome, MarketplaceOnlyForTests::quietsNotifications,
                 MarketplaceOnlyForTests::skipsFeedPrefetch));
         // The tab bar builder is told to leave the Reels tab out.
-        probes.put(PatchFamily.REELS_TAB, Collections.singletonList(ReelsTabForTests::hidesTheTab));
+        // Facebook's push of its Reels launcher shortcut is held back too.
+        probes.put(PatchFamily.REELS_TAB, Arrays.asList(ReelsTabForTests::hidesTheTab,
+                ReelsTabForTests::dropsTheShortcut));
         // The tab bar's count for the Reels tab reads none.
         probes.put(PatchFamily.REELS_TAB_DOT, Collections.singletonList(ReelsTabForTests::clearsTheDot));
         // A request for a post's comments that names no order asks for the chosen one.

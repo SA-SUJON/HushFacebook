@@ -1259,7 +1259,7 @@
     },
     {
       "name": "Hide the Reels tab",
-      "description": "Takes the Reels tab, which some accounts call Video, off the tab bar. Reel links and the reels in your feed still open. Facebook's own Hide in its tab bar settings keeps working, and a change to the switch shows once Facebook restarts.",
+      "description": "Takes the Reels tab, which some accounts call Video, off the tab bar, and its shortcut out of the long-press menu of Facebook's icon. Reel links and the reels in your feed still open. Facebook's own Hide in its tab bar settings keeps working, and a change to the switch shows once Facebook restarts.",
       "category": "Interface",
       "use": false,
       "dependencies": [
