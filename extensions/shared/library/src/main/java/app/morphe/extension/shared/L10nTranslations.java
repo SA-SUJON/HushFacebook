@@ -123,8 +123,8 @@ public final class L10nTranslations {
                 "F\u00fcgt Reels einen Download-Button mit deiner Downloadqualit\u00e4t hinzu. Ausgeschaltet oder pausiert erscheinen Facebooks eigene Buttons.");
         table.put("Additional Facebook preferences",
                 "Weitere Facebook-Einstellungen");
-        table.put("Ads and boosted listings in Marketplace's feed. The other listings stay.",
-                "Werbung und hervorgehobene Angebote im Marketplace-Feed. Die anderen Angebote bleiben.");
+        table.put("Ads and boosted listings in Marketplace's feed and search results. The other listings stay.",
+                "Werbung und hervorgehobene Angebote im Marketplace-Feed und in den Suchergebnissen. Die anderen Angebote bleiben.");
         table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
                 "Werbung zwischen den Beitr\u00e4gen auf einem Profil oder einer Seite. Deren eigene Beitr\u00e4ge bleiben.");
         table.put("Ads between the results when you search Facebook. What you searched for stays.",
@@ -1016,8 +1016,8 @@ public final class L10nTranslations {
                 "A\u00f1ade Descargar a los reels con tu calidad de descarga. Desactivado o en pausa, vuelven los botones de Facebook.");
         table.put("Additional Facebook preferences",
                 "Otras preferencias de Facebook");
-        table.put("Ads and boosted listings in Marketplace's feed. The other listings stay.",
-                "Anuncios y art\u00edculos promocionados en el feed de Marketplace. Los dem\u00e1s art\u00edculos se quedan.");
+        table.put("Ads and boosted listings in Marketplace's feed and search results. The other listings stay.",
+                "Anuncios y art\u00edculos promocionados en el feed y en los resultados de b\u00fasqueda de Marketplace. Los dem\u00e1s art\u00edculos se quedan.");
         table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
                 "Anuncios entre las publicaciones del perfil de alguien o de una p\u00e1gina. Sus propias publicaciones se quedan.");
         table.put("Ads between the results when you search Facebook. What you searched for stays.",
@@ -1909,8 +1909,8 @@ public final class L10nTranslations {
                 "Tambahkan tombol Unduh ke reel dengan kualitas unduhan Anda. Saat mati atau dijeda, tombol asli Facebook kembali.");
         table.put("Additional Facebook preferences",
                 "Preferensi Facebook tambahan");
-        table.put("Ads and boosted listings in Marketplace's feed. The other listings stay.",
-                "Iklan dan tawaran yang dipromosikan di feed Marketplace. Tawaran lainnya tetap ada.");
+        table.put("Ads and boosted listings in Marketplace's feed and search results. The other listings stay.",
+                "Iklan dan tawaran yang dipromosikan di feed dan hasil pencarian Marketplace. Tawaran lainnya tetap ada.");
         table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
                 "Iklan di antara postingan di profil seseorang atau Halaman. Postingan milik mereka sendiri tetap ada.");
         table.put("Ads between the results when you search Facebook. What you searched for stays.",
@@ -2802,8 +2802,8 @@ public final class L10nTranslations {
                 "Adiciona um bot\u00e3o Baixar aos Reels, usando sua qualidade de download. Desativado ou pausado, os bot\u00f5es do pr\u00f3prio Facebook voltam.");
         table.put("Additional Facebook preferences",
                 "Outras prefer\u00eancias do Facebook");
-        table.put("Ads and boosted listings in Marketplace's feed. The other listings stay.",
-                "Propagandas e an\u00fancios impulsionados no feed do Marketplace. Os demais an\u00fancios permanecem.");
+        table.put("Ads and boosted listings in Marketplace's feed and search results. The other listings stay.",
+                "Propagandas e an\u00fancios impulsionados no feed e nos resultados de busca do Marketplace. Os demais an\u00fancios permanecem.");
         table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
                 "An\u00fancios entre as publica\u00e7\u00f5es no perfil de algu\u00e9m ou em uma P\u00e1gina. As publica\u00e7\u00f5es da pr\u00f3pria pessoa permanecem.");
         table.put("Ads between the results when you search Facebook. What you searched for stays.",
@@ -3695,8 +3695,8 @@ public final class L10nTranslations {
                 "Reels\u2019e indirme kalitenizle \u0130ndir d\u00fc\u011fmesi ekler. Kapal\u0131 veya duraklat\u0131lm\u0131\u015fken Facebook\u2019un kendi d\u00fc\u011fmeleri geri gelir.");
         table.put("Additional Facebook preferences",
                 "Ek Facebook tercihleri");
-        table.put("Ads and boosted listings in Marketplace's feed. The other listings stay.",
-                "Marketplace ak\u0131\u015f\u0131ndaki reklamlar ve \u00f6ne \u00e7\u0131kar\u0131lan ilanlar. Di\u011fer ilanlar kal\u0131r.");
+        table.put("Ads and boosted listings in Marketplace's feed and search results. The other listings stay.",
+                "Marketplace ak\u0131\u015f\u0131ndaki ve arama sonu\u00e7lar\u0131ndaki reklamlar ve \u00f6ne \u00e7\u0131kar\u0131lan ilanlar. Di\u011fer ilanlar kal\u0131r.");
         table.put("Ads between the posts on someone's profile or a Page. Their own posts stay.",
                 "Birinin profilindeki ya da bir Sayfadaki g\u00f6nderilerin aras\u0131ndaki reklamlar. Kendi g\u00f6nderileri kal\u0131r.");
         table.put("Ads between the results when you search Facebook. What you searched for stays.",

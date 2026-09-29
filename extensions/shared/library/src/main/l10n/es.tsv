@@ -417,7 +417,7 @@ Keep friends and followed Pages in the Stories tray. Applies when Facebook next 
 # context: switch title under Marketplace; the ads Facebook puts between the things people sell in Marketplace's feed
 Hide sponsored Marketplace listings	Ocultar artículos publicitarios de Marketplace
 # context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
-Ads and boosted listings in Marketplace's feed. The other listings stay.	Anuncios y artículos promocionados en el feed de Marketplace. Los demás artículos se quedan.
+Ads and boosted listings in Marketplace's feed and search results. The other listings stay.	Anuncios y artículos promocionados en el feed y en los resultados de búsqueda de Marketplace. Los demás artículos se quedan.
 # context: switch title under News feed; hides posts whose text holds a word or phrase the person listed
 Hide posts with words you choose	Ocultar publicaciones con las palabras que elijas
 # context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes

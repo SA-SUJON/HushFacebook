@@ -275,10 +275,12 @@ public class PausedHooksTest {
         // A timeline story with sponsored data isn't drawn on a profile.
         probes.put(PatchFamily.SPONSORED_PROFILE_POSTS,
                 Collections.singletonList(ProfileAdFilterForTests::hidesASponsoredStory));
-        // Marketplace's feed query asks to skip its ads, and an ads-only query isn't sent.
+        // Marketplace's feed query asks to skip its ads, an ads-only query isn't sent, and a search
+        // answer loses its ad.
         probes.put(PatchFamily.SPONSORED_MARKETPLACE, Arrays.asList(
                 MarketplaceAdFilterForTests::asksTheFeedToSkipAds,
-                MarketplaceAdFilterForTests::holdsBackAnAdsQuery));
+                MarketplaceAdFilterForTests::holdsBackAnAdsQuery,
+                MarketplaceAdFilterForTests::dropsASearchAd));
         // A Remix chip under a reel, the Follow and Following buttons beside its author, and both
         // footer queries.
         probes.put(PatchFamily.REEL_DECLUTTER, Arrays.asList(

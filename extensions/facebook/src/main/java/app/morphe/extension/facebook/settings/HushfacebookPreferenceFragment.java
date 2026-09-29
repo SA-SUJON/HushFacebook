@@ -578,7 +578,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             PreferenceCategory marketplace = category(screen, L10n.t("Marketplace"));
             marketplace.addPreference(toggle(context, Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS,
                     L10n.t("Hide sponsored Marketplace listings"),
-                    L10n.t("Ads and boosted listings in Marketplace's feed. The other listings stay.")));
+                    L10n.t("Ads and boosted listings in Marketplace's feed and search results. The other "
+                            + "listings stay.")));
         }
 
         if (build.contains(PatchFamily.PROMO_NOTIFICATIONS)) {

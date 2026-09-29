@@ -172,6 +172,8 @@ public class ColdStartHooksTest {
                 MarketplaceAdFilterForTests.asksTheFeedToSkipAds());
         assertFalse("a Marketplace ads query sent before the context was held back",
                 MarketplaceAdFilterForTests.holdsBackAnAdsQuery());
+        assertFalse("a Marketplace search answer read before the context lost its ad",
+                MarketplaceAdFilterForTests.dropsASearchAd());
         Activity browser = Robolectric.buildActivity(Activity.class,
                 new Intent(Intent.ACTION_VIEW, Uri.parse("https://example.org/"))).create().get();
         assertFalse(ExternalBrowser.redirect(browser, browser.getIntent()));
