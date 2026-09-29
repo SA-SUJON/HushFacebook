@@ -50,9 +50,25 @@ public final class AmoledTheme {
 
     /**
      * The largest value that a channel can have and still count as a background. Measured on a
-     * device: a card is {@code #252728}, but a divider is {@code #3A3B3C}.
+     * device: a surface is {@code #252728}, but a divider is {@code #3A3B3C}.
      */
     static final int MAX_CHANNEL = 0x2A;
+
+    /**
+     * The largest value that a channel of a raised surface can have: a card, a comment or a popover
+     * that sits on a background. FDS's dark styles in 577 and 580 give a card {@code #333334}, a
+     * popover {@code #3B3C3E}, and the Video tab's popover {@code #3E4042}, the lightest of them.
+     * Route one takes a background token in this band to near black ({@link #RAISED_SHIFT}), issue
+     * #27.
+     */
+    static final int MAX_RAISED_CHANNEL = 0x42;
+
+    /**
+     * How far each channel of a raised surface goes down. A card's {@code #333334} becomes
+     * {@code #121213}, near black but still apart from the black page under it, and a popover keeps
+     * its step above the card. The darkest grey in the band ends at {@code #0A0A0A}, not black.
+     */
+    private static final int RAISED_SHIFT = 0x21;
 
     /**
      * The largest difference between the channels of a background. A grey has almost none. A dark
@@ -128,16 +144,26 @@ public final class AmoledTheme {
     /**
      * Route one: a colour that a resolver returns.
      *
+     * <p>A background in Facebook's dark mode turns black. A raised surface on it, a card for one,
+     * turns near black instead: FDS's dark card is {@code #333334}, and on AMOLED's black page it
+     * stayed a grey slab (issue #27), while a black card would lose its edge, since FDS draws no
+     * border round one in dark mode. The grey's steps between surfaces are kept, so what Facebook
+     * draws on a card (a translucent input, a chip) still shows against it.
+     *
      * @param token an enum constant. Only its name is used.
-     * @return black if this is a background that is already dark in Facebook's dark mode, or
+     * @return black for a background up to {@link #MAX_CHANNEL}, the near black of
+     * {@link #RAISED_SHIFT} for one up to {@link #MAX_RAISED_CHANNEL}, in Facebook's dark mode, or
      * {@code color} unchanged.
      */
     public static int apply(int color, Object token) {
         HookStatus.invoked(FamilyNames.AMOLED_THEME);
-        if (!isDarkNeutral(color, MAX_CHANNEL)) return color;
+        if (!isDarkNeutral(color, MAX_RAISED_CHANNEL)) return color;
         if (!(token instanceof Enum) || !DarkMode.on()) return color;
+        if (!BACKGROUND_TOKENS.contains(((Enum<?>) token).name())) return color;
 
-        return BACKGROUND_TOKENS.contains(((Enum<?>) token).name()) ? 0xFF000000 : color;
+        // Every channel of a grey above the black band is at least MAX_CHANNEL + 1 - MAX_SPREAD,
+        // above RAISED_SHIFT, so no channel borrows from the next.
+        return isDarkNeutral(color, MAX_CHANNEL) ? BLACK : color - RAISED_SHIFT * 0x010101;
     }
 
     /**

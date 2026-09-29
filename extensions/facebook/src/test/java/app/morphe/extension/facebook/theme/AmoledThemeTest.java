@@ -26,7 +26,7 @@ import java.util.Map;
 @Config(sdk = 30)
 public class AmoledThemeTest {
     /** Stands in for Facebook's colour token enums: only the constant names matter. */
-    enum Token { CARD_BACKGROUND, WASH, DIVIDER, PRIMARY_TEXT }
+    enum Token { CARD_BACKGROUND, COMMENT_BACKGROUND, POPOVER_BACKGROUND, WASH, DIVIDER, PRIMARY_TEXT }
 
     private static final int BLACK = 0xFF000000;
 
@@ -40,10 +40,41 @@ public class AmoledThemeTest {
     @Test
     public void everythingElseKeepsItsColour() {
         assertEquals("a divider token", 0xFF252728, AmoledTheme.apply(0xFF252728, Token.DIVIDER));
-        assertEquals("above the dark threshold", 0xFF3A3B3C, AmoledTheme.apply(0xFF3A3B3C, Token.CARD_BACKGROUND));
+        assertEquals("above the raised band", 0xFF46484B, AmoledTheme.apply(0xFF46484B, Token.CARD_BACKGROUND));
         assertEquals("a dark colour with a hue", 0xFF1A2A10, AmoledTheme.apply(0xFF1A2A10, Token.CARD_BACKGROUND));
         assertEquals("light mode's white card", 0xFFFFFFFF, AmoledTheme.apply(0xFFFFFFFF, Token.CARD_BACKGROUND));
         assertEquals("no token to go on", 0xFF252728, AmoledTheme.apply(0xFF252728, "CARD_BACKGROUND"));
+    }
+
+    /**
+     * Issue #27: Facebook's dark cards are #333334 on the black page AMOLED leaves (a Page card, a
+     * post, the profile's composer bar), its popovers #3B3C3E, or #3E4042 on the Video tab. They
+     * turn near black, apart from the page and each still a step above the surface under it.
+     */
+    @Test
+    public void aDarkCardTurnsNearBlack() {
+        assertEquals("a card", 0xFF121213, AmoledTheme.apply(0xFF333334, Token.CARD_BACKGROUND));
+        assertEquals("a comment", 0xFF121213, AmoledTheme.apply(0xFF333334, Token.COMMENT_BACKGROUND));
+        assertEquals("a popover", 0xFF1A1B1D, AmoledTheme.apply(0xFF3B3C3E, Token.POPOVER_BACKGROUND));
+        assertEquals("the Video tab's popover", 0xFF1D1F21, AmoledTheme.apply(0xFF3E4042, Token.POPOVER_BACKGROUND));
+        assertEquals("the older palette's card", 0xFF191A1B, AmoledTheme.apply(0xFF3A3B3C, Token.CARD_BACKGROUND));
+        assertEquals("just above the black band, still not black", 0xFF0A0A0A,
+                AmoledTheme.apply(0xFF2B2B2B, Token.CARD_BACKGROUND));
+    }
+
+    /** The mutation controls for #27: light mode, other tokens, lighter greys, a hue and no token. */
+    @Test
+    public void aCardOutsideTheRaisedBandKeepsItsColour() {
+        assertEquals("a divider", 0xFF3A3B3C, AmoledTheme.apply(0xFF3A3B3C, Token.DIVIDER));
+        assertEquals("text", 0xFF333334, AmoledTheme.apply(0xFF333334, Token.PRIMARY_TEXT));
+        assertEquals("a button's grey, above the band", 0xFF46484B, AmoledTheme.apply(0xFF46484B, Token.POPOVER_BACKGROUND));
+        assertEquals("a translucent card", 0x99333334, AmoledTheme.apply(0x99333334, Token.COMMENT_BACKGROUND));
+        assertEquals("a card with a hue", 0xFF2E3A44, AmoledTheme.apply(0xFF2E3A44, Token.CARD_BACKGROUND));
+        assertEquals("no token to go on", 0xFF333334, AmoledTheme.apply(0xFF333334, "CARD_BACKGROUND"));
+
+        DarkMode.answer(false);
+        assertEquals("light mode, the Video tab's dark card", 0xFF333334, AmoledTheme.apply(0xFF333334, Token.CARD_BACKGROUND));
+        assertEquals("light mode, its popover", 0xFF3E4042, AmoledTheme.apply(0xFF3E4042, Token.POPOVER_BACKGROUND));
     }
 
     @Test
@@ -106,10 +137,13 @@ public class AmoledThemeTest {
         assertEquals("a white bar", 0xFFFFFFFF, AmoledTheme.navigationBar(0xFFFFFFFF, true));
     }
 
-    /** The bar's higher threshold stays the bar's: a resolver's #333334 card keeps its colour. */
+    /**
+     * The bar's black stays the bar's: a resolver's #333334 card gets a card's near black, and a
+     * server colour, with no token to say it's a card, keeps its grey.
+     */
     @Test
     public void theBarThresholdDoesNotReachTheOtherRoutes() {
-        assertEquals(0xFF333334, AmoledTheme.apply(0xFF333334, Token.CARD_BACKGROUND));
+        assertEquals(0xFF121213, AmoledTheme.apply(0xFF333334, Token.CARD_BACKGROUND));
         assertEquals(0xFF333334, AmoledTheme.parseColor("#FF333334"));
     }
 

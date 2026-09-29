@@ -41,9 +41,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * mode ({@link DarkMode}). The system bars ask Facebook's dark check for the window
  * ({@link #statusBar}, {@link #navigationBar}).
  *
- * <p>With the AMOLED black theme in the same build, AMOLED goes first. Its black backgrounds
- * reach this class as black, which is no dark-theme colour, so they stay black, and this class
- * recolours text, icons, dividers and the cards AMOLED leaves grey.
+ * <p>With the AMOLED black theme in the same build, AMOLED goes first. Its black backgrounds and
+ * near-black cards reach this class in colours no dark-theme token has, so they stay as AMOLED made
+ * them, and this class recolours text, icons, dividers and the buttons and inputs AMOLED leaves grey.
  */
 public final class MaterialYouTheme {
 
