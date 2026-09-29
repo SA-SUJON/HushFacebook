@@ -36,8 +36,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * <p>The same reader gives Facebook a caller's signers when it builds the caller's identity for a
  * guarded component. On a re-signed build a Meta family app the user patched with the same key is
  * answered Meta's certificate here too, so Facebook's caller rules judge it exactly as the Meta-signed
- * app. {@link FamilySignatureTrust} makes that decision, and only in a build that carries Install
- * beside Meta's apps: that patch pulls this one in, but this one can be picked without it.
+ * app. {@link FamilySignatureTrust} makes that decision, and does it whenever this patch runs: the
+ * security boundary is the same-key check this reader already carries, so a same-key Messenger,
+ * Messenger Lite or Facebook Lite gets it whether or not Install beside Meta's apps is picked too.
  */
 public final class FacebookSignature {
 
@@ -67,18 +68,18 @@ public final class FacebookSignature {
      */
     public static List<Signature> originalSigners(PackageInfo info) {
         if (isThisApp(info)) {
-            // Counted only when it answers for this app, which is the whole of Restore screens' job.
-            // The name is a compile-time constant: this can run while content providers start, before
-            // Hushfacebook has a context, and Hook status reads no setting.
+            // Counted when it answers for this app. The name is a compile-time constant: this can run
+            // while content providers start, before Hushfacebook has a context, and Hook status reads
+            // no setting.
             HookStatus.invoked(FamilyNames.RESTORE_TRUST);
             return meta();
         }
 
         // A Meta family app re-signed with this build's key, calling a guarded component over Binder:
         // answer Meta's certificate for it too, so Facebook's caller checks judge it as the Meta-signed
-        // app. This runs only in a build carrying Install beside Meta's apps, only on a re-signed build
-        // and only for the app the current IPC comes from. FamilySignatureTrust counts under its own
-        // patch and takes Facebook's own path for anyone else.
+        // app. This runs on any build carrying this patch, only on a re-signed build and only for the
+        // app the current IPC comes from. FamilySignatureTrust counts it under this same patch and
+        // takes Facebook's own path for anyone else.
         if (FamilySignatureTrust.isSameKeyFamilyCaller(info)) {
             return meta();
         }

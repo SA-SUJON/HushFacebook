@@ -75,8 +75,6 @@ public class FamilySignatureTrustTest {
         packages = shadowOf(context.getPackageManager());
         install(context.getPackageName(), Process.myUid(), OUR_KEY);
         FamilySignatureTrust.ownSigners = null;
-        // Install beside Meta's apps is in the build unless a test says otherwise.
-        FamilySignatureTrust.inBuildForTests = Boolean.TRUE;
         HookStatus.clear();
     }
 
@@ -84,7 +82,6 @@ public class FamilySignatureTrustTest {
     public void tearDown() {
         ShadowBinder.reset();
         FamilySignatureTrust.ownSigners = null;
-        FamilySignatureTrust.inBuildForTests = null;
         PauseForTests.resume();
         HookStatus.clear();
     }
@@ -141,7 +138,7 @@ public class FamilySignatureTrustTest {
     }
 
     private static String familyLine() {
-        return statusLine(FamilyNames.INSTALL_BESIDE_META_APPS);
+        return statusLine(FamilyNames.RESTORE_TRUST);
     }
 
     private static String statusLine(String family) {
@@ -191,26 +188,26 @@ public class FamilySignatureTrustTest {
     // -- Which builds it runs in --------------------------------------------------------------
 
     /**
-     * The reader this rides on belongs to Restore screens on re-signed builds, which a build can carry
-     * without Install beside Meta's apps: Install beside pulls Restore screens in, not the other way
-     * round. Such a build answers a same-key Messenger its own signers, as it did before the reader
-     * learned about callers, and counts nothing under a patch it doesn't carry.
+     * The reader this rides on belongs to Restore screens on re-signed builds alone: the family-caller
+     * answer is that patch's own job, not something Install beside Meta's apps switches on. A build
+     * carrying Restore screens without Install beside still answers a same-key Messenger Meta's
+     * certificate, and counts it under Restore screens, because the security boundary (the same-key
+     * check) and the problem it solves (Restore screens rewriting Facebook's own signer lookup) are
+     * both Restore screens', and a same-key Facebook and Messenger pair needs nothing else to coexist.
      */
     @Test
-    public void withoutInstallBesideASameKeyMessengerKeepsItsOwnSigners() {
-        // SettingsStatus answers as it does in a build the patch didn't switch on.
-        FamilySignatureTrust.inBuildForTests = null;
+    public void withRestoreScreensAloneASameKeyMessengerGetsMetasCertificate() {
         PackageInfo messenger = caller(MESSENGER, OUR_KEY);
-        assertNull("Restore screens alone gave a same-key Messenger Facebook's certificate",
+        assertNotNull("Restore screens alone should give a same-key Messenger Facebook's certificate",
                 FacebookSignature.originalSigners(messenger));
-        assertFalse(callerCheck(messenger));
-        assertNull("counted under a patch this build doesn't carry", familyLine());
-        assertNull("counted a read Restore screens didn't answer", statusLine(FamilyNames.RESTORE_TRUST));
+        assertTrue(callerCheck(messenger));
+        assertNotNull("counted under Restore screens, which carries the hook", familyLine());
+        assertTrue("the count names the caller", familyLine().contains("shared sign-in"));
     }
 
     /**
-     * Pause can't undo Install beside's manifest, and SharedPermissions keeps naming the renamed
-     * permissions while paused. A same-key Messenger that signs in through Facebook keeps doing so.
+     * Restore screens' hook reads no Pause setting, the same as Install beside's manifest can't be
+     * undone at run time. A same-key Messenger that signs in through Facebook keeps doing so.
      */
     @Test
     public void pauseChangesNothing() {

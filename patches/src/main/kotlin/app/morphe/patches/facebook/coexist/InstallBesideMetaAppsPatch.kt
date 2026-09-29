@@ -8,7 +8,6 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
-import app.morphe.patches.facebook.misc.resignedtrust.restoreTrustPatch
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 
@@ -29,12 +28,13 @@ private val renameSharedPermissionsPatch = resourcePatch {
  * state broadcast and Profilo's trace control, six places on 577 and 580). Left alone they'd name a
  * permission this build no longer holds, and those broadcasts would stop reaching Facebook itself.
  *
- * It also lets a Meta app signed with Facebook's own certificate (Messenger, Messenger Lite, Facebook
- * Lite) that you patch with this build's own key reach Facebook's guarded components, so a Messenger
- * patched with the same key can sign in through a patched Facebook. That half rides on
- * Restore screens on re-signed builds: it hooks the one method Facebook reads a package's signers
- * through, and FamilySignatureTrust answers that same-key family caller Facebook's own certificate
- * there, so Facebook judges it as it would the Meta-signed app. This patch depends on that one.
+ * Letting a same-key Messenger, Messenger Lite or Facebook Lite sign in through this Facebook is
+ * Restore screens on re-signed builds' job, not this one's: that patch hooks the one method Facebook
+ * reads a package's signers through, and the same-key answer it gives a family caller there needs
+ * nothing from this patch. A same-key Facebook and Messenger pair installs fine without this patch
+ * too, since both declare Facebook's stock shared permission names under the same signer; this patch
+ * only keeps a Meta-signed Messenger, Facebook Lite, Business Suite or Workplace from colliding with
+ * a re-signed Facebook's copy of those names.
  *
  * No switch: a manifest can't change at run time, so the patch stays in while paused.
  */
@@ -43,18 +43,14 @@ val installBesideMetaAppsPatch = bytecodePatch(
     name = "Install beside Meta's apps",
     description = "Lets the official Messenger, Facebook Lite, Business Suite and Workplace install beside the " +
         "patched Facebook. Facebook shares two permissions with them, and Android lets only one signing key own " +
-        "a permission, so this patch renames Facebook's. Messenger, Messenger Lite and Facebook Lite, the Meta " +
-        "apps signed with Facebook's own certificate, are treated as Meta's own when you patch them with the same " +
-        "key, so they get exactly what the Meta-signed app would from the patched Facebook and can sign in " +
-        "through it. A Root Mount install doesn't need it.",
+        "a permission, so this patch renames Facebook's. A Root Mount install doesn't need it.",
     default = true,
 ) {
     category("Fixes")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
-    // Restore screens hooks the signers reader the same-key family caller trust rides on.
-    dependsOn(renameSharedPermissionsPatch, facebookExtensionPatch, restoreTrustPatch)
+    dependsOn(renameSharedPermissionsPatch, facebookExtensionPatch)
 
     execute {
         routeSharedLiterals()

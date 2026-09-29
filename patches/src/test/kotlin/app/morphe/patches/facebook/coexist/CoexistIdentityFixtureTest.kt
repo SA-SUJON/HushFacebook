@@ -34,10 +34,11 @@ import org.junit.Test
  * signer lists and the old array too (the shape Restore screens' fingerprint pins), that the caller's
  * identity for a guarded component is built from that reader's result, so answering it Meta's
  * certificate makes Facebook judge a same-key family caller as the Meta-signed app, and that the
- * caller checks themselves are left alone. For that last part Restore screens and Install beside Meta's
- * apps run, as the patcher runs them, on the build's own reader, the two trusted-caller delegates and
- * their shared evaluator: the reader then asks the extension first, and nothing in the delegates or
- * the evaluator calls the extension.
+ * caller checks themselves are left alone. For that last part Restore screens and Install beside
+ * Meta's apps both run, as the patcher runs them, on the build's own reader, the two trusted-caller
+ * delegates and their shared evaluator: the reader then asks the extension first, and nothing in the
+ * delegates or the evaluator calls the extension. The family-caller answer is Restore screens' own,
+ * unconditional job; Install beside Meta's apps runs here only because a real build carries both.
  */
 class CoexistIdentityFixtureTest {
     private companion object {
@@ -129,7 +130,7 @@ class CoexistIdentityFixtureTest {
                     builders.isNotEmpty(),
                 )
 
-                // The patched app: Restore screens, then Install beside Meta's apps, which depends on it,
+                // The patched app: Restore screens, then Install beside Meta's apps, in patcher order,
                 // run on this build's reader, its result class, both delegates and their evaluator.
                 val evaluator = evaluatorOf(bundle, delegate)
                 val types = setOf(reader.definingClass, reader.returnType, TRUSTED_CALLER_DELEGATE, SAME_KEY_DELEGATE,
