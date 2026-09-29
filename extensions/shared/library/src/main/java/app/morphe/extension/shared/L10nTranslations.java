@@ -675,8 +675,8 @@ public final class L10nTranslations {
                 "Einstellungsdatei wird gespeichert");
         table.put("Saving...",
                 "Wird gespeichert \u2026");
-        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
-                "Wird gespeichert \u2026 Zum Abbrechen \u00f6ffne Downloads in den Hushfacebook-Einstellungen.");
+        table.put("Saving... Cancel: Downloads in Hushfacebook.",
+                "Wird gespeichert... Abbrechen: Downloads in Hushfacebook.");
         table.put("Search",
                 "Suche");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -1548,8 +1548,8 @@ public final class L10nTranslations {
                 "Guardando el archivo de configuraci\u00f3n");
         table.put("Saving...",
                 "Guardando...");
-        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
-                "Guardando... Para cancelar, abre Descargas en la configuraci\u00f3n de Hushfacebook.");
+        table.put("Saving... Cancel: Downloads in Hushfacebook.",
+                "Guardando... Cancelar: Descargas en Hushfacebook.");
         table.put("Search",
                 "B\u00fasqueda");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -2421,8 +2421,8 @@ public final class L10nTranslations {
                 "Menyimpan file pengaturan");
         table.put("Saving...",
                 "Menyimpan...");
-        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
-                "Menyimpan... Untuk membatalkan, buka Unduhan di Pengaturan Hushfacebook.");
+        table.put("Saving... Cancel: Downloads in Hushfacebook.",
+                "Menyimpan... Batalkan: Unduhan di Hushfacebook.");
         table.put("Search",
                 "Pencarian");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -3294,8 +3294,8 @@ public final class L10nTranslations {
                 "Salvando o arquivo de configura\u00e7\u00f5es");
         table.put("Saving...",
                 "Salvando...");
-        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
-                "Salvando... Para cancelar, abra Downloads nas Configura\u00e7\u00f5es do Hushfacebook.");
+        table.put("Saving... Cancel: Downloads in Hushfacebook.",
+                "Salvando... Cancelar: Downloads no Hushfacebook.");
         table.put("Search",
                 "Pesquisa");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -4167,8 +4167,8 @@ public final class L10nTranslations {
                 "Ayar dosyas\u0131 kaydediliyor");
         table.put("Saving...",
                 "Kaydediliyor...");
-        table.put("Saving... To cancel, open Downloads in Hushfacebook's settings.",
-                "Kaydediliyor... \u0130ptal etmek i\u00e7in Hushfacebook ayarlar\u0131nda \u0130ndirmeler b\u00f6l\u00fcm\u00fcn\u00fc a\u00e7.");
+        table.put("Saving... Cancel: Downloads in Hushfacebook.",
+                "Kaydediliyor... \u0130ptal: Hushfacebook'ta \u0130ndirmeler.");
         table.put("Search",
                 "Arama");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",

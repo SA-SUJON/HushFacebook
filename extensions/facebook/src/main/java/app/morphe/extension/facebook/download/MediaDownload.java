@@ -715,7 +715,7 @@ public final class MediaDownload {
             Feedback.show(application, L10n.t(application, "Saving..."), false);
         } else {
             Feedback.show(application,
-                L10n.t(application, "Saving... To cancel, open Downloads in Hushfacebook's settings."), true);
+                L10n.t(application, "Saving... Cancel: Downloads in Hushfacebook."), true);
         }
 
         Thread worker = new Thread(() -> {
