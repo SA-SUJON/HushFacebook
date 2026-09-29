@@ -369,7 +369,8 @@ public final class MediaDownload {
     /**
      * The largest picture of [tracks] that fits [quality] and is larger than a saved one of quality
      * [saved], whatever its format, or null: the picture Facebook's player can show that the save
-     * didn't keep. VP9 is one, since an MP4 can't hold it, and so is AV1 before Android 14. For
+     * didn't keep. AV1 on a phone with no AV1 decoder is one, and so is any picture of a DASH save
+     * that failed and fell back to the single file. For
      * the smallest file there's never one, and a saved quality nobody stated has none either. Purely
      * informational: this doesn't ask whether the phone could have written [better], only whether
      * the manifest offered it. {@link #noticeablyLower} is what decides whether the person saving

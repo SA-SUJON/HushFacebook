@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.robolectric.util.ReflectionHelpers;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -258,36 +259,62 @@ public class SaveQualityTest {
         }
     }
 
-    /** VP9 pictures only: MP4 can't hold them, and the player shows them at 1080p. */
-    private static final String VP9_ONLY = "<MPD><Period><AdaptationSet mimeType=\"video/mp4\">"
-            + "<Representation codecs=\"vp09.00.40.08\" width=\"1080\" height=\"1920\" bandwidth=\"2000000\" "
-            + "FBQualityLabel=\"1080p\"><BaseURL>https://video-iad3-1.xx.fbcdn.net/o1/v/t2/f2/m69/vp9.mp4?oh=1&amp;oe=2"
+    /** Pictures in one format only, [codecs], which the player shows at 1080p, and AAC-LC sound. */
+    private static String onlyIn(String codecs) {
+        return "<MPD><Period><AdaptationSet mimeType=\"video/mp4\">"
+            + "<Representation codecs=\"" + codecs + "\" width=\"1080\" height=\"1920\" bandwidth=\"2000000\" "
+            + "FBQualityLabel=\"1080p\"><BaseURL>https://video-iad3-1.xx.fbcdn.net/o1/v/t2/f2/m69/only.mp4?oh=1&amp;oe=2"
             + "</BaseURL></Representation></AdaptationSet><AdaptationSet mimeType=\"audio/mp4\">"
             + "<Representation codecs=\"mp4a.40.2\" bandwidth=\"64000\">"
             + "<BaseURL>https://video-iad3-1.xx.fbcdn.net/o1/v/t2/f2/m69/sound.mp4?oh=1&amp;oe=2</BaseURL>"
             + "</Representation></AdaptationSet></Period></MPD>";
+    }
 
     /**
      * A save that ends below the best picture the manifest offers within the quality setting says
      * so in the report, beside what it saved. Held to a lower setting, the same file isn't below it.
+     * The picture here is AV1 on a phone with no AV1 decoder, which no save can keep.
      */
     @Test
     public void aStorySavedBelowWhatItsPlayerOffersSaysSo() throws Exception {
         String id = "6660000" + (System.nanoTime() % 100_000_000L + 100_000_000L);
+        Object av1Before = ReflectionHelpers.getStaticField(DashSave.class, "canWriteAv1");
         try {
+            ReflectionHelpers.setStaticField(DashSave.class, "canWriteAv1", Boolean.FALSE);
             Settings.DOWNLOAD_STORIES.save(true);
             PlayerSources.remember(new PlayerSourcesForTests.Params(id,
-                    new PlayerSourcesForTests.HdSource(null, VP9_ONLY)), "videoId", "hd", "manifest");
+                    new PlayerSourcesForTests.HdSource(null, onlyIn("av01.0.08m.08"))), "videoId", "hd", "manifest");
             StoryCard card = new StoryCard(id, new StoryMedia(id, SD, null));
 
             String report = storySaveAt(DownloadQuality.BEST, card);
             assertTrue(report, report.contains("saving video mp4 (360p) from 1 candidate(s): mp4 (360p), below the "
-                    + "manifest's video/mp4 vp09.00.40.08 1080x1920 2000kbps 1080p, the best it offers within the "
+                    + "manifest's video/mp4 av01.0.08m.08 1080x1920 2000kbps 1080p, the best it offers within the "
                     + "Download quality\n"));
 
             report = storySaveAt(DownloadQuality.P360, card);
             assertTrue(report, report.contains("saving video mp4 (360p) from 1 candidate(s)"));
             assertFalse(report, report.contains("below the manifest's"));
+        } finally {
+            ReflectionHelpers.setStaticField(DashSave.class, "canWriteAv1", av1Before);
+            Settings.DOWNLOAD_STORIES.resetToDefault();
+        }
+    }
+
+    /**
+     * A suggested story that comes only in VP9 (1080x1920 down to 360x640 on the phone that found
+     * it) saves its 1080p VP9 track with its sound, not the card's 360p H.264 file: the save writes
+     * that MP4 itself, since Android's muxer won't. The report names no picture it fell short of.
+     */
+    @Test
+    public void aVp9OnlyStorySavesFromItsManifest() throws Exception {
+        String id = "6670000" + (System.nanoTime() % 100_000_000L + 100_000_000L);
+        try {
+            Settings.DOWNLOAD_STORIES.save(true);
+            StoryCard card = new StoryCard(id, new StoryMedia(id, SD, onlyIn("vp09.00.40.08")));
+
+            String report = storySaveAt(DownloadQuality.BEST, card);
+            assertTrue(report, report.contains("saving the story video from its DASH manifest: video/mp4 vp09.00.40.08 "
+                    + "1080x1920 2000kbps 1080p + audio/mp4 mp4a.40.2 0x0 64kbps, instead of mp4 (360p)\n"));
         } finally {
             Settings.DOWNLOAD_STORIES.resetToDefault();
         }
