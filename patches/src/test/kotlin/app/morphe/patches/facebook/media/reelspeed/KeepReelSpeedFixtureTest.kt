@@ -16,7 +16,6 @@ import app.morphe.patches.facebook.media.resume.paramsGetters
 import app.morphe.patches.facebook.media.resume.reportedValues
 import app.morphe.patches.facebook.media.resume.trackers
 import app.morphe.patches.facebook.media.taptoplay.GROOT_PLAY
-import app.morphe.patches.facebook.media.taptoplay.grootBinds
 import app.morphe.patches.facebook.media.taptoplay.grootPlays
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.facebook.misc.extension.localRegisterCount
@@ -41,9 +40,9 @@ import java.io.File
 
 /**
  * Keep the reel speed's anchors on every Facebook build the bundle declares: FbGrootPlayer's speed
- * setter, PlayerOrigin getter, bind, maybeTrackVideoStart and VideoPlayerParams getter, each there
- * once; the params' one debug dump reporting isFbShorts, isSponsored and isLiveNow, each a public
- * boolean; PlayerOrigin naming the Reels viewer; and the Reels menu's speed toast, the only method
+ * setter, PlayerOrigin getter, maybeTrackVideoStart and VideoPlayerParams getter, each there once;
+ * the params' one debug dump reporting isFbShorts, isSponsored and isLiveNow, each a public boolean;
+ * and the Reels menu's speed toast, the only method
  * holding its selector's name, which only FbShortsInlinePlaybackSpeedUtil's two pickers call. The
  * gear menu's speed sheet sets its pick with the same setter. Then the patch itself, run on those
  * classes: each hook first in its method, reading the method's own arguments, and each stub calling
@@ -89,8 +88,6 @@ class KeepReelSpeedFixtureTest {
                 assertEquals("$name: speed setters reading the speed cache switch", 1, setters.size)
                 val origins = originGetters(owner)
                 assertEquals("$name: PlayerOrigin getters", 1, origins.size)
-                val binds = grootBinds(owner)
-                assertEquals("$name: binds", 1, binds.size)
                 val starts = trackers(owner, TRACK_START, trigger)
                 assertEquals("$name: $TRACK_START", 1, starts.size)
                 val paramsGetter = paramsGetters(owner)
@@ -101,7 +98,7 @@ class KeepReelSpeedFixtureTest {
                     assertTrue("$name: ${method.name} isn't public", AccessFlags.PUBLIC.isSet(method.accessFlags))
                 }
 
-                // The params' debug dump names the three booleans the rule reads, and PlayerOrigin the viewer.
+                // The params' debug dump names the three booleans the rule reads.
                 val paramsClass = FixtureDex.classes(bundle, setOf(VIDEO_PLAYER_PARAMS)).values.single()
                 assertTrue("$name: $VIDEO_PLAYER_PARAMS isn't public", AccessFlags.PUBLIC.isSet(paramsClass.accessFlags))
                 val dumps = paramsClass.methods.filter { m -> REEL_PARAM_STUBS.keys.all { holdsString(m, it) } }
@@ -116,8 +113,6 @@ class KeepReelSpeedFixtureTest {
                     stub to field.name
                 }
                 assertEquals("$name: the fields reported as ${REEL_PARAM_STUBS.keys}", 3, flagFields.values.toSet().size)
-                val playerOrigin = FixtureDex.classes(bundle, setOf(PLAYER_ORIGIN)).values.single()
-                assertTrue("$name: $PLAYER_ORIGIN doesn't name \"$VIEWER_ORIGIN\"", playerOrigin.methods.any { holdsString(it, VIEWER_ORIGIN) })
 
                 // The only method of the build holding the selector's name, and the Reels pickers' runnables
                 // are all that call it.
@@ -143,7 +138,7 @@ class KeepReelSpeedFixtureTest {
                 })
 
                 val toastClass = toastHolders.single { it.type == toast.definingClass }
-                val context = PatchContexts.of(listOf(owner, toastClass, paramsClass, playerOrigin,
+                val context = PatchContexts.of(listOf(owner, toastClass, paramsClass,
                     ExtensionDex.classDef(REEL_SPEED), ExtensionDex.classDef(SETTINGS_STATUS)))
                 keepReelSpeedPatch.execute(context)
 
@@ -160,7 +155,6 @@ class KeepReelSpeedFixtureTest {
                 }
                 val self = setter.localRegisterCount()
                 assertFirst("speed setter", setter, SPEED_SET, listOf(self, self + 1))
-                assertFirst("bind", binds.single(), BOUND, listOf(binds.single().localRegisterCount()))
                 assertFirst("start", starts.single(), STARTED, listOf(starts.single().localRegisterCount()))
                 assertFirst("toast", toast, PICKED, listOf(toast.localRegisterCount() + 1))
 

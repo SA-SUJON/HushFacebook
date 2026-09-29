@@ -5,7 +5,9 @@
 package app.morphe.extension.facebook.media;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 /** What tests outside this package need of Keep the reel speed: one pick and the next reel. */
 public final class ReelSpeedForTests {
@@ -18,6 +20,7 @@ public final class ReelSpeedForTests {
     public static boolean keepsAPickedSpeed() {
         ReelSpeed.forget();
         List<Float> set = new ArrayList<>();
+        Map<Object, Object> params = new IdentityHashMap<>();
         ReelSpeed.access = new ReelSpeed.Player() {
             @Override
             public void setSpeed(Object player, float speed) {
@@ -30,26 +33,29 @@ public final class ReelSpeedForTests {
             }
 
             @Override
-            public boolean reel(Object player) {
+            public Object params(Object player) {
+                return params.computeIfAbsent(player, p -> new Object());
+            }
+
+            @Override
+            public boolean reel(Object videoParams) {
                 return true;
             }
 
             @Override
-            public boolean ad(Object player) {
+            public boolean ad(Object videoParams) {
                 return false;
             }
 
             @Override
-            public boolean live(Object player) {
+            public boolean live(Object videoParams) {
                 return false;
             }
         };
         try {
             ReelSpeed.speedSet(new Object(), 1.5f);
             ReelSpeed.picked(1.5f);
-            Object next = new Object();
-            ReelSpeed.bound(next);
-            ReelSpeed.started(next);
+            ReelSpeed.started(new Object());
             return !set.isEmpty();
         } finally {
             ReelSpeed.forget();

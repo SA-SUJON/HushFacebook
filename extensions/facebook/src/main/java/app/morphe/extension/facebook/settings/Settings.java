@@ -223,7 +223,7 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_turn_off_double_tap_like", TRUE);
 
     /**
-     * A speed picked in a reel's menu in the Reels viewer stays for its next reels, ads and live
+     * A speed picked in a reel's menu stays for the next reels where it was picked, ads and live
      * videos aside, until another is picked or Facebook restarts
      * ({@link app.morphe.extension.facebook.media.ReelSpeed}). Nothing is
      * stored. Off or paused, each reel starts at the speed Facebook starts it at.

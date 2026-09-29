@@ -19,7 +19,6 @@ import app.morphe.patches.facebook.media.resume.paramsGetters
 import app.morphe.patches.facebook.media.resume.reportedValues
 import app.morphe.patches.facebook.media.resume.trackers
 import app.morphe.patches.facebook.media.taptoplay.GROOT_PLAY
-import app.morphe.patches.facebook.media.taptoplay.grootBinds
 import app.morphe.patches.facebook.media.taptoplay.grootPlays
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.settings.settingsPatch
@@ -36,8 +35,8 @@ internal const val PATCH = "Keep the reel speed"
  * The speed picked in a reel's menu stays for the next reels. See ReelSpeedAnchors.kt for where
  * Facebook sets, announces and forgets a reel's speed, and the extension's ReelSpeed for the rule.
  *
- * FbGrootPlayer's speed setter, its bind and its maybeTrackVideoStart tell the extension about
- * themselves first thing, and so does the Reels menu's speed toast, which follows a pick. The
+ * FbGrootPlayer's speed setter and its maybeTrackVideoStart tell the extension about themselves
+ * first thing, and so does the Reels menu's speed toast, which follows a pick. The
  * extension's stubs are filled with the player's speed setter, its PlayerOrigin getter, its
  * VideoPlayerParams getter and the params' isFbShorts, isSponsored and isLiveNow.
  */
@@ -67,7 +66,6 @@ internal class ReelSpeedAnchors(
     val owner: ClassDef,
     val setter: Method,
     val origin: Method,
-    val bind: Method,
     val start: Method,
     val toast: Method,
     val params: Method,
@@ -75,7 +73,7 @@ internal class ReelSpeedAnchors(
 )
 
 /**
- * FbGrootPlayer's setter, origin getter, bind, start and params getter, the params' fields the rule
+ * FbGrootPlayer's setter, origin getter, start and params getter, the params' fields the rule
  * reads, and the Reels menu's speed toast. Changes nothing.
  */
 internal fun BytecodePatchContext.findReelSpeedAnchors(): ReelSpeedAnchors {
@@ -91,7 +89,6 @@ internal fun BytecodePatchContext.findReelSpeedAnchors(): ReelSpeedAnchors {
 
     val setter = single("speed setter reading HeroPlayerSetting's speed cache switch", speedSetters(owner))
     val origin = single("PlayerOrigin getter", originGetters(owner))
-    val bind = single("bind of Tap to play's", grootBinds(owner))
     val start = single("$TRACK_START($trigger)", trackers(owner, TRACK_START, trigger))
     val params = single("getter of its $VIDEO_PLAYER_PARAMS", paramsGetters(owner))
 
@@ -115,10 +112,6 @@ internal fun BytecodePatchContext.findReelSpeedAnchors(): ReelSpeedAnchors {
         stub to field
     }
 
-    // A build that renamed the Reels viewer would keep every speed to itself without a word.
-    val playerOrigin = classDefByOrNull(PLAYER_ORIGIN) ?: refuse("this build has no $PLAYER_ORIGIN")
-    if (playerOrigin.methods.none { holdsString(it, VIEWER_ORIGIN) }) refuse("$PLAYER_ORIGIN doesn't name \"$VIEWER_ORIGIN\"")
-
     // The extension's stubs call these from outside Facebook's package.
     listOf(owner, paramsClass).forEach { reachable ->
         if (!AccessFlags.PUBLIC.isSet(reachable.accessFlags)) refuse("${reachable.type} isn't public, so the extension can't reach it")
@@ -128,18 +121,17 @@ internal fun BytecodePatchContext.findReelSpeedAnchors(): ReelSpeedAnchors {
             refuse("${owner.type}->${method.name} isn't public, so the extension can't call it")
         }
     }
-    return ReelSpeedAnchors(owner, setter, origin, bind, start, toast, params, flags)
+    return ReelSpeedAnchors(owner, setter, origin, start, toast, params, flags)
 }
 
 /**
  * Each hook goes first in its method and hands the extension the method's own arguments through
  * the range form, which names any register and borrows none: the player and the speed for the
- * setter, the player for the bind and the start, and the speed, the toast's second argument.
+ * setter, the player for the start, and the speed, the toast's second argument.
  */
 internal fun BytecodePatchContext.applyReelSpeedAnchors(anchors: ReelSpeedAnchors) {
     val owner = mutableClassDefBy(anchors.owner.type)
     owner.findMutableMethodOf(anchors.setter).addInstruction(0, "invoke-static/range { p0 .. p1 }, $SPEED_SET")
-    owner.findMutableMethodOf(anchors.bind).addInstruction(0, "invoke-static/range { p0 .. p0 }, $BOUND")
     owner.findMutableMethodOf(anchors.start).addInstruction(0, "invoke-static/range { p0 .. p0 }, $STARTED")
     mutableClassDefBy(anchors.toast.definingClass).findMutableMethodOf(anchors.toast)
         .addInstruction(0, "invoke-static/range { p1 .. p1 }, $PICKED")

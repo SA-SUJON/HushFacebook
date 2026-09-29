@@ -9,6 +9,9 @@ import android.os.SystemClock;
 import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
@@ -23,20 +26,21 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * reel's own FbGrootPlayer and shows Facebook's speed toast a moment later; nothing else shows that
  * toast. Facebook remembers a speed per video, so the next reel's player starts at normal speed.
  * The patch hands this class every speed set on a player ({@link #speedSet}), the toast's speed
- * ({@link #picked}), each video a player binds ({@link #bound}) and each start of playback
- * ({@link #started}).
+ * ({@link #picked}) and each start of playback ({@link #started}).
  *
- * <p>A speed picked on a reel in the Reels viewer, the {@link #VIEWER} origin the Reels tab and
- * every reel opened full screen play in, is kept, and the first start after each bind of a player
- * there gets it when the player's video is a reel that's neither an ad nor live: Facebook's menu
- * may not offer a speed on an ad, and a live video sped up runs into its live edge. Reels in the
- * feed (fb_shorts_native_in_feed_unit and the like) start on their own as you scroll past, so a
- * pick there stays with that one reel and neither replaces nor forgets the viewer's speed. A reel
- * paused and started again, a reel held at 2x and anything else set on the reel you're watching
- * stay as they are until the next reel. Picking normal speed goes back to Facebook's reset. The
- * speed lives in memory only, so it's gone when Facebook restarts, and nothing is kept or applied
- * while the switch is off, Hushfacebook is paused, the settings aren't ready, or anything here
- * fails.
+ * <p>A picked speed is kept for the viewer the reel was playing in, its PlayerOrigin's origin:
+ * fb_shorts_viewer for the Reels viewer, video_home where an account's Reels live in the Video
+ * tab, fb_shorts_native_in_feed_unit for reels in the feed, and so on. A pick in one viewer never
+ * changes another's. When a player of that viewer starts a video it hasn't started since the pick,
+ * which it tells by the VideoPlayerParams object each video brings, the speed goes on if the video
+ * is a reel (isFbShorts) that isn't an ad (isSponsored) or live (isLiveNow): Facebook's menu may
+ * not offer a speed on an ad, a live video sped up runs into its live edge, and other videos keep
+ * Facebook's speed. A reel that started before the pick, such as the next one Facebook readies in
+ * advance, gets it when it starts again. A reel paused and started again after that, a reel held at
+ * 2x and anything else set on the reel you're watching stay as they are until the next reel.
+ * Picking normal speed goes back to Facebook's reset for that viewer. The speeds live in memory
+ * only, so they're gone when Facebook restarts, and nothing is kept or applied while the switch is
+ * off, Hushfacebook is paused, the settings aren't ready, or anything here fails.
  */
 public final class ReelSpeed {
     static final float NORMAL = 1f;
@@ -50,9 +54,6 @@ public final class ReelSpeed {
     /** Counted under the patch's name for each reel started at the kept speed. */
     static final String APPLIED = "reel started at the kept speed";
 
-    /** The Reels viewer's origin, what its PlayerOrigin's toString() writes before "::". The patch checks the build has it. */
-    static final String VIEWER = "fb_shorts_viewer";
-
     private static final String FAMILY = FamilyNames.KEEP_REEL_SPEED;
 
     /** What this class reads from a player and does to it. {@link #PATCHED} is the patch's; tests stand in. */
@@ -64,14 +65,18 @@ public final class ReelSpeed {
         @Nullable
         Object origin(Object player);
 
-        /** Whether the player's video is a reel, by its VideoPlayerParams' isFbShorts. False without params. */
-        boolean reel(Object player);
+        /** The player's VideoPlayerParams, one object per video it binds, or null before the first. */
+        @Nullable
+        Object params(Object player);
 
-        /** Whether the player's video is an ad, by its params' isSponsored. False without params. */
-        boolean ad(Object player);
+        /** Whether [params]' video is a reel, by its isFbShorts. */
+        boolean reel(Object params);
 
-        /** Whether the player's video is live now, by its params' isLiveNow. False without params. */
-        boolean live(Object player);
+        /** Whether [params]' video is an ad, by its isSponsored. */
+        boolean ad(Object params);
+
+        /** Whether [params]' video is live now, by its isLiveNow. */
+        boolean live(Object params);
     }
 
     static final Player PATCHED = new Player() {
@@ -86,21 +91,23 @@ public final class ReelSpeed {
         }
 
         @Override
-        public boolean reel(Object player) {
-            Object params = playerParams(player);
-            return params != null && fbShorts(params);
+        public Object params(Object player) {
+            return playerParams(player);
         }
 
         @Override
-        public boolean ad(Object player) {
-            Object params = playerParams(player);
-            return params != null && sponsored(params);
+        public boolean reel(Object params) {
+            return fbShorts(params);
         }
 
         @Override
-        public boolean live(Object player) {
-            Object params = playerParams(player);
-            return params != null && liveNow(params);
+        public boolean ad(Object params) {
+            return sponsored(params);
+        }
+
+        @Override
+        public boolean live(Object params) {
+            return liveNow(params);
         }
     };
 
@@ -108,14 +115,16 @@ public final class ReelSpeed {
 
     private static final Object LOCK = new Object();
 
-    /** The players that bound a video and haven't started it yet, weakly, by identity. */
-    private static final TapToPlay.ArmedPlayers BOUND = new TapToPlay.ArmedPlayers();
+    /** The speed kept for each viewer, by its origin. */
+    private static final Map<String, Float> KEPT = new HashMap<>();
+
+    /** The params each player last started with a speed kept for its viewer, weakly. Players don't override equals. */
+    private static final Map<Object, WeakReference<Object>> HANDLED = new WeakHashMap<>();
 
     @Nullable
     private static WeakReference<Object> lastSetPlayer;
     private static float lastSetSpeed = NORMAL;
     private static long lastSetAt = Long.MIN_VALUE;
-    private static float kept = NORMAL;
 
     private ReelSpeed() {
     }
@@ -155,7 +164,10 @@ public final class ReelSpeed {
 
     // ------------------------------------------------------------------ hooks
 
-    /** The hook, first thing in FbGrootPlayer's speed setter, whoever calls it. */
+    /**
+     * The hook, first thing in FbGrootPlayer's speed setter, whoever calls it. With debug logging on,
+     * it logs the speed the player really gets, whatever its menu shows.
+     */
     public static void speedSet(Object player, float speed) {
         try {
             HookStatus.invoked(FAMILY);
@@ -165,15 +177,15 @@ public final class ReelSpeed {
                 lastSetSpeed = speed;
                 lastSetAt = SystemClock.uptimeMillis();
             }
+            Logger.printDebug(() -> "Reel speed: a player in " + viewerForLog(player) + " set to " + speed + "x");
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "speed set", failure);
         }
     }
 
     /**
-     * The hook, first thing in the Reels menu's speed toast, which follows a pick. Keeps [speed] when
-     * the pick just set it on a player in the Reels viewer; normal speed forgets it. A pick on a
-     * player anywhere else changes nothing kept.
+     * The hook, first thing in the Reels menu's speed toast, which follows a pick. Keeps [speed] for
+     * the viewer of the player the pick just set it on; normal speed forgets that viewer's speed.
      */
     public static void picked(float speed) {
         try {
@@ -182,60 +194,68 @@ public final class ReelSpeed {
             HookStatus.bound(FAMILY, "speed picked");
             Object player = pickedPlayer(speed, SystemClock.uptimeMillis());
             String origin = player == null ? null : originName(player);
-            if (origin != null && !VIEWER.equals(origin)) {
-                Logger.printDebug(() -> "Reel speed: " + speed + "x picked in " + origin + ", not the Reels viewer, so not kept");
-                return;
-            }
-            if (same(speed, NORMAL)) {
-                synchronized (LOCK) {
-                    kept = NORMAL;
-                }
-                Logger.printDebug(() -> "Reel speed: normal speed picked, reels start as Facebook starts them");
-                return;
-            }
             if (origin == null) {
-                Logger.printDebug(() -> "Reel speed: " + speed + "x picked, but no reel player took it");
+                if (same(speed, NORMAL)) {
+                    synchronized (LOCK) {
+                        KEPT.clear();
+                    }
+                    Logger.printDebug(() -> "Reel speed: normal speed picked, reels start as Facebook starts them");
+                } else {
+                    Logger.printDebug(() -> "Reel speed: " + speed + "x picked, but no reel player took it");
+                }
                 return;
             }
+            Object params = access.params(player);
             synchronized (LOCK) {
-                kept = speed;
+                if (same(speed, NORMAL)) {
+                    KEPT.remove(origin);
+                } else {
+                    KEPT.put(origin, speed);
+                }
+                // The reel picked on already plays at the speed.
+                if (params != null) HANDLED.put(player, new WeakReference<>(params));
             }
-            Logger.printDebug(() -> "Reel speed: keeping " + speed + "x for the Reels viewer");
+            Logger.printDebug(() -> same(speed, NORMAL)
+                    ? "Reel speed: normal speed picked, reels in " + origin + " start as Facebook starts them"
+                    : "Reel speed: keeping " + speed + "x for " + origin);
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "speed picked", failure);
         }
     }
 
-    /** The hook, first thing where FbGrootPlayer binds a video. The next start is a new reel's. */
-    public static void bound(Object player) {
-        try {
-            HookStatus.invoked(FAMILY);
-            if (player == null || !on()) return;
-            BOUND.arm(player, SystemClock.uptimeMillis());
-        } catch (Throwable failure) {
-            HookStatus.threw(FAMILY, "player bind", failure);
-        }
-    }
-
     /**
      * The hook, first thing in FbGrootPlayer's maybeTrackVideoStart, which runs once the player has
-     * started playing. The first start after a bind, on a player in the Reels viewer playing a reel
-     * that's neither an ad nor live, gets the kept speed.
+     * started playing. The first start of each video after a pick in the player's viewer gets the
+     * kept speed when the video is a reel that's neither an ad nor live.
      */
     public static void started(Object player) {
         try {
             HookStatus.invoked(FAMILY);
-            if (player == null || !on() || !BOUND.armed(player)) return;
-            BOUND.disarm(player);
-            float speed;
+            if (player == null || !on()) return;
+            String origin = originName(player);
+            Float kept;
             synchronized (LOCK) {
-                speed = kept;
+                kept = origin == null ? null : KEPT.get(origin);
             }
-            if (same(speed, NORMAL) || !VIEWER.equals(originName(player)) || !plainReel(player)) return;
+            // Nothing kept for this viewer yet: a later start of the same video can still get a pick.
+            if (kept == null) return;
+            Object params = access.params(player);
+            if (params == null) return;
+            synchronized (LOCK) {
+                WeakReference<Object> handled = HANDLED.get(player);
+                if (handled != null && handled.get() == params) return;
+                HANDLED.put(player, new WeakReference<>(params));
+            }
+            float speed = kept;
+            String skip = !access.reel(params) ? "not a reel" : access.ad(params) ? "an ad" : access.live(params) ? "live" : null;
+            if (skip != null) {
+                Logger.printDebug(() -> "Reel speed: a video in " + origin + " started at Facebook's speed, it's " + skip);
+                return;
+            }
             HookStatus.bound(FAMILY, "player start");
             access.setSpeed(player, speed);
             HookStatus.counted(FAMILY, APPLIED);
-            Logger.printDebug(() -> "Reel speed: next reel started at " + speed + "x");
+            Logger.printDebug(() -> "Reel speed: a reel in " + origin + " started, set to the kept " + speed + "x");
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "player start", failure);
         }
@@ -249,11 +269,6 @@ public final class ReelSpeed {
 
     private static boolean same(float a, float b) {
         return Math.abs(a - b) < SAME;
-    }
-
-    /** Whether [player]'s video is a reel, not an ad and not live, by its VideoPlayerParams. */
-    private static boolean plainReel(Object player) {
-        return access.reel(player) && !access.ad(player) && !access.live(player);
     }
 
     /** The player a pick of [speed] at [now] set its speed on, or null when none did just before. */
@@ -282,22 +297,33 @@ public final class ReelSpeed {
         return name.isEmpty() ? null : name;
     }
 
-    /** The kept speed, or {@link #NORMAL} when none is kept. For tests. */
-    static float kept() {
-        synchronized (LOCK) {
-            return kept;
+    /** [player]'s viewer for a log line. Facebook's getter throws before the player's first bind. */
+    private static String viewerForLog(Object player) {
+        try {
+            String origin = originName(player);
+            return origin == null ? "no viewer" : origin;
+        } catch (Throwable failure) {
+            return "no viewer yet";
         }
     }
 
-    /** Forgets the kept speed, the last speed set and every bound player. For tests. */
+    /** The speed kept for [origin], or {@link #NORMAL} when none is. For tests. */
+    static float kept(String origin) {
+        synchronized (LOCK) {
+            Float kept = KEPT.get(origin);
+            return kept == null ? NORMAL : kept;
+        }
+    }
+
+    /** Forgets every kept speed, the last speed set and every started video. For tests. */
     static void forget() {
         synchronized (LOCK) {
             lastSetPlayer = null;
             lastSetSpeed = NORMAL;
             lastSetAt = Long.MIN_VALUE;
-            kept = NORMAL;
+            KEPT.clear();
+            HANDLED.clear();
         }
-        BOUND.clear();
         access = PATCHED;
     }
 }
