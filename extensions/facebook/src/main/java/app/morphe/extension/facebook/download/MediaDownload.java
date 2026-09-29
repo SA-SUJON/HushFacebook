@@ -489,11 +489,13 @@ public final class MediaDownload {
      * is told against, once the file is down: the saved picture is measured from the file itself,
      * never guessed from its address, and named in the report whenever it beats what was saved,
      * whatever wrote it. [writable] is the one track, if any, the phone is known to be able to
-     * write, such as the manifest's own pick passed over for this file: a shortfall against it is
-     * held to a plain best-over-saved test, since {@link #noticeablyLower}'s tolerance is for a
-     * picture nothing could have written, and that excuse doesn't apply here. [quality] is the
-     * setting read when the save began, so a change while a long fetch runs can't move what this
-     * file is judged against.
+     * write, such as the manifest's own pick passed over for this file: a shortfall against it, by
+     * its measured pixels rather than a label, is flagged without {@link #noticeablyLower}'s
+     * tolerance for a picture nothing could have written, since that excuse doesn't apply here, but
+     * only when the file was actually read back, [writable] itself fits [quality]'s ceiling, and the
+     * gap clears a small pixel margin a rounding or a container quirk could otherwise trip.
+     * [quality] is the setting read when the save began, so a change while a long fetch runs can't
+     * move what this file is judged against.
      */
     private static Downloader.Result saveFile(Context application, String url, Downloader.Kind kind, String why,
             List<DashManifest.Track> offered, DashManifest.Track writable, DownloadQuality quality,
@@ -520,7 +522,17 @@ public final class MediaDownload {
                             + ", the best it offers within the Download quality");
                         lower = noticeablyLower(savedShortSide, better.shortSide());
                     }
-                    if (!lower && writable != null && picture(writable, quality) > savedShortSide) lower = true;
+                    // A file the phone couldn't read back measures 0, never a shortfall. A track
+                    // above the ceiling isn't a real alternative for this setting, whatever its
+                    // picture. And the compare itself is pixels on both sides: writable.quality()
+                    // is picture()'s label below the best, which an unusually shaped video can
+                    // carry far above what it actually measures. A small gap, kept to 16 pixels,
+                    // is a rounding or a container quirk, not a shortfall worth a nag.
+                    if (!lower && writable != null && quality != DownloadQuality.SMALLEST && savedShortSide > 0
+                            && writable.quality() <= quality.ceiling
+                            && writable.shortSide() - savedShortSide > 16) {
+                        lower = true;
+                    }
                 }
             }
             return published.ok() && lower ? published.lower() : published;
@@ -619,21 +631,28 @@ public final class MediaDownload {
         return true;
     }
 
-    /** {@link #beginDash}'s save, on the worker: the manifest's tracks or the single file. */
+    /**
+     * {@link #beginDash}'s save, on the worker: the manifest's tracks or the single file. The
+     * quality setting is read once, here at the start, and passed to every helper this calls rather
+     * than read again by each: {@link #saveSingleVideo} and {@link #dashJob} used to read it a
+     * second time on the same save, so a setting changed between those reads, however unlikely on
+     * one thread with no I/O in between, could judge the fallback against a quality other than the
+     * one that picked it.
+     */
     private static Downloader.Result saveDash(Context application, String label, String manifest, List<String> urls,
             MediaStoreWriter writer, Downloader.Progress progress) {
+        DownloadQuality quality = quality();
         if (!DashManifest.withinLimits(manifest)) {
             info(() -> "the manifest of " + label + " is over the limits a save reads (" + manifest.length()
                 + " characters), saving the single file");
             return saveSingleVideo(application, urls, java.util.Collections.emptyList(), Dash.SINGLE_FILE,
-                "the manifest is over the limits a save reads", null, writer, progress);
+                "the manifest is over the limits a save reads", null, quality, writer, progress);
         }
         List<DashManifest.Track> tracks = new ArrayList<>();
         for (DashManifest.Track track : DashManifest.parse(manifest)) {
             if (MediaUrlPolicy.shapeRefusal(track.url) == null) tracks.add(track);
         }
         urls = metaOnly(urls);
-        DownloadQuality quality = quality();
         boolean compatible = compatibleSaves();
         boolean allowAv1 = DashSave.canWriteAv1();
         // What a save below is weighed against when it tells the person it's lower. Not with saves
@@ -661,7 +680,7 @@ public final class MediaDownload {
                 info(() -> "the manifest of " + label + " has no H.264 video with AAC-LC or HE-AAC sound, "
                     + "saving the single file instead");
                 return saveSingleVideo(application, urls, offered, leftToFile,
-                    "the manifest has no H.264 video with AAC-LC or HE-AAC sound", null, writer, progress);
+                    "the manifest has no H.264 video with AAC-LC or HE-AAC sound", null, quality, writer, progress);
             }
             if (usual != null) {
                 info(() -> "nothing of " + label + " is in a format other apps can open, saving it as the switch "
@@ -673,7 +692,7 @@ public final class MediaDownload {
         if (pick == null) {
             info(() -> "the manifest of " + label + " has no track to save: " + tracks);
             return saveSingleVideo(application, urls, offered, Dash.SINGLE_FILE, "the manifest has no track to save",
-                null, writer, progress);
+                null, quality, writer, progress);
         }
 
         DashManifest.Track video = pick.video;
@@ -684,7 +703,8 @@ public final class MediaDownload {
             // video already passed the writability check that picked it: if the fallback's address
             // overstated its own quality, the shortfall against video is held to a plain test, not
             // noticeablyLower's tolerance for a picture nothing could have written.
-            return saveSingleVideo(application, urls, offered, Dash.SINGLE_FILE, null, video, writer, progress);
+            return saveSingleVideo(application, urls, offered, Dash.SINGLE_FILE, null, video, quality, writer,
+                progress);
         }
 
         // A track the muxer can't write can be a larger picture than the one saved.
@@ -694,7 +714,7 @@ public final class MediaDownload {
             + ", instead of " + (fallback == null ? "nothing" : describe(fallback))
             + qualityNote(quality) + compatibleNote(keptCompatible) + soundNote(audio) + belowNote(better));
 
-        Downloader.Result result = dashJob(application, video, audio, fallback).run(writer, progress);
+        Downloader.Result result = dashJob(application, video, audio, fallback, quality).run(writer, progress);
         boolean lower = better != null && noticeablyLower(picture(video, quality), better.shortSide());
         return result.ok() && lower ? result.lower() : result;
     }
@@ -708,13 +728,13 @@ public final class MediaDownload {
      * save was started as one. The save line below reports against a guess of [video]'s own
      * quality, since nothing has been fetched yet to measure; once the file is down, {@link
      * #saveFile} weighs the person saving's "lower" note against what it actually measures, not
-     * this guess.
+     * this guess. [quality] is what {@link #saveDash} already read for this save, not read again
+     * here.
      */
     private static Downloader.Result saveSingleVideo(Context application, List<String> urls,
             List<DashManifest.Track> tracks, Dash dash, String why, DashManifest.Track writable,
-            MediaStoreWriter writer, Downloader.Progress progress) {
+            DownloadQuality quality, MediaStoreWriter writer, Downloader.Progress progress) {
         List<String> meta = metaOnly(urls);
-        DownloadQuality quality = quality();
         String video = RenditionPicker.bestVideo(meta, quality);
         if (video == null) {
             final int found = urls.size();
@@ -747,7 +767,12 @@ public final class MediaDownload {
      * runs can't move what the fallback is judged against.
      */
     static Job dashJob(Context application, DashManifest.Track video, DashManifest.Track audio, String fallback) {
-        DownloadQuality quality = quality();
+        return dashJob(application, video, audio, fallback, quality());
+    }
+
+    /** As above, with [quality] already read by {@link #saveDash} rather than read again here. */
+    private static Job dashJob(Context application, DashManifest.Track video, DashManifest.Track audio,
+            String fallback, DownloadQuality quality) {
         return (writer, progress) -> {
             Downloader.Result result = DashSave.save(application, video, audio, writer, policyFor(application), cap(),
                 progress);
