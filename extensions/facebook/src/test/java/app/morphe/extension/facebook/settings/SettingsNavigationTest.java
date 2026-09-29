@@ -543,6 +543,7 @@ public class SettingsNavigationTest {
         String[][] links = {
                 {Settings.HIDE_FEED_REELS.key, "News feed"},
                 {Settings.TAP_TO_PLAY.key, "Playback"},
+                {Settings.HIDE_REELS_TAB.key, "Reels and Watch"},
                 {Settings.MARKETPLACE_ONLY.key, "Opening Facebook"}};
         for (String[] link : links) {
             page.navigation.navigate("Reels and Watch");
@@ -581,7 +582,15 @@ public class SettingsNavigationTest {
                     + " patch in Morphe Manager and patch again.",
                     String.valueOf(((Preference) list().getItemAtPosition(row)).getSummary()));
         }
+        // Without Hide the Reels tab, the tab's line is Facebook's own setting, and it names the patch.
+        int tab = titles().indexOf("The Reels tab");
+        assertFalse("The Reels tab can be tapped", list().getAdapter().isEnabled(tab));
+        assertEquals("Facebook's own setting blocks it. Open Settings, Tab bar, Customize the bar and choose Hide next "
+                        + "to Reels, which some accounts call Video. If neither is listed, choose the "
+                        + L10n.isolate("Hide the Reels tab") + " patch in Morphe Manager and patch again.",
+                String.valueOf(((Preference) list().getItemAtPosition(tab)).getSummary()));
         assertNull(page.findPreference(Settings.HIDE_FEED_REELS.key));
+        assertNull(page.findPreference(Settings.HIDE_REELS_TAB.key));
         assertEquals(before, savedValues());
     }
 

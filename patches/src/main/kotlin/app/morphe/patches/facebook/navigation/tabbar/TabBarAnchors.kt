@@ -2,7 +2,7 @@
  * Copyright 2026 Hushfacebook contributors
  * https://github.com/SysAdminDoc/Hushfacebook
  */
-package app.morphe.patches.facebook.navigation.marketplaceonly
+package app.morphe.patches.facebook.navigation.tabbar
 
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.navigation.starttab.TAB_TAG
@@ -29,17 +29,20 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  * static method of the state class builds from the first: for each configured tab it asks a set of
  * tab ids (the tabs hidden in Facebook's own Settings, Tab bar, Customize the bar) whether it has
  * the tab's id as a string, and adds the tab to an ImmutableList.Builder when it hasn't. That's
- * how hiding Reels there takes the tab off at once.
+ * how hiding Reels there takes the tab off at once. The method loads no strings.
  *
- * Marketplace only asks the extension there too, right after Facebook's own set answers, so the
- * tabs it drops go the same way a hidden Reels tab does. Home can't be hidden in Facebook's editor,
- * but Facebook's code looks tabs up by id and checks the answer: switching to Home, the back press
- * that returns to Home and the "reset to feed" of a notification all find no Home and leave the
- * current tab, and a start or a link asking for a tab the bar hasn't got opens the bar's first
+ * The tab bar filter asks the extension there too, right after Facebook's own set answers, so the
+ * tabs Marketplace only or Hide the Reels tab drop go the same way a hidden Reels tab does. It's
+ * one call for every patch that drops tabs, since a second call put in after the first would find
+ * the answer's branch no longer right behind the set's answer. Home can't be hidden in Facebook's
+ * editor, but Facebook's code looks tabs up by id and checks the answer: switching to Home, the back
+ * press that returns to Home and the "reset to feed" of a notification all find no Home and leave
+ * the current tab, and a start or a link asking for a tab the bar hasn't got opens the bar's first
  * tab. Nothing builds the feed's page when the bar has no Home, though the start-up still warms
- * the feed's data in the background.
+ * the feed's data in the background. The older top navigation bar looks the Video tab up in the
+ * shown list the same way and keeps -1 when it's gone.
  */
-internal const val PATCH = "Marketplace only"
+internal const val TAB_BAR_FILTER = "Tab bar filter"
 
 /** The class of the tab bar's configured tabs and start index. Redex keeps the name. */
 internal const val NAVIGATION_CONFIG = "Lcom/facebook/navigation/tabbar/state/model/NavigationConfig;"
@@ -52,7 +55,7 @@ private const val LIST_BUILDER_ADD = "$LIST_BUILDER->add(Ljava/lang/Object;)$LIS
 
 /** The extension's answer after Facebook's hidden-tab set has answered for one tab. */
 internal const val HIDES_TAB =
-    "$EXTENSION_PACKAGE/navigation/MarketplaceOnly;->hidesTab(ZLjava/lang/Object;Ljava/util/List;Ljava/util/Set;)Z"
+    "$EXTENSION_PACKAGE/navigation/TabBarFilter;->hidesTab(ZLjava/lang/Object;Ljava/util/List;Ljava/util/Set;)Z"
 
 /** Where the shown-tab list's builder asks the hidden set, and the registers the hook reads there. */
 internal data class TabFilter(

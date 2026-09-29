@@ -140,7 +140,16 @@ In News feed, Hide Reels in the feed blocks the rows of reels between posts.	En 
 Reels that play by themselves	Reels que se reproducen solos
 In Playback, Tap to play blocks autoplay, so reels and other videos wait for your tap.	En Reproducción, “Toca para reproducir” bloquea la reproducción automática, así que los reels y otros vídeos esperan a que toques.
 The Reels tab	La pestaña Reels
-Facebook's own setting blocks it. Open Settings, Tab bar, Customize the bar and choose Hide next to Reels, which some accounts call Video. If neither is listed, Facebook hasn't given your account that option, and Hushfacebook has no switch for the tab.	La bloquea el propio ajuste de Facebook. Abre Configuración, Barra de pestañas, Personalizar la barra y elige Ocultar junto a Reels, que en algunas cuentas se llama Video. Si no aparece ninguna de las dos, Facebook no le ha dado esa opción a tu cuenta, y Hushfacebook no tiene ningún interruptor para la pestaña.
+# context: map line without the patch; %1$s is the patch's English name in Morphe Manager
+Facebook's own setting blocks it. Open Settings, Tab bar, Customize the bar and choose Hide next to Reels, which some accounts call Video. If neither is listed, choose the %1$s patch in Morphe Manager and patch again.	La bloquea el propio ajuste de Facebook. Abre Configuración, Barra de pestañas, Personalizar la barra y elige Ocultar junto a Reels, que en algunas cuentas se llama Video. Si no aparece ninguna de las dos, elige el parche %1$s en Morphe Manager y vuelve a parchear.
+# context: map line with the patch; Reels and Watch is this settings section, Hide the Reels tab is the switch below
+In Reels and Watch, Hide the Reels tab blocks it after a restart.	En “Reels y Watch”, “Ocultar la pestaña Reels” la bloquea tras un reinicio.
+# context: switch title under Reels and Watch; the tab some accounts call Video
+Hide the Reels tab	Ocultar la pestaña Reels
+# context: summary of that switch
+Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.	Quita de la barra de pestañas la pestaña Reels, que en algunas cuentas se llama Video. Los enlaces a reels y los reels del feed se siguen abriendo. Los cambios se ven al reiniciar Facebook.
+# context: start tab row summary when Video is the chosen tab and Hide the Reels tab is on; Home and Video are tab names
+Facebook opens on Home while Hide the Reels tab is on, since Video is off the tab bar. Your choice stays saved.	Facebook se abre en Inicio mientras “Ocultar la pestaña Reels” esté activado, porque Video no está en la barra de pestañas. Tu selección se conserva.
 Everything except Marketplace	Todo menos Marketplace
 In Opening Facebook, Marketplace only blocks the feed, the Reels tab and the other social tabs after a restart.	En “Al abrir Facebook”, “Solo Marketplace” bloquea el feed, la pestaña Reels y las demás pestañas sociales tras un reinicio.
 Not in this build. To block this, choose the %1$s patch in Morphe Manager and patch again.	No está en esta compilación. Para bloquearlo, elige el parche %1$s en Morphe Manager y vuelve a parchear.

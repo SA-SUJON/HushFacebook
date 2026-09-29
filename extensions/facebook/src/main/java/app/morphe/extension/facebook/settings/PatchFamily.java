@@ -102,6 +102,8 @@ public enum PatchFamily {
             Settings.OPEN_ON_CHOSEN_TAB),
     MARKETPLACE_ONLY(FamilyNames.MARKETPLACE_ONLY, "marketplaceOnly", null,
             Settings.MARKETPLACE_ONLY, Settings.MARKETPLACE_QUIET_NOTIFICATIONS, Settings.MARKETPLACE_SKIP_FEED_PREFETCH),
+    REELS_TAB(FamilyNames.REELS_TAB, "reelsTab", null,
+            Settings.HIDE_REELS_TAB),
     MESSENGER_CARD(FamilyNames.MESSENGER_CARD, "messengerCard", null,
             Settings.HIDE_GET_MESSENGER_CARD),
     MESSENGER_ICON(FamilyNames.MESSENGER_ICON, "messengerIcon", null,

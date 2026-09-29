@@ -642,6 +642,50 @@ public class HushfacebookPreferenceFragmentTest {
     }
 
     /**
+     * With Hide the Reels tab in the build, its switch is under Reels and Watch, and while it's on a
+     * chosen Video tab's row says Facebook opens on Home, since a start never lands on the hidden
+     * tab. Switched off, with no Marketplace only in the build, the row names Video again. The saved
+     * choice stays Video throughout.
+     */
+    @Test
+    public void aChosenReelsTabSaysItOpensHomeWhileHideTheReelsTabIsOn() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.START_TAB, PatchFamily.REELS_TAB);
+        Settings.START_TAB.save(StartTab.VIDEO);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment page = new HushfacebookPreferenceFragment();
+            controller.get().getFragmentManager().beginTransaction().add(android.R.id.content, page).commitNow();
+            SwitchPreference hide = (SwitchPreference) page.findPreference(Settings.HIDE_REELS_TAB.key);
+            assertEquals("Hide the Reels tab", String.valueOf(hide.getTitle()));
+            assertEquals("Reels and Watch", String.valueOf(hide.getParent().getTitle()));
+            assertTrue("picking the patch is the choice", hide.isChecked());
+            Preference start = page.findPreference(Settings.START_TAB.key);
+            assertEquals("Facebook opens on Home while Hide the Reels tab is on, since Video is off the tab bar. "
+                    + "Your choice stays saved.", String.valueOf(start.getSummary()));
+
+            hide.setChecked(false);
+            ShadowLooper.idleMainLooper();
+            assertFalse(Settings.HIDE_REELS_TAB.savedValue());
+            assertEquals("Facebook opens on Video. If your tab bar doesn't have it, Facebook opens on Home.",
+                    String.valueOf(start.getSummary()));
+            assertEquals(StartTab.VIDEO, Settings.START_TAB.savedValue());
+
+            // Any other tab keeps its own summary with the switch on.
+            hide.setChecked(true);
+            ShadowLooper.idleMainLooper();
+            assertEquals(HushfacebookPreferenceFragment.startTabSummary(StartTab.FRIENDS),
+                    "Facebook opens on Friends. If your tab bar doesn't have it, Facebook opens on Home.");
+        } finally {
+            Settings.START_TAB.resetToDefault();
+            Settings.HIDE_REELS_TAB.resetToDefault();
+        }
+
+        // Without the patch, a chosen Video tab is Facebook's to open or not, whatever the stored switch says.
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.START_TAB);
+        assertEquals("Facebook opens on Video. If your tab bar doesn't have it, Facebook opens on Home.",
+                HushfacebookPreferenceFragment.startTabSummary(StartTab.VIDEO));
+    }
+
+    /**
      * With Default comment order in the build, the screen has a Comments section with its switch and
      * the list of orders, which offers Facebook's own choice first and each order by the name
      * Facebook's sort menu gives it, says what the chosen one does, and reaches the setting the way

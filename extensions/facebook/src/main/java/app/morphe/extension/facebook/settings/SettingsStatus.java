@@ -170,6 +170,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean reelsTab() {
+        return false;
+    }
+
     public static boolean messengerCard() {
         return false;
     }

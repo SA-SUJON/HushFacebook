@@ -418,6 +418,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_marketplace_skip_feed_prefetch", FALSE);
 
     /**
+     * The Reels tab, which some accounts call Video, stays off the tab bar, and a start sent to
+     * it by {@link #START_TAB} opens Home. Facebook builds the bar once, so a change shows when it
+     * restarts. A Reels tab Facebook's own tab bar settings hide stays hidden either way.
+     */
+    public static final BooleanSetting HIDE_REELS_TAB =
+            new BooleanSetting("hushfacebook_hide_reels_tab", TRUE, true);
+
+    /**
      * The folder every save goes to, under Movies for a video and Pictures for a photo. The
      * settings row and an import keep it clean, and {@link SaveFolder#sanitize} cleans it again
      * wherever it's read, so whatever wrote the store, a save lands in one folder under each.

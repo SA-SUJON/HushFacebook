@@ -427,15 +427,28 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         reels.addPreference(reelsLink(context, build, PatchFamily.TAP_TO_PLAY, Settings.TAP_TO_PLAY,
                 L10n.t("Reels that play by themselves"),
                 L10n.t("In Playback, Tap to play blocks autoplay, so reels and other videos wait for your tap.")));
-        // No patch hides the tab. Facebook's own Hide does, on the accounts that have it.
-        reels.addPreference(info(context, L10n.t("The Reels tab"),
-                L10n.t("Facebook's own setting blocks it. Open Settings, Tab bar, Customize the bar and choose Hide "
-                        + "next to Reels, which some accounts call Video. If neither is listed, Facebook hasn't given "
-                        + "your account that option, and Hushfacebook has no switch for the tab.")));
+        // Without Hide the Reels tab, Facebook's own Hide is the answer, on the accounts that have it.
+        if (build.contains(PatchFamily.REELS_TAB)) {
+            reels.addPreference(reelsLink(context, build, PatchFamily.REELS_TAB, Settings.HIDE_REELS_TAB,
+                    L10n.t("The Reels tab"),
+                    L10n.t("In Reels and Watch, Hide the Reels tab blocks it after a restart.")));
+        } else {
+            reels.addPreference(info(context, L10n.t("The Reels tab"),
+                    L10n.f("Facebook's own setting blocks it. Open Settings, Tab bar, Customize the bar and choose "
+                            + "Hide next to Reels, which some accounts call Video. If neither is listed, choose the "
+                            + "%1$s patch in Morphe Manager and patch again.",
+                            L10n.isolate(PatchFamily.REELS_TAB.patchName))));
+        }
         reels.addPreference(reelsLink(context, build, PatchFamily.MARKETPLACE_ONLY, Settings.MARKETPLACE_ONLY,
                 L10n.t("Everything except Marketplace"),
                 L10n.t("In Opening Facebook, Marketplace only blocks the feed, the Reels tab and the other social "
                         + "tabs after a restart.")));
+        if (build.contains(PatchFamily.REELS_TAB)) {
+            // Facebook keeps the tab bar it built, so a change waits for a restart and the page says so.
+            reels.addPreference(toggle(context, Settings.HIDE_REELS_TAB, L10n.t("Hide the Reels tab"),
+                    L10n.t("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels "
+                            + "in the feed still open. Changes show after Facebook restarts.")));
+        }
         // Both reel filters work on each batch of reels as it arrives, so a change leaves the
         // reels already loaded as they are, and the rows say so.
         if (build.contains(PatchFamily.SPONSORED_REELS)) {
@@ -1075,19 +1088,24 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         showMarketplaceSettings();
     }
 
-    /** Recomputed after a tap, an import or a resumed page; no saved start-tab choice is changed. */
+    /**
+     * Recomputed after a tap, an import or a resumed page; no saved start-tab choice is changed.
+     * The start tab's rows are redone without Marketplace only too, since Hide the Reels tab changes
+     * what a chosen Reels tab does.
+     */
     private void showMarketplaceSettings() {
         if (getPreferenceScreen() == null) return;
         Preference mode = findPreference(Settings.MARKETPLACE_ONLY.key);
-        if (mode == null) return;
-        boolean selected = Settings.MARKETPLACE_ONLY.savedValue();
-        mode.setSummary(marketplaceSummary());
-        Preference regular = findPreference("action_regular_facebook");
-        if (regular != null) regular.setEnabled(selected);
-        Preference quiet = findPreference(Settings.MARKETPLACE_QUIET_NOTIFICATIONS.key);
-        if (quiet != null) quiet.setEnabled(selected);
-        Preference prefetch = findPreference(Settings.MARKETPLACE_SKIP_FEED_PREFETCH.key);
-        if (prefetch != null) prefetch.setEnabled(selected);
+        boolean selected = mode != null && Settings.MARKETPLACE_ONLY.savedValue();
+        if (mode != null) {
+            mode.setSummary(marketplaceSummary());
+            Preference regular = findPreference("action_regular_facebook");
+            if (regular != null) regular.setEnabled(selected);
+            Preference quiet = findPreference(Settings.MARKETPLACE_QUIET_NOTIFICATIONS.key);
+            if (quiet != null) quiet.setEnabled(selected);
+            Preference prefetch = findPreference(Settings.MARKETPLACE_SKIP_FEED_PREFETCH.key);
+            if (prefetch != null) prefetch.setEnabled(selected);
+        }
         Preference chosen = findPreference(Settings.OPEN_ON_CHOSEN_TAB.key);
         if (chosen != null) {
             chosen.setEnabled(!selected);
@@ -1297,9 +1315,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
 
     /**
      * What a start does with [tab], for the row's summary. Facebook opens Home for a tab the
-     * account's tab bar hasn't got, so the summary says so rather than promise the tab.
+     * account's tab bar hasn't got, so the summary says so rather than promise the tab. A Reels tab
+     * Hide the Reels tab keeps off the bar is asked for as Home, and the summary says that instead.
      */
     static String startTabSummary(StartTab tab) {
+        if (tab == StartTab.VIDEO && Settings.HIDE_REELS_TAB.savedValue() && PatchFamily.REELS_TAB.inBuild()) {
+            return L10n.t("Facebook opens on Home while Hide the Reels tab is on, since Video is off the tab bar. "
+                    + "Your choice stays saved.");
+        }
         return L10n.f("Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.",
                 tabLabel(tab));
     }

@@ -2,21 +2,18 @@
  * Copyright 2026 Hushfacebook contributors
  * https://github.com/SysAdminDoc/Hushfacebook
  */
-package app.morphe.patches.facebook.navigation.marketplaceonly
+package app.morphe.patches.facebook.navigation.tabbar
 
-import app.morphe.ExtensionDex
 import app.morphe.PatchContexts
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
-import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.facebook.navigation.starttab.TAB_TAG
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
-import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
@@ -31,11 +28,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Marketplace only over a stand-in tab bar state: which method counts as the builder of the shown
+ * The tab bar filter over a stand-in tab bar state: which method counts as the builder of the shown
  * tabs, what the patch refuses, and the call it puts after the hidden-tab set's answer. Each rule
- * has a control that must fail it.
+ * has a control that must fail it. Moved here from Marketplace only's tests when Hide the Reels tab
+ * came to share the call.
  */
-class MarketplaceOnlyShapesTest {
+class TabBarFilterShapesTest {
     private val state = "Lfixture/TabBarState;"
     private val hiddenTabs = "Lfixture/HiddenTabs;"
 
@@ -123,9 +121,9 @@ class MarketplaceOnlyShapesTest {
 
     @Test
     fun `the patch asks the extension right after the hidden set answers`() {
-        val context = PatchContexts.of(listOf(classOf(builder()), ExtensionDex.classDef(SETTINGS_STATUS)))
+        val context = PatchContexts.of(listOf(classOf(builder())))
 
-        marketplaceOnlyPatch.execute(context)
+        tabBarFilterPatch.execute(context)
 
         val body = context.mutableClassDefBy(state).methods.single().body()
         assertEquals(Opcode.MOVE_RESULT, body[18].opcode)
@@ -137,25 +135,23 @@ class MarketplaceOnlyShapesTest {
         assertEquals(0, (body[20] as OneRegisterInstruction).registerA)
         assertEquals(Opcode.IF_NEZ, body[21].opcode)
         assertEquals(0, (body[21] as OneRegisterInstruction).registerA)
-
-        val status = context.mutableClassDefBy(SETTINGS_STATUS).methods.single { it.name == "marketplaceOnly" }
-        val answer = status.body().first { it is NarrowLiteralInstruction }
-        assertEquals("the settings screen isn't told the patch is in", 1, (answer as NarrowLiteralInstruction).narrowLiteral)
+        assertEquals("one call to the extension, whichever patches drop tabs", 1,
+            body.count { it.opcode == Opcode.INVOKE_STATIC && it.reference.startsWith("Lapp/morphe/extension/") })
     }
 
     @Test
     fun `a build whose tab bar builder can't be told apart is refused before anything changes`() {
         fun refusal(vararg classes: ClassDef): String {
-            val context = PatchContexts.of(classes.toList() + ExtensionDex.classDef(SETTINGS_STATUS))
-            return assertThrows(PatchException::class.java) { marketplaceOnlyPatch.execute(context) }.message!!
+            val context = PatchContexts.of(classes.toList())
+            return assertThrows(PatchException::class.java) { tabBarFilterPatch.execute(context) }.message!!
         }
         val none = refusal(classOf(builder(), withConfig = false))
         assertTrue(none, none.contains("found 0"))
         val two = refusal(classOf(builder()), classOf(builder(owner = "Lfixture/OtherState;")))
         assertTrue(two, two.contains("found 2"))
 
-        val jumped = PatchContexts.of(listOf(classOf(builder(jumpToBranch = true)), ExtensionDex.classDef(SETTINGS_STATUS)))
-        val refused = assertThrows(PatchException::class.java) { marketplaceOnlyPatch.execute(jumped) }
+        val jumped = PatchContexts.of(listOf(classOf(builder(jumpToBranch = true))))
+        val refused = assertThrows(PatchException::class.java) { tabBarFilterPatch.execute(jumped) }
         assertTrue(refused.message, refused.message!!.contains("has a jump to the branch that skips a hidden tab"))
     }
 }
