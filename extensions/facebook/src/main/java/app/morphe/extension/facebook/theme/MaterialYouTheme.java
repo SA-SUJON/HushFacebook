@@ -163,6 +163,9 @@ public final class MaterialYouTheme {
      * palette in the default configuration, where light mode reads it too. The Video tab's bottom
      * bar is {@code getColor} of that palette's #252728 (580 {@code LX/4KA}, 577 {@code LX/4Bb}),
      * in both modes. So one of the dark surfaces takes the palette here, in Facebook's dark mode only.
+     * In dark mode the tab bar also sets the window's navigation bar colour from that read for every
+     * tab (580 {@code LX/268;->A0F}, 577 {@code LX/29f;->A0F}), which Android 15 and newer draws at
+     * 80% over the bottom edge with three-button navigation.
      */
     public static int getColor(Context context, int id) {
         return getColor(context, id, SettingsStatus.amoledTheme());
