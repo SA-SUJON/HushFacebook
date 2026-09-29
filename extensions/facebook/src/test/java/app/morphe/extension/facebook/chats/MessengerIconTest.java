@@ -15,6 +15,9 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.SystemClock;
+import android.view.MotionEvent;
+import android.view.ViewConfiguration;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,8 +27,10 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowSystemClock;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
@@ -69,6 +74,17 @@ public class MessengerIconTest {
             if (line.startsWith(FamilyNames.MESSENGER_ICON + ":")) return line;
         }
         return null;
+    }
+
+    /**
+     * A finger on the icon for {@code heldMs}, lifted now, each event handed to the hook as the
+     * screen's touch dispatch hands it on before Facebook sees it.
+     */
+    private static void press(long heldMs) {
+        long down = SystemClock.uptimeMillis();
+        MessengerIcon.touch(MotionEvent.obtain(down, down, MotionEvent.ACTION_DOWN, 40, 40, 0));
+        ShadowSystemClock.advanceBy(heldMs, TimeUnit.MILLISECONDS);
+        MessengerIcon.touch(MotionEvent.obtain(down, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 40, 40, 0));
     }
 
     /** Off until it's turned on: a tap with Messenger right there still opens Facebook's Chats. */
@@ -134,6 +150,69 @@ public class MessengerIconTest {
         assertFalse(MessengerIcon.open(app, true));
         assertNull(MessengerIconForTests.nextStarted());
         assertTrue(MessengerIcon.open(app, false));
+    }
+
+    /**
+     * Where Facebook gives the icon no long-click listener of its own, which is behind a
+     * MobileConfig flag, a press held on it reaches the tap as a plain tap when the finger lifts,
+     * and Facebook opens Chats for it. That's still a long press, so it stays Facebook's, as it is
+     * with the switch off. The next quick tap opens Messenger again.
+     */
+    @Test
+    public void aPressHeldPastTheLongPressTimeStaysFacebooksWhenItArrivesAsATap() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        press(ViewConfiguration.getLongPressTimeout());
+        assertFalse("a held press opened Messenger", MessengerIcon.open(app, false));
+        assertNull("something was started", MessengerIconForTests.nextStarted());
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 1, 1 found, 0 missing. Counted: "
+                + MessengerIcon.LONG_PRESS + " 1", statusLine());
+
+        press(100);
+        assertTrue("a quick tap after a held press didn't open Messenger", MessengerIcon.open(app, false));
+        assertNotNull(MessengerIconForTests.nextStarted());
+    }
+
+    /** Lifted just before the long-press time, it's a tap, and Messenger opens. */
+    @Test
+    public void aPressLiftedBeforeTheLongPressTimeIsATap() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        press(ViewConfiguration.getLongPressTimeout() - 1);
+        assertTrue(MessengerIcon.open(app, false));
+    }
+
+    /**
+     * A tap no finger made, well after a held press ended, an accessibility click say, isn't that
+     * press's release, so it opens Messenger.
+     */
+    @Test
+    public void aHeldPressLongOverDoesntHoldBackALaterTap() {
+        Settings.OPEN_MESSENGER_APP.save(true);
+        MessengerIconForTests.install();
+        press(ViewConfiguration.getLongPressTimeout() + 200);
+        ShadowSystemClock.advanceBy(MessengerIcon.RELEASE_WINDOW_MS + 1, TimeUnit.MILLISECONDS);
+        assertTrue(MessengerIcon.open(app, false));
+    }
+
+    /** With the switch off, a held press is Facebook's like everything else, and nothing is counted. */
+    @Test
+    public void offAHeldPressIsFacebooksAndUncounted() {
+        MessengerIconForTests.install();
+        press(ViewConfiguration.getLongPressTimeout() + 200);
+        assertFalse(MessengerIcon.open(app, false));
+        assertNull(MessengerIconForTests.nextStarted());
+        assertEquals(FamilyNames.MESSENGER_ICON + ": invoked 1, 1 found, 0 missing", statusLine());
+    }
+
+    /** The touch hook reads every touch on every screen: a null or odd event is passed over. */
+    @Test
+    public void theTouchHookTakesAnyEvent() {
+        MessengerIcon.touch(null);
+        long now = SystemClock.uptimeMillis();
+        MessengerIcon.touch(MotionEvent.obtain(now, now, MotionEvent.ACTION_MOVE, 1, 1, 0));
+        MessengerIcon.touch(MotionEvent.obtain(now, now + 5_000, MotionEvent.ACTION_CANCEL, 1, 1, 0));
+        assertEquals(List.of(), HookStatus.missing(FamilyNames.MESSENGER_ICON));
     }
 
     @Test

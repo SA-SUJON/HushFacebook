@@ -4,8 +4,13 @@
  */
 package app.morphe.patches.facebook.chats
 
+import app.morphe.ExtensionDex
+import app.morphe.PatchContexts
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
+import app.morphe.patches.facebook.media.taptoplay.FRAGMENT_ACTIVITY
+import app.morphe.patches.facebook.media.taptoplay.MOTION_EVENT
+import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
@@ -14,12 +19,16 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodImplementation
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction10x
+import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction11n
+import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction11x
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction21c
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction35c
 import com.android.tools.smali.dexlib2.immutable.reference.ImmutableMethodReference
@@ -33,7 +42,8 @@ import org.junit.Test
 /**
  * The parts of Open Messenger from the top bar that need no Facebook build: which methods the
  * anchors take as the Messenger icon's tap and as the Messenger button handler it shares, which
- * they turn down, and the code the hook puts first in both.
+ * they turn down, the code the hook puts first in both, and the touch hook in the screen's
+ * dispatch.
  */
 class MessengerIconShapesTest {
     private val contextType = "Landroid/content/Context;"
@@ -55,8 +65,9 @@ class MessengerIconShapesTest {
         body: List<Instruction>,
         static: Boolean = true,
         returnType: String = "V",
+        owner: String = "Lfixture/MessengerIcon;",
     ): Method = ImmutableMethod(
-        "Lfixture/MessengerIcon;",
+        owner,
         name,
         parameters.map { ImmutableMethodParameter(it, null, null) },
         returnType,
@@ -82,7 +93,8 @@ class MessengerIconShapesTest {
         parameters: List<String> = BUTTON_PARAMETERS,
         static: Boolean = true,
         registers: Int = 25,
-    ) = method("A00", parameters, registers, literals.map(::string) + returnVoid, static)
+        owner: String = "Lfixture/MessengerIcon;",
+    ) = method("A00", parameters, registers, literals.map(::string) + returnVoid, static, owner = owner)
 
     private fun invoke(opcode: Opcode, reference: MethodReference) =
         ImmutableInstruction35c(opcode, reference.parameterTypes.size, 3, 4, 7, 8, 9, reference)
@@ -194,6 +206,77 @@ class MessengerIconShapesTest {
         assertThrows(PatchException::class.java) { noContext.openMessengerFirst(TAP_LONG_PRESS) }
         assertEquals(3, surface.implementation!!.instructions.count())
         assertEquals(3, noContext.implementation!!.instructions.count())
+    }
+
+    /** Facebook's screen touch dispatch: this in v1 and the event in v2, answering false. */
+    private fun dispatch(): Method = ImmutableMethod(
+        FRAGMENT_ACTIVITY, "dispatchTouchEvent", listOf(ImmutableMethodParameter(MOTION_EVENT, null, null)), "Z",
+        AccessFlags.PUBLIC.value, null, null,
+        ImmutableMethodImplementation(3, listOf(ImmutableInstruction11n(Opcode.CONST_4, 0, 0), ImmutableInstruction11x(Opcode.RETURN, 0)),
+            null, null),
+    )
+
+    private fun classDef(type: String, vararg methods: Method) =
+        ImmutableClassDef(type, AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null, null, null, null, methods.map(ImmutableMethod::of))
+
+    /** A build with the icon's tap calling the button handler, and FbFragmentActivity declaring [screen]. */
+    private fun build(vararg screen: Method) = PatchContexts.of(
+        listOf(
+            classDef("Lfixture/MessengerIcon;", tap(calls = listOf(invoke(Opcode.INVOKE_STATIC, handlerCall)))),
+            classDef(handlerCall.definingClass, handler(owner = handlerCall.definingClass)),
+            classDef(FRAGMENT_ACTIVITY, *screen),
+            ExtensionDex.classDef(SETTINGS_STATUS),
+        ),
+    )
+
+    /** The touch, in the event's own register through the range form, then the dispatch's own code. */
+    private fun assertTouchFirst(dispatch: MutableMethod) {
+        val call = dispatch.at(0)
+        assertEquals(Opcode.INVOKE_STATIC_RANGE, call.opcode)
+        assertEquals("Lapp/morphe/extension/facebook/chats/MessengerIcon;->touch(Landroid/view/MotionEvent;)V",
+            (call as ReferenceInstruction).reference.toString())
+        assertEquals("the hook doesn't hand over the event", listOf(2, 1),
+            (call as RegisterRangeInstruction).let { listOf(it.startRegister, it.registerCount) })
+        assertEquals(3, dispatch.implementation!!.instructions.count())
+        assertEquals(Opcode.CONST_4, dispatch.at(1).opcode)
+    }
+
+    @Test
+    fun `every touch on a screen goes to the extension first and on to Facebook unchanged`() {
+        val dispatch = MutableMethod(dispatch())
+        dispatch.handTouchesToIcon()
+        assertTouchFirst(dispatch)
+    }
+
+    /**
+     * The patch puts all three hooks in: the tap and the handler ask first, and every touch goes to
+     * the extension, which is how a held press that reaches the tap as a plain tap stays Facebook's.
+     */
+    @Test
+    fun `the patch asks first in the tap and the handler and hands the extension every touch`() {
+        val context = build(dispatch())
+        openMessengerFromTopBarPatch.execute(context)
+        val tap = context.mutableClassDefBy("Lfixture/MessengerIcon;").methods.single()
+        assertEquals("open", ((tap.at(2) as ReferenceInstruction).reference as MethodReference).name)
+        val handler = context.mutableClassDefBy(handlerCall.definingClass).methods.single()
+        assertEquals("open", ((handler.at(2) as ReferenceInstruction).reference as MethodReference).name)
+        assertTouchFirst(context.mutableClassDefBy(FRAGMENT_ACTIVITY).methods.single())
+    }
+
+    /**
+     * Without the screen's touch dispatch the patch can't tell a held press from a tap, so it stops
+     * before any hook goes in: a half-applied patch would send long presses to Messenger.
+     */
+    @Test
+    fun `a build without the screen's touch dispatch stops the patch before anything goes in`() {
+        val context = build()
+        val refusal = assertThrows(PatchException::class.java) { openMessengerFromTopBarPatch.execute(context) }
+        assertTrue(refusal.message, refusal.message!!.contains(ICON_PATCH))
+        assertTrue(refusal.message, refusal.message!!.contains("dispatchTouchEvent"))
+        val tap = context.mutableClassDefBy("Lfixture/MessengerIcon;").methods.single()
+        assertEquals(Opcode.CONST_STRING, tap.at(0).opcode)
+        val handler = context.mutableClassDefBy(handlerCall.definingClass).methods.single()
+        assertEquals(Opcode.CONST_STRING, handler.at(0).opcode)
     }
 
     /** The instruction index a branch at [index] lands on. */

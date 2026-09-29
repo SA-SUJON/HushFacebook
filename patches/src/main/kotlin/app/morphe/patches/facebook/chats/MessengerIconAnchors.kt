@@ -17,6 +17,10 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  * The icon's click listener and its long-click listener both call one static tap method with the
  * context, the user session, four renamed helpers, the surface the icon sits on and three flags.
  * The second flag is the long press: the click listener hands it 0 and the long-click listener 1.
+ * The long-click listener only exists behind a MobileConfig flag (580 0x8105b2000f2771, 577
+ * 0x8105b8000f276a), which also gives the top bar's touch listener the gesture detector that calls
+ * it. Without the flag, a press lifted on the icon is a click however long it was held, so a long
+ * press reaches the tap with 0.
  * The method is the only one in either build that loads both
  * "entry_point_navbar_global_icon_reels_tab" and "entry_point_navbar_global_icon_", the entry
  * points it names the tap by.

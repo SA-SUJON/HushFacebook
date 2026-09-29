@@ -4,10 +4,16 @@
  */
 package app.morphe.patches.facebook.chats
 
+import app.morphe.ExtensionDex
 import app.morphe.Fixtures
+import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.feed.resolveStatic
+import app.morphe.patches.facebook.media.taptoplay.FRAGMENT_ACTIVITY
+import app.morphe.patches.facebook.media.taptoplay.touchDispatches
+import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
@@ -35,6 +41,9 @@ import org.junit.Test
  * two by. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class MessengerIconFixtureTest {
+    private val openCall = "Lapp/morphe/extension/facebook/chats/MessengerIcon;->open(Landroid/content/Context;Z)Z"
+    private val touchCall = "Lapp/morphe/extension/facebook/chats/MessengerIcon;->touch(Landroid/view/MotionEvent;)V"
+
     private val Instruction.call: MethodReference?
         get() = (this as? ReferenceInstruction)?.reference as? MethodReference
 
@@ -70,6 +79,58 @@ class MessengerIconFixtureTest {
             dex.methodSection.any { it.definingClass == target.definingClass && it.name == target.name }
         }) { calls(it, target) }
 
+    /** The registers a call passes, in order. */
+    private fun Instruction.registers(): List<Int> = when (this) {
+        is RegisterRangeInstruction -> (startRegister until startRegister + registerCount).toList()
+        is FiveRegisterInstruction -> listOf(registerC, registerD, registerE, registerF, registerG).take(registerCount)
+        else -> emptyList()
+    }
+
+    /**
+     * The patch itself, run on each build's own tap, handler and screen classes. The tap and the
+     * handler ask the extension first, and every touch on a Facebook screen goes to the extension
+     * before Facebook sees it. Where the icon's long-click listener is off (MobileConfig builds it
+     * behind a flag, the same flag that gives the top bar's touch listener its long-press detector),
+     * a press held on the icon reaches the tap as a plain click when the finger lifts, with 0 for
+     * the long press, and only the touch tells the extension it was held.
+     */
+    @Test
+    fun `on each declared build the patch asks first in the tap and the handler and sees every touch`() {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        val checked = mutableSetOf<String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                val name = bundle.name
+                val tapClass = FixtureDex.classesHolding(bundle, REELS_TAB_ENTRY).single { owner -> owner.methods.any(::isIconTap) }
+                val tap = tapClass.methods.single(::isIconTap)
+                val handlerType = buttonHandlerCalls(tap).map { it.definingClass }.distinct().single()
+                val classes = FixtureDex.classes(bundle, setOf(handlerType, FRAGMENT_ACTIVITY))
+                val context = PatchContexts.of(
+                    listOf(tapClass, classes.getValue(handlerType), classes.getValue(FRAGMENT_ACTIVITY),
+                        ExtensionDex.classDef(SETTINGS_STATUS)),
+                )
+                openMessengerFromTopBarPatch.execute(context)
+
+                for (hooked in listOf(tapClass.type, handlerType)) {
+                    val asks = context.mutableClassDefBy(hooked).methods.filter { method ->
+                        method.implementation?.instructions?.take(3)?.any { it.call?.toString() == openCall } == true
+                    }
+                    assertEquals("$name: methods of $hooked asking the extension first", 1, asks.size)
+                }
+                val dispatch = touchDispatches(context.mutableClassDefBy(FRAGMENT_ACTIVITY)).single()
+                val code = dispatch.implementation!!.instructions.toList()
+                val first = code.indexOfFirst { it.call?.toString() == touchCall }
+                assertEquals("$name: dispatchTouchEvent doesn't hand the touch to the extension first", 0, first)
+                assertEquals("$name: the touch the extension gets", listOf(dispatch.localRegisterCount() + 1),
+                    code[first].registers())
+                assertTrue("$name: dispatchTouchEvent no longer hands the event on",
+                    code.drop(1).any { it.call?.name == "dispatchTouchEvent" })
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", versions, checked)
+    }
+
     @Test
     fun `each declared build has one Messenger icon tap and one button handler, both handed the long press`() {
         val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
@@ -99,6 +160,23 @@ class MessengerIconFixtureTest {
                 }
                 assertEquals("$name: the tap's callers and the long press each hands it",
                     mapOf("onClick(Landroid/view/View;)V" to 0, "onLongClick(Landroid/view/View;)Z" to 1), flags)
+
+                // The long-click listener is built in one place, only when a flag the builder is
+                // handed says so: its new-instance sits right behind an if-eqz on a parameter. With
+                // the flag off the icon has no long-click listener, and a held press reaches the
+                // tap through the click listener with 0, which is why the patch reads the touches.
+                val longClick = callers(bundle, tap).single { it.name == "onLongClick" }.definingClass
+                fun buildsLongClick(instruction: Instruction) = instruction.opcode == Opcode.NEW_INSTANCE &&
+                    (instruction as ReferenceInstruction).reference.toString() == longClick
+                val builders = FixtureDex.methodsWhere(bundle, dexFilter = { dex -> dex.typeSection.any { it == longClick } }) {
+                    it.implementation?.instructions?.any(::buildsLongClick) == true
+                }
+                assertEquals("$name: methods building the long-click listener $longClick", 1, builders.size)
+                val builderCode = builders.single().implementation!!.instructions.toList()
+                val built = builderCode.indexOfFirst(::buildsLongClick)
+                val guard = builderCode[built - 1]
+                assertTrue("$name: the long-click listener is built without a flag ahead of it ($guard)",
+                    guard.opcode == Opcode.IF_EQZ && (guard as OneRegisterInstruction).registerA >= locals(builders.single()))
 
                 // The tap calls one button handler, and hands it its own long-press parameter.
                 val handlerCalls = buttonHandlerCalls(tap).distinctBy(::key)
