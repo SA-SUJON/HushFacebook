@@ -8,6 +8,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
+import app.morphe.patches.facebook.misc.resignedtrust.restoreTrustPatch
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 
@@ -28,8 +29,11 @@ private val renameSharedPermissionsPatch = resourcePatch {
  * state broadcast and Profilo's trace control, six places on 577 and 580). Left alone they'd name a
  * permission this build no longer holds, and those broadcasts would stop reaching Facebook itself.
  *
- * It also lets a Messenger re-signed with this build's own key reach Facebook's sign-in store, so a
- * patched Messenger can sign in through a patched Facebook. See FamilyTrust.kt.
+ * It also lets a Meta app you patch with this build's own key reach Facebook's guarded components, so
+ * a Messenger patched with the same key can sign in through a patched Facebook. That half rides on
+ * Restore screens on re-signed builds: it hooks the one method Facebook reads a package's signers
+ * through, and FamilySignatureTrust answers that same-key family caller Facebook's own certificate
+ * there, so Facebook judges it as it would the Meta-signed app. This patch depends on that one.
  *
  * No switch: a manifest can't change at run time, so the patch stays in while paused.
  */
@@ -38,19 +42,20 @@ val installBesideMetaAppsPatch = bytecodePatch(
     name = "Install beside Meta's apps",
     description = "Lets the official Messenger, Facebook Lite, Business Suite and Workplace install beside the " +
         "patched Facebook. Facebook shares two permissions with them, and Android lets only one signing key own " +
-        "a permission, so this patch renames Facebook's. It also lets a Messenger patched with the same key sign " +
-        "in through the patched Facebook. A Root Mount install doesn't need it.",
+        "a permission, so this patch renames Facebook's. A Meta app you patch with the same key is treated as " +
+        "Meta's own when it calls the patched Facebook, so it gets exactly what the Meta-signed app would and can " +
+        "sign in through it. A Root Mount install doesn't need it.",
     default = true,
 ) {
     category("Fixes")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
-    dependsOn(renameSharedPermissionsPatch, facebookExtensionPatch)
+    // Restore screens hooks the signers reader the same-key family caller trust rides on.
+    dependsOn(renameSharedPermissionsPatch, facebookExtensionPatch, restoreTrustPatch)
 
     execute {
         routeSharedLiterals()
-        trustSameKeyFamilyCallers()
         enableStatus("installBesideMetaApps")
     }
 }
