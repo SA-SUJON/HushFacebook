@@ -34,8 +34,9 @@ internal const val PATCH = "Hold a reel for 2x"
  *
  * The long-press handlers' speed-up flag, the overlay's check of it before it gives a reel its
  * release listener, the release listeners' two flags and the edge check each hand their answer to
- * the extension on its way out, and every touch on a Facebook screen tells the extension when a
- * gesture starts, so the release listener puts the speed back only after a hold.
+ * the extension on its way out. Each handler tells the extension when it takes the speed-up path,
+ * and every touch on a Facebook screen when a gesture starts and ends, so the release listener
+ * puts the speed back only after a hold.
  *
  * Off in the default selection: while its switch is on, a hold on a reel speeds it up instead of
  * opening Facebook's long-press menu, which is a choice to make. Picked, its switch starts on.
@@ -73,14 +74,23 @@ internal class ReelHoldAnchors(
     val plans: List<FlagPlan>,
     val edgeCheck: Method,
     val dispatch: Method,
+    val speedUpPaths: List<Method>,
 )
 
-/** The long-press handlers, the release listeners, the overlay's check, the edge check and the touch dispatch. */
+/** The long-press handlers and their speed-up paths, the release listeners, the overlay's check, the edge check and the touch dispatch. */
 internal fun BytecodePatchContext.findReelHoldAnchors(): ReelHoldAnchors {
     val handlers = classDefByStrings(SPEED_UP_LOG, StringComparisonType.EQUALS).filter(::isLongPressHandler)
     if (handlers.isEmpty()) refuse("no long-press handler holds \"$SPEED_UP_LOG\" and keeps $DISPATCH_DIRECTLY_FIELD")
     val configs = handlers.mapNotNull(::configType).toSet()
     val config = configs.singleOrNull() ?: refuse("the long-press handlers capture ${configs.size} config types")
+
+    // Each handler loads its log name once, on the speed-up path only; the hold starts there.
+    val speedUpPaths = handlers.map { handler ->
+        val loading = handler.methods.filter { speedUpLoads(it).isNotEmpty() }
+        loading.singleOrNull()?.takeIf { speedUpLoads(it).size == 1 }
+            ?: refuse("expected the long-press handler ${handler.type} to load \"$SPEED_UP_LOG\" once, found " +
+                loading.sumOf { speedUpLoads(it).size })
+    }
 
     val speedUps = handlers.flatMap { handler -> handler.methods.flatMap { flagCalls(it, config).values } }.toSet()
     val speedUpFlag = speedUps.singleOrNull()
@@ -124,14 +134,16 @@ internal fun BytecodePatchContext.findReelHoldAnchors(): ReelHoldAnchors {
     val activity = classDefByOrNull(FRAGMENT_ACTIVITY) ?: refuse("this build has no $FRAGMENT_ACTIVITY")
     val dispatch = touchDispatches(activity).singleOrNull()
         ?: refuse("expected $FRAGMENT_ACTIVITY to declare one dispatchTouchEvent($MOTION_EVENT)Z")
-    return ReelHoldAnchors(config, speedUpFlag, releaseFlag, handlerPlans + listenerPlans + builderPlans, edgeCheck, dispatch)
+    return ReelHoldAnchors(config, speedUpFlag, releaseFlag, handlerPlans + listenerPlans + builderPlans, edgeCheck, dispatch,
+        speedUpPaths)
 }
 
 /**
  * After each flag call's move-result, the extension's answer in its place, in the same register,
  * which the range form names whatever its number; the branch that follows reads it as Facebook's.
- * Before each of the edge check's returns, the same. First in the touch dispatch, the event, which
- * the extension only reads.
+ * Before each of the edge check's returns, the same. Straight after each handler's "speed_up" load,
+ * which falls through to it, a call naming no register. First in the touch dispatch, the event,
+ * which the extension only reads.
  */
 internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors) {
     for (plan in anchors.plans) {
@@ -146,6 +158,10 @@ internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors)
                 """,
             )
         }
+    }
+    for (path in anchors.speedUpPaths) {
+        val mutable = mutableClassDefBy(path.definingClass).findMutableMethodOf(path)
+        mutable.addInstruction(speedUpLoads(mutable).single() + 1, "invoke-static {}, $HELD")
     }
     val edge = mutableClassDefBy(anchors.edgeCheck.definingClass).findMutableMethodOf(anchors.edgeCheck)
     edge.implementation!!.instructions.withIndex().filter { it.value.opcode == Opcode.RETURN }.map { it.index }

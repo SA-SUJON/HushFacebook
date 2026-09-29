@@ -23,15 +23,22 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * <ul>
  *   <li>{@link #longPress}: the speed-up flag, where a long press on a reel chooses between the
  *       speed-up and the menu. Yes while the switch is on, so the hold speeds the reel up instead
- *       of opening the menu. The menu is still one tap away on the reel's more button.</li>
+ *       of opening the menu. The menu is still one tap away on the reel's more button. Ads open
+ *       the menu whatever the flag says.</li>
+ *   <li>{@link #held}: the handler has taken the speed-up path, past the flag, the ad check and
+ *       the edge check. That's a hold.</li>
  *   <li>{@link #anywhere}: the check of whether the press landed on an edge. Yes while the switch
  *       is on, so a hold anywhere on the reel counts.</li>
  *   <li>{@link #speedUp}: the speed-up flag where the controls decide whether to give a reel its
  *       release listener. Yes while the switch is on, so every reel has one.</li>
  *   <li>{@link #release}: both flags the release listener asks before it puts the speed back.
- *       Yes only during the gesture a hold began, since the listener hears every touch and would
+ *       Yes from a hold until a lift the listener hears, since it hears every touch and would
  *       otherwise put back the speed the reel had before its last hold, undoing a speed picked in
- *       the menu since then. {@link #touch} sees each gesture start.</li>
+ *       the menu since then. It puts the speed back on a lift or a cancel, so once one reaches it
+ *       during a hold, the hold is over from the next gesture on. A lift it doesn't hear leaves the
+ *       hold for the next one: the listener is drawn with the reel, and a lift before the speed-up
+ *       has it drawn again can reach one that lets it go by, or none. {@link #touch} sees each
+ *       gesture start and end first.</li>
  * </ul>
  *
  * <p>A tap still plays or pauses, a double tap and the side buttons work as before, and reels that
@@ -39,34 +46,61 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * anything here fails, every answer is Facebook's own.
  */
 public final class ReelHold {
-    /** Counted under the patch's name for each long press on a reel while the switch is on. */
+    /** Counted under the patch's name for each long press on a reel that went to the speed-up while the switch is on. */
     static final String HELD = "hold on a reel";
 
     private static final String FAMILY = FamilyNames.HOLD_REEL_FOR_2X;
 
-    /** Whether the gesture going on now began a hold. A new gesture starts without one. */
+    /** Whether a hold sped a reel up and the speed hasn't gone back since. */
     private static volatile boolean holding;
+
+    /** Whether the gesture going on now has lifted or been cancelled. */
+    private static volatile boolean lifted;
+
+    /** Whether the release listener heard a lift during a hold, so the speed went back. The next gesture ends the hold. */
+    private static volatile boolean restored;
 
     private ReelHold() {
     }
 
-    /** The hook, first thing in FbFragmentActivity.dispatchTouchEvent: a finger landing starts a gesture. */
+    /**
+     * The hook, first thing in FbFragmentActivity.dispatchTouchEvent, before any view hears the
+     * event: a finger landing starts a gesture, and ends a hold whose speed went back; the last
+     * finger lifting or a cancel ends the gesture.
+     */
     public static void touch(MotionEvent event) {
         try {
-            if (event != null && event.getActionMasked() == MotionEvent.ACTION_DOWN) holding = false;
+            if (event == null) return;
+            int action = event.getActionMasked();
+            if (action == MotionEvent.ACTION_DOWN) {
+                if (restored) holding = false;
+                restored = false;
+                lifted = false;
+            } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                lifted = true;
+            }
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "touch", failure);
         }
     }
 
-    /** After the long-press handler asks Facebook's speed-up flag. Yes while on, and the gesture is a hold. */
+    /** After the long-press handler asks Facebook's speed-up flag. Yes while on. */
     public static boolean longPress(boolean facebooks) {
         HookStatus.invoked(FAMILY);
-        if (!on("long press")) return facebooks;
+        return on("long press") || facebooks;
+    }
+
+    /**
+     * The hook, straight after the long-press handler loads its "speed_up" log name, which it does
+     * only on its way to the speed-up: past the flag, the ad check and the edge check. A hold.
+     */
+    public static void held() {
+        HookStatus.invoked(FAMILY);
+        if (!on("hold")) return;
         holding = true;
+        restored = false;
         HookStatus.counted(FAMILY, HELD);
-        Logger.printDebug(() -> "Reel hold: a long press on a reel goes to the speed-up");
-        return true;
+        Logger.printDebug(() -> "Reel hold: a long press on a reel went to the speed-up");
     }
 
     /** After Facebook's check of whether a long press landed on a reel's edge. Yes while on. */
@@ -81,10 +115,15 @@ public final class ReelHold {
         return on("release listener") || facebooks;
     }
 
-    /** After the release listener asks either flag. While on, yes only during a gesture a hold began. */
+    /**
+     * After the release listener asks either flag. While on, yes from a hold until a lift the listener
+     * hears, whose two questions both get yes; the gesture after it starts with the hold over.
+     */
     public static boolean release(boolean facebooks) {
         HookStatus.invoked(FAMILY);
-        return on("release") ? holding : facebooks;
+        if (!on("release")) return facebooks;
+        if (holding && lifted) restored = true;
+        return holding;
     }
 
     /** Whether the switch is on, with [where] bound. Never throws: a failure is reported and reads off. */
@@ -99,8 +138,10 @@ public final class ReelHold {
         }
     }
 
-    /** Forgets the gesture. For tests. */
+    /** Forgets the hold and the gesture. For tests. */
     static void forget() {
         holding = false;
+        lifted = false;
+        restored = false;
     }
 }

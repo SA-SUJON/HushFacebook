@@ -15,6 +15,7 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 /*
@@ -31,18 +32,23 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  *   player config (580 LX/Cv5;, 577 LX/Cpk;) one flag with no arguments (580 AgW, 577 Aiu), the
  *   speed-up flag. Yes, and a press on a reel that isn't an ad goes to the speed-up when it landed
  *   within the config's edge width of the reel's left or right side; otherwise it opens the
- *   long-press menu. The speed-up (580 LX/83J;->A0H, 577 LX/7mG;->A0H) remembers the reel's speed
- *   and sets the config's long-press speed, 2x unless the server says otherwise, through
- *   FbGrootPlayer's speed setter.
+ *   long-press menu. Each loads "speed_up" once, for the log call it makes only on its way to the
+ *   speed-up, past those checks (580 88x index 125, UoS 117; 577 9bg 131, V0J 107). The speed-up
+ *   (580 LX/83J;->A0H, 577 LX/7mG;->A0H) remembers the reel's speed and sets the config's
+ *   long-press speed, 2x unless the server says otherwise, through FbGrootPlayer's speed setter.
  * - The edge check: the one method of the build taking (MotionEvent, View, FbUserSession, the
  *   config, boolean) and answering a boolean (580 LX/88V;->A06, 577 LX/9bD;->A06). One long-press
  *   handler calls it itself, the other through a lazy value.
  * - The release listeners: lambdas keeping $isInLongPress2xPlaybackSpeed and
  *   $immersiveFeedPlayerConfig (580 LX/88y; and LX/UoP;, 577 LX/9bh; and LX/V0G;), a reel's touch
  *   listener. Each asks a second flag with no arguments (580 AgX, 577 Aiv) and, straight after its
- *   branch, the speed-up flag; with both yes, on the finger's lift it puts back the speed the
- *   speed-up remembered, whenever the player's speed differs from it. It hears every touch on the
- *   reel, not only a hold's.
+ *   branch, the speed-up flag; with both yes, on the finger's lift or a cancel it puts back the
+ *   speed the speed-up remembered, whenever the player's speed differs from it. It hears every
+ *   touch on the reel, not only a hold's. It captures whether a hold is on and the speed to put
+ *   back when the reel is drawn, and the speed-up has the reel drawn again, so a lift before that
+ *   reaches a listener holding the old values. Its own check of the hold flag is behind a third
+ *   config answer (580 AhA, 577 AjY) that every implementation on both builds answers no, so on
+ *   these builds every listener asks both flags on every touch.
  * - The overlay component's render (580 LX/83D;->A1F, 577 LX/7H5;->A1N) gives a reel its release
  *   listener only when the speed-up flag says yes. The control component gives it one regardless.
  *   Three other places read the speed-up flag (a Watch fragment's setup and an auto-advance guard);
@@ -55,6 +61,7 @@ internal const val LONG_PRESS = "$REEL_HOLD->longPress(Z)Z"
 internal const val ANYWHERE = "$REEL_HOLD->anywhere(Z)Z"
 internal const val SPEED_UP = "$REEL_HOLD->speedUp(Z)Z"
 internal const val RELEASE = "$REEL_HOLD->release(Z)Z"
+internal const val HELD = "$REEL_HOLD->held()V"
 
 internal const val SPEED_UP_LOG = "speed_up"
 internal const val CONFIG_FIELD = "\$immersiveFeedPlayerConfig"
@@ -128,6 +135,11 @@ internal fun isMethod(method: Method, reference: MethodReference): Boolean =
     method.definingClass == reference.definingClass && method.name == reference.name &&
         method.returnType == reference.returnType && method.parameters() == reference.parameterTypes.map(CharSequence::toString) &&
         method.implementation != null
+
+/** The indices in [method] of the instructions loading the long-press handlers' "speed_up" log name. */
+internal fun speedUpLoads(method: Method): List<Int> = method.code.withIndex().filter { (_, instruction) ->
+    ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string == SPEED_UP_LOG
+}.map { it.index }
 
 /** Whether the instruction after the call at [index] in [method] takes its boolean answer. */
 internal fun answerTakenAt(method: Method, index: Int): Int? =

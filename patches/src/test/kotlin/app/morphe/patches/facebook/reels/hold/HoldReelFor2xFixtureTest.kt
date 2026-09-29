@@ -29,14 +29,15 @@ import java.io.File
 
 /**
  * Hold a reel for 2x's anchors on every Facebook build the bundle declares: two long-press
- * handlers holding "speed_up", which ask the immersive player config one flag; two release
+ * handlers holding "speed_up", which ask the immersive player config one flag and load the log name
+ * once each, after they take the flag's answer; two release
  * listeners, which ask a second flag straight before that one; the overlay's one check of the
  * speed-up flag before it gives a reel its release listener; the one edge check of the build, which
  * a handler calls; and nothing else in the build asking either flag but three places the patch
  * leaves alone, none of which makes a handler or a listener. Then the patch itself, run on those
  * classes: every flag call's answer through the extension in the same register before its branch,
- * every return of the edge check through the extension, and the touch dispatch handing the event
- * over first. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
+ * every return of the edge check through the extension, the hold's start straight after each
+ * "speed_up" load, and the touch dispatch handing the event over first. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class HoldReelFor2xFixtureTest {
     private val Instruction.call: MethodReference?
@@ -148,6 +149,24 @@ class HoldReelFor2xFixtureTest {
                 listeners.flatMap { it.methods }.filter { flagCalls(it, config).isNotEmpty() }
                     .forEach { assertAnswers(it, RELEASE, setOf(speedUp, release)) }
                 assertAnswers(checks.single(), SPEED_UP, setOf(speedUp, release))
+
+                // Each handler loads its log name once, only past the flag, and the hold starts right after.
+                for (handler in handlers) {
+                    val loading = handler.methods.filter { speedUpLoads(it).isNotEmpty() }
+                    assertEquals("$name: ${handler.type}'s methods loading \"$SPEED_UP_LOG\"", 1, loading.size)
+                    val method = loading.single()
+                    val load = speedUpLoads(method).single()
+                    val flag = flagCalls(method, config).filterValues { it == speedUp }.keys.filter { answerTakenAt(method, it) != null }
+                    assertTrue("$name: ${key(method)} loads \"$SPEED_UP_LOG\" before it takes the speed-up flag's answer",
+                        flag.isNotEmpty() && flag.all { it < load })
+                    val before = method.code()
+                    val after = patched(method)
+                    val at = speedUpLoads(context.mutableClassDefBy(method.definingClass).methods.single { key(it) == key(method) }).single()
+                    assertEquals("$name: ${key(method)} after its \"$SPEED_UP_LOG\" load", HELD, after[at + 1].call.toString())
+                    assertEquals("$name: ${key(method)} hands the hold a register", emptyList<Int>(), after[at + 1].registers())
+                    assertEquals("$name: ${key(method)} lost what came after the load", before[load + 1].opcode, after[at + 2].opcode)
+                    assertEquals("$name: ${key(method)} holds", 1, after.count { it.call?.toString() == HELD })
+                }
 
                 val edgeBefore = edge.code()
                 val edgeAfter = patched(edge)
