@@ -16,6 +16,7 @@ import app.morphe.patches.facebook.media.taptoplay.grootPlays
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.shared.compat.AppCompatibilities
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
@@ -26,6 +27,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -40,11 +42,14 @@ import java.io.File
  * a handler calls; and nothing else in the build asking either flag but three places the patch
  * leaves alone, none of which makes a handler or a listener; and the two speed-ups, one in each of
  * FbShortsVideoControlComponent and UddPlayerControlComponent, setting FbGrootPlayer's speed from
- * one read of the config. Then the patch itself, run on those
+ * one read of the config; and both release listeners reading the player's speed with one public
+ * getter. Then the patch itself, run on those
  * classes: every flag call's answer through the extension in the same register before its branch,
  * every return of the edge check and of the hold speed through the extension, the hold's start
- * straight after each "speed_up" load, and the touch dispatch and the speed setter handing the event
- * and the speed over first. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
+ * straight after each "speed_up" load, the touch dispatch handing the event over first, the speed
+ * setter handing the player and the speed over first and going on with the speed it gets back, and
+ * the extension's speed stub calling the getter. Reads the fixture bundles from
+ * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class HoldReelFor2xFixtureTest {
     private val Instruction.call: MethodReference?
@@ -139,6 +144,16 @@ class HoldReelFor2xFixtureTest {
                 val speedClass = FixtureDex.classes(bundle, setOf(reads.first().second.definingClass)).values.single()
                 val holdSpeed = speedClass.methods.single { isMethod(it, reads.first().second) }
 
+                // Each release listener reads the player's speed with the same one getter.
+                for (listener in listeners) {
+                    val getters = listener.methods.flatMap { speedGettersCalled(it, player.type) }.map { it.toString() }.toSet()
+                    assertEquals("$name: ${listener.type}'s reads of ${player.type}'s speed", 1, getters.size)
+                }
+                val getterCall = listeners.flatMap { l -> l.methods.flatMap { speedGettersCalled(it, player.type) } }
+                    .distinctBy { it.toString() }.single()
+                val speedGetter = player.methods.single { isMethod(it, getterCall) }
+                assertTrue("$name: ${key(speedGetter)} isn't public", AccessFlags.PUBLIC.isSet(speedGetter.accessFlags))
+
                 val activity = FixtureDex.classes(bundle, setOf(FRAGMENT_ACTIVITY)).values.single()
                 val componentClasses = components.filter { c -> checks.any { it.definingClass == c.type } }
                 val classes: List<ClassDef> = (handlers + listeners + componentClasses + edgeClass + activity + player + configClass +
@@ -217,9 +232,21 @@ class HoldReelFor2xFixtureTest {
                     assertEquals("$name: the hold speed takes the answer back", Opcode.MOVE_RESULT_WIDE, speedAfter[index - 1].opcode)
                     assertEquals("$name: the hold speed's answer register", register, (speedAfter[index - 1] as OneRegisterInstruction).registerA)
                 }
-                val setterFirst = patched(setter)[0]
-                assertEquals("$name: the speed setter's first call", SPEED_SET, setterFirst.call.toString())
-                assertEquals("$name: the speed the setter hands over", listOf(setter.localRegisterCount() + 1), setterFirst.registers())
+                val setterAfter = patched(setter)
+                val self = setter.localRegisterCount()
+                assertEquals("$name: the speed setter's first call", SPEED_SET, setterAfter[0].call.toString())
+                assertEquals("$name: the player and speed the setter hands over", listOf(self, self + 1), setterAfter[0].registers())
+                assertEquals("$name: the setter takes the speed back", Opcode.MOVE_RESULT, setterAfter[1].opcode)
+                assertEquals("$name: the register the setter's speed comes back to", self + 1,
+                    (setterAfter[1] as OneRegisterInstruction).registerA)
+                assertEquals("$name: the setter lost its own first instruction", setter.code()[0].opcode, setterAfter[2].opcode)
+
+                val stubMethod = context.mutableClassDefBy(REEL_HOLD).methods.single { it.name == PLAYER_SPEED_STUB }
+                val stub = stubMethod.code()
+                assertEquals("$name: the speed stub's cast", player.type, ((stub[0] as ReferenceInstruction).reference as TypeReference).type)
+                assertEquals("$name: the speed stub's call", key(speedGetter), stub[1].call.toString())
+                assertEquals("$name: the speed stub's register", listOf(stubMethod.localRegisterCount()), stub[1].registers())
+                assertEquals("$name: the speed stub's answer", Opcode.RETURN, stub[3].opcode)
 
                 val dispatch = activity.methods.single { it.name == "dispatchTouchEvent" && it.implementation != null }
                 val first = patched(dispatch)[0]

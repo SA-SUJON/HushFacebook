@@ -73,6 +73,7 @@ import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
 import app.morphe.extension.facebook.reels.DoubleTapLike;
 import app.morphe.extension.facebook.reels.ReelHold;
+import app.morphe.extension.facebook.reels.ReelHoldForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
@@ -303,7 +304,8 @@ public class PausedHooksTest {
                 () -> DoubleTapLike.holdBackLike("DOUBLE_TAP"),
                 DoubleTapLike::holdBackTap));
         // A long press on a reel goes to Facebook's speed-up wherever it lands, the reel gets its
-        // release listener, a hold speed of normal becomes 2x, and the lift of a hold puts the speed back.
+        // release listener, a hold speed of normal becomes 2x, the lift of a hold puts the speed back,
+        // and that lift's speed is the one the reel had before the hold.
         probes.put(PatchFamily.REEL_HOLD, Arrays.asList(
                 () -> ReelHold.longPress(false),
                 () -> ReelHold.anywhere(false),
@@ -312,7 +314,8 @@ public class PausedHooksTest {
                 () -> {
                     ReelHold.held();
                     return ReelHold.release(false);
-                }));
+                },
+                ReelHoldForTests::putsBackTheSpeedBeforeAHold));
         // A speed picked on a reel is set on the next reel the viewer starts.
         probes.put(PatchFamily.KEEP_REEL_SPEED, Collections.singletonList(ReelSpeedForTests::keepsAPickedSpeed));
         // A player's start with no tap before it is held, and Facebook's Autoplay setting reads Off.

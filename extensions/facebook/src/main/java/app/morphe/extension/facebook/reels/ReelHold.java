@@ -6,6 +6,10 @@ package app.morphe.extension.facebook.reels;
 
 import android.view.MotionEvent;
 
+import androidx.annotation.Nullable;
+
+import java.lang.ref.WeakReference;
+
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.Logger;
@@ -44,13 +48,17 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *       hold for the next one: the listener is drawn with the reel, and a lift before the speed-up
  *       has it drawn again can reach one that lets it go by, or none. {@link #touch} sees each
  *       gesture start and end first.</li>
+ *   <li>{@link #speedSet}: every speed FbGrootPlayer's speed setter gets. A hold's speed-up has the
+ *       player's speed read through its getter first, and the hold's lift puts that speed back in
+ *       place of the one Facebook noted, which is normal speed on a reel Keep the reel speed started
+ *       at a kept 2x, and on one a listener drawn before a pick puts back.</li>
  * </ul>
  *
- * <p>With Debug logging on, {@link #speedSet} logs the speed Facebook's speed setter gets when a
- * hold speeds a reel up and when its lift puts the speed back, which tells what a muted reel plays
- * at. A tap still plays or pauses, a double tap and the side buttons work as before, and reels that
- * are ads keep Facebook's long-press menu. Off, paused, before the settings are ready, or when
- * anything here fails, every answer is Facebook's own.
+ * <p>With Debug logging on, {@link #speedSet} logs the speed a hold speeds a reel up to and the one
+ * its lift puts back, which tells what a muted reel plays at. A tap still plays or pauses, a double
+ * tap and the side buttons work as before, and reels that are ads keep Facebook's long-press menu.
+ * Off, paused, before the settings are ready, or when anything here fails, every answer is
+ * Facebook's own.
  */
 public final class ReelHold {
     /** Counted under the patch's name for each long press on a reel that went to the speed-up while the switch is on. */
@@ -70,9 +78,29 @@ public final class ReelHold {
     /** Whether the release listener heard a lift during a hold, so the speed went back. The next gesture ends the hold. */
     private static volatile boolean restored;
 
-    /** Whether the next speed the setter gets is a hold's speed-up, or its lift's, for the debug log. */
+    /** Whether the next speed the setter gets is a hold's speed-up, or its lift's. */
     private static volatile boolean speedUpNext;
     private static volatile boolean backNext;
+
+    /** Whether the hold going on began before the last one's speed went back. */
+    private static volatile boolean again;
+
+    /** The player a hold sped up, weakly, and the speed it played at before, NaN when unread. */
+    @Nullable
+    private static volatile WeakReference<Object> heldPlayer;
+    private static volatile float before = Float.NaN;
+
+    /** Two speeds this close are the same one, as Facebook's player compares them. */
+    static final float SAME = 0.01f;
+
+    /** Reads a player's speed. {@link #PATCHED} is the patch's getter; tests stand in. */
+    interface Speeds {
+        float of(Object player);
+    }
+
+    static final Speeds PATCHED = ReelHold::playerSpeed;
+
+    static volatile Speeds speeds = PATCHED;
 
     private ReelHold() {
     }
@@ -113,6 +141,7 @@ public final class ReelHold {
     public static void held() {
         HookStatus.invoked(FAMILY);
         if (!on("hold")) return;
+        again = holding && !restored;
         holding = true;
         restored = false;
         speedUpNext = true;
@@ -121,23 +150,48 @@ public final class ReelHold {
     }
 
     /**
-     * The hook, first thing in FbGrootPlayer's speed setter, whoever calls it. It only logs, with
-     * Debug logging on, the speed a hold's speed-up sets and the speed its lift puts back.
+     * The hook, first thing in FbGrootPlayer's speed setter, whoever calls it: the speed the setter
+     * goes on with. When a hold's speed-up sets [player]'s speed, it notes the speed the player plays
+     * at, unless the hold began before the last one's speed went back on the same player, whose noted
+     * speed stays. When the hold's lift then sets that player to another speed, the noted one goes on
+     * instead: the speed-up takes a reel already at the hold speed for one at normal speed, and the
+     * listener puts back the speed it had when the reel was drawn, so a kept speed or one picked
+     * since would come back as normal speed. Every other speed goes on as Facebook set it, and so
+     * does the lift's where the player's speed couldn't be read.
      */
-    public static void speedSet(float speed) {
+    public static float speedSet(Object player, float speed) {
         try {
             HookStatus.invoked(FAMILY);
-            if (!on("speed set")) return;
+            if (!on("speed set")) return speed;
             if (speedUpNext) {
                 speedUpNext = false;
-                Logger.printDebug(() -> "Reel hold: speed " + speed + "x");
+                WeakReference<Object> last = heldPlayer;
+                if (!again || last == null || last.get() != player) {
+                    heldPlayer = null;
+                    before = speeds.of(player);
+                    heldPlayer = new WeakReference<>(player);
+                }
+                float was = before;
+                Logger.printDebug(() -> "Reel hold: speed " + speed + "x, the reel was at " + was + "x");
             } else if (backNext) {
                 backNext = false;
+                WeakReference<Object> held = heldPlayer;
+                float back = before;
+                if (held != null && held.get() == player && !Float.isNaN(back) && Math.abs(speed - back) >= SAME) {
+                    Logger.printDebug(() -> "Reel hold: back to " + back + "x (the speed before the hold)");
+                    return back;
+                }
                 Logger.printDebug(() -> "Reel hold: back to " + speed + "x");
             }
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "speed set", failure);
         }
+        return speed;
+    }
+
+    /** Filled in by the patch: FbGrootPlayer's speed getter, which the release listener reads. Only a player may be passed. */
+    public static float playerSpeed(Object player) {
+        return Float.NaN;
     }
 
     /** Before Facebook's hold speed goes out. While on, one that isn't faster than normal is 2x. */
@@ -186,12 +240,16 @@ public final class ReelHold {
         }
     }
 
-    /** Forgets the hold and the gesture. For tests. */
+    /** Forgets the hold, the gesture and the speed before the hold, and reads speeds through the patch's getter. For tests. */
     static void forget() {
         holding = false;
         lifted = false;
         restored = false;
         speedUpNext = false;
         backNext = false;
+        again = false;
+        heldPlayer = null;
+        before = Float.NaN;
+        speeds = PATCHED;
     }
 }

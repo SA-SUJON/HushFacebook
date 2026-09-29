@@ -60,6 +60,13 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  *   2x label. Outside the Video tab it answers a fixed 2.0; where an account's Reels live in the
  *   Video tab (the object's surface is FB_SHORTS_IN_WATCH_TAB) it answers MobileConfig double
  *   0x104003303ee0017, whose default no code sets.
+ * - The speed to put back: the speed-up asks a helper (580 LX/B1k;->A00) for it, which answers the
+ *   player's speed through its getter (580 Brl, 577 BtK) but normal speed when that already is the
+ *   hold speed and MobileConfig 0x101055200213585 says so, and keeps it in the component's state, from
+ *   which the listener is drawn with it. So a reel Keep the reel speed started at 2x comes back at
+ *   normal speed, and so does a reel whose listener was drawn before a speed was picked. The release
+ *   listeners each read the getter to compare with it, the one no-argument float method of the
+ *   player they call; the extension reads the player's speed through it when a hold speeds a reel up.
  * - The overlay component's render (580 LX/83D;->A1F, 577 LX/7H5;->A1N) gives a reel its release
  *   listener only when the speed-up flag says yes. The control component gives it one regardless.
  *   Three other places read the speed-up flag (a Watch fragment's setup and an auto-advance guard);
@@ -74,7 +81,8 @@ internal const val SPEED_UP = "$REEL_HOLD->speedUp(Z)Z"
 internal const val RELEASE = "$REEL_HOLD->release(Z)Z"
 internal const val HELD = "$REEL_HOLD->held()V"
 internal const val HOLD_SPEED = "$REEL_HOLD->holdSpeed(D)D"
-internal const val SPEED_SET = "$REEL_HOLD->speedSet(F)V"
+internal const val SPEED_SET = "$REEL_HOLD->speedSet(Ljava/lang/Object;F)F"
+internal const val PLAYER_SPEED_STUB = "playerSpeed"
 
 internal const val SPEED_UP_LOG = "speed_up"
 internal const val CONFIG_FIELD = "\$immersiveFeedPlayerConfig"
@@ -181,6 +189,12 @@ internal fun holdSpeedReads(method: Method, setter: String, configAnswers: Set<S
         val read = (code.getOrNull(index - 3) as? ReferenceInstruction)?.reference as? MethodReference ?: return@mapNotNull null
         read.takeIf { it.returnType == "D" && it.parameterTypes.isEmpty() && it.definingClass in configAnswers }
     }
+}
+
+/** The no-argument float methods of [player] that [method] calls, as references: in a release listener, the speed getter. */
+internal fun speedGettersCalled(method: Method, player: String): List<MethodReference> = method.code.mapNotNull {
+    val call = (it as? ReferenceInstruction)?.reference as? MethodReference ?: return@mapNotNull null
+    call.takeIf { call.definingClass == player && call.returnType == "F" && call.parameterTypes.isEmpty() }
 }
 
 /** Whether the instruction after the call at [index] in [method] takes its boolean answer. */

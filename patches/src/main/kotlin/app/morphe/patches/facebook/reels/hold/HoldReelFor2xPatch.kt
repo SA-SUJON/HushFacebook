@@ -24,6 +24,7 @@ import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
@@ -41,7 +42,9 @@ internal const val PATCH = "Hold a reel for 2x"
  * the extension on its way out, and so does the read of the hold speed. Each handler tells the
  * extension when it takes the speed-up path, every touch on a Facebook screen when a gesture starts
  * and ends, so the release listener puts the speed back only after a hold, and FbGrootPlayer's
- * speed setter each speed it gets, for the debug log.
+ * speed setter each player and speed it gets, going on with the speed the extension answers: a
+ * hold's lift gets the speed the reel played at before the hold, which the extension reads through
+ * the player's speed getter, filled into its stub.
  *
  * Off in the default selection: while its switch is on, a hold on a reel speeds it up instead of
  * opening Facebook's long-press menu, which is a choice to make. Picked, its switch starts on.
@@ -82,6 +85,7 @@ internal class ReelHoldAnchors(
     val speedUpPaths: List<Method>,
     val holdSpeed: Method,
     val setter: Method,
+    val speedGetter: Method,
 )
 
 /** The long-press handlers and their speed-up paths, the release listeners, the overlay's check, the edge check and the touch dispatch. */
@@ -155,11 +159,24 @@ internal fun BytecodePatchContext.findReelHoldAnchors(): ReelHoldAnchors {
         ?: refuse("the hold speed $speedRead has no body in this build")
     if (holdSpeed.implementation!!.instructions.none { it.opcode == Opcode.RETURN_WIDE }) refuse("the hold speed never returns")
 
+    // The player's speed getter, which the release listeners compare with the speed to put back.
+    val getterCalls = listeners.flatMap { listener -> listener.methods.flatMap { speedGettersCalled(it, player.type) } }
+        .distinctBy { it.toString() }
+    val getterCall = getterCalls.singleOrNull()
+        ?: refuse("expected the release listeners to read ${player.type}'s speed with one method, found ${getterCalls.map { it.toString() }}")
+    val speedGetter = player.methods.singleOrNull { isMethod(it, getterCall) } ?: refuse("the speed getter $getterCall has no body in this build")
+    // The extension's stub calls it from outside Facebook's package.
+    if (!AccessFlags.PUBLIC.isSet(player.accessFlags) || !AccessFlags.PUBLIC.isSet(speedGetter.accessFlags) ||
+        AccessFlags.STATIC.isSet(speedGetter.accessFlags)
+    ) {
+        refuse("the speed getter $getterCall isn't a public instance method of a public class, so the extension can't call it")
+    }
+
     val activity = classDefByOrNull(FRAGMENT_ACTIVITY) ?: refuse("this build has no $FRAGMENT_ACTIVITY")
     val dispatch = touchDispatches(activity).singleOrNull()
         ?: refuse("expected $FRAGMENT_ACTIVITY to declare one dispatchTouchEvent($MOTION_EVENT)Z")
     return ReelHoldAnchors(config, speedUpFlag, releaseFlag, handlerPlans + listenerPlans + builderPlans, edgeCheck, dispatch,
-        speedUpPaths, holdSpeed, setter)
+        speedUpPaths, holdSpeed, setter, speedGetter)
 }
 
 /**
@@ -167,10 +184,17 @@ internal fun BytecodePatchContext.findReelHoldAnchors(): ReelHoldAnchors {
  * which the range form names whatever its number; the branch that follows reads it as Facebook's.
  * Before each of the edge check's returns, the same, and before each of the hold speed's, for its
  * register pair. Straight after each handler's "speed_up" load, which falls through to it, a call
- * naming no register. First in the touch dispatch, the event, and first in the speed setter, the
- * speed, both of which the extension only reads.
+ * naming no register. First in the touch dispatch, the event, which the extension only reads, and
+ * first in the speed setter, the player and the speed, with the extension's answer in the speed's
+ * parameter register. The extension's playerSpeed stub is filled with the player's speed getter.
  */
 internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors) {
+    // Found before anything changes, like every anchor.
+    val player = anchors.speedGetter.definingClass
+    val stub = mutableClassDefBy(REEL_HOLD).methods.singleOrNull {
+        it.name == PLAYER_SPEED_STUB && it.returnType == "F" && AccessFlags.STATIC.isSet(it.accessFlags) &&
+            it.parameterTypes.map(CharSequence::toString) == listOf("Ljava/lang/Object;")
+    } ?: refuse("$REEL_HOLD has no static F $PLAYER_SPEED_STUB(Ljava/lang/Object;)")
     for (plan in anchors.plans) {
         val mutable = mutableClassDefBy(plan.method.definingClass).findMutableMethodOf(plan.method)
         plan.calls.sortedDescending().forEach { call ->
@@ -212,8 +236,22 @@ internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors)
                 """,
             )
         }
-    mutableClassDefBy(anchors.setter.definingClass).findMutableMethodOf(anchors.setter)
-        .addInstruction(0, "invoke-static/range { p1 .. p1 }, $SPEED_SET")
+    mutableClassDefBy(anchors.setter.definingClass).findMutableMethodOf(anchors.setter).addInstructions(
+        0,
+        """
+            invoke-static/range { p0 .. p1 }, $SPEED_SET
+            move-result p1
+        """,
+    )
+    stub.addInstructions(
+        0,
+        """
+            check-cast p0, $player
+            invoke-virtual/range { p0 .. p0 }, $player->${anchors.speedGetter.name}()F
+            move-result p0
+            return p0
+        """,
+    )
     val dispatch = mutableClassDefBy(FRAGMENT_ACTIVITY).findMutableMethodOf(anchors.dispatch)
     val event = dispatch.parameterRegister(0)
     dispatch.addInstruction(0, "invoke-static/range { $event .. $event }, $TOUCH")

@@ -68,6 +68,21 @@ public class ReelHoldTest {
         ReelHold.held();
     }
 
+    /** Stands in for FbGrootPlayer: the speed it plays at, which only its setter changes, with the hook first in it. */
+    private static final class Reel {
+        float speed = 1f;
+
+        void set(float facebooks) {
+            speed = ReelHold.speedSet(this, facebooks);
+        }
+    }
+
+    /** A hold on [reel] and its lift, where the release listener puts back [facebooks]. */
+    private static void holdAndLift(Reel reel, float facebooks) {
+        ReelHoldForTests.holdAndLift(reel, player -> ((Reel) player).speed, (player, speed) -> ((Reel) player).set(speed),
+                facebooks);
+    }
+
     /** A tap on a reel: the release listener hears the finger land and lift. True when either answer was yes. */
     private static boolean tapReleases() {
         finger(MotionEvent.ACTION_DOWN);
@@ -156,6 +171,113 @@ public class ReelHoldTest {
         assertEquals(FamilyNames.HOLD_REEL_FOR_2X + ": invoked 4, 2 found, 0 missing", statusLine());
     }
 
+    /**
+     * Facebook's lift puts back the speed its listener noted, and on a reel Keep the reel speed
+     * started at a kept 2x that's normal speed: the speed-up takes a reel already at the hold speed
+     * for one at normal speed, and a listener drawn before the kept speed went on noted normal speed
+     * too. The reel goes back to the kept speed, and a tap after the hold leaves it there.
+     */
+    @Test
+    public void aReelAtAKeptSpeedGoesBackToItAfterAHold() {
+        Reel reel = new Reel();
+        reel.set(2f);
+        holdAndLift(reel, 1f);
+        assertEquals("the lift put back Facebook's speed, not the kept one", 2f, reel.speed, 0f);
+        assertFalse("a tap after the hold put a speed back", tapReleases());
+        holdAndLift(reel, 1f);
+        assertEquals("a second hold didn't go back to the kept speed", 2f, reel.speed, 0f);
+    }
+
+    @Test
+    public void aReelAtNormalSpeedGoesBackToNormal() {
+        Reel reel = new Reel();
+        holdAndLift(reel, 1f);
+        assertEquals(1f, reel.speed, 0f);
+    }
+
+    /** A speed picked in the menu comes back after a hold, whether the listener noted it or was drawn before the pick. */
+    @Test
+    public void aSpeedPickedInTheMenuComesBackAfterAHold() {
+        Reel reel = new Reel();
+        reel.set(2.5f);
+        holdAndLift(reel, 1f);
+        assertEquals(2.5f, reel.speed, 0f);
+        holdAndLift(reel, 2.5f);
+        assertEquals(2.5f, reel.speed, 0f);
+    }
+
+    /**
+     * A hold that starts before the last one's speed went back, after a lift no listener heard, finds
+     * the reel at the first hold's 2x. Its lift goes back to the speed from before the first hold.
+     */
+    @Test
+    public void aHoldBeforeTheLastOnesSpeedWentBackEndsAtTheSpeedBeforeBoth() {
+        Reel reel = new Reel();
+        reel.set(1.5f);
+        ReelHold.speeds = player -> ((Reel) player).speed;
+        finger(MotionEvent.ACTION_DOWN);
+        hold();
+        reel.set(2f);
+        finger(MotionEvent.ACTION_UP);
+        holdAndLift(reel, 1f);
+        assertEquals(1.5f, reel.speed, 0f);
+    }
+
+    /** Only the reel held gets its speed back: a speed another player gets at the lift goes on as Facebook set it. */
+    @Test
+    public void anotherPlayerKeepsTheSpeedFacebookSets() {
+        Reel held = new Reel();
+        held.set(2f);
+        Reel other = new Reel();
+        ReelHold.speeds = player -> ((Reel) player).speed;
+        finger(MotionEvent.ACTION_DOWN);
+        hold();
+        held.set(2f);
+        finger(MotionEvent.ACTION_UP);
+        assertTrue(ReelHold.release(false));
+        other.set(1f);
+        assertEquals(1f, other.speed, 0f);
+    }
+
+    /** Where the player's speed can't be read, as before the patch fills the getter in, the lift's speed goes on. */
+    @Test
+    public void anUnreadSpeedLeavesFacebooksSpeed() {
+        Reel reel = new Reel();
+        reel.set(2f);
+        ReelHoldForTests.holdAndLift(reel, player -> Float.NaN, (player, speed) -> reel.set(speed), 1f);
+        assertEquals(1f, reel.speed, 0f);
+    }
+
+    @Test
+    public void aFailingSpeedReadIsReportedAndFacebooksSpeedGoesOn() {
+        Reel reel = new Reel();
+        reel.set(2f);
+        ReelHoldForTests.holdAndLift(reel, player -> {
+            throw new IllegalStateException("the getter failed");
+        }, (player, speed) -> reel.set(speed), 1f);
+        assertEquals(1f, reel.speed, 0f);
+        assertTrue(HookStatus.missing(FamilyNames.HOLD_REEL_FOR_2X).get(0)
+                .startsWith("a working 'speed set' hook (it threw "));
+    }
+
+    @Test
+    public void offOrPausedTheSetterGetsFacebooksSpeed() {
+        Reel reel = new Reel();
+        reel.set(2f);
+        ReelHold.speeds = player -> ((Reel) player).speed;
+        finger(MotionEvent.ACTION_DOWN);
+        hold();
+        reel.set(2f);
+        finger(MotionEvent.ACTION_UP);
+        assertTrue(ReelHold.release(false));
+        Settings.HOLD_REEL_FOR_2X.save(false);
+        reel.set(1f);
+        assertEquals("off, the lift's speed changed", 1f, reel.speed, 0f);
+        Settings.HOLD_REEL_FOR_2X.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertEquals("paused, a speed set changed", 1.5f, ReelHold.speedSet(reel, 1.5f), 0f);
+    }
+
     /** A pinch's second finger is part of the same gesture, so a hold stays a hold. */
     @Test
     public void aSecondFingerKeepsTheHold() {
@@ -222,25 +344,24 @@ public class ReelHoldTest {
 
     /**
      * With Debug logging on, the speed Facebook's speed setter gets when a hold speeds a reel up and
-     * when its lift puts the speed back has a line each, for a phone check where the reel is muted.
-     * Other speeds set don't.
+     * when its lift puts the speed back has a line each, for a phone check where the reel is muted,
+     * and so does a lift whose speed the hook changed. Other speeds set don't.
      */
     @Test
     public void debugLoggingSaysWhatSpeedAHoldSetAndWhatItWentBackTo() {
         BaseSettings.DEBUG.save(true);
+        Reel reel = new Reel();
+        reel.set(1.5f);
         LogBufferManager.clearLogBuffer();
+        holdAndLift(reel, 1f);
+        holdAndLift(reel, 1.5f);
         finger(MotionEvent.ACTION_DOWN);
-        hold();
-        ReelHold.speedSet(2.0f);
-        finger(MotionEvent.ACTION_UP);
-        ReelHold.release(false);
-        ReelHold.release(false);
-        ReelHold.speedSet(1.5f);
-        finger(MotionEvent.ACTION_DOWN);
-        ReelHold.speedSet(1.25f);
+        reel.set(1.25f);
         String report = LogBufferManager.buildExportText();
-        assertTrue(report, report.contains("Reel hold: speed 2.0x"));
-        assertTrue(report, report.contains("Reel hold: back to 1.5x"));
+        assertTrue(report, report.contains("Reel hold: speed 2.0x, the reel was at 1.5x"));
+        // The first lift's speed was changed, the second's already was the speed before the hold.
+        assertEquals(report, 1, report.split("Reel hold: back to 1.5x \\(the speed before the hold\\)", -1).length - 1);
+        assertEquals(report, 2, report.split("Reel hold: back to 1.5x", -1).length - 1);
         assertTrue(report, !report.contains("1.25"));
     }
 

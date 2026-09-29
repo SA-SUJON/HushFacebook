@@ -22,6 +22,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import app.morphe.extension.facebook.reels.ReelHold;
+import app.morphe.extension.facebook.reels.ReelHoldForTests;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -70,6 +72,8 @@ public class ReelSpeedTest {
         final Map<Object, Video> kinds = new IdentityHashMap<>();
         final Map<Object, Object> params = new IdentityHashMap<>();
         final List<String> set = new ArrayList<>();
+        /** The speed each player plays at, normal until one is set. */
+        final Map<Object, Float> speeds = new IdentityHashMap<>();
         RuntimeException failure;
 
         /** A player from [origin] whose videos are reels that are neither ads nor live. */
@@ -95,6 +99,12 @@ public class ReelSpeedTest {
             set.add(origins.get(player) + " " + speed);
             // Facebook's setter is hooked too, so the extension hears its own change.
             ReelSpeed.speedSet(player, speed);
+            speeds.put(player, speed);
+        }
+
+        double speed(Object player) {
+            Float speed = speeds.get(player);
+            return speed == null ? ReelSpeed.NORMAL : speed;
         }
 
         @Override
@@ -149,6 +159,7 @@ public class ReelSpeedTest {
         PauseForTests.resume();
         Settings.KEEP_REEL_SPEED.resetToDefault();
         ReelSpeed.forget();
+        ReelHoldForTests.forget();
         HookStatus.clear();
     }
 
@@ -247,6 +258,30 @@ public class ReelSpeedTest {
         resume(next);
         resume(next);
         assertEquals(List.of(REELS + " 0.5"), players.set);
+    }
+
+    /**
+     * With Hold a reel for 2x in too, a hold on a reel at the kept speed ends at that speed, and
+     * neither its speed-up nor its lift is a pick. Both go through the player's setter, where Keep the
+     * reel speed's hook runs first, as Morphe puts the two in: it hears the normal speed Facebook's
+     * lift sets, and Hold a reel for 2x's hook then puts the kept speed back in its place.
+     */
+    @Test
+    public void aHoldOnAReelAtTheKeptSpeedEndsThereAndPicksNothing() {
+        Object reel = players.player(VIDEO_TAB);
+        play(reel);
+        pick(reel, 2f);
+        Object next = players.player(VIDEO_TAB);
+        play(next);
+        ReelHoldForTests.holdAndLift(next, players::speed, (player, speed) -> {
+            ReelSpeed.speedSet(player, speed);
+            players.speeds.put(player, ReelHold.speedSet(player, speed));
+        }, 1f);
+        assertEquals("the held reel didn't go back to the kept speed", 2.0, players.speed(next), 0.0);
+        SystemClock.sleep(150);
+        assertEquals(2f, ReelSpeed.kept(VIDEO_TAB), 0f);
+        play(players.player(VIDEO_TAB));
+        assertEquals(List.of(VIDEO_TAB + " 2.0", VIDEO_TAB + " 2.0"), players.set);
     }
 
     /**
