@@ -42,11 +42,12 @@ public final class ReturnRefresh {
     private static final String KEPT_ON_WARM_START = "kept the feed at warm start";
     private static final String KEPT_ON_AUTO_SCROLL = "kept the feed from the foreground auto-scroll";
     private static final String KEPT_WHILE_AWAY = "kept the feed loaded while away";
-    /** Counted for the negative answer of every decision here, kept under one label. */
-    private static final String LET_FACEBOOK_REFRESH = "let Facebook refresh";
+    /** Prefix for a refusal's count label; one label per fixed reason from refreshBecause()/offBecause(). */
+    private static final String LET_FACEBOOK_REFRESH = "let Facebook refresh: ";
     private static long hiddenAt = -1;
     private static long decidedAt = -1;
-    private static boolean holding;
+    /** Why the first check of the current return let Facebook refresh, or null while it's holding. */
+    private static String decidedBecause;
     private static boolean registered;
 
     private ReturnRefresh() { }
@@ -71,7 +72,7 @@ public final class ReturnRefresh {
         synchronized (ReturnRefresh.class) {
             hiddenAt = now;
             decidedAt = -1;
-            holding = false;
+            decidedBecause = null;
         }
         Logger.printDebug(() -> "Return refresh: Facebook's screens were hidden");
     }
@@ -116,7 +117,7 @@ public final class ReturnRefresh {
             String off = offBecause();
             Logger.printDebug(() -> "Return refresh: feed teardown while away"
                     + (off == null ? ": skipped, keeping the feed" : ": Facebook tears the feed down, " + off));
-            HookStatus.counted(FamilyNames.RETURN_REFRESH, off == null ? KEPT_WHILE_AWAY : LET_FACEBOOK_REFRESH);
+            HookStatus.counted(FamilyNames.RETURN_REFRESH, off == null ? KEPT_WHILE_AWAY : LET_FACEBOOK_REFRESH + off);
             return off == null;
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.RETURN_REFRESH, "feed teardown", failure);
@@ -139,9 +140,12 @@ public final class ReturnRefresh {
     private static boolean ask(String check, String kept) {
         try {
             HookStatus.invoked(FamilyNames.RETURN_REFRESH);
-            boolean hold = askAt(SystemClock.elapsedRealtime(), check);
-            HookStatus.counted(FamilyNames.RETURN_REFRESH, hold ? kept : LET_FACEBOOK_REFRESH);
-            return hold;
+            Decision decision = decide(SystemClock.elapsedRealtime(), check);
+            if (decision.countable) {
+                HookStatus.counted(FamilyNames.RETURN_REFRESH,
+                        decision.hold ? kept : LET_FACEBOOK_REFRESH + decision.reason);
+            }
+            return decision.hold;
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.RETURN_REFRESH, check, failure);
             return false;
@@ -149,33 +153,62 @@ public final class ReturnRefresh {
     }
 
     static boolean skipAt(long now) {
-        return askAt(now, FEED_RESUME);
+        return decide(now, FEED_RESUME).hold;
     }
 
     static boolean askAt(long now, String check) {
+        return decide(now, check).hold;
+    }
+
+    /**
+     * Decides one check. A check outside any tracked return (a resume or tab switch with nothing
+     * hidden, or past {@link #SAME_RETURN_MS} of the last one) isn't a decision at all: it's
+     * {@link Decision#countable countable} false so callers don't count it either way, the bug
+     * behind #22's "let Facebook refresh 15" from a switch that never once refused a real return.
+     */
+    private static Decision decide(long now, String check) {
         final long away;
-        final String refreshBecause;
+        final String reason;
+        final boolean countable;
         synchronized (ReturnRefresh.class) {
             long at = hiddenAt;
             if (at >= 0) {
                 hiddenAt = -1;
                 decidedAt = now;
                 away = now - at;
-                refreshBecause = refreshBecause(now, at);
-                holding = refreshBecause == null;
+                reason = refreshBecause(now, at);
+                decidedBecause = reason;
+                countable = true;
             } else if (decidedAt >= 0 && now >= decidedAt && now - decidedAt <= SAME_RETURN_MS) {
                 away = -1;
-                refreshBecause = holding ? null : "as the first check of this return decided";
+                reason = decidedBecause;
+                countable = true;
             } else {
                 decidedAt = -1;
                 away = -2;
-                refreshBecause = "no return from the background";
+                reason = "no return from the background";
+                countable = false;
             }
         }
+        boolean hold = countable && reason == null;
+        String logReason = away == -1 && reason != null ? "as the first check of this return decided" : reason;
         Logger.printDebug(() -> "Return refresh: " + check
                 + (away >= 0 ? " after " + away / 1000 + " s away" : away == -1 ? " in the same return" : "")
-                + (refreshBecause == null ? ": keeping the feed" : ": Facebook goes ahead, " + refreshBecause));
-        return refreshBecause == null;
+                + (hold ? ": keeping the feed" : ": Facebook goes ahead, " + logReason));
+        return new Decision(hold, countable, reason);
+    }
+
+    /** The outcome of one {@link #decide} call: whether to hold, and whether it belongs to a count. */
+    private static final class Decision {
+        final boolean hold;
+        final boolean countable;
+        final String reason;
+
+        Decision(boolean hold, boolean countable, String reason) {
+            this.hold = hold;
+            this.countable = countable;
+            this.reason = reason;
+        }
     }
 
     /** Why a return from {@code at} to {@code now} lets Facebook refresh, or null when it keeps the feed. */

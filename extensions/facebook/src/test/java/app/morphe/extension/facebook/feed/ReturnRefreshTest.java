@@ -219,9 +219,9 @@ public class ReturnRefreshTest {
     }
 
     /**
-     * A check that lets Facebook refresh counts too, under one shared label, so a report from
-     * someone whose feed keeps resetting isn't just "invoked N, 0 found, 0 missing" with nothing
-     * else to read.
+     * A check that lets Facebook refresh counts too, under its reason's own label, so a report
+     * from someone whose feed keeps resetting isn't just "invoked N, 0 found, 0 missing" with
+     * nothing else to read.
      */
     @Test public void everyDecisionCountsBothWaysInTheReport() {
         HookStatus.clear();
@@ -245,8 +245,79 @@ public class ReturnRefreshTest {
             assertFalse(ReturnRefresh.holdAutoScroll());
             String refused = String.join("\n", HookStatus.report());
             assertTrue(refused, refused.contains(FamilyNames.RETURN_REFRESH + ": invoked 4"));
-            assertTrue(refused, refused.contains("let Facebook refresh 4"));
+            assertTrue(refused, refused.contains("let Facebook refresh: switch off 4"));
         } finally {
+            Settings.BLOCK_RETURN_REFRESH.resetToDefault();
+            HookStatus.clear();
+        }
+    }
+
+    /**
+     * #22-style: with the switch on and no background return, a feed resume or tab switch runs
+     * the same "not a return" branch every time. It used to land in the shared refusal label, so
+     * five rounds of skip/holdWarmStart/holdAutoScroll gave "invoked 15 ... let Facebook refresh
+     * 15" for a working install that never refused anything. That branch isn't a decision, so it
+     * counts nothing beyond the invoke.
+     */
+    @Test public void aResumeWithNoBackgroundReturnCountsNothingButInvoked() {
+        HookStatus.clear();
+        try {
+            for (int i = 0; i < 5; i++) {
+                assertFalse(ReturnRefresh.skip());
+                assertFalse(ReturnRefresh.holdWarmStart());
+                assertFalse(ReturnRefresh.holdAutoScroll());
+            }
+            String report = String.join("\n", HookStatus.report());
+            assertTrue(report, report.contains(FamilyNames.RETURN_REFRESH + ": invoked 15"));
+            assertFalse(report, report.contains("let Facebook refresh"));
+            assertFalse(report, report.contains("kept the feed"));
+        } finally {
+            HookStatus.clear();
+        }
+    }
+
+    /**
+     * #23-style reports need to say why a return refreshed, not just that it did. Each fixed
+     * reason from refreshBecause()/offBecause() counts under its own label, so a real refusal
+     * during the same return keeps reporting the reason that return was decided on.
+     */
+    @Test public void eachRefusalReasonCountsUnderItsOwnLabel() {
+        HookStatus.clear();
+        try {
+            // A hidden time ahead of the real clock: "the clock went back".
+            ReturnRefresh.uiHidden(Long.MAX_VALUE / 2);
+            assertFalse(ReturnRefresh.skip());
+
+            // The switch off, right away: "switch off".
+            Settings.BLOCK_RETURN_REFRESH.save(false);
+            ReturnRefresh.uiHidden();
+            assertFalse(ReturnRefresh.skip());
+
+            // Paused instead of switched off: "Hushfacebook paused".
+            Settings.BLOCK_RETURN_REFRESH.save(true);
+            PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+            ReturnRefresh.uiHidden();
+            assertFalse(ReturnRefresh.skip());
+
+            // Away past the ten-minute limit: "away over ten minutes", and a later check of the
+            // same return keeps that same reason rather than the first check's alone.
+            PauseForTests.resume();
+            ReturnRefresh.uiHidden();
+            SystemClock.sleep(11 * 60 * 1000L);
+            assertFalse(ReturnRefresh.skip());
+            assertFalse("a later check of the same return keeps the same reason", ReturnRefresh.holdWarmStart());
+
+            String report = String.join("\n", HookStatus.report());
+            assertTrue(report, report.contains(FamilyNames.RETURN_REFRESH + ": invoked 5"));
+            for (String label : new String[]{
+                    "let Facebook refresh: the clock went back 1",
+                    "let Facebook refresh: switch off 1",
+                    "let Facebook refresh: Hushfacebook paused 1",
+                    "let Facebook refresh: away over ten minutes 2"}) {
+                assertTrue(report + "\nmissing: " + label, report.contains(label));
+            }
+        } finally {
+            PauseForTests.resume();
             Settings.BLOCK_RETURN_REFRESH.resetToDefault();
             HookStatus.clear();
         }
