@@ -174,10 +174,15 @@ public final class ReelHold {
                 float was = before;
                 Logger.printDebug(() -> "Reel hold: speed " + speed + "x, the reel was at " + was + "x");
             } else if (backNext) {
-                backNext = false;
                 WeakReference<Object> held = heldPlayer;
+                Object heldNow = held == null ? null : held.get();
+                // Only the held reel's own lift ends the wait. Another player's speed set meanwhile,
+                // a next reel Facebook readies say, goes on as Facebook set it; the next finger down
+                // ends the wait anyway (touch).
+                if (heldNow != null && heldNow != player) return speed;
+                backNext = false;
                 float back = before;
-                if (held != null && held.get() == player && !Float.isNaN(back) && Math.abs(speed - back) >= SAME) {
+                if (heldNow != null && !Float.isNaN(back) && Math.abs(speed - back) >= SAME) {
                     Logger.printDebug(() -> "Reel hold: back to " + back + "x (the speed before the hold)");
                     return back;
                 }

@@ -237,6 +237,10 @@ public class ReelHoldTest {
         assertTrue(ReelHold.release(false));
         other.set(1f);
         assertEquals(1f, other.speed, 0f);
+        // Another player's speed set before the held reel's lift, a next reel Facebook readies say,
+        // leaves the held reel's own lift to put its speed back.
+        held.set(1f);
+        assertEquals("the held reel's lift after another player's set lost the speed from before", 2f, held.speed, 0f);
     }
 
     /** Where the player's speed can't be read, as before the patch fills the getter in, the lift's speed goes on. */
