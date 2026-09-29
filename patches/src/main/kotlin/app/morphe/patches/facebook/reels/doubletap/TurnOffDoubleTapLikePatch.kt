@@ -16,6 +16,7 @@ import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.extension.parameterRegister
+import app.morphe.patches.facebook.misc.extension.requireStatusMethod
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.findMutableMethodOf
@@ -51,10 +52,13 @@ val turnOffDoubleTapLikePatch = bytecodePatch(
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {
-        // Every anchor of both hooks is found, and every reader that would refuse the gesture-view
-        // hook is checked, before either hook changes a single instruction. A build that fails
-        // anywhere in the find phase is refused with nothing patched: the like hooks, the gesture
-        // view or a reader partway through can't stay in the APK while a later anchor is missing.
+        // Every anchor of both hooks is found, every reader that would refuse the gesture-view hook
+        // is checked, and SettingsStatus is confirmed to carry the switch's own method, before either
+        // hook changes a single instruction. A build that fails anywhere in the find phase is refused
+        // with nothing patched: the like hooks, the gesture view or a reader partway through can't
+        // stay in the APK while a later anchor is missing. Without this, enableStatus's own check
+        // would run last and could refuse after both hooks were already in.
+        requireStatusMethod("doubleTapLike")
         val reelLikeAnchors = findReelLikeAnchors()
         val gestureViewAnchors = findGestureViewAnchors()
         // The two hooks read different classes in every build seen so far; if a reader the gesture

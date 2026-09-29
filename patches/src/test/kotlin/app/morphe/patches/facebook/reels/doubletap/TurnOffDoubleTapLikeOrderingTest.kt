@@ -300,4 +300,35 @@ class TurnOffDoubleTapLikeOrderingTest {
                 instructionCount(context, owner, name))
         }
     }
+
+    /** SettingsStatus with none of its usual switches, so it has no boolean doubleTapLike(). */
+    private fun settingsStatusMissingDoubleTapLike() = classDef(
+        SETTINGS_STATUS,
+        method(SETTINGS_STATUS, "someOtherSwitch", emptyList(), "Z", "const/4 v0, 0x0\nreturn v0", static = true),
+    )
+
+    /**
+     * SettingsStatus carries no doubleTapLike() method, everything else about the build is sound.
+     * enableStatus itself would refuse on this, but only after both hooks already changed their
+     * anchors; the whole hook must refuse before either one runs, the same as a bad anchor does.
+     */
+    @Test
+    fun `SettingsStatus missing the switch refuses before either hook changes anything`() {
+        val context = PatchContexts.of(
+            listOf(helperClass(), attachment(), componentClass(), gestureView(), listenerClass(),
+                eventSubscriberClass(checked = true), settingsStatusMissingDoubleTapLike()),
+        )
+        val before = listOf(helper to "like", helper to "doubleTapLike", attachmentClass to "onDoubleTap",
+            view to "heart", listener to "onDoubleTap", eventSubscriber to "onEvent")
+            .associateWith { (owner, name) -> instructionCount(context, owner, name) }
+
+        val message = assertThrows(PatchException::class.java) { turnOffDoubleTapLikePatch.execute(context) }.message!!
+        assertTrue(message, message.contains("SettingsStatus has no boolean method doubleTapLike()"))
+
+        before.forEach { (ownerAndName, originalCount) ->
+            val (owner, name) = ownerAndName
+            assertEquals("$owner->$name changed even though SettingsStatus was missing the switch", originalCount,
+                instructionCount(context, owner, name))
+        }
+    }
 }
