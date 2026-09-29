@@ -26,7 +26,8 @@ import java.util.Map;
 @Config(sdk = 30)
 public class AmoledThemeTest {
     /** Stands in for Facebook's colour token enums: only the constant names matter. */
-    enum Token { CARD_BACKGROUND, COMMENT_BACKGROUND, POPOVER_BACKGROUND, WASH, DIVIDER, PRIMARY_TEXT }
+    enum Token { CARD_BACKGROUND, COMMENT_BACKGROUND, POPOVER_BACKGROUND, WASH, DIVIDER, PRIMARY_TEXT,
+        PRIMARY_UI, BACKGROUND_PRIMARY_UI }
 
     private static final int BLACK = 0xFF000000;
 
@@ -60,6 +61,19 @@ public class AmoledThemeTest {
         assertEquals("the older palette's card", 0xFF191A1B, AmoledTheme.apply(0xFF3A3B3C, Token.CARD_BACKGROUND));
         assertEquals("just above the black band, still not black", 0xFF0A0A0A,
                 AmoledTheme.apply(0xFF2B2B2B, Token.CARD_BACKGROUND));
+    }
+
+    /**
+     * PRIMARY_UI is Mig's fill for an input or a pill, such as a search field, not a card: it shows
+     * only through this fill, so a card's near black would leave it at about 1.1:1 against the black
+     * page. It goes down less than a card, to about #262627, near 1.5:1. BACKGROUND_PRIMARY_UI is
+     * FDS's counterpart. A card stays at the near black #27 already gives it.
+     */
+    @Test
+    public void anInputOrPillFillStaysVisibleOnTheBlackPage() {
+        assertEquals("PRIMARY_UI", 0xFF262627, AmoledTheme.apply(0xFF333334, Token.PRIMARY_UI));
+        assertEquals("BACKGROUND_PRIMARY_UI", 0xFF262627, AmoledTheme.apply(0xFF333334, Token.BACKGROUND_PRIMARY_UI));
+        assertEquals("a card still goes near black", 0xFF121213, AmoledTheme.apply(0xFF333334, Token.CARD_BACKGROUND));
     }
 
     /** The mutation controls for #27: light mode, other tokens, lighter greys, a hue and no token. */

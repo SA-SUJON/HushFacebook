@@ -67,8 +67,32 @@ public final class AmoledTheme {
      * How far each channel of a raised surface goes down. A card's {@code #333334} becomes
      * {@code #121213}, near black but still apart from the black page under it, and a popover keeps
      * its step above the card. The darkest grey in the band ends at {@code #0A0A0A}, not black.
+     *
+     * <p>{@code CARD_BORDER} isn't a background token, so route one leaves it at Facebook's own
+     * {@code #333334} rather than shifting it too. Most cards draw no border stroke at all in dark
+     * mode, which is why the near black rather than pure black matters here in the first place; on
+     * the few that do, the unshifted border now reads as a visible, lighter edge against the card's
+     * own near black, which is the same edge this shift exists to preserve, not a fault to fix.
      */
     private static final int RAISED_SHIFT = 0x21;
+
+    /**
+     * How far each channel of an input or a pill's fill goes down: less than {@link #RAISED_SHIFT}.
+     * {@link #FILL_TOKENS} shows its shape only through this fill, not a border or the text on it,
+     * so shifting it as far as a card would leave it at about 1.1:1 against the black page, close
+     * enough to disappear. This keeps a fill at about {@code #262627} from {@code #333334}, near
+     * 1.5:1, while a card still goes to the near black {@link #RAISED_SHIFT} gives it.
+     */
+    private static final int FILL_SHIFT = 0x0D;
+
+    /**
+     * Names of the tokens for an input or a pill's fill, rather than a card, comment or popover:
+     * Mig's {@code PRIMARY_UI} (a search field, a pill) and its FDS counterpart. Both read
+     * {@code #333334} in dark mode ({@code LX/Dol;->AP6}), the same as a card, but a card is a panel
+     * with its own edge while these show only through the fill itself.
+     */
+    private static final Set<String> FILL_TOKENS = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList("PRIMARY_UI", "BACKGROUND_PRIMARY_UI")));
 
     /**
      * The largest difference between the channels of a background. A grey has almost none. A dark
@@ -152,18 +176,22 @@ public final class AmoledTheme {
      *
      * @param token an enum constant. Only its name is used.
      * @return black for a background up to {@link #MAX_CHANNEL}, the near black of
-     * {@link #RAISED_SHIFT} for one up to {@link #MAX_RAISED_CHANNEL}, in Facebook's dark mode, or
-     * {@code color} unchanged.
+     * {@link #RAISED_SHIFT} for one up to {@link #MAX_RAISED_CHANNEL}, {@link #FILL_SHIFT} for an
+     * input or a pill's fill ({@link #FILL_TOKENS}), in Facebook's dark mode, or {@code color}
+     * unchanged.
      */
     public static int apply(int color, Object token) {
         HookStatus.invoked(FamilyNames.AMOLED_THEME);
         if (!isDarkNeutral(color, MAX_RAISED_CHANNEL)) return color;
         if (!(token instanceof Enum) || !DarkMode.on()) return color;
-        if (!BACKGROUND_TOKENS.contains(((Enum<?>) token).name())) return color;
+        String name = ((Enum<?>) token).name();
+        if (!BACKGROUND_TOKENS.contains(name)) return color;
 
+        if (isDarkNeutral(color, MAX_CHANNEL)) return BLACK;
         // Every channel of a grey above the black band is at least MAX_CHANNEL + 1 - MAX_SPREAD,
-        // above RAISED_SHIFT, so no channel borrows from the next.
-        return isDarkNeutral(color, MAX_CHANNEL) ? BLACK : color - RAISED_SHIFT * 0x010101;
+        // above either shift, so no channel borrows from the next.
+        int shift = FILL_TOKENS.contains(name) ? FILL_SHIFT : RAISED_SHIFT;
+        return color - shift * 0x010101;
     }
 
     /**
