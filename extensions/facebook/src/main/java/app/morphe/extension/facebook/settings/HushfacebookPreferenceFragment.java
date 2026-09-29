@@ -745,7 +745,9 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         hushfacebook.addPreference(mark(toggle(context, BaseSettings.DEBUG, L10n.t("Debug logging"),
                 L10n.t("Record patch activity and show errors for a bug report. Leave off during normal use.")), SettingsIcons.BUG));
         // A test for Debug logging only: a Messenger patched with this build's key, asked now
-        // instead of on Facebook's own schedule. Restore screens fills it in.
+        // instead of on Facebook's own schedule. Restore screens fills it in. The screen is built
+        // once, so the row comes and goes when settings open again after Debug logging changes: a
+        // row this page can only disable would sit greyed out in every build with Restore screens.
         if (build.contains(PatchFamily.RESTORE_TRUST) && BaseSettings.DEBUG.get() && MessengerLinkCheck.available()) {
             Preference link = new Row(context);
             link.setTitle(L10n.t("Test the Messenger link"));

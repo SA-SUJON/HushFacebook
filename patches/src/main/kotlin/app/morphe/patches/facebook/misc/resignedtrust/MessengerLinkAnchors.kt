@@ -134,8 +134,10 @@ internal fun BytecodePatchContext.findMessengerLinkAnchors(): MessengerLinkAncho
 }
 
 /**
- * Fills MessengerLinkCheck's stubs. Each reads only its own parameter, cast to the type the call
- * needs; the reader stub borrows the local its unfilled body already has.
+ * Fills MessengerLinkCheck's stubs. Each uses only its parameter registers, cast to the type the
+ * call needs: a stub whose unfilled body only returns null can compile to the parameter's one
+ * register, so there's no local to borrow. The reader stub builds the reader in its spare
+ * parameter.
  */
 internal fun BytecodePatchContext.fillMessengerLinkStubs(anchors: MessengerLinkAnchors) {
     val extension = mutableClassDefBy(MESSENGER_LINK_CHECK)
@@ -154,13 +156,13 @@ internal fun BytecodePatchContext.fillMessengerLinkStubs(anchors: MessengerLinkA
             return-object p0
         """,
     )
-    stub(READER_STUB, listOf(OBJECT), OBJECT).addInstructions(
+    stub(READER_STUB, listOf(OBJECT, OBJECT), OBJECT).addInstructions(
         0,
         """
             check-cast p0, $FB_USER_SESSION
-            new-instance v0, $reader
-            invoke-direct { v0, p0 }, $reader-><init>($FB_USER_SESSION)V
-            return-object v0
+            new-instance p1, $reader
+            invoke-direct { p1, p0 }, $reader-><init>($FB_USER_SESSION)V
+            return-object p1
         """,
     )
     for ((name, read) in listOf(OPT_OUT_STUB to anchors.optOut, TRIGGERED_STUB to anchors.triggered)) {

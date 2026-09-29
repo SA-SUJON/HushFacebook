@@ -14,7 +14,6 @@ import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
-import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
@@ -60,11 +59,12 @@ val restoreTrustPatch = bytecodePatch(
 
         method.answerOriginalSigners(packageInfo, signers)
 
-        // The Debug logging test of a same-key Messenger's link. A build without its anchors still
-        // gets the fix, and the settings screen then shows no test row.
+        // The Debug logging test of a same-key Messenger's link. A build without its anchors, or
+        // where anything else about the test fails, still gets the fix, and the settings screen then
+        // shows no test row: patched() is filled last, so a fill that stops part way runs nothing.
         try {
             fillMessengerLinkStubs(findMessengerLinkAnchors())
-        } catch (missing: PatchException) {
+        } catch (missing: Exception) {
             patchLog.warning("Restore screens on re-signed builds: ${missing.message}. The Messenger link test is left out.")
         }
 

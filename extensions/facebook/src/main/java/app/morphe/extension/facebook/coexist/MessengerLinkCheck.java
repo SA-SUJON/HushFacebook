@@ -59,7 +59,7 @@ public final class MessengerLinkCheck {
 
         @Override
         public Object reader(Object session) {
-            return flagReader(session);
+            return flagReader(session, null);
         }
 
         @Override
@@ -91,9 +91,13 @@ public final class MessengerLinkCheck {
         return null;
     }
 
-    /** Filled in by the patch: a new flag reader for [session]. Only an FbUserSession may be passed. */
+    /**
+     * Filled in by the patch: a new flag reader for [session]. Only an FbUserSession may be passed.
+     * [spare] is where the fill builds the reader, so pass null: an unfilled body that only returns
+     * null can compile to a single register, the parameter's, which leaves no local to borrow.
+     */
     @Nullable
-    public static Object flagReader(Object session) {
+    public static Object flagReader(Object session, @Nullable Object spare) {
         return null;
     }
 

@@ -9,12 +9,15 @@ import app.morphe.Fixtures
 import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
@@ -82,7 +85,17 @@ class MessengerLinkFixtureTest {
                     session[0].call!!.let { it.definingClass + "->" + it.name })
                 assertEquals("$name: the session stub's answer", Opcode.RETURN_OBJECT, session[2].opcode)
 
-                val built = stub(READER_STUB)
+                val readerStub = stubs.single { it.name == READER_STUB }
+                val built = readerStub.code()
+                // Parameter registers only: the unfilled body can compile to the one register p0 has.
+                val sessionRegister = readerStub.localRegisterCount()
+                val spareRegister = sessionRegister + 1
+                assertEquals("$name: the reader stub's cast register", sessionRegister, (built[0] as OneRegisterInstruction).registerA)
+                assertEquals("$name: the reader stub builds the reader in its spare parameter", spareRegister,
+                    (built[1] as OneRegisterInstruction).registerA)
+                val init = built[2] as FiveRegisterInstruction
+                assertEquals("$name: the constructor's registers", listOf(spareRegister, sessionRegister), listOf(init.registerC, init.registerD))
+                assertEquals("$name: the reader stub's answer register", spareRegister, (built[3] as OneRegisterInstruction).registerA)
                 assertEquals("$name: the reader stub's cast", FB_USER_SESSION, ((built[0] as ReferenceInstruction).reference as TypeReference).type)
                 assertEquals("$name: the reader stub's new object", reader.type, ((built[1] as ReferenceInstruction).reference as TypeReference).type)
                 assertEquals("$name: the reader stub's constructor", "${reader.type}-><init>",
