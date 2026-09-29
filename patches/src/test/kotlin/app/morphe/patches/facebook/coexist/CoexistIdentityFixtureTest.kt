@@ -4,8 +4,13 @@
  */
 package app.morphe.patches.facebook.coexist
 
+import app.morphe.ExtensionDex
 import app.morphe.Fixtures
+import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
+import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
+import app.morphe.patches.facebook.misc.resignedtrust.PackageSignersFingerprint
+import app.morphe.patches.facebook.misc.resignedtrust.restoreTrustPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
@@ -16,9 +21,10 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import java.io.File
+import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 /**
@@ -28,8 +34,10 @@ import org.junit.Test
  * signer lists and the old array too (the shape Restore screens' fingerprint pins), that the caller's
  * identity for a guarded component is built from that reader's result, so answering it Meta's
  * certificate makes Facebook judge a same-key family caller as the Meta-signed app, and that the
- * trusted-caller evaluator is left alone: the coexistence patch no longer hooks it and nothing in it
- * calls the extension.
+ * caller checks themselves are left alone. For that last part Restore screens and Install beside Meta's
+ * apps run, as the patcher runs them, on the build's own reader, the two trusted-caller delegates and
+ * their shared evaluator: the reader then asks the extension first, and nothing in the delegates or
+ * the evaluator calls the extension.
  */
 class CoexistIdentityFixtureTest {
     private companion object {
@@ -38,13 +46,22 @@ class CoexistIdentityFixtureTest {
         const val SIGNING_INFO = "Landroid/content/pm/SigningInfo;"
         const val PACKAGE_INFO = "Landroid/content/pm/PackageInfo;"
         const val CONTEXT = "Landroid/content/Context;"
-        const val ORIGINAL_SIGNERS = "Lapp/morphe/extension/facebook/misc/FacebookSignature;->originalSigners"
+        const val SAME_KEY_DELEGATE = "Lcom/facebook/secure/content/delegate/SameKeyContentProviderDelegate;"
+        const val FACEBOOK_SIGNATURE = "Lapp/morphe/extension/facebook/misc/FacebookSignature;"
     }
+
+    @Before
+    @After
+    fun forgetTheLastMatch() = PackageSignersFingerprint.clearMatch()
 
     private val Instruction.call: MethodReference?
         get() = (this as? ReferenceInstruction)?.reference as? MethodReference
 
     private fun Method.body(): List<Instruction> = implementation?.instructions?.toList().orEmpty()
+
+    /** Parameters compared as text: dexlib2's lists of two kinds don't equal each other. */
+    private fun Method.sameSignatureAs(other: Method) = name == other.name && returnType == other.returnType &&
+        parameterTypes.map { it.toString() } == other.parameterTypes.map { it.toString() }
 
     /** The `(class, name)` of every method this one calls. */
     private fun Method.calls(): List<Pair<String, String>> = body().mapNotNull { it.call }.map { it.definingClass to it.name }
@@ -112,12 +129,33 @@ class CoexistIdentityFixtureTest {
                     builders.isNotEmpty(),
                 )
 
-                // The trusted-caller evaluator is left alone: nothing in it calls the extension.
+                // The patched app: Restore screens, then Install beside Meta's apps, which depends on it,
+                // run on this build's reader, its result class, both delegates and their evaluator.
                 val evaluator = evaluatorOf(bundle, delegate)
-                assertFalse(
-                    "$name: the trusted-caller evaluator must not call the extension",
-                    evaluator.calls().any { (owner, methodName) -> "$owner->$methodName".startsWith(ORIGINAL_SIGNERS) },
-                )
+                val types = setOf(reader.definingClass, reader.returnType, TRUSTED_CALLER_DELEGATE, SAME_KEY_DELEGATE,
+                    evaluator.definingClass)
+                val fixture = FixtureDex.classes(bundle, types)
+                assertEquals("$name: classes the patches run on", types, fixture.keys)
+                val context = PatchContexts.of(fixture.values.map(ImmutableClassDef::of) + ExtensionDex.classDef(SETTINGS_STATUS))
+                PackageSignersFingerprint.clearMatch()
+                restoreTrustPatch.execute(context)
+                installBesideMetaAppsPatch.execute(context)
+
+                // The patches ran: the reader asks the extension before Facebook's own code.
+                val patchedReader = context.mutableClassDefBy(reader.definingClass).methods.single { it.sameSignatureAs(reader) }
+                assertTrue("$name: Restore screens hooked the signers reader",
+                    FACEBOOK_SIGNATURE to "originalSigners" in patchedReader.calls())
+
+                // Facebook's caller checks are its own: nothing in the delegates or the evaluator calls
+                // the extension, so every rule judges the identity the reader gave it.
+                val checks = context.mutableClassDefBy(TRUSTED_CALLER_DELEGATE).methods +
+                    context.mutableClassDefBy(SAME_KEY_DELEGATE).methods +
+                    context.mutableClassDefBy(evaluator.definingClass).methods.single { it.sameSignatureAs(evaluator) }
+                val extensionCalls = checks.flatMap { method ->
+                    method.calls().filter { (owner, _) -> owner.startsWith(EXTENSION_ROOT) }
+                        .map { (owner, called) -> "${method.definingClass}->${method.name} calls $owner->$called" }
+                }
+                assertEquals("$name: extension calls in Facebook's caller checks", emptyList<String>(), extensionCalls)
                 checked += version
             }
         }
