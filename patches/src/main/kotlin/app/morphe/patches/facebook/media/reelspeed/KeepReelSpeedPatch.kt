@@ -12,7 +12,11 @@ import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
+import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.media.resume.TRACK_START
+import app.morphe.patches.facebook.media.resume.VIDEO_PLAYER_PARAMS
+import app.morphe.patches.facebook.media.resume.paramsGetters
+import app.morphe.patches.facebook.media.resume.reportedValues
 import app.morphe.patches.facebook.media.resume.trackers
 import app.morphe.patches.facebook.media.taptoplay.GROOT_PLAY
 import app.morphe.patches.facebook.media.taptoplay.grootBinds
@@ -24,6 +28,7 @@ import app.morphe.util.findMutableMethodOf
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
 internal const val PATCH = "Keep the reel speed"
 
@@ -33,7 +38,8 @@ internal const val PATCH = "Keep the reel speed"
  *
  * FbGrootPlayer's speed setter, its bind and its maybeTrackVideoStart tell the extension about
  * themselves first thing, and so does the Reels menu's speed toast, which follows a pick. The
- * extension's stubs are filled with the player's speed setter and its PlayerOrigin getter.
+ * extension's stubs are filled with the player's speed setter, its PlayerOrigin getter, its
+ * VideoPlayerParams getter and the params' isFbShorts, isSponsored and isLiveNow.
  */
 @Suppress("unused")
 val keepReelSpeedPatch = bytecodePatch(
@@ -56,7 +62,7 @@ val keepReelSpeedPatch = bytecodePatch(
 
 private fun refuse(detail: String): Nothing = throw PatchException("$PATCH: $detail")
 
-/** What [findReelSpeedAnchors] found, for [applyReelSpeedAnchors] to change. */
+/** What [findReelSpeedAnchors] found, for [applyReelSpeedAnchors] to change. [flags] maps each flag stub to its field. */
 internal class ReelSpeedAnchors(
     val owner: ClassDef,
     val setter: Method,
@@ -64,9 +70,14 @@ internal class ReelSpeedAnchors(
     val bind: Method,
     val start: Method,
     val toast: Method,
+    val params: Method,
+    val flags: Map<String, FieldReference>,
 )
 
-/** FbGrootPlayer's setter, origin getter, bind and start, and the Reels menu's speed toast. Changes nothing. */
+/**
+ * FbGrootPlayer's setter, origin getter, bind, start and params getter, the params' fields the rule
+ * reads, and the Reels menu's speed toast. Changes nothing.
+ */
 internal fun BytecodePatchContext.findReelSpeedAnchors(): ReelSpeedAnchors {
     val plays = classDefByStrings(GROOT_PLAY, StringComparisonType.EQUALS)
         .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
@@ -82,6 +93,7 @@ internal fun BytecodePatchContext.findReelSpeedAnchors(): ReelSpeedAnchors {
     val origin = single("PlayerOrigin getter", originGetters(owner))
     val bind = single("bind of Tap to play's", grootBinds(owner))
     val start = single("$TRACK_START($trigger)", trackers(owner, TRACK_START, trigger))
+    val params = single("getter of its $VIDEO_PLAYER_PARAMS", paramsGetters(owner))
 
     val toasts = classDefByStrings(SPEED_TOAST, StringComparisonType.EQUALS)
         .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
@@ -89,14 +101,34 @@ internal fun BytecodePatchContext.findReelSpeedAnchors(): ReelSpeedAnchors {
     val toast = toasts.singleOrNull()
         ?: refuse("expected one static (Context, float) speed toast holding \"$SPEED_TOAST\", found ${toasts.size}")
 
+    val paramsClass = classDefByOrNull(VIDEO_PLAYER_PARAMS) ?: refuse("this build has no $VIDEO_PLAYER_PARAMS")
+    val dumps = paramsClass.methods.filter { method -> REEL_PARAM_STUBS.keys.all { holdsString(method, it) } }
+    val dump = dumps.singleOrNull()
+        ?: refuse("expected one method of $VIDEO_PLAYER_PARAMS reporting ${REEL_PARAM_STUBS.keys.joinToString()}, found ${dumps.size}")
+    val reported = reportedValues(dump)
+    val flags = REEL_PARAM_STUBS.entries.associate { (name, stub) ->
+        val field = reported[name] ?: refuse("$VIDEO_PLAYER_PARAMS->${dump.name} doesn't report $name")
+        val declared = paramsClass.fields.singleOrNull {
+            it.name == field.name && it.type == "Z" && !AccessFlags.STATIC.isSet(it.accessFlags)
+        } ?: refuse("$name is ${field.name}:${field.type}, not a boolean field of $VIDEO_PLAYER_PARAMS")
+        if (!AccessFlags.PUBLIC.isSet(declared.accessFlags)) refuse("$name, ${field.name}, isn't public, so the extension can't read it")
+        stub to field
+    }
+
+    // A build that renamed the Reels viewer would keep every speed to itself without a word.
+    val playerOrigin = classDefByOrNull(PLAYER_ORIGIN) ?: refuse("this build has no $PLAYER_ORIGIN")
+    if (playerOrigin.methods.none { holdsString(it, VIEWER_ORIGIN) }) refuse("$PLAYER_ORIGIN doesn't name \"$VIEWER_ORIGIN\"")
+
     // The extension's stubs call these from outside Facebook's package.
-    if (!AccessFlags.PUBLIC.isSet(owner.accessFlags)) refuse("${owner.type} isn't public, so the extension can't reach it")
-    listOf(setter, origin).forEach { method ->
+    listOf(owner, paramsClass).forEach { reachable ->
+        if (!AccessFlags.PUBLIC.isSet(reachable.accessFlags)) refuse("${reachable.type} isn't public, so the extension can't reach it")
+    }
+    listOf(setter, origin, params).forEach { method ->
         if (!AccessFlags.PUBLIC.isSet(method.accessFlags)) {
             refuse("${owner.type}->${method.name} isn't public, so the extension can't call it")
         }
     }
-    return ReelSpeedAnchors(owner, setter, origin, bind, start, toast)
+    return ReelSpeedAnchors(owner, setter, origin, bind, start, toast, params, flags)
 }
 
 /**
@@ -114,7 +146,7 @@ internal fun BytecodePatchContext.applyReelSpeedAnchors(anchors: ReelSpeedAnchor
     fillStubs(anchors)
 }
 
-/** Fills the extension's stubs. Each reads only its parameter registers, cast to the player's own type. */
+/** Fills the extension's stubs. Each reads only its parameter registers, cast to the player's or the params' own type. */
 private fun BytecodePatchContext.fillStubs(anchors: ReelSpeedAnchors) {
     val extension = mutableClassDefBy(REEL_SPEED)
     fun stub(name: String, parameters: List<String>, answer: String): MutableMethod = extension.methods.singleOrNull {
@@ -141,4 +173,23 @@ private fun BytecodePatchContext.fillStubs(anchors: ReelSpeedAnchors) {
             return-object p0
         """,
     )
+    stub(REEL_PARAMS_STUB, listOf(objectType), objectType).addInstructions(
+        0,
+        """
+            check-cast p0, $owner
+            invoke-virtual/range { p0 .. p0 }, $owner->${anchors.params.name}()$VIDEO_PLAYER_PARAMS
+            move-result-object p0
+            return-object p0
+        """,
+    )
+    anchors.flags.forEach { (name, field) ->
+        stub(name, listOf(objectType), "Z").addInstructions(
+            0,
+            """
+                check-cast p0, $VIDEO_PLAYER_PARAMS
+                iget-boolean p0, p0, $VIDEO_PLAYER_PARAMS->${field.name}:Z
+                return p0
+            """,
+        )
+    }
 }

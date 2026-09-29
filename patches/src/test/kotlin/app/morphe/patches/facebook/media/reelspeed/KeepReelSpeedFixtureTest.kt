@@ -11,6 +11,9 @@ import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.media.resume.TRACK_START
+import app.morphe.patches.facebook.media.resume.VIDEO_PLAYER_PARAMS
+import app.morphe.patches.facebook.media.resume.paramsGetters
+import app.morphe.patches.facebook.media.resume.reportedValues
 import app.morphe.patches.facebook.media.resume.trackers
 import app.morphe.patches.facebook.media.taptoplay.GROOT_PLAY
 import app.morphe.patches.facebook.media.taptoplay.grootBinds
@@ -27,6 +30,8 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import org.junit.Assert.assertEquals
@@ -36,11 +41,13 @@ import java.io.File
 
 /**
  * Keep the reel speed's anchors on every Facebook build the bundle declares: FbGrootPlayer's speed
- * setter, PlayerOrigin getter, bind and maybeTrackVideoStart, each there once, and the Reels menu's
- * speed toast, the only method holding its selector's name, which only FbShortsInlinePlaybackSpeedUtil's
- * two pickers call. The gear menu's speed sheet sets its pick with the same setter. Then the patch
- * itself, run on those classes: each hook first in its method, reading the method's own arguments,
- * and each stub calling the method it stands for. Reads the fixture bundles from
+ * setter, PlayerOrigin getter, bind, maybeTrackVideoStart and VideoPlayerParams getter, each there
+ * once; the params' one debug dump reporting isFbShorts, isSponsored and isLiveNow, each a public
+ * boolean; PlayerOrigin naming the Reels viewer; and the Reels menu's speed toast, the only method
+ * holding its selector's name, which only FbShortsInlinePlaybackSpeedUtil's two pickers call. The
+ * gear menu's speed sheet sets its pick with the same setter. Then the patch itself, run on those
+ * classes: each hook first in its method, reading the method's own arguments, and each stub calling
+ * the method or reading the field it stands for. Reads the fixture bundles from
  * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class KeepReelSpeedFixtureTest {
@@ -86,11 +93,31 @@ class KeepReelSpeedFixtureTest {
                 assertEquals("$name: binds", 1, binds.size)
                 val starts = trackers(owner, TRACK_START, trigger)
                 assertEquals("$name: $TRACK_START", 1, starts.size)
+                val paramsGetter = paramsGetters(owner)
+                assertEquals("$name: VideoPlayerParams getters", 1, paramsGetter.size)
                 val setter = setters.single()
                 val origin = origins.single()
-                for (method in listOf(setter, origin)) {
+                for (method in listOf(setter, origin, paramsGetter.single())) {
                     assertTrue("$name: ${method.name} isn't public", AccessFlags.PUBLIC.isSet(method.accessFlags))
                 }
+
+                // The params' debug dump names the three booleans the rule reads, and PlayerOrigin the viewer.
+                val paramsClass = FixtureDex.classes(bundle, setOf(VIDEO_PLAYER_PARAMS)).values.single()
+                assertTrue("$name: $VIDEO_PLAYER_PARAMS isn't public", AccessFlags.PUBLIC.isSet(paramsClass.accessFlags))
+                val dumps = paramsClass.methods.filter { m -> REEL_PARAM_STUBS.keys.all { holdsString(m, it) } }
+                assertEquals("$name: methods reporting ${REEL_PARAM_STUBS.keys}", 1, dumps.size)
+                val reported = reportedValues(dumps.single())
+                val flagFields = REEL_PARAM_STUBS.entries.associate { (reportedName, stub) ->
+                    val field = reported[reportedName]
+                    assertTrue("$name: the dump doesn't report $reportedName", field != null)
+                    val declared = paramsClass.fields.singleOrNull { it.name == field!!.name && it.type == "Z" }
+                    assertTrue("$name: $reportedName, ${field!!.name}, isn't a public boolean",
+                        declared != null && AccessFlags.PUBLIC.isSet(declared.accessFlags) && !AccessFlags.STATIC.isSet(declared.accessFlags))
+                    stub to field.name
+                }
+                assertEquals("$name: the fields reported as ${REEL_PARAM_STUBS.keys}", 3, flagFields.values.toSet().size)
+                val playerOrigin = FixtureDex.classes(bundle, setOf(PLAYER_ORIGIN)).values.single()
+                assertTrue("$name: $PLAYER_ORIGIN doesn't name \"$VIEWER_ORIGIN\"", playerOrigin.methods.any { holdsString(it, VIEWER_ORIGIN) })
 
                 // The only method of the build holding the selector's name, and the Reels pickers' runnables
                 // are all that call it.
@@ -116,7 +143,7 @@ class KeepReelSpeedFixtureTest {
                 })
 
                 val toastClass = toastHolders.single { it.type == toast.definingClass }
-                val context = PatchContexts.of(listOf(owner, toastClass,
+                val context = PatchContexts.of(listOf(owner, toastClass, paramsClass, playerOrigin,
                     ExtensionDex.classDef(REEL_SPEED), ExtensionDex.classDef(SETTINGS_STATUS)))
                 keepReelSpeedPatch.execute(context)
 
@@ -146,6 +173,19 @@ class KeepReelSpeedFixtureTest {
                 assertEquals("$name: the origin stub's call", "${owner.type}->${origin.name}()$PLAYER_ORIGIN",
                     originStub[1].call.toString())
                 assertEquals("$name: the origin stub's answer", Opcode.RETURN_OBJECT, originStub[3].opcode)
+                val paramsStub = stubs.methods.single { it.name == REEL_PARAMS_STUB }.code()
+                assertEquals("$name: the params stub's call", "${owner.type}->${paramsGetter.single().name}()$VIDEO_PLAYER_PARAMS",
+                    paramsStub[1].call.toString())
+                assertEquals("$name: the params stub's answer", Opcode.RETURN_OBJECT, paramsStub[3].opcode)
+                for ((stub, field) in flagFields) {
+                    val code = stubs.methods.single { it.name == stub }.code()
+                    assertEquals("$name: the $stub stub's cast", VIDEO_PLAYER_PARAMS, ((code[0] as ReferenceInstruction).reference as TypeReference).type)
+                    assertEquals("$name: the $stub stub's read", Opcode.IGET_BOOLEAN, code[1].opcode)
+                    assertEquals("$name: the $stub stub's field", "$VIDEO_PLAYER_PARAMS->$field:Z",
+                        ((code[1] as ReferenceInstruction).reference as FieldReference).toString())
+                    assertEquals("$name: the $stub stub reads its argument", 0, (code[1] as TwoRegisterInstruction).registerB)
+                    assertEquals("$name: the $stub stub's answer", Opcode.RETURN, code[2].opcode)
+                }
 
                 val status = context.mutableClassDefBy(SETTINGS_STATUS).methods.single { it.name == "keepReelSpeed" }
                 assertEquals("$name: SettingsStatus.keepReelSpeed() isn't switched on", 1,

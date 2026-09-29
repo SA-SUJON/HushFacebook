@@ -28,6 +28,21 @@ public final class ReelSpeedForTests {
             public Object origin(Object player) {
                 return "fb_shorts_viewer";
             }
+
+            @Override
+            public boolean reel(Object player) {
+                return true;
+            }
+
+            @Override
+            public boolean ad(Object player) {
+                return false;
+            }
+
+            @Override
+            public boolean live(Object player) {
+                return false;
+            }
         };
         try {
             ReelSpeed.speedSet(new Object(), 1.5f);

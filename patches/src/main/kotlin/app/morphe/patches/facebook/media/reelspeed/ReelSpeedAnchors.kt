@@ -27,11 +27,19 @@ import com.android.tools.smali.dexlib2.iface.reference.FieldReference
  *   (580 A1V, 577 A1U; the pickers, the gear menu's speed sheet and Facebook's own hold-for-2x all
  *   set a speed through it); its PlayerOrigin getter, the one no-argument method answering a
  *   PlayerOrigin (580 Bs0, 577 BtY); its bind, the one method holding "FbGrootPlayer.bindVideoSources"
- *   (580 A1l, 577 A1j); and maybeTrackVideoStart, a kept name, which the play's start path runs
- *   right after the Hero player starts, before it looks up the speed it remembers for the video.
+ *   (580 A1l, 577 A1j); maybeTrackVideoStart, a kept name, which the play's start path runs
+ *   right after the Hero player starts, before it looks up the speed it remembers for the video;
+ *   and its VideoPlayerParams getter, the one no-argument method answering them (580 CM9, 577 CMy),
+ *   null before the first bind.
+ * - VideoPlayerParams' debug dump (580 EYb, 577 EVr) reports each field under its name: isFbShorts
+ *   (580 A1e, 577 A1d), isSponsored (580 A1v, 577 A1u) and isLiveNow (580 A1m, 577 A1l) are public
+ *   booleans. The Reels viewer
+ *   plays ads and live videos between reels, and Facebook's own speed-up skips live videos too.
  * - A new reel's player starts at normal speed: the play only restores a speed Facebook remembered
  *   for that same video. PlayerOrigin.toString() writes the origin, then "::" and where in the
- *   viewer the video started when that's known.
+ *   viewer the video started when that's known. The Reels viewer's origin is "fb_shorts_viewer";
+ *   reels in the feed play under others (fb_shorts_native_in_feed_unit and more), all named in
+ *   PlayerOrigin's static initializer.
  */
 
 internal const val REEL_SPEED = "$EXTENSION_PACKAGE/media/ReelSpeed;"
@@ -41,6 +49,13 @@ internal const val BOUND = "$REEL_SPEED->bound(Ljava/lang/Object;)V"
 internal const val STARTED = "$REEL_SPEED->started(Ljava/lang/Object;)V"
 internal const val SET_SPEED_STUB = "setPlayerSpeed"
 internal const val ORIGIN_STUB = "playerOrigin"
+internal const val REEL_PARAMS_STUB = "playerParams"
+
+/** The VideoPlayerParams booleans the extension reads, by the name the params' debug dump reports each under, to the stub reading it. */
+internal val REEL_PARAM_STUBS = linkedMapOf("isFbShorts" to "fbShorts", "isSponsored" to "sponsored", "isLiveNow" to "liveNow")
+
+/** The Reels viewer's PlayerOrigin, the only viewer whose reels get the kept speed (the extension's ReelSpeed.VIEWER). */
+internal const val VIEWER_ORIGIN = "fb_shorts_viewer"
 
 internal const val SPEED_TOAST = "InlinePlaybackSpeedAttributeSelector"
 internal const val PLAYER_ORIGIN = "Lcom/facebook/video/common/playerorigin/PlayerOrigin;"

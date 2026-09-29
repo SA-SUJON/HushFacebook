@@ -18,9 +18,11 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
@@ -30,10 +32,11 @@ import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
- * Keep the reel speed: a speed picked in a reel's menu is kept with the viewer of the player it was
- * set on, and the first start after each bind of a player from that viewer gets it. The same reel
- * started again keeps whatever it's at, another viewer keeps Facebook's speed, normal speed goes
- * back to Facebook's reset, and off, paused or failing, every reel starts as Facebook starts it.
+ * Keep the reel speed: a speed picked in a reel's menu in the Reels viewer is kept, and the first
+ * start after each bind of a player there gets it when its video is a reel that's neither an ad nor
+ * live. A pick anywhere else keeps nothing and forgets nothing. The same reel started again keeps
+ * whatever it's at, another viewer keeps Facebook's speed, normal speed goes back to Facebook's
+ * reset, and off, paused or failing, every reel starts as Facebook starts it.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -41,16 +44,27 @@ public class ReelSpeedTest {
     @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
 
     private static final String REELS = "fb_shorts_viewer";
+    private static final String IN_FEED = "fb_shorts_native_in_feed_unit";
 
-    /** Stands in for FbGrootPlayer: its PlayerOrigin's toString and the speeds set on it. */
+    /** Stands in for FbGrootPlayer: its PlayerOrigin's toString, what its params say and the speeds set on it. */
     private static final class FakePlayers implements ReelSpeed.Player {
         final Map<Object, String> origins = new IdentityHashMap<>();
+        final Set<Object> notReels = Collections.newSetFromMap(new IdentityHashMap<>());
+        final Set<Object> ads = Collections.newSetFromMap(new IdentityHashMap<>());
+        final Set<Object> live = Collections.newSetFromMap(new IdentityHashMap<>());
         final List<String> set = new ArrayList<>();
         RuntimeException failure;
 
+        /** A player from [origin] playing a reel that's neither an ad nor live. */
         Object player(String origin) {
             Object player = new Object();
             origins.put(player, origin);
+            return player;
+        }
+
+        Object player(String origin, Set<Object> kind) {
+            Object player = player(origin);
+            kind.add(player);
             return player;
         }
 
@@ -71,6 +85,21 @@ public class ReelSpeedTest {
                     return origin;
                 }
             };
+        }
+
+        @Override
+        public boolean reel(Object player) {
+            return origins.containsKey(player) && !notReels.contains(player);
+        }
+
+        @Override
+        public boolean ad(Object player) {
+            return ads.contains(player);
+        }
+
+        @Override
+        public boolean live(Object player) {
+            return live.contains(player);
         }
     }
 
@@ -155,6 +184,43 @@ public class ReelSpeedTest {
         Object noOrigin = new Object();
         play(noOrigin);
         assertEquals(0, players.set.size());
+    }
+
+    /**
+     * Facebook's Reels viewer plays ads and live videos between reels, and its speed menu may not
+     * offer a speed there; a live video sped up runs into its live edge. They, and a video in the
+     * viewer that isn't a reel, start at Facebook's speed while the next reel gets the kept one.
+     */
+    @Test
+    public void anAdALiveVideoOrAnotherVideoInTheViewerStartsAtFacebooksSpeed() {
+        pick(players.player(REELS), 1.5f);
+        play(players.player(REELS + "::reels_tab", players.ads));
+        play(players.player(REELS, players.live));
+        play(players.player(REELS, players.notReels));
+        assertEquals("an ad, a live video or a video that isn't a reel got the kept speed", 0, players.set.size());
+        play(players.player(REELS));
+        assertEquals(List.of(REELS + " 1.5"), players.set);
+    }
+
+    /**
+     * Reels in the feed start on their own as you scroll, so a pick in an in-feed reel isn't kept for
+     * the next one, and it doesn't take the place of, or forget, the speed kept for the Reels viewer.
+     */
+    @Test
+    public void aPickOutsideTheReelsViewerIsNotKeptAndLeavesTheViewersSpeed() {
+        Object inFeed = players.player(IN_FEED + "::newsfeed");
+        pick(inFeed, 2f);
+        assertEquals("a pick in an in-feed reel was kept", 1f, ReelSpeed.kept(), 0f);
+        play(players.player(IN_FEED));
+        assertEquals("the next in-feed reel started at the in-feed pick", 0, players.set.size());
+
+        pick(players.player(REELS), 1.5f);
+        pick(inFeed, 2f);
+        pick(inFeed, 1f);
+        assertEquals("an in-feed pick changed the Reels viewer's speed", 1.5f, ReelSpeed.kept(), 0f);
+        play(players.player(IN_FEED));
+        play(players.player(REELS));
+        assertEquals(List.of(REELS + " 1.5"), players.set);
     }
 
     @Test
