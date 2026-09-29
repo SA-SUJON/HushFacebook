@@ -92,13 +92,14 @@ public final class MaterialYouTheme {
 
     // Route three: the patch replaces "const vX, 0xFF252728" with a read of DARK_252728, and so on.
     // In Facebook's dark mode they hold the palette's colours, and in light mode Facebook's own, for
-    // the Video tab that stays dark there.
-    public static int DARK_101011;
-    public static int DARK_18191A;
-    public static int DARK_1C1C1D;
-    public static int DARK_242526;
-    public static int DARK_252728;
-    public static int DARK_3E4042;
+    // the Video tab that stays dark there. Volatile: the thread that gets Facebook's answer writes
+    // them, and the UI thread reads them.
+    public static volatile int DARK_101011;
+    public static volatile int DARK_18191A;
+    public static volatile int DARK_1C1C1D;
+    public static volatile int DARK_242526;
+    public static volatile int DARK_252728;
+    public static volatile int DARK_3E4042;
 
     /** The palette in use: {@link TonePalette#fallback()} until the context is there. */
     private static volatile TonePalette palette;
@@ -106,10 +107,13 @@ public final class MaterialYouTheme {
     /** Whether the palette follows the phone's, and is read again when its colours change. */
     private static volatile boolean bound;
 
+    /** Held while route three's fields are written, so two writes can't interleave. */
+    private static final Object PUBLISHING = new Object();
+
     static {
         palette = TonePalette.fallback();
-        publish(palette);
-        DarkMode.changed = () -> publish(palette);
+        publish();
+        DarkMode.changed = MaterialYouTheme::publish;
         bind();
     }
 
@@ -306,30 +310,38 @@ public final class MaterialYouTheme {
     }
 
     static void reload(Context context) {
-        TonePalette next = TonePalette.of(context);
-        palette = next;
-        publish(next);
+        palette = TonePalette.of(context);
+        publish();
     }
 
     /** Package-visible for tests: puts a palette in use and writes the route three fields from it. */
     static void use(TonePalette next, boolean followPhone) {
         palette = next;
-        publish(next);
+        publish();
         bound = !followPhone;
     }
 
-    /** Writes route three's fields: the palette's surfaces in Facebook's dark mode, its own in light mode. */
-    private static void publish(TonePalette p) {
-        DARK_101011 = surface(p, 0x101011);
-        DARK_18191A = surface(p, 0x18191A);
-        DARK_1C1C1D = surface(p, 0x1C1C1D);
-        DARK_242526 = surface(p, 0x242526);
-        DARK_252728 = surface(p, 0x252728);
-        DARK_3E4042 = surface(p, 0x3E4042);
+    /**
+     * Writes route three's fields from the palette in use: its surfaces in Facebook's dark mode,
+     * Facebook's own in light mode. It runs after every change of either, on the thread that made
+     * it. One write at a time, each reading the answer and the palette once, so the last one leaves
+     * all six fields in the mode and the palette that stand.
+     */
+    private static void publish() {
+        synchronized (PUBLISHING) {
+            TonePalette p = DarkMode.on() ? palette : null;
+            DARK_101011 = surface(p, 0x101011);
+            DARK_18191A = surface(p, 0x18191A);
+            DARK_1C1C1D = surface(p, 0x1C1C1D);
+            DARK_242526 = surface(p, 0x242526);
+            DARK_252728 = surface(p, 0x252728);
+            DARK_3E4042 = surface(p, 0x3E4042);
+        }
     }
 
-    private static int surface(TonePalette p, int rgb) {
-        return DarkMode.on() ? p.sameLightness(TonePalette.NEUTRAL, 0xFF000000 | rgb) : 0xFF000000 | rgb;
+    /** The palette's neutral at the lightness of Facebook's surface {@code rgb}, or Facebook's own without a palette. */
+    private static int surface(@Nullable TonePalette p, int rgb) {
+        return p == null ? 0xFF000000 | rgb : p.sameLightness(TonePalette.NEUTRAL, 0xFF000000 | rgb);
     }
 
     private static Map<String, int[]> parseTokens(String table) {

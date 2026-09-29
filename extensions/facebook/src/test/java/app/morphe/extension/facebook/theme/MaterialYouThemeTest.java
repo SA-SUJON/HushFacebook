@@ -19,7 +19,14 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * The Material You theme's rules: what it recolours, that a colour keeps its lightness, and that
@@ -208,6 +215,56 @@ public class MaterialYouThemeTest {
         MaterialYouTheme.use(other, false);
         assertEquals("the fields follow a new palette", other.sameLightness(TonePalette.NEUTRAL, 0xFF252728),
                 MaterialYouTheme.DARK_252728);
+    }
+
+    /**
+     * Facebook answers whether dark mode is on from whatever thread asks, a feed request or an app
+     * job as well as the UI, and the answer's thread writes route three's fields that the UI thread
+     * reads. So each field is volatile.
+     */
+    @Test
+    public void routeThreesFieldsAreSafeToReadFromAnyThread() throws Exception {
+        for (String field : MaterialYouTheme.SURFACES.split(" ")) {
+            int modifiers = MaterialYouTheme.class.getField("DARK_" + field).getModifiers();
+            assertTrue("DARK_" + field + " isn't volatile", Modifier.isVolatile(modifiers));
+        }
+    }
+
+    /**
+     * Answers that change dark mode at the same moment, from several threads: once they're done, all
+     * six fields hold the colours of the answer that stands, none of them left from the other mode.
+     */
+    @Test
+    public void routeThreesFieldsFollowTheAnswerThatStandsWhenAnswersRace() throws Exception {
+        int threads = 4;
+        ExecutorService pool = Executors.newFixedThreadPool(threads);
+        try {
+            for (int round = 0; round < 10000; round++) {
+                CyclicBarrier start = new CyclicBarrier(threads);
+                List<Future<?>> answers = new ArrayList<>();
+                for (int t = 0; t < threads; t++) {
+                    boolean first = t % 2 == 0;
+                    answers.add(pool.submit(() -> {
+                        start.await();
+                        for (int i = 0; i < 200; i++) DarkMode.answer(first == (i % 2 == 0));
+                        return null;
+                    }));
+                }
+                for (Future<?> answer : answers) answer.get();
+
+                boolean dark = DarkMode.on();
+                int[] read = {MaterialYouTheme.DARK_101011, MaterialYouTheme.DARK_18191A, MaterialYouTheme.DARK_1C1C1D,
+                        MaterialYouTheme.DARK_242526, MaterialYouTheme.DARK_252728, MaterialYouTheme.DARK_3E4042};
+                String[] surfaces = MaterialYouTheme.SURFACES.split(" ");
+                for (int i = 0; i < read.length; i++) {
+                    int facebook = 0xFF000000 | Integer.parseInt(surfaces[i], 16);
+                    assertEquals("round " + round + ", " + (dark ? "dark" : "light") + " mode, #" + surfaces[i],
+                            dark ? palette.sameLightness(TonePalette.NEUTRAL, facebook) : facebook, read[i]);
+                }
+            }
+        } finally {
+            pool.shutdownNow();
+        }
     }
 
     /**
