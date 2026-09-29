@@ -14,6 +14,7 @@ import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
@@ -65,7 +66,9 @@ val restoreTrustPatch = bytecodePatch(
         try {
             fillMessengerLinkStubs(findMessengerLinkAnchors())
         } catch (missing: Exception) {
-            patchLog.warning("Restore screens on re-signed builds: ${missing.message}. The Messenger link test is left out.")
+            // A missing anchor is a PatchException with its reason; anything else is a bug, named as one.
+            val why = if (missing is PatchException) missing.message else "${missing::class.java.name}: ${missing.message}"
+            patchLog.warning("Restore screens on re-signed builds: $why. The Messenger link test is left out.")
         }
 
         enableStatus("restoreTrust")
