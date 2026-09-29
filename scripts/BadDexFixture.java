@@ -81,7 +81,9 @@ import java.util.Set;
  * bar's call to {@code MessengerIcon.open} first. And the reel like helper's like, holding its
  * trace, and the feed attachment's onDoubleTap, holding "translationY", each with Turn off double
  * tap to like's call to {@code DoubleTapLike} first. And the Reels menu's speed toast, holding its
- * selector's name, with Keep the reel speed's call to {@code ReelSpeed.picked} first. Beside each
+ * selector's name, with Keep the reel speed's call to {@code ReelSpeed.picked} first. And the tab
+ * bar's jewel count, holding its log name, with Hide the Reels tab dot's call to
+ * {@code ReelsTabDot.clear} first. Beside each
  * method a start-call, next-call,
  * sole-call or once-call rule picks sit methods holding part of what it's picked by: the tray
  * controller, the refresh controller's onPause, two other methods naming both surfaces and one
@@ -173,6 +175,11 @@ public class BadDexFixture {
     private static final String SPEED_TOAST = "Lfixture/SpeedToast;";
     private static final String REEL_SPEED = "Lapp/morphe/extension/facebook/media/ReelSpeed;";
     private static final ImmutableMethodReference PICKED = method(REEL_SPEED, "picked", "V", "F");
+
+    private static final String JEWEL_CONTROLLER = "Lfixture/JewelController;";
+    private static final String TAB_TAG = "Lcom/facebook/navigation/tabbar/state/model/TabTag;";
+    private static final String REELS_TAB_DOT = "Lapp/morphe/extension/facebook/navigation/ReelsTabDot;";
+    private static final ImmutableMethodReference CLEAR_DOT = method(REELS_TAB_DOT, "clear", "Z", OBJECT);
 
     private static final String SHORTCUT_MANAGER = "Landroid/content/pm/ShortcutManager;";
     private static final String SHORTCUT_INFO = "Landroid/content/pm/ShortcutInfo;";
@@ -975,6 +982,61 @@ public class BadDexFixture {
         return late;
     }
 
+    /**
+     * The tab bar's jewel controller: its count, a static method taking the session, the
+     * controller, the tab and an int (v0 and v1 free, v4 the tab), holding the log name with
+     * [countPrefix] first, and an instance method of the same parameters holding it too (v5 the
+     * tab), with [instancePrefix] first, as Facebook has only the static one.
+     */
+    private static ClassDef jewelController(List<Instruction> countPrefix, List<Instruction> instancePrefix) {
+        return new ImmutableClassDef(JEWEL_CONTROLLER, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Arrays.asList(
+                        define(JEWEL_CONTROLLER, "count", "I", true, jewelBody(countPrefix, 6),
+                                FB_USER_SESSION, JEWEL_CONTROLLER, TAB_TAG, "I"),
+                        define(JEWEL_CONTROLLER, "countOver", "I", false, jewelBody(instancePrefix, 7),
+                                FB_USER_SESSION, JEWEL_CONTROLLER, TAB_TAG, "I")));
+    }
+
+    /** [prefix], then the log name in v1 and a count of 1 returned from v0, in [registers] registers. */
+    private static ImmutableMethodImplementation jewelBody(List<Instruction> prefix, int registers) {
+        List<Instruction> instructions = new ArrayList<>(prefix);
+        instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 1,
+                new ImmutableStringReference("FbMainTabActivityJewelController.getTrackedCountWithLogging")));
+        instructions.add(new ImmutableInstruction11n(Opcode.CONST_4, 0, 1));
+        instructions.add(op(Opcode.RETURN, 0));
+        return new ImmutableMethodImplementation(registers, instructions, null, null);
+    }
+
+    /**
+     * What Hide the Reels tab dot puts first in the count: the tab in [tab] handed over as a range,
+     * its answer in v0, and a yes returning 0 before Facebook's count.
+     */
+    private static List<Instruction> dotHook(int tab) {
+        List<Instruction> hook = new ArrayList<>();
+        hook.add(new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, tab, 1, CLEAR_DOT)); // 0
+        hook.add(op(Opcode.MOVE_RESULT, 0));                                               // 3
+        hook.add(ifEqz(0, 4));                                                             // 4 -> 8
+        hook.add(new ImmutableInstruction11n(Opcode.CONST_4, 0, 0));                       // 6
+        hook.add(op(Opcode.RETURN, 0));                                                    // 7
+        return hook;
+    }
+
+    /** The count's hook after a branch on the int, not first. */
+    private static List<Instruction> lateDotHook() {
+        List<Instruction> late = new ArrayList<>();
+        late.add(ifEqz(5, 3));                                            // 0 -> 3
+        late.add(op(Opcode.NOP));                                         // 2
+        late.addAll(dotHook(4));                                          // 3
+        return late;
+    }
+
+    private static ClassDef reelsTabDot() {
+        return new ImmutableClassDef(REELS_TAB_DOT, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
+                OBJECT, null, null, null, null, Collections.singletonList(
+                        define(REELS_TAB_DOT, "clear", "Z", true,
+                                body(2, new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN, 0)), OBJECT)));
+    }
+
     private static ClassDef reelSpeed() {
         return new ImmutableClassDef(REEL_SPEED, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
                 OBJECT, null, null, null, null, Collections.singletonList(
@@ -1447,7 +1509,8 @@ public class BadDexFixture {
                         Collections.<Instruction>emptyList()), messengerIcon(),
                 reelLikeHelper(likeHook(), Collections.<Instruction>emptyList()),
                 attachmentTap(tapHook(), Collections.<Instruction>emptyList()), doubleTapLike(),
-                speedToast(toastHook(3), Collections.<Instruction>emptyList()), reelSpeed());
+                speedToast(toastHook(3), Collections.<Instruction>emptyList()), reelSpeed(),
+                jewelController(dotHook(4), Collections.<Instruction>emptyList()), reelsTabDot());
     }
 
     /** The clean host, Facebook's classes as they ship, with the batcher's flush making [handOver]. */
@@ -1463,7 +1526,8 @@ public class BadDexFixture {
                         Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 reelLikeHelper(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 attachmentTap(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
-                speedToast(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()));
+                speedToast(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
+                jewelController(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()));
     }
 
     /**
@@ -1992,6 +2056,11 @@ public class BadDexFixture {
         dexes.put("bad-reel-speed-hook-missing", replaced(good(), speedToast(noHook, noHook)));
         dexes.put("bad-reel-speed-hook-late", replaced(good(), speedToast(lateToastHook(), noHook)));
 
+        // contract: the tab bar's jewel count left without Hide the Reels tab dot's call or with the
+        // call after a branch.
+        dexes.put("bad-reels-tab-dot-hook-missing", replaced(good(), jewelController(noHook, noHook)));
+        dexes.put("bad-reels-tab-dot-hook-late", replaced(good(), jewelController(lateDotHook(), noHook)));
+
         // contract: the GenAI reel stub left as the extension ships it, answering its marker.
         dexes.put("bad-finder-stub-not-filled", withFinderStub(good(), UNFILLED_FINDER_STUB));
         // contract: the stub filled with a call that never leaves the extension, not Facebook's finder.
@@ -2096,6 +2165,7 @@ public class BadDexFixture {
         dexes.put("bad-double-tap-like-hook-wrong-method", replaced(good(), reelLikeHelper(none, likeHook())));
         dexes.put("bad-double-tap-tap-hook-wrong-method", replaced(good(), attachmentTap(none, tapHook())));
         dexes.put("bad-reel-speed-hook-wrong-method", replaced(good(), speedToast(none, toastHook(4))));
+        dexes.put("bad-reels-tab-dot-hook-wrong-method", replaced(good(), jewelController(none, dotHook(5))));
         // contract: a second method answering the return-refresh rule, so it can't say which one
         // the hook belongs in, although the hook is where it was.
         dexes.put("bad-return-refresh-two-callbacks", replaced(good(), returnController(returnHook(), none, true)));

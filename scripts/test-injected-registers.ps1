@@ -641,6 +641,11 @@ try {
             'first in Lfixture/SpeedToast;->show('))) `
         "The good build's reel speed hook was not first in the Reels menu's speed toast.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        ('ReelsTabDot;->clear(Ljava/lang/Object;)Z in static (Lcom/facebook/auth/usersession/FbUserSession;*' +
+            'Lcom/facebook/navigation/tabbar/state/model/TabTag;I)I holding ' +
+            'FbMainTabActivityJewelController.getTrackedCountWithLogging: first in Lfixture/JewelController;->count('))) `
+        "The good build's Reels tab dot hook was not first in the tab bar's jewel count.`n$($good.Output -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         'GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside ' +
         'Lapp/morphe/extension/: calls Lfixture/Attributions;->A02(Lfixture/ReelModel;Ljava/lang/String;)Lfixture/Model; ' +
         'before its first return')) `
@@ -820,6 +825,8 @@ try {
         'bad-double-tap-tap-hook-late' = 'contract'
         'bad-reel-speed-hook-missing' = 'contract'
         'bad-reel-speed-hook-late' = 'contract'
+        'bad-reels-tab-dot-hook-missing' = 'contract'
+        'bad-reels-tab-dot-hook-late' = 'contract'
         'bad-logo-hook-missing' = 'contract'
         'bad-logo-hook-other-call' = 'contract'
         'bad-logo-hook-other-view' = 'contract'
@@ -853,6 +860,7 @@ try {
         'bad-double-tap-like-hook-wrong-method' = 'contract'
         'bad-double-tap-tap-hook-wrong-method' = 'contract'
         'bad-reel-speed-hook-wrong-method' = 'contract'
+        'bad-reels-tab-dot-hook-wrong-method' = 'contract'
         'bad-follow-hook-also-elsewhere' = 'contract'
         'bad-register-added-helper' = 'register'
         'bad-register-wide-source' = 'register'
@@ -1029,6 +1037,13 @@ try {
             'is not called in Lfixture/SpeedToast;->show(Landroid/content/Context;F)V, the one method holding ' +
             '"InlinePlaybackSpeedAttributeSelector" with the shape static (Landroid/content/Context;F)V; the host methods ' +
             'that call it: *Lfixture/SpeedToast;->showOver(Landroid/content/Context;F)V*'))
+        'bad-reels-tab-dot-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/navigation/ReelsTabDot;->clear(Ljava/lang/Object;)Z ' +
+            'is not called in Lfixture/JewelController;->count(Lcom/facebook/auth/usersession/FbUserSession;Lfixture/JewelController;' +
+            'Lcom/facebook/navigation/tabbar/state/model/TabTag;I)I, the one method holding ' +
+            '"FbMainTabActivityJewelController.getTrackedCountWithLogging" with the shape static ' +
+            '(Lcom/facebook/auth/usersession/FbUserSession;*Lcom/facebook/navigation/tabbar/state/model/TabTag;I)I; ' +
+            'the host methods that call it: *Lfixture/JewelController;->countOver(Lcom/facebook/auth/usersession/FbUserSession;' +
+            'Lfixture/JewelController;Lcom/facebook/navigation/tabbar/state/model/TabTag;I)I*'))
         'bad-follow-hook-also-elsewhere' = @(('*contract: Lapp/morphe/extension/facebook/reels/ReelDeclutter;->hideFollowButton()Z ' +
             'is called in Lfixture/FollowCheck;->offersFollowHere(Lcom/facebook/auth/usersession/FbUserSession;)Z as well as in ' +
             'Lfixture/FollowCheck;->offersFollow(Lcom/facebook/auth/usersession/FbUserSession;)Z, the one method holding ' +
