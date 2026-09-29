@@ -77,6 +77,15 @@ public final class AmoledTheme {
     private static final int RAISED_SHIFT = 0x21;
 
     /**
+     * The largest value that a channel of a card's grey sent as text can have (route four). Facebook
+     * builds its search results from server templates, and a Page's card there comes as
+     * {@code #333334} ({@code #333333} in the report), issue #27. A string comes with no token, and
+     * the next greys up that a server sends, {@code #3A3B3C}, {@code #3B3C3E} and {@code #3E4042},
+     * are a button's, a popover's or a divider's own fill, so they keep Facebook's grey.
+     */
+    static final int MAX_SERVER_CARD_CHANNEL = 0x36;
+
+    /**
      * How far each channel of an input or a pill's fill goes down: less than {@link #RAISED_SHIFT}.
      * {@link #FILL_TOKENS} shows its shape only through this fill, not a border or the text on it,
      * so shifting it as far as a card would leave it at about 1.1:1 against the black page, close
@@ -198,9 +207,14 @@ public final class AmoledTheme {
      * Route four: a colour that the server sends as text.
      *
      * <p>The patch replaces each call to {@link Color#parseColor} in the app with a call to this
-     * method. A server-driven screen, such as Settings, gets its colours as strings like
-     * {@code "#FF252728"}. No token comes with a string, so the colour alone decides, as in route
-     * two and route three.
+     * method. A server-driven screen, such as Settings or the search results, gets its colours as
+     * strings like {@code "#FF252728"}. No token comes with a string, so the colour alone decides,
+     * as in route two and route three.
+     *
+     * <p>In Facebook's dark mode a background grey turns black, and a card's grey up to
+     * {@link #MAX_SERVER_CARD_CHANNEL} goes to the near black route one gives a card: the Page
+     * card in search results, issue #27. A translucent colour, such as the 10% white of the card's
+     * message box, is left as it is and stays a step above the card.
      *
      * <p>A text that is not a colour throws the same exception as before, so the callers see no
      * change. In light mode the colour is left as parsed.
@@ -208,7 +222,8 @@ public final class AmoledTheme {
     public static int parseColor(String text) {
         HookStatus.invoked(FamilyNames.AMOLED_THEME);
         int color = Color.parseColor(text);
-        return isDarkNeutral(color, MAX_CHANNEL) && DarkMode.on() ? BLACK : color;
+        if (!isDarkNeutral(color, MAX_SERVER_CARD_CHANNEL) || !DarkMode.on()) return color;
+        return isDarkNeutral(color, MAX_CHANNEL) ? BLACK : color - RAISED_SHIFT * 0x010101;
     }
 
     /**

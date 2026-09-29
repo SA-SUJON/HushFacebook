@@ -5,6 +5,7 @@
 package app.morphe.extension.facebook.theme;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -98,6 +99,68 @@ public class AmoledThemeTest {
         assertEquals("a translucent scrim stays", 0x80252728, AmoledTheme.parseColor("#80252728"));
     }
 
+    /**
+     * Issue #27, the Page card in search results: Facebook builds its search results from server
+     * templates, so the card's dark grey comes as text, #333334 on a phone and #333333 in the report,
+     * through the parser route four sends here. No token says it's a card, so the grey does, and it
+     * goes to the near black route one gives a card.
+     */
+    @Test
+    public void aServerCardTurnsNearBlack() {
+        assertEquals("the Page card", 0xFF121213, AmoledTheme.parseColor("#FF333334"));
+        assertEquals("the reporter's card", 0xFF121212, AmoledTheme.parseColor("#333333"));
+        assertEquals("the top of the card band", 0xFF151515, AmoledTheme.parseColor("#363636"));
+        assertEquals("just above the black band, still not black", 0xFF0A0A0A, AmoledTheme.parseColor("#2B2B2B"));
+    }
+
+    /**
+     * The card's "Write a message" input measured (71,71,72) on the #333334 card: Facebook's 10%
+     * white over it. That fill stays translucent, so on the near black card the input still comes
+     * out lighter than the #262627 an input's own fill keeps under route one.
+     */
+    @Test
+    public void theServerCardsInputStaysVisible() {
+        int input = AmoledTheme.parseColor("#19FFFFFF");
+        assertEquals("the input's fill stays translucent", 0x19FFFFFF, input);
+        int card = AmoledTheme.parseColor("#FF333334");
+        assertEquals("before, on Facebook's card", 0xFF474748, over(input, 0xFF333334));
+        int onCard = over(input, card);
+        assertEquals("on the near black card", 0xFF29292A, onCard);
+        for (int shift : new int[]{16, 8, 0}) {
+            assertTrue("each channel at least route one's input fill", ((onCard >> shift) & 0xFF) >= 0x26);
+        }
+    }
+
+    /**
+     * The controls: the next greys up a server sends (a button's, a popover's, a divider's) show
+     * only through their own fill and keep it, and so does a translucent grey, one with a hue, and
+     * every grey in light mode.
+     */
+    @Test
+    public void aServerGreyAboveTheCardBandKeepsItsColour() {
+        assertEquals("the older palette's button", 0xFF3A3B3C, AmoledTheme.parseColor("#3A3B3C"));
+        assertEquals("a popover", 0xFF3B3C3E, AmoledTheme.parseColor("#3B3C3E"));
+        assertEquals("a divider", 0xFF3E4042, AmoledTheme.parseColor("#3E4042"));
+        assertEquals("just above the card band", 0xFF373737, AmoledTheme.parseColor("#373737"));
+        assertEquals("a translucent card", 0x99333334, AmoledTheme.parseColor("#99333334"));
+        assertEquals("a dark brown", 0xFF34302A, AmoledTheme.parseColor("#34302A"));
+
+        DarkMode.answer(false);
+        assertEquals("light mode, a server card", 0xFF333334, AmoledTheme.parseColor("#FF333334"));
+        assertEquals("light mode, a server background", 0xFF252728, AmoledTheme.parseColor("#FF252728"));
+    }
+
+    /** {@code top}, a colour with alpha, drawn over the opaque {@code under}, rounded as a screen does. */
+    private static int over(int top, int under) {
+        int alpha = top >>> 24;
+        int out = 0xFF000000;
+        for (int shift : new int[]{16, 8, 0}) {
+            int blended = (((top >> shift) & 0xFF) * alpha + ((under >> shift) & 0xFF) * (255 - alpha) + 127) / 255;
+            out |= blended << shift;
+        }
+        return out;
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void aStringThatIsNoColourThrowsAsBefore() {
         AmoledTheme.parseColor("not a colour");
@@ -152,13 +215,13 @@ public class AmoledThemeTest {
     }
 
     /**
-     * The bar's black stays the bar's: a resolver's #333334 card gets a card's near black, and a
-     * server colour, with no token to say it's a card, keeps its grey.
+     * The bar's black stays the bar's: a resolver's #333334 card gets a card's near black, and so
+     * does a server's (#27), neither the bar's black.
      */
     @Test
     public void theBarThresholdDoesNotReachTheOtherRoutes() {
         assertEquals(0xFF121213, AmoledTheme.apply(0xFF333334, Token.CARD_BACKGROUND));
-        assertEquals(0xFF333334, AmoledTheme.parseColor("#FF333334"));
+        assertEquals(0xFF121213, AmoledTheme.parseColor("#FF333334"));
     }
 
     @After
