@@ -243,6 +243,26 @@ public class ReelHoldTest {
         assertEquals("the held reel's lift after another player's set lost the speed from before", 2f, held.speed, 0f);
     }
 
+    /**
+     * A lift that never sets the held reel's speed doesn't leave the wait standing: past the window
+     * after the release listener asked, the same pooled player's next set, for a reel Facebook moved
+     * on to without a touch, goes on as Facebook set it.
+     */
+    @Test
+    public void aMissedLiftDoesNotOverrideTheNextReelOnTheSamePlayer() {
+        Reel held = new Reel();
+        held.set(2f);
+        ReelHold.speeds = player -> ((Reel) player).speed;
+        finger(MotionEvent.ACTION_DOWN);
+        hold();
+        held.set(2f);
+        finger(MotionEvent.ACTION_UP);
+        assertTrue(ReelHold.release(false));
+        SystemClock.sleep(ReelHold.BACK_WINDOW_MS + 1);
+        held.set(1f);
+        assertEquals("a set long after the release was taken for the lift", 1f, held.speed, 0f);
+    }
+
     /** Where the player's speed can't be read, as before the patch fills the getter in, the lift's speed goes on. */
     @Test
     public void anUnreadSpeedLeavesFacebooksSpeed() {

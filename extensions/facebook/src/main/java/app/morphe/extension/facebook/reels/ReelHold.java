@@ -4,6 +4,7 @@
  */
 package app.morphe.extension.facebook.reels;
 
+import android.os.SystemClock;
 import android.view.MotionEvent;
 
 import androidx.annotation.Nullable;
@@ -93,6 +94,16 @@ public final class ReelHold {
     /** Two speeds this close are the same one, as Facebook's player compares them. */
     static final float SAME = 0.01f;
 
+    /**
+     * How long after the release listener's questions its lift may still set the held reel's speed.
+     * It sets it straight after asking, so a set later than this is something else: a next reel
+     * Facebook moved on to on the same pooled player, say.
+     */
+    static final long BACK_WINDOW_MS = 1_000;
+
+    /** When the release listener last asked, for {@link #BACK_WINDOW_MS}. */
+    private static volatile long backSince;
+
     /** Reads a player's speed. {@link #PATCHED} is the patch's getter; tests stand in. */
     interface Speeds {
         float of(Object player);
@@ -174,6 +185,11 @@ public final class ReelHold {
                 float was = before;
                 Logger.printDebug(() -> "Reel hold: speed " + speed + "x, the reel was at " + was + "x");
             } else if (backNext) {
+                if (SystemClock.uptimeMillis() - backSince > BACK_WINDOW_MS) {
+                    // The lift this waited for never set a speed. Whatever sets one now goes on as set.
+                    backNext = false;
+                    return speed;
+                }
                 WeakReference<Object> held = heldPlayer;
                 Object heldNow = held == null ? null : held.get();
                 // Only the held reel's own lift ends the wait. Another player's speed set meanwhile,
@@ -228,6 +244,7 @@ public final class ReelHold {
         if (!on("release")) return facebooks;
         if (holding && lifted && !restored) {
             restored = true;
+            backSince = SystemClock.uptimeMillis();
             backNext = true;
         }
         return holding;
@@ -252,6 +269,7 @@ public final class ReelHold {
         restored = false;
         speedUpNext = false;
         backNext = false;
+        backSince = 0;
         again = false;
         heldPlayer = null;
         before = Float.NaN;
