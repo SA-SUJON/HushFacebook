@@ -32,6 +32,8 @@ import org.robolectric.shadows.ShadowPackageManager;
 import org.robolectric.shadows.ShadowSigningInfo;
 
 import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import app.morphe.extension.facebook.misc.FacebookSignature;
@@ -60,6 +62,7 @@ public class FamilySignatureTrustTest {
 
     private static final String MESSENGER = "com.facebook.orca";
     private static final String INSTAGRAM = "com.instagram.android";
+    private static final String INSTAGRAM_LITE = "com.instagram.lite";
     private static final int CALLER_UID = 12345;
     private static final int STRANGER_UID = 54321;
 
@@ -244,6 +247,34 @@ public class FamilySignatureTrustTest {
             assertFalse(lookalike + " is not a family app", callerCheck(caller(lookalike, OUR_KEY)));
         }
         assertNull("a non-family read isn't counted", familyLine());
+    }
+
+    /**
+     * The answer is Facebook's own certificate, which is right only for an app Meta signs with it.
+     * Instagram and Instagram Lite are Meta's too but carry Instagram's own certificate, so even
+     * carrying this build's key they keep their own signers, uncounted.
+     */
+    @Test
+    public void aSameKeyInstagramKeepsItsOwnSigners() {
+        for (String instagram : new String[]{INSTAGRAM, INSTAGRAM_LITE}) {
+            ShadowBinder.reset();
+            packages.removePackage(instagram);
+            PackageInfo app = caller(instagram, OUR_KEY);
+            assertFalse(instagram + " isn't signed with Facebook's certificate", callerCheck(app));
+            assertNull(instagram + " got Facebook's certificate", FacebookSignature.originalSigners(app));
+        }
+        assertNull("a non-family read isn't counted", familyLine());
+    }
+
+    /**
+     * The family is the apps Meta signs with Facebook's own certificate: Facebook, Messenger (the
+     * same rotated pair as Facebook 580), Messenger Lite and Facebook Lite (the original certificate).
+     */
+    @Test
+    public void theFamilyIsTheAppsSignedWithFacebooksCertificate() {
+        assertEquals(new HashSet<>(Arrays.asList(
+                "com.facebook.katana", MESSENGER, "com.facebook.mlite", "com.facebook.lite")),
+                FamilySignatureTrust.FAMILY_PACKAGES);
     }
 
     /** A same-key app that isn't in the family list keeps Facebook's answer, uncounted. */

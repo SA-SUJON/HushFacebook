@@ -44,13 +44,13 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * signers read as Meta's as well, and the family-signature, trusted-app and Facebook-permission rules
  * see a Meta family caller. Facebook's own code is left to make each of those decisions.
  *
- * <p>The caller is trusted only when all of these hold: its package is one of the Meta family apps by
- * an exact name, that package is the one the calling uid owns (so the read really is the current
- * IPC's caller and not this app's own read or a look at some other package), this build is re-signed,
- * and the certificate the caller carries now equals the one this build carries. A caller with another
- * signer, a name that only looks like a family app's, an unknown or absent caller, and a build that
- * still carries Meta's key all keep Facebook's own answer, so nothing Facebook wouldn't already trust
- * is let in.
+ * <p>The caller is trusted only when all of these hold: its package is, by an exact name, one of the
+ * Meta apps signed with Facebook's own certificate, that package is the one the calling uid owns (so
+ * the read really is the current IPC's caller and not this app's own read or a look at some other
+ * package), this build is re-signed, and the certificate the caller carries now equals the one this
+ * build carries. A caller with another signer, a name that only looks like a family app's, an unknown
+ * or absent caller, and a build that still carries Meta's key all keep Facebook's own answer, so
+ * nothing Facebook wouldn't already trust is let in.
  *
  * <p>Only someone holding the user's Manager key can sign an app to this certificate, so a
  * same-certificate caller is one the user built and installed themselves. That is the trust Facebook
@@ -62,18 +62,20 @@ public final class FamilySignatureTrust {
     }
 
     /**
-     * The Meta family apps that share sign-in, by their exact package names. A name has to match one
-     * of these exactly; a lookalike such as {@code com.facebook.orca.x} is not one of them. The
-     * signing certificate is what makes the caller safe to trust; this list keeps the widening to the
-     * apps Facebook treats as family.
+     * The Meta apps signed with Facebook's own certificate, by their exact package names. A name has
+     * to match one of these exactly; a lookalike such as {@code com.facebook.orca.x} is not one of
+     * them. The signing certificate is what makes the caller safe to trust; this list keeps the
+     * widening to the apps whose Meta-signed build carries the certificate the caller is answered.
+     * Messenger 580 carries the same rotated pair as Facebook 580, and Messenger Lite 338 and
+     * Facebook Lite 530 the original Facebook certificate alone. Instagram and Instagram Lite are
+     * Meta's too, but signed with Instagram's own certificate, so Facebook's would be a wrong answer
+     * for them.
      */
     static final Set<String> FAMILY_PACKAGES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            "com.facebook.katana",   // Facebook
-            "com.facebook.orca",     // Messenger
-            "com.facebook.mlite",    // Messenger Lite
-            "com.facebook.lite",     // Facebook Lite
-            "com.instagram.android", // Instagram
-            "com.instagram.lite"     // Instagram Lite
+            "com.facebook.katana", // Facebook
+            "com.facebook.orca",   // Messenger
+            "com.facebook.mlite",  // Messenger Lite
+            "com.facebook.lite"    // Facebook Lite
     )));
 
     /**
