@@ -106,3 +106,8 @@ next-call Lapp/morphe/extension/facebook/settings/SettingsEntry;->setLogoTouchLi
 # method holds the mutation's name). Left out or left beside the stand-in, the batch goes out; on
 # other registers, the stand-in gets the send as its executor.
 sole-call Lapp/morphe/extension/facebook/reels/ReelWatchHistory;->send(Ljava/util/concurrent/Executor;Ljava/lang/Runnable;)V replacing Ljava/util/concurrent/Executor;->execute(Ljava/lang/Runnable;)V in instance ()V holding FbShortsSeenStateMutation video_ids
+# The tab bar asks its jewel controller for each tab's new count through one static method, which
+# loads the controller's getTrackedCountWithLogging name. Hide the Reels tab dot asks the extension
+# first thing in it, so the Reels tab's count can read none. Left out, the dot stays; anywhere
+# else, the count it answers isn't the tab bar's.
+start-call Lapp/morphe/extension/facebook/navigation/ReelsTabDot;->clear(Ljava/lang/Object;)Z in static (Lcom/facebook/auth/usersession/FbUserSession;*Lcom/facebook/navigation/tabbar/state/model/TabTag;I)I holding FbMainTabActivityJewelController.getTrackedCountWithLogging

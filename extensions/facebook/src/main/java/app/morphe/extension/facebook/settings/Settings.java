@@ -455,6 +455,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reels_tab", TRUE, true);
 
     /**
+     * The Reels tab, which some accounts call Video, shows no new-item dot or count
+     * ({@link app.morphe.extension.facebook.navigation.ReelsTabDot}). Off or paused, Facebook's
+     * count comes back when the tab bar next asks for it.
+     */
+    public static final BooleanSetting HIDE_REELS_TAB_DOT =
+            new BooleanSetting("hushfacebook_hide_reels_tab_dot", TRUE);
+
+    /**
      * The folder every save goes to, under Movies for a video and Pictures for a photo. The
      * settings row and an import keep it clean, and {@link SaveFolder#sanitize} cleans it again
      * wherever it's read, so whatever wrote the store, a save lands in one folder under each.

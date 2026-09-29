@@ -31,4 +31,9 @@ public final class ReelsTabForTests {
             ReelsTab.forget();
         }
     }
+
+    /** Asks the tab bar's count hook about the Reels tab. True when it answers none for it. */
+    public static boolean clearsTheDot() {
+        return ReelsTabDot.clear(new WatchTab());
+    }
 }

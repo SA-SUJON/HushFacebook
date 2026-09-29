@@ -574,3 +574,7 @@ no answer	yanıt yok
 answered	yanıt verdi
 # context: a read's result in that toast; the placeholder is an error's class name, left in English
 failed (%1$s)	başarısız (%1$s)
+# context: switch title under Reels and Watch; the dot is the tab bar's new-item badge
+Hide the Reels tab dot	Reels sekmesindeki noktayı gizle
+# context: summary of that switch; Video is Facebook's name for the tab on some accounts
+No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.	Bazı hesaplarda Video adıyla görünen Reels sekmesinde nokta ya da yeni sayısı olmaz. Diğer sekmeler kendilerininkini korur.

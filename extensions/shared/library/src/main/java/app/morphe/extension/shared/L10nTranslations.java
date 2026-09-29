@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(908);
+        Map<String, String> table = new HashMap<>(912);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -444,6 +444,8 @@ public final class L10nTranslations {
                 "Karte \u201eMessenger holen\u201c ausblenden");
         table.put("Hide the Reels tab",
                 "Reels-Tab ausblenden");
+        table.put("Hide the Reels tab dot",
+                "Punkt am Reels-Tab ausblenden");
         table.put("Hide the Stories tray",
                 "Stories-Leiste ausblenden");
         table.put("Highest",
@@ -544,13 +546,15 @@ public final class L10nTranslations {
                 "Relevanteste");
         table.put("Newest",
                 "Neueste");
-        table.put("News feed",
-                "Newsfeed");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("News feed",
+                "Newsfeed");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Keine App auf diesem Handy kann den Link \u00f6ffnen. Die Adresse ist %1$s.");
+        table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
+                "Kein Punkt und keine Neu-Zahl am Reels-Tab, bei manchen Konten Video genannt. Andere Tabs behalten ihre.");
         table.put("No matching settings",
                 "Keine passenden Einstellungen");
         table.put("No more reminders that it's a friend's birthday.",
@@ -665,13 +669,13 @@ public final class L10nTranslations {
                 "Beim n\u00e4chsten Neustart werden die normalen Tabs wiederhergestellt. Deine anderen Einstellungen bleiben gespeichert.");
         table.put("Resume",
                 "Fortsetzen");
+    }
+
+    private static void fillDe5(Map<String, String> table) {
         table.put("Resume long videos",
                 "Lange Videos fortsetzen");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Setzt Videos \u00fcber zwei Minuten an deiner letzten Stelle fort. Die Suchleiste \u00e4ndert den Start. Reels, Live-Videos und Werbung starten wie gewohnt.");
-    }
-
-    private static void fillDe5(Map<String, String> table) {
         table.put("Retry",
                 "Erneut versuchen");
         table.put("Return to regular Facebook",
@@ -788,13 +792,13 @@ public final class L10nTranslations {
                 "Zum Wiedereinschalten tippen.");
         table.put("Test the Messenger link",
                 "Messenger-Verbindung testen");
+    }
+
+    private static void fillDe6(Map<String, String> table) {
         table.put("That file is too large to be a settings file. Nothing was changed.",
                 "Diese Datei ist zu gro\u00df f\u00fcr eine Einstellungsdatei. Es wurde nichts ge\u00e4ndert.");
         table.put("That file isn't readable text, so it may have been damaged on the way. Nothing was changed.",
                 "Diese Datei ist kein lesbarer Text, sie wurde also wom\u00f6glich bei der \u00dcbertragung besch\u00e4digt. Es wurde nichts ge\u00e4ndert.");
-    }
-
-    private static void fillDe6(Map<String, String> table) {
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "Diese Datei f\u00fchrt eine Einstellung zweimal auf, daher ist unklar, welcher Wert gilt. Es wurde nichts ge\u00e4ndert.");
         table.put("That font file is over %1$d MB. Your font didn't change.",
@@ -911,13 +915,13 @@ public final class L10nTranslations {
                 "Videos landen in %1$s und Fotos in %2$s.");
         table.put("Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.",
                 "Videos laufen in der besten Qualit\u00e4t bis %1$s, die Facebook f\u00fcr sie anbietet, oder der n\u00e4chsth\u00f6heren.");
+    }
+
+    private static void fillDe7(Map<String, String> table) {
         table.put("Videos play at the highest quality Facebook offers for each.",
                 "Videos laufen in der h\u00f6chsten Qualit\u00e4t, die Facebook f\u00fcr sie anbietet.");
         table.put("Videos play at the lowest quality Facebook offers for each.",
                 "Videos laufen in der niedrigsten Qualit\u00e4t, die Facebook f\u00fcr sie anbietet.");
-    }
-
-    private static void fillDe7(Map<String, String> table) {
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Videos werden dann in %1$s oder der n\u00e4chstniedrigeren Qualit\u00e4t gespeichert. Hat ein Video keine so niedrige Qualit\u00e4t, wird es in der n\u00e4chsth\u00f6heren gespeichert.");
         table.put("Videos will save at the best quality.",
@@ -989,7 +993,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(908);
+        Map<String, String> table = new HashMap<>(912);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1389,6 +1393,8 @@ public final class L10nTranslations {
                 "Ocultar la tarjeta para obtener Messenger");
         table.put("Hide the Reels tab",
                 "Ocultar la pesta\u00f1a Reels");
+        table.put("Hide the Reels tab dot",
+                "Ocultar el punto de la pesta\u00f1a Reels");
         table.put("Hide the Stories tray",
                 "Ocultar la bandeja de historias");
         table.put("Highest",
@@ -1489,13 +1495,15 @@ public final class L10nTranslations {
                 "M\u00e1s relevantes");
         table.put("Newest",
                 "M\u00e1s recientes");
-        table.put("News feed",
-                "Feed");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("News feed",
+                "Feed");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Ninguna app de este tel\u00e9fono puede abrir el enlace. La direcci\u00f3n es %1$s.");
+        table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
+                "Sin punto ni recuento de novedades en la pesta\u00f1a Reels, llamada Video en algunas cuentas. Las dem\u00e1s pesta\u00f1as conservan los suyos.");
         table.put("No matching settings",
                 "No hay ajustes coincidentes");
         table.put("No more reminders that it's a friend's birthday.",
@@ -1610,13 +1618,13 @@ public final class L10nTranslations {
                 "Restaura las pesta\u00f1as normales al reiniciar. Tus otros ajustes se conservan.");
         table.put("Resume",
                 "Reanudar");
+    }
+
+    private static void fillEs5(Map<String, String> table) {
         table.put("Resume long videos",
                 "Reanudar videos largos");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Reanuda v\u00eddeos de m\u00e1s de dos minutos donde los dejaste. Usa la barra para cambiar el inicio. Reels, directos y anuncios empiezan como siempre.");
-    }
-
-    private static void fillEs5(Map<String, String> table) {
         table.put("Retry",
                 "Reintentar");
         table.put("Return to regular Facebook",
@@ -1733,13 +1741,13 @@ public final class L10nTranslations {
                 "Toca para volver a activarlo.");
         table.put("Test the Messenger link",
                 "Probar la conexi\u00f3n con Messenger");
+    }
+
+    private static void fillEs6(Map<String, String> table) {
         table.put("That file is too large to be a settings file. Nothing was changed.",
                 "Ese archivo es demasiado grande para ser un archivo de configuraci\u00f3n. No se cambi\u00f3 nada.");
         table.put("That file isn't readable text, so it may have been damaged on the way. Nothing was changed.",
                 "Ese archivo no es texto legible, as\u00ed que puede haberse da\u00f1ado por el camino. No se cambi\u00f3 nada.");
-    }
-
-    private static void fillEs6(Map<String, String> table) {
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "Ese archivo incluye un ajuste dos veces, as\u00ed que no se sabe qu\u00e9 valor usar. No se cambi\u00f3 nada.");
         table.put("That font file is over %1$d MB. Your font didn't change.",
@@ -1856,13 +1864,13 @@ public final class L10nTranslations {
                 "Los videos van a %1$s y las fotos a %2$s.");
         table.put("Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.",
                 "Los v\u00eddeos se reproducen en la mejor calidad hasta %1$s que Facebook ofrece para cada uno, o en la m\u00e1s cercana por encima.");
+    }
+
+    private static void fillEs7(Map<String, String> table) {
         table.put("Videos play at the highest quality Facebook offers for each.",
                 "Los v\u00eddeos se reproducen en la calidad m\u00e1s alta que Facebook ofrece para cada uno.");
         table.put("Videos play at the lowest quality Facebook offers for each.",
                 "Los v\u00eddeos se reproducen en la calidad m\u00e1s baja que Facebook ofrece para cada uno.");
-    }
-
-    private static void fillEs7(Map<String, String> table) {
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Los videos se guardar\u00e1n en %1$s o en la calidad m\u00e1s cercana por debajo. Si un video no tiene ninguna tan baja, se guardar\u00e1 en la m\u00e1s cercana por encima.");
         table.put("Videos will save at the best quality.",
@@ -1934,7 +1942,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(908);
+        Map<String, String> table = new HashMap<>(912);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -2334,6 +2342,8 @@ public final class L10nTranslations {
                 "Sembunyikan kartu Dapatkan Messenger");
         table.put("Hide the Reels tab",
                 "Sembunyikan tab Reels");
+        table.put("Hide the Reels tab dot",
+                "Sembunyikan titik di tab Reels");
         table.put("Hide the Stories tray",
                 "Sembunyikan deretan Cerita");
         table.put("Highest",
@@ -2434,13 +2444,15 @@ public final class L10nTranslations {
                 "Paling relevan");
         table.put("Newest",
                 "Terbaru");
-        table.put("News feed",
-                "Kabar Beranda");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("News feed",
+                "Kabar Beranda");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Tidak ada aplikasi di ponsel ini yang dapat membuka tautan ini. Alamatnya %1$s.");
+        table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
+                "Tanpa titik atau jumlah baru di tab Reels, yang di beberapa akun bernama Video. Tab lain tetap menampilkannya.");
         table.put("No matching settings",
                 "Tidak ada pengaturan yang cocok");
         table.put("No more reminders that it's a friend's birthday.",
@@ -2555,13 +2567,13 @@ public final class L10nTranslations {
                 "Pulihkan tab biasa saat aplikasi dimulai ulang. Setelan lainnya tetap tersimpan.");
         table.put("Resume",
                 "Lanjutkan");
+    }
+
+    private static void fillIn5(Map<String, String> table) {
         table.put("Resume long videos",
                 "Lanjutkan video panjang");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Lanjutkan video lebih dari dua menit dari posisi terakhir. Geser bilah untuk posisi lain. Reel, video langsung, dan iklan mulai seperti biasa.");
-    }
-
-    private static void fillIn5(Map<String, String> table) {
         table.put("Retry",
                 "Coba lagi");
         table.put("Return to regular Facebook",
@@ -2678,13 +2690,13 @@ public final class L10nTranslations {
                 "Ketuk untuk mengaktifkan Hushfacebook lagi.");
         table.put("Test the Messenger link",
                 "Uji koneksi Messenger");
+    }
+
+    private static void fillIn6(Map<String, String> table) {
         table.put("That file is too large to be a settings file. Nothing was changed.",
                 "File itu terlalu besar untuk sebuah file pengaturan. Tidak ada yang diubah.");
         table.put("That file isn't readable text, so it may have been damaged on the way. Nothing was changed.",
                 "File itu bukan teks yang dapat dibaca, jadi mungkin rusak saat ditransfer. Tidak ada yang diubah.");
-    }
-
-    private static void fillIn6(Map<String, String> table) {
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "File itu mencantumkan satu pengaturan dua kali, jadi tidak jelas nilai mana yang harus dipakai. Tidak ada yang diubah.");
         table.put("That font file is over %1$d MB. Your font didn't change.",
@@ -2801,13 +2813,13 @@ public final class L10nTranslations {
                 "Video disimpan ke %1$s dan foto ke %2$s.");
         table.put("Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.",
                 "Video diputar dengan kualitas terbaik hingga %1$s yang ditawarkan Facebook untuk masing-masing, atau yang terdekat di atasnya.");
+    }
+
+    private static void fillIn7(Map<String, String> table) {
         table.put("Videos play at the highest quality Facebook offers for each.",
                 "Video diputar dengan kualitas tertinggi yang ditawarkan Facebook untuk masing-masing.");
         table.put("Videos play at the lowest quality Facebook offers for each.",
                 "Video diputar dengan kualitas terendah yang ditawarkan Facebook untuk masing-masing.");
-    }
-
-    private static void fillIn7(Map<String, String> table) {
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Video akan disimpan dalam %1$s atau kualitas terdekat di bawahnya. Video yang tidak memiliki kualitas serendah itu akan disimpan dalam kualitas terdekat di atasnya.");
         table.put("Videos will save at the best quality.",
@@ -2879,7 +2891,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(908);
+        Map<String, String> table = new HashMap<>(912);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -3279,6 +3291,8 @@ public final class L10nTranslations {
                 "Ocultar o cart\u00e3o Baixar o Messenger");
         table.put("Hide the Reels tab",
                 "Ocultar a aba Reels");
+        table.put("Hide the Reels tab dot",
+                "Ocultar o ponto da aba Reels");
         table.put("Hide the Stories tray",
                 "Ocultar a bandeja de Stories");
         table.put("Highest",
@@ -3379,13 +3393,15 @@ public final class L10nTranslations {
                 "Mais relevantes");
         table.put("Newest",
                 "Mais recentes");
-        table.put("News feed",
-                "Feed de not\u00edcias");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("News feed",
+                "Feed de not\u00edcias");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Nenhum aplicativo neste dispositivo consegue abrir o link. O endere\u00e7o \u00e9 %1$s.");
+        table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
+                "Sem ponto nem contagem de novidades na aba Reels, chamada V\u00eddeo em algumas contas. As outras abas mant\u00eam os seus.");
         table.put("No matching settings",
                 "Nenhuma configura\u00e7\u00e3o encontrada");
         table.put("No more reminders that it's a friend's birthday.",
@@ -3500,13 +3516,13 @@ public final class L10nTranslations {
                 "Restaura as abas normais ao reiniciar. Suas outras configura\u00e7\u00f5es s\u00e3o mantidas.");
         table.put("Resume",
                 "Retomar");
+    }
+
+    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Resume long videos",
                 "Retomar v\u00eddeos longos");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Retoma v\u00eddeos com mais de dois minutos de onde voc\u00ea parou. Arraste a barra de progresso para come\u00e7ar em outro ponto. Reels, v\u00eddeos ao vivo e an\u00fancios come\u00e7am normalmente.");
-    }
-
-    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Retry",
                 "Tentar novamente");
         table.put("Return to regular Facebook",
@@ -3623,13 +3639,13 @@ public final class L10nTranslations {
                 "Toque para reativar.");
         table.put("Test the Messenger link",
                 "Testar a conex\u00e3o com o Messenger");
+    }
+
+    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("That file is too large to be a settings file. Nothing was changed.",
                 "Esse arquivo \u00e9 grande demais para ser um arquivo de configura\u00e7\u00f5es. Nada foi alterado.");
         table.put("That file isn't readable text, so it may have been damaged on the way. Nothing was changed.",
                 "Esse arquivo n\u00e3o cont\u00e9m texto leg\u00edvel, ent\u00e3o pode ter sido corrompido durante o processo. Nada foi alterado.");
-    }
-
-    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "Esse arquivo cont\u00e9m uma configura\u00e7\u00e3o duplicada, ent\u00e3o n\u00e3o \u00e9 poss\u00edvel saber qual valor usar. Nada foi alterado.");
         table.put("That font file is over %1$d MB. Your font didn't change.",
@@ -3746,13 +3762,13 @@ public final class L10nTranslations {
                 "Os v\u00eddeos v\u00e3o para %1$s e as fotos para %2$s.");
         table.put("Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.",
                 "Os v\u00eddeos s\u00e3o reproduzidos na melhor qualidade at\u00e9 %1$s que o Facebook oferece para cada um, ou na mais pr\u00f3xima acima.");
+    }
+
+    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("Videos play at the highest quality Facebook offers for each.",
                 "Os v\u00eddeos s\u00e3o reproduzidos na maior qualidade que o Facebook oferece para cada um.");
         table.put("Videos play at the lowest quality Facebook offers for each.",
                 "Os v\u00eddeos s\u00e3o reproduzidos na menor qualidade que o Facebook oferece para cada um.");
-    }
-
-    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Os v\u00eddeos ser\u00e3o salvos em %1$s ou na qualidade dispon\u00edvel mais pr\u00f3xima abaixo disso. Se n\u00e3o houver uma qualidade t\u00e3o baixa, ser\u00e3o salvos na qualidade dispon\u00edvel mais pr\u00f3xima acima.");
         table.put("Videos will save at the best quality.",
@@ -3824,7 +3840,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(908);
+        Map<String, String> table = new HashMap<>(912);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -4224,6 +4240,8 @@ public final class L10nTranslations {
                 "Messenger'\u0131 Edin kart\u0131n\u0131 gizle");
         table.put("Hide the Reels tab",
                 "Reels sekmesini gizle");
+        table.put("Hide the Reels tab dot",
+                "Reels sekmesindeki noktay\u0131 gizle");
         table.put("Hide the Stories tray",
                 "Hikaye \u015feridini gizle");
         table.put("Highest",
@@ -4324,13 +4342,15 @@ public final class L10nTranslations {
                 "En alakal\u0131");
         table.put("Newest",
                 "En yeni");
-        table.put("News feed",
-                "Ak\u0131\u015f");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("News feed",
+                "Ak\u0131\u015f");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Bu telefondaki hi\u00e7bir uygulama ba\u011flant\u0131y\u0131 a\u00e7am\u0131yor. Adres: %1$s.");
+        table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
+                "Baz\u0131 hesaplarda Video ad\u0131yla g\u00f6r\u00fcnen Reels sekmesinde nokta ya da yeni say\u0131s\u0131 olmaz. Di\u011fer sekmeler kendilerininkini korur.");
         table.put("No matching settings",
                 "E\u015fle\u015fen ayar yok");
         table.put("No more reminders that it's a friend's birthday.",
@@ -4445,13 +4465,13 @@ public final class L10nTranslations {
                 "Bir sonraki yeniden ba\u015flatmada normal sekmeleri geri getirir. Di\u011fer ayarlar\u0131n\u0131z kay\u0131tl\u0131 kal\u0131r.");
         table.put("Resume",
                 "Devam et");
+    }
+
+    private static void fillTr5(Map<String, String> table) {
         table.put("Resume long videos",
                 "Uzun videolara kald\u0131\u011f\u0131n yerden devam et");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "\u0130ki dakikadan uzun videolar kald\u0131\u011f\u0131 yerden devam eder. Ba\u015fka bir yerden ba\u015flatmak i\u00e7in \u00e7ubu\u011fu kayd\u0131r\u0131n. Reels, canl\u0131 videolar ve reklamlar normal ba\u015flar.");
-    }
-
-    private static void fillTr5(Map<String, String> table) {
         table.put("Retry",
                 "Yeniden dene");
         table.put("Return to regular Facebook",
@@ -4568,13 +4588,13 @@ public final class L10nTranslations {
                 "Yeniden a\u00e7mak i\u00e7in dokun.");
         table.put("Test the Messenger link",
                 "Messenger ba\u011flant\u0131s\u0131n\u0131 test et");
+    }
+
+    private static void fillTr6(Map<String, String> table) {
         table.put("That file is too large to be a settings file. Nothing was changed.",
                 "Bu dosya bir ayar dosyas\u0131 olamayacak kadar b\u00fcy\u00fck. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That file isn't readable text, so it may have been damaged on the way. Nothing was changed.",
                 "Bu dosya okunabilir bir metin de\u011fil, aktar\u0131m s\u0131ras\u0131nda hasar g\u00f6rm\u00fc\u015f olabilir. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
-    }
-
-    private static void fillTr6(Map<String, String> table) {
         table.put("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.",
                 "Bu dosyada bir ayar iki kez ge\u00e7iyor, bu y\u00fczden hangi de\u011ferin kullan\u0131laca\u011f\u0131 belli de\u011fil. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("That font file is over %1$d MB. Your font didn't change.",
@@ -4691,13 +4711,13 @@ public final class L10nTranslations {
                 "Videolar %1$s klas\u00f6r\u00fcne, foto\u011fraflar %2$s klas\u00f6r\u00fcne kaydedilir.");
         table.put("Videos play at the best quality up to %1$s that Facebook offers for each, or the closest above.",
                 "Videolar, Facebook'un her biri i\u00e7in sundu\u011fu en fazla %1$s olan en iyi kalitede ya da hemen \u00fcst\u00fcndekinde oynat\u0131l\u0131r.");
+    }
+
+    private static void fillTr7(Map<String, String> table) {
         table.put("Videos play at the highest quality Facebook offers for each.",
                 "Videolar, Facebook'un her biri i\u00e7in sundu\u011fu en y\u00fcksek kalitede oynat\u0131l\u0131r.");
         table.put("Videos play at the lowest quality Facebook offers for each.",
                 "Videolar, Facebook'un her biri i\u00e7in sundu\u011fu en d\u00fc\u015f\u00fck kalitede oynat\u0131l\u0131r.");
-    }
-
-    private static void fillTr7(Map<String, String> table) {
         table.put("Videos will save at %1$s or the closest quality below it. A video with nothing that low will save at the closest quality above.",
                 "Videolar %1$s kalitesinde ya da bunun alt\u0131ndaki en yak\u0131n kalitede kaydedilecek. Bu kadar d\u00fc\u015f\u00fck kalitesi olmayan video, bunun \u00fcst\u00fcndeki en yak\u0131n kalitede kaydedilecek.");
         table.put("Videos will save at the best quality.",

@@ -451,6 +451,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                     L10n.t("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels "
                             + "in the feed still open. Changes show after Facebook restarts.")));
         }
+        if (build.contains(PatchFamily.REELS_TAB_DOT)) {
+            reels.addPreference(toggle(context, Settings.HIDE_REELS_TAB_DOT, L10n.t("Hide the Reels tab dot"),
+                    L10n.t("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.")));
+        }
         // Both reel filters work on each batch of reels as it arrives, so a change leaves the
         // reels already loaded as they are, and the rows say so.
         if (build.contains(PatchFamily.SPONSORED_REELS)) {

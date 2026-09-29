@@ -381,6 +381,8 @@ public class PausedHooksTest {
                 MarketplaceOnlyForTests::skipsFeedPrefetch));
         // The tab bar builder is told to leave the Reels tab out.
         probes.put(PatchFamily.REELS_TAB, Collections.singletonList(ReelsTabForTests::hidesTheTab));
+        // The tab bar's count for the Reels tab reads none.
+        probes.put(PatchFamily.REELS_TAB_DOT, Collections.singletonList(ReelsTabForTests::clearsTheDot));
         // A request for a post's comments that names no order asks for the chosen one.
         probes.put(PatchFamily.DEFAULT_COMMENT_ORDER,
                 Collections.singletonList(DefaultCommentOrderForTests::asksForTheChosenOrder));

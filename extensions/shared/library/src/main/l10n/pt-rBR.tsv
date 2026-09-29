@@ -468,3 +468,7 @@ no answer	sem resposta
 answered	respondeu
 # context: a read's result in that toast; the placeholder is an error's class name, left in English
 failed (%1$s)	falhou (%1$s)
+# context: switch title under Reels and Watch; the dot is the tab bar's new-item badge
+Hide the Reels tab dot	Ocultar o ponto da aba Reels
+# context: summary of that switch; Video is Facebook's name for the tab on some accounts
+No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.	Sem ponto nem contagem de novidades na aba Reels, chamada Vídeo em algumas contas. As outras abas mantêm os seus.
