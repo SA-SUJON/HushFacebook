@@ -136,6 +136,8 @@ public enum PatchFamily {
     AMOLED_THEME(FamilyNames.AMOLED_THEME, "amoledTheme", "the black background in dark mode"),
     MATERIAL_YOU_THEME(FamilyNames.MATERIAL_YOU_THEME, "materialYouTheme", "the recoloured dark mode"),
     RESTORE_TRUST(FamilyNames.RESTORE_TRUST, "restoreTrust", "the re-signed build fix"),
+    // Runs while the application is built, before a switch can be read, and keeps Facebook starting.
+    TRANSLATED_START(FamilyNames.TRANSLATED_START, "translatedStart", "the start-up fix for x86 devices"),
     // A manifest can't be switched at run time: the permissions are renamed in the APK, and Facebook's
     // code has to keep using the names this install holds whether or not Hushfacebook is paused.
     INSTALL_BESIDE_META_APPS(FamilyNames.INSTALL_BESIDE_META_APPS, "installBesideMetaApps",
@@ -198,7 +200,7 @@ public enum PatchFamily {
             RESUME_LONG_VIDEOS, EXTERNAL_BROWSER, SANITIZE_SHARING_LINKS, UPDATE_PROMPTS, STORY_DOWNLOAD,
             REEL_DOWNLOAD, MARKETPLACE_ONLY, REELS_TAB_DOT, MESSENGER_CARD, MESSENGER_ICON, MENU_PROMOTIONS,
             META_AI_SEARCH, PROMO_NOTIFICATIONS, AD_PREFETCH, AD_TELEMETRY, AUDIENCE_NETWORK, RESTORE_TRUST,
-            INSTALL_BESIDE_META_APPS, MENU_SETTINGS_ROW));
+            TRANSLATED_START, INSTALL_BESIDE_META_APPS, MENU_SETTINGS_ROW));
 
     /** The families a test says this build carries, instead of asking {@link SettingsStatus}. */
     @Nullable

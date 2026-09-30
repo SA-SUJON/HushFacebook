@@ -126,6 +126,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/TranslatedStart.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/translatedstart/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Start on x86 devices, which adds Facebook's MprotectCode start-up task and its later half to the list of start-up tasks Facebook's own cold start experiments skip, on an x86 device running Facebook's arm code translated, found in Facebook 577 and 580 through the log line that names that list."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/GenAiLabel.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/feed/aidetected/**"
       ],

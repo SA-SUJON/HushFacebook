@@ -75,6 +75,7 @@ public final class FamilyNames {
     public static final String AMOLED_THEME = "AMOLED black theme";
     public static final String MATERIAL_YOU_THEME = "Material You theme";
     public static final String RESTORE_TRUST = "Restore screens on re-signed builds";
+    public static final String TRANSLATED_START = "Start on x86 devices";
     public static final String INSTALL_BESIDE_META_APPS = "Install beside Meta's apps";
     public static final String MENU_SETTINGS_ROW = "Hushfacebook in the Menu";
 

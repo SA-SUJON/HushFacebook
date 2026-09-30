@@ -154,6 +154,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean translatedStart() {
+        return false;
+    }
+
     public static boolean installBesideMetaApps() {
         return false;
     }

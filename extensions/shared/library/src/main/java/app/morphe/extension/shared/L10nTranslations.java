@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(980);
+        Map<String, String> table = new HashMap<>(982);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -1062,10 +1062,12 @@ public final class L10nTranslations {
                 "die Umbenennung der gemeinsamen Berechtigungen");
         table.put("the settings row in Facebook's Menu",
                 "die Einstellungszeile im Facebook-Men\u00fc");
+        table.put("the start-up fix for x86 devices",
+                "der Startfix f\u00fcr x86-Ger\u00e4te");
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(980);
+        Map<String, String> table = new HashMap<>(982);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -2083,10 +2085,12 @@ public final class L10nTranslations {
                 "el cambio de nombre de los permisos compartidos");
         table.put("the settings row in Facebook's Menu",
                 "la fila de configuraci\u00f3n en el men\u00fa de Facebook");
+        table.put("the start-up fix for x86 devices",
+                "el arreglo de inicio para dispositivos x86");
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(980);
+        Map<String, String> table = new HashMap<>(982);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -3104,10 +3108,12 @@ public final class L10nTranslations {
                 "penggantian nama izin bersama");
         table.put("the settings row in Facebook's Menu",
                 "baris pengaturan di Menu Facebook");
+        table.put("the start-up fix for x86 devices",
+                "perbaikan saat mulai untuk perangkat x86");
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(980);
+        Map<String, String> table = new HashMap<>(982);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -4125,10 +4131,12 @@ public final class L10nTranslations {
                 "a renomea\u00e7\u00e3o das permiss\u00f5es compartilhadas");
         table.put("the settings row in Facebook's Menu",
                 "a linha de configura\u00e7\u00f5es no Menu do Facebook");
+        table.put("the start-up fix for x86 devices",
+                "a corre\u00e7\u00e3o de inicializa\u00e7\u00e3o para dispositivos x86");
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(980);
+        Map<String, String> table = new HashMap<>(982);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -5146,5 +5154,7 @@ public final class L10nTranslations {
                 "payla\u015f\u0131lan izinlerin yeniden adland\u0131r\u0131lmas\u0131");
         table.put("the settings row in Facebook's Menu",
                 "Facebook men\u00fcs\u00fcndeki ayarlar sat\u0131r\u0131");
+        table.put("the start-up fix for x86 devices",
+                "x86 cihazlar i\u00e7in a\u00e7\u0131l\u0131\u015f d\u00fczeltmesi");
     }
 }
