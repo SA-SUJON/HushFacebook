@@ -254,10 +254,12 @@ final class MediaStoreWriter implements Downloader.Sink {
         List<String> missing = new ArrayList<>();
         if (FileNameTemplate.usesVideoId(template) && !details.hasVideoId()) missing.add("the video id");
         if (FileNameTemplate.usesOwner(template) && !details.hasOwner()) missing.add("the poster");
+        if (FileNameTemplate.usesOwnerId(template) && !details.hasOwnerId()) missing.add("the poster's id");
         if (FileNameTemplate.usesPosted(template) && !details.hasPosted()) missing.add("the post date");
         if (missing.isEmpty()) return;
 
-        boolean apart = FileNameTemplate.keepsApart(template, details.hasVideoId(), details.hasOwner(), details.hasPosted());
+        boolean apart = FileNameTemplate.keepsApart(template, details.hasVideoId(), details.hasOwner(),
+            details.hasOwnerId(), details.hasPosted());
         String asked = missing.size() == 1 ? missing.get(0)
             : String.join(", ", missing.subList(0, missing.size() - 1)) + " and " + missing.get(missing.size() - 1);
         String has = missing.size() == 1 ? "none" : missing.size() == 2 ? "neither" : "none of them";

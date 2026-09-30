@@ -1614,13 +1614,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setTitle(L10n.t("Video file name"));
         row.setDialogTitle(L10n.t("Video file name"));
         row.setDialogMessage(L10n.f("%1$s becomes the date and time of the save, %2$s the video's number on "
-                        + "Facebook, %3$s who posted it and %4$s the day it was posted. What a save doesn't know is "
-                        + "left out, and a name with none of these gets the date added. When the name is already in "
-                        + "the folder, the time of the save goes on the end. Invalid characters become underscores. "
-                        + "Leave it blank to use the default, %5$s.",
+                        + "Facebook, %3$s who posted it, %4$s their profile's number on Facebook and %5$s the day it "
+                        + "was posted. What a save doesn't know is left out, and a name with none of these gets the "
+                        + "date added. When the name is already in the folder, the time of the save goes on the end. "
+                        + "Invalid characters become underscores. Leave it blank to use the default, %6$s.",
                 L10n.isolate(FileNameTemplate.DATE), L10n.isolate(FileNameTemplate.VIDEO_ID),
-                L10n.isolate(FileNameTemplate.OWNER), L10n.isolate(FileNameTemplate.POSTED),
-                L10n.isolate(FileNameTemplate.DEFAULT)));
+                L10n.isolate(FileNameTemplate.OWNER), L10n.isolate(FileNameTemplate.OWNER_ID),
+                L10n.isolate(FileNameTemplate.POSTED), L10n.isolate(FileNameTemplate.DEFAULT)));
         row.setPositiveButtonText(L10n.t("Save"));
         // Android's own Cancel follows the activity's language, as the folder row's did.
         row.setNegativeButtonText(L10n.t("Cancel"));
