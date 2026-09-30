@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
@@ -363,7 +364,7 @@ public class SettingsBackupPreference extends Preference {
             }
             parts.addAll(valueSentences(snapshot.folderChange(), snapshot.qualityChange(), snapshot.fileNameChange(),
                     snapshot.startChange(), snapshot.orderChange(), snapshot.hiddenChange(), snapshot.keptChange(),
-                    snapshot.playbackChange(), snapshot.actionChange(), snapshot.appChange()));
+                    snapshot.playbackChange(), snapshot.actionChange(), snapshot.appChange(), snapshot.toChange()));
             message = String.join("\n\n", parts);
         }
         if (snapshot.unknown > 0) {
@@ -388,6 +389,15 @@ public class SettingsBackupPreference extends Preference {
         }
         page.importPreview = builder.show();
         ScreenColors.dialog(page.importPreview);
+    }
+
+    /** The sentence that says which top folder saves go to after an import. */
+    static String saveToSentence(SaveTo to) {
+        if (to == SaveTo.MOVIES_AND_PICTURES) {
+            return L10n.f("Videos will go to %1$s and photos to %2$s.", L10n.isolate(to.directory(true)),
+                    L10n.isolate(to.directory(false)));
+        }
+        return L10n.f("Videos and photos will go to %1$s.", L10n.isolate(to.directory(true)));
     }
 
     /** The sentence that says where saves go after an import, for the folder name [folder]. */
@@ -487,6 +497,15 @@ public class SettingsBackupPreference extends Preference {
         return valueSentences(folder, quality, fileName, start, order, hidden, kept, playback, null, null);
     }
 
+    /** A sentence for each setting that isn't a switch an import changes, the top folder aside. */
+    static List<String> valueSentences(@Nullable String folder, @Nullable DownloadQuality quality,
+                                       @Nullable String fileName, @Nullable StartTab start,
+                                       @Nullable CommentOrder order, @Nullable String hidden,
+                                       @Nullable String kept, @Nullable PlaybackQuality playback,
+                                       @Nullable SendLink.Action action, @Nullable String app) {
+        return valueSentences(folder, quality, fileName, start, order, hidden, kept, playback, action, app, null);
+    }
+
     /**
      * A sentence for each setting that isn't a switch an import changes, in the order the screen
      * shows them: the tab Facebook opens on, the word filter's lists, the order comments open in,
@@ -496,7 +515,8 @@ public class SettingsBackupPreference extends Preference {
                                        @Nullable String fileName, @Nullable StartTab start,
                                        @Nullable CommentOrder order, @Nullable String hidden,
                                        @Nullable String kept, @Nullable PlaybackQuality playback,
-                                       @Nullable SendLink.Action action, @Nullable String app) {
+                                       @Nullable SendLink.Action action, @Nullable String app,
+                                       @Nullable SaveTo to) {
         List<String> sentences = new ArrayList<>();
         if (start != null) sentences.add(startTabSentence(start));
         if (hidden != null) sentences.add(wordsSentence(hidden, true));
@@ -504,6 +524,7 @@ public class SettingsBackupPreference extends Preference {
         if (order != null) sentences.add(commentOrderSentence(order));
         if (playback != null) sentences.add(playbackQualitySentence(playback));
         if (quality != null) sentences.add(qualitySentence(quality));
+        if (to != null) sentences.add(saveToSentence(to));
         if (folder != null) sentences.add(folderSentence(folder));
         if (fileName != null) sentences.add(fileNameSentence(fileName));
         if (action != null) sentences.add(downloadActionSentence(action));
@@ -528,7 +549,8 @@ public class SettingsBackupPreference extends Preference {
             // Counted before the write, which makes every change match the store.
             String done = importedMessage(snapshot.switchChanges(), snapshot.folderChange(), snapshot.qualityChange(),
                     snapshot.fileNameChange(), snapshot.startChange(), snapshot.orderChange(), snapshot.hiddenChange(),
-                    snapshot.keptChange(), snapshot.playbackChange(), snapshot.actionChange(), snapshot.appChange());
+                    snapshot.keptChange(), snapshot.playbackChange(), snapshot.actionChange(), snapshot.appChange(),
+                    snapshot.toChange());
             accepted = Utils.runOnBackgroundThread(() -> {
                 try {
                     SettingsBackup.apply(snapshot);
@@ -592,6 +614,15 @@ public class SettingsBackupPreference extends Preference {
         return importedMessage(switches, folder, quality, fileName, start, order, hidden, kept, playback, null, null);
     }
 
+    /** The toast after an import that changed no top folder. */
+    static String importedMessage(int switches, @Nullable String folder, @Nullable DownloadQuality quality,
+                                  @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                                  @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                                  @Nullable SendLink.Action action, @Nullable String app) {
+        return importedMessage(switches, folder, quality, fileName, start, order, hidden, kept, playback, action, app,
+                null);
+    }
+
     /**
      * What the toast after an import says: how many switches changed, then a sentence for each
      * other setting that did. A folder alone keeps the one sentence it always had.
@@ -599,15 +630,15 @@ public class SettingsBackupPreference extends Preference {
     static String importedMessage(int switches, @Nullable String folder, @Nullable DownloadQuality quality,
                                   @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
                                   @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
-                                  @Nullable SendLink.Action action, @Nullable String app) {
+                                  @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to) {
         if (switches == 0 && folder != null && quality == null && fileName == null && start == null && order == null
-                && hidden == null && kept == null && playback == null && action == null && app == null) {
+                && hidden == null && kept == null && playback == null && action == null && app == null && to == null) {
             return L10n.f("Settings imported. Saves will go to a folder named %1$s.", L10n.isolate(folder));
         }
         List<String> parts = new ArrayList<>();
         parts.add(switches == 0 ? L10n.t("Settings imported.") : L10n.quantity(switches,
                 "Settings imported. %1$d switch changed.", "Settings imported. %1$d switches changed.", switches));
-        parts.addAll(valueSentences(folder, quality, fileName, start, order, hidden, kept, playback, action, app));
+        parts.addAll(valueSentences(folder, quality, fileName, start, order, hidden, kept, playback, action, app, to));
         return String.join(" ", parts);
     }
 

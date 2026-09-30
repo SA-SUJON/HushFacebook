@@ -561,6 +561,15 @@ Reels and videos will save to this phone when you tap Download.	Saat mengetuk Un
 Tapping Download on a reel or video will send its link to an app.	Mengetuk Unduh pada reel atau video akan mengirim tautannya ke aplikasi.
 Android will ask which app gets the links each time.	Android akan menanyakan aplikasi penerima tautan setiap kali.
 Links will go to %1$s.	Tautan akan dikirim ke %1$s.
+Save to	Simpan ke
+Movies and Pictures	Movies dan Pictures
+Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.	Video dan foto masuk ke %1$s, di samping milik kamera. Simpanan Anda yang sudah ada tetap di tempatnya.
+Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.	Video dan foto masuk ke %1$s, bersama unduhan lain di ponsel. Simpanan Anda yang sudah ada tetap di tempatnya.
+Videos go to %1$s and photos to %2$s, as Facebook's own saves do. Some galleries don't show %1$s.	Video masuk ke %1$s dan foto ke %2$s, seperti simpanan Facebook sendiri. Beberapa galeri tidak menampilkan %1$s.
+Choose a folder name under %1$s. Invalid characters become underscores. Leave it blank to use the default folder, %2$s.	Pilih nama folder di dalam %1$s. Karakter yang tidak valid menjadi garis bawah. Kosongkan untuk memakai folder default, %2$s.
+Videos and photos go to %1$s.	Video dan foto masuk ke %1$s.
+Videos will go to %1$s and photos to %2$s.	Video akan masuk ke %1$s dan foto ke %2$s.
+Videos and photos will go to %1$s.	Video dan foto akan masuk ke %1$s.
 # context: row title under Pause, backup and diagnostics, shown only while Debug logging is on
 Test the Messenger link	Uji koneksi Messenger
 # context: summary of that row; Debug logging is the switch's name as this table gives it

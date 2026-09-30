@@ -35,6 +35,7 @@ import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
@@ -53,19 +54,19 @@ import app.morphe.extension.shared.settings.StringSetting;
  * over. This writes them to a JSON file the person chooses and reads one back.
  *
  * <p>Only the switches in {@link #ALLOWLIST} and the settings in {@link #VALUES} (the word
- * filter's two lists, the save folder, the save quality, the video file name, what a tap on
- * Download does, the app links go to, the tab Facebook opens on, the order comments open in and
- * the quality videos play at) go out or come in. Pause, safe mode, the debug settings, the app
- * language and the counters Hushfacebook keeps for itself stay out, and so do the log, the
- * diagnostic data and anything about the person or the phone: a file is a format name, a version
- * number, one true or false per switch, two word lists, one folder name, one save quality, one
- * file name template, one download action, one package name or none, one tab, one comment order
- * and one playback quality. The word lists go only into the file the person picks, with the rest.
- * An import applies what it read in one preference commit. A file that is too large, isn't JSON,
- * names something twice, holds a value of the wrong type, a word list that isn't one clean list, a
- * folder or a template that isn't one clean name, an app that isn't a package name, or a quality,
- * download action, tab or comment order this build doesn't offer, or comes from a newer version
- * changes nothing.
+ * filter's two lists, the top folder saves go to, the save folder, the save quality, the video
+ * file name, what a tap on Download does, the app links go to, the tab Facebook opens on, the
+ * order comments open in and the quality videos play at) go out or come in. Pause, safe mode, the
+ * debug settings, the app language and the counters Hushfacebook keeps for itself stay out, and so
+ * do the log, the diagnostic data and anything about the person or the phone: a file is a format
+ * name, a version number, one true or false per switch, two word lists, one top folder, one folder
+ * name, one save quality, one file name template, one download action, one package name or none,
+ * one tab, one comment order and one playback quality. The word lists go only into the file the
+ * person picks, with the rest. An import applies what it read in one preference commit. A file
+ * that is too large, isn't JSON, names something twice, holds a value of the wrong type, a word
+ * list that isn't one clean list, a folder or a template that isn't one clean name, an app that
+ * isn't a package name, or a top folder, quality, download action, tab or comment order this build
+ * doesn't offer, or comes from a newer version changes nothing.
  * <p>The release check stays out of the file: it puts the phone online, so it's switched on
  * from the phone's own screen, never by a file.
  *
@@ -163,6 +164,12 @@ public final class SettingsBackup {
     static final StringSetting KEPT = Settings.KEPT_WORDS;
 
     /**
+     * The top folder saves go to, held in a file as its {@link SaveTo#fileValue}. Anything else
+     * refuses the whole file, as a quality does. Saves already made stay where they are.
+     */
+    static final EnumSetting<SaveTo> TO = Settings.SAVE_TO;
+
+    /**
      * The one setting a file carries that isn't a switch: the folder saves go to. A file holds it
      * as the clean folder name the saves use, and an import takes nothing else there. A value
      * {@link SaveFolder#sanitize} would change refuses the whole file, as a switch that isn't true
@@ -217,7 +224,8 @@ public final class SettingsBackup {
 
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(HIDDEN, KEPT, FOLDER, QUALITY, FILE_NAME, ACTION, APP, START, ORDER, PLAYBACK));
+            Arrays.<Setting<?>>asList(HIDDEN, KEPT, TO, FOLDER, QUALITY, FILE_NAME, ACTION, APP, START, ORDER,
+                    PLAYBACK));
 
     /**
      * Bounds for the parser, well past anything this class writes, so a file built to be
@@ -277,8 +285,8 @@ public final class SettingsBackup {
 
     /**
      * What a file says: a value for each switch it names, the folder, the quality, the file name,
-     * the start tab, the comment order, the playback quality, the download action and the app links
-     * go to when it names them, and how many other names it holds.
+     * the start tab, the comment order, the playback quality, the download action, the app links go
+     * to and the top folder when it names them, and how many other names it holds.
      */
     public static final class Snapshot {
         private static final String SWITCHES = "switches";
@@ -293,6 +301,7 @@ public final class SettingsBackup {
         private static final String PLAYBACK_NAME = "playback_quality";
         private static final String ACTION_NAME = "download_action";
         private static final String APP_NAME = "send_to_app";
+        private static final String TO_NAME = "save_to";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -326,6 +335,9 @@ public final class SettingsBackup {
         /** The package name links go to that the file holds, blank for Android's chooser, or null when it names none. */
         @Nullable
         final String app;
+        /** The top folder saves go to that the file holds, or null when it names none. */
+        @Nullable
+        final SaveTo to;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -350,6 +362,13 @@ public final class SettingsBackup {
                  @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
                  @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
                  @Nullable SendLink.Action action, @Nullable String app, int unknown) {
+            this(values, folder, quality, fileName, start, order, hidden, kept, playback, action, app, null, unknown);
+        }
+
+        Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                 @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                 @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
@@ -361,6 +380,7 @@ public final class SettingsBackup {
             this.playback = playback;
             this.action = action;
             this.app = app;
+            this.to = to;
             this.unknown = unknown;
         }
 
@@ -375,6 +395,8 @@ public final class SettingsBackup {
                     changes.put(entry.getKey(), entry.getValue());
                 }
             }
+            SaveTo toChange = toChange();
+            if (toChange != null) changes.put(TO, toChange);
             String folderChange = folderChange();
             if (folderChange != null) changes.put(FOLDER, folderChange);
             DownloadQuality qualityChange = qualityChange();
@@ -448,6 +470,12 @@ public final class SettingsBackup {
             return playback == null || playback == PLAYBACK.savedValue() ? null : playback;
         }
 
+        /** The top folder this file sends saves to, or null when it names none or the one already set. */
+        @Nullable
+        SaveTo toChange() {
+            return to == null || to == TO.savedValue() ? null : to;
+        }
+
         /** The download action this file sets, or null when it names none or the one already set. */
         @Nullable
         SendLink.Action actionChange() {
@@ -500,6 +528,7 @@ public final class SettingsBackup {
             if (playback != null) state.putString(PLAYBACK_NAME, playback.fileValue);
             if (action != null) state.putString(ACTION_NAME, action.fileValue);
             if (app != null) state.putString(APP_NAME, app);
+            if (to != null) state.putString(TO_NAME, to.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -532,7 +561,7 @@ public final class SettingsBackup {
                     hidden instanceof String && PostWords.isClean((String) hidden) ? (String) hidden : null,
                     kept instanceof String && PostWords.isClean((String) kept) ? (String) kept : null,
                     PlaybackQuality.fromFile(state.get(PLAYBACK_NAME)), SendLink.Action.fromFile(state.get(ACTION_NAME)),
-                    SendLink.isFileApp(app) ? (String) app : null, unknown);
+                    SendLink.isFileApp(app) ? (String) app : null, SaveTo.fromFile(state.get(TO_NAME)), unknown);
         }
     }
 
@@ -545,6 +574,7 @@ public final class SettingsBackup {
         for (BooleanSetting setting : ALLOWLIST) {
             switches.put(setting.key, setting.savedValue().booleanValue());
         }
+        switches.put(TO.key, TO.savedValue().fileValue);
         // The name the saves use, so a file never carries one an import would refuse.
         switches.put(FOLDER.key, SaveFolder.sanitize(FOLDER.savedValue()));
         switches.put(QUALITY.key, QUALITY.savedValue().fileValue);
@@ -652,6 +682,7 @@ public final class SettingsBackup {
         PlaybackQuality playback = null;
         SendLink.Action action = null;
         String app = null;
+        SaveTo to = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -691,6 +722,11 @@ public final class SettingsBackup {
             if (PLAYBACK.key.equals(name)) {
                 playback = PlaybackQuality.fromFile(values.opt(name));
                 if (playback == null) throw new Rejected(Reason.VALUE, "Not a playback quality: " + name);
+                continue;
+            }
+            if (TO.key.equals(name)) {
+                to = SaveTo.fromFile(values.opt(name));
+                if (to == null) throw new Rejected(Reason.VALUE, "Not a save location: " + name);
                 continue;
             }
             if (ACTION.key.equals(name)) {
@@ -733,7 +769,7 @@ public final class SettingsBackup {
             Boolean value = found.get(setting);
             if (value != null) ordered.put(setting, value);
         }
-        return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app,
+        return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
                 unknown);
     }
 

@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWordsForTests;
 import app.morphe.extension.facebook.media.PlaybackQuality;
@@ -85,6 +86,7 @@ public class HushfacebookPreferenceFragmentTest {
         PauseForTests.resume();
         BaseSettings.SAFE_MODE.resetToDefault();
         Settings.SAVE_FOLDER.resetToDefault();
+        Settings.SAVE_TO.resetToDefault();
         Settings.DOWNLOAD_QUALITY.resetToDefault();
         Settings.FILENAME_TEMPLATE.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
@@ -306,6 +308,79 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse("a folder row with no download in the build",
                         row instanceof HushfacebookPreferenceFragment.FolderRow);
             }
+        }
+    }
+
+    /**
+     * Save to (#42): right above the folder, it offers Movies and Pictures, the default, DCIM and
+     * Download, and the folder row's summary and dialog name the top folder it picks, after a tap
+     * as much as on a fresh page.
+     */
+    @Test
+    public void theSaveToRowPicksTheTopFolderAndTheFolderRowFollowsIt() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.STORY_DOWNLOAD);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int toAt = -1;
+            int folderAt = -1;
+            for (int i = 0; i < rows.size(); i++) {
+                if (rows.get(i) instanceof HushfacebookPreferenceFragment.SaveToRow) toAt = i;
+                if (rows.get(i) instanceof HushfacebookPreferenceFragment.FolderRow) folderAt = i;
+            }
+            assertTrue("no Save to row with a download in the build", toAt >= 0);
+            assertEquals("Save to isn't right above the folder", folderAt - 1, toAt);
+            HushfacebookPreferenceFragment.SaveToRow to = (HushfacebookPreferenceFragment.SaveToRow) rows.get(toAt);
+            HushfacebookPreferenceFragment.FolderRow folder = (HushfacebookPreferenceFragment.FolderRow) rows.get(folderAt);
+            assertEquals(Settings.SAVE_TO.key, to.getKey());
+            assertEquals("Save to", String.valueOf(to.getTitle()));
+            List<String> entries = new ArrayList<>();
+            for (CharSequence entry : to.getEntries()) entries.add(String.valueOf(entry));
+            assertEquals(Arrays.asList("Movies and Pictures", L10n.isolate("DCIM"), L10n.isolate("Download")), entries);
+            List<String> values = new ArrayList<>();
+            for (CharSequence value : to.getEntryValues()) values.add(String.valueOf(value));
+            assertEquals(Arrays.asList("MOVIES_AND_PICTURES", "DCIM", "DOWNLOAD"), values);
+            assertEquals("MOVIES_AND_PICTURES", to.getValue());
+            assertEquals("Videos go to " + L10n.isolate("Movies") + " and photos to " + L10n.isolate("Pictures")
+                    + ", as Facebook's own saves do. Some galleries don't show " + L10n.isolate("Movies") + ".",
+                    String.valueOf(to.getSummary()));
+            assertEquals("Choose a folder name under Movies and Pictures. Invalid characters become underscores. "
+                    + "Leave it blank to use the default folder, " + L10n.isolate("Facebook") + ".",
+                    String.valueOf(folder.getDialogMessage()));
+
+            for (SaveTo choice : new SaveTo[]{SaveTo.DOWNLOAD, SaveTo.DCIM}) {
+                to.setValue(choice.name());
+                ShadowLooper.idleMainLooper();
+                assertEquals(choice, Settings.SAVE_TO.savedValue());
+                assertEquals(HushfacebookPreferenceFragment.saveToSummary(choice), String.valueOf(to.getSummary()));
+                String top = choice.directory(true);
+                assertTrue(String.valueOf(to.getSummary()), String.valueOf(to.getSummary()).startsWith(
+                        "Videos and photos go to " + L10n.isolate(top) + ", "));
+                assertEquals("Videos and photos go to " + L10n.isolate(top + "/Facebook") + ".",
+                        String.valueOf(folder.getSummary()));
+                assertEquals("Choose a folder name under " + L10n.isolate(top) + ". Invalid characters become "
+                        + "underscores. Leave it blank to use the default folder, " + L10n.isolate("Facebook") + ".",
+                        String.valueOf(folder.getDialogMessage()));
+            }
+
+            to.setValue("MOVIES_AND_PICTURES");
+            ShadowLooper.idleMainLooper();
+            assertEquals(SaveTo.MOVIES_AND_PICTURES, Settings.SAVE_TO.savedValue());
+            assertEquals("Videos go to " + L10n.isolate("Movies/Facebook") + " and photos to "
+                    + L10n.isolate("Pictures/Facebook") + ".", String.valueOf(folder.getSummary()));
+        }
+
+        // A fresh page reads the saved choice.
+        Settings.SAVE_TO.save(SaveTo.DOWNLOAD);
+        Settings.SAVE_FOLDER.save("Clips");
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment.SaveToRow to = null;
+            HushfacebookPreferenceFragment.FolderRow folder = null;
+            for (Preference row : rowsOf(controller)) {
+                if (row instanceof HushfacebookPreferenceFragment.SaveToRow) to = (HushfacebookPreferenceFragment.SaveToRow) row;
+                if (row instanceof HushfacebookPreferenceFragment.FolderRow) folder = (HushfacebookPreferenceFragment.FolderRow) row;
+            }
+            assertEquals("DOWNLOAD", to.getValue());
+            assertEquals("Videos and photos go to " + L10n.isolate("Download/Clips") + ".", String.valueOf(folder.getSummary()));
         }
     }
 
@@ -553,8 +628,8 @@ public class HushfacebookPreferenceFragmentTest {
 
     /**
      * The download quality's row offers every quality, says what the chosen one does, and a pick
-     * reaches the setting the way the list's own dialog sends it. It sits above the folder, and
-     * it's there with any download in the build.
+     * reaches the setting the way the list's own dialog sends it. It sits above Save to and the
+     * folder, and it's there with any download in the build.
      */
     @Test
     public void theQualityRowOffersEveryQualityAndSaysWhatItDoes() {
@@ -566,16 +641,20 @@ public class HushfacebookPreferenceFragmentTest {
             collect(page.getPreferenceScreen(), rows);
             HushfacebookPreferenceFragment.QualityRow quality = null;
             int qualityAt = -1;
+            int toAt = -1;
             int folderAt = -1;
             for (int i = 0; i < rows.size(); i++) {
                 if (rows.get(i) instanceof HushfacebookPreferenceFragment.QualityRow) {
                     quality = (HushfacebookPreferenceFragment.QualityRow) rows.get(i);
                     qualityAt = i;
                 }
+                if (rows.get(i) instanceof HushfacebookPreferenceFragment.SaveToRow) toAt = i;
                 if (rows.get(i) instanceof HushfacebookPreferenceFragment.FolderRow) folderAt = i;
             }
             assertNotNull("no quality row with a download in the build", quality);
-            assertEquals("the quality row isn't next to the folder", folderAt - 1, qualityAt);
+            // Save to (#42) goes between them: the top folder, then the folder under it.
+            assertEquals("the quality row isn't right above Save to", toAt - 1, qualityAt);
+            assertEquals("Save to isn't right above the folder", folderAt - 1, toAt);
             assertEquals(Settings.DOWNLOAD_QUALITY.key, quality.getKey());
             assertEquals("Download quality", String.valueOf(quality.getTitle()));
 

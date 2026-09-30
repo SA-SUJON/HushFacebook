@@ -561,6 +561,15 @@ Reels and videos will save to this phone when you tap Download.	İndir'e dokundu
 Tapping Download on a reel or video will send its link to an app.	Bir reel'de veya videoda İndir'e dokunmak bağlantısını bir uygulamaya gönderecek.
 Android will ask which app gets the links each time.	Android bağlantıları hangi uygulamanın alacağını her seferinde soracak.
 Links will go to %1$s.	Bağlantılar %1$s uygulamasına gidecek.
+Save to	Kaydetme yeri
+Movies and Pictures	Movies ve Pictures
+Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.	Videolar ve fotoğraflar kameranınkilerin yanına, %1$s klasörüne kaydedilir. Önceden kaydettiklerin olduğu yerde kalır.
+Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.	Videolar ve fotoğraflar telefonun diğer indirmeleriyle birlikte %1$s klasörüne kaydedilir. Önceden kaydettiklerin olduğu yerde kalır.
+Videos go to %1$s and photos to %2$s, as Facebook's own saves do. Some galleries don't show %1$s.	Videolar %1$s klasörüne, fotoğraflar %2$s klasörüne kaydedilir, tıpkı Facebook'un kendi kayıtları gibi. Bazı galeriler %1$s klasörünü göstermez.
+Choose a folder name under %1$s. Invalid characters become underscores. Leave it blank to use the default folder, %2$s.	%1$s altında bir klasör adı seç. Geçersiz karakterler alt çizgiye dönüşür. Varsayılan %2$s klasörünü kullanmak için boş bırak.
+Videos and photos go to %1$s.	Videolar ve fotoğraflar %1$s klasörüne kaydedilir.
+Videos will go to %1$s and photos to %2$s.	Videolar %1$s klasörüne, fotoğraflar %2$s klasörüne gidecek.
+Videos and photos will go to %1$s.	Videolar ve fotoğraflar %1$s klasörüne gidecek.
 # context: row title under Pause, backup and diagnostics, shown only while Debug logging is on
 Test the Messenger link	Messenger bağlantısını test et
 # context: summary of that row; Debug logging is the switch's name as this table gives it

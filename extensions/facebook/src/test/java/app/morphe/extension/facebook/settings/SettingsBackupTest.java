@@ -68,6 +68,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.media.PlaybackQuality;
@@ -167,6 +168,7 @@ public class SettingsBackupTest {
         Settings.PLAYBACK_QUALITY.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
         Settings.SEND_TO_APP.resetToDefault();
+        Settings.SAVE_TO.resetToDefault();
         Settings.HIDDEN_WORDS.resetToDefault();
         Settings.KEPT_WORDS.resetToDefault();
         BaseSettings.PAUSED.resetToDefault();
@@ -211,9 +213,11 @@ public class SettingsBackupTest {
         for (Setting<?> setting : SettingsBackup.VALUES) {
             assertFalse(setting.key + " is carried and kept out at once", VALUES_STAY_OUT.containsKey(setting.key));
         }
-        assertEquals(Arrays.<Setting<?>>asList(Settings.HIDDEN_WORDS, Settings.KEPT_WORDS, Settings.SAVE_FOLDER,
-                Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE, Settings.DOWNLOAD_ACTION, Settings.SEND_TO_APP,
-                Settings.START_TAB, Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY), SettingsBackup.VALUES);
+        assertEquals(Arrays.<Setting<?>>asList(Settings.HIDDEN_WORDS, Settings.KEPT_WORDS, Settings.SAVE_TO,
+                Settings.SAVE_FOLDER, Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE, Settings.DOWNLOAD_ACTION,
+                Settings.SEND_TO_APP, Settings.START_TAB, Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY),
+                SettingsBackup.VALUES);
+        assertEquals(Settings.SAVE_TO, SettingsBackup.TO);
         assertEquals(Settings.HIDDEN_WORDS, SettingsBackup.HIDDEN);
         assertEquals(Settings.KEPT_WORDS, SettingsBackup.KEPT);
         assertEquals(Settings.SAVE_FOLDER, SettingsBackup.FOLDER);
@@ -1360,6 +1364,109 @@ public class SettingsBackupTest {
                         + "Android will ask which app gets the links each time.",
                 SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null,
                         SendLink.Action.SAVE, ""));
+    }
+
+    /** A file exported with Save to set to Download puts it back on a clean install (#42). */
+    @Test
+    public void theTopFolderComesBackOnACleanInstall() throws Exception {
+        Settings.SAVE_TO.save(SaveTo.DOWNLOAD);
+        String file = SettingsBackup.create();
+        assertEquals("download", new JSONObject(file).getJSONObject("settings").get(SettingsBackup.TO.key));
+
+        Settings.SAVE_TO.resetToDefault();
+        SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+        assertEquals(SaveTo.DOWNLOAD, snapshot.toChange());
+        assertEquals(Collections.singletonMap(SettingsBackup.TO, SaveTo.DOWNLOAD), snapshot.changes());
+        assertEquals(1, SettingsBackup.apply(snapshot));
+        assertEquals(SaveTo.DOWNLOAD, Settings.SAVE_TO.savedValue());
+        assertEquals("a file read back is the file", file, SettingsBackup.create());
+        assertEquals("the same file again changes nothing", 0, SettingsBackup.parse(file).changes().size());
+    }
+
+    /**
+     * Each top folder goes out as its file value and comes back only as one of those. Anything else
+     * refuses the whole file, a file from before it was carried leaves it alone, and a preview kept
+     * across a rebuild keeps only a value a file could hold.
+     */
+    @Test
+    public void theTopFolderComesBackOnlyAsOneTheRowOffers() throws Exception {
+        for (SaveTo to : SaveTo.values()) {
+            Settings.SAVE_TO.save(to);
+            String file = SettingsBackup.create();
+            assertEquals(to.fileValue, new JSONObject(file).getJSONObject("settings").get(SettingsBackup.TO.key));
+            Settings.SAVE_TO.save(to == SaveTo.DCIM ? SaveTo.DOWNLOAD : SaveTo.DCIM);
+
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+            assertEquals(to, snapshot.to);
+            assertEquals(Collections.singletonMap(SettingsBackup.TO, to), snapshot.changes());
+            assertEquals(1, SettingsBackup.apply(snapshot));
+            assertEquals(to, Settings.SAVE_TO.savedValue());
+            assertEquals("a file read back is the file", file, SettingsBackup.create());
+        }
+        assertEquals(Arrays.asList("movies_pictures", "dcim", "download"), Arrays.asList(
+                SaveTo.MOVIES_AND_PICTURES.fileValue, SaveTo.DCIM.fileValue, SaveTo.DOWNLOAD.fileValue));
+
+        Settings.SAVE_TO.save(SaveTo.DCIM);
+        String file = SettingsBackup.create();
+        Map<String, ?> before = store();
+        for (Object refused : new Object[]{"DCIM", "Download", "downloads", "movies", "pictures", "MOVIES_AND_PICTURES",
+                "", " dcim", "dcim ", "sdcard", 1, true, JSONObject.NULL, new JSONObject(), new org.json.JSONArray()}) {
+            JSONObject hostile = new JSONObject(file);
+            hostile.getJSONObject("settings").put(SettingsBackup.TO.key, refused);
+            try {
+                SettingsBackup.parse(hostile.toString());
+                fail("a file with the top folder " + printable(String.valueOf(refused)) + " was read");
+            } catch (SettingsBackup.Rejected rejected) {
+                assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+                assertEquals("a refusal names the setting, never what the file holds",
+                        "Not a save location: " + SettingsBackup.TO.key, rejected.getMessage());
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the top folder was carried leaves it alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.to);
+        assertNull(older.toChange());
+        SettingsBackup.apply(older);
+        assertEquals(SaveTo.DCIM, Settings.SAVE_TO.savedValue());
+
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(SaveTo.DCIM, SettingsBackup.Snapshot.fromBundle(state).to);
+        state.putString("save_to", "DCIM");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).to);
+        state.putInt("save_to", 1);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).to);
+    }
+
+    /** A file that changes the top folder says where saves will go, in the preview and the toast. */
+    @Test
+    public void importOfTheTopFolderSaysWhereSavesWillGo() throws Exception {
+        JSONObject file = new JSONObject(fileWith(Settings.DOWNLOAD_REELS, false));
+        file.getJSONObject("settings").put(SettingsBackup.TO.key, "download");
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            deliver(activity, tap(activity, page, IMPORT_ROW), file.toString());
+            AlertDialog preview = shownPreview();
+            String to = "Videos and photos will go to " + L10n.isolate("Download") + ".";
+            assertEquals("1 switch will change.\n\n" + to, String.valueOf(shadowOf(preview).getMessage()));
+            preview.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+            settle();
+            assertEquals("Settings imported. 1 switch changed. " + to, ShadowToast.getTextOfLatestToast());
+            assertEquals(SaveTo.DOWNLOAD, Settings.SAVE_TO.savedValue());
+            assertEquals("the Save to row still shows the old top folder",
+                    HushfacebookPreferenceFragment.saveToSummary(SaveTo.DOWNLOAD),
+                    String.valueOf(page.findPreference(Settings.SAVE_TO.key).getSummary()));
+            assertEquals("the folder row still names the old top folder",
+                    HushfacebookPreferenceFragment.folderSummary(
+                            app.morphe.extension.facebook.download.SaveFolder.DEFAULT, SaveTo.DOWNLOAD),
+                    String.valueOf(page.findPreference(Settings.SAVE_FOLDER.key).getSummary()));
+        }
+        assertEquals("Settings imported. Videos will go to " + L10n.isolate("Movies") + " and photos to "
+                        + L10n.isolate("Pictures") + ".",
+                SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null, null, null,
+                        SaveTo.MOVIES_AND_PICTURES));
     }
 
     /** A file that changes the start tab says where Facebook will open, before and after. */

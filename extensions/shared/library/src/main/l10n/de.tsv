@@ -561,6 +561,15 @@ Reels and videos will save to this phone when you tap Download.	Beim Tippen auf 
 Tapping Download on a reel or video will send its link to an app.	Beim Tippen auf Download wird der Link eines Reels oder Videos an eine App gesendet.
 Android will ask which app gets the links each time.	Android fragt jedes Mal, welche App die Links bekommt.
 Links will go to %1$s.	Links gehen dann an %1$s.
+Save to	Speichern in
+Movies and Pictures	Movies und Pictures
+Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.	Videos und Fotos landen in %1$s, neben denen der Kamera. Was du schon gespeichert hast, bleibt, wo es ist.
+Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.	Videos und Fotos landen in %1$s, bei den anderen Downloads des Handys. Was du schon gespeichert hast, bleibt, wo es ist.
+Videos go to %1$s and photos to %2$s, as Facebook's own saves do. Some galleries don't show %1$s.	Videos landen in %1$s und Fotos in %2$s, wie bei Facebooks eigenen Speicherungen. Manche Galerien zeigen %1$s nicht an.
+Choose a folder name under %1$s. Invalid characters become underscores. Leave it blank to use the default folder, %2$s.	Wähle einen Ordnernamen unter %1$s. Ungültige Zeichen werden zu Unterstrichen. Lass das Feld leer, um den Standardordner %2$s zu verwenden.
+Videos and photos go to %1$s.	Videos und Fotos landen in %1$s.
+Videos will go to %1$s and photos to %2$s.	Videos landen dann in %1$s und Fotos in %2$s.
+Videos and photos will go to %1$s.	Videos und Fotos landen dann in %1$s.
 # context: row title under Pause, backup and diagnostics, shown only while Debug logging is on
 Test the Messenger link	Messenger-Verbindung testen
 # context: summary of that row; Debug logging is the switch's name as this table gives it

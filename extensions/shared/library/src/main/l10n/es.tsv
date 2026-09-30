@@ -561,6 +561,15 @@ Reels and videos will save to this phone when you tap Download.	Al tocar Descarg
 Tapping Download on a reel or video will send its link to an app.	Al tocar Descargar en un reel o video, su enlace se enviará a una app.
 Android will ask which app gets the links each time.	Android preguntará cada vez qué app recibe los enlaces.
 Links will go to %1$s.	Los enlaces irán a %1$s.
+Save to	Guardar en
+Movies and Pictures	Movies y Pictures
+Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.	Los videos y las fotos van a %1$s, junto a los de la cámara. Lo que ya guardaste se queda donde está.
+Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.	Los videos y las fotos van a %1$s, con las demás descargas del teléfono. Lo que ya guardaste se queda donde está.
+Videos go to %1$s and photos to %2$s, as Facebook's own saves do. Some galleries don't show %1$s.	Los videos van a %1$s y las fotos a %2$s, como lo que guarda el propio Facebook. Algunas galerías no muestran %1$s.
+Choose a folder name under %1$s. Invalid characters become underscores. Leave it blank to use the default folder, %2$s.	Elige un nombre de carpeta dentro de %1$s. Los caracteres no válidos se convierten en guiones bajos. Déjalo en blanco para usar la carpeta predeterminada, %2$s.
+Videos and photos go to %1$s.	Los videos y las fotos van a %1$s.
+Videos will go to %1$s and photos to %2$s.	Los videos irán a %1$s y las fotos a %2$s.
+Videos and photos will go to %1$s.	Los videos y las fotos irán a %1$s.
 # context: row title under Pause, backup and diagnostics, shown only while Debug logging is on
 Test the Messenger link	Probar la conexión con Messenger
 # context: summary of that row; Debug logging is the switch's name as this table gives it

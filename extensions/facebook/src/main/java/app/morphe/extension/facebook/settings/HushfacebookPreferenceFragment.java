@@ -16,7 +16,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -59,6 +58,7 @@ import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveControl;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
@@ -584,6 +584,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                     L10n.t("For WhatsApp, video editors such as CapCut and InShot, or a gallery or player that plays saves "
                             + "without sound. May lower quality.")));
             downloads.addPreference(qualityRow(context));
+            downloads.addPreference(saveToRow(context));
             downloads.addPreference(folderRow(context));
             downloads.addPreference(fileNameRow(context));
             // Reels and feed and Watch videos can go to another app as a link (#41). A story can't:
@@ -1194,12 +1195,27 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     protected void updateUIAvailability() {
         super.updateUIAvailability();
         showMarketplaceSettings();
+        showSaveFolder();
     }
 
     @Override
     protected void updateUIToSettingValues() {
         super.updateUIToSettingValues();
         showMarketplaceSettings();
+        showSaveFolder();
+    }
+
+    /**
+     * The folder row names the top folder Save to picks, in its summary and its dialog, so it's
+     * redone after a tap on either row or an import.
+     */
+    private void showSaveFolder() {
+        if (getPreferenceScreen() == null) return;
+        Preference folder = findPreference(Settings.SAVE_FOLDER.key);
+        if (!(folder instanceof FolderRow)) return;
+        FolderRow row = (FolderRow) folder;
+        row.setSummary(folderSummary(SaveFolder.sanitize(row.getText())));
+        row.setDialogMessage(folderDialogMessage(Settings.SAVE_TO.savedValue()));
     }
 
     /**
@@ -1560,6 +1576,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((QualityRow) listPreference).showSummary();
         } else if (listPreference instanceof DownloadActionRow) {
             ((DownloadActionRow) listPreference).showSummary();
+        } else if (listPreference instanceof SaveToRow) {
+            ((SaveToRow) listPreference).showSummary();
         } else if (listPreference instanceof StartTabRow) {
             ((StartTabRow) listPreference).showSummary();
         } else if (listPreference instanceof CommentOrderRow) {
@@ -1580,8 +1598,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setKey(Settings.SAVE_FOLDER.key);
         row.setTitle(L10n.t("Save folder"));
         row.setDialogTitle(L10n.t("Save folder"));
-        row.setDialogMessage(L10n.f("Choose a folder name under Movies and Pictures. Invalid characters become "
-                + "underscores. Leave it blank to use the default folder, %1$s.", L10n.isolate(SaveFolder.DEFAULT)));
+        row.setDialogMessage(folderDialogMessage(Settings.SAVE_TO.savedValue()));
         row.setPositiveButtonText(L10n.t("Save"));
         // Unset, Android fills in its own Cancel in the activity's language, which can differ
         // from Facebook's, and the dialog read "Speichern" next to "Cancel".
@@ -1601,6 +1618,52 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             return false;
         });
         return row;
+    }
+
+    /** What the folder row's dialog says, naming the top folder [to] puts the folder under. */
+    static String folderDialogMessage(SaveTo to) {
+        if (to == SaveTo.MOVIES_AND_PICTURES) {
+            return L10n.f("Choose a folder name under Movies and Pictures. Invalid characters become "
+                    + "underscores. Leave it blank to use the default folder, %1$s.", L10n.isolate(SaveFolder.DEFAULT));
+        }
+        return L10n.f("Choose a folder name under %1$s. Invalid characters become underscores. Leave it blank to "
+                + "use the default folder, %2$s.", L10n.isolate(to.directory(true)), L10n.isolate(SaveFolder.DEFAULT));
+    }
+
+    /**
+     * The top folder saves go to (#42): Movies and Pictures, where Facebook's own saves go, or DCIM
+     * or Download for both. The values are the setting's own names, as the quality's are. DCIM and
+     * Download are the folders' own names on the phone, so they aren't translated.
+     */
+    static SaveToRow saveToRow(Context context) {
+        SaveToRow row = new SaveToRow(context);
+        row.setKey(Settings.SAVE_TO.key);
+        row.setTitle(L10n.t("Save to"));
+        row.setDialogTitle(L10n.t("Save to"));
+        // Android's own Cancel follows the activity's language, as the quality row's did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        // DCIM and Download are folder names, spelled as the phone spells them in every language.
+        row.setEntries(new CharSequence[]{L10n.t("Movies and Pictures"), L10n.isolate(SaveTo.DCIM.directory(true)),
+                L10n.isolate(SaveTo.DOWNLOAD.directory(true))});
+        row.setEntryValues(new CharSequence[]{SaveTo.MOVIES_AND_PICTURES.name(), SaveTo.DCIM.name(),
+                SaveTo.DOWNLOAD.name()});
+        row.setValue(Settings.SAVE_TO.savedValue().name());
+        return row;
+    }
+
+    /** What the Save to row says for [to]. */
+    static String saveToSummary(SaveTo to) {
+        switch (to) {
+            case DCIM:
+                return L10n.f("Videos and photos go to %1$s, next to the camera's. Saves you already have stay "
+                        + "where they are.", L10n.isolate(to.directory(true)));
+            case DOWNLOAD:
+                return L10n.f("Videos and photos go to %1$s, with the phone's other downloads. Saves you already "
+                        + "have stay where they are.", L10n.isolate(to.directory(true)));
+            default:
+                return L10n.f("Videos go to %1$s and photos to %2$s, as Facebook's own saves do. Some galleries "
+                        + "don't show %1$s.", L10n.isolate(to.directory(true)), L10n.isolate(to.directory(false)));
+        }
     }
 
     /**
@@ -1714,10 +1777,19 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 : L10n.f("Links go to %1$s. When it isn't installed, Android asks which app.", L10n.isolate(target));
     }
 
-    /** "Videos go to Movies/Clips and photos to Pictures/Clips." for the folder [leaf]. */
+    /** {@link #folderSummary(String, SaveTo)} under the top folder Save to picks now. */
     static String folderSummary(String leaf) {
-        String videos = Environment.DIRECTORY_MOVIES + "/" + leaf;
-        String photos = Environment.DIRECTORY_PICTURES + "/" + leaf;
+        return folderSummary(leaf, Settings.SAVE_TO.savedValue());
+    }
+
+    /**
+     * "Videos go to Movies/Clips and photos to Pictures/Clips." for the folder [leaf] under
+     * [to], or "Videos and photos go to Download/Clips." when both go to one top folder.
+     */
+    static String folderSummary(String leaf, SaveTo to) {
+        String videos = to.directory(true) + "/" + leaf;
+        String photos = to.directory(false) + "/" + leaf;
+        if (videos.equals(photos)) return L10n.f("Videos and photos go to %1$s.", L10n.isolate(videos));
         return L10n.f("Videos go to %1$s and photos to %2$s.", L10n.isolate(videos), L10n.isolate(photos));
     }
 
@@ -2146,6 +2218,45 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 if (candidate.name().equals(getValue())) quality = candidate;
             }
             setSummary(qualitySummary(quality));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The Save to row. Its summary follows its value, whoever sets it: the person, the shared page
+     * syncing it from the setting, or an import.
+     */
+    static final class SaveToRow extends ListPreference {
+        SaveToRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            SaveTo to = SaveTo.MOVIES_AND_PICTURES;
+            for (SaveTo candidate : SaveTo.values()) {
+                if (candidate.name().equals(getValue())) to = candidate;
+            }
+            setSummary(saveToSummary(to));
         }
 
         @Override

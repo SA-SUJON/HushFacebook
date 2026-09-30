@@ -13,6 +13,7 @@ import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -490,7 +491,16 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reel_prompts", TRUE);
 
     /**
-     * The folder every save goes to, under Movies for a video and Pictures for a photo. The
+     * The top folder saves go to: Movies for a video and Pictures for a photo, the default and
+     * where Facebook's own saves go, or DCIM or Download for both (#42). The {@link #SAVE_FOLDER}
+     * goes under it. Saves made before a change stay where they are. Like the folder, it isn't a
+     * switch.
+     */
+    public static final EnumSetting<SaveTo> SAVE_TO =
+            new EnumSetting<>("hushfacebook_save_to", SaveTo.MOVIES_AND_PICTURES);
+
+    /**
+     * The folder every save goes to, under the top folder {@link #SAVE_TO} names. The
      * settings row and an import keep it clean, and {@link SaveFolder#sanitize} cleans it again
      * wherever it's read, so whatever wrote the store, a save lands in one folder under each.
      * It isn't a switch, and a paused Facebook makes no Hushfacebook saves for it to steer.
