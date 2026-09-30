@@ -24,19 +24,35 @@ public final class ReactColours {
 
     /** A view's background colour. */
     public static int background(int color) {
-        if (SettingsStatus.amoledTheme()) color = AmoledTheme.react(color);
-        return SettingsStatus.materialYouTheme() ? MaterialYouTheme.react(color) : color;
+        return background(color, SettingsStatus.amoledTheme(), SettingsStatus.materialYouTheme());
     }
 
     /** A text span's colour. */
     public static int text(int color) {
-        return SettingsStatus.materialYouTheme() ? MaterialYouTheme.react(color) : color;
+        return text(color, SettingsStatus.materialYouTheme());
     }
 
     /** A border's or an image tint's colour, or null when the screen set none. */
     @Nullable
     public static Integer colour(@Nullable Integer color) {
-        if (color == null || !SettingsStatus.materialYouTheme()) return color;
+        return colour(color, SettingsStatus.materialYouTheme());
+    }
+
+    /** {@link #background(int)} with the themes in the build given. */
+    static int background(int color, boolean amoled, boolean materialYou) {
+        if (amoled) color = AmoledTheme.react(color);
+        return materialYou ? MaterialYouTheme.react(color) : color;
+    }
+
+    /** {@link #text(int)} with the theme in the build given. */
+    static int text(int color, boolean materialYou) {
+        return materialYou ? MaterialYouTheme.react(color) : color;
+    }
+
+    /** {@link #colour(Integer)} with the theme in the build given. */
+    @Nullable
+    static Integer colour(@Nullable Integer color, boolean materialYou) {
+        if (color == null || !materialYou) return color;
         int recoloured = MaterialYouTheme.react(color);
         return recoloured == color ? color : Integer.valueOf(recoloured);
     }

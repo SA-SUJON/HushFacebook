@@ -419,6 +419,41 @@ public class MaterialYouThemeTest {
         assertTrue(pin == ReactColours.colour(pin));
     }
 
+    /**
+     * The order ReactColours runs the themes in: AMOLED first for a background, so Material You
+     * gets AMOLED's colour, as route four does. With AMOLED's background set to #18191A, one of the
+     * dark surfaces, Marketplace's #252728 strip goes to AMOLED's colour and on to the palette's
+     * neutral at its lightness; the other way round it would end on AMOLED's plain #18191A. Text,
+     * borders and tints skip AMOLED, so a dark grey there keeps its colour with Material You out.
+     */
+    @Test
+    public void reactColoursRunAmoledFirstForABackgroundOnly() {
+        DarkMode.answer(true);
+        MaterialYouTheme.use(PalettesForTests.palette(PalettesForTests.RED), false);
+        AmoledTheme.useBackground(0xFF18191A);
+        try {
+            TonePalette red = PalettesForTests.palette(PalettesForTests.RED);
+            int neutral = red.sameLightness(TonePalette.NEUTRAL, 0xFF18191A);
+            assertNotEquals("the palette's neutral isn't AMOLED's colour", 0xFF18191A, neutral);
+            assertEquals("both themes", neutral, ReactColours.background(0xFF252728, true, true));
+            assertEquals("AMOLED alone", 0xFF18191A, ReactColours.background(0xFF252728, true, false));
+            assertEquals("Material You alone", red.sameLightness(TonePalette.NEUTRAL, 0xFF252728),
+                    ReactColours.background(0xFF252728, false, true));
+            assertEquals("neither", 0xFF252728, ReactColours.background(0xFF252728, false, false));
+
+            assertEquals("text skips AMOLED", 0xFF333334, ReactColours.text(0xFF333334, false));
+            assertEquals("text with Material You", red.sameLightness(TonePalette.ACCENT, 0xFF5AA7FF),
+                    ReactColours.text(0xFF5AA7FF, true));
+            assertEquals("a tint with Material You", Integer.valueOf(red.sameLightness(TonePalette.ACCENT, 0xFF75B6FF)),
+                    ReactColours.colour(0xFF75B6FF, true));
+            Integer unlisted = 0xFF123456;
+            assertTrue("an unlisted tint comes back as it was", unlisted == ReactColours.colour(unlisted, true));
+            assertEquals("no tint set", null, ReactColours.colour(null, true));
+        } finally {
+            AmoledTheme.useBackground(0xFF000000);
+        }
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void aServerStringThatIsNoColourThrowsAsBefore() {
         MaterialYouTheme.parseColor("not a colour");
