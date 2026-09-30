@@ -112,7 +112,8 @@ class MaterialYouStylesTest {
         val night = xml("<resources/>")
         val nightColours = xml("<resources/>")
         val stateLists = mutableMapOf<String, String>()
-        val changed = writeNightStyles(darkFdsStyles(source, tokens), colours, nightColourNames, tokens, night, nightColours, stateLists)
+        val changed = writeNightStyles(darkFdsStyles(source, tokens), colours, nightColourNames, tokens, night, nightColours,
+            xml("<resources/>"), stateLists, emptySet())
 
         val copies = night.elements("style.2").associateBy { it.getAttribute("name") }
         assertEquals("only styles with an item to change are copied", setOf("dark", "darker", "darker_child"), copies.keys)
@@ -146,6 +147,43 @@ class MaterialYouStylesTest {
             assertEquals(shade.fallback, fallbacks[shade.name])
             assertEquals(shade.stateList, stateLists[shade.name])
         }
+    }
+
+    @Test
+    fun `a token some code reads as plain data takes a system tone or stays`() {
+        val night = xml("<resources/>")
+        val nightColours = xml("<resources/>")
+        val blue = checkNotNull(nightTone("#ff0866ff"))
+        val nightV31Colours = xml("<resources><color name=\"hushfacebook_you_accent_50\">${blue.systemColor}</color></resources>")
+        val stateLists = mutableMapOf<String, String>()
+        val plain = setOf("PRIMARY_BUTTON_BACKGROUND", "ACCENT", "ACCENT_DEEMPHASIZED", "PRIMARY_TEXT")
+        val changed = writeNightStyles(darkFdsStyles(defaults(), tokens), colours, nightColourNames, tokens, night,
+            nightColours, nightV31Colours, stateLists, plain)
+
+        val copies = night.elements("style.2").associateBy { it.getAttribute("name") }
+        val dark = copies.getValue("dark").items()
+        assertEquals("a blue 2 L* from tone 50 is that tone", "@color/hushfacebook_you_accent_50",
+            dark[attribute("PRIMARY_BUTTON_BACKGROUND")])
+        assertEquals("a blue with no tone within 3 L* stays", "@color/accent", dark[attribute("ACCENT")])
+        assertEquals("a translucent colour stays", "@color/tint", dark[attribute("ACCENT_DEEMPHASIZED")])
+        assertEquals("a token read as a colour state list keeps its shade", "@color/hushfacebook_you_neutral_l21",
+            dark[attribute("CARD_BACKGROUND")])
+        assertEquals("@color/hushfacebook_you_neutral_95", copies.getValue("darker_child").items()[attribute("PRIMARY_TEXT")])
+        assertEquals("@color/hushfacebook_you_accent_l60", copies.getValue("darker").items()[attribute("BLUE_LINK")])
+        assertEquals(4, changed)
+
+        val text = checkNotNull(nightTone("#fff2f4f7"))
+        assertEquals("only the other tokens get state lists", setOf("hushfacebook_you_neutral_l21", "hushfacebook_you_accent_l60"),
+            stateLists.keys)
+        val fallbacks = nightColours.elements("color").associate { it.getAttribute("name") to it.textContent }
+        assertEquals(blue.fallback, fallbacks["hushfacebook_you_accent_50"])
+        assertEquals(text.fallback, fallbacks["hushfacebook_you_neutral_95"])
+        assertEquals(4, fallbacks.size)
+        val dynamic = nightV31Colours.elements("color").map { it.getAttribute("name") to it.textContent }
+        assertEquals("each tone's system colour is written once for Android 12 and newer",
+            listOf("hushfacebook_you_accent_50" to "@android:color/system_accent1_500",
+                "hushfacebook_you_neutral_95" to "@android:color/system_neutral1_50"),
+            dynamic)
     }
 
     @Test
@@ -194,7 +232,7 @@ class MaterialYouStylesTest {
         val source = defaults()
         val before = source.text()
         writeNightStyles(darkFdsStyles(source, tokens), colours, nightColourNames, tokens,
-            xml("<resources/>"), xml("<resources/>"), mutableMapOf())
+            xml("<resources/>"), xml("<resources/>"), xml("<resources/>"), mutableMapOf(), emptySet())
         assertEquals(before, source.text())
     }
 
@@ -203,7 +241,7 @@ class MaterialYouStylesTest {
         val night = xml("<resources><style.2 name=\"dark\"><item name=\"x\">#ff000000</item></style.2></resources>")
         val before = night.text()
         val changed = writeNightStyles(darkFdsStyles(defaults(), tokens), colours, nightColourNames, tokens,
-            night, xml("<resources/>"), mutableMapOf())
+            night, xml("<resources/>"), xml("<resources/>"), mutableMapOf(), emptySet())
         val names = night.elements("style.2").map { it.getAttribute("name") }
         assertEquals(listOf("dark", "darker", "darker_child"), names)
         assertTrue("Facebook's night dark style was changed", night.text().startsWith(before.substringBefore("</resources>")))
@@ -216,7 +254,7 @@ class MaterialYouStylesTest {
         val nightColours = xml("<resources><color name=\"${blue.name}\">${blue.fallback}</color></resources>")
         val stateLists = mutableMapOf(blue.name to blue.stateList)
         writeNightStyles(darkFdsStyles(defaults(), tokens), colours, nightColourNames, tokens,
-            xml("<resources/>"), nightColours, stateLists)
+            xml("<resources/>"), nightColours, xml("<resources/>"), stateLists, emptySet())
         assertEquals(1, nightColours.elements("color").count { it.getAttribute("name") == blue.name })
         assertEquals(blue.stateList, stateLists[blue.name])
         assertEquals("the other five shades still go in", 6, stateLists.size)

@@ -270,7 +270,10 @@ private val materialYouResourcePatch = resourcePatch {
             get(nightStyles, false).let { if (!it.exists()) it.writeText(EMPTY_RESOURCES) }
             restyled += document(nightStyles).use { night ->
                 document(NIGHT_COLORS).use { nightColours ->
-                    writeNightStyles(family, colours, nightColourNames, tokenAttributeNames, night, nightColours, stateLists)
+                    document(NIGHT_V31_COLORS).use { nightV31Colours ->
+                        writeNightStyles(family, colours, nightColourNames, tokenAttributeNames, night, nightColours,
+                            nightV31Colours, stateLists, plainTokens)
+                    }
                 }
             }
         }

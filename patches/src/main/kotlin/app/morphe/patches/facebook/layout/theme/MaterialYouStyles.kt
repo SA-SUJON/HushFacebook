@@ -5,15 +5,19 @@
 package app.morphe.patches.facebook.layout.theme
 
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patches.facebook.misc.extension.parameterRegisterNumber
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import java.util.Locale
@@ -37,10 +41,13 @@ import kotlin.math.roundToInt
  * token of its own, with each item for a token and colour FDS_DARK or FDS_SHARED lists pointing at a
  * palette colour instead, at the listed colour's lightness and alpha, the lightness route one's
  * runtime hooks give it (the hue is the nearest system tone's, where route one blends the two tones
- * either side). Night resources are only read while Facebook's dark mode is on, so light mode, and the
- * Video tab in light mode with it, keeps the default styles as they are. A colour the tables don't
- * list for its token (the logo's blue, a map's), black, white and any colour that's neither a grey
- * nor one of Facebook's blues stay as Facebook has them.
+ * either side). On Android 12 and newer that palette colour is a colour state list, which some of
+ * Facebook's code can't read: it resolves the attribute and takes `TypedValue.data` as the colour, and
+ * gets the file's name. Those tokens' items take the nearest system tone itself instead, as the night
+ * colours do, or stay when none is near. Night resources are only read while Facebook's dark mode is
+ * on, so light mode, and the Video tab in light mode with it, keeps the default styles as they are. A
+ * colour the tables don't list for its token (the logo's blue, a map's), black, white and any colour
+ * that's neither a grey nor one of Facebook's blues stay as Facebook has them.
  */
 
 /** MaterialYouTheme.FDS_DARK, which the parity test holds to the extension's. */
@@ -108,7 +115,13 @@ private const val FULL_THEME_ITEMS = 300
  */
 internal var tokenAttributeNames: Map<String, String> = emptyMap()
 
-/** Reads [tokenAttributeNames] out of the token enum FDSColors resolves. */
+/**
+ * The FDS tokens some of Facebook's code reads as a plain colour, which [dataReadTokens] finds. Their
+ * night style items keep a plain colour instead of a state list.
+ */
+internal var plainTokens: Set<String> = emptySet()
+
+/** Reads [tokenAttributeNames] and [plainTokens] out of the token enum FDSColors resolves. */
 internal val fdsTokenAttributesPatch = bytecodePatch {
     execute {
         val source = classDefBy(FDS_COLORS).methods.singleOrNull { method ->
@@ -116,23 +129,40 @@ internal val fdsTokenAttributesPatch = bytecodePatch {
                 method.parameterTypes.size == 3 && method.parameterTypes[0].toString() == "Landroid/content/Context;"
         } ?: error("FDSColors has no single Integer colour source taking a Context, a token and a palette")
         val tokenType = source.parameterTypes[1].toString()
-        val initializer = classDefBy(tokenType).methods.single { it.name == "<clinit>" }
-        tokenAttributeNames = tokenAttributes(initializer, tokenType).entries
+        val tokenClass = classDefBy(tokenType)
+        val constants = tokenConstants(tokenClass.methods.single { it.name == "<clinit>" }, tokenType)
+        tokenAttributeNames = constants.attributes.entries
             .associate { (token, attribute) -> "attr_0x%08x".format(attribute) to token }
         check(tokenAttributeNames.size > FULL_THEME_ITEMS) {
             "The FDS token enum has too few constants with a theme attribute, so no style item can be matched"
         }
+        plainTokens = dataReadTokens({ visit -> classDefForEach { visit(it) } }, constants, tokenAttributeField(tokenClass))
     }
 }
 
 /**
- * Each constant of the token enum, by name, with the theme attribute it passes. Follows constants
- * and moves through registers to each constructor call, which takes the name, the ordinal, the theme
- * attribute, a fallback colour and a colour resource.
+ * The token enum's constants: each one's theme attribute by its name, and its name by the static
+ * field holding it, for the token enum [type].
  */
-internal fun tokenAttributes(initializer: Method, tokenType: String): Map<String, Int> {
+internal class TokenConstants(val type: String, val attributes: Map<String, Int>, val fields: Map<String, String>)
+
+/** A token constant being built in the enum's initializer, told apart from the others by identity. */
+private class BuiltToken
+
+/** Each constant of the token enum, by name, with the theme attribute it passes. */
+internal fun tokenAttributes(initializer: Method, tokenType: String): Map<String, Int> =
+    tokenConstants(initializer, tokenType).attributes
+
+/**
+ * Follows constants and moves through registers to each constructor call, which takes the name, the
+ * ordinal, the theme attribute, a fallback colour and a colour resource, and on to the static field
+ * each built constant goes in.
+ */
+internal fun tokenConstants(initializer: Method, tokenType: String): TokenConstants {
     val registers = mutableMapOf<Int, Any?>()
     val tokens = mutableMapOf<String, Int>()
+    val built = mutableMapOf<BuiltToken, String>()
+    val fields = mutableMapOf<String, String>()
     for (instruction in initializer.implementation!!.instructions) {
         val opcode = instruction.opcode
         when {
@@ -156,12 +186,165 @@ internal fun tokenAttributes(initializer: Method, tokenType: String): Map<String
                 }
                 val name = registers[arguments[1]] as? String ?: continue
                 (registers[arguments[3]] as? Int)?.let { tokens[name] = it }
+                (registers[arguments[0]] as? BuiltToken)?.let { built[it] = name }
             }
-            instruction is OneRegisterInstruction && opcode != Opcode.SPUT_OBJECT -> registers.remove(instruction.registerA)
+            opcode == Opcode.NEW_INSTANCE && (instruction as ReferenceInstruction).reference.toString() == tokenType ->
+                registers[(instruction as OneRegisterInstruction).registerA] = BuiltToken()
+            opcode == Opcode.SPUT_OBJECT -> {
+                val field = (instruction as ReferenceInstruction).reference as FieldReference
+                val name = (registers[(instruction as OneRegisterInstruction).registerA] as? BuiltToken)?.let { built[it] }
+                if (field.definingClass == tokenType && name != null) fields[field.name] = name
+            }
+            instruction is OneRegisterInstruction -> registers.remove(instruction.registerA)
         }
     }
-    return tokens
+    return TokenConstants(tokenType, tokens, fields)
 }
+
+/** The token enum's field holding each constant's theme attribute, which its constructor stores. */
+internal fun tokenAttributeField(tokenClass: ClassDef): String {
+    val fields = tokenClass.methods.filter { it.name == "<init>" && it.parameterTypes.size > 2 }.flatMap { constructor ->
+        val attribute = constructor.parameterRegisterNumber(2)
+        constructor.implementation!!.instructions
+            .filter { it.opcode == Opcode.IPUT && (it as TwoRegisterInstruction).registerA == attribute }
+            .map { (it as ReferenceInstruction).reference.toString() }
+    }.toSet()
+    return fields.singleOrNull() ?: error("The FDS token enum keeps its theme attribute in ${fields.size} fields, not one")
+}
+
+private const val RESOLVE_ATTRIBUTE = "Landroid/content/res/Resources\$Theme;->resolveAttribute(ILandroid/util/TypedValue;Z)Z"
+private const val TYPED_VALUE = "Landroid/util/TypedValue;"
+
+/** Where a register's value came from, as far as a look back up the method goes. */
+private sealed interface Origin {
+    class Literal(val value: Int) : Origin
+    class Token(val field: String) : Origin
+    class Parameter(val index: Int) : Origin
+    object Other : Origin
+}
+
+/**
+ * The FDS tokens Facebook's code resolves with `Theme.resolveAttribute` and then reads as
+ * `TypedValue.data` without looking at `TypedValue.type`. A night style item pointing at a colour
+ * state list resolves to the file's name there, not a colour, so these tokens' items keep a plain
+ * colour. Each method reading `data` but never `type` is looked at: the attribute it resolves is a
+ * token's literal, a token constant's [attributeField], or a parameter, which makes the method a
+ * helper whose callers are looked at the same way. [forEachClass] walks every class, twice.
+ */
+internal fun dataReadTokens(
+    forEachClass: ((ClassDef) -> Unit) -> Unit,
+    constants: TokenConstants,
+    attributeField: String,
+): Set<String> {
+    val byAttribute = constants.attributes.entries.associate { (name, attribute) -> attribute to name }
+    val found = sortedSetOf<String>()
+    fun note(origin: Origin) {
+        when (origin) {
+            is Origin.Literal -> byAttribute[origin.value]?.let { found += it }
+            is Origin.Token -> constants.fields[origin.field]?.let { found += it }
+            else -> Unit
+        }
+    }
+
+    val helpers = mutableMapOf<String, Int>()
+    forEachClass { classDef ->
+        if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@forEachClass
+        for (method in classDef.methods) {
+            val instructions = method.implementation?.instructions ?: continue
+            if (!readsDataWithoutType(instructions)) continue
+            val listed = instructions.toList()
+            for ((index, instruction) in listed.withIndex()) {
+                if ((instruction as? ReferenceInstruction)?.reference?.toString() != RESOLVE_ATTRIBUTE) continue
+                when (val origin = origin(method, listed, index, instruction.arguments()[1], constants, attributeField)) {
+                    is Origin.Parameter -> helpers[method.key()] = origin.index
+                    else -> note(origin)
+                }
+            }
+        }
+    }
+    if (helpers.isEmpty()) return found
+
+    val helperTypes = helpers.keys.map { it.substringBefore("->") }.toSet()
+    forEachClass { classDef ->
+        if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@forEachClass
+        for (method in classDef.methods) {
+            val instructions = method.implementation?.instructions ?: continue
+            var listed: List<Instruction>? = null
+            for ((index, instruction) in instructions.withIndex()) {
+                val target = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: continue
+                if (target.definingClass !in helperTypes) continue
+                val parameter = helpers[target.key()] ?: continue
+                val static = instruction.opcode == Opcode.INVOKE_STATIC || instruction.opcode == Opcode.INVOKE_STATIC_RANGE
+                val slot = (if (static) 0 else 1) +
+                    target.parameterTypes.take(parameter).sumOf { if (it.toString() == "J" || it.toString() == "D") 2 else 1 }
+                val all = listed ?: instructions.toList().also { listed = it }
+                note(origin(method, all, index, instruction.arguments()[slot], constants, attributeField))
+            }
+        }
+    }
+    return found
+}
+
+private fun readsDataWithoutType(instructions: Iterable<Instruction>): Boolean {
+    var data = false
+    for (instruction in instructions) {
+        val field = (instruction as? ReferenceInstruction)?.reference as? FieldReference ?: continue
+        if (field.definingClass != TYPED_VALUE) continue
+        when (field.name) {
+            "type" -> return false
+            "data" -> data = true
+        }
+    }
+    return data
+}
+
+private fun MethodReference.key(): String = "$definingClass->$name(${parameterTypes.joinToString("")})$returnType"
+
+private fun Instruction.arguments(): List<Int> = when (this) {
+    is RegisterRangeInstruction -> (0 until registerCount).map { startRegister + it }
+    is FiveRegisterInstruction -> listOf(registerC, registerD, registerE, registerF, registerG).take(registerCount)
+    else -> error("unexpected call form $opcode")
+}
+
+/**
+ * What last went into [register] before instruction [at], looking back in code order: a literal, a
+ * token constant's attribute read off its static field, one of [method]'s parameters, or something
+ * else.
+ */
+private fun origin(
+    method: Method,
+    instructions: List<Instruction>,
+    at: Int,
+    register: Int,
+    constants: TokenConstants,
+    attributeField: String,
+): Origin {
+    for (index in at - 1 downTo 0) {
+        val instruction = instructions[index]
+        if (!instruction.opcode.setsRegister()) continue
+        val target = (instruction as OneRegisterInstruction).registerA
+        if (instruction.opcode.setsWideRegister() && target + 1 == register) return Origin.Other
+        if (target != register) continue
+        return when {
+            instruction is NarrowLiteralInstruction -> Origin.Literal(instruction.narrowLiteral)
+            instruction.opcode == Opcode.IGET && (instruction as ReferenceInstruction).reference.toString() == attributeField ->
+                origin(method, instructions, index, (instruction as TwoRegisterInstruction).registerB, constants, attributeField)
+                    .takeIf { it is Origin.Token } ?: Origin.Other
+            instruction.opcode == Opcode.SGET_OBJECT -> {
+                val field = (instruction as ReferenceInstruction).reference as FieldReference
+                if (field.definingClass == constants.type && field.type == constants.type) Origin.Token(field.name) else Origin.Other
+            }
+            instruction.opcode in MOVES ->
+                origin(method, instructions, index, (instruction as TwoRegisterInstruction).registerB, constants, attributeField)
+            else -> Origin.Other
+        }
+    }
+    return method.parameterTypes.indices.firstOrNull { method.parameterRegisterNumber(it) == register }
+        ?.let { Origin.Parameter(it) } ?: Origin.Other
+}
+
+private val MOVES = setOf(Opcode.MOVE, Opcode.MOVE_FROM16, Opcode.MOVE_16, Opcode.MOVE_OBJECT,
+    Opcode.MOVE_OBJECT_FROM16, Opcode.MOVE_OBJECT_16)
 
 private fun Element.childElements(): List<Element> =
     (0 until childNodes.length).mapNotNull { childNodes.item(it) as? Element }
@@ -311,12 +494,21 @@ private fun defaultColour(value: String, colours: Map<String, String>, nightColo
 }
 
 /**
+ * The plain palette colour a night style item for one of [plainTokens] points at: a system tone
+ * itself, as route two gives the night colours.
+ */
+private val NightTone.name: String
+    get() = "hushfacebook_you_" + (if (accent) "accent" else "neutral") + "_$tone"
+
+/**
  * Writes into [night] a copy of each style in [family] with an item to change, its items for a
  * listed token and colour pointing at that colour's [NightShade], and adds each shade once to
  * [nightColours] (the fixed palette, for Android 11) and [stateLists] (the wallpaper's, as the
- * `res/color-night-v31` file for each name). [colours] are the default colours by name and
- * [nightColourNames] the ones with a night value. A style [night] already has is left to Facebook.
- * Answers how many items it pointed elsewhere.
+ * `res/color-night-v31` file for each name). An item for one of [plain], the tokens some code reads
+ * as a plain colour, takes the colour's [nightTone] instead, a colour in [nightColours] and a system
+ * colour in [nightV31Colours], or stays when no tone is near. [colours] are the default colours by
+ * name and [nightColourNames] the ones with a night value. A style [night] already has is left to
+ * Facebook. Answers how many items it pointed elsewhere.
  */
 internal fun writeNightStyles(
     family: List<Element>,
@@ -325,32 +517,44 @@ internal fun writeNightStyles(
     tokens: Map<String, String>,
     night: Document,
     nightColours: Document,
+    nightV31Colours: Document,
     stateLists: MutableMap<String, String>,
+    plain: Set<String>,
 ): Int {
     val listed = listedTokenColours()
     val present = night.documentElement.childElements().map { it.getAttribute("name") }.toSet()
     val written = nightColours.documentElement.childElements().map { it.getAttribute("name") }.toMutableSet()
+    val writtenV31 = nightV31Colours.documentElement.childElements().map { it.getAttribute("name") }.toMutableSet()
 
     var changed = 0
     for (style in family) {
         if (style.getAttribute("name") in present) continue
-        val shades = style.childElements().mapIndexedNotNull { index, item ->
+        val names = style.childElements().mapIndexedNotNull { index, item ->
             val token = tokens[item.getAttribute("name")] ?: return@mapIndexedNotNull null
             val colour = defaultColour(item.textContent, colours, nightColourNames) ?: return@mapIndexedNotNull null
             if (colour !in listed[token].orEmpty()) return@mapIndexedNotNull null
-            nightShade(colour)?.let { index to it }
+            val name = if (token in plain) {
+                nightTone("#%08x".format(colour))?.also { tone ->
+                    if (written.add(tone.name)) nightColours.documentElement.appendChild(nightColours.colour(tone.name, tone.fallback))
+                    if (writtenV31.add(tone.name)) {
+                        nightV31Colours.documentElement.appendChild(nightV31Colours.colour(tone.name, tone.systemColor))
+                    }
+                }?.name
+            } else {
+                nightShade(colour)?.also { shade ->
+                    if (written.add(shade.name)) nightColours.documentElement.appendChild(nightColours.colour(shade.name, shade.fallback))
+                    stateLists.getOrPut(shade.name) { shade.stateList }
+                }?.name
+            }
+            name?.let { index to it }
         }.toMap()
-        if (shades.isEmpty()) continue
+        if (names.isEmpty()) continue
 
         val copy = night.importNode(style, true) as Element
         val items = copy.childElements()
-        for ((index, shade) in shades) {
-            items[index].textContent = "@color/${shade.name}"
-            if (written.add(shade.name)) nightColours.documentElement.appendChild(nightColours.colour(shade.name, shade.fallback))
-            stateLists.getOrPut(shade.name) { shade.stateList }
-        }
+        for ((index, name) in names) items[index].textContent = "@color/$name"
         night.documentElement.appendChild(copy)
-        changed += shades.size
+        changed += names.size
     }
     return changed
 }

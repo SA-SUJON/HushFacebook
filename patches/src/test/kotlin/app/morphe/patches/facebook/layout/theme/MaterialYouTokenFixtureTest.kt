@@ -59,6 +59,15 @@ import org.w3c.dom.Element
  * a dark grey it changes.
  */
 class MaterialYouTokenFixtureTest {
+    private companion object {
+        /**
+         * The FDS tokens 577 and 580 resolve and read as `TypedValue.data`: straight from a literal, off a
+         * token constant, or through the two helpers that take the attribute as a parameter.
+         */
+        val DATA_READ_TOKENS = setOf("ACCENT", "DISABLED_TEXT", "DIVIDER", "NAV_BAR_BACKGROUND", "PLACEHOLDER_IMAGE",
+            "PRIMARY_TEXT", "PRIMARY_TEXT_ON_MEDIA", "SURFACE_BACKGROUND", "WASH")
+    }
+
     private val theme = File(RepoFiles.root,
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/theme/MaterialYouTheme.java").readText()
 
@@ -259,6 +268,11 @@ class MaterialYouTokenFixtureTest {
      * only the dark style's family, leave the default styles as they are, and point an item at the
      * palette only for a token and colour FDS_DARK or FDS_SHARED lists. PRIMARY_BUTTON_BACKGROUND in
      * the dark style has to be one of them.
+     *
+     * <p>Some of Facebook's code resolves a token's attribute and reads `TypedValue.data` as its colour,
+     * which a colour state list doesn't give. The patch finds those tokens in each build's dex, the
+     * same [DATA_READ_TOKENS] in both, and each item it changes for one of them has to be a plain
+     * colour, while every other item keeps its state list.
      */
     @Test
     fun `every night style item the patch changes is a listed token and colour in each declared build`() {
@@ -281,6 +295,8 @@ class MaterialYouTokenFixtureTest {
         val (initializer, tokenType) = tokenInitializer(apk)
         assertEquals("$build: the patch reads other token attributes", attributes, patchTokenAttributes(initializer, tokenType))
         val tokens = attributes.entries.associate { (token, attribute) -> "attr_0x%08x".format(attribute) to token }
+        val plain = scannedPlainTokens(apk, initializer, tokenType)
+        assertEquals("$build: the tokens read as TypedValue data", DATA_READ_TOKENS, plain)
 
         val styles = fdsStyles(apk, attributes.values.toSet())
         val light = styles.values.single { it.parent == 0 && it.sets > 300 }
@@ -289,6 +305,7 @@ class MaterialYouTokenFixtureTest {
 
         var restyled = 0
         val darkTokens = mutableSetOf<String>()
+        val plainTones = mutableSetOf<String>()
         for ((type, file) in decoded.styleFiles) {
             val family = darkFdsStyles(file, tokens)
             if (family.isEmpty()) continue
@@ -299,7 +316,9 @@ class MaterialYouTokenFixtureTest {
 
             val before = file.text()
             val night = emptyResources()
-            restyled += writeNightStyles(family, decoded.colours, decoded.nightColours, tokens, night, emptyResources(), mutableMapOf())
+            val stateLists = mutableMapOf<String, String>()
+            restyled += writeNightStyles(family, decoded.colours, decoded.nightColours, tokens, night, emptyResources(),
+                emptyResources(), stateLists, plain)
             assertEquals("$build: the default $type file changed", before, file.text())
 
             for (copy in night.documentElement.elements()) {
@@ -312,6 +331,9 @@ class MaterialYouTokenFixtureTest {
                     val colour = decoded.styleColours.getValue(name)[attribute]
                     assertTrue("$build: $name changes $token, ${colour?.let { hex(setOf(it)) }}, which no table lists",
                         colour != null && colour in listed[token].orEmpty())
+                    val stateList = item.textContent.removePrefix("@color/") in stateLists
+                    assertEquals("$build: $name gives $token ${item.textContent}, a state list is $stateList", token !in plain, stateList)
+                    if (token in plain) plainTones += "$token ${item.textContent}"
                     if (name == family.first().getAttribute("name")) darkTokens += token
                 }
             }
@@ -319,6 +341,19 @@ class MaterialYouTokenFixtureTest {
         assertTrue("$build: no night style item takes the palette", restyled > 0)
         assertTrue("$build: the dark style keeps its PRIMARY_BUTTON_BACKGROUND, found $darkTokens",
             "PRIMARY_BUTTON_BACKGROUND" in darkTokens)
+        assertTrue("$build: PRIMARY_TEXT takes no system tone, found $plainTones",
+            "PRIMARY_TEXT @color/hushfacebook_you_neutral_95" in plainTones)
+    }
+
+    /** The FDS tokens the patch finds read through `TypedValue.data`, over every class in [apk]. */
+    private fun scannedPlainTokens(apk: File, initializer: Method, tokenType: String): Set<String> {
+        val container = DexFileFactory.loadDexContainer(apk, Opcodes.getDefault())
+        val forEachClass: ((ClassDef) -> Unit) -> Unit = { visit ->
+            for (name in container.dexEntryNames) container.getEntry(name)!!.dexFile.classes.forEach(visit)
+        }
+        var tokenClass: ClassDef? = null
+        forEachClass { if (it.type == tokenType && tokenClass == null) tokenClass = it }
+        return dataReadTokens(forEachClass, tokenConstants(initializer, tokenType), tokenAttributeField(checkNotNull(tokenClass)))
     }
 
     /**
