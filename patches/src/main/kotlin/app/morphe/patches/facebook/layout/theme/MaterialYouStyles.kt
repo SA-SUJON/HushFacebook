@@ -35,8 +35,9 @@ import kotlin.math.roundToInt
  *
  * So the resource half writes a night copy of the dark style, and of each style under it that sets a
  * token of its own, with each item for a token and colour FDS_DARK or FDS_SHARED lists pointing at a
- * palette colour instead, at the listed colour's lightness and alpha, as route one's runtime hooks
- * give it. Night resources are only read while Facebook's dark mode is on, so light mode, and the
+ * palette colour instead, at the listed colour's lightness and alpha, the lightness route one's
+ * runtime hooks give it (the hue is the nearest system tone's, where route one blends the two tones
+ * either side). Night resources are only read while Facebook's dark mode is on, so light mode, and the
  * Video tab in light mode with it, keeps the default styles as they are. A colour the tables don't
  * list for its token (the logo's blue, a map's), black, white and any colour that's neither a grey
  * nor one of Facebook's blues stay as Facebook has them.

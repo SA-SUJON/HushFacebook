@@ -139,7 +139,8 @@ class MaterialYouStylesTest {
         val shades = listOf(0xFF0866FF, 0xFF333334, 0x331D85FC, 0xFF1D85FC, 0xFF3E93F8, 0xFFF2F4F7)
             .map { checkNotNull(nightShade(it.toInt())) }
         val fallbacks = nightColours.elements("color").associate { it.getAttribute("name") to it.textContent }
-        assertEquals("each shade is written once", shades.map { it.name }.toSet(), fallbacks.keys)
+        assertEquals("each shade is written once", shades.size, nightColours.elements("color").size)
+        assertEquals("the shades written", shades.map { it.name }.toSet(), fallbacks.keys)
         assertEquals("each shade has one Android 12 state list", shades.map { it.name }.toSet(), stateLists.keys)
         for (shade in shades) {
             assertEquals(shade.fallback, fallbacks[shade.name])
