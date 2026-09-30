@@ -204,15 +204,16 @@ public class FileNameTemplateTest {
 
         String[] templates = {"Clip", "Reel {video_id}", "{video_id}", "Clip_", "x-", FileNameTemplate.DEFAULT,
                 "{date}", "{creator}", "{owner}", "{posted}", "{owner}_{posted}", "{owner} {video_id}", "{posted}{date}",
-                "Reel {owner}"};
-        PostDetails[] known = {PostDetails.NONE, PostDetails.of(ID), new PostDetails(null, "Stevi Ous", posted()), full()};
+                "Reel {owner}", "{owner_id}", "{owner}_{owner_id}_{posted}", "{owner_id} {video_id}"};
+        PostDetails[] known = {PostDetails.NONE, PostDetails.of(ID), new PostDetails(null, "Stevi Ous", posted()), full(),
+                new PostDetails(null, "Stevi Ous", OWNER_ID, posted()), new PostDetails(null, null, OWNER_ID, null)};
         for (String template : templates) {
             for (PostDetails details : known) {
                 String clean = FileNameTemplate.sanitize(template);
                 String first = FileNameTemplate.videoName(template, at(5), details);
                 String second = FileNameTemplate.videoName(template, at(6), details);
                 boolean byThePost = !FileNameTemplate.usesDate(clean) && FileNameTemplate.keepsApart(clean,
-                        details.hasVideoId(), details.hasOwner(), details.hasPosted());
+                        details.hasVideoId(), details.hasOwner(), details.hasOwnerId(), details.hasPosted());
                 if (byThePost) {
                     // Named by what the post is: the same name for the same post.
                     assertEquals(template + " with " + details, first, second);
@@ -259,8 +260,6 @@ public class FileNameTemplateTest {
         assertTrue(FileNameTemplate.keepsApart("{owner}_{owner_id}_{posted}", false, true, true, true));
         assertFalse(FileNameTemplate.keepsApart("{owner}_{owner_id}_{posted}", false, true, false, true));
         assertFalse(FileNameTemplate.keepsApart("{owner}_{owner_id}_{posted}", false, false, true, true));
-        assertFalse("the four-way form is for a save with no id",
-                FileNameTemplate.keepsApart("{owner_id}", false, true, true));
 
         // Already in the folder: the time of the save goes on the end, as for any name from the post.
         assertEquals("Page Name_" + OWNER_ID + "_" + DAY + "_143005",

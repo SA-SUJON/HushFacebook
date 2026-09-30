@@ -185,11 +185,6 @@ public final class FileNameTemplate {
         return false;
     }
 
-    /** {@link #keepsApart} for a save that doesn't know the poster's id. */
-    static boolean keepsApart(String template, boolean hasId, boolean hasOwner, boolean hasPosted) {
-        return keepsApart(template, hasId, hasOwner, false, hasPosted);
-    }
-
     /**
      * Whether a name from the clean [template] tells one save from the next: the date and time
      * are in it, or a video id it has, or the poster, their id and the post day it has, each of

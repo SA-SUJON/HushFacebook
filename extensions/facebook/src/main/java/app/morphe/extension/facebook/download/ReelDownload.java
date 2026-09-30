@@ -76,9 +76,9 @@ public final class ReelDownload implements Function1<Object, Object> {
     /**
      * The reel's own story: the props its sidebar was built from, a GraphQL tree the patch hands
      * over beside the player. Facebook reads the reel's creation_time off it for the reel's time
-     * label, and its actors are who posted the reel, so it gives the file name its poster and post
-     * day ({@link PostDetails}). Null, or a model that isn't a tree, costs those two tokens and
-     * nothing else.
+     * label, and its actors are who posted the reel, so it gives the file name its poster, their id
+     * and the post day ({@link PostDetails}). Null, or a model that isn't a tree, costs those three
+     * tokens and nothing else.
      */
     private final Object story;
 
