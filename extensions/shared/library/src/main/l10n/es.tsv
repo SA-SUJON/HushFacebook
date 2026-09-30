@@ -557,6 +557,10 @@ Videos play at the best quality up to %1$s that Facebook offers for each, or the
 Videos play at the highest quality Facebook offers for each.	Los vídeos se reproducen en la calidad más alta que Facebook ofrece para cada uno.
 Facebook will pick the quality videos play at.	Facebook elegirá la calidad de reproducción de los vídeos.
 Playback quality will be set to %1$s.	La calidad de reproducción será %1$s.
+Reels and videos will save to this phone when you tap Download.	Al tocar Descargar, los reels y videos se guardarán en este teléfono.
+Tapping Download on a reel or video will send its link to an app.	Al tocar Descargar en un reel o video, su enlace se enviará a una app.
+Android will ask which app gets the links each time.	Android preguntará cada vez qué app recibe los enlaces.
+Links will go to %1$s.	Los enlaces irán a %1$s.
 # context: row title under Pause, backup and diagnostics, shown only while Debug logging is on
 Test the Messenger link	Probar la conexión con Messenger
 # context: summary of that row; Debug logging is the switch's name as this table gives it

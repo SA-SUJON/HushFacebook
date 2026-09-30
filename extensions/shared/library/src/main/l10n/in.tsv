@@ -557,6 +557,10 @@ Videos play at the best quality up to %1$s that Facebook offers for each, or the
 Videos play at the highest quality Facebook offers for each.	Video diputar dengan kualitas tertinggi yang ditawarkan Facebook untuk masing-masing.
 Facebook will pick the quality videos play at.	Facebook akan memilih kualitas pemutaran video.
 Playback quality will be set to %1$s.	Kualitas pemutaran akan diatur ke %1$s.
+Reels and videos will save to this phone when you tap Download.	Saat mengetuk Unduh, reel dan video akan disimpan di ponsel ini.
+Tapping Download on a reel or video will send its link to an app.	Mengetuk Unduh pada reel atau video akan mengirim tautannya ke aplikasi.
+Android will ask which app gets the links each time.	Android akan menanyakan aplikasi penerima tautan setiap kali.
+Links will go to %1$s.	Tautan akan dikirim ke %1$s.
 # context: row title under Pause, backup and diagnostics, shown only while Debug logging is on
 Test the Messenger link	Uji koneksi Messenger
 # context: summary of that row; Debug logging is the switch's name as this table gives it

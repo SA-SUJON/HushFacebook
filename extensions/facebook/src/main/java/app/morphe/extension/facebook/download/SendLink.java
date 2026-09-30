@@ -48,9 +48,26 @@ public final class SendLink {
     /** What a tap on a Download button does. */
     public enum Action {
         /** Save the video into the phone's gallery, as Hushfacebook always has. */
-        SAVE,
+        SAVE("save"),
         /** Send the video's link to another app. */
-        SEND
+        SEND("send");
+
+        /** What a settings file holds for this action. It never changes once written. */
+        public final String fileValue;
+
+        Action(String fileValue) {
+            this.fileValue = fileValue;
+        }
+
+        /** The action a settings file names, or null when it names neither. */
+        @Nullable
+        public static Action fromFile(@Nullable Object value) {
+            if (!(value instanceof String)) return null;
+            for (Action action : values()) {
+                if (action.fileValue.equals(value)) return action;
+            }
+            return null;
+        }
     }
 
     /** Whether a Download tap sends the link now. False before the settings are ready. */
@@ -80,6 +97,22 @@ public final class SendLink {
         if (typed == null) return null;
         String trimmed = typed.trim();
         return PACKAGE.matcher(trimmed).matches() ? trimmed : null;
+    }
+
+    /**
+     * [typed] as a settings file holds it: the package name links go to, or blank for Android's
+     * chooser, which is where anything that isn't a package name sends them.
+     */
+    public static String fileApp(@Nullable String typed) {
+        String target = targetPackage(typed);
+        return target == null ? "" : target;
+    }
+
+    /** Whether a settings file's [value] is one {@link #fileApp} writes: blank, or one package name as it stands. */
+    public static boolean isFileApp(@Nullable Object value) {
+        if (!(value instanceof String)) return false;
+        String app = (String) value;
+        return app.isEmpty() || app.equals(targetPackage(app));
     }
 
     /** The plain-text share of [link], aimed at [target] when there is one. */
