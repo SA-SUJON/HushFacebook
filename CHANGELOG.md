@@ -2,8 +2,10 @@
 
 Every Hushfacebook release, newest first.
 
-## Unreleased
+## 0.5.0 (2026-09-29)
 
+* **Facebook:** This release gathers everything since v0.4.0: 51 patches for Facebook 580 and 577, up from 43. The eight new ones are `Hide the Reels tab dot`, `Hide the Reels tab`, `Keep the reel speed`, `Hold a reel for 2x`, `Default playback quality`, `Turn off double tap to like`, `Open Messenger from the top bar` and `View stories anonymously`. `Hide the Reels tab dot`, `Keep the reel speed` and `Open Messenger from the top bar` are in Morphe Manager's default selection, the last with its switch off until you turn it on, and the other five are yours to pick. Among the fixes, the "Suggested for you" groups row is hidden again, Marketplace search results lose their ads, stories and VP9 reels save at full quality, AMOLED cards turn black, and a Messenger patched with the same key signs in through your Facebook.
+* **Tooling:** The build notes now say the unit tests on Windows need JDK 25 or newer, and the test run warns on an older one, since those JDKs can't rename a file over an existing one there. Two test classes also stopped leaking state into the ones after them, which had made a translation test and a launcher shortcut test fail now and then.
 * **Facebook:** `Hide the Reels tab` now takes Facebook's Reels shortcut out of the long-press menu of its icon too, so that way into Reels goes with the tab. Checked on a device: the Reels shortcut was gone after a start with the switch on, and Facebook put it back at the next start with the switch off.
 * **Facebook:** New patch, `Hide the Reels tab dot`, on by default under Reels and Watch. The Reels tab, which some accounts call Video, stops showing a dot or a number for new reels, and every other tab keeps its count. On a phone the Reels tab's dot and its "1 new" went, and Notifications kept its badge.
 * **Facebook:** The "Suggested for you" row of groups to join, with its Discover more groups button, is hidden again. Facebook now sends it as one of its own promo cards instead of the groups row the feed filter knew, so it got through even with every switch on. Hide suggested groups, or Hide page suggestions and Facebook's own promos, now takes it out, along with Facebook's other cards of that kind. Checked on a phone: the row sat at the top of Home with both switches off and was gone with them on.
