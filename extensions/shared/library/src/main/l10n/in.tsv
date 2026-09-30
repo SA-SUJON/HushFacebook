@@ -578,3 +578,13 @@ failed (%1$s)	gagal (%1$s)
 Hide the Reels tab dot	Sembunyikan titik di tab Reels
 # context: summary of that switch; Video is Facebook's name for the tab on some accounts
 No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.	Tanpa titik atau jumlah baru di tab Reels, yang di beberapa akun bernama Video. Tab lain tetap menampilkannya.
+# context: title of the overview row under the status card when the build lacks one patch Morphe Manager selects by default
+%1$d default patch isn't in this build	%1$d tambalan default tidak ada di build ini
+# context: title of that row when several default patches are missing
+%1$d default patches aren't in this build	%1$d tambalan default tidak ada di build ini
+# context: summary of that row while its list of patch names is closed; a tap opens it
+Tap to see which.	Ketuk untuk melihat yang mana.
+# context: that row's summary once opened, one patch missing; the placeholder is the patch's English name as Morphe Manager lists it
+Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.	Tidak ada di build ini: %1$s. Morphe Manager memilihnya secara default. Pilih tambalan itu lalu tambal ulang untuk mendapatkan fungsinya.
+# context: that row's summary once opened, several patches missing; the placeholder is their English names joined as a list
+Not in this build: %1$s. Morphe Manager selects them by default. Patch again with them selected to get what they do.	Tidak ada di build ini: %1$s. Morphe Manager memilihnya secara default. Pilih tambalan itu lalu tambal ulang untuk mendapatkan fungsinya.

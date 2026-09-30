@@ -99,6 +99,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     static final String CHECK_NOW = "action_check_for_release";
     /** The Supported links row's key. It stores nothing either. */
     static final String SUPPORTED_LINKS = "action_supported_links";
+    /** The key of the row naming the default patches this build lacks. It stores nothing either. */
+    static final String MISSING_DEFAULTS = "action_missing_default_patches";
 
     /** Thrown by the next initialize() and then cleared: how a test reaches the recovery page. */
     static volatile RuntimeException failNextInitialization;
@@ -812,6 +814,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             return true;
         });
         about.addPreference(mark(licenses, SettingsIcons.LICENSE));
+
+        // The overview shows it under the card by its key. Last in the model, it moves no other row.
+        Preference lacking = missingDefaultsRow(context, build);
+        if (lacking != null) screen.addPreference(lacking);
     }
 
     /**
@@ -984,6 +990,40 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             return true;
         });
         return card;
+    }
+
+    /**
+     * Under the card when this build lacks a patch Morphe Manager selects by default, or null when
+     * it has them all. A patch left out is the usual answer to "ads still show" (#29, #35). A tap
+     * opens and closes the list of names, which runs to thirty for a build patched with one
+     * patch picked.
+     */
+    @Nullable
+    private static Preference missingDefaultsRow(Context context, Set<PatchFamily> build) {
+        List<String> missing = PatchFamily.missingDefaults(build);
+        if (missing.isEmpty()) return null;
+        List<String> names = new ArrayList<>();
+        for (String name : missing) names.add(L10n.isolate(name));
+        String closed = L10n.t("Tap to see which.");
+        String open = L10n.quantity(missing.size(),
+                "Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to "
+                        + "get what it does.",
+                "Not in this build: %1$s. Morphe Manager selects them by default. Patch again with them selected to "
+                        + "get what they do.",
+                L10n.join(names));
+        Row row = new Row(context);
+        row.setKey(MISSING_DEFAULTS);
+        row.setPersistent(false);
+        // The tap only opens or closes the list, so the row goes without a chevron.
+        row.actsAtOnce = true;
+        row.setTitle(L10n.quantity(missing.size(), "%1$d default patch isn't in this build",
+                "%1$d default patches aren't in this build", missing.size()));
+        row.setSummary(closed);
+        row.setOnPreferenceClickListener(p -> {
+            p.setSummary(closed.contentEquals(p.getSummary()) ? open : closed);
+            return true;
+        });
+        return row;
     }
 
     void resumeFromOverview() {

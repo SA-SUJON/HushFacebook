@@ -2,6 +2,10 @@
 
 Every Hushfacebook release, newest first.
 
+## Unreleased
+
+* **Facebook:** When your build is missing patches Morphe Manager picks by default, the settings overview now says so right under the status card, as in "2 default patches aren't in this build". Tap it to see their names. A patch left out is the usual reason ads or suggestions still show (issues #29 and #35), and until now nothing on the phone said which one it was. The diagnostic report lists the same patches on a line of its own. A build with every default patch shows nothing new.
+
 ## 0.5.0 (2026-09-29)
 
 * **Facebook:** This release gathers everything since v0.4.0: 51 patches for Facebook 580 and 577, up from 43. The eight new ones are `Hide the Reels tab dot`, `Hide the Reels tab`, `Keep the reel speed`, `Hold a reel for 2x`, `Default playback quality`, `Turn off double tap to like`, `Open Messenger from the top bar` and `View stories anonymously`. `Hide the Reels tab dot`, `Keep the reel speed` and `Open Messenger from the top bar` are in Morphe Manager's default selection, the last with its switch off until you turn it on, and the other five are yours to pick. Among the fixes, the "Suggested for you" groups row is hidden again, Marketplace search results lose their ads, stories and VP9 reels save at full quality, AMOLED cards turn black, and a Messenger patched with the same key signs in through your Facebook.
