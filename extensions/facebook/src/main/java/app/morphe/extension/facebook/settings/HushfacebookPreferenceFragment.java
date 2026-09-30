@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,6 +65,7 @@ import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.navigation.MarketplaceOnly;
+import app.morphe.extension.facebook.theme.AmoledTheme;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
@@ -745,7 +747,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             }
             if (build.contains(PatchFamily.AMOLED_THEME)) {
                 patched.addPreference(mark(info(context, L10n.t("AMOLED black theme"),
-                        L10n.t("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.")), SettingsIcons.MOON));
+                        amoledSummary(AmoledTheme.backgroundColour())), SettingsIcons.MOON));
             }
             if (build.contains(PatchFamily.MATERIAL_YOU_THEME)) {
                 patched.addPreference(mark(info(context, L10n.t("Material You theme"),
@@ -1248,6 +1250,16 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             tab.setSummary(selected ? L10n.t("Marketplace mode chooses the opening tab. Your previous choice stays saved.")
                     : startTabSummary(Settings.START_TAB.savedValue()));
         }
+    }
+
+    /** The AMOLED row under Patched: black, or the Background colour the patch was given (issue #34). */
+    static String amoledSummary(int background) {
+        if (background == Color.BLACK) {
+            return L10n.t("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.");
+        }
+        String colour = String.format(Locale.ROOT, "#%06X", background & 0xFFFFFF);
+        return L10n.f("Dark mode draws %1$s instead of dark grey. Turn on dark mode in Facebook to see it.",
+                L10n.isolate(colour));
     }
 
     static String marketplaceSummary() {

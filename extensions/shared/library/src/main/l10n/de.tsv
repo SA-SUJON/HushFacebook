@@ -44,6 +44,7 @@ Couldn't start that. Try again in a moment.	Das ließ sich nicht starten. Versuc
 Couldn't start the report export. Try again shortly.	Der Export des Berichts ließ sich nicht starten. Versuche es gleich noch einmal.
 Couldn't turn Hushfacebook back on. Try again.	Hushfacebook ließ sich nicht wieder einschalten. Versuche es noch einmal.
 Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.	Der Dunkelmodus zeigt Schwarz statt Dunkelgrau. Schalte in Facebook den Dunkelmodus ein, um das zu sehen.
+Dark mode draws %1$s instead of dark grey. Turn on dark mode in Facebook to see it.	Der Dunkelmodus zeigt %1$s statt Dunkelgrau. Schalte in Facebook den Dunkelmodus ein, um das zu sehen.
 Debug logging	Debug-Protokollierung
 Diagnostic data cleared. Tap again to put it back.	Diagnosedaten gelöscht. Tippe erneut, um sie wiederherzustellen.
 Diagnostic data put back.	Diagnosedaten wiederhergestellt.

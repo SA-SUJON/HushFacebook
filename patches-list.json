@@ -6,7 +6,7 @@
   "patches": [
     {
       "name": "AMOLED black theme",
-      "description": "Makes Facebook's dark mode black instead of dark grey. Turn on dark mode in Facebook first.",
+      "description": "Makes Facebook's dark mode black, or a dark colour you pick, instead of dark grey. Turn on dark mode in Facebook first.",
       "category": "Interface",
       "use": false,
       "dependencies": [
@@ -48,7 +48,17 @@
           ]
         }
       ],
-      "options": []
+      "options": [
+        {
+          "key": "backgroundColour",
+          "title": "Background colour",
+          "description": "The colour dark mode's backgrounds take, as #RRGGBB. Cards and inputs take a lighter step of it. Leave it blank for black. A colour too light for Facebook's white text is refused.",
+          "required": false,
+          "type": "kotlin.String",
+          "default": "#000000",
+          "values": null
+        }
+      ]
     },
     {
       "name": "Block ad telemetry",

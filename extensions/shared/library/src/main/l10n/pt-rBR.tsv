@@ -44,6 +44,7 @@ Couldn't start that. Try again in a moment.	Não foi possível iniciar isso. Ten
 Couldn't start the report export. Try again shortly.	Não foi possível iniciar a exportação do relatório. Tente de novo daqui a pouco.
 Couldn't turn Hushfacebook back on. Try again.	Não foi possível reativar o Hushfacebook. Tente novamente.
 Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.	O modo escuro usa preto em vez de cinza-escuro. Ative o modo escuro no Facebook para vê-lo.
+Dark mode draws %1$s instead of dark grey. Turn on dark mode in Facebook to see it.	O modo escuro usa %1$s em vez de cinza-escuro. Ative o modo escuro no Facebook para vê-lo.
 Debug logging	Registro de depuração
 Diagnostic data cleared. Tap again to put it back.	Dados de diagnóstico apagados. Toque de novo para restaurá-los.
 Diagnostic data put back.	Dados de diagnóstico restaurados.

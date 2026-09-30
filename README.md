@@ -69,7 +69,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 
 | Patch | What it does |
 |---|---|
-| `AMOLED black theme` | Makes Facebook's dark mode black instead of dark grey. Turn on dark mode in Facebook first. |
+| `AMOLED black theme` | Makes Facebook's dark mode black, or a dark colour you pick, instead of dark grey. Turn on dark mode in Facebook first. |
 | `Block ad telemetry` | Stops Facebook watching for screenshots of ads and reporting which apps you install for ad attribution. |
 | `Block background ad prefetch` | Stops Facebook downloading ads and its ad model in the background. That saves data and battery. The ads don't take up storage either. |
 | `Block background-return feed refresh` | Keeps your feed position when you return to Facebook within ten minutes, or for any time away with No time limit on. Pull to refresh and a fresh launch still work. |
@@ -131,7 +131,9 @@ Neither path can be tried against a real block until the check reaches sideloads
 
 `Material You theme` colours Facebook's dark mode with the palette Android 12 and newer take from your wallpaper. Each grey keeps how light it is and picks up the palette's tint, so text stays as easy to read as Facebook made it. Facebook's blue takes the palette's accent colour in links and tagged names, buttons like Confirm and Add to story, the selected chip, story rings, the verified badge, unread notifications and the Like button once you've liked something. Facebook's exact blues change when a server sends them for a screen too, while the Facebook logo, maps, charts and pictures keep their own colours. Android 11 has no wallpaper palette, so there it uses a fixed one built from Facebook's own blue. Light mode keeps Facebook's colours, and a colour the patch doesn't recognise is left as it came. Parts of Marketplace still show Facebook's blue for now, and so do a few lighter blues on buttons Facebook builds from its own layouts.
 
-The two themes work alone or together. With both, backgrounds stay true black and the palette colours the cards, text, icons and dividers on top. The Hushfacebook settings screen follows the palette as well, dark or light to match your phone. Without `Material You theme` it stays black.
+`AMOLED black theme` has one option, Background colour, for anyone who finds pure black too harsh (issue #34). Leave it blank for black, or give a dark colour as #RRGGBB, such as #0D1117. Pages, bars and the Video tab take it, and cards, popovers and search fields sit a small step lighter than it, the same step they sit above black. Facebook's own black, behind a video for one, stays black. A colour that's too light gets refused. Facebook's white text has to keep a contrast of at least 4.5:1 on the lightest surface the theme makes from it, so no grey lighter than #3A3A3A gets through. You set it in Morphe Manager when you patch, and changing it means patching again.
+
+The two themes work alone or together. With both, backgrounds stay true black and the palette colours the cards, text, icons and dividers on top. A Background colour you picked works the same way. The page keeps it, and the palette colours what sits on top. The Hushfacebook settings screen follows the palette as well, dark or light to match your phone. Without `Material You theme` it stays black.
 
 ### Saving videos
 

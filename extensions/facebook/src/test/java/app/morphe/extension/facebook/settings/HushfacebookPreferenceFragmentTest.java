@@ -1167,4 +1167,14 @@ public class HushfacebookPreferenceFragmentTest {
         }
         return 0xFF000000 | (out[0] << 16) | (out[1] << 8) | out[2];
     }
+
+    /** Issue #34: the AMOLED row under Patched names the Background colour the patch was given. */
+    @Test
+    public void theAmoledRowNamesAPickedBackgroundColour() {
+        assertEquals("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.",
+                HushfacebookPreferenceFragment.amoledSummary(Color.BLACK));
+        assertEquals("Dark mode draws " + L10n.isolate("#0D1117")
+                        + " instead of dark grey. Turn on dark mode in Facebook to see it.",
+                HushfacebookPreferenceFragment.amoledSummary(0xFF0D1117));
+    }
 }

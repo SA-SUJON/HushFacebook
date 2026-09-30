@@ -44,6 +44,7 @@ Couldn't start that. Try again in a moment.	Bu işlem başlatılamadı. Birazdan
 Couldn't start the report export. Try again shortly.	Rapor dışa aktarımı başlatılamadı. Birazdan tekrar dene.
 Couldn't turn Hushfacebook back on. Try again.	Hushfacebook yeniden açılamadı. Tekrar dene.
 Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.	Karanlık mod koyu gri yerine siyah görünür. Görmek için Facebook'ta karanlık modu aç.
+Dark mode draws %1$s instead of dark grey. Turn on dark mode in Facebook to see it.	Karanlık mod koyu gri yerine %1$s rengiyle görünür. Görmek için Facebook'ta karanlık modu aç.
 Debug logging	Hata ayıklama günlüğü
 Diagnostic data cleared. Tap again to put it back.	Tanılama verileri temizlendi. Geri getirmek için tekrar dokun.
 Diagnostic data put back.	Tanılama verileri geri getirildi.
