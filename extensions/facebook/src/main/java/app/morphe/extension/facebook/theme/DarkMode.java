@@ -55,8 +55,11 @@ public final class DarkMode {
     public static boolean answer(boolean dark) {
         // The reads keep the usual case, the same answer again, to two volatile reads. Of the answers
         // that change it at the same moment, the swap lets exactly one run the listener.
+        boolean flipped = ON.get() != dark && ON.getAndSet(dark) != dark;
+        // Only once ON holds this answer, or saidOn could pair a first light answer with the
+        // starting dark on another thread.
         if (!answered) answered = true;
-        if (ON.get() != dark && ON.getAndSet(dark) != dark) {
+        if (flipped) {
             Runnable listener = changed;
             if (listener != null) listener.run();
         }
