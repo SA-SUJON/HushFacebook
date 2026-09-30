@@ -1223,6 +1223,29 @@ try {
             $atAllowlist.Note -like "*allowlist at its own commit $($allowlistCommit.Substring(0, 8)) reviews*") `
             "The receipt was not held to the allowlist its own commit carried (byte order mark: $bom): $(@($atAllowlist.Entries) -join ', ') / $($atAllowlist.Note)"
     }
+    # The one with a byte order mark again, under a console on code page 437, which a hook's pwsh
+    # gets when the push starts in Git Bash. PowerShell decoded git's UTF-8 with it, the mark came
+    # back as U+2229 U+2557 U+2510, and the allowlist's first line was refused as malformed. The
+    # console's own encoding has to be back once the read is done.
+    $consoleEncoding = [Console]::OutputEncoding
+    try {
+        [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(437)
+        $allowlistCommit = Save-FixtureAllowlist @('# reviewed at the release', $reviewed) -Bom -Commit
+        Save-FixtureAllowlist @('# added since, never committed', $unreviewed) | Out-Null
+        $oemAllowlist = $null
+        $oemFailure = $null
+        try {
+            $oemAllowlist = Resolve-ReceiptManifestAllowlist -Root $toolchainRoot -Commit $allowlistCommit -WorkingPath $allowlistFile
+        } catch {
+            $oemFailure = $_.Exception.Message
+        }
+        $oemAfter = [Console]::OutputEncoding.CodePage
+    } finally {
+        [Console]::OutputEncoding = $consoleEncoding
+    }
+    Assert-True ($null -eq $oemFailure -and (@($oemAllowlist.Entries) -join ',') -ceq $reviewed) `
+        "An allowlist with a byte order mark was misread under a code page 437 console: $oemFailure $(@($oemAllowlist.Entries) -join ', ')"
+    Assert-True ($oemAfter -eq 437) "Reading git's output left the console on code page $oemAfter instead of putting 437 back."
     $atNoAllowlist = Resolve-ReceiptManifestAllowlist -Root $toolchainRoot -Commit $releaseCommitSha -WorkingPath $allowlistFile
     Assert-True ((@($atNoAllowlist.Entries) -join ',') -ceq $unreviewed -and $atNoAllowlist.Note -like '*has no manifest delta allowlist*') `
         "A commit with no allowlist did not fall back to the working one, saying so: $($atNoAllowlist.Note)"

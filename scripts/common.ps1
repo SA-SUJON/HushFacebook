@@ -404,9 +404,13 @@ function Find-MachineNames {
             Pattern = @((($serial -join '') + '[A-Z0-9]{8}'), ((& $wideLe $serial) + '(?:[A-Z0-9]\x00){8}'),
                 ((& $wideBe $serial) + '(?:\x00[A-Z0-9]){8}')) -join '|' }
     )
+    # The console reads UTF-8 while git runs, as Invoke-RepoGit explains, so a hit is reported as
+    # the file has it.
     $preference = $ErrorActionPreference
+    $encoding = [Console]::OutputEncoding
     try {
         $ErrorActionPreference = 'Continue'
+        [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
         foreach ($scan in $scans) {
             foreach ($batch in $batches) {
                 $arguments = @('-C', $Root, 'grep', '-n', '-a') + $scan.Flags + @('-e', $scan.Pattern) + @($batch) +
@@ -421,6 +425,7 @@ function Find-MachineNames {
             }
         }
     } finally {
+        [Console]::OutputEncoding = $encoding
         $ErrorActionPreference = $preference
         foreach ($name in $saved.Keys) { Set-Item -LiteralPath ('Env:\' + $name) -Value $saved[$name] }
     }
