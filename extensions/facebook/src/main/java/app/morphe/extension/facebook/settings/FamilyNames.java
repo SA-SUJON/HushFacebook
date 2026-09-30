@@ -28,6 +28,7 @@ public final class FamilyNames {
      */
     public static final String AI_DETECTED_REELS = "Hide AI-detected posts (Reels and Watch)";
     public static final String POST_WORDS = "Hide posts by words";
+    public static final String POST_PROMPTS = "Hide post prompts";
     public static final String STORIES_TRAY = "Hide Stories tray";
     public static final String FEED_REELS = "Hide Reels in the feed";
     public static final String RETURN_REFRESH = "Block background-return feed refresh";
@@ -40,6 +41,7 @@ public final class FamilyNames {
     public static final String SPONSORED_PROFILE_POSTS = "Hide sponsored profile posts";
     public static final String SPONSORED_MARKETPLACE = "Hide sponsored Marketplace listings";
     public static final String REEL_DECLUTTER = "Clean up Reels";
+    public static final String REEL_PROMPTS = "Hide reel interest prompts";
     public static final String REEL_WATCH_HISTORY = "Don't send reel watch history";
     public static final String DOUBLE_TAP_LIKE = "Turn off double tap to like";
     public static final String KEEP_REEL_SPEED = "Keep the reel speed";

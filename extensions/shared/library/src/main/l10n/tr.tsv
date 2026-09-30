@@ -598,3 +598,11 @@ Turn on %1$s to save videos they all play.	Hepsinin oynatabileceği videolar kay
 WhatsApp and some editors may refuse this video	WhatsApp ve bazı düzenleyiciler bu videoyu reddedebilir
 # context: Button on that notification. It opens Hushfacebook settings at the switch Save videos other apps can open.
 Open the setting	Ayarı aç
+# context: switch title under News feed; the prompts are the strip Facebook puts under some posts, such as "Are you interested in this post?"
+Hide post prompts	Gönderi altındaki soruları gizle
+# context: description of that switch; the quoted texts are Facebook's own prompts, so use Facebook's wording in your language if you know it
+The strip on some posts, like "Are you interested in this post?", "Show less" or who recently commented, and the follow and chat suggestions in the same place. The post stays.	Bazı gönderilerdeki şerit, örneğin “Bu gönderiyle ilgileniyor musun?”, “Daha az göster” veya kimin az önce yorum yaptığı, ve aynı yerdeki takip ve sohbet önerileri. Gönderi kalır.
+# context: switch title under Reels and Watch; the prompt is Facebook's "Are you interested in this reel?" question on a reel
+Hide reel interest prompts	Reels'teki ilgi sorusunu gizle
+# context: description of that switch; the quoted text is Facebook's own prompt, so use Facebook's wording in your language if you know it
+No "Are you interested in this reel?" prompt on reels. The reel plays as usual.	Reels'te “Bu reel ile ilgileniyor musun?” sorusu çıkmaz. Reel her zamanki gibi oynar.

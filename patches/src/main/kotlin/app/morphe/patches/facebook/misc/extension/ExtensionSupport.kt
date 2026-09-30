@@ -6,13 +6,16 @@
  */
 package app.morphe.patches.facebook.misc.extension
 
+import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.util.ControlFlow
+import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.RegisterLiveness
 import app.morphe.util.returnEarly
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import java.util.BitSet
@@ -206,6 +209,27 @@ internal fun Method.requireFreeAt(
         throw PatchException(
             "$what: $definingClass->$name still reads ${live.joinToString { "v$it" }} after instruction $index, " +
                 "so the hook there can't borrow ${if (live.size == 1) "it" else "them"}",
+        )
+    }
+}
+
+/**
+ * Hands each answer the boolean method gives to [hook], a static (Z)Z, and returns what the hook
+ * says instead. The answer's own register carries it there and back, so nothing is borrowed, and
+ * the call goes in at each return's control flow label, so every branch to a return runs it too.
+ */
+internal fun MutableMethod.filterBooleanReturns(what: String, hook: String) {
+    if (returnType != "Z") throw PatchException("$what: $definingClass->$name answers $returnType, not a boolean")
+    val returns = implementation!!.instructions.withIndex().filter { it.value.opcode == Opcode.RETURN }.map { it.index }
+    if (returns.isEmpty()) throw PatchException("$what: $definingClass->$name never returns")
+    for (index in returns.asReversed()) {
+        val answer = getInstruction<OneRegisterInstruction>(index).registerA
+        addInstructionsAtControlFlowLabel(
+            index,
+            """
+                invoke-static/range { v$answer .. v$answer }, $hook
+                move-result v$answer
+            """,
         )
     }
 }

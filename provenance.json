@@ -59,6 +59,18 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/feed/postprompts/HidePostPromptsPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/reels/prompts/HideReelPromptsPatch.kt"
+      ],
+      "origin": "ported",
+      "upstream": "https://github.com/andrewliang25/morphe-patches",
+      "commit": "16464b2ba606745de0ebe9cc52f18ef42e6a05d8",
+      "via": [],
+      "license": "GPL-3.0",
+      "changes": "Rewritten from the two patches at that commit. The anchors are the same: the bumper component's constructor string and its one static (props) -> Z predicate, and the reel overlay enum's INTERESTED_OR_NOT_INTERESTED_BUMPER constant and the one (reel) -> Z method that reads it. Instead of returning false from the first instruction, each answer the predicate gives goes through an extension hook with a switch, so pausing Hushfacebook or turning a switch off brings the prompt back, and the diagnostic report counts the prompts kept out. Both are checked on 580 as well as 577, and a missing or doubled anchor stops patching with a message naming it."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/MediaUrlPolicy.java"
       ],
       "origin": "original",

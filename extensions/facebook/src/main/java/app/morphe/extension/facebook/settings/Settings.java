@@ -463,6 +463,23 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reels_tab_dot", TRUE);
 
     /**
+     * The strip some posts carry ("Are you interested in this post?", "Show less", who recently
+     * commented, follow and chat suggestions) goes, and so does the room kept for it
+     * ({@link app.morphe.extension.facebook.feed.PostPrompts}). A change shows on the posts drawn
+     * after it.
+     */
+    public static final BooleanSetting HIDE_POST_PROMPTS =
+            new BooleanSetting("hushfacebook_hide_post_prompts", TRUE);
+
+    /**
+     * Reels come without the "Are you interested in this reel?" prompt
+     * ({@link app.morphe.extension.facebook.reels.ReelPrompts}). A change shows on the reels built
+     * after it.
+     */
+    public static final BooleanSetting HIDE_REEL_PROMPTS =
+            new BooleanSetting("hushfacebook_hide_reel_prompts", TRUE);
+
+    /**
      * The folder every save goes to, under Movies for a video and Pictures for a photo. The
      * settings row and an import keep it clean, and {@link SaveFolder#sanitize} cleans it again
      * wherever it's read, so whatever wrote the store, a save lands in one folder under each.

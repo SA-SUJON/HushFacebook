@@ -190,6 +190,14 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean postPrompts() {
+        return false;
+    }
+
+    public static boolean reelPrompts() {
+        return false;
+    }
+
     public static boolean messengerCard() {
         return false;
     }

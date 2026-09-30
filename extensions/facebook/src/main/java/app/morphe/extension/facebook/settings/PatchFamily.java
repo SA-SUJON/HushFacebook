@@ -51,6 +51,8 @@ public enum PatchFamily {
             Settings.HIDE_AI_DETECTED_POSTS, Settings.HIDE_AI_LABELLED_POSTS, Settings.HIDE_AI_DETECTED_REELS),
     POST_WORDS(FamilyNames.POST_WORDS, "postWords", null,
             Settings.HIDE_POSTS_WITH_WORDS),
+    POST_PROMPTS(FamilyNames.POST_PROMPTS, "postPrompts", null,
+            Settings.HIDE_POST_PROMPTS),
     SPONSORED_STORIES(FamilyNames.SPONSORED_STORIES, "sponsoredStories", null,
             Settings.HIDE_SPONSORED_STORIES),
     SUGGESTED_STORIES(FamilyNames.SUGGESTED_STORIES, "suggestedStories", null,
@@ -70,6 +72,8 @@ public enum PatchFamily {
             Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS),
     REEL_DECLUTTER(FamilyNames.REEL_DECLUTTER, "reelDeclutter", null,
             Settings.HIDE_REEL_CHIPS, Settings.HIDE_REEL_FOLLOW_BUTTON, Settings.HIDE_REEL_SOCIAL_FOOTER),
+    REEL_PROMPTS(FamilyNames.REEL_PROMPTS, "reelPrompts", null,
+            Settings.HIDE_REEL_PROMPTS),
     REEL_WATCH_HISTORY(FamilyNames.REEL_WATCH_HISTORY, "reelWatchHistory", null,
             Settings.DONT_SEND_REEL_WATCH_HISTORY),
     DOUBLE_TAP_LIKE(FamilyNames.DOUBLE_TAP_LIKE, "doubleTapLike", null,
@@ -185,7 +189,8 @@ public enum PatchFamily {
      * a new default patch fails it until it's listed here.
      */
     static final Set<PatchFamily> DEFAULT_SELECTION = Collections.unmodifiableSet(EnumSet.of(
-            SPONSORED_POSTS, SUGGESTED_POSTS, AI_DETECTED_POSTS, POST_WORDS, SPONSORED_STORIES, SUGGESTED_STORIES,
+            SPONSORED_POSTS, SUGGESTED_POSTS, AI_DETECTED_POSTS, POST_WORDS, POST_PROMPTS, SPONSORED_STORIES,
+            SUGGESTED_STORIES, REEL_PROMPTS,
             SPONSORED_REELS, SPONSORED_SEARCH, SPONSORED_PROFILE_POSTS, SPONSORED_MARKETPLACE, KEEP_REEL_SPEED,
             RESUME_LONG_VIDEOS, EXTERNAL_BROWSER, SANITIZE_SHARING_LINKS, UPDATE_PROMPTS, STORY_DOWNLOAD,
             REEL_DOWNLOAD, MARKETPLACE_ONLY, REELS_TAB_DOT, MESSENGER_CARD, MESSENGER_ICON, MENU_PROMOTIONS,

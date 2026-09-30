@@ -319,7 +319,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 || build.contains(PatchFamily.RETURN_REFRESH)
                 || build.contains(PatchFamily.AI_DETECTED_POSTS)
                 || build.contains(PatchFamily.SPONSORED_PROFILE_POSTS)
-                || build.contains(PatchFamily.POST_WORDS)) {
+                || build.contains(PatchFamily.POST_WORDS)
+                || build.contains(PatchFamily.POST_PROMPTS)) {
             PreferenceCategory feed = category(screen, L10n.t("News feed"));
             if (build.contains(PatchFamily.SPONSORED_POSTS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_SPONSORED_POSTS, L10n.t("Hide sponsored posts"),
@@ -363,6 +364,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             if (build.contains(PatchFamily.FEED_REELS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_FEED_REELS, L10n.t("Hide Reels in the feed"),
                         L10n.t("The rows of reels between posts, and the reels Facebook adds where your feed ends.")));
+            }
+            if (build.contains(PatchFamily.POST_PROMPTS)) {
+                feed.addPreference(toggle(context, Settings.HIDE_POST_PROMPTS, L10n.t("Hide post prompts"),
+                        L10n.t("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" "
+                                + "or who recently commented, and the follow and chat suggestions in the same place. "
+                                + "The post stays.")));
             }
             if (build.contains(PatchFamily.RETURN_REFRESH)) {
                 feed.addPreference(toggle(context, Settings.BLOCK_RETURN_REFRESH,
@@ -464,6 +471,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (build.contains(PatchFamily.REELS_TAB_DOT)) {
             reels.addPreference(toggle(context, Settings.HIDE_REELS_TAB_DOT, L10n.t("Hide the Reels tab dot"),
                     L10n.t("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.")));
+        }
+        if (build.contains(PatchFamily.REEL_PROMPTS)) {
+            reels.addPreference(toggle(context, Settings.HIDE_REEL_PROMPTS, L10n.t("Hide reel interest prompts"),
+                    L10n.t("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.")));
         }
         // Both reel filters work on each batch of reels as it arrives, so a change leaves the
         // reels already loaded as they are, and the rows say so.
