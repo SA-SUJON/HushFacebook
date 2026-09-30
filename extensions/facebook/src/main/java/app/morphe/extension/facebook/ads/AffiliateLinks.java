@@ -39,6 +39,14 @@ public final class AffiliateLinks {
     }
 
     /**
+     * The entry the patch calls, handed the predicate's answer as an int: a boolean method may
+     * return a register the verifier types as int, and a boolean parameter wouldn't take it.
+     */
+    public static boolean keepReelCard(int showsCard) {
+        return keepReelCard(showsCard != 0);
+    }
+
+    /**
      * The hook at each return of the reel overlay's product card predicate, handed what it was about
      * to answer. False for a reel that would get the card while the switch is on, and Facebook's
      * answer otherwise.

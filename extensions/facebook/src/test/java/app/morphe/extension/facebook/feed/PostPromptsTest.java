@@ -74,4 +74,14 @@ public class PostPromptsTest {
             PauseForTests.resume();
         }
     }
+
+    /** The patch hands Facebook's answer over as an int, since a boolean method may return one. */
+    @Test
+    public void thePatchsIntEntryReadsNonZeroAsYes() {
+        assertFalse("a bumper handed over as 1 stayed", PostPrompts.keep(1));
+        assertFalse(PostPrompts.keep(0));
+        Settings.HIDE_POST_PROMPTS.save(false);
+        assertTrue("with the switch off, 1 lost Facebook's yes", PostPrompts.keep(1));
+        assertFalse(PostPrompts.keep(0));
+    }
 }

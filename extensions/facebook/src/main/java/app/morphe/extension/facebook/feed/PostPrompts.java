@@ -31,6 +31,14 @@ public final class PostPrompts {
     }
 
     /**
+     * The entry the patch calls, handed the predicate's answer as an int: a boolean method may
+     * return a register the verifier types as int, and a boolean parameter wouldn't take it.
+     */
+    public static boolean keep(int hasBumper) {
+        return keep(hasBumper != 0);
+    }
+
+    /**
      * The hook, at each of the has-bumper predicate's returns, handed what it was about to answer.
      * Answers what the predicate returns instead: false for a story with a bumper while the switch
      * is on, and Facebook's answer otherwise.

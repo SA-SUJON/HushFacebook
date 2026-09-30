@@ -34,7 +34,7 @@ internal const val TUNE_YOUR_ALGORITHM = "TUNE_YOUR_ALGORITHM"
 internal const val ENUM = "Ljava/lang/Enum;"
 
 internal const val REEL_PROMPTS = "Lapp/morphe/extension/facebook/reels/ReelPrompts;"
-internal const val KEEP = "$REEL_PROMPTS->keep(Z)Z"
+internal const val KEEP = "$REEL_PROMPTS->keep(I)Z"
 
 /**
  * The "Are you interested in this reel?" prompt goes. The things Facebook can lay over a reel (a

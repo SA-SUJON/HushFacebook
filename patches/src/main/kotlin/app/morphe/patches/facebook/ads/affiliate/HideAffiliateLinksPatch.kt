@@ -43,7 +43,7 @@ internal const val FOOTER_HIDDEN = "isFooterHidden\$"
 internal const val STRING = "Ljava/lang/String;"
 
 internal const val AFFILIATE_LINKS = "Lapp/morphe/extension/facebook/ads/AffiliateLinks;"
-internal const val KEEP_REEL_CARD = "$AFFILIATE_LINKS->keepReelCard(Z)Z"
+internal const val KEEP_REEL_CARD = "$AFFILIATE_LINKS->keepReelCard(I)Z"
 internal const val KEEP_FOOTER = "$AFFILIATE_LINKS->keepFooter($STRING)$STRING"
 internal const val KEEP_COMMENT_CARD = "$AFFILIATE_LINKS->keepCommentCard(Ljava/lang/Object;)Ljava/lang/Object;"
 

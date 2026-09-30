@@ -88,4 +88,14 @@ public class AffiliateLinksTest {
             PauseForTests.resume();
         }
     }
+
+    /** The patch hands Facebook's answer over as an int, since a boolean method may return one. */
+    @Test
+    public void thePatchsIntEntryReadsNonZeroAsYes() {
+        assertFalse("a reel's card handed over as 1 stayed", AffiliateLinks.keepReelCard(1));
+        assertFalse(AffiliateLinks.keepReelCard(0));
+        Settings.HIDE_AFFILIATE_LINKS.save(false);
+        assertTrue("with the switch off, 1 lost Facebook's yes", AffiliateLinks.keepReelCard(1));
+        assertFalse(AffiliateLinks.keepReelCard(0));
+    }
 }

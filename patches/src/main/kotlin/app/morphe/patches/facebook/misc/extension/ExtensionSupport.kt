@@ -214,12 +214,17 @@ internal fun Method.requireFreeAt(
 }
 
 /**
- * Hands each answer the boolean method gives to [hook], a static (Z)Z, and returns what the hook
+ * Hands each answer the boolean method gives to [hook], a static (I)Z, and returns what the hook
  * says instead. The answer's own register carries it there and back, so nothing is borrowed, and
  * the call goes in at each return's control flow label, so every branch to a return runs it too.
+ *
+ * The hook takes an int because ART lets a boolean method return a register it types as int or
+ * byte (code such as `and-int/lit8 v0, v0, 0x1` before the return), and handing that register to a
+ * boolean parameter fails verification when the class loads. An int parameter takes all of them.
  */
 internal fun MutableMethod.filterBooleanReturns(what: String, hook: String) {
     if (returnType != "Z") throw PatchException("$what: $definingClass->$name answers $returnType, not a boolean")
+    if (!hook.endsWith("(I)Z")) throw PatchException("$what: $hook must take the answer as an int, (I)Z")
     val returns = implementation!!.instructions.withIndex().filter { it.value.opcode == Opcode.RETURN }.map { it.index }
     if (returns.isEmpty()) throw PatchException("$what: $definingClass->$name never returns")
     for (index in returns.asReversed()) {

@@ -31,6 +31,14 @@ public final class ReelPrompts {
     }
 
     /**
+     * The entry the patch calls, handed the predicate's answer as an int: a boolean method may
+     * return a register the verifier types as int, and a boolean parameter wouldn't take it.
+     */
+    public static boolean keep(int showsPrompt) {
+        return keep(showsPrompt != 0);
+    }
+
+    /**
      * The hook, at each of the prompt predicate's returns, handed what it was about to answer.
      * Answers what the predicate returns instead: false for a reel that would get the prompt while
      * the switch is on, and Facebook's answer otherwise.

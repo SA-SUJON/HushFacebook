@@ -29,7 +29,7 @@ internal const val PATCH = "Hide post prompts"
 internal const val BUMPER_COMPONENT = "NTFeedStoryBumperComponent"
 
 internal const val POST_PROMPTS = "Lapp/morphe/extension/facebook/feed/PostPrompts;"
-internal const val KEEP = "$POST_PROMPTS->keep(Z)Z"
+internal const val KEEP = "$POST_PROMPTS->keep(I)Z"
 
 /**
  * The strip Facebook draws on some posts ("Are you interested in this post?", "Show less", who

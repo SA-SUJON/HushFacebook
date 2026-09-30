@@ -74,4 +74,14 @@ public class ReelPromptsTest {
             PauseForTests.resume();
         }
     }
+
+    /** The patch hands Facebook's answer over as an int, since a boolean method may return one. */
+    @Test
+    public void thePatchsIntEntryReadsNonZeroAsYes() {
+        assertFalse("a reel's prompt handed over as 1 stayed", ReelPrompts.keep(1));
+        assertFalse(ReelPrompts.keep(0));
+        Settings.HIDE_REEL_PROMPTS.save(false);
+        assertTrue("with the switch off, 1 lost Facebook's yes", ReelPrompts.keep(1));
+        assertFalse(ReelPrompts.keep(0));
+    }
 }
