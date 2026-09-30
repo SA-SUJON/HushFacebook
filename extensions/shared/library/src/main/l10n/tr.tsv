@@ -610,3 +610,39 @@ No "Are you interested in this reel?" prompt on reels. The reel plays as usual.	
 Hide affiliate product links	Satış ortaklığı ürün bağlantılarını gizle
 # context: description of that switch; "Commission eligible" is Facebook's own label, so use Facebook's wording in your language if you know it
 The product cards of shop links creators add to posts, on reels, under feed posts and in the comments. The "Commission eligible" label stays.	İçerik üreticilerinin gönderilere eklediği mağaza bağlantılarının ürün kartları, reels'te, akıştaki gönderilerin altında ve yorumlarda. “Komisyona uygun” etiketi kalır.
+# context: The reel button and the video menu item while links are sent to another app (#41)
+Send to app	Uygulamaya gönder
+# context: Title of Android's app chooser when a video's link is sent
+Send the link to	Bağlantıyı gönder:
+# context: Toast when no app could take a video's link
+Couldn't open an app for this link	Bu bağlantı için bir uygulama açılamadı
+# context: Clipboard label of a copied video link
+Video link	Video bağlantısı
+# context: Toast after a long press on the reel button copied its link
+Link copied	Bağlantı kopyalandı
+# context: Toast when a reel's link can't be built
+Couldn't find this reel's link	Bu reel'in bağlantısı bulunamadı
+# context: Toast when a feed video's link can't be built
+Couldn't find this video's link	Bu videonun bağlantısı bulunamadı
+# context: Settings row title: what the Download button does
+When you tap Download	İndir'e dokunduğunuzda
+# context: Choice of the download action row
+Save to phone	Telefona kaydet
+# context: Choice of the download action row
+Send the link to an app	Bağlantıyı bir uygulamaya gönder
+# context: Summary of the download action row while links are sent
+Reels and videos go to the app below as a facebook.com link. Hold the reel Download button to copy the link instead. Stories still save to this phone.	Reel'ler ve videolar aşağıdaki uygulamaya facebook.com bağlantısı olarak gider. Bağlantıyı kopyalamak için reel'in İndir düğmesini basılı tutun. Hikayeler bu telefona kaydedilmeye devam eder.
+# context: Summary of the download action row while saving, the default
+Reels, videos and stories save to this phone.	Reel'ler, videolar ve hikayeler bu telefona kaydedilir.
+# context: Settings row title: the app links are sent to
+App to send to	Gönderilecek uygulama
+# context: Dialog message of the send-to app row; %1$s and %2$s are package names
+The package name of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.	Bağlantıları alacak uygulamanın paket adı, örneğin YTDLnis için %1$s veya Seal için %2$s. Her seferinde bir uygulama seçmek için boş bırakın.
+# context: Hint in the send-to app field
+Package name	Paket adı
+# context: Toast when what was typed in the send-to app row isn't a package name; %1$s is what was typed
+%1$s isn't a package name, so the app stays as it was.	%1$s bir paket adı değil, uygulama olduğu gibi kaldı.
+# context: Summary of the send-to app row with no app named
+Android asks which app each time.	Android her seferinde hangi uygulamanın kullanılacağını sorar.
+# context: Summary of the send-to app row; %1$s is the package name
+Links go to %1$s. When it isn't installed, Android asks which app.	Bağlantılar %1$s uygulamasına gider. Yüklü değilse Android hangi uygulamanın kullanılacağını sorar.

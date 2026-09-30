@@ -115,9 +115,20 @@ public class SettingsBackupTest {
      * test below. Keys, not the settings: a Setting read before the context rule has run poisons
      * the registry for the rest of the sandbox.
      */
-    private static final Map<String, String> VALUES_STAY_OUT = Collections.singletonMap("hushfacebook_font_source",
-            "it names the font file Use the system font draws in, whose copy only this install holds. A settings "
-                    + "file can't carry the font itself, and the name alone would point at nothing on another phone.");
+    private static final Map<String, String> VALUES_STAY_OUT = valuesStayOut();
+
+    private static Map<String, String> valuesStayOut() {
+        Map<String, String> out = new java.util.LinkedHashMap<>();
+        out.put("hushfacebook_font_source",
+                "it names the font file Use the system font draws in, whose copy only this install holds. A settings "
+                        + "file can't carry the font itself, and the name alone would point at nothing on another phone.");
+        String notYet = "the file format has no field for Send to an app's two rows yet (#41), and an import that "
+                + "dropped them without a word would be worse than one that says they stay out. The README says so "
+                + "until the format carries them.";
+        out.put("hushfacebook_download_action", notYet);
+        out.put("hushfacebook_send_to_app", notYet);
+        return Collections.unmodifiableMap(out);
+    }
 
     /** Hushfacebook's own state and its diagnostics. None of them is ever in a file. */
     private static List<Setting<?>> neverInAFile() {

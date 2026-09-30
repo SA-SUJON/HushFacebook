@@ -59,6 +59,7 @@ import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveControl;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -585,6 +586,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             downloads.addPreference(qualityRow(context));
             downloads.addPreference(folderRow(context));
             downloads.addPreference(fileNameRow(context));
+            // Reels and feed and Watch videos can go to another app as a link (#41). A story can't:
+            // its link opens only for someone signed in, so no downloader could fetch it.
+            if (build.contains(PatchFamily.REEL_DOWNLOAD) || build.contains(PatchFamily.VIDEO_DOWNLOAD)) {
+                downloads.addPreference(downloadActionRow(context));
+                downloads.addPreference(sendAppRow(context));
+            }
         }
 
         if (build.contains(PatchFamily.MESSENGER_CARD) || build.contains(PatchFamily.MESSENGER_ICON)) {
@@ -1544,13 +1551,15 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
-     * The quality, start tab, comment order and playback quality rows' summaries are sentences of
-     * their own rather than the chosen entry.
+     * The quality, download action, start tab, comment order and playback quality rows' summaries
+     * are sentences of their own rather than the chosen entry.
      */
     @Override
     protected void updateListPreferenceSummary(ListPreference listPreference, Setting<?> setting) {
         if (listPreference instanceof QualityRow) {
             ((QualityRow) listPreference).showSummary();
+        } else if (listPreference instanceof DownloadActionRow) {
+            ((DownloadActionRow) listPreference).showSummary();
         } else if (listPreference instanceof StartTabRow) {
             ((StartTabRow) listPreference).showSummary();
         } else if (listPreference instanceof CommentOrderRow) {
@@ -1635,6 +1644,74 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     static String fileNameSummary(String template) {
         return L10n.f("Videos are named %1$s. Photos keep Facebook's own %2$s names.",
                 L10n.isolate(template), L10n.isolate(FileNameTemplate.PHOTO_PREFIX));
+    }
+
+    /**
+     * What a tap on Download does for a reel or a video: save it to the phone, the default, or send
+     * its link to another app (#41). The values are the setting's own names, as the quality's are.
+     */
+    static DownloadActionRow downloadActionRow(Context context) {
+        DownloadActionRow row = new DownloadActionRow(context);
+        row.setKey(Settings.DOWNLOAD_ACTION.key);
+        row.setTitle(L10n.t("When you tap Download"));
+        row.setDialogTitle(L10n.t("When you tap Download"));
+        // Android's own Cancel follows the activity's language, as the quality row's did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        row.setEntries(new CharSequence[]{L10n.t("Save to phone"), L10n.t("Send the link to an app")});
+        row.setEntryValues(new CharSequence[]{SendLink.Action.SAVE.name(), SendLink.Action.SEND.name()});
+        row.setValue(Settings.DOWNLOAD_ACTION.savedValue().name());
+        return row;
+    }
+
+    /** What the download action's row says for [action]. */
+    static String downloadActionSummary(SendLink.Action action) {
+        return action == SendLink.Action.SEND
+                ? L10n.t("Reels and videos go to the app below as a facebook.com link. Hold the reel Download "
+                        + "button to copy the link instead. Stories still save to this phone.")
+                : L10n.t("Reels, videos and stories save to this phone.");
+    }
+
+    /**
+     * The app links go to while they're sent, by package name. What's typed is trimmed, anything
+     * that isn't a package name is turned down with a message, and blank leaves the pick to
+     * Android each time.
+     */
+    static SendAppRow sendAppRow(Context context) {
+        SendAppRow row = new SendAppRow(context);
+        row.setKey(Settings.SEND_TO_APP.key);
+        row.setTitle(L10n.t("App to send to"));
+        row.setDialogTitle(L10n.t("App to send to"));
+        row.setDialogMessage(L10n.f("The package name of the app that gets the links, such as %1$s for YTDLnis or "
+                + "%2$s for Seal. Leave it blank to pick an app each time.",
+                L10n.isolate(SendLink.YTDLNIS), L10n.isolate(SendLink.SEAL)));
+        row.setPositiveButtonText(L10n.t("Save"));
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        EditText field = row.getEditText();
+        field.setSingleLine(true);
+        field.setHint(L10n.t("Package name"));
+        row.setText(Settings.SEND_TO_APP.savedValue());
+        row.setOnPreferenceChangeListener((preference, typed) -> {
+            String raw = typed == null ? "" : typed.toString();
+            String clean = raw.trim();
+            if (!clean.isEmpty() && SendLink.targetPackage(clean) == null) {
+                Utils.showToastShort(L10n.f("%1$s isn't a package name, so the app stays as it was.",
+                        L10n.isolate(clean)));
+                return false;
+            }
+            if (clean.equals(raw)) return true;
+            // Keeps the trimmed name in place of what was typed, as the folder row does.
+            ((SendAppRow) preference).setText(clean);
+            return false;
+        });
+        return row;
+    }
+
+    /** What the send-to row says for [app], the package typed there. */
+    static String sendAppSummary(String app) {
+        String target = SendLink.targetPackage(app);
+        return target == null
+                ? L10n.t("Android asks which app each time.")
+                : L10n.f("Links go to %1$s. When it isn't installed, Android asks which app.", L10n.isolate(target));
     }
 
     /** "Videos go to Movies/Clips and photos to Pictures/Clips." for the folder [leaf]. */
@@ -2084,6 +2161,74 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         protected void showDialog(Bundle state) {
             super.showDialog(state);
             if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The download action's row. Its summary follows its value, whoever sets it: the person or the
+     * shared page syncing it from the setting.
+     */
+    static final class DownloadActionRow extends ListPreference {
+        DownloadActionRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            setSummary(downloadActionSummary(SendLink.Action.SEND.name().equals(getValue())
+                    ? SendLink.Action.SEND : SendLink.Action.SAVE));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The send-to app's row. Its summary follows its text, whoever sets it: the person or the
+     * shared page syncing it from the setting.
+     */
+    static final class SendAppRow extends EditTextPreference {
+        SendAppRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setText(String text) {
+            super.setText(text);
+            setSummary(sendAppSummary(text));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its edit dialog takes the screen's colours, as the folder's does. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+            fitAboveKeyboard(getDialog());
         }
     }
 

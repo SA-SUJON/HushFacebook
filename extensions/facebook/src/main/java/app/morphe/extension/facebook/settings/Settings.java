@@ -13,6 +13,7 @@ import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
+import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.settings.BaseSettings;
@@ -526,6 +527,21 @@ public class Settings extends BaseSettings {
      */
     public static final StringSetting FILENAME_TEMPLATE =
             new StringSetting("hushfacebook_filename_template", FileNameTemplate.DEFAULT);
+
+    /**
+     * What a tap on Download does for a reel or a feed or Watch video: save it here, the default,
+     * or send its link to another app ({@link SendLink}, #41). Stories always save. Like the
+     * quality, it isn't a switch.
+     */
+    public static final EnumSetting<SendLink.Action> DOWNLOAD_ACTION =
+            new EnumSetting<>("hushfacebook_download_action", SendLink.Action.SAVE);
+
+    /**
+     * The app {@link #DOWNLOAD_ACTION} sends links to, by package name. Blank, or anything that
+     * isn't a package name, leaves the choice to Android's chooser each time.
+     */
+    public static final StringSetting SEND_TO_APP =
+            new StringSetting("hushfacebook_send_to_app", "");
 
     /**
      * The tab a start from the launcher icon opens on while {@link #OPEN_ON_CHOSEN_TAB} is on:

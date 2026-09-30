@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWordsForTests;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -86,6 +87,8 @@ public class HushfacebookPreferenceFragmentTest {
         Settings.SAVE_FOLDER.resetToDefault();
         Settings.DOWNLOAD_QUALITY.resetToDefault();
         Settings.FILENAME_TEMPLATE.resetToDefault();
+        Settings.DOWNLOAD_ACTION.resetToDefault();
+        Settings.SEND_TO_APP.resetToDefault();
         Settings.HIDDEN_WORDS.resetToDefault();
         Settings.KEPT_WORDS.resetToDefault();
     }
@@ -302,6 +305,81 @@ public class HushfacebookPreferenceFragmentTest {
             for (Preference row : rowsOf(controller)) {
                 assertFalse("a folder row with no download in the build",
                         row instanceof HushfacebookPreferenceFragment.FolderRow);
+            }
+        }
+    }
+
+    /**
+     * Send to an app (#41): with a reel or video download in the build, Downloads ends with what a
+     * tap on Download does, saving by default, and the app the links go to. The app row keeps a
+     * package name trimmed and turns down anything else. A story-only build has neither, since a
+     * story always saves.
+     */
+    @Test
+    public void theSendRowsChooseWhatDownloadDoesAndWhichAppGetsTheLink() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.REEL_DOWNLOAD);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int nameAt = -1;
+            int actionAt = -1;
+            int appAt = -1;
+            for (int i = 0; i < rows.size(); i++) {
+                if (rows.get(i) instanceof HushfacebookPreferenceFragment.FileNameRow) nameAt = i;
+                if (rows.get(i) instanceof HushfacebookPreferenceFragment.DownloadActionRow) actionAt = i;
+                if (rows.get(i) instanceof HushfacebookPreferenceFragment.SendAppRow) appAt = i;
+            }
+            assertTrue("no download action row with a reel download in the build", actionAt >= 0);
+            assertEquals("the action row isn't under the file name", nameAt + 1, actionAt);
+            assertEquals("the app row isn't under the action", actionAt + 1, appAt);
+
+            HushfacebookPreferenceFragment.DownloadActionRow action =
+                    (HushfacebookPreferenceFragment.DownloadActionRow) rows.get(actionAt);
+            assertEquals(Settings.DOWNLOAD_ACTION.key, action.getKey());
+            assertEquals("When you tap Download", String.valueOf(action.getTitle()));
+            assertEquals(Arrays.asList("Save to phone", "Send the link to an app"),
+                    Arrays.asList(String.valueOf(action.getEntries()[0]), String.valueOf(action.getEntries()[1])));
+            assertEquals(Arrays.asList("SAVE", "SEND"),
+                    Arrays.asList(String.valueOf(action.getEntryValues()[0]), String.valueOf(action.getEntryValues()[1])));
+            assertEquals("SAVE", action.getValue());
+            assertEquals("Reels, videos and stories save to this phone.", String.valueOf(action.getSummary()));
+
+            action.setValue("SEND");
+            ShadowLooper.idleMainLooper();
+            assertEquals(SendLink.Action.SEND, Settings.DOWNLOAD_ACTION.savedValue());
+            assertEquals(HushfacebookPreferenceFragment.downloadActionSummary(SendLink.Action.SEND),
+                    String.valueOf(action.getSummary()));
+
+            HushfacebookPreferenceFragment.SendAppRow app = (HushfacebookPreferenceFragment.SendAppRow) rows.get(appAt);
+            assertEquals(Settings.SEND_TO_APP.key, app.getKey());
+            assertEquals("App to send to", String.valueOf(app.getTitle()));
+            assertEquals("Android asks which app each time.", String.valueOf(app.getSummary()));
+            String message = String.valueOf(app.getDialogMessage());
+            assertTrue(message, message.contains(L10n.isolate(SendLink.YTDLNIS)) && message.contains(L10n.isolate(SendLink.SEAL)));
+
+            Preference.OnPreferenceChangeListener ok = app.getOnPreferenceChangeListener();
+            assertFalse("a name with spaces round it was kept as typed", ok.onPreferenceChange(app, " com.junkfood.seal "));
+            ShadowLooper.idleMainLooper();
+            assertEquals(SendLink.SEAL, app.getText());
+            assertEquals(SendLink.SEAL, Settings.SEND_TO_APP.savedValue());
+            assertEquals("Links go to " + L10n.isolate(SendLink.SEAL) + ". When it isn't installed, Android asks which app.",
+                    String.valueOf(app.getSummary()));
+
+            assertFalse("something that isn't a package name was kept", ok.onPreferenceChange(app, "seal --exec"));
+            ShadowLooper.idleMainLooper();
+            assertEquals(SendLink.SEAL, Settings.SEND_TO_APP.savedValue());
+            assertEquals(L10n.isolate("seal --exec") + " isn't a package name, so the app stays as it was.",
+                    ShadowToast.getTextOfLatestToast());
+
+            assertTrue("a clean name was changed", ok.onPreferenceChange(app, SendLink.YTDLNIS));
+            assertTrue("a blank name was turned down", ok.onPreferenceChange(app, ""));
+        }
+
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.STORY_DOWNLOAD);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            for (Preference row : rowsOf(controller)) {
+                assertFalse("a send row with only story downloads in the build",
+                        row instanceof HushfacebookPreferenceFragment.DownloadActionRow
+                                || row instanceof HushfacebookPreferenceFragment.SendAppRow);
             }
         }
     }
