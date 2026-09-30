@@ -220,7 +220,7 @@ internal fun decodedColourId(name: String): Long? =
  * A resource colour's value as an int, for `#rgb`, `#argb`, `#rrggbb` and `#aarrggbb`, or null for
  * anything else, a reference such as `@color/foo` included.
  */
-private fun argb(value: String): Int? {
+internal fun argb(value: String): Int? {
     val hex = value.trim().removePrefix("#")
     if (hex.length !in setOf(3, 4, 6, 8)) return null
     if (!hex.all { it.isDigit() || it.lowercaseChar() in 'a'..'f' }) return null

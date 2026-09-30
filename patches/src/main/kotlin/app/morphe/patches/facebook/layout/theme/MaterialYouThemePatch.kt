@@ -22,6 +22,8 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import java.io.File
+import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import kotlin.math.abs
@@ -205,8 +207,27 @@ internal fun recolourNightColours(night: Document, nightV31: Document): Int {
 
 private const val NIGHT_COLORS = "res/values-night/colors.xml"
 private const val NIGHT_V31_COLORS = "res/values-night-v31/colors.xml"
+private const val NIGHT_VALUES = "res/values-night"
+
+/** Read, never written: light mode's colours and styles stay as Facebook has them. */
+private const val DEFAULT_COLORS = "res/values/colors.xml"
+private const val DEFAULT_VALUES = "res/values"
+
+private const val EMPTY_RESOURCES = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n</resources>\n"
+
+/** A decoded resource file parsed for reading only, so nothing writes it back. */
+private fun readOnly(file: File): Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
+
+/** Each colour in a decoded colours file, by name, with its value as written. */
+private fun Document.colourValues(): Map<String, String> {
+    val colors = getElementsByTagName("color")
+    return (0 until colors.length).mapNotNull { colors.item(it) as? Element }
+        .associate { it.getAttribute("name") to it.textContent.trim() }
+}
 
 private val materialYouResourcePatch = resourcePatch {
+    dependsOn(fdsTokenAttributesPatch)
+
     // After every patch's own work, so AMOLED's black has gone in first and stays: black is no
     // tone this recolours.
     finalize {
@@ -214,12 +235,35 @@ private val materialYouResourcePatch = resourcePatch {
         val dynamic = get(NIGHT_V31_COLORS, false)
         if (!dynamic.exists()) {
             dynamic.parentFile.mkdirs()
-            dynamic.writeText("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n</resources>\n")
+            dynamic.writeText(EMPTY_RESOURCES)
         }
+        val nightColourNames = readOnly(get(NIGHT_COLORS)).colourValues().keys
         val changed = document(NIGHT_COLORS).use { night ->
             document(NIGHT_V31_COLORS).use { nightV31 -> recolourNightColours(night, nightV31) }
         }
         check(changed > 0) { "No night colour is near a palette tone, so text would keep its grey" }
+
+        // Route two for the FDS styles (MaterialYouStyles.kt): a night copy of the dark style.
+        val colours = readOnly(get(DEFAULT_COLORS)).colourValues()
+        val styleFiles = get(DEFAULT_VALUES).listFiles().orEmpty()
+            .filter { it.name.startsWith("style") && it.name.endsWith(".xml") }.sortedBy { it.name }
+        var restyled = 0
+        for (file in styleFiles) {
+            val family = darkFdsStyles(readOnly(file), tokenAttributeNames)
+            if (family.isEmpty()) continue
+            val nightStyles = "$NIGHT_VALUES/${file.name}"
+            get(nightStyles, false).let { if (!it.exists()) it.writeText(EMPTY_RESOURCES) }
+            restyled += document(nightStyles).use { night ->
+                document(NIGHT_COLORS).use { nightColours ->
+                    document(NIGHT_V31_COLORS).use { nightV31 ->
+                        writeNightStyles(family, colours, nightColourNames, tokenAttributeNames, night, nightColours, nightV31)
+                    }
+                }
+            }
+        }
+        check(restyled > 0) {
+            "No FDS dark style item takes a palette colour, so views Facebook inflates from its layouts would keep its blue"
+        }
     }
 }
 

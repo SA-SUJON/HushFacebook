@@ -209,17 +209,33 @@ class MaterialYouPatchTest {
         assertEquals(before, night.text() to nightV31.text())
     }
 
-    /** Light mode's colours live in values/, which the resource half never opens. */
+    /**
+     * Light mode's colours and styles live in values/, which the resource half reads for the FDS
+     * styles' night copies and never writes: it opens for writing only night files.
+     */
     @Test
-    fun `the resource half opens only the night colours`() {
-        val source = File(RepoFiles.root, "patches/src/main/kotlin/app/morphe/patches/facebook/layout/theme/MaterialYouThemePatch.kt").readText()
+    fun `the resource half writes only night resources`() {
+        val dir = "patches/src/main/kotlin/app/morphe/patches/facebook/layout/theme"
+        val source = File(RepoFiles.root, "$dir/MaterialYouThemePatch.kt").readText()
         val paths = Regex(""""(res/[^"]+)"""").findAll(source).map { it.groupValues[1] }.toSet()
-        assertEquals(setOf("res/values-night/colors.xml", "res/values-night-v31/colors.xml"), paths)
+        assertEquals(setOf("res/values-night/colors.xml", "res/values-night-v31/colors.xml", "res/values-night",
+            "res/values/colors.xml", "res/values"), paths)
+
+        val opened = Regex("""document\((\w+)\)""").findAll(source).map { it.groupValues[1] }.toSet()
+        assertEquals(setOf("NIGHT_COLORS", "NIGHT_V31_COLORS", "nightStyles"), opened)
+        assertTrue("the night styles are no night file", source.contains("val nightStyles = \"\$NIGHT_VALUES/"))
+        val defaults = Regex("""\S*DEFAULT_(?:COLORS|VALUES)\S*""").findAll(source).map { it.value }
+            .filterNot { it == "DEFAULT_COLORS" || it == "DEFAULT_VALUES" }.toSet()
+        assertEquals(setOf("readOnly(get(DEFAULT_COLORS)).colourValues()", "get(DEFAULT_VALUES).listFiles().orEmpty()"), defaults)
+        assertTrue("the style files are opened for writing", source.contains("darkFdsStyles(readOnly(file), "))
+
+        val styles = File(RepoFiles.root, "$dir/MaterialYouStyles.kt").readText()
+        assertTrue("MaterialYouStyles opens a resource file", "\"res/" !in styles && "document(" !in styles)
     }
 
     /** The patch and the extension hold the same lists, each in its own module. */
     @Test
-    fun `the patch and the extension agree on the surfaces and the fixed palette`() {
+    fun `the patch and the extension agree on the surfaces, the token tables and the fixed palette`() {
         val theme = File(RepoFiles.root, "extensions/facebook/src/main/java/app/morphe/extension/facebook/theme/MaterialYouTheme.java").readText()
         val palette = File(RepoFiles.root, "extensions/facebook/src/main/java/app/morphe/extension/facebook/theme/TonePalette.java").readText()
 
@@ -234,5 +250,10 @@ class MaterialYouPatchTest {
         val fallback = Regex("""static final String FALLBACK =\s*((?:\s*\+?\s*"[^"]*")+);""").find(palette)!!.groupValues[1]
         val javaText = Regex(""""([^"]*)"""").findAll(fallback).joinToString("") { it.groupValues[1] }
         assertEquals(FALLBACK_PALETTE, javaText)
+
+        for ((java, kotlin) in listOf("FDS_DARK" to FDS_DARK_TOKENS, "FDS_SHARED" to FDS_SHARED_TOKENS)) {
+            val table = Regex("""static final String $java =\s*((?:\s*\+?\s*"[^"]*")+);""").find(theme)!!.groupValues[1]
+            assertEquals("$java differs", Regex(""""([^"]*)"""").findAll(table).joinToString("") { it.groupValues[1] }, kotlin)
+        }
     }
 }
