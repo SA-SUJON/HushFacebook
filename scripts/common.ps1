@@ -210,6 +210,29 @@ function Resolve-DesktopCli {
     return $found
 }
 
+function Select-FixtureBuild {
+    <#
+    .SYNOPSIS
+        The .apk and .apkm files in -Folder whose names hold -Version, with the one .apkm picked
+        when there are several.
+    .DESCRIPTION
+        A version can name its split bundle beside a single APK made from it, such as the
+        -minapi28.apk the emulator installs, and the bundle is the fixture the tests read. With more
+        than one bundle, or several APKs and no bundle, every match comes back, for the caller to
+        refuse with its own message.
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$Folder,
+        [Parameter(Mandatory = $true)][string]$Version
+    )
+
+    $matching = @(Get-ChildItem -LiteralPath $Folder -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Extension -in '.apk', '.apkm' -and $_.Name.Contains($Version) })
+    $bundles = @($matching | Where-Object { $_.Extension -eq '.apkm' })
+    if ($matching.Count -gt 1 -and $bundles.Count -eq 1) { return $bundles }
+    return $matching
+}
+
 function Get-BaseApk {
     <#
     .SYNOPSIS
