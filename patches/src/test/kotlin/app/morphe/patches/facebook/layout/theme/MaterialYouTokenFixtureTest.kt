@@ -299,7 +299,7 @@ class MaterialYouTokenFixtureTest {
 
             val before = file.text()
             val night = emptyResources()
-            restyled += writeNightStyles(family, decoded.colours, decoded.nightColours, tokens, night, emptyResources(), emptyResources())
+            restyled += writeNightStyles(family, decoded.colours, decoded.nightColours, tokens, night, emptyResources(), mutableMapOf())
             assertEquals("$build: the default $type file changed", before, file.text())
 
             for (copy in night.documentElement.elements()) {

@@ -219,7 +219,8 @@ class MaterialYouPatchTest {
         val source = File(RepoFiles.root, "$dir/MaterialYouThemePatch.kt").readText()
         val paths = Regex(""""(res/[^"]+)"""").findAll(source).map { it.groupValues[1] }.toSet()
         assertEquals(setOf("res/values-night/colors.xml", "res/values-night-v31/colors.xml", "res/values-night",
-            "res/values/colors.xml", "res/values"), paths)
+            "res/color-night-v31", "res/values/colors.xml", "res/values"), paths)
+        assertTrue("the state lists are written as files", source.contains("get(\"\$NIGHT_V31_STATE_LISTS/\$name.xml\", false)"))
 
         val opened = Regex("""document\((\w+)\)""").findAll(source).map { it.groupValues[1] }.toSet()
         assertEquals(setOf("NIGHT_COLORS", "NIGHT_V31_COLORS", "nightStyles"), opened)

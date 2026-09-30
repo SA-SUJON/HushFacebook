@@ -16,8 +16,13 @@ import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstructio
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
+import java.util.Locale
 import org.w3c.dom.Document
 import org.w3c.dom.Element
+import kotlin.math.abs
+import kotlin.math.cbrt
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 /*
  * Route two for the FDS styles.
@@ -30,10 +35,11 @@ import org.w3c.dom.Element
  *
  * So the resource half writes a night copy of the dark style, and of each style under it that sets a
  * token of its own, with each item for a token and colour FDS_DARK or FDS_SHARED lists pointing at a
- * palette colour instead. Night resources are only read while Facebook's dark mode is on, so light
- * mode, and the Video tab in light mode with it, keeps the default styles as they are. A colour the
- * tables don't list for its token (the logo's blue, a map's), a translucent one, which no system
- * colour resource can carry, and one no palette tone is near all stay as Facebook has them.
+ * palette colour instead, at the listed colour's lightness and alpha, as route one's runtime hooks
+ * give it. Night resources are only read while Facebook's dark mode is on, so light mode, and the
+ * Video tab in light mode with it, keeps the default styles as they are. A colour the tables don't
+ * list for its token (the logo's blue, a map's), black, white and any colour that's neither a grey
+ * nor one of Facebook's blues stay as Facebook has them.
  */
 
 /** MaterialYouTheme.FDS_DARK, which the parity test holds to the extension's. */
@@ -184,9 +190,110 @@ internal fun darkFdsStyles(styles: Document, tokens: Map<String, String>): List<
     return family
 }
 
-/** The palette colour resource a night style item points at for [tone]. */
-internal fun paletteColourName(tone: NightTone): String =
-    "hushfacebook_you_" + (if (tone.accent) "accent_" else "neutral_") + tone.tone
+/**
+ * The palette colour a night style item points at: the family, the listed colour's L* rounded to a
+ * whole number, and its alpha. The fixed palette's steps are tones 0 to 100, so a blue at L* 56 sits
+ * between two of them; both of these land on its lightness instead.
+ */
+internal data class NightShade(val accent: Boolean, val lightness: Int, val alpha: Int) {
+    /** The colour resource's name, one per family, lightness and alpha. */
+    val name: String
+        get() = "hushfacebook_you_" + (if (accent) "accent" else "neutral") + "_l$lightness" +
+            (if (alpha == 0xFF) "" else "_a%02x".format(alpha))
+
+    /**
+     * Android 12 and newer: a colour state list in `res/color-night-v31` that moves the system tone
+     * nearest [lightness] to it with `android:lStar`, keeping that tone's hue and chroma, and gives it
+     * [alpha]. The base is never tone 0 or 100, whose hue is lost.
+     */
+    val stateList: String
+        get() {
+            val base = NightTone(accent, TONES.filter { it in 10..95 }.minBy { abs(it - lightness) }).systemColor
+            val alphaAttribute = if (alpha == 0xFF) "" else " android:alpha=\"%.4f\"".format(Locale.ROOT, alpha / 255.0)
+            return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<selector xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
+                "    <item android:color=\"$base\" android:lStar=\"$lightness.0\"$alphaAttribute />\n" +
+                "</selector>\n"
+        }
+
+    /** Android 11: the fixed palette's family at [lightness], between its two nearest steps in CIELAB, with [alpha]. */
+    val fallback: String
+        get() = "#%02x%06x".format(alpha, fixedPaletteColour(accent, lightness.toDouble()) and 0xFFFFFF)
+}
+
+/**
+ * The shade a listed style colour takes, or null to leave it: a grey takes the neutral family and one
+ * of Facebook's blues the accent, at any lightness and alpha. Black, white, a clear colour and any
+ * other hue stay as they are.
+ */
+internal fun nightShade(colour: Int): NightShade? {
+    val alpha = colour ushr 24
+    val rgb = colour and 0xFFFFFF
+    if (alpha == 0 || rgb == 0 || rgb == 0xFFFFFF) return null
+    val r = rgb shr 16
+    val g = (rgb shr 8) and 0xFF
+    val b = rgb and 0xFF
+    val accent = when {
+        maxOf(r, g, b) - minOf(r, g, b) <= 10 -> false
+        isFacebookBlue(r, g, b) -> true
+        else -> return null
+    }
+    return NightShade(accent, lstar(r, g, b).roundToInt(), alpha)
+}
+
+/**
+ * TonePalette.sameLightness on the fixed palette: the family's colour at L* [lightness], its a* and
+ * b* taken between the two steps either side of it.
+ */
+internal fun fixedPaletteColour(accent: Boolean, lightness: Double): Int {
+    val steps = FALLBACK_PALETTE.split(";")[if (accent) 0 else 1].trim().split(" ")
+        .map { lab(it.toInt(16)) }.sortedBy { it[0] }
+    var k = 0
+    while (k < steps.size - 2 && lightness > steps[k + 1][0]) k++
+    val (low, high) = steps[k] to steps[k + 1]
+    val span = high[0] - low[0]
+    val w = if (span <= 0) 0.0 else ((lightness - low[0]) / span).coerceIn(0.0, 1.0)
+    return fromLab(lightness, low[1] + (high[1] - low[1]) * w, low[2] + (high[2] - low[2]) * w)
+}
+
+private fun linear(channel: Int): Double {
+    val c = channel / 255.0
+    return if (c <= 0.04045) c / 12.92 else ((c + 0.055) / 1.055).pow(2.4)
+}
+
+// D65 white, as sRGB defines it, the same as TonePalette's.
+private const val XN = 0.95047
+private const val ZN = 1.08883
+
+private fun labF(t: Double) = if (t > 216.0 / 24389.0) cbrt(t) else (24389.0 / 27.0 * t + 16) / 116
+
+private fun labInverse(f: Double): Double {
+    val cube = f * f * f
+    return if (cube > 216.0 / 24389.0) cube else (116 * f - 16) * 27.0 / 24389.0
+}
+
+private fun lab(rgb: Int): DoubleArray {
+    val r = linear((rgb shr 16) and 0xFF)
+    val g = linear((rgb shr 8) and 0xFF)
+    val b = linear(rgb and 0xFF)
+    val fx = labF((0.4124 * r + 0.3576 * g + 0.1805 * b) / XN)
+    val fy = labF(0.2126 * r + 0.7152 * g + 0.0722 * b)
+    val fz = labF((0.0193 * r + 0.1192 * g + 0.9505 * b) / ZN)
+    return doubleArrayOf(116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz))
+}
+
+private fun fromLab(l: Double, a: Double, b: Double): Int {
+    val fy = (l + 16) / 116
+    val x = labInverse(fy + a / 500) * XN
+    val y = labInverse(fy)
+    val z = labInverse(fy - b / 200) * ZN
+    fun channel(linear: Double): Int {
+        val c = if (linear <= 0.0031308) 12.92 * linear else 1.055 * linear.pow(1 / 2.4) - 0.055
+        return (c.coerceIn(0.0, 1.0) * 255).roundToInt()
+    }
+    return -0x1000000 or (channel(3.2406 * x - 1.5372 * y - 0.4986 * z) shl 16) or
+        (channel(-0.9689 * x + 1.8758 * y + 0.0415 * z) shl 8) or channel(0.0557 * x - 0.2040 * y + 1.0570 * z)
+}
 
 /**
  * An item's colour as the default configuration has it, following `@color/` references through
@@ -204,10 +311,11 @@ private fun defaultColour(value: String, colours: Map<String, String>, nightColo
 
 /**
  * Writes into [night] a copy of each style in [family] with an item to change, its items for a
- * listed token and colour pointing at that colour's palette tone, and adds each tone once to
- * [nightColours] (the fixed palette, for Android 11) and [nightV31Colours] (the wallpaper's).
- * [colours] are the default colours by name and [nightColourNames] the ones with a night value.
- * A style [night] already has is left to Facebook. Answers how many items it pointed elsewhere.
+ * listed token and colour pointing at that colour's [NightShade], and adds each shade once to
+ * [nightColours] (the fixed palette, for Android 11) and [stateLists] (the wallpaper's, as the
+ * `res/color-night-v31` file for each name). [colours] are the default colours by name and
+ * [nightColourNames] the ones with a night value. A style [night] already has is left to Facebook.
+ * Answers how many items it pointed elsewhere.
  */
 internal fun writeNightStyles(
     family: List<Element>,
@@ -216,36 +324,32 @@ internal fun writeNightStyles(
     tokens: Map<String, String>,
     night: Document,
     nightColours: Document,
-    nightV31Colours: Document,
+    stateLists: MutableMap<String, String>,
 ): Int {
     val listed = listedTokenColours()
     val present = night.documentElement.childElements().map { it.getAttribute("name") }.toSet()
-    val written = (nightColours.documentElement.childElements() + nightV31Colours.documentElement.childElements())
-        .map { it.getAttribute("name") }.toMutableSet()
+    val written = nightColours.documentElement.childElements().map { it.getAttribute("name") }.toMutableSet()
 
     var changed = 0
     for (style in family) {
         if (style.getAttribute("name") in present) continue
-        val tones = style.childElements().mapIndexedNotNull { index, item ->
+        val shades = style.childElements().mapIndexedNotNull { index, item ->
             val token = tokens[item.getAttribute("name")] ?: return@mapIndexedNotNull null
             val colour = defaultColour(item.textContent, colours, nightColourNames) ?: return@mapIndexedNotNull null
             if (colour !in listed[token].orEmpty()) return@mapIndexedNotNull null
-            nightTone("#%08x".format(colour))?.let { index to it }
+            nightShade(colour)?.let { index to it }
         }.toMap()
-        if (tones.isEmpty()) continue
+        if (shades.isEmpty()) continue
 
         val copy = night.importNode(style, true) as Element
         val items = copy.childElements()
-        for ((index, tone) in tones) {
-            val name = paletteColourName(tone)
-            items[index].textContent = "@color/$name"
-            if (written.add(name)) {
-                nightColours.documentElement.appendChild(nightColours.colour(name, tone.fallback))
-                nightV31Colours.documentElement.appendChild(nightV31Colours.colour(name, tone.systemColor))
-            }
+        for ((index, shade) in shades) {
+            items[index].textContent = "@color/${shade.name}"
+            if (written.add(shade.name)) nightColours.documentElement.appendChild(nightColours.colour(shade.name, shade.fallback))
+            stateLists.getOrPut(shade.name) { shade.stateList }
         }
         night.documentElement.appendChild(copy)
-        changed += tones.size
+        changed += shades.size
     }
     return changed
 }
