@@ -238,6 +238,18 @@ public final class MaterialYouTheme {
     }
 
     /**
+     * A colour a React Native screen sets on a view, a text or an image (ReactColours), after
+     * AMOLED's rule for a background. It comes with no token, so the dark surfaces and Facebook's
+     * blues take the palette as a colour from the server does: Marketplace home's selected chip is
+     * #331D85FC over its strip, its location text #5AA7FF and its pin #75B6FF. Anything else, and
+     * light mode, keeps the colour as it came.
+     */
+    static int react(int color) {
+        HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
+        return withoutToken(color);
+    }
+
+    /**
      * A colour that came with no token: the palette's neutral at the same lightness for one of the
      * {@link #SURFACES} in dark mode, and its accent for one of the {@link #SERVER_BLUES} once
      * Facebook has said dark mode is on.

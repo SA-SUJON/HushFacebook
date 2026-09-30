@@ -231,7 +231,21 @@ public final class AmoledTheme {
      */
     public static int parseColor(String text) {
         HookStatus.invoked(FamilyNames.AMOLED_THEME);
-        int color = Color.parseColor(text);
+        return withoutToken(Color.parseColor(text));
+    }
+
+    /**
+     * A background a React Native screen sets on a view (ReactColours), such as the strip behind
+     * Marketplace home's chips. It comes from the screen's JavaScript with no token, so it takes
+     * route four's rule.
+     */
+    static int react(int color) {
+        HookStatus.invoked(FamilyNames.AMOLED_THEME);
+        return withoutToken(color);
+    }
+
+    /** Route four's rule for a colour that comes with no token. */
+    private static int withoutToken(int color) {
         if (!isDarkNeutral(color, MAX_SERVER_CARD_CHANNEL) || !DarkMode.on()) return color;
         if (color == BLACK || color == background) return color;
         return isDarkNeutral(color, MAX_CHANNEL) ? background : raise(background, color - RAISED_SHIFT * 0x010101);

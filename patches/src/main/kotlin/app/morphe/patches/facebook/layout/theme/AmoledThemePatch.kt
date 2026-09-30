@@ -365,6 +365,10 @@ val amoledThemePatch = bytecodePatch(
         check(routeTwoRestores.isNotEmpty()) { "Route two's table is empty, so light mode's Video tab would stay black" }
         fillRouteTwoTable(routeTwoRestores)
 
+        // React Native screens such as Marketplace home, whose colours come from their JavaScript
+        // as ints on props, past every route.
+        hookReactColours()
+
         enableStatus("amoledTheme")
     }
 }

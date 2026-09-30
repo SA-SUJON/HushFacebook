@@ -371,6 +371,54 @@ public class MaterialYouThemeTest {
         assertFalse(MaterialYouTheme.isServerBlue(0xFF252728));
     }
 
+    /**
+     * Marketplace home, a React Native screen, in Facebook's dark mode (ReactColours): the selected
+     * chip's #331D85FC, the location pin's #75B6FF and the location name's #5AA7FF take the palette's
+     * accent at the same lightness, the chip staying as see-through, and the #252728 strip behind the
+     * chips takes its neutral. A colour no list has, AMOLED's black, light mode and the blues before
+     * Facebook answers keep Facebook's.
+     */
+    @Test
+    public void marketplacesReactColoursTakeThePaletteInDarkMode() {
+        DarkMode.answer(true);
+        for (int blue : new int[]{0x331D85FC, 0xFF75B6FF, 0xFF5AA7FF}) {
+            int drawn = MaterialYouTheme.react(blue);
+            assertEquals(Integer.toHexString(blue), palette.sameLightness(TonePalette.ACCENT, blue), drawn);
+            assertSameLightness(Integer.toHexString(blue), blue | 0xFF000000, drawn | 0xFF000000);
+            assertEquals(Integer.toHexString(blue) + " keeps its alpha", blue >>> 24, drawn >>> 24);
+        }
+        assertNotEquals("the chip kept Facebook's blue", 0x331D85FC, MaterialYouTheme.react(0x331D85FC));
+        assertEquals("the strip", palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728), MaterialYouTheme.react(0xFF252728));
+        assertEquals("a colour no list has", 0xFF123456, MaterialYouTheme.react(0xFF123456));
+        assertEquals("a blue someone picked", 0xFF1877F2, MaterialYouTheme.react(0xFF1877F2));
+        assertEquals("AMOLED's black", 0xFF000000, MaterialYouTheme.react(0xFF000000));
+        assertEquals("white text", 0xFFFFFFFF, MaterialYouTheme.react(0xFFFFFFFF));
+
+        DarkMode.answer(false);
+        for (int colour : new int[]{0x261D85FC, 0xFF0064D1, 0xFF75B6FF, 0xFF5AA7FF, 0xFF252728}) {
+            assertEquals("light mode " + Integer.toHexString(colour), colour, MaterialYouTheme.react(colour));
+        }
+        DarkMode.forget();
+        for (int blue : new int[]{0x331D85FC, 0xFF75B6FF, 0xFF5AA7FF}) {
+            assertEquals("before Facebook answers " + Integer.toHexString(blue), blue, MaterialYouTheme.react(blue));
+        }
+    }
+
+    /**
+     * With neither theme in the build (a test JVM's SettingsStatus says so), React's colours pass
+     * through as they came, a border or tint React didn't set stays null, and one it did set comes
+     * back as the same object.
+     */
+    @Test
+    public void reactColoursPassThroughWithoutATheme() {
+        DarkMode.answer(true);
+        assertEquals(0xFF252728, ReactColours.background(0xFF252728));
+        assertEquals(0xFF5AA7FF, ReactColours.text(0xFF5AA7FF));
+        assertEquals(null, ReactColours.colour(null));
+        Integer pin = 0xFF75B6FF;
+        assertTrue(pin == ReactColours.colour(pin));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void aServerStringThatIsNoColourThrowsAsBefore() {
         MaterialYouTheme.parseColor("not a colour");

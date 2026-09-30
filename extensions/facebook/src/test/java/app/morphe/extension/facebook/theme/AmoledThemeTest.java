@@ -150,6 +150,23 @@ public class AmoledThemeTest {
         assertEquals("light mode, a server background", 0xFF252728, AmoledTheme.parseColor("#FF252728"));
     }
 
+    /**
+     * Marketplace home, a React Native screen, sets its backgrounds from its JavaScript with no token
+     * (ReactColours): the strip behind its chips is #252728, which goes black like a server
+     * background. The selected chip's see-through blue, a scrim and light mode keep theirs.
+     */
+    @Test
+    public void aReactBackgroundIsJudgedByItsValue() {
+        assertEquals("the strip behind Marketplace's chips", BLACK, AmoledTheme.react(0xFF252728));
+        assertEquals("a card", 0xFF121213, AmoledTheme.react(0xFF333334));
+        assertEquals("the selected chip", 0x331D85FC, AmoledTheme.react(0x331D85FC));
+        assertEquals("a translucent scrim stays", 0x80252728, AmoledTheme.react(0x80252728));
+        assertEquals("white", 0xFFFFFFFF, AmoledTheme.react(0xFFFFFFFF));
+
+        DarkMode.answer(false);
+        assertEquals("light mode", 0xFF252728, AmoledTheme.react(0xFF252728));
+    }
+
     /** {@code top}, a colour with alpha, drawn over the opaque {@code under}, rounded as a screen does. */
     private static int over(int top, int under) {
         int alpha = top >>> 24;

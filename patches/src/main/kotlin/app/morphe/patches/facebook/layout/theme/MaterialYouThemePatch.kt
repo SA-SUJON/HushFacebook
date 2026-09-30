@@ -337,6 +337,10 @@ val materialYouThemePatch = bytecodePatch(
         // finding none is fine then.
         val read = readSurfaceLiterals()
         check(read > 0 || amoledParsers > 0) { "No dark surface written in code, so the chrome would stay grey" }
+
+        // React Native screens such as Marketplace home. With AMOLED in the build its call put
+        // the hooks in already, and ReactColours runs both themes.
+        hookReactColours()
     }
 }
 
