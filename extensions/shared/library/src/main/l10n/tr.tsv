@@ -588,3 +588,13 @@ Tap to see which.	Hangileri olduğunu görmek için dokun.
 Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.	Bu sürümde yok: %1$s. Morphe Manager bunu varsayılan olarak seçer. Yaptığı işi almak için onu seçip yeniden yamala.
 # context: that row's summary once opened, several patches missing; the placeholder is their English names joined as a list
 Not in this build: %1$s. Morphe Manager selects them by default. Patch again with them selected to get what they do.	Bu sürümde yok: %1$s. Morphe Manager bunları varsayılan olarak seçer. Yaptıkları işi almak için onları seçip yeniden yamala.
+# context: Toast at the end of a video save whose file uses a codec WhatsApp and some video editors can't open (AV1, VP9, HEVC or xHE-AAC). A notification with a button to the fix is showing too. Keep it short: Android shows two lines at most.
+Saved, but WhatsApp and some editors may refuse it	Kaydedildi, ancak WhatsApp ve bazı düzenleyiciler reddedebilir
+# context: Toast at the end of a video save whose file WhatsApp may not open, when no notification can be shown. Downloads is the section of Hushfacebook settings with the fix. Two lines at most.
+Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.	Kaydedildi, ancak WhatsApp reddedebilir. Çözüm: Hushfacebook'ta İndirmeler.
+# context: Second line of the notification after such a save. %1$s is the switch's name, Save videos other apps can open. They: WhatsApp and the editors.
+Turn on %1$s to save videos they all play.	Hepsinin oynatabileceği videolar kaydetmek için %1$s ayarını aç.
+# context: Title of the notification after a video save whose file uses a codec WhatsApp and some video editors can't open.
+WhatsApp and some editors may refuse this video	WhatsApp ve bazı düzenleyiciler bu videoyu reddedebilir
+# context: Button on that notification. It opens Hushfacebook settings at the switch Save videos other apps can open.
+Open the setting	Ayarı aç

@@ -158,6 +158,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (getParentFragment() instanceof SettingsDialog && !sections().isEmpty()) {
             navigation = new SettingsNavigation(this, (SettingsDialog) getParentFragment(), savedInstanceState);
         }
+        showRequestedSetting();
+    }
+
+    /** Goes to the row the request that opened the page named, if it named one this build has. */
+    void showRequestedSetting() {
+        String key = SettingsEntry.takeRequestedSetting();
+        Preference target = key == null ? null : findPreference(key);
+        if (target != null) jumpTo(target);
     }
 
     @Override

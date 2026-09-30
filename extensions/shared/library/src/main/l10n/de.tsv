@@ -588,3 +588,13 @@ Tap to see which.	Tippe, um sie zu sehen.
 Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.	Nicht in diesem Build: %1$s. Morphe Manager wählt diesen Patch standardmäßig aus. Wähle ihn aus und patche erneut, um zu bekommen, was er tut.
 # context: that row's summary once opened, several patches missing; the placeholder is their English names joined as a list
 Not in this build: %1$s. Morphe Manager selects them by default. Patch again with them selected to get what they do.	Nicht in diesem Build: %1$s. Morphe Manager wählt diese Patches standardmäßig aus. Wähle sie aus und patche erneut, um zu bekommen, was sie tun.
+# context: Toast at the end of a video save whose file uses a codec WhatsApp and some video editors can't open (AV1, VP9, HEVC or xHE-AAC). A notification with a button to the fix is showing too. Keep it short: Android shows two lines at most.
+Saved, but WhatsApp and some editors may refuse it	Gespeichert, aber WhatsApp und manche Editoren lehnen es eventuell ab
+# context: Toast at the end of a video save whose file WhatsApp may not open, when no notification can be shown. Downloads is the section of Hushfacebook settings with the fix. Two lines at most.
+Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.	Gespeichert, aber WhatsApp lehnt es eventuell ab. Abhilfe: Downloads in Hushfacebook.
+# context: Second line of the notification after such a save. %1$s is the switch's name, Save videos other apps can open. They: WhatsApp and the editors.
+Turn on %1$s to save videos they all play.	Schalte %1$s ein, um Videos zu speichern, die alle abspielen können.
+# context: Title of the notification after a video save whose file uses a codec WhatsApp and some video editors can't open.
+WhatsApp and some editors may refuse this video	WhatsApp und manche Editoren lehnen dieses Video eventuell ab
+# context: Button on that notification. It opens Hushfacebook settings at the switch Save videos other apps can open.
+Open the setting	Einstellung öffnen

@@ -588,3 +588,13 @@ Tap to see which.	Toca para ver cuáles.
 Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.	No está en esta compilación: %1$s. Morphe Manager lo selecciona por defecto. Selecciónalo y vuelve a parchear para obtener lo que hace.
 # context: that row's summary once opened, several patches missing; the placeholder is their English names joined as a list
 Not in this build: %1$s. Morphe Manager selects them by default. Patch again with them selected to get what they do.	No están en esta compilación: %1$s. Morphe Manager los selecciona por defecto. Selecciónalos y vuelve a parchear para obtener lo que hacen.
+# context: Toast at the end of a video save whose file uses a codec WhatsApp and some video editors can't open (AV1, VP9, HEVC or xHE-AAC). A notification with a button to the fix is showing too. Keep it short: Android shows two lines at most.
+Saved, but WhatsApp and some editors may refuse it	Se guardó, pero WhatsApp y algunos editores podrían rechazarlo
+# context: Toast at the end of a video save whose file WhatsApp may not open, when no notification can be shown. Downloads is the section of Hushfacebook settings with the fix. Two lines at most.
+Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.	Se guardó, pero WhatsApp podría rechazarlo. Solución: Descargas en Hushfacebook.
+# context: Second line of the notification after such a save. %1$s is the switch's name, Save videos other apps can open. They: WhatsApp and the editors.
+Turn on %1$s to save videos they all play.	Activa %1$s para guardar videos que todos puedan reproducir.
+# context: Title of the notification after a video save whose file uses a codec WhatsApp and some video editors can't open.
+WhatsApp and some editors may refuse this video	WhatsApp y algunos editores podrían rechazar este video
+# context: Button on that notification. It opens Hushfacebook settings at the switch Save videos other apps can open.
+Open the setting	Abrir la configuración

@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(922);
+        Map<String, String> table = new HashMap<>(932);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -605,6 +605,8 @@ public final class L10nTranslations {
                 "Mit einem gew\u00e4hlten Tab starten");
         table.put("Open the Messenger app",
                 "Messenger-App \u00f6ffnen");
+        table.put("Open the setting",
+                "Einstellung \u00f6ffnen");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "\u00d6ffnet Weblinks in deinem Browser. Facebooks eigene Seiten bleiben in der App.");
         table.put("Opening Facebook",
@@ -667,11 +669,11 @@ public final class L10nTranslations {
                 "Reels, die von selbst starten");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Die Buttons Remix, Vorlage verwenden, \u201eDu bist dran\u201c und Edits sowie die f\u00fcr Sterne, Spiele, Partner-Apps und externe Links. Der Song und andere Hinweise bleiben.");
-        table.put("Remove tracking from shared links",
-                "Tracking aus geteilten Links entfernen");
     }
 
     private static void fillDe5(Map<String, String> table) {
+        table.put("Remove tracking from shared links",
+                "Tracking aus geteilten Links entfernen");
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "Neustart erforderlich. Der Marketplace-Modus wird beim n\u00e4chsten Start von Facebook aktiviert.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -720,6 +722,10 @@ public final class L10nTranslations {
                 "In der Galerie gespeichert, in geringerer Qualit\u00e4t als auf Facebook");
         table.put("Saved videos will be named %1$s.",
                 "Gespeicherte Videos hei\u00dfen dann %1$s.");
+        table.put("Saved, but WhatsApp and some editors may refuse it",
+                "Gespeichert, aber WhatsApp und manche Editoren lehnen es eventuell ab");
+        table.put("Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.",
+                "Gespeichert, aber WhatsApp lehnt es eventuell ab. Abhilfe: Downloads in Hushfacebook.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Gespeichert. Starte Facebook neu, um diese \u00c4nderung zu \u00fcbernehmen.");
         table.put("Saves will go to a folder named %1$s.",
@@ -786,15 +792,15 @@ public final class L10nTranslations {
                 "Unterst\u00fctzte Links");
         table.put("Tab to open on",
                 "Tab beim Start");
+    }
+
+    private static void fillDe6(Map<String, String> table) {
         table.put("Tag suggestions only after @",
                 "Markierungsvorschl\u00e4ge nur nach @");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
                 "Nimmt den Reels-Tab, der bei manchen Konten Video hei\u00dft, aus der Tab-Leiste. Reel-Links und Reels im Feed \u00f6ffnen sich weiterhin. \u00c4nderungen wirken nach einem Neustart von Facebook.");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Entfernt Tracking-Tags wie mibextid aus den Links, die du teilst oder kopierst. Ein Link zu facebook.com/share/ wird f\u00fcr ein einzelnes Teilen erstellt, deshalb kann Facebook ihn trotzdem auf dich zur\u00fcckf\u00fchren.");
-    }
-
-    private static void fillDe6(Map<String, String> table) {
         table.put("Tap to play",
                 "Zum Abspielen tippen");
         table.put("Tap to play, quality and resume",
@@ -887,6 +893,8 @@ public final class L10nTranslations {
                 "Versuche es noch einmal oder kehre zu Facebook zur\u00fcck.");
         table.put("Turn off double tap to like",
                 "Doppeltippen zum Liken ausschalten");
+        table.put("Turn on %1$s to save videos they all play.",
+                "Schalte %1$s ein, um Videos zu speichern, die alle abspielen k\u00f6nnen.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Facebook schl\u00e4gt Personen in Beitr\u00e4gen und Kommentaren erst nach @ vor. Dein Text bleibt unver\u00e4ndert.");
         table.put("Undo",
@@ -907,6 +915,9 @@ public final class L10nTranslations {
                 "Nutzt die Emoji deines Telefons. Reaktionen und Sticker bleiben gleich. Starte Facebook nach der \u00c4nderung neu.");
         table.put("Use your phone's font",
                 "Schriftart des Handys verwenden");
+    }
+
+    private static void fillDe7(Map<String, String> table) {
         table.put("Use your phone's font or a file chosen below. Restart Facebook after changing it.",
                 "Nutzt die Schrift deines Telefons oder eine unten gew\u00e4hlte Datei. Starte Facebook nach der \u00c4nderung neu.");
         table.put("Using %1$s. Choose another file to replace it.",
@@ -915,9 +926,6 @@ public final class L10nTranslations {
                 "Version");
         table.put("Version %1$s for Facebook %2$s",
                 "Version %1$s f\u00fcr Facebook %2$s");
-    }
-
-    private static void fillDe7(Map<String, String> table) {
         table.put("Video",
                 "Video");
         table.put("Video file name",
@@ -946,6 +954,8 @@ public final class L10nTranslations {
                 "Warten auf Facebooks Tab-Leiste. Der Marketplace-Modus wird angewendet, sobald Facebook sie erstellt.");
         table.put("What always comes through",
                 "Was immer ankommt");
+        table.put("WhatsApp and some editors may refuse this video",
+                "WhatsApp und manche Editoren lehnen dieses Video eventuell ab");
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Wenn der Schalter oben an ist, bleibt deine Stelle erhalten, egal wie lange du weg bist. Zum Aktualisieren ziehen und ein Neustart laden weiterhin neue Beitr\u00e4ge.");
         table.put("Words that keep a post",
@@ -1003,7 +1013,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(922);
+        Map<String, String> table = new HashMap<>(932);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1564,6 +1574,8 @@ public final class L10nTranslations {
                 "Abrir en una pesta\u00f1a elegida");
         table.put("Open the Messenger app",
                 "Abrir la app de Messenger");
+        table.put("Open the setting",
+                "Abrir la configuraci\u00f3n");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "Abre enlaces web en tu navegador. Las p\u00e1ginas de Facebook se quedan en la app.");
         table.put("Opening Facebook",
@@ -1626,11 +1638,11 @@ public final class L10nTranslations {
                 "Reels que se reproducen solos");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Los botones para hacer un remix, usar la plantilla, sumar el tuyo o abrir Edits, y los de estrellas, juegos, apps asociadas y enlaces externos. La canci\u00f3n y las dem\u00e1s etiquetas se quedan.");
-        table.put("Remove tracking from shared links",
-                "Quitar el seguimiento de los enlaces compartidos");
     }
 
     private static void fillEs5(Map<String, String> table) {
+        table.put("Remove tracking from shared links",
+                "Quitar el seguimiento de los enlaces compartidos");
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "Es necesario reiniciar. El modo Marketplace se activar\u00e1 la pr\u00f3xima vez que se inicie Facebook.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -1679,6 +1691,10 @@ public final class L10nTranslations {
                 "Se guard\u00f3 en la galer\u00eda con menos calidad que en Facebook");
         table.put("Saved videos will be named %1$s.",
                 "Los videos guardados se llamar\u00e1n %1$s.");
+        table.put("Saved, but WhatsApp and some editors may refuse it",
+                "Se guard\u00f3, pero WhatsApp y algunos editores podr\u00edan rechazarlo");
+        table.put("Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.",
+                "Se guard\u00f3, pero WhatsApp podr\u00eda rechazarlo. Soluci\u00f3n: Descargas en Hushfacebook.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Guardado. Reinicia Facebook para aplicar este cambio.");
         table.put("Saves will go to a folder named %1$s.",
@@ -1745,15 +1761,15 @@ public final class L10nTranslations {
                 "Enlaces compatibles");
         table.put("Tab to open on",
                 "Pesta\u00f1a al abrir");
+    }
+
+    private static void fillEs6(Map<String, String> table) {
         table.put("Tag suggestions only after @",
                 "Sugerencias para etiquetar solo despu\u00e9s de @");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
                 "Quita de la barra de pesta\u00f1as la pesta\u00f1a Reels, que en algunas cuentas se llama Video. Los enlaces a reels y los reels del feed se siguen abriendo. Los cambios se ven al reiniciar Facebook.");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Quita las etiquetas de seguimiento, como mibextid, de los enlaces que compartes o copias. Un enlace de facebook.com/share/ se crea para una sola acci\u00f3n de compartir, as\u00ed que Facebook puede vincularlo contigo de todos modos.");
-    }
-
-    private static void fillEs6(Map<String, String> table) {
         table.put("Tap to play",
                 "Toca para reproducir");
         table.put("Tap to play, quality and resume",
@@ -1846,6 +1862,8 @@ public final class L10nTranslations {
                 "Int\u00e9ntalo de nuevo o vuelve a Facebook.");
         table.put("Turn off double tap to like",
                 "Desactivar tocar dos veces para dar Me gusta");
+        table.put("Turn on %1$s to save videos they all play.",
+                "Activa %1$s para guardar videos que todos puedan reproducir.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Escribe @ para que Facebook sugiera a qui\u00e9n etiquetar en publicaciones o comentarios. Tu texto no cambia.");
         table.put("Undo",
@@ -1866,6 +1884,9 @@ public final class L10nTranslations {
                 "Usa los emojis del tel\u00e9fono. Las reacciones y pegatinas no cambian. Reinicia Facebook despu\u00e9s de cambiarlo.");
         table.put("Use your phone's font",
                 "Usar la fuente del tel\u00e9fono");
+    }
+
+    private static void fillEs7(Map<String, String> table) {
         table.put("Use your phone's font or a file chosen below. Restart Facebook after changing it.",
                 "Usa la fuente del tel\u00e9fono o un archivo elegido abajo. Reinicia Facebook despu\u00e9s de cambiarla.");
         table.put("Using %1$s. Choose another file to replace it.",
@@ -1874,9 +1895,6 @@ public final class L10nTranslations {
                 "Versi\u00f3n");
         table.put("Version %1$s for Facebook %2$s",
                 "Versi\u00f3n %1$s para Facebook %2$s");
-    }
-
-    private static void fillEs7(Map<String, String> table) {
         table.put("Video",
                 "Video");
         table.put("Video file name",
@@ -1905,6 +1923,8 @@ public final class L10nTranslations {
                 "Esperando la barra de pesta\u00f1as de Facebook. El modo Marketplace se aplicar\u00e1 cuando Facebook la cree.");
         table.put("What always comes through",
                 "Lo que siempre llega");
+        table.put("WhatsApp and some editors may refuse this video",
+                "WhatsApp y algunos editores podr\u00edan rechazar este video");
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Con el interruptor de arriba activado, tu lugar se mantiene sin importar cu\u00e1nto tiempo est\u00e9s fuera. Deslizar para actualizar y abrir la app de nuevo siguen cargando publicaciones nuevas.");
         table.put("Words that keep a post",
@@ -1962,7 +1982,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(922);
+        Map<String, String> table = new HashMap<>(932);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -2523,6 +2543,8 @@ public final class L10nTranslations {
                 "Buka di tab pilihan");
         table.put("Open the Messenger app",
                 "Buka aplikasi Messenger");
+        table.put("Open the setting",
+                "Buka pengaturan");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "Buka tautan web di browser Anda. Halaman Facebook tetap di aplikasi.");
         table.put("Opening Facebook",
@@ -2585,11 +2607,11 @@ public final class L10nTranslations {
                 "Reels yang diputar sendiri");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Tombol untuk Remix, memakai templat, menambahkan milik Anda, dan Edits, serta tombol Bintang, game, aplikasi mitra, dan tautan eksternal. Lagu dan label lainnya tetap ada.");
-        table.put("Remove tracking from shared links",
-                "Hapus pelacakan dari tautan yang dibagikan");
     }
 
     private static void fillIn5(Map<String, String> table) {
+        table.put("Remove tracking from shared links",
+                "Hapus pelacakan dari tautan yang dibagikan");
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "Perlu dimulai ulang. Mode Marketplace akan aktif saat Facebook dimulai lagi.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -2638,6 +2660,10 @@ public final class L10nTranslations {
                 "Disimpan ke galeri dengan kualitas lebih rendah daripada di Facebook");
         table.put("Saved videos will be named %1$s.",
                 "Video yang disimpan akan diberi nama %1$s.");
+        table.put("Saved, but WhatsApp and some editors may refuse it",
+                "Disimpan, tetapi WhatsApp dan beberapa editor mungkin menolaknya");
+        table.put("Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.",
+                "Disimpan, tetapi WhatsApp mungkin menolaknya. Solusi: Unduhan di Hushfacebook.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Tersimpan. Mulai ulang Facebook untuk menerapkan perubahan ini.");
         table.put("Saves will go to a folder named %1$s.",
@@ -2704,15 +2730,15 @@ public final class L10nTranslations {
                 "Tautan yang didukung");
         table.put("Tab to open on",
                 "Tab saat dibuka");
+    }
+
+    private static void fillIn6(Map<String, String> table) {
         table.put("Tag suggestions only after @",
                 "Saran menandai hanya setelah @");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
                 "Menghapus tab Reels, yang di beberapa akun disebut Video, dari bilah tab. Tautan Reels dan Reels di Kabar Beranda tetap terbuka. Perubahan berlaku setelah Facebook dimulai ulang.");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Menghapus tag pelacakan seperti mibextid dari tautan yang Anda bagikan atau salin. Tautan facebook.com/share/ dibuat khusus untuk satu kali berbagi, jadi Facebook tetap dapat mengaitkannya dengan Anda.");
-    }
-
-    private static void fillIn6(Map<String, String> table) {
         table.put("Tap to play",
                 "Ketuk untuk memutar");
         table.put("Tap to play, quality and resume",
@@ -2805,6 +2831,8 @@ public final class L10nTranslations {
                 "Coba lagi, atau kembali ke Facebook.");
         table.put("Turn off double tap to like",
                 "Matikan ketuk dua kali untuk menyukai");
+        table.put("Turn on %1$s to save videos they all play.",
+                "Aktifkan %1$s untuk menyimpan video yang bisa diputar semuanya.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Ketik @ sebelum Facebook menyarankan orang untuk ditandai dalam postingan atau komentar. Teks Anda tidak berubah.");
         table.put("Undo",
@@ -2825,6 +2853,9 @@ public final class L10nTranslations {
                 "Gunakan emoji ponsel. Reaksi dan stiker tetap sama. Mulai ulang Facebook setelah mengubahnya.");
         table.put("Use your phone's font",
                 "Gunakan font ponsel");
+    }
+
+    private static void fillIn7(Map<String, String> table) {
         table.put("Use your phone's font or a file chosen below. Restart Facebook after changing it.",
                 "Gunakan font ponsel atau file yang dipilih di bawah. Mulai ulang Facebook setelah mengubahnya.");
         table.put("Using %1$s. Choose another file to replace it.",
@@ -2833,9 +2864,6 @@ public final class L10nTranslations {
                 "Versi");
         table.put("Version %1$s for Facebook %2$s",
                 "Versi %1$s untuk Facebook %2$s");
-    }
-
-    private static void fillIn7(Map<String, String> table) {
         table.put("Video",
                 "Video");
         table.put("Video file name",
@@ -2864,6 +2892,8 @@ public final class L10nTranslations {
                 "Menunggu bilah tab Facebook. Mode Marketplace akan diterapkan saat Facebook membuatnya.");
         table.put("What always comes through",
                 "Yang selalu masuk");
+        table.put("WhatsApp and some editors may refuse this video",
+                "WhatsApp dan beberapa editor mungkin menolak video ini");
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Jika sakelar di atas aktif, posisi Anda tetap tersimpan berapa lama pun Anda pergi. Tarik untuk memuat ulang dan membuka ulang aplikasi tetap memuat postingan baru.");
         table.put("Words that keep a post",
@@ -2921,7 +2951,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(922);
+        Map<String, String> table = new HashMap<>(932);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -3482,6 +3512,8 @@ public final class L10nTranslations {
                 "Abrir em uma aba escolhida");
         table.put("Open the Messenger app",
                 "Abrir o aplicativo Messenger");
+        table.put("Open the setting",
+                "Abrir a configura\u00e7\u00e3o");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "Abre links da web no seu navegador. As p\u00e1ginas do pr\u00f3prio Facebook continuam abrindo no aplicativo.");
         table.put("Opening Facebook",
@@ -3544,11 +3576,11 @@ public final class L10nTranslations {
                 "Reels que tocam sozinhos");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Bot\u00f5es Remix, Usar modelo, Adicionar o seu e Edits, al\u00e9m de Estrelas, jogos, aplicativos parceiros e links externos. A m\u00fasica e os demais r\u00f3tulos permanecem.");
-        table.put("Remove tracking from shared links",
-                "Remover o rastreamento dos links compartilhados");
     }
 
     private static void fillPt_rBR5(Map<String, String> table) {
+        table.put("Remove tracking from shared links",
+                "Remover o rastreamento dos links compartilhados");
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "\u00c9 preciso reiniciar. O modo Marketplace ser\u00e1 ativado na pr\u00f3xima vez que o Facebook for iniciado.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -3597,6 +3629,10 @@ public final class L10nTranslations {
                 "Salvo na galeria com qualidade menor que no Facebook");
         table.put("Saved videos will be named %1$s.",
                 "Os v\u00eddeos salvos ser\u00e3o nomeados como %1$s.");
+        table.put("Saved, but WhatsApp and some editors may refuse it",
+                "Salvo, mas o WhatsApp e alguns editores podem recus\u00e1-lo");
+        table.put("Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.",
+                "Salvo, mas o WhatsApp pode recus\u00e1-lo. Solu\u00e7\u00e3o: Downloads no Hushfacebook.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Salvo. Reinicie o Facebook para aplicar esta altera\u00e7\u00e3o.");
         table.put("Saves will go to a folder named %1$s.",
@@ -3663,15 +3699,15 @@ public final class L10nTranslations {
                 "Links compat\u00edveis");
         table.put("Tab to open on",
                 "Aba ao abrir");
+    }
+
+    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Tag suggestions only after @",
                 "Sugest\u00f5es de marca\u00e7\u00e3o s\u00f3 depois de @");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
                 "Tira da barra de abas a aba Reels, que em algumas contas se chama V\u00eddeo. Links de Reels e os Reels do feed continuam abrindo. As mudan\u00e7as aparecem depois de reiniciar o Facebook.");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Remove dos links que voc\u00ea compartilha ou copia as tags de rastreamento, como mibextid. Um link facebook.com/share/ \u00e9 criado para um \u00fanico compartilhamento, ent\u00e3o o Facebook ainda pode rastre\u00e1-lo at\u00e9 voc\u00ea.");
-    }
-
-    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Tap to play",
                 "Tocar para reproduzir");
         table.put("Tap to play, quality and resume",
@@ -3764,6 +3800,8 @@ public final class L10nTranslations {
                 "Tente novamente ou volte para o Facebook.");
         table.put("Turn off double tap to like",
                 "Desativar toque duplo para curtir");
+        table.put("Turn on %1$s to save videos they all play.",
+                "Ative %1$s para salvar v\u00eddeos que todos conseguem reproduzir.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Digite @ para o Facebook sugerir quem marcar em publica\u00e7\u00f5es ou coment\u00e1rios. Seu texto n\u00e3o \u00e9 alterado.");
         table.put("Undo",
@@ -3784,6 +3822,9 @@ public final class L10nTranslations {
                 "Usa os emojis do seu dispositivo. Rea\u00e7\u00f5es e figurinhas n\u00e3o s\u00e3o alteradas. Reinicie o Facebook depois de alterar esta op\u00e7\u00e3o.");
         table.put("Use your phone's font",
                 "Usar a fonte do celular");
+    }
+
+    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("Use your phone's font or a file chosen below. Restart Facebook after changing it.",
                 "Usa a fonte do seu dispositivo ou um arquivo escolhido abaixo. Reinicie o Facebook depois de alterar esta op\u00e7\u00e3o.");
         table.put("Using %1$s. Choose another file to replace it.",
@@ -3792,9 +3833,6 @@ public final class L10nTranslations {
                 "Vers\u00e3o");
         table.put("Version %1$s for Facebook %2$s",
                 "Vers\u00e3o %1$s para o Facebook %2$s");
-    }
-
-    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("Video",
                 "V\u00eddeo");
         table.put("Video file name",
@@ -3823,6 +3861,8 @@ public final class L10nTranslations {
                 "Aguardando a barra de abas do Facebook. O modo Marketplace ser\u00e1 aplicado quando o Facebook a criar.");
         table.put("What always comes through",
                 "O que sempre chega");
+        table.put("WhatsApp and some editors may refuse this video",
+                "O WhatsApp e alguns editores podem recusar este v\u00eddeo");
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Com a op\u00e7\u00e3o acima ativada, voc\u00ea continua no ponto em que estava, n\u00e3o importa quanto tempo fique fora. Puxar para atualizar e iniciar o Facebook novamente continuam carregando novas publica\u00e7\u00f5es.");
         table.put("Words that keep a post",
@@ -3880,7 +3920,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(922);
+        Map<String, String> table = new HashMap<>(932);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -4441,6 +4481,8 @@ public final class L10nTranslations {
                 "Se\u00e7ilen sekmede a\u00e7");
         table.put("Open the Messenger app",
                 "Messenger uygulamas\u0131n\u0131 a\u00e7");
+        table.put("Open the setting",
+                "Ayar\u0131 a\u00e7");
         table.put("Open web links in your browser. Facebook's own pages stay in the app.",
                 "Web ba\u011flant\u0131lar\u0131n\u0131 taray\u0131c\u0131n\u0131zda a\u00e7ar. Facebook sayfalar\u0131 uygulamada kal\u0131r.");
         table.put("Opening Facebook",
@@ -4503,11 +4545,11 @@ public final class L10nTranslations {
                 "Kendili\u011finden oynayan Reels");
         table.put("Remix, Use template, Add yours and Edits buttons, plus Stars, games, partner apps and outside links. The song and other labels stay.",
                 "Remix, \u015fablon kullanma, kendi videonu ekleme ve Edits d\u00fc\u011fmeleri ile y\u0131ld\u0131z, oyun, i\u015f orta\u011f\u0131 uygulamas\u0131 ve d\u0131\u015f ba\u011flant\u0131 d\u00fc\u011fmeleri. \u015eark\u0131 ve di\u011fer etiketler kal\u0131r.");
-        table.put("Remove tracking from shared links",
-                "Payla\u015f\u0131lan ba\u011flant\u0131lardan izlemeyi kald\u0131r");
     }
 
     private static void fillTr5(Map<String, String> table) {
+        table.put("Remove tracking from shared links",
+                "Payla\u015f\u0131lan ba\u011flant\u0131lardan izlemeyi kald\u0131r");
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "Yeniden ba\u015flatma gerekiyor. Marketplace modu, Facebook bir sonraki a\u00e7\u0131l\u0131\u015f\u0131nda etkinle\u015fecek.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -4556,6 +4598,10 @@ public final class L10nTranslations {
                 "Galeriye Facebook'takinden d\u00fc\u015f\u00fck kalitede kaydedildi");
         table.put("Saved videos will be named %1$s.",
                 "Kaydedilen videolar\u0131n ad\u0131 %1$s olacak.");
+        table.put("Saved, but WhatsApp and some editors may refuse it",
+                "Kaydedildi, ancak WhatsApp ve baz\u0131 d\u00fczenleyiciler reddedebilir");
+        table.put("Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.",
+                "Kaydedildi, ancak WhatsApp reddedebilir. \u00c7\u00f6z\u00fcm: Hushfacebook'ta \u0130ndirmeler.");
         table.put("Saved. Restart Facebook to apply this change.",
                 "Kaydedildi. Bu de\u011fi\u015fikli\u011fi uygulamak i\u00e7in Facebook'u yeniden ba\u015flat.");
         table.put("Saves will go to a folder named %1$s.",
@@ -4622,15 +4668,15 @@ public final class L10nTranslations {
                 "Desteklenen ba\u011flant\u0131lar");
         table.put("Tab to open on",
                 "A\u00e7\u0131l\u0131\u015fta g\u00f6sterilecek sekme");
+    }
+
+    private static void fillTr6(Map<String, String> table) {
         table.put("Tag suggestions only after @",
                 "Etiket \u00f6nerileri yaln\u0131zca @ sonras\u0131nda");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
                 "Baz\u0131 hesaplarda Video ad\u0131n\u0131 ta\u015f\u0131yan Reels sekmesini sekme \u00e7ubu\u011fundan kald\u0131r\u0131r. Reels ba\u011flant\u0131lar\u0131 ve ak\u0131\u015ftaki Reels videolar\u0131 a\u00e7\u0131lmaya devam eder. De\u011fi\u015fiklikler Facebook yeniden ba\u015flat\u0131l\u0131nca g\u00f6r\u00fcn\u00fcr.");
         table.put("Takes tracking tags such as mibextid off the links you share or copy. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.",
                 "Payla\u015ft\u0131\u011f\u0131n veya kopyalad\u0131\u011f\u0131n ba\u011flant\u0131lardan mibextid gibi izleme etiketlerini kald\u0131r\u0131r. Bir facebook.com/share/ ba\u011flant\u0131s\u0131 tek bir payla\u015f\u0131m i\u00e7in olu\u015fturulur, bu y\u00fczden Facebook onu yine de seninle ili\u015fkilendirebilir.");
-    }
-
-    private static void fillTr6(Map<String, String> table) {
         table.put("Tap to play",
                 "Oynatmak i\u00e7in dokun");
         table.put("Tap to play, quality and resume",
@@ -4723,6 +4769,8 @@ public final class L10nTranslations {
                 "Tekrar dene veya Facebook'a geri d\u00f6n.");
         table.put("Turn off double tap to like",
                 "Be\u011fenmek i\u00e7in \u00e7ift dokunmay\u0131 kapat");
+        table.put("Turn on %1$s to save videos they all play.",
+                "Hepsinin oynatabilece\u011fi videolar kaydetmek i\u00e7in %1$s ayar\u0131n\u0131 a\u00e7.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
                 "Facebook\u2019un g\u00f6nderi ve yorumlarda etiketlenecek ki\u015fi \u00f6nermesi i\u00e7in @ yaz\u0131n. Metniniz de\u011fi\u015fmez.");
         table.put("Undo",
@@ -4743,6 +4791,9 @@ public final class L10nTranslations {
                 "Telefonunuzun emojilerini kullan\u0131r. \u0130fadeler ve \u00e7\u0131kartmalar ayn\u0131 kal\u0131r. De\u011fi\u015ftirdikten sonra Facebook\u2019u yeniden ba\u015flat\u0131n.");
         table.put("Use your phone's font",
                 "Telefonun yaz\u0131 tipini kullan");
+    }
+
+    private static void fillTr7(Map<String, String> table) {
         table.put("Use your phone's font or a file chosen below. Restart Facebook after changing it.",
                 "Telefonunuzun yaz\u0131 tipini veya a\u015fa\u011f\u0131dan se\u00e7ilen dosyay\u0131 kullan\u0131r. De\u011fi\u015ftirdikten sonra Facebook\u2019u yeniden ba\u015flat\u0131n.");
         table.put("Using %1$s. Choose another file to replace it.",
@@ -4751,9 +4802,6 @@ public final class L10nTranslations {
                 "S\u00fcr\u00fcm");
         table.put("Version %1$s for Facebook %2$s",
                 "Facebook %2$s i\u00e7in %1$s s\u00fcr\u00fcm\u00fc");
-    }
-
-    private static void fillTr7(Map<String, String> table) {
         table.put("Video",
                 "Video");
         table.put("Video file name",
@@ -4782,6 +4830,8 @@ public final class L10nTranslations {
                 "Facebook'un sekme \u00e7ubu\u011fu bekleniyor. Facebook \u00e7ubu\u011fu olu\u015fturdu\u011funda Marketplace modu uygulanacak.");
         table.put("What always comes through",
                 "Her zaman gelenler");
+        table.put("WhatsApp and some editors may refuse this video",
+                "WhatsApp ve baz\u0131 d\u00fczenleyiciler bu videoyu reddedebilir");
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Yukar\u0131daki anahtar a\u00e7\u0131kken ne kadar uzun s\u00fcre uzakta kal\u0131rsan kal yerin korunur. Yenilemek i\u00e7in \u00e7ekmek ve uygulamay\u0131 yeniden ba\u015flatmak yine yeni g\u00f6nderileri y\u00fckler.");
         table.put("Words that keep a post",
