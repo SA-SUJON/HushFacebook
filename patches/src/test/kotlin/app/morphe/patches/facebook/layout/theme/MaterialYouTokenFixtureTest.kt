@@ -40,8 +40,10 @@ import org.junit.Test
  * both fixtures: the token enum `FDSColors` resolves (its names and theme attributes, from its
  * static initializer) and the FDS styles in the resource table that set those attributes. Every
  * listed colour has to be one the dark or darker style gives that token, and none may be one any
- * light style gives it, or light mode would change. SURFACES, which route three and route four
- * recolour with no token to go on, may be no light style's colour for any token at all.
+ * light style gives it, or light mode would change. FDS_SHARED lists the blues a token has in both
+ * themes, which wait for Facebook's dark mode answer instead, so each of those has to be the light
+ * and the dark style's colour alike. SURFACES, which route three and route four recolour with no
+ * token to go on, may be no light style's colour for any token at all.
  *
  * <p>The AMOLED theme's token rule is held to the same styles: each background token it names gets
  * a dark grey it changes.
@@ -53,14 +55,18 @@ class MaterialYouTokenFixtureTest {
     private val amoled = File(RepoFiles.root,
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/theme/AmoledTheme.java").readText()
 
-    /** Token name to the dark colours the theme recolours, from the Java table. */
-    private fun listedTokens(): Map<String, Set<Int>> {
-        val start = theme.indexOf("static final String FDS_DARK =")
+    /**
+     * Token name to the colours the theme recolours, from one of the Java tables. Six hex digits are
+     * opaque and eight carry their alpha, as MaterialYouTheme.parseTokens reads them.
+     */
+    private fun listedTokens(constant: String = "FDS_DARK"): Map<String, Set<Int>> {
+        val start = theme.indexOf("static final String $constant =")
+        check(start >= 0) { "MaterialYouTheme declares no $constant" }
         val end = theme.indexOf("\";", start)
         val table = Regex(""""([^"]*)"""").findAll(theme.substring(start, end + 1)).joinToString("") { it.groupValues[1] }
         return table.split(";").associate { entry ->
             val (name, values) = entry.split("=")
-            name to values.split(",").map { it.toInt(16) or -0x1000000 }.toSet()
+            name to values.split(",").map { if (it.length == 8) it.toLong(16).toInt() else it.toInt(16) or -0x1000000 }.toSet()
         }
     }
 
@@ -112,6 +118,72 @@ class MaterialYouTokenFixtureTest {
         for (surface in surfaces) {
             assertTrue("$build: ${hex(setOf(surface))} is a light style's colour", surface !in lightColours)
         }
+    }
+
+    /**
+     * Issue #37: FDS_SHARED lists the blues Facebook gives a token in both themes, which only
+     * Facebook's dark mode answer can tell apart. Each listed colour has to be the one the light
+     * style gives that token and the one the dark style gives it too, and no colour of a token may
+     * be in both tables, or a shared blue would skip that answer.
+     */
+    @Test
+    fun `every shared blue is the token's colour in both themes in each declared build`() {
+        val shared = listedTokens("FDS_SHARED")
+        assertTrue("the shared table lists almost nothing", shared.size >= 10)
+        val dark = listedTokens()
+        for ((name, colours) in shared) {
+            val twice = colours intersect dark[name].orEmpty()
+            assertTrue("$name lists ${hex(twice)} in both tables", twice.isEmpty())
+        }
+        var builds = 0
+        for (target in AppCompatibilities.facebook().single().targets) {
+            val version = checkNotNull(target.version)
+            for (fixture in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                withBaseApk(fixture) { apk ->
+                    val attributes = tokenAttributes(apk)
+                    val styles = fdsStyles(apk, attributes.values.toSet())
+                    val light = styles.values.single { it.parent == 0 && it.sets > 300 }
+                    val darkStyle = styles.values.single { it.parent == light.id && it.sets > 300 }
+                    for ((name, colours) in shared) {
+                        val attribute = attributes[name] ?: error("${fixture.name}: no FDS token $name")
+                        for (colour in colours) {
+                            assertEquals("${fixture.name}: $name in the light style", colour, light.values[attribute])
+                            assertEquals("${fixture.name}: $name in the dark style", colour, darkStyle.values[attribute])
+                        }
+                    }
+                }
+                builds++
+            }
+        }
+        assertEquals("one fixture for each declared build", AppCompatibilities.facebook().single().targets.size, builds)
+    }
+
+    /**
+     * Issue #37: SERVER_BLUES, which routes two and four recolour with no token to go on, are
+     * Facebook's own palette and nobody else's: each is a colour one of the FDS styles gives some
+     * token, at some alpha.
+     */
+    @Test
+    fun `every server blue is a colour Facebook's styles give a token in each declared build`() {
+        val blues = Regex("""static final String SERVER_BLUES = "([0-9A-F ]+)";""").find(theme)!!.groupValues[1]
+            .split(" ").map { it.toInt(16) }
+        assertTrue("SERVER_BLUES lists almost nothing", blues.size >= 5)
+        var builds = 0
+        for (target in AppCompatibilities.facebook().single().targets) {
+            val version = checkNotNull(target.version)
+            for (fixture in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                withBaseApk(fixture) { apk ->
+                    val attributes = tokenAttributes(apk)
+                    val rgb = fdsStyles(apk, attributes.values.toSet()).values
+                        .flatMap { it.values.values }.map { it and 0xFFFFFF }.toSet()
+                    for (blue in blues) {
+                        assertTrue("${fixture.name}: ${"%06X".format(blue)} is no FDS style's colour", blue in rgb)
+                    }
+                }
+                builds++
+            }
+        }
+        assertEquals("one fixture for each declared build", AppCompatibilities.facebook().single().targets.size, builds)
     }
 
     /** AmoledTheme's BACKGROUND_TOKENS, the Mig names in it included. */
