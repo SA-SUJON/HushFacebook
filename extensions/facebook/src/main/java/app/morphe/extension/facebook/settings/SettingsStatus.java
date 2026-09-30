@@ -78,6 +78,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean affiliateLinks() {
+        return false;
+    }
+
     public static boolean reelDeclutter() {
         return false;
     }

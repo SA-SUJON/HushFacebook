@@ -606,3 +606,7 @@ The strip on some posts, like "Are you interested in this post?", "Show less" or
 Hide reel interest prompts	Ocultar la pregunta de interés en los reels
 # context: description of that switch; the quoted text is Facebook's own prompt, so use Facebook's wording in your language if you know it
 No "Are you interested in this reel?" prompt on reels. The reel plays as usual.	Sin la pregunta “¿Te interesa este reel?” en los reels. El reel se reproduce como siempre.
+# context: switch title under News feed; affiliate product links are the shop links creators add to their posts to earn a commission
+Hide affiliate product links	Ocultar los enlaces de productos de afiliados
+# context: description of that switch; "Commission eligible" is Facebook's own label, so use Facebook's wording in your language if you know it
+The product cards of shop links creators add to posts, on reels, under feed posts and in the comments. The "Commission eligible" label stays.	Las tarjetas de producto de los enlaces de tienda que los creadores añaden a sus publicaciones, en los reels, bajo las publicaciones del feed y en los comentarios. La etiqueta “Apto para comisión” se queda.

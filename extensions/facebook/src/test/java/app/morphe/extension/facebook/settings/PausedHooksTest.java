@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import app.morphe.extension.facebook.ads.AffiliateLinks;
 import app.morphe.extension.facebook.ads.MarketplaceAdFilterForTests;
 import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
@@ -289,6 +290,12 @@ public class PausedHooksTest {
                 MarketplaceAdFilterForTests::asksTheFeedToSkipAds,
                 MarketplaceAdFilterForTests::holdsBackAnAdsQuery,
                 MarketplaceAdFilterForTests::dropsASearchAd));
+        // A reel's product card is answered away, and so are a feed post's product footer and the
+        // comment sheet's floating card.
+        probes.put(PatchFamily.AFFILIATE_LINKS, Arrays.asList(
+                () -> !AffiliateLinks.keepReelCard(true),
+                () -> AffiliateLinks.keepFooter("footer") == null,
+                () -> AffiliateLinks.keepCommentCard(new Object()) == null));
         // A Remix chip under a reel, the Follow and Following buttons beside its author, and both
         // footer queries.
         probes.put(PatchFamily.REEL_DECLUTTER, Arrays.asList(

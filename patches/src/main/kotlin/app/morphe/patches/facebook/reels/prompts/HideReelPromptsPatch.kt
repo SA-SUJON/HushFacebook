@@ -76,13 +76,18 @@ internal fun isPromptCheck(method: Method, prompt: String): Boolean =
             it.opcode == Opcode.SGET_OBJECT && (it as ReferenceInstruction).reference.toString() == prompt
         } == true
 
-/** The prompt's constant on the reel overlay enum, as a field reference. Changes nothing. */
-internal fun BytecodePatchContext.findPromptConstant(): String {
+/** The reel overlay enum. Hide affiliate product links reads its product card constant too. Changes nothing. */
+internal fun BytecodePatchContext.findOverlayEnum(): ClassDef {
     val enums = classDefByStrings(INTEREST_PROMPT, StringComparisonType.EQUALS)
         .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
         .filter(::isOverlayEnum)
-    val overlay = enums.singleOrNull()
+    return enums.singleOrNull()
         ?: refuse("expected one enum naming $INTEREST_PROMPT and $TUNE_YOUR_ALGORITHM, found ${enums.size}")
+}
+
+/** The prompt's constant on the reel overlay enum, as a field reference. Changes nothing. */
+internal fun BytecodePatchContext.findPromptConstant(): String {
+    val overlay = findOverlayEnum()
     return enumConstant(overlay, INTEREST_PROMPT) ?: refuse("${overlay.type} stores no $INTEREST_PROMPT constant")
 }
 

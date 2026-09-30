@@ -40,6 +40,7 @@ public final class FamilyNames {
     public static final String SPONSORED_SEARCH = "Hide sponsored search results";
     public static final String SPONSORED_PROFILE_POSTS = "Hide sponsored profile posts";
     public static final String SPONSORED_MARKETPLACE = "Hide sponsored Marketplace listings";
+    public static final String AFFILIATE_LINKS = "Hide affiliate product links";
     public static final String REEL_DECLUTTER = "Clean up Reels";
     public static final String REEL_PROMPTS = "Hide reel interest prompts";
     public static final String REEL_WATCH_HISTORY = "Don't send reel watch history";

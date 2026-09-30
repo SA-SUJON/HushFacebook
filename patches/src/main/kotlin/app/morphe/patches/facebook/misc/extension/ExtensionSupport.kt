@@ -233,3 +233,27 @@ internal fun MutableMethod.filterBooleanReturns(what: String, hook: String) {
         )
     }
 }
+
+/**
+ * [filterBooleanReturns] for a method that answers an object: each answer goes to [hook], a static
+ * method taking and answering one object, and the method returns what the hook says instead. When
+ * the hook answers a wider type than the method, the answer is cast back to the method's own.
+ */
+internal fun MutableMethod.filterObjectReturns(what: String, hook: String) {
+    if (!returnType.startsWith("L") && !returnType.startsWith("[")) {
+        throw PatchException("$what: $definingClass->$name answers $returnType, not an object")
+    }
+    val returns = implementation!!.instructions.withIndex().filter { it.value.opcode == Opcode.RETURN_OBJECT }.map { it.index }
+    if (returns.isEmpty()) throw PatchException("$what: $definingClass->$name never returns")
+    val castBack = !hook.endsWith(")$returnType")
+    for (index in returns.asReversed()) {
+        val answer = getInstruction<OneRegisterInstruction>(index).registerA
+        addInstructionsAtControlFlowLabel(
+            index,
+            """
+                invoke-static/range { v$answer .. v$answer }, $hook
+                move-result-object v$answer
+            """ + if (castBack) "check-cast v$answer, $returnType\n" else "",
+        )
+    }
+}

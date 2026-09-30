@@ -311,7 +311,7 @@ public class PatchFamilyTest {
                 "not in this build: Hide suggested and promoted posts, Hide Stories tray, Hide Reels in the feed, "
                         + "Block background-return feed refresh, Hide AI-detected posts, Hide posts by words, "
                         + "Hide post prompts, Hide sponsored stories, Hide suggested stories, Stop Story auto-advance, View stories anonymously, Hide sponsored search results, "
-                        + "Hide sponsored profile posts, Hide sponsored Marketplace listings, Clean up Reels, Hide reel interest prompts, Don't send reel watch history, Turn off double tap to like, Keep the reel speed, Hold a reel for 2x, Default comment order, "
+                        + "Hide sponsored profile posts, Hide sponsored Marketplace listings, Hide affiliate product links, Clean up Reels, Hide reel interest prompts, Don't send reel watch history, Turn off double tap to like, Keep the reel speed, Hold a reel for 2x, Default comment order, "
                         + "Tag suggestions only after @, Tap to play, Resume long videos, Default playback quality, "
                         + "Use the system font, Use the phone's emoji, Open links in "
                         + "external browser, Sanitize sharing links, Stop update prompts, Download any story, Download any reel, "
@@ -319,7 +319,7 @@ public class PatchFamilyTest {
                         + "Restore screens on re-signed builds, Install beside Meta's apps, Hushfacebook in the Menu",
                 "left out of Manager's default selection: Hide suggested and promoted posts, Hide AI-detected posts, "
                         + "Hide posts by words, Hide post prompts, Hide sponsored stories, Hide suggested stories, Hide sponsored search "
-                        + "results, Hide sponsored profile posts, Hide sponsored Marketplace listings, Hide reel interest prompts, Keep the reel "
+                        + "results, Hide sponsored profile posts, Hide sponsored Marketplace listings, Hide affiliate product links, Hide reel interest prompts, Keep the reel "
                         + "speed, Resume long videos, Open links in external browser, Sanitize sharing links, Stop "
                         + "update prompts, Download any story, Download any reel, Marketplace only, Hide the Reels tab "
                         + "dot, Hide the Get Messenger card, Open Messenger from the top bar, Hide Menu promotions, "

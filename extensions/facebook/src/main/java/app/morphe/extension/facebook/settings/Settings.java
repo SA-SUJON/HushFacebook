@@ -185,6 +185,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_sponsored_marketplace_listings", TRUE);
 
     /**
+     * The product cards of the shop links a creator attaches to a post go: on a reel, under a feed
+     * post and floating over the comment box ({@link app.morphe.extension.facebook.ads.AffiliateLinks}).
+     * The "Commission eligible" label stays. A change shows on the reels, posts and comment sheets
+     * built after it.
+     */
+    public static final BooleanSetting HIDE_AFFILIATE_LINKS =
+            new BooleanSetting("hushfacebook_hide_affiliate_links", TRUE);
+
+    /**
      * The chips under a reel that prompt you to make something (Remix, Use template, Add yours,
      * Edits) or promote something (Stars, games, a partner app, a link out of Facebook). A chip of
      * any other type stays.

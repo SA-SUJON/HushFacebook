@@ -319,6 +319,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 || build.contains(PatchFamily.RETURN_REFRESH)
                 || build.contains(PatchFamily.AI_DETECTED_POSTS)
                 || build.contains(PatchFamily.SPONSORED_PROFILE_POSTS)
+                || build.contains(PatchFamily.AFFILIATE_LINKS)
                 || build.contains(PatchFamily.POST_WORDS)
                 || build.contains(PatchFamily.POST_PROMPTS)) {
             PreferenceCategory feed = category(screen, L10n.t("News feed"));
@@ -333,6 +334,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 feed.addPreference(toggle(context, Settings.HIDE_SPONSORED_PROFILE_POSTS,
                         L10n.t("Hide sponsored profile posts"),
                         L10n.t("Ads between the posts on someone's profile or a Page. Their own posts stay.")));
+            }
+            // One switch covers the cards on reels and in the comment sheet too.
+            if (build.contains(PatchFamily.AFFILIATE_LINKS)) {
+                feed.addPreference(toggle(context, Settings.HIDE_AFFILIATE_LINKS,
+                        L10n.t("Hide affiliate product links"),
+                        L10n.t("The product cards of shop links creators add to posts, on reels, under feed posts and "
+                                + "in the comments. The \"Commission eligible\" label stays.")));
             }
             if (build.contains(PatchFamily.SUGGESTED_POSTS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_SUGGESTED_POSTS,
