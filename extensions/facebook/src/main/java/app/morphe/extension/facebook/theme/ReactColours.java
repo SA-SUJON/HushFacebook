@@ -16,7 +16,8 @@ import app.morphe.extension.facebook.settings.SettingsStatus;
  *
  * <p>No token comes with them, so the colour alone decides, as in route four. AMOLED goes first
  * for a background and leaves text and borders alone, and Material You follows with the dark
- * surfaces and Facebook's blues it knows. Either one runs only when its patch is in the build.
+ * surfaces and Facebook's blues it knows, and for a background the greys its dark token table
+ * lists as well. Either one runs only when its patch is in the build.
  */
 public final class ReactColours {
     private ReactColours() {
@@ -41,7 +42,7 @@ public final class ReactColours {
     /** {@link #background(int)} with the themes in the build given. */
     static int background(int color, boolean amoled, boolean materialYou) {
         if (amoled) color = AmoledTheme.react(color);
-        return materialYou ? MaterialYouTheme.react(color) : color;
+        return materialYou ? MaterialYouTheme.reactBackground(color) : color;
     }
 
     /** {@link #text(int)} with the theme in the build given. */

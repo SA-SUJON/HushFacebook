@@ -405,6 +405,35 @@ public class MaterialYouThemeTest {
     }
 
     /**
+     * A Marketplace listing's page in dark mode: the Message seller card is #333334, a grey FDS_DARK
+     * lists (CARD_BACKGROUND), and as a React background it takes the palette's neutral at its
+     * lightness, as the token would. As text, in light mode, or a grey no table lists, it keeps
+     * Facebook's colour, and AMOLED's card and black stay AMOLED's.
+     */
+    @Test
+    public void aReactBackgroundTakesTheGreysTheDarkTableLists() {
+        DarkMode.answer(true);
+        int card = MaterialYouTheme.reactBackground(0xFF333334);
+        assertEquals("the card", palette.sameLightness(TonePalette.NEUTRAL, 0xFF333334), card);
+        assertNotEquals("the card kept Facebook's grey", 0xFF333334, card);
+        assertSameLightness("the card", 0xFF333334, card);
+        assertEquals("ReactColours paints a background with it", card, ReactColours.background(0xFF333334, false, true));
+        assertEquals("a surface", palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728),
+                MaterialYouTheme.reactBackground(0xFF252728));
+        assertEquals("a server blue", palette.sameLightness(TonePalette.ACCENT, 0x331D85FC),
+                MaterialYouTheme.reactBackground(0x331D85FC));
+        assertEquals("text keeps the grey", 0xFF333334, MaterialYouTheme.react(0xFF333334));
+        assertEquals("text through ReactColours", 0xFF333334, ReactColours.text(0xFF333334, true));
+        assertEquals("a grey no table lists", 0xFF343435, MaterialYouTheme.reactBackground(0xFF343435));
+        assertEquals("AMOLED's card", 0xFF121213, MaterialYouTheme.reactBackground(0xFF121213));
+        assertEquals("AMOLED's black", 0xFF000000, MaterialYouTheme.reactBackground(0xFF000000));
+
+        DarkMode.answer(false);
+        assertEquals("light mode", 0xFF333334, MaterialYouTheme.reactBackground(0xFF333334));
+        assertEquals("light mode through ReactColours", 0xFF333334, ReactColours.background(0xFF333334, false, true));
+    }
+
+    /**
      * With neither theme in the build (a test JVM's SettingsStatus says so), React's colours pass
      * through as they came, a border or tint React didn't set stays null, and one it did set comes
      * back as the same object.

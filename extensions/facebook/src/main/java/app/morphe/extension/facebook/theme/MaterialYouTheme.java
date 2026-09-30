@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.SettingsStatus;
@@ -123,6 +124,9 @@ public final class MaterialYouTheme {
     private static final Map<String, int[]> FDS = Collections.unmodifiableMap(parseTokens(FDS_DARK));
     private static final Map<String, int[]> SHARED = Collections.unmodifiableMap(parseTokens(FDS_SHARED));
     private static final int[] SURFACE_VALUES = parseSurfaces(SURFACES);
+
+    /** Every grey {@link #FDS_DARK} lists, for any token, sorted. */
+    private static final int[] DARK_GREYS = darkGreys(FDS);
     /** {@link #SERVER_BLUES} without alpha, sorted. */
     private static final int[] SERVER_BLUE_VALUES = parseRgb(SERVER_BLUES);
 
@@ -247,6 +251,20 @@ public final class MaterialYouTheme {
     static int react(int color) {
         HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
         return withoutToken(color);
+    }
+
+    /**
+     * A background a React Native screen sets, after AMOLED's rule: as {@link #react}, and in dark
+     * mode a grey {@link #FDS_DARK} lists for any token takes the palette's neutral at the same
+     * lightness too, as that token would. React's own dark theme paints its cards with them:
+     * Marketplace's Message seller card on a listing is #333334 (CARD_BACKGROUND) on the #252728
+     * page. Text keeps {@link #react}, where a grey stays as it came.
+     */
+    static int reactBackground(int color) {
+        HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
+        int themed = withoutToken(color);
+        if (themed != color || !DarkMode.on() || Arrays.binarySearch(DARK_GREYS, color) < 0) return themed;
+        return palette().sameLightness(TonePalette.NEUTRAL, color);
     }
 
     /**
@@ -436,6 +454,19 @@ public final class MaterialYouTheme {
         int[] values = new int[hex.length];
         for (int i = 0; i < hex.length; i++) values[i] = 0xFF000000 | Integer.parseInt(hex[i], 16);
         Arrays.sort(values);
+        return values;
+    }
+
+    private static int[] darkGreys(Map<String, int[]> tokens) {
+        TreeSet<Integer> greys = new TreeSet<>();
+        for (int[] colours : tokens.values()) {
+            for (int colour : colours) {
+                if (isNeutral(colour)) greys.add(colour);
+            }
+        }
+        int[] values = new int[greys.size()];
+        int i = 0;
+        for (int grey : greys) values[i++] = grey;
         return values;
     }
 
