@@ -182,17 +182,14 @@ function Invoke-GitQuietly {
         command's standard error into a terminating error under Stop even when it is redirected,
         so a warning, or the "fatal:" a missing object prints, stopped the hook with a
         NativeCommandError before the caller could say what went wrong. The console reads UTF-8
-        for the call, as Invoke-RepoGit explains, so a non-ASCII path in a -z list comes back whole.
+        for the call (Use-Utf8ConsoleOutput), so a non-ASCII path in a -z list comes back whole.
     #>
     param([string[]]$Arguments)
     $preference = $ErrorActionPreference
-    $encoding = [Console]::OutputEncoding
     $ErrorActionPreference = 'Continue'
     try {
-        [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
-        & git @Arguments 2>$null
+        Use-Utf8ConsoleOutput { & git @Arguments 2>$null }
     } finally {
-        [Console]::OutputEncoding = $encoding
         $ErrorActionPreference = $preference
     }
 }
@@ -249,18 +246,17 @@ function Invoke-HookGit {
     param([string[]]$Arguments)
     Invoke-WithoutGitEnvironment {
         $preference = $ErrorActionPreference
-        $encoding = [Console]::OutputEncoding
         $ErrorActionPreference = 'Continue'
         try {
-            [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
             $errors = New-Object System.Collections.Generic.List[string]
-            $output = @(& git @Arguments 2>&1 | ForEach-Object {
-                if ($_ -is [System.Management.Automation.ErrorRecord]) { $errors.Add($_.ToString()) } else { $_ }
+            $output = @(Use-Utf8ConsoleOutput {
+                & git @Arguments 2>&1 | ForEach-Object {
+                    if ($_ -is [System.Management.Automation.ErrorRecord]) { $errors.Add($_.ToString()) } else { $_ }
+                }
             })
             if ($LASTEXITCODE -ne 0) { throw "git $($Arguments -join ' ') failed: $($errors -join ' ')" }
             return $output
         } finally {
-            [Console]::OutputEncoding = $encoding
             $ErrorActionPreference = $preference
         }
     }

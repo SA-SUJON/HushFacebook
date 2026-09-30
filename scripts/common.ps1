@@ -370,6 +370,44 @@ function Assert-UrlReachable {
     Write-Host ("[release] ${Description} answers 200: " + $Uri)
 }
 
+function Use-Utf8ConsoleOutput {
+    <#
+    .SYNOPSIS
+        Runs a script block with PowerShell reading native commands' output as UTF-8, and puts the
+        caller's encoding back afterwards.
+    .DESCRIPTION
+        git writes UTF-8, and PowerShell decodes a native command's output with
+        [Console]::OutputEncoding, which is code page 437 for a hook's pwsh when the push starts in
+        Git Bash. Setting it calls SetConsoleOutputCP, and in a process with no console (a detached
+        start, a service) Windows PowerShell 5.1 turns that into "The handle is invalid." before git
+        ever runs. pwsh 7 keeps the value without a console. So when the setter finds no console,
+        the encoding goes into Console's own field instead, which the property hands back and 5.1
+        decodes with (checked on 5.1.26100 on 2026-09-30, with the console on code page 437).
+    #>
+    param([Parameter(Mandatory = $true)][scriptblock]$Script)
+
+    $utf8OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+    $utf8OutputBefore = [Console]::OutputEncoding
+    $utf8OutputField = $null
+    try {
+        [Console]::OutputEncoding = $utf8OutputEncoding
+    } catch {
+        if ($_.Exception.InnerException -isnot [System.IO.IOException]) { throw }
+        $utf8OutputField = [Console].GetField('_outputEncoding', [System.Reflection.BindingFlags]'NonPublic, Static')
+        if (-not $utf8OutputField) { throw }
+        $utf8OutputField.SetValue($null, $utf8OutputEncoding)
+    }
+    try {
+        & $Script
+    } finally {
+        if ($utf8OutputField) {
+            $utf8OutputField.SetValue($null, $utf8OutputBefore)
+        } else {
+            [Console]::OutputEncoding = $utf8OutputBefore
+        }
+    }
+}
+
 function Find-MachineNames {
     <#
     .SYNOPSIS
@@ -427,18 +465,15 @@ function Find-MachineNames {
             Pattern = @((($serial -join '') + '[A-Z0-9]{8}'), ((& $wideLe $serial) + '(?:[A-Z0-9]\x00){8}'),
                 ((& $wideBe $serial) + '(?:\x00[A-Z0-9]){8}')) -join '|' }
     )
-    # The console reads UTF-8 while git runs, as Invoke-RepoGit explains, so a hit is reported as
-    # the file has it.
+    # git's output is read as UTF-8 (Use-Utf8ConsoleOutput), so a hit is reported as the file has it.
     $preference = $ErrorActionPreference
-    $encoding = [Console]::OutputEncoding
     try {
         $ErrorActionPreference = 'Continue'
-        [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
         foreach ($scan in $scans) {
             foreach ($batch in $batches) {
                 $arguments = @('-C', $Root, 'grep', '-n', '-a') + $scan.Flags + @('-e', $scan.Pattern) + @($batch) +
                     @('--', '.', ':!.gitignore')
-                $found = @(& git @arguments 2>$null)
+                $found = @(Use-Utf8ConsoleOutput { & git @arguments 2>$null })
                 # 1 is git grep's "no match". Anything above it means the search did not run.
                 if ($LASTEXITCODE -gt 1) {
                     $what = if ($batch.Count -gt 0) { "commit $($batch -join ', ')" } else { 'the tracked files' }
@@ -448,7 +483,6 @@ function Find-MachineNames {
             }
         }
     } finally {
-        [Console]::OutputEncoding = $encoding
         $ErrorActionPreference = $preference
         foreach ($name in $saved.Keys) { Set-Item -LiteralPath ('Env:\' + $name) -Value $saved[$name] }
     }
