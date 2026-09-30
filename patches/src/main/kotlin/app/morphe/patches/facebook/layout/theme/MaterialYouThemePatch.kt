@@ -218,6 +218,17 @@ private const val EMPTY_RESOURCES = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\
 /** A decoded resource file parsed for reading only, so nothing writes it back. */
 private fun readOnly(file: File): Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file)
 
+/**
+ * The colours given a night value in [res], a decoded resource folder: every values folder with a
+ * night qualifier, values-night-v31 or values-land-night as well as values-night. A colour Facebook
+ * gives its own night value in any of them is its choice at night, so route two leaves it alone.
+ */
+internal fun nightValuedColours(res: File): Set<String> =
+    res.listFiles().orEmpty()
+        .filter { folder -> folder.isDirectory && folder.name.split('-').let { it.first() == "values" && "night" in it } }
+        .map { File(it, "colors.xml") }.filter { it.isFile }
+        .flatMapTo(sortedSetOf()) { readOnly(it).colourValues().keys }
+
 /** Each colour in a decoded colours file, by name, with its value as written. */
 private fun Document.colourValues(): Map<String, String> {
     val colors = getElementsByTagName("color")
@@ -237,7 +248,7 @@ private val materialYouResourcePatch = resourcePatch {
             dynamic.parentFile.mkdirs()
             dynamic.writeText(EMPTY_RESOURCES)
         }
-        val nightColourNames = readOnly(get(NIGHT_COLORS)).colourValues().keys
+        val nightColourNames = nightValuedColours(get("res", false))
         val changed = document(NIGHT_COLORS).use { night ->
             document(NIGHT_V31_COLORS).use { nightV31 -> recolourNightColours(night, nightV31) }
         }

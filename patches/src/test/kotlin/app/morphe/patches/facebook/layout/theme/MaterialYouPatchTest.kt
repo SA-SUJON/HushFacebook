@@ -233,6 +233,30 @@ class MaterialYouPatchTest {
         assertTrue("MaterialYouStyles opens a resource file", "\"res/" !in styles && "document(" !in styles)
     }
 
+    /**
+     * Route two leaves a colour to Facebook when it has a night value under any night qualifier,
+     * not values-night alone. Until 2026-09-30 only values-night/colors.xml was read, so a colour
+     * Facebook set for night in values-night-v31 alone would have taken a palette tone.
+     */
+    @Test
+    fun `a night value under any night qualifier counts`() {
+        val res = kotlin.io.path.createTempDirectory("night-res").toFile()
+        try {
+            fun colours(folder: String, vararg names: String) = File(res, folder).apply { mkdirs() }.resolve("colors.xml")
+                .writeText(names.joinToString("", "<resources>", "</resources>") { "<color name=\"$it\">#ff000000</color>" })
+            colours("values", "light_only")
+            colours("values-v31", "light_v31")
+            colours("values-night", "night_text")
+            colours("values-night-v31", "night_v31_only")
+            colours("values-land-night", "night_land_only")
+            File(res, "values-nightly").mkdirs()
+            File(res, "values-night-v29").mkdirs()
+            assertEquals(setOf("night_land_only", "night_text", "night_v31_only"), nightValuedColours(res))
+        } finally {
+            res.deleteRecursively()
+        }
+    }
+
     /** The patch and the extension hold the same lists, each in its own module. */
     @Test
     fun `the patch and the extension agree on the surfaces, the token tables and the fixed palette`() {
