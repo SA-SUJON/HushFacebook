@@ -42,9 +42,10 @@ class KeepPostDatesShapesTest {
      * answer sits in v17 by default, past the four bits a plain call can name, as a later build
      * might put it, so the log's call is a range one there. The patcher's compiler drops a plain
      * call naming a register past v15 without a word, so every call here names its registers the
-     * way a real build has to. [tail] goes after the last return.
+     * way a real build has to. [head] goes before the call and [tail] after the last return.
      */
     private fun header(
+        head: String = "",
         answer: Int = 17,
         between: String = "",
         written: String = "invoke-static/range { v$answer .. v$answer }, $VALUE_OF_BOOLEAN",
@@ -53,6 +54,7 @@ class KeepPostDatesShapesTest {
         tail: String = "",
     ) = method(
         """
+            $head
             invoke-static/range { p1 .. p1 }, Lfixture/Flags;->A1Y(Ljava/lang/Object;)Z
             move-result v$answer
             $between
@@ -110,6 +112,9 @@ class KeepPostDatesShapesTest {
                 (header(branch = "const/4 v5, 0x0", tail = "if-eqz v17, :one_line") to "nothing in"),
             "the answer's register written again on one way to the branch" to
                 (header(secondLog = "if-eqz v5, :keep\nconst/16 v17, 0x1\n:keep") to "some ways from the log"),
+            "a way that skips the branch on the answer and branches on another value" to
+                (header(secondLog = "if-nez v5, :skip", tail = ":skip\nconst/16 v17, 0x0\nif-eqz v17, :one_line\nreturn-object v3") to
+                    "some ways from the log"),
             "the name loaded twice" to
                 (header(secondLog = "const-string v4, \"$CYCLING_LOG\"") to "expected one load of \"$CYCLING_LOG\""),
         )
@@ -119,6 +124,16 @@ class KeepPostDatesShapesTest {
             val message = refusal.message!!
             assertTrue("$shape: $message", message.startsWith("$PATCH: ") && reason in message)
         }
+    }
+
+    /**
+     * A choice made again on a loop's next pass gets the hook again, since the hook sits right
+     * after it, so a way back round to it before the branch is no other value.
+     */
+    @Test
+    fun `a choice made inside a loop with every branch reading it is accepted`() {
+        val method = header(head = ":again", secondLog = "if-nez p1, :again")
+        assertEquals(17, cyclingChoice(method).register)
     }
 
     /** 577 uses the answer's register again further on, after the branch, and that's no reason to refuse. */

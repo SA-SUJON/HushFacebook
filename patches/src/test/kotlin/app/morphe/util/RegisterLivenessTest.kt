@@ -4,6 +4,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLa
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.immutable.ImmutableExceptionHandler
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodImplementation
@@ -329,6 +331,92 @@ class RegisterLivenessTest {
         )
         assertEquals(listOf(1), loop.literalReads(0))
         assertEquals(listOf(1), loop.rewrittenReads(0))
+    }
+
+    @Test
+    fun `the first stop after a rewrite on each way, past handlers and wide writes`() {
+        fun branchOn(register: Int) = { instruction: Instruction ->
+            instruction.opcode == Opcode.IF_EQZ && (instruction as OneRegisterInstruction).registerA == register
+        }
+        // The way through the second const meets the branch holding the 0, the other the 1.
+        val oneWay = smali(
+            registers = 3, params = listOf("Z"),
+            body = """
+                const/4 v0, 0x1
+                if-eqz p0, :keep
+                const/4 v0, 0x0
+                :keep
+                if-eqz v0, :done
+                :done
+                return-void
+            """,
+        )
+        assertEquals(listOf(3), oneWay.firstAfterRewrite(0, branchOn(0)))
+        // A branch holding the definition's value ends its way, so a later one past a write isn't the first.
+        val passed = smali(
+            registers = 1, params = emptyList(),
+            body = """
+                const/4 v0, 0x1
+                if-eqz v0, :next
+                :next
+                const/4 v0, 0x0
+                if-eqz v0, :done
+                :done
+                return-void
+            """,
+        )
+        assertEquals(emptyList<Int>(), passed.firstAfterRewrite(0, branchOn(0)))
+        assertEquals("the later branch still reads another value", listOf(3), passed.rewrittenReads(0))
+        // Back round to the definition, the register holds the definition's value again.
+        val loop = smali(
+            registers = 3, params = listOf("Z"),
+            body = """
+                :top
+                const/4 v0, 0x1
+                invoke-static {}, Lcom/example/Log;->tick()V
+                if-nez p0, :top
+                if-eqz v0, :done
+                :done
+                return-void
+            """,
+        )
+        assertEquals(emptyList<Int>(), loop.firstAfterRewrite(0, branchOn(0)))
+        assertEquals(emptyList<Int>(), loop.rewrittenReads(0))
+        // A handler reached from a call before the write sees the definition's value, one reached after it doesn't.
+        fun caught(from: Int) = smali(
+            registers = 3, params = emptyList(),
+            body = """
+                const/4 v0, 0x1
+                invoke-static {}, Lcom/example/Log;->tick()V
+                const/4 v0, 0x0
+                invoke-static {}, Lcom/example/Log;->tick()V
+                return-void
+                move-exception v1
+                if-eqz v0, :done
+                :done
+                return-void
+            """,
+        ).apply {
+            // addInstructionsWithLabels leaves .catch out, so the try block over one call is added by hand.
+            implementation!!.addCatch("Ljava/lang/Exception;", implementation!!.newLabelForIndex(from),
+                implementation!!.newLabelForIndex(from + 1), implementation!!.newLabelForIndex(5))
+        }
+        assertEquals(emptyList<Int>(), caught(1).firstAfterRewrite(0, branchOn(0)))
+        assertEquals(listOf(6), caught(3).firstAfterRewrite(0, branchOn(0)))
+        assertEquals(listOf(6), caught(3).rewrittenReads(0))
+        // A wide write into the register below writes this one too.
+        val wide = smali(
+            registers = 2, params = emptyList(),
+            body = """
+                const/4 v1, 0x1
+                const-wide/16 v0, 0x0
+                if-eqz v1, :done
+                :done
+                return-void
+            """,
+        )
+        assertEquals(listOf(2), wide.firstAfterRewrite(0, branchOn(1)))
+        assertEquals(listOf(2), wide.rewrittenReads(0))
     }
 
     @Test

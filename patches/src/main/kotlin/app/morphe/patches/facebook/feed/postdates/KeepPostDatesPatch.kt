@@ -16,6 +16,7 @@ import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
+import app.morphe.util.firstAfterRewrite
 import app.morphe.util.literalReads
 import app.morphe.util.rewrittenReads
 import com.android.tools.smali.dexlib2.Opcode
@@ -120,22 +121,21 @@ internal fun cyclingChoice(method: Method): CyclingChoice {
     if (!writesTheAnswer || (written as ReferenceInstruction).reference.toString() != VALUE_OF_BOOLEAN) {
         refuse("the log of \"$CYCLING_LOG\" in $where doesn't write v$register")
     }
-    // The branch has to read this answer, on every way from the log. An if-eqz on the same register
-    // after something wrote it again tests another value (577 reuses v12 as an iterator further on),
-    // and a hook there would only change what the log says.
+    // On every way from the log, the first branch on the register has to read this answer. One
+    // after something wrote it again tests another value, and a hook there would only change what
+    // the log says. A branch past the answer's own decides something else: 577 reuses v12 as an
+    // iterator further on.
     fun branchesOn(instruction: Instruction) =
         instruction.opcode == Opcode.IF_EQZ && (instruction as OneRegisterInstruction).registerA == register
-    val onAnswer = method.literalReads(index - 1).filter { branchesOn(code[it]) }
-    val onOther = method.rewrittenReads(index - 1).filter { branchesOn(code[it]) }
-    if (onAnswer.isEmpty()) {
-        if (onOther.isNotEmpty()) {
+    if (method.literalReads(index - 1).none { branchesOn(code[it]) }) {
+        if (method.rewrittenReads(index - 1).any { branchesOn(code[it]) }) {
             refuse("v$register is written again in $where before the branch on it after the log of \"$CYCLING_LOG\"")
         }
         refuse("nothing in $where branches on v$register after the log of \"$CYCLING_LOG\"")
     }
-    val mixed = onAnswer.filter { it in onOther }
-    if (mixed.isNotEmpty()) {
-        refuse("in $where some ways from the log of \"$CYCLING_LOG\" write v$register again before the branch on it at $mixed")
+    val unanswered = method.firstAfterRewrite(index - 1, ::branchesOn)
+    if (unanswered.isNotEmpty()) {
+        refuse("in $where some ways from the log of \"$CYCLING_LOG\" write v$register again before the branch on it at $unanswered")
     }
     return CyclingChoice(method, index, register)
 }

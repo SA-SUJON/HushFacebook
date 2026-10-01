@@ -257,19 +257,51 @@ fun Method.literalReads(index: Int): List<Int> {
  * Every instruction that can read the register the instruction at [index] writes on a way from
  * it that writes that register again first, so a read of some other value. With [literalReads]
  * it splits the reads the ways from the definition reach, and an instruction in both reads the
- * definition's value on one way and another value on another.
+ * definition's value on one way and another value on another. A way that comes back round to
+ * the definition holds its value again.
  *
  * @throws IllegalArgumentException when the instruction at [index] writes no single register.
  */
 fun Method.rewrittenReads(index: Int): List<Int> {
+    val reads = sortedSetOf<Int>()
+    walkFromDefinition(index) { at, instruction, register, rewritten ->
+        if (rewritten && readsRegister(instruction, register)) reads += at
+        true
+    }
+    return reads.toList()
+}
+
+/**
+ * On each way from the instruction at [index], the first instruction [stops] takes, when that way
+ * wrote the register the instruction at [index] writes again before getting there. A way that
+ * meets one of them still holding the definition's value ends there, and one that comes back
+ * round to the definition holds its value again.
+ *
+ * @throws IllegalArgumentException when the instruction at [index] writes no single register.
+ */
+fun Method.firstAfterRewrite(index: Int, stops: (Instruction) -> Boolean): List<Int> {
+    val found = sortedSetOf<Int>()
+    walkFromDefinition(index) { at, instruction, _, rewritten ->
+        if (!stops(instruction)) return@walkFromDefinition true
+        if (rewritten) found += at
+        false
+    }
+    return found.toList()
+}
+
+/**
+ * Walks every way from the instruction at [index], which writes one register, visiting each
+ * instruction at most twice: still holding the definition's value, and written again. [visit]
+ * gets the instruction, the register and whether it was written again, and answers whether the
+ * way goes on past it.
+ */
+private fun Method.walkFromDefinition(index: Int, visit: (Int, Instruction, Int, Boolean) -> Boolean) {
     val flow = ControlFlow.of(this)
     val definition = flow.instructions[index]
     require(definition.opcode.setsRegister() && !definition.opcode.setsWideRegister()) {
         "Instruction $index of $this does not write a single register."
     }
     val register = (definition as OneRegisterInstruction).registerA
-    val reads = sortedSetOf<Int>()
-    // One walk over each instruction twice at most: still holding the definition's value, and written again.
     val seen = arrayOf(BitSet(), BitSet())
     val pending = ArrayDeque<Pair<Int, Int>>()
     fun enqueue(successors: List<Int>, state: Int) = successors.forEach {
@@ -279,12 +311,16 @@ fun Method.rewrittenReads(index: Int): List<Int> {
     while (pending.isNotEmpty()) {
         val (at, state) = pending.removeFirst()
         val instruction = flow.instructions[at]
-        if (state == 1 && readsRegister(instruction, register)) reads += at
+        if (!visit(at, instruction, register, state == 1)) continue
         // An instruction that throws never writes its destination, so its handlers see what it held.
         enqueue(flow.exceptional[at], state)
-        enqueue(flow.normal[at], if (writesRegister(instruction, register)) 1 else state)
+        val next = when {
+            at == index -> 0
+            writesRegister(instruction, register) -> 1
+            else -> state
+        }
+        enqueue(flow.normal[at], next)
     }
-    return reads.toList()
 }
 
 /**

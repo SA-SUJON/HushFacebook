@@ -4,6 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Tooling:** `Keep post dates` now wants the first branch on the post header's choice along every way from its log to read the choice itself, so a later Facebook build where one way skips that branch, writes the register and branches on something else is refused. A choice made again inside a loop no longer counts as another value on the next pass, since the hook runs on every pass.
 * **Tooling:** `Tab bar at the bottom` now takes a TriState kept in a high register, and refuses a Facebook build that hands the bar's key anywhere besides a read or a write it knows, or reads the TriState again past its ordinal. Before, a build that read one of the two places some other way would have patched with only the other place hooked.
 * **Tooling:** `Hide Meta AI questions under posts` now follows catch handlers on its way from the `meta_ai` compare to the `stars` compare, so a later Facebook build whose handler hands the Meta AI row back first is refused rather than patched with the row left in. When the early return sits on the way where the row isn't Meta AI's, the refusal says that now, instead of blaming a Meta AI row.
 * **Tooling:** `Keep post dates` now follows each way from the post header's choice to the branch it hooks. A Facebook build where one way writes over the choice before the branch reads it gets its own refusal, since the hook couldn't keep the date there, and a build with no branch on the choice at all is told exactly that.
