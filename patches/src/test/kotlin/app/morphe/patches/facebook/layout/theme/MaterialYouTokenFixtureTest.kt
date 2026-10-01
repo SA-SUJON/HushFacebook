@@ -79,7 +79,9 @@ class MaterialYouTokenFixtureTest {
          * The data-reading calls whose attribute the scan can't follow, by build. React Native's
          * PlatformColor (`A02`, called from FabricUIManager.getColor) looks an attribute up by the name
          * the JavaScript gives it, and Mapbox's ColorUtils looks up colorAccent, colorPrimary and
-         * colorPrimaryDark, which aren't FDS tokens.
+         * colorPrimaryDark, which aren't FDS tokens. The JavaScript ships compressed, so PlatformColor's
+         * names were logged on 580 instead (2026-09-30): Marketplace home, a listing, search and its
+         * results asked it for none, since React Native's colours there arrive as ints.
          */
         val UNRESOLVED = mapOf(
             "577.0.0.50.72" to setOf("LX/CHJ;->A02(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/Integer;@88"),
