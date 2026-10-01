@@ -4421,7 +4421,7 @@ public final class L10nTranslations {
         table.put("Add Save to every story menu, using your download quality. Off or paused, Facebook only saves your own stories.",
                 "Her hikaye men\u00fcs\u00fcne indirme kalitenizle Kaydet ekler. Kapal\u0131 veya duraklat\u0131lm\u0131\u015fken Facebook yaln\u0131zca kendi hikayelerinizi kaydeder.");
         table.put("Add a Download button to reels, using your download quality. Off or paused, Facebook's own buttons return.",
-                "Reels\u2019e indirme kalitenizle \u0130ndir d\u00fc\u011fmesi ekler. Kapal\u0131 veya duraklat\u0131lm\u0131\u015fken Facebook\u2019un kendi d\u00fc\u011fmeleri geri gelir.");
+                "Reels'e indirme kalitenizle \u0130ndir d\u00fc\u011fmesi ekler. Kapal\u0131 veya duraklat\u0131lm\u0131\u015fken Facebook'un kendi d\u00fc\u011fmeleri geri gelir.");
         table.put("Additional Facebook preferences",
                 "Ek Facebook tercihleri");
         table.put("Ads and boosted listings in Marketplace's feed and search results. The other listings stay.",
@@ -4461,7 +4461,7 @@ public final class L10nTranslations {
         table.put("Appearance",
                 "G\u00f6r\u00fcn\u00fcm");
         table.put("Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.",
-                "Ba\u015flang\u0131\u00e7ta g\u00fcnde bir kez GitHub\u2019\u0131 kontrol eder ve yeni s\u00fcr\u00fcmleri genel bak\u0131\u015fta g\u00f6sterir. Varsay\u0131lan olarak kapal\u0131d\u0131r. Hi\u00e7bir \u015fey indirilmez.");
+                "Ba\u015flang\u0131\u00e7ta g\u00fcnde bir kez GitHub'\u0131 kontrol eder ve yeni s\u00fcr\u00fcmleri genel bak\u0131\u015fta g\u00f6sterir. Varsay\u0131lan olarak kapal\u0131d\u0131r. Hi\u00e7bir \u015fey indirilmez.");
         table.put("Asks GitHub for the newest release right now, even with the switch above off.",
                 "Yukar\u0131daki anahtar kapal\u0131 olsa bile GitHub'a en yeni s\u00fcr\u00fcm\u00fc hemen sorar.");
         table.put("Audience Network off",
@@ -5139,7 +5139,7 @@ public final class L10nTranslations {
         table.put("Stop Story auto-advance",
                 "Hikayelerin otomatik ilerlemesini durdur");
         table.put("Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.",
-                "\u0130zlenen Reels listelerini Facebook\u2019a g\u00f6ndermeyi durdurur. Listeler ak\u0131\u015f\u0131 s\u0131ralad\u0131\u011f\u0131ndan izlenen Reels tekrar g\u00f6r\u00fcnebilir.");
+                "\u0130zlenen Reels listelerini Facebook'a g\u00f6ndermeyi durdurur. Listeler ak\u0131\u015f\u0131 s\u0131ralad\u0131\u011f\u0131ndan izlenen Reels tekrar g\u00f6r\u00fcnebilir.");
         table.put("Stop update prompts",
                 "G\u00fcncelleme uyar\u0131lar\u0131n\u0131 durdur");
         table.put("Stops using the font file and goes back to your phone's font.",
@@ -5274,7 +5274,7 @@ public final class L10nTranslations {
         table.put("Turn on %1$s to save videos they all play.",
                 "Hepsinin oynatabilece\u011fi videolar kaydetmek i\u00e7in %1$s ayar\u0131n\u0131 a\u00e7.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
-                "Facebook\u2019un g\u00f6nderi ve yorumlarda etiketlenecek ki\u015fi \u00f6nermesi i\u00e7in @ yaz\u0131n. Metniniz de\u011fi\u015fmez.");
+                "Facebook'un g\u00f6nderi ve yorumlarda etiketlenecek ki\u015fi \u00f6nermesi i\u00e7in @ yaz\u0131n. Metniniz de\u011fi\u015fmez.");
         table.put("Undo",
                 "Geri al");
         table.put("Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.",
@@ -5290,11 +5290,11 @@ public final class L10nTranslations {
         table.put("Use the system font",
                 "Sistem yaz\u0131 tipini kullan");
         table.put("Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.",
-                "Telefonunuzun emojilerini kullan\u0131r. \u0130fadeler ve \u00e7\u0131kartmalar ayn\u0131 kal\u0131r. De\u011fi\u015ftirdikten sonra Facebook\u2019u yeniden ba\u015flat\u0131n.");
+                "Telefonunuzun emojilerini kullan\u0131r. \u0130fadeler ve \u00e7\u0131kartmalar ayn\u0131 kal\u0131r. De\u011fi\u015ftirdikten sonra Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Use your phone's font",
                 "Telefonun yaz\u0131 tipini kullan");
         table.put("Use your phone's font or a file chosen below. Restart Facebook after changing it.",
-                "Telefonunuzun yaz\u0131 tipini veya a\u015fa\u011f\u0131dan se\u00e7ilen dosyay\u0131 kullan\u0131r. De\u011fi\u015ftirdikten sonra Facebook\u2019u yeniden ba\u015flat\u0131n.");
+                "Telefonunuzun yaz\u0131 tipini veya a\u015fa\u011f\u0131dan se\u00e7ilen dosyay\u0131 kullan\u0131r. De\u011fi\u015ftirdikten sonra Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Using %1$s. Choose another file to replace it.",
                 "%1$s kullan\u0131l\u0131yor. De\u011fi\u015ftirmek i\u00e7in ba\u015fka bir dosya se\u00e7.");
         table.put("Version",
@@ -5339,7 +5339,7 @@ public final class L10nTranslations {
         table.put("Videos will save at their lowest quality, for the smallest files.",
                 "Videolar en d\u00fc\u015f\u00fck kalitelerinde kaydedilecek, b\u00f6ylece dosyalar en k\u00fc\u00e7\u00fck olur.");
         table.put("Videos, reels, stories and music wait for your tap. Facebook's Autoplay setting temporarily reads Off.",
-                "Videolar, Reels, hikayeler ve m\u00fczik dokunman\u0131z\u0131 bekler. Facebook\u2019un Otomatik Oynatma ayar\u0131 ge\u00e7ici olarak Kapal\u0131 g\u00f6r\u00fcn\u00fcr.");
+                "Videolar, Reels, hikayeler ve m\u00fczik dokunman\u0131z\u0131 bekler. Facebook'un Otomatik Oynatma ayar\u0131 ge\u00e7ici olarak Kapal\u0131 g\u00f6r\u00fcn\u00fcr.");
         table.put("View stories anonymously",
                 "Hikayeleri anonim olarak izle");
         table.put("Waiting for Facebook's tab bar. Marketplace mode will apply when Facebook builds it.",

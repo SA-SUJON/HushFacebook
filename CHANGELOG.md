@@ -4,6 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Facebook:** The Turkish settings now write Facebook'u, Reels'e and GitHub'ı with a straight apostrophe on every row. Seven rows had a curly one, so the note to restart Facebook looked different from one row to the next.
 * **Tooling:** `Keep post dates` refuses a Facebook build where the post header's choice reaches a branch on it only through a catch handler. The branch between the rotating subtitle and the one line runs when nothing throws, so that one isn't it, and the hook would have gone in and changed nothing.
 * **Tooling:** `Hide the Feeds header` refuses a Facebook build with a try block over, or starting or ending at, a spot where one of its hooks goes in, as the hand-over to the filters' controller already did. That covers each answer to whether the tab gets a title row and the branch that gives the posts room for the filters. A try block there could take the hook's call in and hand its handler the registers the hook writes.
 * **Tooling:** `Hide Meta AI questions under posts` refuses a Facebook build with a catch handler over the `stars` name's load that reads the name's register. The hook keeps its answer in that register until the load, so the handler would have found a boolean where it expects the name, and Android would have turned the whole class away.
