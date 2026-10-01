@@ -96,6 +96,13 @@ public final class FeedFilter {
      * adapter of its own. A unit answering it as an edge would be the tray between posts.
      */
     static final String STORIES_TRAY_UNIT_TYPE = "StoriesTrayFeedUnit";
+    /**
+     * The other two kinds of Stories between posts the same model answers in 577 and 580, through
+     * its table of type names rather than a literal: one large Stories tile, and one person's
+     * Stories in a viewer of their own.
+     */
+    static final String STORIES_LARGE_TILE_UNIT_TYPE = "StoriesOneColumnOneRowLargeTileFeedUnit";
+    static final String STORIES_INLINE_VIEWER_UNIT_TYPE = "StoriesSingleBucketInlineViewerFeedUnit";
     /** What Hide the Stories tray's rule adds to the type of a row of Stories it took out of the feed. */
     static final String STORIES_TRAY_REASON = "stories tray";
 
@@ -405,12 +412,15 @@ public final class FeedFilter {
     /**
      * Hide the Stories tray's rule for the Stories that come as feed edges (issue #45): a row of
      * several people's Stories between posts, {@link #DISCOVER_UNIT_TYPE}, your friends' as well as
-     * the ones "Stories you might like" takes, and the tray itself should it come as an edge,
-     * {@link #STORIES_TRAY_UNIT_TYPE}. The reason names the type; any other type, or none, is null.
+     * the ones "Stories you might like" takes, the tray itself should it come as an edge,
+     * {@link #STORIES_TRAY_UNIT_TYPE}, and the single tiles and viewers of Stories,
+     * {@link #STORIES_LARGE_TILE_UNIT_TYPE} and {@link #STORIES_INLINE_VIEWER_UNIT_TYPE}. The reason
+     * names the type; any other type, or none, is null.
      */
     @Nullable
     static String storiesRowReason(@Nullable String type) {
-        if (DISCOVER_UNIT_TYPE.equals(type) || STORIES_TRAY_UNIT_TYPE.equals(type)) {
+        if (DISCOVER_UNIT_TYPE.equals(type) || STORIES_TRAY_UNIT_TYPE.equals(type)
+                || STORIES_LARGE_TILE_UNIT_TYPE.equals(type) || STORIES_INLINE_VIEWER_UNIT_TYPE.equals(type)) {
             return type + ":" + STORIES_TRAY_REASON;
         }
         return null;

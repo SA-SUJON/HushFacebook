@@ -38,8 +38,12 @@ internal const val UNIFIED_TRAY = 1
  *
  * The rows of Stories Facebook puts between posts are edges, DiscoverFeedUnit ones, so the feed
  * guard this patch brings takes them out under the same switch (issue #45), and the tray too
- * should it ever come as an edge, a StoriesTrayFeedUnit one. Hide suggested and promoted posts
- * takes out the rows of Stories from people you aren't connected to on its own switch.
+ * should it ever come as an edge, a StoriesTrayFeedUnit one. So do the single large Stories tile
+ * and the single person's Stories viewer the same model answers through its table of type names,
+ * StoriesOneColumnOneRowLargeTileFeedUnit and StoriesSingleBucketInlineViewerFeedUnit
+ * (StoriesBetweenPostsFixtureTest finds both in every declared build). Hide suggested and
+ * promoted posts takes out the rows of Stories from people you aren't connected to on its own
+ * switch.
  */
 @Suppress("unused")
 val hideStoriesTrayPatch = bytecodePatch(

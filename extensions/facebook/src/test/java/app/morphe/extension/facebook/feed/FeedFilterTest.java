@@ -425,6 +425,35 @@ public class FeedFilterTest {
     }
 
     /**
+     * The model's other two kinds of Stories between posts, one large tile and one person's Stories
+     * in a viewer, go under the same switch and come back with it off. A unit of the model's reels
+     * showcase type is the control: the tray's switch leaves it to Hide Reels in the feed.
+     */
+    @Test
+    public void theStoriesTraySwitchTakesTheSingleTilesAndViewersOfStories() {
+        FeedFilter.storiesTrayInBuildForTests = true;
+        assertTrue(Settings.HIDE_STORIES_TRAY.get());
+        TypedFeedUnit tile = new TypedFeedUnit("StoriesOneColumnOneRowLargeTileFeedUnit");
+        TypedFeedUnit viewer = new TypedFeedUnit("StoriesSingleBucketInlineViewerFeedUnit");
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, tile, false, false));
+        assertTrue(FeedFilter.hideEdge(Category.ORGANIC, viewer, false, false));
+        assertNull(FeedFilter.storiesRowReason("ShowcaseFeedUnit"));
+
+        String report = String.join("\n", FeedFilterCounters.report());
+        assertTrue(report, report.contains(FeedFilter.FEED_ROUTE + ": 2 lists, 2 items, 2 removed. "
+                + "Last reason: StoriesSingleBucketInlineViewerFeedUnit:stories tray. "
+                + "Removed: StoriesOneColumnOneRowLargeTileFeedUnit:stories tray 1, "
+                + "StoriesSingleBucketInlineViewerFeedUnit:stories tray 1."));
+
+        Settings.HIDE_STORIES_TRAY.save(false);
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, tile, false, false));
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, viewer, false, false));
+        Settings.HIDE_STORIES_TRAY.resetToDefault();
+        FeedFilter.storiesTrayInBuildForTests = false;
+        assertFalse(FeedFilter.hideEdge(Category.ORGANIC, tile, false, false));
+    }
+
+    /**
      * With "Stories you might like" on as well, a row from people you aren't connected to keeps that
      * rule's reason, which runs first, and a row of your friends' Stories goes under the tray's.
      */
