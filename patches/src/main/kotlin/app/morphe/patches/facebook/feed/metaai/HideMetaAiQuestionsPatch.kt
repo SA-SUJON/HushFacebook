@@ -231,7 +231,8 @@ internal class DefaultPill(val index: Int, val typeRegister: Int, val freeRegist
  * Reads the default way's hook point out of [method]. Refuses unless the method returns an object,
  * compares a pill's type with [META_AI_TYPE] once, reading it with a literal key, and compares the
  * type read with that key from the same tree with [STARS_TYPE] once, unless that compare can only
- * be reached through the read just before it, and unless every path from the [META_AI_TYPE]
+ * be reached through the read just before it, with no try block's edge or handler on its name's
+ * load, and unless every path from the [META_AI_TYPE]
  * compare gets there before it returns, through the catch handlers of what can throw on it too.
  */
 internal fun defaultPill(method: Method): DefaultPill {
@@ -253,6 +254,11 @@ internal fun defaultPill(method: Method): DefaultPill {
     if (into != listOf(site.nameIndex - 1)) {
         refuse("in $where the \"$STARS_TYPE\" compare can be reached from $into, not only through the read of the type")
     }
+    // The hook goes in above the name's load, and dexlib2 keeps a handler's start and a try block's
+    // edges on the load itself: a handler there would skip the hook, a try block ending there would
+    // take it in, and one starting there would leave it out.
+    val edges = tryEdgesAt(method, site.nameIndex)
+    if (edges.isNotEmpty()) refuse("in $where ${edges.joinToString(" and ")} at the \"$STARS_TYPE\" compare's name, where the hook goes")
     // A pill typed meta_ai that could be returned before the stars compare would be drawn with the
     // hook in place, so every way on from the meta_ai compare has to pass it first. A return only on
     // the way where the type isn't meta_ai is refused too, since 577 and 580 join both ways before
@@ -275,6 +281,18 @@ internal fun defaultPill(method: Method): DefaultPill {
 }
 
 private val RETURNS = setOf(Opcode.RETURN_OBJECT, Opcode.RETURN, Opcode.RETURN_WIDE, Opcode.RETURN_VOID)
+
+/** What [method]'s try blocks put on the instruction at [index]: a catch handler's start, a try block's start or its end. */
+private fun tryEdgesAt(method: Method, index: Int): List<String> {
+    val implementation = method.implementation!!
+    val address = implementation.instructions.take(index).sumOf { it.codeUnits }
+    return implementation.tryBlocks.flatMap { block ->
+        listOfNotNull(
+            "a try block starts".takeIf { block.startCodeAddress == address },
+            "a try block ends".takeIf { block.startCodeAddress + block.codeUnitCount == address },
+        ) + block.exceptionHandlers.filter { it.handlerCodeAddress == address }.map { "a catch handler starts" }
+    }.distinct()
+}
 
 /**
  * Follows every path from [from] in [flow], into the catch handlers of what can throw on it too,

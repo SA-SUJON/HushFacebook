@@ -213,6 +213,46 @@ class HideMetaAiQuestionsShapesTest {
     }
 
     /**
+     * dexlib2 keeps a handler's start and a try block's edges on the instruction the hook goes in
+     * above, the stars name's load. A handler there, reached here when the meta_ai compare's read
+     * throws, would skip the hook; a try block ending there would take the hook in, and one starting
+     * there would leave it out. A try block that stops one instruction short still applies.
+     */
+    @Test
+    fun `a handler or a try block edge at the stars name's load is refused`() {
+        val extra = """
+            move-exception v13
+            throw v13
+        """
+        fun caught(from: Int, to: Int, handler: Int? = null) = socket(extra = extra).apply {
+            val lines = body()
+            val thrown = handler ?: lines.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+            implementation!!.apply {
+                addCatch("Ljava/lang/Exception;", newLabelForIndex(from), newLabelForIndex(to), newLabelForIndex(thrown))
+            }
+        }
+        val code = socket(extra = extra).body()
+        val stars = indexOfString(code, STARS_TYPE)
+        val metaAiRead = indexOfString(code, META_AI_TYPE) - 2
+        assertEquals(Opcode.INVOKE_VIRTUAL, code[metaAiRead].opcode)
+        assertEquals(Opcode.INVOKE_VIRTUAL, code[stars - 2].opcode)
+        val shapes = mapOf(
+            "a handler at the stars name" to (caught(metaAiRead, metaAiRead + 1, handler = stars) to "a catch handler starts"),
+            "a try block ending at the stars name" to (caught(stars - 2, stars) to "a try block ends"),
+            "a try block starting at the stars name" to (caught(stars, stars + 2) to "a try block starts"),
+        )
+        for ((shape, case) in shapes) {
+            val (method, edge) = case
+            val refusal = assertThrows(shape, PatchException::class.java) { defaultPill(method) }.message!!
+            assertTrue("$shape: $refusal", "$edge at the \"$STARS_TYPE\" compare's name, where the hook goes" in refusal)
+        }
+        val short = caught(stars - 2, stars - 1)
+        assertEquals("the try block is in the flow", listOf(code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }),
+            ControlFlow.of(short).exceptional[stars - 2])
+        assertEquals(stars, defaultPill(short).index)
+    }
+
+    /**
      * A try block covering only the answer's move and the branch on it can't hand anything to its
      * handler, so the socket applies as it does without one, though the handler returns.
      */
