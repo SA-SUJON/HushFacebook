@@ -74,6 +74,10 @@ The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	D
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zurück, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.
 Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Bis zum Fortsetzen verhält sich jeder Schalter außer der Debug-Protokollierung, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Nutzt die Emoji deines Telefons. Reaktionen und Sticker bleiben gleich. Starte Facebook nach der Änderung neu.
+# context: switch title under Appearance; the tab bar is Facebook's row of tabs, Home, Video, Marketplace and the rest
+Tab bar at the bottom	Tab-Leiste unten
+# context: description of that switch; Facebook shows the tab bar at the top of the screen on some accounts and at the bottom on others
+Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.	Setzt die Tab-Leiste von Facebook an den unteren Bildschirmrand, bei Konten, die sie oben haben. Starte Facebook nach der Änderung neu.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Nutzt die Schrift deines Telefons oder eine unten gewählte Datei. Starte Facebook nach der Änderung neu.
 Font file	Schriftdatei
 Use your phone's font	Schriftart des Handys verwenden

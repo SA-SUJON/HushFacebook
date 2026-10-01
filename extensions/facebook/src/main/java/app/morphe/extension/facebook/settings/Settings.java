@@ -484,6 +484,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reels_tab_dot", TRUE);
 
     /**
+     * The tab bar goes to the bottom of the screen on accounts Facebook gives it at the top
+     * ({@link app.morphe.extension.facebook.navigation.BottomTabBar}). Facebook places the bar as
+     * its main screen starts, so a change waits for a restart.
+     */
+    public static final BooleanSetting BOTTOM_TAB_BAR =
+            new BooleanSetting("hushfacebook_bottom_tab_bar", FALSE, true);
+
+    /**
      * The strip some posts carry ("Are you interested in this post?", "Show less", who recently
      * commented, follow and chat suggestions) goes, and so does the room kept for it
      * ({@link app.morphe.extension.facebook.feed.PostPrompts}). A change shows on the posts drawn

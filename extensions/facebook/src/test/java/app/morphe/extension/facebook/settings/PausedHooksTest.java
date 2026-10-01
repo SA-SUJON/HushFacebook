@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 
+import com.facebook.common.util.TriState;
 import com.facebook.graphql.model.GraphQLPagesYouMayLikeFeedUnit;
 import com.facebook.graphql.model.GraphQLStory;
 
@@ -71,6 +72,7 @@ import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
+import app.morphe.extension.facebook.navigation.BottomTabBar;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.ReelsTabForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
@@ -408,6 +410,9 @@ public class PausedHooksTest {
                 ReelsTabForTests::dropsTheShortcut));
         // The tab bar's count for the Reels tab reads none.
         probes.put(PatchFamily.REELS_TAB_DOT, Collections.singletonList(ReelsTabForTests::clearsTheDot));
+        // Facebook's own override of where the tab bar goes reads YES, for the bottom, where it read NO.
+        probes.put(PatchFamily.BOTTOM_TAB_BAR, Collections.singletonList(
+                () -> BottomTabBar.override(TriState.NO.ordinal()) == TriState.YES.ordinal()));
         // A request for a post's comments that names no order asks for the chosen one.
         probes.put(PatchFamily.DEFAULT_COMMENT_ORDER,
                 Collections.singletonList(DefaultCommentOrderForTests::asksForTheChosenOrder));

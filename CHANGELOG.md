@@ -4,6 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Facebook:** New `Tab bar at the bottom` moves Facebook's tab bar to the bottom of the screen on accounts that have it at the top (issue #49). Facebook decides where the bar goes by a server setting, and it keeps a preference of its own that overrides that setting either way. With the switch on, Hushfacebook answers that preference with the bottom, so after a restart the bar sits there with the same tabs in the same order. It's in Morphe Manager's default selection with its switch off, under Appearance, and Pause brings Facebook's choice back after a restart.
 * **Tooling:** `Hide Meta AI questions under posts` now checks while patching that a Meta AI row drawn the default way can't be returned before the patch sees it, and refuses a Facebook build where it could, rather than leaving the row in.
 * **Tooling:** `Keep post dates` now checks while patching that the branch it hooks reads the post header's choice itself, so a later Facebook build that moves that branch gets a clear refusal rather than a patch that goes in and does nothing.
 * **Facebook:** If Google Play keeps offering a Facebook update it can't install (issue #46), the README now says how to add Morphe's own `Disable Play Store updates` beside Hushfacebook in Morphe Manager. With Hushfacebook's default selection on Facebook 580.0.0.51.74, a Facebook patched with both stayed signed in and loaded the feed. Once a Facebook with it is installed, keep picking it, since Android treats a build without it as an older version.

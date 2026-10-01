@@ -198,6 +198,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean bottomTabBar() {
+        return false;
+    }
+
     public static boolean postPrompts() {
         return false;
     }

@@ -729,7 +729,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         updates.addPreference(checkNowRow(context));
         ReleaseCheck.watch(this);
 
-        if (build.contains(PatchFamily.SYSTEM_FONT) || build.contains(PatchFamily.SYSTEM_EMOJI)) {
+        if (build.contains(PatchFamily.SYSTEM_FONT) || build.contains(PatchFamily.SYSTEM_EMOJI)
+                || build.contains(PatchFamily.BOTTOM_TAB_BAR)) {
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
             if (build.contains(PatchFamily.SYSTEM_FONT)) {
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT, L10n.t("Use the system font"),
@@ -747,6 +748,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 // The quick emoji picker keeps the first typeface it's given until Facebook restarts.
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_EMOJI, L10n.t("Use the phone's emoji"),
                         L10n.t("Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.")));
+            }
+            if (build.contains(PatchFamily.BOTTOM_TAB_BAR)) {
+                // Facebook places the tab bar as its main screen starts, so a change waits for a restart.
+                appearance.addPreference(toggle(context, Settings.BOTTOM_TAB_BAR, L10n.t("Tab bar at the bottom"),
+                        L10n.t("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. "
+                                + "Restart Facebook after changing it.")));
             }
         }
 
