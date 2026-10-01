@@ -100,12 +100,12 @@ class BottomTabBarShapesTest {
         name = name,
     )
 
-    /** Facebook's tab menu: it stores the flipped answer under the key and reads nothing. */
-    private fun menuWrite() = method(
+    /** Facebook's tab menu: it stores the flipped answer under the key, through [store], and reads nothing. */
+    private fun menuWrite(store: String = "invoke-static { v0, v1, v2 }, Lfixture/Editor;->A1F(Lfixture/Editor;${keyType}Z)V") = method(
         """
             const/4 v2, 0x1
             sget-object v1, $holder->A01:$keyType
-            invoke-static { v0, v1, v2 }, Lfixture/Editor;->A1F(Lfixture/Editor;${keyType}Z)V
+            $store
             return-void
         """,
         name = "A0H", returnType = "V", static = true, definingClass = "Lfixture/TabMenu;",
@@ -144,15 +144,21 @@ class BottomTabBarShapesTest {
     fun `a read goes straight from the key to FbSharedPreferences, a TriState and its ordinal`() {
         val read = overrideReads(gate(), key).single()
         assertEquals(4 to 2, read.resultIndex to read.register)
-        // A register past v15 and a TriState's own ordinal() read the same way.
+        // An ordinal kept past v15 and a TriState's own ordinal() read the same way.
         val wide = overrideReads(gate(result = 17, ordinal = "invoke-virtual { v0 }, $TRI_STATE->ordinal()I"), key).single()
         assertEquals(4 to 17, wide.resultIndex to wide.register)
         val range = gate(read = "invoke-interface/range { v0 .. v1 }, $FB_SHARED_PREFERENCES->B2w($keyType)$TRI_STATE")
         assertEquals(1, overrideReads(range, key).size)
+        // A TriState kept past v15 has its ordinal taken by a range call, which names any register.
+        val kept = gate(result = 17, afterRead = "move-result-object v17",
+            ordinal = "invoke-virtual/range { v17 .. v17 }, Ljava/lang/Enum;->ordinal()I")
+        assertEquals(4 to 17, overrideReads(kept, key).single().let { it.resultIndex to it.register })
         assertEquals("the tab menu's write is no read", emptyList<OverrideRead>(), overrideReads(menuWrite(), key))
+        val triStateWrite = menuWrite("invoke-interface { v0, v1, v3 }, Lfixture/Editor;->put(${keyType}$TRI_STATE)V")
+        assertEquals("a write of a TriState is no read", emptyList<OverrideRead>(), overrideReads(triStateWrite, key))
     }
 
-    /** Each shape changes one step of [gate], and has to be refused for that step. */
+    /** Each shape changes one step of [gate] or [menuWrite], and has to be refused for that step. */
     @Test
     fun `a read that answers no TriState, or doesn't take its ordinal right away, is refused`() {
         val noOrdinal = "doesn't take the ordinal of the override's TriState right after reading it"
@@ -164,6 +170,17 @@ class BottomTabBarShapesTest {
             "the TriState left unkept" to (gate(afterRead = "nop") to noOrdinal),
             "the ordinal of another register" to (gate(ordinal = "invoke-virtual { v3 }, Ljava/lang/Enum;->ordinal()I") to noOrdinal),
             "the ordinal unkept" to (gate(afterOrdinal = "nop") to noOrdinal),
+            "the TriState read again past its ordinal" to
+                (gate(afterOrdinal = "move-result v2\ninvoke-static { v0 }, Lfixture/Log;->tri($TRI_STATE)V") to
+                    "uses the override's TriState past its ordinal"),
+            "the key handed to a helper that answers a TriState" to
+                (gate(read = "invoke-static { v1, v0 }, Lfixture/Prefs;->tri($FB_SHARED_PREFERENCES$keyType)$TRI_STATE") to
+                    "Lfixture/TabBarGate;->A06 hands the override's key at 0 to neither a read nor a write"),
+            "the key stored in a field" to
+                (menuWrite("sput-object v1, Lfixture/Cache;->key:$keyType") to "hands the override's key at 1 to neither"),
+            "the key put to a call that answers something" to
+                (menuWrite("invoke-static { v0, v1, v2 }, Lfixture/Editor;->A1F(Lfixture/Editor;${keyType}Z)Z") to
+                    "to neither a read nor a write"),
         )
         for ((shape, case) in shapes) {
             val (method, expected) = case

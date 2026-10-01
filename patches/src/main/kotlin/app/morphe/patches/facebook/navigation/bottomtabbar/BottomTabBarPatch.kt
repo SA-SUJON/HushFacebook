@@ -15,6 +15,7 @@ import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.findMutableMethodOf
+import app.morphe.util.literalReads
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.BuilderInstruction
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -46,7 +47,8 @@ internal const val OVERRIDE = "$BOTTOM_TAB_BAR->override(I)I"
  * (580 `LX/1rJ;->A06` and `A09`, 577 `LX/1qY;->A06` and `A0A`) reads the key from FbSharedPreferences
  * as a TriState and branches on its ordinal. The extension goes right after each ordinal and
  * answers YES's while the switch is on. Facebook's own tab menu writes the key without reading it,
- * and that's left alone.
+ * and that's left alone. A load of the key that's neither is refused, since a read the patch
+ * can't see would leave that place deciding the bar on its own.
  */
 @Suppress("unused")
 val bottomTabBarPatch = bytecodePatch(
@@ -88,8 +90,9 @@ private fun loadsKeyName(instruction: Instruction) =
 private fun fieldOf(instruction: Instruction) = (instruction as? ReferenceInstruction)?.reference as? FieldReference
 
 /**
- * The static field Facebook keeps the override's key in: the first one a class's `<clinit>`
- * stores into its own class after loading [OVERRIDE_KEY]. Refuses unless [holders] have exactly one.
+ * The static field Facebook keeps the override's key in: what the first sput-object after the
+ * load of [OVERRIDE_KEY] in a class's `<clinit>` stores, when that's a field of the same class.
+ * Refuses unless [holders] have exactly one.
  */
 internal fun overrideKeyField(holders: List<ClassDef>): FieldReference {
     val fields = holders.flatMap { holder ->
@@ -108,8 +111,10 @@ internal fun overrideKeyField(holders: List<ClassDef>): FieldReference {
 /**
  * The reads of [key] in [method]. A load of the key that goes straight into a call on
  * FbSharedPreferences is a read, and that call has to answer a TriState whose ordinal() is taken
- * right away, the ordinal kept by a move-result. A load that goes anywhere else is taken for a
- * write, the way Facebook's tab menu stores the key, and left alone.
+ * right away, by a plain or a range call, the ordinal kept by a move-result and the TriState read
+ * nowhere else. A load that goes straight into a call answering nothing, which also takes a
+ * boolean or a TriState, is a write, the way Facebook's tab menu stores the key, and left alone.
+ * Refuses a load that's neither.
  */
 internal fun overrideReads(method: Method, key: FieldReference): List<OverrideRead> {
     val code = method.implementation?.instructions?.toList() ?: return emptyList()
@@ -117,19 +122,30 @@ internal fun overrideReads(method: Method, key: FieldReference): List<OverrideRe
     return code.indices.filter { code[it].opcode == Opcode.SGET_OBJECT && fieldOf(code[it]) == key }.mapNotNull { load ->
         val keyRegister = (code[load] as OneRegisterInstruction).registerA
         val call = code.getOrNull(load + 1)
-        val read = ((call as? ReferenceInstruction)?.reference as? MethodReference)
-            ?.takeIf { it.definingClass == FB_SHARED_PREFERENCES && keyRegister in call.namedRegisters() }
-            ?: return@mapNotNull null
+        val named = (call as? ReferenceInstruction)?.reference as? MethodReference
+        val takesKey = named != null && keyRegister in call.namedRegisters()
+        if (takesKey && named.definingClass != FB_SHARED_PREFERENCES && named.returnType == "V" &&
+            named.parameterTypes.any { it.toString() == "Z" || it.toString() == TRI_STATE }
+        ) {
+            return@mapNotNull null
+        }
+        val read = named?.takeIf { takesKey && it.definingClass == FB_SHARED_PREFERENCES }
+            ?: refuse("$where hands the override's key at $load to neither a read nor a write the patch knows")
         if (read.returnType != TRI_STATE) refuse("$where reads the override with $read, which doesn't answer a TriState")
         val triState = code.getOrNull(load + 2)
         val ordinal = code.getOrNull(load + 3)
         val result = code.getOrNull(load + 4)
         val ordinalCall = (ordinal as? ReferenceInstruction)?.reference as? MethodReference
-        val takesOrdinal = triState?.opcode == Opcode.MOVE_RESULT_OBJECT && ordinal?.opcode == Opcode.INVOKE_VIRTUAL &&
+        val takesOrdinal = triState?.opcode == Opcode.MOVE_RESULT_OBJECT &&
+            (ordinal?.opcode == Opcode.INVOKE_VIRTUAL || ordinal?.opcode == Opcode.INVOKE_VIRTUAL_RANGE) &&
             ordinalCall?.name == "ordinal" && ordinalCall.parameterTypes.isEmpty() && ordinalCall.returnType == "I" &&
             ordinal.namedRegisters() == listOf((triState as OneRegisterInstruction).registerA) &&
             result?.opcode == Opcode.MOVE_RESULT
         if (!takesOrdinal) refuse("$where doesn't take the ordinal of the override's TriState right after reading it")
+        // Anything else reading the TriState would decide the bar from Facebook's answer, past the hook.
+        if (method.literalReads(load + 2) != listOf(load + 3)) {
+            refuse("$where uses the override's TriState past its ordinal, where the hook can't change it")
+        }
         OverrideRead(method, load + 4, (result as OneRegisterInstruction).registerA)
     }
 }
