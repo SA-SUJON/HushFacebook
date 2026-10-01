@@ -164,6 +164,29 @@ public class L10nCatalogTest {
         assertEquals("accented letters are words, not invisible", null, textProblem("Ausblenden f" + (char) 0x00FC + "r"));
     }
 
+    /**
+     * Every apostrophe in a translation is the straight one the English uses. Turkish puts one
+     * before every suffix on a name (Facebook'u), and seven rows once had a curly one, so the same
+     * name looked different from one row to the next.
+     */
+    @Test
+    public void everyApostropheIsStraight() {
+        List<String> problems = new ArrayList<>();
+        for (String language : L10nTranslations.LANGUAGES) {
+            for (Map.Entry<String, String> row : L10nTranslations.of(language).entrySet()) {
+                if (curlyApostrophe(row.getValue())) problems.add(language + ": " + row.getKey());
+            }
+        }
+        assertEquals(problems.toString(), 0, problems.size());
+        assertTrue(curlyApostrophe("Facebook" + (char) 0x2019 + "u"));
+        assertTrue(curlyApostrophe((char) 0x2018 + "Reels"));
+        assertFalse(curlyApostrophe("Facebook'u"));
+    }
+
+    static boolean curlyApostrophe(String text) {
+        return text.indexOf(0x2018) >= 0 || text.indexOf(0x2019) >= 0;
+    }
+
     /** No sentence goes to a view, a toast or a notification without going through the catalog. */
     @Test
     public void noEnglishReachesTheScreenOutsideTheCatalog() throws IOException {

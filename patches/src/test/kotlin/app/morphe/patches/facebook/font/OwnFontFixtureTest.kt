@@ -16,7 +16,6 @@ import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
-import com.android.tools.smali.dexlib2.iface.instruction.VariableRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import org.junit.Assert.assertEquals
@@ -88,8 +87,34 @@ class OwnFontFixtureTest {
             method.implementation!!.instructions.filter { defaultRead(it) == DEFAULT_FROM_STYLE }
         }
         assertTrue("${bundle.name}: no defaultFromStyle call", styleCalls.isNotEmpty())
-        assertTrue("${bundle.name}: a defaultFromStyle call takes more than the style",
-            styleCalls.all { (it as VariableRegisterInstruction).registerCount == 1 })
+
+        // The rewrite itself, over every class that reads them: each read goes to the extension,
+        // in its own place, a field read's answer comes back into the register the read wrote, and
+        // no read of the framework's is left.
+        val owners = FixtureDex.classes(bundle, readers.map { it.definingClass }.toSet())
+        val context = PatchContexts.of(owners.values)
+        assertEquals("${bundle.name}: reads sent", reads.size, context.hookDefaultTypefaces())
+        val getters = DEFAULT_TYPEFACES.values.map { "$OWN_FONT->$it()$TYPEFACE" }.toSet()
+        var styles = 0
+        for ((type, original) in owners) {
+            for (method in context.mutableClassDefBy(type).methods) {
+                val body = method.implementation?.instructions?.toList() ?: continue
+                val where = "${bundle.name}: $type->${method.name}"
+                assertEquals("$where still reads a default", null, body.firstNotNullOfOrNull(::defaultRead))
+                val wanted = original.methods.single { it.name == method.name && it.parameterTypes.map(CharSequence::toString) == method.parameterTypes.map(CharSequence::toString) &&
+                    it.returnType == method.returnType }.implementation!!.instructions
+                    .filter { defaultRead(it) in DEFAULT_TYPEFACES }.map { (it as OneRegisterInstruction).registerA }
+                val given = body.indices.filter { at ->
+                    (body[at] as? ReferenceInstruction)?.reference?.toString() in getters
+                }.map { at ->
+                    assertEquals("$where: the getter's answer is moved", Opcode.MOVE_RESULT_OBJECT, body[at + 1].opcode)
+                    (body[at + 1] as OneRegisterInstruction).registerA
+                }
+                assertEquals("$where: the registers the reads wrote", wanted, given)
+                styles += body.count { (it as? ReferenceInstruction)?.reference?.toString() == OWN_DEFAULT_FROM_STYLE }
+            }
+        }
+        assertEquals("${bundle.name}: defaultFromStyle calls sent", styleCalls.size, styles)
     }
 
     private fun checkResolver(bundle: File, owner: ClassDef) {

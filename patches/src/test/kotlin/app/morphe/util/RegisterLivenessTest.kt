@@ -501,6 +501,23 @@ class RegisterLivenessTest {
         }
         assertEquals("the handler sees v0 from before the call that threw", listOf(0), caught.writersReaching(4, 0))
         assertEquals(listOf(2), caught.writersReaching(3, 0))
+
+        // The instruction that throws is itself a write of v0, so a walk that took a throwing
+        // write for a write would answer 1 here.
+        val throwingWrite = smali(
+            registers = 2, params = emptyList(),
+            body = """
+                const/4 v0, 0x0
+                const-string v0, "x"
+                return-void
+                invoke-static {v0}, Lcom/example/Log;->note(Ljava/lang/Object;)V
+                return-void
+            """,
+        ).apply {
+            implementation!!.apply { addCatch(newLabelForIndex(1), newLabelForIndex(2), newLabelForIndex(3)) }
+        }
+        assertEquals("the handler sees v0 from before the write that threw", listOf(0), throwingWrite.writersReaching(3, 0))
+        assertEquals("past the write it's the write", listOf(1), throwingWrite.writersReaching(2, 0))
     }
 
     private fun smali(registers: Int, params: List<String>, body: String) = MutableMethod(
