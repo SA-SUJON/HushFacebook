@@ -4,6 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Tooling:** `Hide the Feeds header` refuses a Facebook build with a try block over, or starting or ending at, a spot where one of its hooks goes in, as the hand-over to the filters' controller already did. That covers each answer to whether the tab gets a title row and the branch that gives the posts room for the filters. A try block there could take the hook's call in and hand its handler the registers the hook writes.
 * **Tooling:** `Hide Meta AI questions under posts` refuses a Facebook build with a catch handler over the `stars` name's load that reads the name's register. The hook keeps its answer in that register until the load, so the handler would have found a boolean where it expects the name, and Android would have turned the whole class away.
 * **Tooling:** `Tab bar at the bottom` refuses a Facebook build where anything but the key's load leads into the read of the bar's preference, or anything but that read leads into its ordinal. In a read like `prefs.read(other ? OTHER_KEY : KEY)` the hook would have swapped the other key's answer for the bar's too.
 * **Tooling:** `Keep post dates` now looks for the branch on the post header's choice over the same ways it checks, into a try block's handler only from what can throw. A branch in a handler nothing can reach no longer lets through a Facebook build whose real branch reads something else, which would have been patched with a hook nothing reads.

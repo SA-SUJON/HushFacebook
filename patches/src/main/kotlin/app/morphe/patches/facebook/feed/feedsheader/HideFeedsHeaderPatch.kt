@@ -105,12 +105,24 @@ val hideFeedsHeaderPatch = bytecodePatch(
 
 private fun refuse(detail: String): Nothing = throw PatchException("$PATCH: $detail")
 
+/**
+ * Whether a try block of [method] covers the instruction at [index], or starts or ends there.
+ * Depending on how a hook goes in at [index], one of those can take the hook's calls in, and its
+ * handler would then get the registers the hook writes.
+ */
+private fun tryBlockAt(method: Method, index: Int): Boolean {
+    val implementation = method.implementation!!
+    val address = implementation.instructions.take(index).sumOf { it.codeUnits }
+    return implementation.tryBlocks.any { address in it.startCodeAddress..(it.startCodeAddress + it.codeUnitCount) }
+}
+
 /** The fragment's [NAV_BAR_QUESTION], and where it returns its answer: each return's index and register. */
 internal class NavBarAnswers(val method: Method, val returns: List<Pair<Int, Int>>)
 
 /**
  * Reads the returns of [fragment]'s [NAV_BAR_QUESTION]. Refuses unless the fragment declares it
- * taking nothing and answering a boolean, with code that returns.
+ * taking nothing and answering a boolean, with code that returns, and unless no try block covers
+ * a return or starts or ends at one, since the hook's call goes in at each.
  */
 internal fun navBarAnswers(fragment: ClassDef): NavBarAnswers {
     val method = fragment.methods.singleOrNull { it.name == NAV_BAR_QUESTION && it.parameterTypes.isEmpty() && it.returnType == "Z" }
@@ -118,6 +130,8 @@ internal fun navBarAnswers(fragment: ClassDef): NavBarAnswers {
     val code = method.implementation?.instructions?.toList() ?: refuse("${fragment.type}->$NAV_BAR_QUESTION has no code")
     val returns = code.indices.filter { code[it].opcode == Opcode.RETURN }.map { it to (code[it] as OneRegisterInstruction).registerA }
     if (returns.isEmpty()) refuse("${fragment.type}->$NAV_BAR_QUESTION never returns an answer")
+    val caught = returns.map { it.first }.filter { tryBlockAt(method, it) }
+    if (caught.isNotEmpty()) refuse("${fragment.type}->$NAV_BAR_QUESTION returns at $caught in a try block or at one's edge")
     return NavBarAnswers(method, returns)
 }
 
@@ -223,10 +237,7 @@ internal fun filtersHandOver(fragment: ClassDef): FiltersHandOver {
     // The hook goes in above the new-instance, and dexlib2 keeps a try block's edges on the
     // new-instance itself, so a try block over it or ending at it would take the hook's calls in
     // and hand its handler the registers the hook writes.
-    val address = code.take(index).sumOf { it.codeUnits }
-    if (view.implementation!!.tryBlocks.any { address in it.startCodeAddress..(it.startCodeAddress + it.codeUnitCount) }) {
-        refuse("in $inView the $controllerType's new-instance is in a try block or at one's edge")
-    }
+    if (tryBlockAt(view, index)) refuse("in $inView the $controllerType's new-instance is in a try block or at one's edge")
     return FiltersHandOver(view, index, controller, container, type, constructor)
 }
 
@@ -278,7 +289,8 @@ internal class FiltersRoom(val runnable: ClassDef, val method: Method, val index
  * Reads where the posts get their room for the filters, finding classes by type with [classDefOf].
  * Refuses unless the class of [fragment]'s [CONTAINER_CONTROLLER_FIELD] makes exactly one runnable
  * Redex names [ROOM_RUNNABLE], and unless that runnable's run() reads one boolean field of its own
- * and branches on it with the if-eqz right after, which nothing else leads to.
+ * and branches on it with the if-eqz right after, which nothing else leads to and no try block
+ * covers or starts or ends at.
  */
 internal fun filtersRoom(fragment: ClassDef, classDefOf: (String) -> ClassDef?): FiltersRoom {
     val where = fragment.type
@@ -317,6 +329,9 @@ internal fun filtersRoom(fragment: ClassDef, classDefOf: (String) -> ClassDef?):
     if (into != listOf(index)) {
         refuse("in $inRun the branch on whether the filters show can be reached from $into, not only from its read")
     }
+    // The hook goes in above the branch, and dexlib2 keeps a try block's edges on the branch
+    // itself, so a try block over it or ending at it would take the hook's call in.
+    if (tryBlockAt(run, index + 1)) refuse("in $inRun the branch on whether the filters show is in a try block or at one's edge")
     return FiltersRoom(runnable, run, index, register)
 }
 

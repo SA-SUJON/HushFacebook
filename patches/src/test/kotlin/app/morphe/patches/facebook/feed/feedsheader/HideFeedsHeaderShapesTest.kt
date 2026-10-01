@@ -350,6 +350,31 @@ class HideFeedsHeaderShapesTest {
         assertEquals(Opcode.RETURN, code[6].opcode)
     }
 
+    /**
+     * The hook takes each return's label, a try block's edges with it, so a try block over a
+     * return or starting there would take the hook's call in. Both are refused, and so is one
+     * ending there. One that ends an instruction short still applies.
+     */
+    @Test
+    fun `a try block at or over an answer is refused`() {
+        // In navBar() the answer's call is at 3, its move at 4 and the returns at 5 and 7.
+        fun caught(from: Int, to: Int) = navBar().apply {
+            implementation!!.apply {
+                addCatch("Ljava/lang/Exception;", newLabelForIndex(from), newLabelForIndex(to), newLabelForIndex(6))
+            }
+        }
+        val shapes = mapOf(
+            "a try block over the call and the return" to caught(3, 6),
+            "a try block ending at the return" to caught(3, 5),
+            "a try block starting at the return" to caught(5, 6),
+        )
+        for ((shape, method) in shapes) {
+            val refusal = assertThrows(shape, PatchException::class.java) { navBarAnswers(fragment(navBar = method)) }.message!!
+            assertTrue("$shape: $refusal", "$FEED_FILTERS_FRAGMENT->$NAV_BAR_QUESTION returns at [5] in a try block or at one's edge" in refusal)
+        }
+        assertEquals(listOf(5 to 0, 7 to 0), navBarAnswers(fragment(navBar = caught(3, 4))).returns)
+    }
+
     @Test
     fun `fragments the patch can't follow are refused`() {
         val shapes = mapOf(
@@ -420,17 +445,24 @@ class HideFeedsHeaderShapesTest {
 
     /**
      * The hook goes in between the runnable's read and its branch, so anything else there, or any
-     * other way to the branch, would leave Facebook's answer standing on some path.
+     * other way to the branch, would leave Facebook's answer standing on some path. A try block
+     * over the branch or at its edge could take the hook's call in, though one that ends at the
+     * read still applies.
      */
     @Test
     fun `rooms the patch can't follow are refused`() {
         val second = "Lfixture/SecondTopMargin;"
         val reads = "expected $inRun to read one boolean of its own"
         val branched = "in $inRun the boolean read at 4 isn't branched on right after"
+        val caught = "in $inRun the branch on whether the filters show is in a try block or at one's edge"
         fun withRun(run: Method) = listOf(controllerClass(), topMarginClass(run = run))
-        val handlerAtBranch = run().apply {
-            implementation!!.apply { addCatch("Ljava/lang/Exception;", newLabelForIndex(2), newLabelForIndex(3), newLabelForIndex(5)) }
+        // In run() the read is at 4, the branch at 5 and the way to no room at 9.
+        fun caughtRun(from: Int, to: Int, handler: Int = 9) = run().apply {
+            implementation!!.apply {
+                addCatch("Ljava/lang/Exception;", newLabelForIndex(from), newLabelForIndex(to), newLabelForIndex(handler))
+            }
         }
+        val handlerAtBranch = caughtRun(2, 3, handler = 5)
         val shapes = mapOf(
             "no controller field" to Triple(
                 fragment(fields = mapOf(FILTERS_FIELD to container)), listOf(controllerClass(), topMarginClass()),
@@ -474,6 +506,9 @@ class HideFeedsHeaderShapesTest {
                 "the branch on whether the filters show can be reached from [4, 5], not only from its read",
             ),
             "a handler at the branch" to Triple(fragment(), withRun(handlerAtBranch), "can be reached from [4, 2]"),
+            "a try block over the read and the branch" to Triple(fragment(), withRun(caughtRun(4, 6)), caught),
+            "a try block ending at the branch" to Triple(fragment(), withRun(caughtRun(4, 5)), caught),
+            "a try block starting at the branch" to Triple(fragment(), withRun(caughtRun(5, 6)), caught),
         )
         for ((shape, case) in shapes) {
             val (fragment, classes, reason) = case
@@ -483,6 +518,8 @@ class HideFeedsHeaderShapesTest {
             assertTrue("$shape: $refusal", refusal.startsWith("$PATCH: "))
             assertTrue("$shape: $refusal", reason in refusal)
         }
+        val plain = fragment()
+        assertEquals(4, filtersRoom(plain, pool(plain, *withRun(caughtRun(2, 4)).toTypedArray())).index)
     }
 
     /**
