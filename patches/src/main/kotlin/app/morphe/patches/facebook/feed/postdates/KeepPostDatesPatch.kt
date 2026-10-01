@@ -16,6 +16,7 @@ import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
+import app.morphe.util.literalReads
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
@@ -96,7 +97,7 @@ private fun stringOf(instruction: Instruction): String? =
  * Reads the choice out of [method], which loads [CYCLING_LOG] and [CYCLING_COUNT_LOG]. Refuses
  * unless the log's name is loaded once, right after a call's boolean answer and right before
  * String.valueOf of that same register (a plain call while the register fits in four bits, a range
- * call past them), and unless an if-eqz on that register follows: the branch between the rotating
+ * call past them), and unless an if-eqz reads that same answer: the branch between the rotating
  * subtitle and the one line.
  */
 internal fun cyclingChoice(method: Method): CyclingChoice {
@@ -118,10 +119,17 @@ internal fun cyclingChoice(method: Method): CyclingChoice {
     if (!writesTheAnswer || (written as ReferenceInstruction).reference.toString() != VALUE_OF_BOOLEAN) {
         refuse("the log of \"$CYCLING_LOG\" in $where doesn't write v$register")
     }
-    val branches = code.drop(index + 1).any {
-        it.opcode == Opcode.IF_EQZ && (it as OneRegisterInstruction).registerA == register
+    // The branch has to read this answer. An if-eqz on the same register after something wrote it
+    // again tests another value (577 reuses v12 as an iterator further on), and a hook there would
+    // only change what the log says.
+    fun branchesOn(instruction: Instruction) =
+        instruction.opcode == Opcode.IF_EQZ && (instruction as OneRegisterInstruction).registerA == register
+    if (method.literalReads(index - 1).none { branchesOn(code[it]) }) {
+        if (code.drop(index + 1).any(::branchesOn)) {
+            refuse("v$register is written again in $where before the branch on it after the log of \"$CYCLING_LOG\"")
+        }
+        refuse("nothing in $where branches on v$register after the log of \"$CYCLING_LOG\"")
     }
-    if (!branches) refuse("nothing in $where branches on v$register after the log of \"$CYCLING_LOG\"")
     return CyclingChoice(method, index, register)
 }
 

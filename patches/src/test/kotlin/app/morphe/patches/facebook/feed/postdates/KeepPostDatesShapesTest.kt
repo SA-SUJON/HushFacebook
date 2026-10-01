@@ -104,6 +104,8 @@ class KeepPostDatesShapesTest {
             "the log writing an int" to
                 (header(written = "invoke-static/range { v17 .. v17 }, Ljava/lang/String;->valueOf(I)Ljava/lang/String;") to wrongWrite),
             "a branch on another register" to (header(branch = "if-eqz v5, :one_line") to "branches on v17"),
+            "the answer's register written again before the branch" to
+                (header(secondLog = "const/16 v17, 0x1") to "v17 is written again"),
             "the name loaded twice" to
                 (header(secondLog = "const-string v4, \"$CYCLING_LOG\"") to "expected one load of \"$CYCLING_LOG\""),
         )
