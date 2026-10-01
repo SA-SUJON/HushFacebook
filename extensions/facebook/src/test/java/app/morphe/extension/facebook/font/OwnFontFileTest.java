@@ -35,7 +35,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Arrays;
 
-import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.settings.HushfacebookPause;
@@ -242,8 +241,7 @@ public class OwnFontFileTest {
      * One of Android's text views Facebook builds takes the picked file when it has no typeface, or
      * one of the phone's sans-serif typefaces from its layout: a style, "sans-serif-medium" or a
      * text weight. One with another typeface keeps it. With no file picked, the switch off or
-     * Hushfacebook paused, every view keeps what Android gave it. The phone's emoji go on getting
-     * Android's own default, whatever is picked.
+     * Hushfacebook paused, every view keeps what Android gave it.
      */
     @Test
     public void textViewsFacebookBuildsTakeThePickedFont() throws Exception {
@@ -271,6 +269,10 @@ public class OwnFontFileTest {
         weighted.setTypeface(Typeface.create(Typeface.DEFAULT, 600, false));
         OwnFont.textView(weighted);
         assertSame("a layout's text weight", OwnFont.typeface(600, false), weighted.getTypeface());
+        TextView namedWeight = new TextView(app);
+        namedWeight.setTypeface(Typeface.create(medium, 600, false));
+        OwnFont.textView(namedWeight);
+        assertSame("a layout's text weight on sans-serif-medium", OwnFont.typeface(600, false), namedWeight.getTypeface());
 
         Typeface mono = Typeface.create("sans-serif-monospace", Typeface.NORMAL);
         for (Typeface other : new Typeface[]{Typeface.SERIF, mono, Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)}) {
@@ -282,13 +284,6 @@ public class OwnFontFileTest {
         OwnFont.inflated(new View(app));
         OwnFont.textView(null);
         OwnFont.inflated(null);
-
-        Settings.USE_SYSTEM_EMOJI.save(true);
-        try {
-            assertSame("the emoji keep Android's default", Typeface.DEFAULT, SystemEmoji.typeface());
-        } finally {
-            Settings.USE_SYSTEM_EMOJI.resetToDefault();
-        }
 
         Settings.USE_SYSTEM_FONT.save(false);
         TextView off = new TextView(app);

@@ -41,8 +41,6 @@ internal const val REPLACE_PHONE_FONT = "$OWN_FONT->replacePhoneFont($TYPEFACE)$
 internal const val OWN_DEFAULT_FROM_STYLE = "$OWN_FONT->defaultFromStyle(I)$TYPEFACE"
 internal const val OWN_TEXT_VIEW = "$OWN_FONT->textView($TEXT_VIEW)V"
 internal const val OWN_INFLATED = "$OWN_FONT->inflated($VIEW)V"
-private const val TEXT_VIEW_BUILT = "invoke-static/range { v%d .. v%d }, $OWN_TEXT_VIEW"
-private const val VIEW_INFLATED = "invoke-static/range { v%d .. v%d }, $OWN_INFLATED"
 
 /**
  * Facebook draws its interface in Meta's Optimistic family, handed out by one typeface
@@ -175,17 +173,24 @@ internal fun BytecodePatchContext.hookTextViews(): Int {
 internal fun MutableMethod.sendTextViews(): Int {
     val instructions = (implementation ?: return 0).instructions.toList()
     val sites = instructions.withIndex().mapNotNull { (index, instruction) ->
-        builtTextView(instruction)?.let { register -> index to TEXT_VIEW_BUILT.format(register, register) }
+        builtTextView(instruction)?.let { register -> index to handOver(register, OWN_TEXT_VIEW) }
             ?: instructions.getOrNull(index + 1)
                 ?.takeIf { makesView(instruction) && it.opcode == Opcode.MOVE_RESULT_OBJECT }
                 ?.let { move ->
                     val register = (move as OneRegisterInstruction).registerA
-                    index + 1 to VIEW_INFLATED.format(register, register)
+                    index + 1 to handOver(register, OWN_INFLATED)
                 }
     }
     sites.asReversed().forEach { (after, call) -> addInstruction(after + 1, call) }
     return sites.size
 }
+
+/**
+ * The call handing [register] to [extension], by range so any register fits. The register is
+ * written into the code as plain digits: a format's would be the phone's own, which aren't always
+ * ASCII, and the assembler takes only those.
+ */
+private fun handOver(register: Int, extension: String) = "invoke-static/range { v$register .. v$register }, $extension"
 
 /**
  * Facebook's Roboto builder, which its text engine asks for text that names none of Meta's fonts

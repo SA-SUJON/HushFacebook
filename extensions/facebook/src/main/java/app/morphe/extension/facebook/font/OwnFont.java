@@ -115,8 +115,8 @@ public final class OwnFont {
     @Nullable
     private static volatile Set<Typeface> phoneTypefaces;
 
-    /** Whether {@link #askedEarly} has logged already. */
-    private static volatile boolean askedEarly;
+    /** The roads {@link #ready} has logged an ask before the settings loaded on. */
+    private static final Set<String> ASKED_EARLY = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /** The picked font as last read, or null before the first read and after a change. */
     @Nullable
@@ -144,7 +144,7 @@ public final class OwnFont {
         try {
             HookStatus.invoked(FamilyNames.SYSTEM_FONT);
             if (original == null || family == null || !isInterfaceFamily(family.name())) return original;
-            if (!Utils.settingsReady() || !Settings.USE_SYSTEM_FONT.get()) return original;
+            if (!ready(REPOSITORY) || !Settings.USE_SYSTEM_FONT.get()) return original;
             HookStatus.bound(FamilyNames.SYSTEM_FONT, REPOSITORY);
             return typeface(Math.max(weight, original.getWeight()), original.isItalic());
         } catch (Throwable failure) {
@@ -172,7 +172,7 @@ public final class OwnFont {
         try {
             HookStatus.invoked(FamilyNames.SYSTEM_FONT);
             if (built == null) return null;
-            if (!Utils.settingsReady() || !Settings.USE_SYSTEM_FONT.get()) return built;
+            if (!ready(BUILDER) || !Settings.USE_SYSTEM_FONT.get()) return built;
             String settings = builder == null ? null : VARIATIONS.get(builder);
             HookStatus.bound(FamilyNames.SYSTEM_FONT, BUILDER);
             return typeface(weightOf(settings, built.getWeight()), italicOf(settings, built.isItalic()));
@@ -195,7 +195,7 @@ public final class OwnFont {
             if (answer == null || family == null) return answer;
             int named = reactNativeFamily(family);
             if (named < 0) return answer;
-            if (!Utils.settingsReady() || !Settings.USE_SYSTEM_FONT.get()) return answer;
+            if (!ready(REACT_NATIVE) || !Settings.USE_SYSTEM_FONT.get()) return answer;
             HookStatus.bound(FamilyNames.SYSTEM_FONT, REACT_NATIVE);
             return typeface(Math.max(named, answer.getWeight()), answer.isItalic());
         } catch (Throwable failure) {
@@ -296,8 +296,9 @@ public final class OwnFont {
 
     /**
      * Whether Android hands out [typeface] for the phone's sans-serif: none at all, the defaults,
-     * defaultFromStyle's four, and "sans-serif" and each of its named weights in each style, which
-     * is what a text view's layout gets for a style or one of those families. Compared by identity,
+     * defaultFromStyle's four, and "sans-serif" and each of its named weights in each style and at
+     * each text weight, which is what a text view's layout gets for a style, one of those families
+     * or a text weight. Compared by identity,
      * since Android keeps one typeface of each and hands the same one out every time.
      */
     static boolean isPhoneTypeface(@Nullable Typeface typeface) {
@@ -311,13 +312,17 @@ public final class OwnFont {
             for (int style = Typeface.NORMAL; style <= Typeface.BOLD_ITALIC; style++) {
                 built.add(Typeface.defaultFromStyle(style));
             }
+            // A layout's text weight is a weight of its family, or of the default with none.
             for (String name : PHONE_SANS) {
                 Typeface base = Typeface.create(name, Typeface.NORMAL);
                 for (int style = Typeface.NORMAL; style <= Typeface.BOLD_ITALIC; style++) {
                     built.add(Typeface.create(base, style));
                 }
+                for (int weight = 100; weight <= 900; weight += 100) {
+                    built.add(Typeface.create(base, weight, false));
+                    built.add(Typeface.create(base, weight, true));
+                }
             }
-            // A layout's text weight with no family is a weight of the default.
             for (int weight = 100; weight <= 900; weight += 100) {
                 built.add(Typeface.create(Typeface.DEFAULT, weight, false));
                 built.add(Typeface.create(Typeface.DEFAULT, weight, true));
@@ -333,8 +338,9 @@ public final class OwnFont {
      * While a font file is picked, a view with none or with one of the phone's sans-serif
      * typefaces takes the file at that weight and slant. Android draws a view with none in the
      * phone's default, in its own code, so this is the one place to reach it. A view with any other
-     * typeface keeps it, and a view of Facebook's own sets its typeface after this, so that still
-     * wins. Called right after the view's constructor, on whichever thread built it.
+     * typeface keeps it. Called right after Android's constructor, on whichever thread built the
+     * view: for a view of Facebook's own that's its super call, so a typeface its constructor sets
+     * afterwards still wins, and for a view an inflater made it's after the whole constructor.
      */
     public static void textView(@Nullable TextView view) {
         if (view == null) return;
@@ -358,14 +364,15 @@ public final class OwnFont {
     }
 
     /**
-     * Logs, once, that Facebook asked for a typeface through [road] before the settings could be
-     * read, so it got Android's. Facebook keeps some it gets while a class loads, and one kept that
-     * early would never take the picked file. The context comes at the start of the application's
-     * onCreate, and Facebook's text classes load after it.
+     * Whether the settings can be read yet. When they can't, the typeface Facebook asked for through
+     * [road] stays what it got, and the first such ask on each road is logged with the class that
+     * made it. Facebook keeps some typefaces it gets while a class loads, and one kept that early
+     * would never take the switch or the picked file. The context comes at the start of the
+     * application's onCreate, and Facebook's text classes load after it.
      */
-    private static void askedEarly(String road) {
-        if (askedEarly) return;
-        askedEarly = true;
+    private static boolean ready(String road) {
+        if (Utils.settingsReady()) return true;
+        if (!ASKED_EARLY.add(road)) return false;
         String caller = "";
         for (StackTraceElement frame : new Throwable().getStackTrace()) {
             if (!frame.getClassName().equals(OwnFont.class.getName())) {
@@ -375,7 +382,8 @@ public final class OwnFont {
         }
         String from = caller;
         Logger.printInfo(() -> "A typeface was asked for through the " + road + " before the settings loaded, by "
-                + from + ", so it stays Android's");
+                + from + ", so it stays as it came");
+        return false;
     }
 
     /**
@@ -386,11 +394,7 @@ public final class OwnFont {
         try {
             HookStatus.invoked(FamilyNames.SYSTEM_FONT);
             if (answer == null) return null;
-            if (!Utils.settingsReady()) {
-                askedEarly(road);
-                return answer;
-            }
-            if (!Settings.USE_SYSTEM_FONT.get()) return answer;
+            if (!ready(road) || !Settings.USE_SYSTEM_FONT.get()) return answer;
             HookStatus.bound(FamilyNames.SYSTEM_FONT, road);
             Picked font = picked();
             Typeface styled = font == null ? null : font.styled(clamped(answer.getWeight()), answer.isItalic());

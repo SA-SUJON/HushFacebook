@@ -6,9 +6,11 @@ package app.morphe.patches.facebook.font
 
 import app.morphe.Fixtures
 import app.morphe.PatchContexts
+import app.morphe.patches.facebook.emoji.isEmojiTypefaceProvider
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.shared.compat.AppCompatibilities
+import app.morphe.util.literalReads
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
@@ -32,6 +34,7 @@ import java.io.File
  */
 class OwnFontFixtureTest {
     private val TEXT_PAINT = "Landroid/text/TextPaint;"
+    private val OBJECT_TYPE = "Ljava/lang/Object;"
 
     /** The families the switch swaps. OwnFontTest holds the extension to the same twelve. */
     private val metaFamilies = sortedSetOf(
@@ -136,6 +139,126 @@ class OwnFontFixtureTest {
             assertEquals("${bundle.name}: $call calls sent", reads.count { it == call }, sent[call])
         }
         assertEquals("${bundle.name}: defaultFromStyle calls sent", styleCalls.size, sent[DEFAULT_FROM_STYLE])
+    }
+
+    /**
+     * Every check each declared build makes of whether a typeface is one of Android's defaults,
+     * found by its shape alone: an if-eq or if-ne, an equals call, or Kotlin's areEqual, a static
+     * call on two objects answering a boolean. A read of the default nothing but checks use is
+     * still a read of Android's own field after the rewrite, so each of those checks still asks
+     * about Android's typeface. Litho's text paint and the post text's check (580 `LX/3qU;->A00`,
+     * `LX/302;->A0k`) are among them. A read that's also set on a paint goes to the extension, and
+     * its check compares the very typeface it then sets, as AppCompat's switch does to see whether
+     * its paint has that one already.
+     */
+    @Test
+    fun `every check of whether a typeface is Android's default still asks about Android's`() = bundles { bundle ->
+        fun isCheck(instruction: Instruction): Boolean = when (instruction.opcode) {
+            Opcode.IF_EQ, Opcode.IF_NE -> true
+            Opcode.INVOKE_VIRTUAL, Opcode.INVOKE_VIRTUAL_RANGE ->
+                (instruction as ReferenceInstruction).reference.toString() == "Ljava/lang/Object;->equals(Ljava/lang/Object;)Z"
+            Opcode.INVOKE_STATIC, Opcode.INVOKE_STATIC_RANGE ->
+                ((instruction as ReferenceInstruction).reference as MethodReference).let { call ->
+                    call.returnType == "Z" && call.parameterTypes.map(CharSequence::toString) == listOf(OBJECT_TYPE, OBJECT_TYPE)
+                }
+            else -> false
+        }
+        fun checked(method: Method, only: Boolean): List<Int> {
+            val code = method.implementation!!.instructions.toList()
+            return code.indices.filter { at ->
+                defaultRead(code[at]) in DEFAULT_TYPEFACES && method.literalReads(at).let { uses ->
+                    uses.any { isCheck(code[it]) } && (!only || uses.all { isCheck(code[it]) })
+                }
+            }
+        }
+        val checkers = FixtureDex.methodsWhere(bundle, { true }) { method ->
+            method.implementation?.instructions?.any { defaultRead(it) in DEFAULT_TYPEFACES } == true
+        }.filter { checked(it, only = false).isNotEmpty() }
+        var throughKotlin = 0
+        var onlyChecked = 0
+        for (method in checkers) {
+            val code = method.implementation!!.instructions.toList()
+            for (at in checked(method, only = true)) {
+                onlyChecked++
+                if (method.literalReads(at).any { code[it].opcode == Opcode.INVOKE_STATIC || code[it].opcode == Opcode.INVOKE_STATIC_RANGE }) throughKotlin++
+            }
+        }
+        assertTrue("${bundle.name}: $onlyChecked reads only checked", onlyChecked >= 5)
+        assertTrue("${bundle.name}: no check goes through Kotlin's areEqual", throughKotlin >= 1)
+        assertTrue("${bundle.name}: Litho's text paint isn't among them", checkers.any { it.returnType == TEXT_PAINT })
+
+        val owners = FixtureDex.classes(bundle, checkers.map { it.definingClass }.toSet())
+        val context = PatchContexts.of(owners.values)
+        context.hookDefaultTypefaces()
+        for (method in checkers) {
+            val after = context.mutableClassDefBy(method.definingClass).methods.single {
+                it.name == method.name && it.returnType == method.returnType &&
+                    it.parameterTypes.map(CharSequence::toString) == method.parameterTypes.map(CharSequence::toString)
+            }
+            val code = method.implementation!!.instructions.toList()
+            val body = after.implementation!!.instructions.toList()
+            val left = body.indices.filter { defaultRead(body[it]) in DEFAULT_TYPEFACES }
+            val where = "${bundle.name}: ${method.definingClass}->${method.name}"
+            assertEquals("$where: the reads left are the ones only checked", checked(method, only = true).map { defaultRead(code[it]) },
+                left.map { defaultRead(body[it]) })
+            for (at in left) assertTrue("$where: the read left at $at is used by nothing but checks", after.literalReads(at).all { isCheck(body[it]) })
+        }
+    }
+
+    /**
+     * Use the system emoji's typeface: each declared build's emoji typeface provider hands its
+     * answer to Facebook's emoji spans and drawings, which set it on a paint themselves, and to the
+     * quick emoji picker's holder. On the way it goes through nothing the font rewrite sends to the
+     * extension, and the rewrite changes nothing in those spans and drawings, so the phone's emoji
+     * draw as they did whatever font file is picked.
+     */
+    @Test
+    fun `the emoji typeface reaches its paints with nothing of the font rewrite's in the way`() = bundles { bundle ->
+        val provider = FixtureDex.methodsWhere(bundle, { true }, ::isEmojiTypefaceProvider).single()
+        val asked = "${provider.definingClass}->${provider.name}()$TYPEFACE"
+        fun holds(method: Method, reference: String) =
+            method.implementation?.instructions?.any { (it as? ReferenceInstruction)?.reference?.toString() == reference } == true
+        val consumers = sortedSetOf<String>()
+        val holders = sortedSetOf<String>()
+        fun follow(method: Method, at: Int, what: String) {
+            val code = method.implementation!!.instructions.toList()
+            for (use in method.literalReads(at)) {
+                val reference = (code[use] as? ReferenceInstruction)?.reference
+                assertTrue("${bundle.name}: ${method.definingClass}->${method.name}: $what goes through $reference",
+                    defaultRead(code[use]) == null && !reference.toString().startsWith("$TYPEFACE->"))
+                if (reference is MethodReference && reference.name == "<init>") consumers += reference.definingClass
+                if (code[use].opcode == Opcode.SPUT_OBJECT) holders += reference.toString()
+            }
+        }
+        for (caller in FixtureDex.methodsWhere(bundle, { true }) { holds(it, asked) }) {
+            val code = caller.implementation!!.instructions.toList()
+            for (at in code.indices.filter { (code[it] as? ReferenceInstruction)?.reference?.toString() == asked }) {
+                assertEquals("${bundle.name}: the answer is moved", Opcode.MOVE_RESULT_OBJECT, code[at + 1].opcode)
+                follow(caller, at + 1, "the provider's answer")
+            }
+        }
+        assertTrue("${bundle.name}: the answer reaches ${consumers.size} spans and drawings", consumers.size >= 3)
+        assertTrue("${bundle.name}: the quick picker's holder", holders.isNotEmpty())
+        for (holder in holders) {
+            val get = FixtureDex.methodsWhere(bundle, { true }) { holds(it, holder) }
+            for (reader in get) {
+                val code = reader.implementation!!.instructions.toList()
+                code.indices.filter { code[it].opcode == Opcode.SGET_OBJECT && (code[it] as ReferenceInstruction).reference.toString() == holder }
+                    .forEach { follow(reader, it, "the held emoji typeface") }
+            }
+        }
+
+        val owners = FixtureDex.classes(bundle, consumers)
+        val context = PatchContexts.of(owners.values)
+        for ((type, consumer) in owners) {
+            assertTrue("${bundle.name}: $type sets a typeface on a paint", consumer.methods.any {
+                holds(it, "Landroid/graphics/Paint;->setTypeface($TYPEFACE)$TYPEFACE")
+            })
+            for (method in context.mutableClassDefBy(type).methods) {
+                assertEquals("${bundle.name}: $type->${method.name}: default reads sent", 0, method.sendDefaultReads())
+                assertEquals("${bundle.name}: $type->${method.name}: text views sent", 0, method.sendTextViews())
+            }
+        }
     }
 
     /**

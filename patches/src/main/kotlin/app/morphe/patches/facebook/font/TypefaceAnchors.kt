@@ -93,9 +93,13 @@ internal fun ownCall(call: String): String = call.replaceFirst("$TYPEFACE->", "$
 
 /**
  * Whether every use of the typeface the field read at [index] loads is a comparison with another
- * typeface: an if-eq or if-ne, or an equals call it's handed to. Litho's text sets a typeface on
- * its paint only when it isn't Typeface.DEFAULT (580 `LX/3qU;->A00`), so with both sides of that
- * check the picked font, plain text would never get it. A read nothing uses isn't one.
+ * typeface: an if-eq or if-ne, an equals call it's handed to, or Kotlin's areEqual, a static call
+ * on two objects answering a boolean under whatever name R8 gave it. Each such check asks whether
+ * a typeface is Android's own default, and keeps asking that. Litho's text sets a typeface on its
+ * paint only when it isn't Typeface.DEFAULT (580 `LX/3qU;->A00`), so with both sides of that
+ * check the picked font, plain text would never get it. The post text takes its own default
+ * branch only for Typeface.DEFAULT itself (580 `LX/302;->A0k`), and on the other one it sets the
+ * typeface it holds, which can be Android's from a caller. A read nothing uses isn't one.
  */
 internal fun Method.onlyCompared(index: Int): Boolean {
     val code = implementation!!.instructions.toList()
@@ -104,7 +108,10 @@ internal fun Method.onlyCompared(index: Int): Boolean {
         when (code[at].opcode) {
             Opcode.IF_EQ, Opcode.IF_NE -> true
             else -> ((code[at] as? ReferenceInstruction)?.reference as? MethodReference)?.let { call ->
-                call.name == "equals" && call.returnType == "Z" && call.parameterTypes.all { it.toString() == OBJECT }
+                call.returnType == "Z" && call.parameterTypes.all { it.toString() == OBJECT } && when (code[at].opcode) {
+                    Opcode.INVOKE_STATIC, Opcode.INVOKE_STATIC_RANGE -> call.parameterTypes.size == 2
+                    else -> call.name == "equals"
+                }
             } == true
         }
     }

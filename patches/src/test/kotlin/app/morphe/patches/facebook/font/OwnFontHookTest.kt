@@ -33,6 +33,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.Locale
 
 /**
  * What the font swap's return hooks read and borrow at each object return: the resolver reads the
@@ -496,6 +497,37 @@ class OwnFontHookTest {
     }
 
     /**
+     * Kotlin's areEqual, a static call on two objects answering a boolean under whatever name R8
+     * gave it, is a check too: the post text asks it whether its typeface is Typeface.DEFAULT. A
+     * static call taking a typeface along with something else isn't one, so a read handed to it is
+     * sent.
+     */
+    @Test
+    fun `a default read only handed to Kotlin's areEqual stays Android's`() {
+        val type = "Lfixture/PostText;"
+        val method = staticMethod(
+            type, registers = 3, params = listOf(TYPEFACE),
+            body = """
+                sget-object v0, $TYPEFACE->DEFAULT:$TYPEFACE
+                invoke-static { p0, v0 }, LX/0bL;->areEqual(Ljava/lang/Object;Ljava/lang/Object;)Z
+                move-result v1
+                if-eqz v1, :other
+                sget-object v0, $TYPEFACE->DEFAULT:$TYPEFACE
+                invoke-static { v0, p0 }, LX/GMb;->A0V(${TYPEFACE}Ljava/lang/Object;)Z
+                move-result v1
+                :other
+                return-object p0
+            """,
+        )
+        assertEquals(listOf(true, false), listOf(0, 4).map(method::onlyCompared))
+        val context = PatchContexts.of(listOf(robotoClass(type, method)))
+        assertEquals("the read handed to the builder", 1, context.hookDefaultTypefaces())
+        val body = context.mutableClassDefBy(type).methods.single().implementation!!.instructions.toList()
+        assertEquals(listOf("$TYPEFACE->DEFAULT:$TYPEFACE"), body.mapNotNull(::defaultRead))
+        assertEquals("the check's read is still first", "$TYPEFACE->DEFAULT:$TYPEFACE", defaultRead(body[0]))
+    }
+
+    /**
      * Each Typeface.create Facebook makes goes to the extension's create of the same arguments, on
      * the same registers in the same form: by family name, plain and range, from a typeface at a
      * style, and at a weight.
@@ -679,6 +711,28 @@ class OwnFontHookTest {
         assertEquals(2, context.mutableClassDefBy(compat).methods.single().implementation!!.instructions.count())
         assertTrue("the extension's views were sent", context.mutableClassDefBy(extension).methods.single().implementation!!
             .instructions.none { reference(it)?.startsWith(OWN_FONT) == true })
+    }
+
+    /**
+     * Morphe Manager patches on the phone, in the phone's language. On one whose language writes
+     * numbers in digits of its own, like Egyptian Arabic, the hooks still name their registers in
+     * the digits the assembler reads, so they go in.
+     */
+    @Test
+    fun `the text view hooks go in on a phone whose language writes other digits`() {
+        val rowsType = "Lfixture/Rows;"
+        val was = Locale.getDefault()
+        Locale.setDefault(Locale.forLanguageTag("ar-EG"))
+        try {
+            assertEquals("the language writes digits of its own", "\u0661\u0662", "%d".format(12))
+            val context = PatchContexts.of(listOf(robotoClass(rowsType, rows(rowsType))))
+            assertEquals("the Button, the EditText and the inflated view", 3, context.hookTextViews())
+            val body = context.mutableClassDefBy(rowsType).methods.single().implementation!!.instructions.toList()
+            assertEquals(listOf(0, 4, 0), body.filter { reference(it)?.startsWith(OWN_FONT) == true }
+                .map { (it as RegisterRangeInstruction).startRegister })
+        } finally {
+            Locale.setDefault(was)
+        }
     }
 
     /** A build where nothing outside the extension builds one of Android's text views stops the patch. */
