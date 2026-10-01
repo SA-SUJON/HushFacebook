@@ -29,8 +29,36 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import java.util.WeakHashMap
 
 internal const val PATCH = "Hold a reel for 2x"
+
+/**
+ * What [reelLiftGuardPatch] found in each patching run, for Hold a reel for 2x, which runs after it
+ * and can't find the release listeners again once their flags are hooked.
+ */
+private val foundAnchors = WeakHashMap<BytecodePatchContext, ReelHoldAnchors>()
+
+/**
+ * The hooks Hold a reel for 2x and Keep the reel speed share, put in once whichever is picked: every
+ * touch on a Facebook screen, each long-press handler's speed-up path, the release listeners' two
+ * flags, and FbGrootPlayer's speed setter, with the extension's speed getter stub filled. On the
+ * accounts Facebook gives its own hold, the release listener sits on every reel, hears every lift
+ * and puts back the speed the reel was drawn at, so without these a tap took a reel picked at 1.5x
+ * back to normal speed (issue #25). The extension's ReelHold says what each answers.
+ *
+ * Declared before Hold a reel for 2x, whose dependsOn would otherwise read it as null while this
+ * file initializes.
+ */
+internal val reelLiftGuardPatch = bytecodePatch {
+    dependsOn(settingsPatch)
+
+    execute {
+        val anchors = findReelHoldAnchors()
+        synchronized(foundAnchors) { foundAnchors[this] = anchors }
+        applyReelLiftGuard(anchors)
+    }
+}
 
 /**
  * A reel you hold plays at double speed until you let go, through the speed-up Facebook's Reels
@@ -48,6 +76,9 @@ internal const val PATCH = "Hold a reel for 2x"
  *
  * Off in the default selection: while its switch is on, a hold on a reel speeds it up instead of
  * opening Facebook's long-press menu, which is a choice to make. Picked, its switch starts on.
+ *
+ * The touch dispatch, the speed-up paths, the release listeners' flags and the speed setter come
+ * from [reelLiftGuardPatch], which Keep the reel speed brings too; this patch adds the rest.
  */
 @Suppress("unused")
 val holdReelFor2xPatch = bytecodePatch(
@@ -58,12 +89,13 @@ val holdReelFor2xPatch = bytecodePatch(
     default = false,
 ) {
     category("Interface")
-    dependsOn(settingsPatch)
+    dependsOn(settingsPatch, reelLiftGuardPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {
-        // Every anchor is found, and every flag call's answer checked, before anything changes.
-        val anchors = findReelHoldAnchors()
+        // The guard found every anchor, and checked every flag call's answer, before anything changed.
+        val anchors = synchronized(foundAnchors) { foundAnchors[this] }
+            ?: refuse("the release guard it depends on didn't run first")
         applyReelHoldAnchors(anchors)
         enableStatus("reelHold")
     }
@@ -182,36 +214,12 @@ internal fun BytecodePatchContext.findReelHoldAnchors(): ReelHoldAnchors {
 /**
  * After each flag call's move-result, the extension's answer in its place, in the same register,
  * which the range form names whatever its number; the branch that follows reads it as Facebook's.
- * Before each of the edge check's returns, the same, and before each of the hold speed's, for its
- * register pair. Straight after each handler's "speed_up" load, which falls through to it, a call
- * naming no register. First in the touch dispatch, the event, which the extension only reads, and
- * first in the speed setter, the player and the speed, with the extension's answer in the speed's
- * parameter register. The extension's playerSpeed stub is filled with the player's speed getter.
+ * Here for the long-press handlers' and the overlay's flags, and before each of the edge check's
+ * returns, the same, and before each of the hold speed's, for its register pair. The release
+ * listeners' flags and the rest are [applyReelLiftGuard]'s.
  */
 internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors) {
-    // Found before anything changes, like every anchor.
-    val player = anchors.speedGetter.definingClass
-    val stub = mutableClassDefBy(REEL_HOLD).methods.singleOrNull {
-        it.name == PLAYER_SPEED_STUB && it.returnType == "F" && AccessFlags.STATIC.isSet(it.accessFlags) &&
-            it.parameterTypes.map(CharSequence::toString) == listOf("Ljava/lang/Object;")
-    } ?: refuse("$REEL_HOLD has no static F $PLAYER_SPEED_STUB(Ljava/lang/Object;)")
-    for (plan in anchors.plans) {
-        val mutable = mutableClassDefBy(plan.method.definingClass).findMutableMethodOf(plan.method)
-        plan.calls.sortedDescending().forEach { call ->
-            val register = mutable.getInstruction<OneRegisterInstruction>(call + 1).registerA
-            mutable.addInstructions(
-                call + 2,
-                """
-                    invoke-static/range { v$register .. v$register }, ${plan.hook}
-                    move-result v$register
-                """,
-            )
-        }
-    }
-    for (path in anchors.speedUpPaths) {
-        val mutable = mutableClassDefBy(path.definingClass).findMutableMethodOf(path)
-        mutable.addInstruction(speedUpLoads(mutable).single() + 1, "invoke-static {}, $HELD")
-    }
+    for (plan in anchors.plans.filter { it.hook != RELEASE }) hookAnswers(plan)
     val edge = mutableClassDefBy(anchors.edgeCheck.definingClass).findMutableMethodOf(anchors.edgeCheck)
     edge.implementation!!.instructions.withIndex().filter { it.value.opcode == Opcode.RETURN }.map { it.index }
         .asReversed().forEach { index ->
@@ -236,13 +244,28 @@ internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors)
                 """,
             )
         }
-    mutableClassDefBy(anchors.setter.definingClass).findMutableMethodOf(anchors.setter).addInstructions(
-        0,
-        """
-            invoke-static/range { p0 .. p1 }, $SPEED_SET
-            move-result p1
-        """,
-    )
+}
+
+/**
+ * The release listeners' flag answers through the extension, as [applyReelHoldAnchors] hooks the
+ * others. Straight after each handler's "speed_up" load, which falls through to it, a call naming no
+ * register. First in the touch dispatch, the event, which the extension only reads, and first in the
+ * speed setter, the player and the speed, with the extension's answer in the speed's parameter
+ * register. The extension's playerSpeed stub is filled with the player's speed getter.
+ */
+internal fun BytecodePatchContext.applyReelLiftGuard(anchors: ReelHoldAnchors) {
+    // Found before anything changes, like every anchor.
+    val player = anchors.speedGetter.definingClass
+    val stub = mutableClassDefBy(REEL_HOLD).methods.singleOrNull {
+        it.name == PLAYER_SPEED_STUB && it.returnType == "F" && AccessFlags.STATIC.isSet(it.accessFlags) &&
+            it.parameterTypes.map(CharSequence::toString) == listOf("Ljava/lang/Object;")
+    } ?: refuse("$REEL_HOLD has no static F $PLAYER_SPEED_STUB(Ljava/lang/Object;)")
+    for (plan in anchors.plans.filter { it.hook == RELEASE }) hookAnswers(plan)
+    for (path in anchors.speedUpPaths) {
+        val mutable = mutableClassDefBy(path.definingClass).findMutableMethodOf(path)
+        mutable.addInstruction(speedUpLoads(mutable).single() + 1, "invoke-static {}, $HELD")
+    }
+    hookSpeedSetter(anchors.setter)
     stub.addInstructions(
         0,
         """
@@ -255,4 +278,33 @@ internal fun BytecodePatchContext.applyReelHoldAnchors(anchors: ReelHoldAnchors)
     val dispatch = mutableClassDefBy(FRAGMENT_ACTIVITY).findMutableMethodOf(anchors.dispatch)
     val event = dispatch.parameterRegister(0)
     dispatch.addInstruction(0, "invoke-static/range { $event .. $event }, $TOUCH")
+}
+
+/**
+ * First in FbGrootPlayer's speed setter, the player and the speed, going on with the speed the
+ * extension answers in the speed's parameter register. Keep the reel speed's own hook goes after it.
+ */
+internal fun BytecodePatchContext.hookSpeedSetter(setter: Method) {
+    mutableClassDefBy(setter.definingClass).findMutableMethodOf(setter).addInstructions(
+        0,
+        """
+            invoke-static/range { p0 .. p1 }, $SPEED_SET
+            move-result p1
+        """,
+    )
+}
+
+/** [plan]'s flag answers through its hook, each in its own register, last call first so the indices hold. */
+private fun BytecodePatchContext.hookAnswers(plan: FlagPlan) {
+    val mutable = mutableClassDefBy(plan.method.definingClass).findMutableMethodOf(plan.method)
+    plan.calls.sortedDescending().forEach { call ->
+        val register = mutable.getInstruction<OneRegisterInstruction>(call + 1).registerA
+        mutable.addInstructions(
+            call + 2,
+            """
+                invoke-static/range { v$register .. v$register }, ${plan.hook}
+                move-result v$register
+            """,
+        )
+    }
 }

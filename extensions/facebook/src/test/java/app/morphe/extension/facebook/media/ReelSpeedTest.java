@@ -170,6 +170,12 @@ public class ReelSpeedTest {
         ReelSpeed.picked(speed);
     }
 
+    /** A pick in the gear menu's sheet as Facebook makes it: the speed set on the player, with no toast after it. */
+    private static void gearPick(Object player, float speed) {
+        ReelSpeed.speedSet(player, speed);
+        ReelSpeed.gearPicked(speed);
+    }
+
     /** A reel coming on screen: its player binds the video, then starts playing it. */
     private void play(Object player) {
         players.bind(player);
@@ -226,6 +232,35 @@ public class ReelSpeedTest {
         play(players.player(VIDEO_TAB, AD));
         play(players.player(REELS));
         assertEquals(List.of(VIDEO_TAB + " 2.0", VIDEO_TAB + "::fb_shorts_in_watch_tab 2.0"), players.set);
+    }
+
+    /**
+     * Some accounts get Playback speed in a reel's More menu from the gear menu's sheet, which shows no
+     * toast (issue #25). A pick there carries to the next reels like a pick in the Reels menu.
+     */
+    @Test
+    public void aPickInTheGearSheetOnAReelCarriesToTheNextReels() {
+        Object reel = players.player(VIDEO_TAB);
+        play(reel);
+        gearPick(reel, 1.5f);
+        assertEquals(1.5f, ReelSpeed.kept(VIDEO_TAB), 0f);
+        play(players.player(VIDEO_TAB));
+        assertEquals(List.of(VIDEO_TAB + " 1.5"), players.set);
+        gearPick(reel, 1f);
+        play(players.player(VIDEO_TAB));
+        assertEquals("normal speed in the gear sheet didn't go back to Facebook's reset",
+                List.of(VIDEO_TAB + " 1.5"), players.set);
+    }
+
+    /** A Watch video's gear menu has the same sheet; a speed picked there stays with that video. */
+    @Test
+    public void aGearPickOnAVideoThatIsntAReelIsntKept() {
+        Object video = players.player(VIDEO_TAB, NOT_A_REEL);
+        play(video);
+        gearPick(video, 2f);
+        assertEquals("a gear pick on a Watch video was kept", 1f, ReelSpeed.kept(VIDEO_TAB), 0f);
+        play(players.player(VIDEO_TAB));
+        assertEquals("a reel after a Watch video's gear pick was sped up", List.of(), players.set);
     }
 
     /**

@@ -1494,6 +1494,7 @@
       "category": "Interface",
       "use": false,
       "dependencies": [
+        "BytecodePatch",
         "Hushfacebook settings"
       ],
       "compatiblePackages": {
@@ -1672,6 +1673,7 @@
       "category": "Interface",
       "use": true,
       "dependencies": [
+        "BytecodePatch",
         "Hushfacebook settings"
       ],
       "compatiblePackages": {
