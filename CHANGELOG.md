@@ -2,8 +2,9 @@
 
 Every Hushfacebook release, newest first.
 
-## Unreleased
+## 0.6.0 (2026-10-01)
 
+* **Facebook:** This release gathers everything since v0.5.0: 59 patches for Facebook 580 and 577, up from 51. The eight new ones are `Hide Meta AI questions under posts`, `Keep post dates`, `Hide post prompts`, `Hide reel interest prompts`, `Hide affiliate product links`, `Hide the Feeds header`, `Tab bar at the bottom` and `Start on x86 devices`. The first five start on. `Hide the Feeds header` and `Tab bar at the bottom` go in with their switches off, and `Start on x86 devices` has no switch.
 * **Tooling:** The MP4 join's real codec check finds FFmpeg and FFprobe on PATH, or through the explicit `HUSHFACEBOOK_TEST_FFMPEG` and `HUSHFACEBOOK_TEST_FFPROBE` paths. It no longer depends on a maintainer's folder. A wrong explicit path fails, and an unavailable local tool produces one named skip. Release validation still refuses skipped codec checks.
 * **Facebook:** The **Words to hide** and **Words that keep a post** editors now scroll as one page, the explanation and the whole list together (issue #58). With the keyboard open you can scroll a long list from its first line to its last, the view follows where you're typing, and Save and Cancel stay on screen. Before, the list scrolled inside a box of eight lines that the keyboard squeezed, and dragging it often didn't move.
 * **Facebook:** **Import settings** takes back a file whose **Words to hide** or **Words that keep a post** list is long. The reader refused any value over 1,024 characters as damaged, and 50 phrases of 60 characters come to about 3,000, so a file Hushfacebook itself saved couldn't be imported. It now allows a list as long as the row can hold, emoji included, and still refuses anything past that without changing a setting.
