@@ -202,6 +202,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean metaAiQuestions() {
+        return false;
+    }
+
     public static boolean reelPrompts() {
         return false;
     }

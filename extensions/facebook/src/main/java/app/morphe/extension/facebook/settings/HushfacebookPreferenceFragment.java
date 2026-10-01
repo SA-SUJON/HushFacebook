@@ -324,7 +324,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 || build.contains(PatchFamily.SPONSORED_PROFILE_POSTS)
                 || build.contains(PatchFamily.AFFILIATE_LINKS)
                 || build.contains(PatchFamily.POST_WORDS)
-                || build.contains(PatchFamily.POST_PROMPTS)) {
+                || build.contains(PatchFamily.POST_PROMPTS)
+                || build.contains(PatchFamily.META_AI_QUESTIONS)) {
             PreferenceCategory feed = category(screen, L10n.t("News feed"));
             if (build.contains(PatchFamily.SPONSORED_POSTS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_SPONSORED_POSTS, L10n.t("Hide sponsored posts"),
@@ -387,6 +388,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" "
                                 + "or who recently commented, and the follow and chat suggestions in the same place. "
                                 + "The post stays.")));
+            }
+            if (build.contains(PatchFamily.META_AI_QUESTIONS)) {
+                feed.addPreference(toggle(context, Settings.HIDE_META_AI_QUESTIONS,
+                        L10n.t("Hide Meta AI questions under posts"),
+                        L10n.t("The row of Meta AI questions under some posts. The post, its link card and its "
+                                + "buttons stay.")));
             }
             if (build.contains(PatchFamily.RETURN_REFRESH)) {
                 feed.addPreference(toggle(context, Settings.BLOCK_RETURN_REFRESH,

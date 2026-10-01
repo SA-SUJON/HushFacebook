@@ -493,6 +493,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_post_prompts", TRUE);
 
     /**
+     * Posts come without the row of Meta AI questions Facebook adds under some of them
+     * ({@link app.morphe.extension.facebook.feed.MetaAiQuestions}). A change shows on the posts
+     * drawn after it.
+     */
+    public static final BooleanSetting HIDE_META_AI_QUESTIONS =
+            new BooleanSetting("hushfacebook_hide_meta_ai_questions", TRUE);
+
+    /**
      * Reels come without the "Are you interested in this reel?" prompt
      * ({@link app.morphe.extension.facebook.reels.ReelPrompts}). A change shows on the reels built
      * after it.

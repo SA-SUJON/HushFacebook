@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(1016);
+        Map<String, String> table = new HashMap<>(1020);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -433,6 +433,8 @@ public final class L10nTranslations {
                 "\u201eAuch von Meta\u201c ausblenden");
         table.put("Hide Meta AI in search",
                 "Meta AI in der Suche ausblenden");
+        table.put("Hide Meta AI questions under posts",
+                "Meta-AI-Fragen unter Beitr\u00e4gen ausblenden");
         table.put("Hide Reels in the feed",
                 "Reels im Feed ausblenden");
         table.put("Hide Upgrades",
@@ -545,11 +547,11 @@ public final class L10nTranslations {
                 "Lizenzen");
         table.put("Link copied",
                 "Link kopiert");
-        table.put("Link expired. Reopen the item and try again",
-                "Link abgelaufen. \u00d6ffne den Inhalt neu und versuche es noch einmal");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("Link expired. Reopen the item and try again",
+                "Link abgelaufen. \u00d6ffne den Inhalt neu und versuche es noch einmal");
         table.put("Links",
                 "Links");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -668,11 +670,11 @@ public final class L10nTranslations {
                 "Videos, Reels und Storys in der Qualit\u00e4t unten abspielen. Eine im Men\u00fc eines Videos gew\u00e4hlte Qualit\u00e4t hat weiter Vorrang.");
         table.put("Playback",
                 "Wiedergabe");
-        table.put("Playback quality",
-                "Wiedergabequalit\u00e4t");
     }
 
     private static void fillDe5(Map<String, String> table) {
+        table.put("Playback quality",
+                "Wiedergabequalit\u00e4t");
         table.put("Playback quality will be set to %1$s.",
                 "Die Wiedergabequalit\u00e4t wird auf %1$s gesetzt.");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -791,11 +793,11 @@ public final class L10nTranslations {
                 "Wird gespeichert \u2026 Abbrechen: Downloads in Hushfacebook.");
         table.put("Search",
                 "Suche");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschl\u00e4ge \u201eMeta AI fragen\u201c mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beitr\u00e4ge bleiben, und die Meta AI-Schaltfl\u00e4che \u00f6ffnet Meta AI weiterhin.");
     }
 
     private static void fillDe6(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Die Suchergebnisse zeigen keine Antwort von Meta AI und keine Vorschl\u00e4ge \u201eMeta AI fragen\u201c mehr, und ein Vorschlag schickt deine Suche nicht mehr an Meta AI. Personen, Gruppen, Seiten und Beitr\u00e4ge bleiben, und die Meta AI-Schaltfl\u00e4che \u00f6ffnet Meta AI weiterhin.");
         table.put("Search settings",
                 "Einstellungen suchen");
         table.put("Selecting links by hand",
@@ -914,17 +916,19 @@ public final class L10nTranslations {
                 "Der Diagnosebericht lie\u00df sich nicht speichern. Versuche es noch einmal.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "Die Datei %1$s lie\u00df sich nicht entfernen. L\u00f6sche sie aus %2$s, um Hushfacebook wieder einzuschalten.");
-        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
-                "Die Datei %1$s lie\u00df sich nicht entfernen. L\u00f6sche sie aus %2$s und tippe dann noch einmal auf Fortsetzen.");
     }
 
     private static void fillDe7(Map<String, String> table) {
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "Die Datei %1$s lie\u00df sich nicht entfernen. L\u00f6sche sie aus %2$s und tippe dann noch einmal auf Fortsetzen.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "Die neueste Version von Hushfacebook ist %1$s.");
         table.put("The package name of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.",
                 "Der Paketname der App, die die Links bekommt, etwa %1$s f\u00fcr YTDLnis oder %2$s f\u00fcr Seal. Leer lassen, um jedes Mal eine App zu w\u00e4hlen.");
         table.put("The product cards of shop links creators add to posts, on reels, under feed posts and in the comments. The \"Commission eligible\" label stays.",
                 "Die Produktkarten der Shop-Links, die Creator zu Beitr\u00e4gen hinzuf\u00fcgen, bei Reels, unter Beitr\u00e4gen im Feed und in den Kommentaren. Das Label \u201eProvisionsberechtigt\u201c bleibt.");
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "Die Reihe mit Meta-AI-Fragen unter manchen Beitr\u00e4gen. Der Beitrag, seine Linkvorschau und seine Schaltfl\u00e4chen bleiben.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Die Reihe mit Stories von Personen, mit denen du nicht verbunden bist, die Facebook zwischen die Beitr\u00e4ge setzt. Die Stories deiner Freunde und die Stories-Leiste bleiben.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
@@ -1035,13 +1039,13 @@ public final class L10nTranslations {
                 "Warten auf Facebooks Tab-Leiste. Der Marketplace-Modus wird angewendet, sobald Facebook sie erstellt.");
         table.put("What always comes through",
                 "Was immer ankommt");
+    }
+
+    private static void fillDe8(Map<String, String> table) {
         table.put("WhatsApp and some editors may refuse this video",
                 "WhatsApp und manche Editoren lehnen dieses Video eventuell ab");
         table.put("When you tap Download",
                 "Beim Tippen auf Download");
-    }
-
-    private static void fillDe8(Map<String, String> table) {
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Wenn der Schalter oben an ist, bleibt deine Stelle erhalten, egal wie lange du weg bist. Zum Aktualisieren ziehen und ein Neustart laden weiterhin neue Beitr\u00e4ge.");
         table.put("Words that keep a post",
@@ -1101,7 +1105,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(1016);
+        Map<String, String> table = new HashMap<>(1020);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1490,6 +1494,8 @@ public final class L10nTranslations {
                 "Ocultar \u201cTambi\u00e9n de Meta\u201d");
         table.put("Hide Meta AI in search",
                 "Ocultar Meta AI en la b\u00fasqueda");
+        table.put("Hide Meta AI questions under posts",
+                "Ocultar las preguntas de Meta AI bajo las publicaciones");
         table.put("Hide Reels in the feed",
                 "Ocultar reels en el feed");
         table.put("Hide Upgrades",
@@ -1602,11 +1608,11 @@ public final class L10nTranslations {
                 "Licencias");
         table.put("Link copied",
                 "Enlace copiado");
-        table.put("Link expired. Reopen the item and try again",
-                "El enlace expir\u00f3. Vuelve a abrir el contenido e int\u00e9ntalo de nuevo");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("Link expired. Reopen the item and try again",
+                "El enlace expir\u00f3. Vuelve a abrir el contenido e int\u00e9ntalo de nuevo");
         table.put("Links",
                 "Enlaces");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -1725,11 +1731,11 @@ public final class L10nTranslations {
                 "Reproduce v\u00eddeos, reels e historias en la calidad de abajo. Una calidad elegida en el men\u00fa de un v\u00eddeo sigue teniendo prioridad.");
         table.put("Playback",
                 "Reproducci\u00f3n");
-        table.put("Playback quality",
-                "Calidad de reproducci\u00f3n");
     }
 
     private static void fillEs5(Map<String, String> table) {
+        table.put("Playback quality",
+                "Calidad de reproducci\u00f3n");
         table.put("Playback quality will be set to %1$s.",
                 "La calidad de reproducci\u00f3n ser\u00e1 %1$s.");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -1848,11 +1854,11 @@ public final class L10nTranslations {
                 "Guardando... Cancelar: Descargas en Hushfacebook.");
         table.put("Search",
                 "B\u00fasqueda");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Los resultados de b\u00fasqueda ya no muestran la respuesta de Meta AI ni las sugerencias para preguntarle a Meta AI, y una sugerencia ya no env\u00eda tu b\u00fasqueda a Meta AI. Las personas, los grupos, las p\u00e1ginas y las publicaciones se mantienen, y el bot\u00f3n de Meta AI sigue abriendo Meta AI.");
     }
 
     private static void fillEs6(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Los resultados de b\u00fasqueda ya no muestran la respuesta de Meta AI ni las sugerencias para preguntarle a Meta AI, y una sugerencia ya no env\u00eda tu b\u00fasqueda a Meta AI. Las personas, los grupos, las p\u00e1ginas y las publicaciones se mantienen, y el bot\u00f3n de Meta AI sigue abriendo Meta AI.");
         table.put("Search settings",
                 "Buscar ajustes");
         table.put("Selecting links by hand",
@@ -1971,17 +1977,19 @@ public final class L10nTranslations {
                 "No se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "No se pudo eliminar el archivo %1$s. B\u00f3rralo de %2$s para volver a activar Hushfacebook.");
-        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
-                "No se pudo eliminar el archivo %1$s. B\u00f3rralo de %2$s y luego vuelve a tocar Reanudar.");
     }
 
     private static void fillEs7(Map<String, String> table) {
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "No se pudo eliminar el archivo %1$s. B\u00f3rralo de %2$s y luego vuelve a tocar Reanudar.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "La versi\u00f3n m\u00e1s reciente de Hushfacebook es la %1$s.");
         table.put("The package name of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.",
                 "El nombre de paquete de la app que recibe los enlaces, como %1$s para YTDLnis o %2$s para Seal. D\u00e9jalo en blanco para elegir una app cada vez.");
         table.put("The product cards of shop links creators add to posts, on reels, under feed posts and in the comments. The \"Commission eligible\" label stays.",
                 "Las tarjetas de producto de los enlaces de tienda que los creadores a\u00f1aden a sus publicaciones, en los reels, bajo las publicaciones del feed y en los comentarios. La etiqueta \u201cApto para comisi\u00f3n\u201d se queda.");
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "La fila de preguntas de Meta AI bajo algunas publicaciones. La publicaci\u00f3n, la tarjeta de su enlace y sus botones se quedan.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "La fila de historias de personas con las que no tienes conexi\u00f3n que Facebook pone entre las publicaciones. Las historias de tus amigos y la bandeja de historias se quedan.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
@@ -2092,13 +2100,13 @@ public final class L10nTranslations {
                 "Esperando la barra de pesta\u00f1as de Facebook. El modo Marketplace se aplicar\u00e1 cuando Facebook la cree.");
         table.put("What always comes through",
                 "Lo que siempre llega");
+    }
+
+    private static void fillEs8(Map<String, String> table) {
         table.put("WhatsApp and some editors may refuse this video",
                 "WhatsApp y algunos editores podr\u00edan rechazar este video");
         table.put("When you tap Download",
                 "Al tocar Descargar");
-    }
-
-    private static void fillEs8(Map<String, String> table) {
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Con el interruptor de arriba activado, tu lugar se mantiene sin importar cu\u00e1nto tiempo est\u00e9s fuera. Deslizar para actualizar y abrir la app de nuevo siguen cargando publicaciones nuevas.");
         table.put("Words that keep a post",
@@ -2158,7 +2166,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(1016);
+        Map<String, String> table = new HashMap<>(1020);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -2547,6 +2555,8 @@ public final class L10nTranslations {
                 "Sembunyikan \u201cJuga dari Meta\u201d");
         table.put("Hide Meta AI in search",
                 "Sembunyikan Meta AI di pencarian");
+        table.put("Hide Meta AI questions under posts",
+                "Sembunyikan pertanyaan Meta AI di bawah postingan");
         table.put("Hide Reels in the feed",
                 "Sembunyikan Reels di Kabar Beranda");
         table.put("Hide Upgrades",
@@ -2659,11 +2669,11 @@ public final class L10nTranslations {
                 "Lisensi");
         table.put("Link copied",
                 "Tautan disalin");
-        table.put("Link expired. Reopen the item and try again",
-                "Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("Link expired. Reopen the item and try again",
+                "Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi");
         table.put("Links",
                 "Tautan");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -2782,11 +2792,11 @@ public final class L10nTranslations {
                 "Putar video, reel, dan cerita dengan kualitas di bawah. Kualitas yang dipilih di menu video itu sendiri tetap diutamakan.");
         table.put("Playback",
                 "Pemutaran");
-        table.put("Playback quality",
-                "Kualitas pemutaran");
     }
 
     private static void fillIn5(Map<String, String> table) {
+        table.put("Playback quality",
+                "Kualitas pemutaran");
         table.put("Playback quality will be set to %1$s.",
                 "Kualitas pemutaran akan diatur ke %1$s.");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -2905,11 +2915,11 @@ public final class L10nTranslations {
                 "Menyimpan... Batal: Unduhan di Hushfacebook.");
         table.put("Search",
                 "Pencarian");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.");
     }
 
     private static void fillIn6(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Hasil pencarian tidak lagi menampilkan jawaban Meta AI dan saran Tanya Meta AI, dan saran tidak lagi mengirim pencarianmu ke Meta AI. Orang, grup, halaman, dan postingan tetap ada, dan tombol Meta AI tetap membuka Meta AI.");
         table.put("Search settings",
                 "Cari pengaturan");
         table.put("Selecting links by hand",
@@ -3028,17 +3038,19 @@ public final class L10nTranslations {
                 "Laporan diagnostik tidak dapat disimpan. Coba lagi.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "File %1$s tidak dapat dihapus. Hapus file itu dari %2$s untuk mengaktifkan Hushfacebook lagi.");
-        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
-                "File %1$s tidak dapat dihapus. Hapus file itu dari %2$s, lalu ketuk Lanjutkan lagi.");
     }
 
     private static void fillIn7(Map<String, String> table) {
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "File %1$s tidak dapat dihapus. Hapus file itu dari %2$s, lalu ketuk Lanjutkan lagi.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "Rilis Hushfacebook terbaru adalah %1$s.");
         table.put("The package name of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.",
                 "Nama paket aplikasi yang menerima tautan, misalnya %1$s untuk YTDLnis atau %2$s untuk Seal. Biarkan kosong untuk memilih aplikasi setiap kali.");
         table.put("The product cards of shop links creators add to posts, on reels, under feed posts and in the comments. The \"Commission eligible\" label stays.",
                 "Kartu produk dari tautan toko yang ditambahkan kreator ke postingan, di reel, di bawah postingan feed, dan di komentar. Label \u201cMemenuhi syarat komisi\u201d tetap ada.");
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "Baris pertanyaan Meta AI di bawah beberapa postingan. Postingan, kartu tautannya, dan tombolnya tetap ada.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Deretan Cerita dari orang yang tidak terhubung dengan Anda, yang diselipkan Facebook di antara postingan. Cerita teman Anda dan deretan Cerita tetap ada.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
@@ -3149,13 +3161,13 @@ public final class L10nTranslations {
                 "Menunggu bilah tab Facebook. Mode Marketplace akan diterapkan saat Facebook membuatnya.");
         table.put("What always comes through",
                 "Yang selalu masuk");
+    }
+
+    private static void fillIn8(Map<String, String> table) {
         table.put("WhatsApp and some editors may refuse this video",
                 "WhatsApp dan beberapa editor mungkin menolak video ini");
         table.put("When you tap Download",
                 "Saat mengetuk Unduh");
-    }
-
-    private static void fillIn8(Map<String, String> table) {
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Jika sakelar di atas aktif, posisi Anda tetap tersimpan berapa lama pun Anda pergi. Tarik untuk memuat ulang dan membuka ulang aplikasi tetap memuat postingan baru.");
         table.put("Words that keep a post",
@@ -3215,7 +3227,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(1016);
+        Map<String, String> table = new HashMap<>(1020);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -3604,6 +3616,8 @@ public final class L10nTranslations {
                 "Ocultar \u201cTamb\u00e9m da Meta\u201d");
         table.put("Hide Meta AI in search",
                 "Ocultar a Meta AI na pesquisa");
+        table.put("Hide Meta AI questions under posts",
+                "Ocultar as perguntas da Meta AI abaixo das publica\u00e7\u00f5es");
         table.put("Hide Reels in the feed",
                 "Ocultar Reels no feed");
         table.put("Hide Upgrades",
@@ -3716,11 +3730,11 @@ public final class L10nTranslations {
                 "Licen\u00e7as");
         table.put("Link copied",
                 "Link copiado");
-        table.put("Link expired. Reopen the item and try again",
-                "Link expirado. Reabra o item e tente novamente");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("Link expired. Reopen the item and try again",
+                "Link expirado. Reabra o item e tente novamente");
         table.put("Links",
                 "Links");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -3839,11 +3853,11 @@ public final class L10nTranslations {
                 "Reproduz v\u00eddeos, Reels e Stories na qualidade abaixo. Uma qualidade escolhida no menu do pr\u00f3prio v\u00eddeo ainda tem prioridade.");
         table.put("Playback",
                 "Reprodu\u00e7\u00e3o");
-        table.put("Playback quality",
-                "Qualidade de reprodu\u00e7\u00e3o");
     }
 
     private static void fillPt_rBR5(Map<String, String> table) {
+        table.put("Playback quality",
+                "Qualidade de reprodu\u00e7\u00e3o");
         table.put("Playback quality will be set to %1$s.",
                 "A qualidade de reprodu\u00e7\u00e3o ser\u00e1 %1$s.");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -3962,11 +3976,11 @@ public final class L10nTranslations {
                 "Salvando... Cancelar: Downloads no Hushfacebook.");
         table.put("Search",
                 "Pesquisa");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugest\u00f5es para perguntar \u00e0 Meta AI, e uma sugest\u00e3o n\u00e3o enviar\u00e1 mais sua pesquisa para a Meta AI. Pessoas, grupos, p\u00e1ginas e publica\u00e7\u00f5es permanecem, e o bot\u00e3o da Meta AI continua abrindo a Meta AI.");
     }
 
     private static void fillPt_rBR6(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Os resultados da pesquisa deixam de mostrar a resposta da Meta AI e as sugest\u00f5es para perguntar \u00e0 Meta AI, e uma sugest\u00e3o n\u00e3o enviar\u00e1 mais sua pesquisa para a Meta AI. Pessoas, grupos, p\u00e1ginas e publica\u00e7\u00f5es permanecem, e o bot\u00e3o da Meta AI continua abrindo a Meta AI.");
         table.put("Search settings",
                 "Buscar configura\u00e7\u00f5es");
         table.put("Selecting links by hand",
@@ -4085,17 +4099,19 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel salvar o relat\u00f3rio de diagn\u00f3stico. Tente de novo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "N\u00e3o foi poss\u00edvel remover o arquivo %1$s. Exclua-o de %2$s para reativar o Hushfacebook.");
-        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
-                "N\u00e3o foi poss\u00edvel remover o arquivo %1$s. Exclua-o de %2$s e toque em Retomar de novo.");
     }
 
     private static void fillPt_rBR7(Map<String, String> table) {
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "N\u00e3o foi poss\u00edvel remover o arquivo %1$s. Exclua-o de %2$s e toque em Retomar de novo.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "A vers\u00e3o mais nova do Hushfacebook \u00e9 %1$s.");
         table.put("The package name of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.",
                 "O nome do pacote do app que recebe os links, como %1$s para o YTDLnis ou %2$s para o Seal. Deixe em branco para escolher um app a cada vez.");
         table.put("The product cards of shop links creators add to posts, on reels, under feed posts and in the comments. The \"Commission eligible\" label stays.",
                 "Os cart\u00f5es de produto dos links de loja que os criadores adicionam \u00e0s publica\u00e7\u00f5es, nos reels, abaixo das publica\u00e7\u00f5es do feed e nos coment\u00e1rios. O r\u00f3tulo \u201cQualificado para comiss\u00e3o\u201d fica.");
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "A fileira de perguntas da Meta AI abaixo de algumas publica\u00e7\u00f5es. A publica\u00e7\u00e3o, o cart\u00e3o do link e os bot\u00f5es continuam.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "A linha de Stories de pessoas com quem voc\u00ea n\u00e3o tem conex\u00e3o, que o Facebook insere entre as publica\u00e7\u00f5es. Os Stories dos seus amigos e a bandeja de Stories permanecem.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
@@ -4206,13 +4222,13 @@ public final class L10nTranslations {
                 "Aguardando a barra de abas do Facebook. O modo Marketplace ser\u00e1 aplicado quando o Facebook a criar.");
         table.put("What always comes through",
                 "O que sempre chega");
+    }
+
+    private static void fillPt_rBR8(Map<String, String> table) {
         table.put("WhatsApp and some editors may refuse this video",
                 "O WhatsApp e alguns editores podem recusar este v\u00eddeo");
         table.put("When you tap Download",
                 "Ao tocar em Baixar");
-    }
-
-    private static void fillPt_rBR8(Map<String, String> table) {
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Com a op\u00e7\u00e3o acima ativada, voc\u00ea continua no ponto em que estava, n\u00e3o importa quanto tempo fique fora. Puxar para atualizar e iniciar o Facebook novamente continuam carregando novas publica\u00e7\u00f5es.");
         table.put("Words that keep a post",
@@ -4272,7 +4288,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(1016);
+        Map<String, String> table = new HashMap<>(1020);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -4661,6 +4677,8 @@ public final class L10nTranslations {
                 "\u201cMeta'dan di\u011ferleri\u201d b\u00f6l\u00fcm\u00fcn\u00fc gizle");
         table.put("Hide Meta AI in search",
                 "Aramada Meta AI'\u0131 gizle");
+        table.put("Hide Meta AI questions under posts",
+                "G\u00f6nderilerin alt\u0131ndaki Meta AI sorular\u0131n\u0131 gizle");
         table.put("Hide Reels in the feed",
                 "Ak\u0131\u015ftaki Reels videolar\u0131n\u0131 gizle");
         table.put("Hide Upgrades",
@@ -4773,11 +4791,11 @@ public final class L10nTranslations {
                 "Lisanslar");
         table.put("Link copied",
                 "Ba\u011flant\u0131 kopyaland\u0131");
-        table.put("Link expired. Reopen the item and try again",
-                "Ba\u011flant\u0131n\u0131n s\u00fcresi doldu. \u00d6\u011feyi yeniden a\u00e7\u0131p tekrar dene");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("Link expired. Reopen the item and try again",
+                "Ba\u011flant\u0131n\u0131n s\u00fcresi doldu. \u00d6\u011feyi yeniden a\u00e7\u0131p tekrar dene");
         table.put("Links",
                 "Ba\u011flant\u0131lar");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -4896,11 +4914,11 @@ public final class L10nTranslations {
                 "Videolar\u0131, Reels'i ve hikayeleri a\u015fa\u011f\u0131daki kalitede oynat\u0131n. Bir videonun kendi men\u00fcs\u00fcnde se\u00e7ilen kalite yine \u00f6nceliklidir.");
         table.put("Playback",
                 "Oynatma");
-        table.put("Playback quality",
-                "Oynatma kalitesi");
     }
 
     private static void fillTr5(Map<String, String> table) {
+        table.put("Playback quality",
+                "Oynatma kalitesi");
         table.put("Playback quality will be set to %1$s.",
                 "Oynatma kalitesi %1$s olarak ayarlanacak.");
         table.put("Posts Facebook files as promotions rather than as ads.",
@@ -5019,11 +5037,11 @@ public final class L10nTranslations {
                 "Kaydediliyor... \u0130ptal: Hushfacebook'ta \u0130ndirmeler.");
         table.put("Search",
                 "Arama");
-        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
-                "Arama sonu\u00e7lar\u0131nda art\u0131k Meta AI yan\u0131t\u0131 ve Meta AI'a sor \u00f6nerileri g\u00f6r\u00fcnmez, bir \u00f6neri de araman\u0131 art\u0131k Meta AI'a g\u00f6ndermez. Ki\u015filer, gruplar, sayfalar ve g\u00f6nderiler kal\u0131r ve Meta AI d\u00fc\u011fmesi yine Meta AI'\u0131 a\u00e7ar.");
     }
 
     private static void fillTr6(Map<String, String> table) {
+        table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
+                "Arama sonu\u00e7lar\u0131nda art\u0131k Meta AI yan\u0131t\u0131 ve Meta AI'a sor \u00f6nerileri g\u00f6r\u00fcnmez, bir \u00f6neri de araman\u0131 art\u0131k Meta AI'a g\u00f6ndermez. Ki\u015filer, gruplar, sayfalar ve g\u00f6nderiler kal\u0131r ve Meta AI d\u00fc\u011fmesi yine Meta AI'\u0131 a\u00e7ar.");
         table.put("Search settings",
                 "Ayarlarda ara");
         table.put("Selecting links by hand",
@@ -5142,17 +5160,19 @@ public final class L10nTranslations {
                 "Tan\u0131lama raporu kaydedilemedi. Tekrar dene.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                 "%1$s dosyas\u0131 kald\u0131r\u0131lamad\u0131. Hushfacebook'u yeniden a\u00e7mak i\u00e7in onu %2$s i\u00e7inden sil.");
-        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
-                "%1$s dosyas\u0131 kald\u0131r\u0131lamad\u0131. Onu %2$s i\u00e7inden sil, sonra yeniden Devam et'e dokun.");
     }
 
     private static void fillTr7(Map<String, String> table) {
+        table.put("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.",
+                "%1$s dosyas\u0131 kald\u0131r\u0131lamad\u0131. Onu %2$s i\u00e7inden sil, sonra yeniden Devam et'e dokun.");
         table.put("The newest Hushfacebook release is %1$s.",
                 "En yeni Hushfacebook s\u00fcr\u00fcm\u00fc %1$s.");
         table.put("The package name of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.",
                 "Ba\u011flant\u0131lar\u0131 alacak uygulaman\u0131n paket ad\u0131, \u00f6rne\u011fin YTDLnis i\u00e7in %1$s veya Seal i\u00e7in %2$s. Her seferinde bir uygulama se\u00e7mek i\u00e7in bo\u015f b\u0131rak\u0131n.");
         table.put("The product cards of shop links creators add to posts, on reels, under feed posts and in the comments. The \"Commission eligible\" label stays.",
                 "\u0130\u00e7erik \u00fcreticilerinin g\u00f6nderilere ekledi\u011fi ma\u011faza ba\u011flant\u0131lar\u0131n\u0131n \u00fcr\u00fcn kartlar\u0131, reels'te, ak\u0131\u015ftaki g\u00f6nderilerin alt\u0131nda ve yorumlarda. \u201cKomisyona uygun\u201d etiketi kal\u0131r.");
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "Baz\u0131 g\u00f6nderilerin alt\u0131ndaki Meta AI sorular\u0131 sat\u0131r\u0131. G\u00f6nderi, ba\u011flant\u0131 kart\u0131 ve d\u00fc\u011fmeleri kal\u0131r.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Facebook'un g\u00f6nderilerin aras\u0131na koydu\u011fu, ba\u011flant\u0131n olmayan ki\u015filerin hikayelerinden olu\u015fan sat\u0131r. Arkada\u015flar\u0131n\u0131n hikayeleri ve hikaye \u015feridi kal\u0131r.");
         table.put("The row of friend suggestions between posts, and the one on your own profile.",
@@ -5263,13 +5283,13 @@ public final class L10nTranslations {
                 "Facebook'un sekme \u00e7ubu\u011fu bekleniyor. Facebook \u00e7ubu\u011fu olu\u015fturdu\u011funda Marketplace modu uygulanacak.");
         table.put("What always comes through",
                 "Her zaman gelenler");
+    }
+
+    private static void fillTr8(Map<String, String> table) {
         table.put("WhatsApp and some editors may refuse this video",
                 "WhatsApp ve baz\u0131 d\u00fczenleyiciler bu videoyu reddedebilir");
         table.put("When you tap Download",
                 "\u0130ndir'e dokundu\u011funuzda");
-    }
-
-    private static void fillTr8(Map<String, String> table) {
         table.put("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.",
                 "Yukar\u0131daki anahtar a\u00e7\u0131kken ne kadar uzun s\u00fcre uzakta kal\u0131rsan kal yerin korunur. Yenilemek i\u00e7in \u00e7ekmek ve uygulamay\u0131 yeniden ba\u015flatmak yine yeni g\u00f6nderileri y\u00fckler.");
         table.put("Words that keep a post",

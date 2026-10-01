@@ -617,6 +617,10 @@ Open the setting	Ayarı aç
 Hide post prompts	Gönderi altındaki soruları gizle
 # context: description of that switch; the quoted texts are Facebook's own prompts, so use Facebook's wording in your language if you know it
 The strip on some posts, like "Are you interested in this post?", "Show less" or who recently commented, and the follow and chat suggestions in the same place. The post stays.	Bazı gönderilerdeki şerit, örneğin “Bu gönderiyle ilgileniyor musun?”, “Daha az göster” veya kimin az önce yorum yaptığı, ve aynı yerdeki takip ve sohbet önerileri. Gönderi kalır.
+# context: switch title under News feed; Meta AI is the name of Meta's assistant, and the questions are the row of suggested questions for it that Facebook puts under some posts
+Hide Meta AI questions under posts	Gönderilerin altındaki Meta AI sorularını gizle
+# context: description of that switch; a link card is the preview of a shared link inside a post
+The row of Meta AI questions under some posts. The post, its link card and its buttons stay.	Bazı gönderilerin altındaki Meta AI soruları satırı. Gönderi, bağlantı kartı ve düğmeleri kalır.
 # context: switch title under Reels and Watch; the prompt is Facebook's "Are you interested in this reel?" question on a reel
 Hide reel interest prompts	Reels'teki ilgi sorusunu gizle
 # context: description of that switch; the quoted text is Facebook's own prompt, so use Facebook's wording in your language if you know it

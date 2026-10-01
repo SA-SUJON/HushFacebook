@@ -471,6 +471,15 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/feed/metaai/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: hiding the row of Meta AI questions under posts. In Facebook 577 and 580 one static method loads both DeepDivePillSocket and the kept class name of GenAiDeepDivePillPlugin. It loads every pill plugin's class name into one register and asks a static (model, index) -> Z check of its own class whether that plugin applies, twice per plugin, each answer in a move-result. The patch puts a call after each answer that hands the extension the answer and the name, and the extension answers no for Meta AI's plugin while its switch is on, so the socket goes on to the next plugin. A missing or doubled socket, plugin names in more than one register, or a register past v15 stops patching with a message."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/composer/**",
         "patches/src/main/kotlin/app/morphe/patches/facebook/composer/**"
       ],

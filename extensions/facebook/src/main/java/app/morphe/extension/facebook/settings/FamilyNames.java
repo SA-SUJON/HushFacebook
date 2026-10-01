@@ -29,6 +29,7 @@ public final class FamilyNames {
     public static final String AI_DETECTED_REELS = "Hide AI-detected posts (Reels and Watch)";
     public static final String POST_WORDS = "Hide posts by words";
     public static final String POST_PROMPTS = "Hide post prompts";
+    public static final String META_AI_QUESTIONS = "Hide Meta AI questions under posts";
     public static final String STORIES_TRAY = "Hide Stories tray";
     public static final String FEED_REELS = "Hide Reels in the feed";
     public static final String RETURN_REFRESH = "Block background-return feed refresh";

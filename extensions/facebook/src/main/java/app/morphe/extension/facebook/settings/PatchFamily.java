@@ -53,6 +53,8 @@ public enum PatchFamily {
             Settings.HIDE_POSTS_WITH_WORDS),
     POST_PROMPTS(FamilyNames.POST_PROMPTS, "postPrompts", null,
             Settings.HIDE_POST_PROMPTS),
+    META_AI_QUESTIONS(FamilyNames.META_AI_QUESTIONS, "metaAiQuestions", null,
+            Settings.HIDE_META_AI_QUESTIONS),
     SPONSORED_STORIES(FamilyNames.SPONSORED_STORIES, "sponsoredStories", null,
             Settings.HIDE_SPONSORED_STORIES),
     SUGGESTED_STORIES(FamilyNames.SUGGESTED_STORIES, "suggestedStories", null,
@@ -193,8 +195,8 @@ public enum PatchFamily {
      * a new default patch fails it until it's listed here.
      */
     static final Set<PatchFamily> DEFAULT_SELECTION = Collections.unmodifiableSet(EnumSet.of(
-            SPONSORED_POSTS, SUGGESTED_POSTS, AI_DETECTED_POSTS, POST_WORDS, POST_PROMPTS, SPONSORED_STORIES,
-            SUGGESTED_STORIES, REEL_PROMPTS,
+            SPONSORED_POSTS, SUGGESTED_POSTS, AI_DETECTED_POSTS, POST_WORDS, POST_PROMPTS, META_AI_QUESTIONS,
+            SPONSORED_STORIES, SUGGESTED_STORIES, REEL_PROMPTS,
             SPONSORED_REELS, SPONSORED_SEARCH, SPONSORED_PROFILE_POSTS, SPONSORED_MARKETPLACE, AFFILIATE_LINKS,
             KEEP_REEL_SPEED,
             RESUME_LONG_VIDEOS, EXTERNAL_BROWSER, SANITIZE_SHARING_LINKS, UPDATE_PROMPTS, STORY_DOWNLOAD,
