@@ -48,7 +48,8 @@ class HideMetaAiQuestionsShapesTest {
      * The default way as 577 and 580 lay it out: a pill with no icon of its own gets Meta AI's
      * when its type is meta_ai, every icon path joins at `:merge`, and there the type is read
      * again with the same key from the same tree and compared with stars first. The tree is in
-     * v11. [metaAiIcon] and [ownIcon] end the two icon paths. [extra] goes after the last of
+     * v11. [metaAiBranch] branches on the meta_ai compare's answer, to the pill's own icon when
+     * it's no. [metaAiIcon] and [ownIcon] end the two icon paths. [extra] goes after the last of
      * them, where nothing reaches it.
      */
     private fun socket(
@@ -57,6 +58,7 @@ class HideMetaAiQuestionsShapesTest {
         starsKey: String = "const v9, $key",
         starsTree: Int = 11,
         intoStars: String = "",
+        metaAiBranch: String = "if-eqz v1, :uri",
         metaAiIcon: String = "goto :merge",
         ownIcon: String = "goto :merge",
         extra: String = "",
@@ -83,7 +85,7 @@ class HideMetaAiQuestionsShapesTest {
             const-string v1, "$metaAiName"
             invoke-virtual { v1, v2 }, $equals
             move-result v1
-            if-eqz v1, :uri
+            $metaAiBranch
             const-string v13, "Meta AI's icon"
             $metaAiIcon
             :uri
@@ -110,8 +112,12 @@ class HideMetaAiQuestionsShapesTest {
         code.indexOfFirst { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string == string }
 
     /** Where the Meta AI icon's path returns in [socket] when it returns instead of joining. */
-    private fun metaAiReturn() = socket(metaAiIcon = "return-object v13").body()
-        .indexOfFirst { it.opcode == Opcode.RETURN_OBJECT && (it as OneRegisterInstruction).registerA == 13 }
+    private fun metaAiReturn() = pillReturns(socket(metaAiIcon = "return-object v13")).single()
+
+    /** Where [method] returns the icon's register, which [socket]'s icon paths do when they return instead of joining. */
+    private fun pillReturns(method: MutableMethod) = method.body().let { code ->
+        code.indices.filter { code[it].opcode == Opcode.RETURN_OBJECT && (code[it] as OneRegisterInstruction).registerA == 13 }
+    }
 
     @Test
     fun `the extension names Meta AI's plugin and type as the patch does`() {
@@ -138,9 +144,13 @@ class HideMetaAiQuestionsShapesTest {
         assertEquals("the type's register and the name's", 1 to 8, pill.typeRegister to pill.freeRegister)
     }
 
-    /** Each shape changes one thing from [socket], and has to be refused for that thing. */
+    /** Each shape changes [socket] where its name says, and has to be refused for that. */
     @Test
     fun `a default way the patch can't read for sure is refused`() {
+        val ownReturn = socket(ownIcon = "return-object v13")
+        val flipped = socket(metaAiBranch = "if-nez v1, :uri", metaAiIcon = "return-object v13")
+        val flippedOwn = socket(metaAiBranch = "if-nez v1, :uri", ownIcon = "return-object v13")
+        val unbranched = socket(metaAiBranch = "move v3, v1\nif-eqz v3, :uri", ownIcon = "return-object v13")
         val shapes = mapOf(
             "no meta_ai compare" to (socket(metaAiName = "meta_ai_v2") to "with \"$META_AI_TYPE\" in Lfixture/PillSocket;->A06, found 0"),
             "two meta_ai compares" to (socket(extra = compare(META_AI_TYPE, 1, 2, 1)) to "with \"$META_AI_TYPE\" in Lfixture/PillSocket;->A06, found 2"),
@@ -150,7 +160,18 @@ class HideMetaAiQuestionsShapesTest {
             "two stars compares" to (socket(extra = compare(STARS_TYPE, 9, 1, 8)) to "with \"$STARS_TYPE\" in Lfixture/PillSocket;->A06, found 2"),
             "a jump straight to the stars name" to (socket(intoStars = "if-nez v11, :stars") to "not only through the read of the type"),
             "a meta_ai pill returned before the stars compare" to
-                (socket(metaAiIcon = "return-object v13") to "can be returned at [${metaAiReturn()}] before"),
+                (socket(metaAiIcon = "return-object v13") to "a pill typed \"$META_AI_TYPE\" can be returned at [${metaAiReturn()}] before"),
+            "a pill whose type isn't meta_ai returned before the stars compare" to
+                (ownReturn to "a pill whose type isn't \"$META_AI_TYPE\" can be returned at ${pillReturns(ownReturn)} before"),
+            "pills returned on both ways, named by the meta_ai way's return" to
+                (socket(metaAiIcon = "return-object v13", ownIcon = "return-object v13") to
+                    "a pill typed \"$META_AI_TYPE\" can be returned at [${metaAiReturn()}] before"),
+            "an if-nez whose way below isn't meta_ai returning there" to
+                (flipped to "a pill whose type isn't \"$META_AI_TYPE\" can be returned at ${pillReturns(flipped)} before"),
+            "an if-nez whose jump is meta_ai returning there" to
+                (flippedOwn to "a pill typed \"$META_AI_TYPE\" can be returned at ${pillReturns(flippedOwn)} before"),
+            "a return after a meta_ai compare nothing branches on right away" to
+                (unbranched to "a pill can be returned at ${pillReturns(unbranched)} after the \"$META_AI_TYPE\" compare"),
             "no way on from the meta_ai compare to the stars compare" to
                 (socket(metaAiIcon = "throw v13", ownIcon = "throw v13") to "nothing after the \"$META_AI_TYPE\" compare reaches"),
             "a socket that returns no object" to (socket(returnType = "Z") to "returns Z"),
@@ -161,6 +182,34 @@ class HideMetaAiQuestionsShapesTest {
             val message = refusal.message!!
             assertTrue("$shape: $message", message.startsWith("$PATCH: ") && reason in message)
         }
+    }
+
+    /**
+     * A handler that returns, covering a call on the Meta AI icon's path, hands back a pill typed
+     * meta_ai before the stars compare whenever that call throws. 577 and 580 have no try block
+     * between the two compares, so the same socket without one still applies.
+     */
+    @Test
+    fun `a catch handler that returns before the stars compare is refused`() {
+        val icon = """
+            invoke-static {}, Lfixture/Icons;->metaAi()V
+            goto :merge
+            move-exception v13
+            return-object v13
+        """
+        // Without the try block nothing reaches the handler, and the socket applies.
+        val plain = socket(metaAiIcon = icon)
+        assertEquals(indexOfString(plain.body(), STARS_TYPE), defaultPill(plain).index)
+        val method = socket(metaAiIcon = icon)
+        val code = method.body()
+        val call = code.indexOfFirst { it.opcode == Opcode.INVOKE_STATIC }
+        val handler = code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+        // addInstructionsWithLabels leaves .catch out, so the try block covering the call is added by hand.
+        method.implementation!!.apply {
+            addCatch("Ljava/lang/Exception;", newLabelForIndex(call), newLabelForIndex(call + 1), newLabelForIndex(handler))
+        }
+        val refusal = assertThrows(PatchException::class.java) { defaultPill(method) }.message!!
+        assertTrue(refusal, "a pill typed \"$META_AI_TYPE\" can be returned at [${handler + 1}] before" in refusal)
     }
 
     /**

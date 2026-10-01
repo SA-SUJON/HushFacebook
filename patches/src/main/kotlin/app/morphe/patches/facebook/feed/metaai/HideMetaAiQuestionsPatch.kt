@@ -232,7 +232,7 @@ internal class DefaultPill(val index: Int, val typeRegister: Int, val freeRegist
  * compares a pill's type with [META_AI_TYPE] once, reading it with a literal key, and compares the
  * type read with that key from the same tree with [STARS_TYPE] once, unless that compare can only
  * be reached through the read just before it, and unless every path from the [META_AI_TYPE]
- * compare gets there before it returns.
+ * compare gets there before it returns, a catch handler's included.
  */
 internal fun defaultPill(method: Method): DefaultPill {
     val code = method.implementation!!.instructions.toList()
@@ -254,10 +254,18 @@ internal fun defaultPill(method: Method): DefaultPill {
         refuse("in $where the \"$STARS_TYPE\" compare can be reached from $into, not only through the read of the type")
     }
     // A pill typed meta_ai that could be returned before the stars compare would be drawn with the
-    // hook in place, so every way on from the meta_ai compare has to pass it first.
+    // hook in place, so every way on from the meta_ai compare has to pass it first. A return only on
+    // the way where the type isn't meta_ai is refused too, since 577 and 580 join both ways before
+    // the stars compare, and the refusal names that way.
     val (reaches, returns) = pathsFrom(flow, icon.nameIndex, site.nameIndex)
     if (returns.isNotEmpty()) {
-        refuse("in $where a pill typed \"$META_AI_TYPE\" can be returned at $returns before the \"$STARS_TYPE\" compare")
+        val (branch, way) = metaAiWay(code, flow, icon)
+            ?: refuse("in $where a pill can be returned at $returns after the \"$META_AI_TYPE\" compare, before the \"$STARS_TYPE\" compare")
+        val onMetaAi = pathsFrom(flow, icon.nameIndex, site.nameIndex, branch, way).second
+        if (onMetaAi.isEmpty()) {
+            refuse("in $where a pill whose type isn't \"$META_AI_TYPE\" can be returned at $returns before the \"$STARS_TYPE\" compare")
+        }
+        refuse("in $where a pill typed \"$META_AI_TYPE\" can be returned at $onMetaAi before the \"$STARS_TYPE\" compare")
     }
     if (!reaches) refuse("in $where nothing after the \"$META_AI_TYPE\" compare reaches the \"$STARS_TYPE\" compare")
     return DefaultPill(site.nameIndex, site.typeRegister, site.nameRegister)
@@ -266,10 +274,11 @@ internal fun defaultPill(method: Method): DefaultPill {
 private val RETURNS = setOf(Opcode.RETURN_OBJECT, Opcode.RETURN, Opcode.RETURN_WIDE, Opcode.RETURN_VOID)
 
 /**
- * Follows every normal path from [from] in [flow], stopping at [to]: whether one gets there, and
- * the returns reached without passing it.
+ * Follows every path from [from] in [flow], into the catch handlers of what it passes too, stopping
+ * at [to]: whether one gets there, and the returns reached without passing it. At [branch] it
+ * takes only [way].
  */
-private fun pathsFrom(flow: ControlFlow, from: Int, to: Int): Pair<Boolean, List<Int>> {
+private fun pathsFrom(flow: ControlFlow, from: Int, to: Int, branch: Int = -1, way: Int = -1): Pair<Boolean, List<Int>> {
     val seen = mutableSetOf<Int>()
     val pending = ArrayDeque(listOf(from))
     val returns = sortedSetOf<Int>()
@@ -281,9 +290,31 @@ private fun pathsFrom(flow: ControlFlow, from: Int, to: Int): Pair<Boolean, List
             continue
         }
         if (!seen.add(at)) continue
-        if (flow.instructions[at].opcode in RETURNS) returns += at else pending += flow.normal[at]
+        if (flow.instructions[at].opcode in RETURNS) {
+            returns += at
+            continue
+        }
+        pending += if (at == branch) listOf(way) else flow.normal[at]
+        pending += flow.exceptional[at]
     }
     return reaches to returns.toList()
+}
+
+/**
+ * The branch on [compare]'s answer right after it, and the instruction its way for a type that is
+ * [META_AI_TYPE] starts at: the jump for an if-nez, the instruction below for an if-eqz. Null when
+ * nothing branches on the answer right away.
+ */
+private fun metaAiWay(code: List<Instruction>, flow: ControlFlow, compare: TypeCompare): Pair<Int, Int>? {
+    val answer = code.getOrNull(compare.nameIndex + 2)
+    if (answer?.opcode != Opcode.MOVE_RESULT) return null
+    val branch = compare.nameIndex + 3
+    val test = code.getOrNull(branch)
+    if (test?.opcode != Opcode.IF_EQZ && test?.opcode != Opcode.IF_NEZ) return null
+    if ((test as OneRegisterInstruction).registerA != (answer as OneRegisterInstruction).registerA) return null
+    // ControlFlow lists a branch's jump first, then the instruction below it.
+    val (jump, below) = flow.normal[branch].takeIf { it.size == 2 } ?: return null
+    return branch to if (test.opcode == Opcode.IF_NEZ) jump else below
 }
 
 /**
