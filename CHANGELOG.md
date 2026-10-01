@@ -4,6 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Tooling:** `Hide Meta AI questions under posts` also refuses a Facebook build where a plugin check can be reached with anything but a plugin's name in the register its hook reads, or where a check answers into that register. The hook decides by that name, so another value there could keep Meta AI's row or hide a different one.
 * **Tooling:** Three tests from the last round now fail when the fix they guard breaks. The translation tables refuse a curly apostrophe. The register walk is tried on a write that throws. And the font file's rewrite runs over both Facebook builds, checking every place it changes, more than a hundred in each.
 * **Tooling:** The settings screen's code is split by category page. Each section is now built in one of four classes, for the feed, video, the rest of Facebook and Hushfacebook itself, and the kinds of row live in two of their own, so the main settings class is half the size it was. Nothing on the screen changes. Every settings page was compared in light and dark with the build before it, and they match.
 * **Tooling:** `Hide Meta AI questions under posts` refuses a Facebook build where anything but a plugin check's answer can reach the instruction after a check, or where a try block or a catch handler sits on that instruction. Each check's hook goes right there, so another way in would skip it. The second check, which feeds the log and jumps back to the first one's branch, still applies, since its own hook took that answer.

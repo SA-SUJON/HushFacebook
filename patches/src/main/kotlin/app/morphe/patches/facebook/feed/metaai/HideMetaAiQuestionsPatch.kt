@@ -140,9 +140,7 @@ internal fun isPluginCheck(instruction: Instruction, owner: String): Boolean {
  */
 internal fun pillSocket(method: Method): PillSocket {
     val code = method.implementation!!.instructions.toList()
-    val nameRegisters = code.filter { it.opcode == Opcode.CONST_STRING || it.opcode == Opcode.CONST_STRING_JUMBO }
-        .filter { ((it as ReferenceInstruction).reference as StringReference).string.startsWith(PILL_PLUGINS) }
-        .map { (it as OneRegisterInstruction).registerA }.toSet()
+    val nameRegisters = code.filter(::isPluginName).map { (it as OneRegisterInstruction).registerA }.toSet()
     val nameRegister = nameRegisters.singleOrNull()
         ?: refuse("expected the plugin names in one register in ${method.definingClass}->${method.name}, found $nameRegisters")
     val answers = code.indices.filter { index ->
@@ -152,7 +150,35 @@ internal fun pillSocket(method: Method): PillSocket {
     val registers = answers.map { (code[it] as OneRegisterInstruction).registerA } + nameRegister
     if (registers.any { it > 15 }) refuse("a register the hook hands over is past v15: $registers")
     requireAnswerSpots(method, answers)
+    requirePluginNames(method, nameRegister, answers)
     return PillSocket(method, nameRegister, answers)
+}
+
+/** Whether [instruction] loads a pill plugin's class name. */
+private fun isPluginName(instruction: Instruction): Boolean =
+    (instruction.opcode == Opcode.CONST_STRING || instruction.opcode == Opcode.CONST_STRING_JUMBO) &&
+        ((instruction as ReferenceInstruction).reference as StringReference).string.startsWith(PILL_PLUGINS)
+
+/**
+ * Proves the name each check's hook hands over is a plugin's. The hook decides by it, so another
+ * value there could keep Meta AI's yes or turn another plugin's yes into a no. On every way into
+ * each check, the name register was last written by the load of a plugin's class name, and the
+ * check doesn't answer into that register, which would hand the hook a boolean for the name.
+ */
+private fun requirePluginNames(method: Method, nameRegister: Int, answers: List<Int>) {
+    val where = "${method.definingClass}->${method.name}"
+    val code = method.implementation!!.instructions.toList()
+    for (answer in answers) {
+        val check = answer - 1
+        if ((code[answer] as OneRegisterInstruction).registerA == nameRegister) {
+            refuse("in $where the plugin check at $check answers into v$nameRegister, the plugin's name its hook hands over")
+        }
+        val strangers = method.writersReaching(check, nameRegister).filterNot { it >= 0 && isPluginName(code[it]) }
+        if (strangers.isNotEmpty()) {
+            val ways = strangers.joinToString(" and ") { if (it < 0) "the method's start" else "the write at $it" }
+            refuse("in $where the plugin check at $check can get v$nameRegister from $ways, not only from a plugin's name")
+        }
+    }
 }
 
 /**
