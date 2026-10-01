@@ -228,14 +228,18 @@ private fun keyOf(code: List<Instruction>, index: Int, register: Int): Long? {
 internal class DefaultPill(val index: Int, val typeRegister: Int, val freeRegister: Int)
 
 /**
- * Reads the default way's hook point out of [method]. Refuses unless the method compares a pill's
- * type with [META_AI_TYPE] once, reading it with a literal key, and compares the type read with
- * that key from the same tree with [STARS_TYPE] once, and unless that compare can only be reached
- * through the read just before it.
+ * Reads the default way's hook point out of [method]. Refuses unless the method returns an object,
+ * compares a pill's type with [META_AI_TYPE] once, reading it with a literal key, and compares the
+ * type read with that key from the same tree with [STARS_TYPE] once, unless that compare can only
+ * be reached through the read just before it, and unless every path from the [META_AI_TYPE]
+ * compare gets there before it returns.
  */
 internal fun defaultPill(method: Method): DefaultPill {
     val code = method.implementation!!.instructions.toList()
     val where = "${method.definingClass}->${method.name}"
+    if (method.returnType.first() != 'L' && method.returnType.first() != '[') {
+        refuse("$where returns ${method.returnType}, so the hook can't return no pill there")
+    }
     val compares = typeCompares(code)
     val metaAi = compares.filter { it.name == META_AI_TYPE }
     val icon = metaAi.singleOrNull()
@@ -249,7 +253,37 @@ internal fun defaultPill(method: Method): DefaultPill {
     if (into != listOf(site.nameIndex - 1)) {
         refuse("in $where the \"$STARS_TYPE\" compare can be reached from $into, not only through the read of the type")
     }
+    // A pill typed meta_ai that could be returned before the stars compare would be drawn with the
+    // hook in place, so every way on from the meta_ai compare has to pass it first.
+    val (reaches, returns) = pathsFrom(flow, icon.nameIndex, site.nameIndex)
+    if (returns.isNotEmpty()) {
+        refuse("in $where a pill typed \"$META_AI_TYPE\" can be returned at $returns before the \"$STARS_TYPE\" compare")
+    }
+    if (!reaches) refuse("in $where nothing after the \"$META_AI_TYPE\" compare reaches the \"$STARS_TYPE\" compare")
     return DefaultPill(site.nameIndex, site.typeRegister, site.nameRegister)
+}
+
+private val RETURNS = setOf(Opcode.RETURN_OBJECT, Opcode.RETURN, Opcode.RETURN_WIDE, Opcode.RETURN_VOID)
+
+/**
+ * Follows every normal path from [from] in [flow], stopping at [to]: whether one gets there, and
+ * the returns reached without passing it.
+ */
+private fun pathsFrom(flow: ControlFlow, from: Int, to: Int): Pair<Boolean, List<Int>> {
+    val seen = mutableSetOf<Int>()
+    val pending = ArrayDeque(listOf(from))
+    val returns = sortedSetOf<Int>()
+    var reaches = false
+    while (pending.isNotEmpty()) {
+        val at = pending.removeFirst()
+        if (at == to) {
+            reaches = true
+            continue
+        }
+        if (!seen.add(at)) continue
+        if (flow.instructions[at].opcode in RETURNS) returns += at else pending += flow.normal[at]
+    }
+    return reaches to returns.toList()
 }
 
 /**
