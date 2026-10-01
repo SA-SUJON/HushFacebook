@@ -26,7 +26,8 @@ import app.morphe.extension.shared.settings.PauseForTests;
 /**
  * Hide Meta AI questions under posts: with the switch on, the pill socket's yes for Meta AI's
  * plugin is answered as a no, and counted; every other plugin, the affiliate one included, keeps
- * the socket's answer, and so does Meta AI's no. Off or paused, Facebook's yes stands.
+ * the socket's answer, and so does Meta AI's no. The socket's default way of drawing a pill drops
+ * one typed meta_ai. Off or paused, Facebook's yes stands and the default way draws every pill.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -78,6 +79,37 @@ public class MetaAiQuestionsTest {
                     MetaAiQuestions.keep(1, MetaAiQuestions.META_AI_PILL));
             PauseForTests.resume();
         }
+    }
+
+    /**
+     * The socket's default way of drawing a pill: with the switch on, a pill typed meta_ai is
+     * dropped and counted, and every other type, or none, is drawn.
+     */
+    @Test
+    public void theDefaultWayDrawsNoMetaAiPill() {
+        assertTrue("a Meta AI pill drawn the default way stayed",
+                MetaAiQuestions.dropsDefaultPill(MetaAiQuestions.META_AI_TYPE));
+        assertFalse("a stars pill went", MetaAiQuestions.dropsDefaultPill("stars"));
+        assertFalse("a pill with no type went", MetaAiQuestions.dropsDefaultPill(null));
+        assertFalse(MetaAiQuestions.dropsDefaultPill(""));
+        assertFalse("Facebook's compare is exact, so this is another type", MetaAiQuestions.dropsDefaultPill("META_AI"));
+        assertEquals(FamilyNames.META_AI_QUESTIONS + ": invoked 5, 1 found, 0 missing. Counted: "
+                + MetaAiQuestions.DEFAULT_HIDDEN + " 1", statusLine());
+    }
+
+    @Test
+    public void offOrPausedTheDefaultWayDrawsMetaAisPill() {
+        Settings.HIDE_META_AI_QUESTIONS.save(false);
+        assertFalse(MetaAiQuestions.dropsDefaultPill(MetaAiQuestions.META_AI_TYPE));
+        Settings.HIDE_META_AI_QUESTIONS.save(true);
+        for (HushfacebookPause.Reason reason : new HushfacebookPause.Reason[] {
+                HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP}) {
+            PauseForTests.pause(reason);
+            assertFalse("a Hushfacebook paused by " + reason + " dropped Meta AI's pill",
+                    MetaAiQuestions.dropsDefaultPill(MetaAiQuestions.META_AI_TYPE));
+            PauseForTests.resume();
+        }
+        assertEquals(FamilyNames.META_AI_QUESTIONS + ": invoked 3, 1 found, 0 missing", statusLine());
     }
 
     /** A name the hook can't read as Meta AI's, or no name at all, keeps the socket's answer. */

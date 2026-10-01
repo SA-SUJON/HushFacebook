@@ -264,9 +264,11 @@ public class PausedHooksTest {
                         FeedGuardForTests.postText("Big SPOILER inside"))));
         // A story with a bumper is answered as one without, so no strip is drawn and no room kept.
         probes.put(PatchFamily.POST_PROMPTS, Collections.singletonList(() -> !PostPrompts.keep(true)));
-        // The pill socket's yes for Meta AI's questions is answered as a no, so it draws no row for them.
-        probes.put(PatchFamily.META_AI_QUESTIONS, Collections.singletonList(
-                () -> !MetaAiQuestions.keep(1, MetaAiQuestions.META_AI_PILL)));
+        // The pill socket's yes for Meta AI's questions is answered as a no, so it draws no row for
+        // them, and its default way of drawing a pill drops one typed meta_ai.
+        probes.put(PatchFamily.META_AI_QUESTIONS, Arrays.asList(
+                () -> !MetaAiQuestions.keep(1, MetaAiQuestions.META_AI_PILL),
+                () -> MetaAiQuestions.dropsDefaultPill(MetaAiQuestions.META_AI_TYPE)));
         // A post header's yes to rotating its subtitle is answered as a no, so it keeps the one line.
         probes.put(PatchFamily.POST_DATES, Collections.singletonList(() -> !PostDates.cycling(true)));
         probes.put(PatchFamily.SPONSORED_STORIES, Collections.singletonList(FeedFilter::hideSponsoredStories));
