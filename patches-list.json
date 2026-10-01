@@ -776,10 +776,11 @@
     },
     {
       "name": "Hide Stories tray",
-      "description": "Removes the row of stories at the top of the news feed, Create story included.",
+      "description": "Removes the row of stories at the top of the news feed, Create story included, and the rows of stories Facebook puts between posts.",
       "category": "Feed",
       "use": false,
       "dependencies": [
+        "BytecodePatch",
         "Hushfacebook settings"
       ],
       "compatiblePackages": {

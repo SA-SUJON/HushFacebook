@@ -933,8 +933,8 @@ public final class L10nTranslations {
                 "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen, die auf deinem eigenen Profil und die Karten mit der Schaltfl\u00e4che \u201eHinzuf\u00fcgen\u201c in der Story-Leiste.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Die Reihe mit Gruppen zum Beitreten zwischen den Beitr\u00e4gen, samt ihrem Button \u201eWeitere Gruppen entdecken\u201c. Beitr\u00e4ge aus deinen Gruppen bleiben.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "Die Reihe mit Stories oben im Feed, \u201eStory erstellen\u201c eingeschlossen.");
+        table.put("The row of stories at the top of the feed, Create story included, and the rows of stories between posts.",
+                "Die Reihe mit Stories oben im Feed, \u201eStory erstellen\u201c eingeschlossen, und die Reihen mit Stories zwischen den Beitr\u00e4gen.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "Die Reihen mit Reels zwischen den Beitr\u00e4gen und die Reels, die Facebook dort anh\u00e4ngt, wo dein Feed endet.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
@@ -1990,8 +1990,8 @@ public final class L10nTranslations {
                 "La fila de sugerencias de amistad entre las publicaciones, la de tu propio perfil y las tarjetas con el bot\u00f3n Agregar en la bandeja de historias.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "La fila de grupos para unirte entre las publicaciones, con su bot\u00f3n Descubrir m\u00e1s grupos. Las publicaciones de tus grupos se quedan.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "La fila de historias en la parte superior del feed, con \u201cCrear historia\u201d incluida.");
+        table.put("The row of stories at the top of the feed, Create story included, and the rows of stories between posts.",
+                "La fila de historias en la parte superior del feed, con \u201cCrear historia\u201d incluida, y las filas de historias entre las publicaciones.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "Las filas de reels entre las publicaciones y los reels que Facebook a\u00f1ade donde termina tu feed.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
@@ -3047,8 +3047,8 @@ public final class L10nTranslations {
                 "Deretan saran pertemanan di antara postingan, deretan di profilmu sendiri, dan kartu dengan tombol Tambah di baki cerita.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Deretan grup untuk diikuti di antara postingan, beserta tombol Temukan grup lainnya. Postingan dari grup tempat Anda bergabung tetap ada.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "Deretan cerita di bagian atas Kabar Beranda, termasuk \u201cBuat cerita\u201d.");
+        table.put("The row of stories at the top of the feed, Create story included, and the rows of stories between posts.",
+                "Deretan cerita di bagian atas Kabar Beranda, termasuk \u201cBuat cerita\u201d, dan deretan cerita di antara postingan.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "Deretan Reels di antara postingan, dan Reels yang ditambahkan Facebook di akhir Kabar Beranda Anda.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
@@ -4104,8 +4104,8 @@ public final class L10nTranslations {
                 "A linha de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es, a linha no seu pr\u00f3prio perfil e os cart\u00f5es com o bot\u00e3o Adicionar na bandeja de Stories.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "A linha de grupos sugeridos para participa\u00e7\u00e3o entre as publica\u00e7\u00f5es, com o bot\u00e3o \u201cDescobrir mais grupos\u201d. As publica\u00e7\u00f5es dos grupos dos quais voc\u00ea participa permanecem.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "A linha de Stories no topo do feed, incluindo \u201cCriar Story\u201d.");
+        table.put("The row of stories at the top of the feed, Create story included, and the rows of stories between posts.",
+                "A linha de Stories no topo do feed, incluindo \u201cCriar Story\u201d, e as linhas de Stories entre as publica\u00e7\u00f5es.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "As linhas de Reels entre as publica\u00e7\u00f5es e os Reels que o Facebook adiciona ao final do feed.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",
@@ -5161,8 +5161,8 @@ public final class L10nTranslations {
                 "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131, kendi profilindeki sat\u0131r ve hikaye tepsisindeki Ekle d\u00fc\u011fmeli kartlar.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "G\u00f6nderilerin aras\u0131ndaki kat\u0131labilece\u011fin gruplar sat\u0131r\u0131 ve Daha fazla grup ke\u015ffet d\u00fc\u011fmesi. \u00dcyesi oldu\u011fun gruplar\u0131n g\u00f6nderileri kal\u0131r.");
-        table.put("The row of stories at the top of the feed, Create story included.",
-                "Ak\u0131\u015f\u0131n en \u00fcst\u00fcndeki hikaye \u015feridi, \u201cHikaye olu\u015ftur\u201d da dahil.");
+        table.put("The row of stories at the top of the feed, Create story included, and the rows of stories between posts.",
+                "Ak\u0131\u015f\u0131n en \u00fcst\u00fcndeki hikaye \u015feridi, \u201cHikaye olu\u015ftur\u201d da dahil, ve g\u00f6nderilerin aras\u0131ndaki hikaye s\u0131ralar\u0131.");
         table.put("The rows of reels between posts, and the reels Facebook adds where your feed ends.",
                 "G\u00f6nderilerin aras\u0131ndaki Reels s\u0131ralar\u0131 ve Facebook'un ak\u0131\u015f\u0131n\u0131n bitti\u011fi yere ekledi\u011fi Reels videolar\u0131.");
         table.put("The setting couldn't finish updating. Its saved value is shown.",

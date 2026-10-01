@@ -92,7 +92,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `Hide sponsored reels` | Removes ads from Reels and Watch, including product banners over a reel and ads inside a video. |
 | `Hide sponsored search results` | Removes the ads from Facebook's search results, the sponsored posts and ad cards between the people, pages and posts you searched for. |
 | `Hide sponsored stories` | Removes ad cards from the story viewer, so swiping through stories only shows stories people posted. |
-| `Hide Stories tray` | Removes the row of stories at the top of the news feed, Create story included. |
+| `Hide Stories tray` | Removes the row of stories at the top of the news feed, Create story included, and the rows of stories Facebook puts between posts. |
 | `Hide suggested stories` | Removes the stories Facebook suggests from people and Pages you don't follow, the ones marked Suggested in the Stories tray, and the tray's Find friends from contacts card. With Hide suggested and promoted posts in the build too, the tray's People you may know cards go as well. Your friends' stories, the Pages you follow and Create story stay. |
 | `Hide Reels in the feed` | Removes the rows of reels between posts in the news feed, and the reels Facebook adds where your feed ends. A reel a friend posts stays. |
 | `Hide the Reels tab` | Takes the Reels tab, which some accounts call Video, off the tab bar, and its shortcut out of the long-press menu of Facebook's icon. Reel links and the reels in your feed still open. Facebook's own Hide in its tab bar settings keeps working, and a change to the switch shows once Facebook restarts. |
@@ -222,7 +222,7 @@ Reels turn up in four places, and no one switch covers them all. The Reels and W
 |---|---|
 | Hide sponsored posts | Off. Sponsored and promoted posts come back. |
 | Hide suggested and promoted posts | Off. |
-| Hide Stories tray | Off. The row of stories comes back. |
+| Hide Stories tray | Off. The row of stories at the top and the rows of stories between posts come back. |
 | Hide Reels in the feed | Off. The rows of reels come back. |
 | Hide AI-detected posts | Off. Posts Facebook detected as made with AI come back, and so do the posts their creator labelled as AI and the reels and videos Facebook flagged. |
 | Hide posts by words | Off. Posts with your words come back. Your lists stay as you left them. |
