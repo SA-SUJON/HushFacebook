@@ -501,6 +501,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_meta_ai_questions", TRUE);
 
     /**
+     * Post headers keep the one line with the date instead of Facebook's rotating subtitle
+     * ({@link app.morphe.extension.facebook.feed.PostDates}). A change shows on the headers drawn
+     * after it.
+     */
+    public static final BooleanSetting KEEP_POST_DATES =
+            new BooleanSetting("hushfacebook_keep_post_dates", TRUE);
+
+    /**
      * Reels come without the "Are you interested in this reel?" prompt
      * ({@link app.morphe.extension.facebook.reels.ReelPrompts}). A change shows on the reels built
      * after it.

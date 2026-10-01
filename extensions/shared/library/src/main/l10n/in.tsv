@@ -621,6 +621,10 @@ The strip on some posts, like "Are you interested in this post?", "Show less" or
 Hide Meta AI questions under posts	Sembunyikan pertanyaan Meta AI di bawah postingan
 # context: description of that switch; a link card is the preview of a shared link inside a post
 The row of Meta AI questions under some posts. The post, its link card and its buttons stay.	Baris pertanyaan Meta AI di bawah beberapa postingan. Postingan, kartu tautannya, dan tombolnya tetap ada.
+# context: switch title under News feed; it keeps the date shown under the name of whoever posted
+Keep post dates	Pertahankan tanggal postingan
+# context: description of that switch; the rotating details are the texts Facebook's newer post header takes turns showing on that line
+The line under the poster's name keeps the post's date instead of Facebook's rotating details, which go blank on some phones.	Baris di bawah nama orang yang memposting tetap menampilkan tanggal postingan, bukan detail yang bergantian dari Facebook, yang di beberapa ponsel menjadi kosong.
 # context: switch title under Reels and Watch; the prompt is Facebook's "Are you interested in this reel?" question on a reel
 Hide reel interest prompts	Sembunyikan pertanyaan minat di reel
 # context: description of that switch; the quoted text is Facebook's own prompt, so use Facebook's wording in your language if you know it

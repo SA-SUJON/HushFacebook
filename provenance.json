@@ -480,6 +480,15 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/feed/postdates/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: keeping the date on post headers. In Facebook 577 and 580 one method, the render of the post header subtitle that names itself FDSPostHeaderSubtitle, loads both in_cycling_experiment and subtitle_cycling_text_count. It works out whether the header rotates its subtitle, logs that boolean as in_cycling_experiment through String.valueOf right after the call that answers it, and then branches on it between a component that rotates the subtitle plugins' texts and the one line with the date. The patch finds that method by the two strings, checks the log's shape, and hands the answer to the extension at the log's own label, which answers no while the switch is on."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/composer/**",
         "patches/src/main/kotlin/app/morphe/patches/facebook/composer/**"
       ],

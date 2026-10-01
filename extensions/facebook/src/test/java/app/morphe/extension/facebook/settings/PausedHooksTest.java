@@ -56,6 +56,7 @@ import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.MetaAiQuestions;
+import app.morphe.extension.facebook.feed.PostDates;
 import app.morphe.extension.facebook.feed.PostPrompts;
 import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
@@ -266,6 +267,8 @@ public class PausedHooksTest {
         // The pill socket's yes for Meta AI's questions is answered as a no, so it draws no row for them.
         probes.put(PatchFamily.META_AI_QUESTIONS, Collections.singletonList(
                 () -> !MetaAiQuestions.keep(1, MetaAiQuestions.META_AI_PILL)));
+        // A post header's yes to rotating its subtitle is answered as a no, so it keeps the one line.
+        probes.put(PatchFamily.POST_DATES, Collections.singletonList(() -> !PostDates.cycling(true)));
         probes.put(PatchFamily.SPONSORED_STORIES, Collections.singletonList(FeedFilter::hideSponsoredStories));
         // A tray of a friend's bucket, a suggested one and one labelled SUGGESTED keeps only the friend's.
         probes.put(PatchFamily.SUGGESTED_STORIES, Collections.singletonList(SuggestedStoriesForTests::hidesSuggestions));

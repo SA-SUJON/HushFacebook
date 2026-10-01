@@ -106,6 +106,7 @@ public final class SettingsBackup {
             Settings.HIDE_POSTS_WITH_WORDS,
             Settings.HIDE_POST_PROMPTS,
             Settings.HIDE_META_AI_QUESTIONS,
+            Settings.KEEP_POST_DATES,
             Settings.HIDE_SPONSORED_STORIES,
             Settings.HIDE_SUGGESTED_STORIES,
             Settings.HIDE_CONTACT_IMPORT_CARD,

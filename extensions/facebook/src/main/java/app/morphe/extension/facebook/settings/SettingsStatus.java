@@ -206,6 +206,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean postDates() {
+        return false;
+    }
+
     public static boolean reelPrompts() {
         return false;
     }

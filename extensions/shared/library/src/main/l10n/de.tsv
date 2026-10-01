@@ -621,6 +621,10 @@ The strip on some posts, like "Are you interested in this post?", "Show less" or
 Hide Meta AI questions under posts	Meta-AI-Fragen unter Beiträgen ausblenden
 # context: description of that switch; a link card is the preview of a shared link inside a post
 The row of Meta AI questions under some posts. The post, its link card and its buttons stay.	Die Reihe mit Meta-AI-Fragen unter manchen Beiträgen. Der Beitrag, seine Linkvorschau und seine Schaltflächen bleiben.
+# context: switch title under News feed; it keeps the date shown under the name of whoever posted
+Keep post dates	Beitragsdatum behalten
+# context: description of that switch; the rotating details are the texts Facebook's newer post header takes turns showing on that line
+The line under the poster's name keeps the post's date instead of Facebook's rotating details, which go blank on some phones.	Die Zeile unter dem Namen der Person, die gepostet hat, behält das Datum des Beitrags statt der wechselnden Angaben von Facebook, die auf manchen Handys leer bleiben.
 # context: switch title under Reels and Watch; the prompt is Facebook's "Are you interested in this reel?" question on a reel
 Hide reel interest prompts	Interessenfrage bei Reels ausblenden
 # context: description of that switch; the quoted text is Facebook's own prompt, so use Facebook's wording in your language if you know it

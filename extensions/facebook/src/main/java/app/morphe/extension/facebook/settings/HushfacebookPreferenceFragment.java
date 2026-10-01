@@ -325,7 +325,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 || build.contains(PatchFamily.AFFILIATE_LINKS)
                 || build.contains(PatchFamily.POST_WORDS)
                 || build.contains(PatchFamily.POST_PROMPTS)
-                || build.contains(PatchFamily.META_AI_QUESTIONS)) {
+                || build.contains(PatchFamily.META_AI_QUESTIONS)
+                || build.contains(PatchFamily.POST_DATES)) {
             PreferenceCategory feed = category(screen, L10n.t("News feed"));
             if (build.contains(PatchFamily.SPONSORED_POSTS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_SPONSORED_POSTS, L10n.t("Hide sponsored posts"),
@@ -394,6 +395,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                         L10n.t("Hide Meta AI questions under posts"),
                         L10n.t("The row of Meta AI questions under some posts. The post, its link card and its "
                                 + "buttons stay.")));
+            }
+            if (build.contains(PatchFamily.POST_DATES)) {
+                feed.addPreference(toggle(context, Settings.KEEP_POST_DATES, L10n.t("Keep post dates"),
+                        L10n.t("The line under the poster's name keeps the post's date instead of Facebook's "
+                                + "rotating details, which go blank on some phones.")));
             }
             if (build.contains(PatchFamily.RETURN_REFRESH)) {
                 feed.addPreference(toggle(context, Settings.BLOCK_RETURN_REFRESH,
