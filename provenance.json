@@ -418,6 +418,15 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredreels/ReelItemStory.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the reel ads Facebook builds as ordinary reels. In Facebook 577 and 580 the reel ad item's base class has one no-argument getter for its GraphQLStory, declared on one public interface up its supertypes that every reel item implements. The patch finds that interface and GraphQLStory's one sponsored_data accessor, and fills three extension stubs with them: whether an object is a reel item, the item's story, and the story's sponsored data. The extension drops a reel whose story carries sponsored data, the check Facebook's own Reels code makes before it shows a promotion over a reel."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/notifications/**",
         "patches/src/main/kotlin/app/morphe/patches/facebook/notifications/**"
       ],
