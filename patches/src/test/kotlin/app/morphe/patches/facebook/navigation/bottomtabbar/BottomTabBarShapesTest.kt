@@ -181,6 +181,14 @@ class BottomTabBarShapesTest {
             "the key put to a call that answers something" to
                 (menuWrite("invoke-static { v0, v1, v2 }, Lfixture/Editor;->A1F(Lfixture/Editor;${keyType}Z)Z") to
                     "to neither a read nor a write"),
+            "the key written, then handed to a helper that reads it" to
+                (menuWrite("invoke-static { v0, v1, v2 }, Lfixture/Editor;->A1F(Lfixture/Editor;${keyType}Z)V\n" +
+                    "invoke-static { v3, v1 }, Lfixture/Prefs;->tri($FB_SHARED_PREFERENCES$keyType)$TRI_STATE") to
+                    "Lfixture/TabMenu;->A0H uses the override's key loaded at 1 past the call it goes into"),
+            "the key read a second time from one load" to
+                (gate(afterRead = "move-result-object v3", ordinal = "invoke-virtual { v3 }, Ljava/lang/Enum;->ordinal()I",
+                    afterOrdinal = "move-result v2\ninvoke-interface { v1, v0 }, $FB_SHARED_PREFERENCES->B2w($keyType)$TRI_STATE") to
+                    "Lfixture/TabBarGate;->A06 uses the override's key loaded at 0 past the call it goes into"),
         )
         for ((shape, case) in shapes) {
             val (method, expected) = case

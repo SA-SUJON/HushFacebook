@@ -114,7 +114,8 @@ internal fun overrideKeyField(holders: List<ClassDef>): FieldReference {
  * right away, by a plain or a range call, the ordinal kept by a move-result and the TriState read
  * nowhere else. A load that goes straight into a call answering nothing, which also takes a
  * boolean or a TriState, is a write, the way Facebook's tab menu stores the key, and left alone.
- * Refuses a load that's neither.
+ * Refuses a load that's neither, and one whose key anything past that call reads again, since a
+ * read there would go unseen.
  */
 internal fun overrideReads(method: Method, key: FieldReference): List<OverrideRead> {
     val code = method.implementation?.instructions?.toList() ?: return emptyList()
@@ -127,6 +128,7 @@ internal fun overrideReads(method: Method, key: FieldReference): List<OverrideRe
         if (takesKey && named.definingClass != FB_SHARED_PREFERENCES && named.returnType == "V" &&
             named.parameterTypes.any { it.toString() == "Z" || it.toString() == TRI_STATE }
         ) {
+            method.keyReadOnce(load, where)
             return@mapNotNull null
         }
         val read = named?.takeIf { takesKey && it.definingClass == FB_SHARED_PREFERENCES }
@@ -146,8 +148,14 @@ internal fun overrideReads(method: Method, key: FieldReference): List<OverrideRe
         if (method.literalReads(load + 2) != listOf(load + 3)) {
             refuse("$where uses the override's TriState past its ordinal, where the hook can't change it")
         }
+        method.keyReadOnce(load, where)
         OverrideRead(method, load + 4, (result as OneRegisterInstruction).registerA)
     }
+}
+
+/** Refuses a load of the key at [load] that anything past the call right after it reads again, a read the patch wouldn't see. */
+private fun Method.keyReadOnce(load: Int, where: String) {
+    if (literalReads(load) != listOf(load + 1)) refuse("$where uses the override's key loaded at $load past the call it goes into")
 }
 
 /**
