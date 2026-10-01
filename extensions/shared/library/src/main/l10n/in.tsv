@@ -661,3 +661,9 @@ Package name	Nama paket
 Android asks which app each time.	Android menanyakan aplikasi setiap kali.
 # context: Summary of the send-to app row; %1$s is the package name
 Links go to %1$s. When it isn't installed, Android asks which app.	Tautan dikirim ke %1$s. Jika tidak terpasang, Android menanyakan aplikasinya.
+# context: switch title under Stories; Find friends from contacts is the Stories tray card that asks to upload your contacts
+Hide "Find friends from contacts"	Sembunyikan “Temukan teman dari kontak”
+# context: summary of that switch
+The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.	Kartu di baki cerita yang meminta Anda mengunggah kontak. Berlaku saat Facebook memuat ulang baki.
+# context: summary of Hide "People you may know" when the build also hides tray cards; Add is the card's button
+The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.	Deretan saran pertemanan di antara postingan, deretan di profilmu sendiri, dan kartu dengan tombol Tambah di baki cerita.

@@ -353,9 +353,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 feed.addPreference(toggle(context, Settings.HIDE_SUGGESTED_FOR_YOU,
                         L10n.t("Hide \"Suggested for you\" posts"),
                         L10n.t("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.")));
+                // The Stories tray's cards are filtered by Hide suggested stories' hook, so the
+                // switch reaches them only when that patch is in too.
                 feed.addPreference(toggle(context, Settings.HIDE_PEOPLE_YOU_MAY_KNOW,
                         L10n.t("Hide \"People you may know\""),
-                        L10n.t("The row of friend suggestions between posts, and the one on your own profile.")));
+                        build.contains(PatchFamily.SUGGESTED_STORIES)
+                                ? L10n.t("The row of friend suggestions between posts, the one on your own profile, "
+                                        + "and the cards with an Add button in the Stories tray.")
+                                : L10n.t("The row of friend suggestions between posts, and the one on your own profile.")));
                 feed.addPreference(toggle(context, Settings.HIDE_SUGGESTED_GROUPS,
                         L10n.t("Hide suggested groups"),
                         L10n.t("The row of groups to join between posts, with its Discover more groups button. "
@@ -427,6 +432,9 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 stories.addPreference(toggle(context, Settings.HIDE_SUGGESTED_STORIES,
                         L10n.t("Hide suggested stories"),
                         L10n.t("Keep friends and followed Pages in the Stories tray. Applies when Facebook next loads the tray.")));
+                stories.addPreference(toggle(context, Settings.HIDE_CONTACT_IMPORT_CARD,
+                        L10n.t("Hide \"Find friends from contacts\""),
+                        L10n.t("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.")));
             }
             if (build.contains(PatchFamily.STORY_AUTO_ADVANCE)) {
                 stories.addPreference(toggle(context, Settings.BLOCK_STORY_AUTO_ADVANCE,

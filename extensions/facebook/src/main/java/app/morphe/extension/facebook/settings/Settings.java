@@ -54,8 +54,10 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_suggested_for_you", TRUE);
 
     /**
-     * The "People you may know" row in the feed, found by its GraphQL type name, and the carousel on
-     * your own profile, found by the name its section gives itself.
+     * The "People you may know" row in the feed, found by its GraphQL type name, the carousel on
+     * your own profile, found by the name its section gives itself, and, when Hide suggested
+     * stories is in too, the People you may know cards in the Stories tray, found by their bucket
+     * type (PYMK_STORY or PYMK_PROFILE_FORWARD_STORY).
      */
     public static final BooleanSetting HIDE_PEOPLE_YOU_MAY_KNOW =
             new BooleanSetting("hushfacebook_hide_people_you_may_know", TRUE);
@@ -154,6 +156,14 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting HIDE_SUGGESTED_STORIES =
             new BooleanSetting("hushfacebook_hide_suggested_stories", TRUE);
+
+    /**
+     * The "Find friends from contacts" card in the Stories tray, which asks to upload the phone's
+     * contacts: a bucket whose type is CONTACT_IMPORTER_STORY, the type the tray's card dispatcher
+     * draws that card for. Stories and the other cards stay.
+     */
+    public static final BooleanSetting HIDE_CONTACT_IMPORT_CARD =
+            new BooleanSetting("hushfacebook_hide_contact_import_card", TRUE);
 
     /** Keep a finished Story visible until the user navigates. */
     public static final BooleanSetting BLOCK_STORY_AUTO_ADVANCE =
