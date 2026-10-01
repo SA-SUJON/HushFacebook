@@ -22,6 +22,7 @@ import android.preference.SwitchPreference;
 import android.text.InputType;
 import android.view.ContextThemeWrapper;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -1240,8 +1241,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         EditText field = row.getEditText();
         field.setSingleLine(false);
         field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        // A landscape IME's extracted editor replaces the dialog and hides Save and Cancel.
+        field.setImeOptions(field.getImeOptions() | EditorInfo.IME_FLAG_NO_FULLSCREEN
+                | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        // No line cap: the list grows inside its dialog's scroll, which a field scrolling itself
+        // inside it would fight (#58).
         field.setMinLines(3);
-        field.setMaxLines(8);
         field.setHint(L10n.t("One word or phrase per line"));
         row.setText(setting.savedValue());
         row.setOnPreferenceChangeListener((preference, typed) -> {
