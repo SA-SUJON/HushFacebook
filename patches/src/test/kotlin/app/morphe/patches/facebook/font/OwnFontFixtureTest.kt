@@ -16,6 +16,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.VariableRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import org.junit.Assert.assertEquals
@@ -55,6 +56,40 @@ class OwnFontFixtureTest {
         assertEquals("${bundle.name}: classes holding the no-source refusal", 1, owners.size)
         checkResolver(bundle, owners.single())
         checkBuilders(bundle, owners.single())
+    }
+
+    /**
+     * The Roboto Facebook's text engine builds for text that names none of Meta's fonts comes from one
+     * builder in each declared build, found by its log, and it hands its answer back through a return.
+     */
+    @Test
+    fun `each declared build has one Roboto builder`() = bundles { bundle ->
+        val builders = FixtureDex.classesHolding(bundle, NO_ROBOTO).flatMap(::robotoBuilders)
+        assertEquals("${bundle.name}: Roboto builders", 1, builders.size)
+        assertTrue("${bundle.name}: the Roboto builder returns a Typeface", objectReturns(builders.single()).isNotEmpty())
+    }
+
+    /**
+     * Each declared build reads Android's default bold in a text span's draw, which is how the names
+     * bolded in a post's header get the phone's bold, and calls defaultFromStyle only in a form the
+     * patch rewrites: the style alone, in a plain or a range call.
+     */
+    @Test
+    fun `each declared build reads Android's default bold in a text span`() = bundles { bundle ->
+        val readers = FixtureDex.methodsWhere(bundle, { true }) { method ->
+            method.implementation?.instructions?.any { defaultRead(it) != null } == true
+        }
+        val reads = readers.flatMap { method -> method.implementation!!.instructions.mapNotNull(::defaultRead) }
+        assertTrue("${bundle.name}: Android's default typefaces read ${reads.size} times", reads.size > 100)
+        assertTrue("${bundle.name}: no text span reads DEFAULT_BOLD", readers.any { method ->
+            method.name == "updateDrawState" && method.implementation!!.instructions.any { defaultRead(it) == "$TYPEFACE->DEFAULT_BOLD:$TYPEFACE" }
+        })
+        val styleCalls = readers.flatMap { method ->
+            method.implementation!!.instructions.filter { defaultRead(it) == DEFAULT_FROM_STYLE }
+        }
+        assertTrue("${bundle.name}: no defaultFromStyle call", styleCalls.isNotEmpty())
+        assertTrue("${bundle.name}: a defaultFromStyle call takes more than the style",
+            styleCalls.all { (it as VariableRegisterInstruction).registerCount == 1 })
     }
 
     private fun checkResolver(bundle: File, owner: ClassDef) {

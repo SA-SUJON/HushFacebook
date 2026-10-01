@@ -35,6 +35,8 @@ import java.util.Arrays;
 
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.SettingsContextRule;
+import app.morphe.extension.shared.settings.HushfacebookPause;
+import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
  * What a picked font file draws: Facebook's text in it, a variable font at the weight asked for,
@@ -119,6 +121,71 @@ public class OwnFontFileTest {
     }
 
     /**
+     * Text that names none of Meta's fonts gets Facebook's Roboto, the phone's font, and with a file
+     * picked it gets the file at the Roboto's weight and slant. With no file, the switch off or
+     * Hushfacebook paused, Facebook's Roboto stands.
+     */
+    @Test
+    public void facebooksRobotoTakesThePickedFont() throws Exception {
+        Typeface regular = Typeface.create("sans-serif", Typeface.NORMAL);
+        Typeface boldItalic = Typeface.create(Typeface.DEFAULT, 700, true);
+        assertSame("no file picked, and the phone's font stays", regular, OwnFont.replacePhoneFont(regular));
+
+        File copy = pick(FontFileTest.STATIC_FONT, "Rubik-Regular.ttf");
+        Typeface rubik = new Typeface.Builder(copy).build();
+        assertNotEquals("Rubik measures like the phone's font, so this proves nothing",
+                width(regular, LATIN), width(rubik, LATIN), 1f);
+        Typeface drawn = OwnFont.replacePhoneFont(regular);
+        assertEquals(width(rubik, LATIN), width(drawn, LATIN), 0.01f);
+        assertEquals(ink(rubik, LATIN), ink(drawn, LATIN));
+        Typeface heavy = OwnFont.replacePhoneFont(boldItalic);
+        assertEquals(700, heavy.getWeight());
+        assertTrue(heavy.isItalic());
+        assertSame(OwnFont.typeface(700, true), heavy);
+
+        Settings.USE_SYSTEM_FONT.save(false);
+        assertSame(regular, OwnFont.replacePhoneFont(regular));
+        Settings.USE_SYSTEM_FONT.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        try {
+            assertSame("paused, Facebook's Roboto stands", regular, OwnFont.replacePhoneFont(regular));
+        } finally {
+            PauseForTests.resume();
+        }
+        assertSame(drawn, OwnFont.replacePhoneFont(regular));
+    }
+
+    /**
+     * Facebook's own reads of Android's default typefaces, the spans that bold a name in a post's
+     * header among them, get the picked file at the default's weight and slant. With no file, the
+     * switch off or Hushfacebook paused, Android's default stands.
+     */
+    @Test
+    public void androidsDefaultTypefacesTakeThePickedFont() throws Exception {
+        assertSame("no file picked, and Android's default stays", Typeface.DEFAULT, OwnFont.defaultTypeface());
+        assertSame(Typeface.DEFAULT_BOLD, OwnFont.defaultBold());
+        assertSame(Typeface.defaultFromStyle(Typeface.ITALIC), OwnFont.defaultFromStyle(Typeface.ITALIC));
+
+        pick(FontFileTest.STATIC_FONT, "Rubik-Regular.ttf");
+        assertSame(OwnFont.typeface(400, false), OwnFont.defaultTypeface());
+        Typeface bold = OwnFont.defaultBold();
+        assertEquals(700, bold.getWeight());
+        assertSame(OwnFont.typeface(700, false), bold);
+        assertSame(OwnFont.typeface(700, true), OwnFont.defaultFromStyle(Typeface.BOLD_ITALIC));
+
+        Settings.USE_SYSTEM_FONT.save(false);
+        assertSame(Typeface.DEFAULT_BOLD, OwnFont.defaultBold());
+        Settings.USE_SYSTEM_FONT.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        try {
+            assertSame("paused, Android's default stands", Typeface.DEFAULT_BOLD, OwnFont.defaultBold());
+        } finally {
+            PauseForTests.resume();
+        }
+        assertSame(bold, OwnFont.defaultBold());
+    }
+
+    /**
      * A variable font is built along its 'wght' axis. Noto Sans Khmer's early axis runs from 26 to
      * 190, so any weight past 190 is its heaviest, and that heaviest is told it's the weight asked
      * for, so Android doesn't embolden it a second time.
@@ -181,6 +248,9 @@ public class OwnFontFileTest {
         // At the weight and slant asked for, as with no file at all.
         assertEquals(width(Typeface.create(Typeface.DEFAULT, 700, true), LATIN), width(OwnFont.replace(
                 Typeface.create(Typeface.SERIF, 400, true), Family.OPTIMISTIC_TEXT_APP_REGULAR, 700), LATIN), 0.01f);
+        // Facebook's own Roboto and Android's defaults are the phone's font already, so they stand.
+        assertSame(phone, OwnFont.replacePhoneFont(phone));
+        assertSame(Typeface.DEFAULT_BOLD, OwnFont.defaultBold());
 
         Settings.USE_SYSTEM_FONT.save(false);
         assertSame(meta, OwnFont.replace(meta, Family.OPTIMISTIC_TEXT_APP_REGULAR, 400));

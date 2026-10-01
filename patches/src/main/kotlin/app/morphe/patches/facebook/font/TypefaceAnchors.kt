@@ -9,6 +9,7 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -51,6 +52,34 @@ private const val CREATE_FROM_ASSET = "createFromAsset"
 internal const val REACT_FAMILY = 2
 
 /**
+ * What Facebook logs when it can't build the Roboto its own text engine gives text that asks for
+ * none of Meta's fonts. The builder, a static method answering a Typeface for a Context and a
+ * weight, is the one method that keeps it (580 `LX/2do;->A01`).
+ */
+internal const val NO_ROBOTO = "Unable to create roboto typeface: %s"
+
+/**
+ * Android's default typefaces as a read of the framework's fields names them, each with the name
+ * of the extension getter that read becomes. The spans that bold a name in a post's header or a
+ * notification read DEFAULT_BOLD themselves (580 `LX/MEz;->updateDrawState`).
+ */
+internal val DEFAULT_TYPEFACES = mapOf(
+    "$TYPEFACE->DEFAULT:$TYPEFACE" to "defaultTypeface",
+    "$TYPEFACE->DEFAULT_BOLD:$TYPEFACE" to "defaultBold",
+)
+
+/** The framework call answering Android's default typeface for a style. */
+internal const val DEFAULT_FROM_STYLE = "$TYPEFACE->defaultFromStyle(I)$TYPEFACE"
+
+/** The field or call [instruction] reads one of Android's default typefaces through, or null when it reads none. */
+internal fun defaultRead(instruction: Instruction): String? = when (instruction.opcode) {
+    Opcode.SGET_OBJECT -> (instruction as ReferenceInstruction).reference.toString().takeIf { it in DEFAULT_TYPEFACES }
+    Opcode.INVOKE_STATIC, Opcode.INVOKE_STATIC_RANGE ->
+        (instruction as ReferenceInstruction).reference.toString().takeIf { it == DEFAULT_FROM_STYLE }
+    else -> null
+}
+
+/**
  * The family constants the extension swaps: Meta's interface families, by the names the enum
  * keeps. OwnFont.isInterfaceFamily is the same rule on the phone.
  */
@@ -75,6 +104,15 @@ internal fun typefaceResolvers(owner: ClassDef): List<Method> = owner.methods.fi
     method.isStatic() && method.returnType == TYPEFACE && holdsString(method, NO_BACKING_SOURCE) &&
         method.parameterTypes.size >= 2 && method.parameterTypeNames().last() == "I" &&
         method.parameterTypeNames().first().startsWith("L")
+}
+
+/**
+ * The static methods of [owner] that answer a Typeface for a Context and end in the [NO_ROBOTO]
+ * log: Facebook's Roboto builder. The patch wants exactly one.
+ */
+internal fun robotoBuilders(owner: ClassDef): List<Method> = owner.methods.filter { method ->
+    method.isStatic() && method.returnType == TYPEFACE && method.parameterTypeNames().firstOrNull() == CONTEXT &&
+        holdsString(method, NO_ROBOTO)
 }
 
 /** The font family type [resolver] takes: its first parameter. */

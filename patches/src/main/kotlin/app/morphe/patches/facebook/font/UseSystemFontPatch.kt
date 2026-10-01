@@ -7,6 +7,7 @@ package app.morphe.patches.facebook.font
 import app.morphe.patcher.StringComparisonType
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
@@ -25,7 +26,9 @@ import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
 import app.morphe.util.superclassChain
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 
 private const val PATCH = "Use the system font"
 internal const val OWN_FONT = "$EXTENSION_PACKAGE/font/OwnFont;"
@@ -33,6 +36,8 @@ internal const val REPLACE = "$OWN_FONT->replace($TYPEFACE${ENUM}I)$TYPEFACE"
 internal const val REMEMBER_VARIATION = "$OWN_FONT->rememberVariation(Ljava/lang/Object;$STRING)V"
 internal const val REPLACE_BUILT = "$OWN_FONT->replaceBuilt(${TYPEFACE}Ljava/lang/Object;)$TYPEFACE"
 internal const val REPLACE_REACT_NATIVE = "$OWN_FONT->replaceReactNative($TYPEFACE$STRING)$TYPEFACE"
+internal const val REPLACE_PHONE_FONT = "$OWN_FONT->replacePhoneFont($TYPEFACE)$TYPEFACE"
+internal const val OWN_DEFAULT_FROM_STYLE = "$OWN_FONT->defaultFromStyle(I)$TYPEFACE"
 
 /**
  * Facebook draws its interface in Meta's Optimistic family, handed out by one typeface
@@ -42,7 +47,11 @@ internal const val REPLACE_REACT_NATIVE = "$OWN_FONT->replaceReactNative($TYPEFA
  * through the builders Meta's factory makes, so those get the same treatment at their exit, with
  * the variation string each was given remembered for the weight. React Native screens ask React
  * Native's font manager for a family by name, so its resolver's answer goes through the extension
- * too, with the name it was asked for.
+ * too, with the name it was asked for. Text that asks for none of Meta's fonts gets a Roboto from
+ * Facebook's own builder, which is how posts, comments and menus get the phone's font on accounts
+ * without Optimistic, and its answer goes through the extension so a picked file reaches them too.
+ * So do Facebook's own reads of Android's default typefaces, where the names bolded in a post's
+ * header or a notification get theirs.
  */
 @Suppress("unused")
 val useSystemFontPatch = bytecodePatch(
@@ -60,7 +69,81 @@ val useSystemFontPatch = bytecodePatch(
         hookTypefaceRepository()
         hookVariableFontBuilders()
         hookReactNativeFonts()
+        hookRobotoBuilder()
+        hookDefaultTypefaces()
         enableStatus("systemFont")
+    }
+}
+
+/**
+ * Facebook's own reads of Android's default typefaces: Typeface.DEFAULT, DEFAULT_BOLD and
+ * defaultFromStyle. That's where the spans that bold a name in a post's header or a notification
+ * get the phone's bold, and where plenty of other text gets the phone's font without asking the
+ * text engine. Each read of either field becomes a call of the extension's getter for it, with the
+ * answer moved into the read's register, and each defaultFromStyle call goes to the extension's
+ * own, which makes the framework's call itself. Both answer a picked font file at the same weight
+ * and slant, and the framework's typeface otherwise. The call takes the read's place, so a jump
+ * to the read or a try block's edge on it stays where it was, and the move after it goes in front
+ * of whatever followed the read, so a jump there still skips it. The extension's own classes are
+ * left alone, since they read the defaults themselves. Answers how many reads it sent.
+ */
+internal fun BytecodePatchContext.hookDefaultTypefaces(): Int {
+    val owners = mutableSetOf<String>()
+    classDefForEach { classDef ->
+        if (classDef.type.startsWith(EXTENSION_CLASSES)) return@classDefForEach
+        if (classDef.methods.any { method -> method.implementation?.instructions?.any { defaultRead(it) != null } == true }) {
+            owners += classDef.type
+        }
+    }
+    val sent = owners.sumOf { type -> mutableClassDefByOrNull(type)?.methods?.sumOf { it.sendDefaultReads() } ?: 0 }
+    if (sent == 0) throw PatchException("$PATCH: found no read of Android's default typefaces outside the extension")
+    return sent
+}
+
+/** Sends each read of Android's default typefaces in this method to the extension, last first. Answers how many. */
+internal fun MutableMethod.sendDefaultReads(): Int {
+    val sites = (implementation ?: return 0).instructions.withIndex()
+        .mapNotNull { (index, instruction) -> defaultRead(instruction)?.let { Triple(index, instruction, it) } }
+    sites.asReversed().forEach { (index, instruction, read) ->
+        if (read == DEFAULT_FROM_STYLE) {
+            val style = when (instruction) {
+                is RegisterRangeInstruction -> "invoke-static/range { v${instruction.startRegister} .. v${instruction.startRegister} }"
+                is FiveRegisterInstruction -> "invoke-static { v${instruction.registerC} }"
+                else -> throw PatchException("$PATCH: $definingClass->$name calls $read in an unexpected form")
+            }
+            replaceInstruction(index, "$style, $OWN_DEFAULT_FROM_STYLE")
+        } else {
+            val register = (instruction as OneRegisterInstruction).registerA
+            replaceInstruction(index, "invoke-static { }, $OWN_FONT->${DEFAULT_TYPEFACES.getValue(read)}()$TYPEFACE")
+            addInstruction(index + 1, "move-result-object v$register")
+        }
+    }
+    return sites.size
+}
+
+/**
+ * Facebook's Roboto builder, which its text engine asks for text that names none of Meta's fonts
+ * and for Optimistic text the repository couldn't build. Each answer goes through the extension,
+ * which swaps in a picked font file at the same weight and slant. A range call names the answer's
+ * register whatever its number, and what comes back goes in the same register, a Typeface either
+ * way, so a handler over the return sees what it did before.
+ */
+internal fun BytecodePatchContext.hookRobotoBuilder() {
+    val builders = classDefByStrings(NO_ROBOTO, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        .flatMap(::robotoBuilders)
+    val builder = builders.singleOrNull() ?: throw PatchException(
+        "$PATCH: expected one Roboto builder logging \"$NO_ROBOTO\", found ${builders.size}",
+    )
+    val mutable = mutableClassDefBy(builder.definingClass).findMutableMethodOf(builder)
+    if (objectReturns(mutable).isEmpty()) {
+        throw PatchException("$PATCH: the Roboto builder ${builder.definingClass}->${builder.name} never returns a Typeface")
+    }
+    mutable.forEachObjectReturn { register ->
+        listOf(
+            "invoke-static/range { v$register .. v$register }, $REPLACE_PHONE_FONT",
+            "move-result-object v$register",
+        )
     }
 }
 

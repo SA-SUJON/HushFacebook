@@ -51,6 +51,18 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * the app's font assets by file name. {@link #replaceReactNative} stands at the exit of the
  * manager's resolver and swaps the families named for Meta's interface fonts.
  *
+ * <p>Text that asks for none of Meta's fonts takes a fourth: Facebook's own text engine builds it
+ * a Roboto, the phone's sans-serif at the weight its style names. That's where posts, comments and
+ * menus get their font on accounts Facebook gives no Optimistic, and where Optimistic text lands
+ * when the repository can't build it. It's the phone's font already, so {@link #replacePhoneFont}
+ * swaps it only for a picked file.
+ *
+ * <p>The rest of Facebook's code reads Android's default typefaces itself, the spans that bold a
+ * name in a post's header or a notification among it. Each read of Typeface.DEFAULT or
+ * DEFAULT_BOLD, and each call of Typeface.defaultFromStyle, comes here instead
+ * ({@link #defaultTypeface}, {@link #defaultBold}, {@link #defaultFromStyle}), and a picked file
+ * takes those too.
+ *
  * <p>The weight comes from what Facebook built, never from a register alone. A static asset
  * carries its own weight (Optimistic Text Bold is 700 whatever was asked for), and a variable
  * font carries its default instance's, so the larger of the built weight and the requested one
@@ -72,6 +84,8 @@ public final class OwnFont {
     private static final String REPOSITORY = "typeface repository";
     private static final String BUILDER = "variable font builder";
     private static final String REACT_NATIVE = "React Native font manager";
+    private static final String ROBOTO = "Roboto builder";
+    private static final String DEFAULTS = "Android's default typefaces";
 
     /**
      * What each family name a React Native screen asked for came to: the weight it ends in, 0 for
@@ -169,6 +183,53 @@ public final class OwnFont {
     }
 
     /**
+     * The picked font at [answer]'s weight and slant while the switch is on and a font file is
+     * picked, otherwise [answer]: the Roboto Facebook's text engine built for text that asks for
+     * none of Meta's fonts. With no file picked, or a copy that won't load, that Roboto is the
+     * phone's font already, so it stands.
+     */
+    public static Typeface replacePhoneFont(Typeface answer) {
+        return pickedInstead(answer, ROBOTO);
+    }
+
+    /** {@link Typeface#DEFAULT} for Facebook's own code: the picked font at 400 while one is picked. */
+    public static Typeface defaultTypeface() {
+        return pickedInstead(Typeface.DEFAULT, DEFAULTS);
+    }
+
+    /**
+     * {@link Typeface#DEFAULT_BOLD} for Facebook's own code: the picked font at 700 while one is
+     * picked. The spans that bold a name in a post's header or a notification read it.
+     */
+    public static Typeface defaultBold() {
+        return pickedInstead(Typeface.DEFAULT_BOLD, DEFAULTS);
+    }
+
+    /** {@link Typeface#defaultFromStyle} for Facebook's own code: the picked font in [style] while one is picked. */
+    public static Typeface defaultFromStyle(int style) {
+        return pickedInstead(Typeface.defaultFromStyle(style), DEFAULTS);
+    }
+
+    /**
+     * The picked font at [answer]'s weight and slant while the switch is on and a font file is
+     * picked, otherwise [answer], a typeface of the phone's font that Facebook got from [road].
+     */
+    private static Typeface pickedInstead(Typeface answer, String road) {
+        try {
+            HookStatus.invoked(FamilyNames.SYSTEM_FONT);
+            if (answer == null) return null;
+            if (!Utils.settingsReady() || !Settings.USE_SYSTEM_FONT.get()) return answer;
+            HookStatus.bound(FamilyNames.SYSTEM_FONT, road);
+            Picked font = picked();
+            Typeface styled = font == null ? null : font.styled(clamped(answer.getWeight()), answer.isItalic());
+            return styled != null ? styled : answer;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.SYSTEM_FONT, road, failure);
+            return answer;
+        }
+    }
+
+    /**
      * What React Native family [family] is: the weight its name ends in, 0 for a name with none, or
      * -1 when it isn't one of Meta's interface fonts. Those are the Optimistic families, under any
      * of the names Facebook gives them ("Optimistic VF App Lite 500", "Optimistic Display App", the
@@ -239,13 +300,18 @@ public final class OwnFont {
      * there is one and it loads, else the phone's default font.
      */
     static Typeface typeface(int weight, boolean italic) {
-        int clamped = weight >= 1 && weight <= 1000 ? weight : 400;
+        int clamped = clamped(weight);
         Picked font = picked();
         if (font != null) {
             Typeface styled = font.styled(clamped, italic);
             if (styled != null) return styled;
         }
         return Typeface.create(Typeface.DEFAULT, clamped, italic);
+    }
+
+    /** [weight] when it's one Android takes, 1 to 1000, and 400 otherwise. */
+    private static int clamped(int weight) {
+        return weight >= 1 && weight <= 1000 ? weight : 400;
     }
 
     /**
