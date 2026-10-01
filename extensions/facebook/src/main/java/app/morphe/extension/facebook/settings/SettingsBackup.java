@@ -232,11 +232,21 @@ public final class SettingsBackup {
             Arrays.<Setting<?>>asList(HIDDEN, KEPT, TO, FOLDER, QUALITY, FILE_NAME, ACTION, APP, START, ORDER,
                     PLAYBACK));
 
+    /** The longest name or value a file holds that isn't a word list, far past a package name. */
+    private static final int MAX_OTHER_CHARS = 1024;
+
     /**
-     * Bounds for the parser, well past anything this class writes, so a file built to be
-     * expensive to read is refused before it is.
+     * The longest string a file can hold, in Java chars: a word list at its longest, which a file
+     * carries whole, or any other name or value.
      */
-    private static final SettingsJson.Limits LIMITS = new SettingsJson.Limits(8, 1024, 1024, 256, MAX_BYTES);
+    static final int MAX_STRING_CHARS = Math.max(PostWords.MAX_STORED_CHARS, MAX_OTHER_CHARS);
+
+    /**
+     * Bounds for the parser. A string may be as long as the longest this class writes, and the
+     * rest are well past anything it writes, so a file built to be expensive to read is refused
+     * before it is.
+     */
+    private static final SettingsJson.Limits LIMITS = new SettingsJson.Limits(8, 1024, MAX_STRING_CHARS, 256, MAX_BYTES);
 
     /** Written by some editors at the start of a UTF-8 file. It isn't part of the JSON. */
     private static final String BYTE_ORDER_MARK = String.valueOf((char) 0xFEFF);
