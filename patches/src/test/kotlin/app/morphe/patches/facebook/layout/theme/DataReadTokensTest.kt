@@ -113,7 +113,7 @@ class DataReadTokensTest {
     }
 
     @Test
-    fun `a switch case and a catch handler bring the values from before them`() {
+    fun `a switch case, and a catch handler from what can throw, bring the values from before them`() {
         val switched = scan(method("Lfixture/Switch;", "colour", listOf(theme, "I"), "I", """
             const v0, 0x7f040001
             packed-switch p1, :cases
@@ -127,6 +127,7 @@ class DataReadTokensTest {
         """))
         assertEquals(setOf("ACCENT", "WASH"), switched.tokens)
         // addInstructionsWithLabels leaves .catch out, so the try block covering 1 and 2 is added by hand.
+        // A const can't throw, so the DIVIDER it writes over never reaches the handler; the call after it can.
         val caught = scan(method("Lfixture/Catch;", "colour", listOf(theme), "I", """
             const v0, 0x7f040003
             const v0, 0x7f040004
@@ -138,7 +139,21 @@ class DataReadTokensTest {
             val code = implementation!!
             code.addCatch("Ljava/lang/Exception;", code.newLabelForIndex(1), code.newLabelForIndex(3), code.newLabelForIndex(4))
         })
-        assertEquals(setOf("DIVIDER", "PRIMARY_TEXT"), caught.tokens)
+        assertEquals(setOf("PRIMARY_TEXT"), caught.tokens)
+        // A call that can throw before the write over it hands DIVIDER to the handler too (try block 1 to 3).
+        val thrownFirst = scan(method("Lfixture/CatchFirst;", "colour", listOf(theme), "I", """
+            const v0, 0x7f040003
+            invoke-static {}, Lfixture/Attrs;->next()I
+            const v0, 0x7f040004
+            invoke-static {}, Lfixture/Attrs;->next()I
+            return v0
+            move-exception v4
+            $readData
+        """).apply {
+            val code = implementation!!
+            code.addCatch("Ljava/lang/Exception;", code.newLabelForIndex(1), code.newLabelForIndex(4), code.newLabelForIndex(5))
+        })
+        assertEquals(setOf("DIVIDER", "PRIMARY_TEXT"), thrownFirst.tokens)
     }
 
     @Test
@@ -213,5 +228,44 @@ class DataReadTokensTest {
         assertEquals(emptySet<String>(), found.tokens)
         assertEquals(1, found.unresolved.size)
         assertTrue(found.unresolved.single(), found.unresolved.single().startsWith("Lfixture/Lookup;->colour("))
+    }
+
+    /** A method reading type for only one of its two calls can still read the other as data. */
+    @Test
+    fun `a call it can't follow in a partly checked method is listed`() {
+        val found = scan(method("Lfixture/Partly;", "colour", listOf(theme), "I", """
+            const v0, 0x7f040001
+            new-instance v1, Landroid/util/TypedValue;
+            invoke-direct {v1}, Landroid/util/TypedValue;-><init>()V
+            const/4 v2, 0x1
+            invoke-virtual {p0, v0, v1, v2}, $resolve
+            iget v3, v1, Landroid/util/TypedValue;->type:I
+            invoke-static {}, Lfixture/Attrs;->next()I
+            move-result v0
+            invoke-virtual {p0, v0, v1, v2}, $resolve
+            iget v3, v1, Landroid/util/TypedValue;->data:I
+            return v3
+        """))
+        assertEquals(emptySet<String>(), found.tokens)
+        assertEquals(mapOf("ACCENT" to setOf("Lfixture/Partly;->colour($theme)I")), found.unchecked)
+        assertEquals(listOf("Lfixture/Partly;->colour($theme)I@8"), found.unresolved.toList())
+    }
+
+    /** A helper reached only through another class's name, a subclass's or an interface's, has no caller the scan sees. */
+    @Test
+    fun `a helper no call reaches is listed`() {
+        val helper = method("Lfixture/Helper;", "colour", listOf(theme, "I"), "I", """
+            move v0, p1
+            $readData
+        """)
+        val caller = method("Lfixture/Caller;", "draw", listOf(theme), "I", """
+            const v4, 0x7f040004
+            invoke-static {p0, v4}, Lfixture/SubHelper;->colour(${theme}I)I
+            move-result v5
+            return v5
+        """)
+        val found = scan(helper, caller)
+        assertEquals(emptySet<String>(), found.tokens)
+        assertEquals(setOf("Lfixture/Helper;->colour(${theme}I)I: no caller"), found.unresolved)
     }
 }

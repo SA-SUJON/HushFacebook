@@ -233,8 +233,10 @@ private enum class Read { DATA, TYPE, NEITHER }
  * What [dataReadTokens] found: the tokens some code reads as `TypedValue.data` without looking at
  * `TypedValue.type`, each with the methods that do ([readers]); the tokens that reach `resolveAttribute` in a method that reads `type` for fewer
  * calls than it makes, or reads neither field and so hands the value on ([unchecked], each with the
- * methods); and the data-reading calls whose attribute the scan can't follow ([unresolved], each
- * `method@instruction`). The last two are for a person to look at: the fixture test pins them.
+ * methods); and what the scan can't follow ([unresolved]): a call whose attribute it can't trace, in a
+ * method that reads `data` unchecked or only partly checked, as `method@instruction`, and a helper no
+ * call it found reaches, as `method: no caller` (a call through a subclass or an interface names
+ * another class). The last two are for a person to look at: the fixture test pins them.
  */
 internal class DataReadScan(
     val readers: Map<String, Set<String>>,
@@ -279,7 +281,7 @@ internal fun dataReadTokens(
                     null
                 }
                 Origin.Other -> {
-                    if (read == Read.DATA) unresolved += "$method@$at"
+                    if (read != Read.TYPE) unresolved += "$method@$at"
                     null
                 }
             } ?: continue
@@ -304,6 +306,7 @@ internal fun dataReadTokens(
         }
     }
 
+    val called = mutableSetOf<String>()
     while (fresh.isNotEmpty()) {
         val round = fresh
         fresh = mutableMapOf()
@@ -317,6 +320,7 @@ internal fun dataReadTokens(
                     val target = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: continue
                     if (target.definingClass !in roundTypes) continue
                     val uses = round[target.key()] ?: continue
+                    called += target.key()
                     val caller = flow ?: Flow(method).also { flow = it }
                     val static = instruction.opcode == Opcode.INVOKE_STATIC || instruction.opcode == Opcode.INVOKE_STATIC_RANGE
                     for ((parameter, read) in uses) {
@@ -328,6 +332,7 @@ internal fun dataReadTokens(
             }
         }
     }
+    for (helper in helpers.keys - called) unresolved += "$helper: no caller"
     return DataReadScan(readers, unchecked, unresolved)
 }
 
@@ -365,7 +370,7 @@ private fun Instruction.arguments(): List<Int> = when (this) {
 /**
  * [method]'s instructions and, for each, the ones control can come to it from: the one above when
  * that one carries on, every branch and switch case aimed at it, and for an exception handler, what
- * comes before each instruction its try block covers. -1 stands for the method's start.
+ * comes before each instruction its try block covers that can throw. -1 stands for the method's start.
  */
 private class Flow(val method: Method) {
     val instructions: List<Instruction> = method.implementation!!.instructions.toList()
@@ -395,7 +400,8 @@ private class Flow(val method: Method) {
         val handlerPredecessors = mutableMapOf<Int, MutableSet<Int>>()
         for (tryBlock in method.implementation!!.tryBlocks) {
             val covered = instructions.indices.filter {
-                addresses[it] >= tryBlock.startCodeAddress && addresses[it] < tryBlock.startCodeAddress + tryBlock.codeUnitCount
+                addresses[it] >= tryBlock.startCodeAddress && addresses[it] < tryBlock.startCodeAddress + tryBlock.codeUnitCount &&
+                    instructions[it].opcode.canThrow()
             }
             for (handler in tryBlock.exceptionHandlers) {
                 handlerPredecessors.getOrPut(byAddress.getValue(handler.handlerCodeAddress)) { linkedSetOf() } +=

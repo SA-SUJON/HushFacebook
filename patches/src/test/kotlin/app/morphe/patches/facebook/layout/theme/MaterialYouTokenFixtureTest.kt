@@ -62,7 +62,7 @@ class MaterialYouTokenFixtureTest {
     private companion object {
         /**
          * The FDS tokens 577 and 580 resolve and read as `TypedValue.data`: straight from a literal, off a
-         * token constant, or through the two helpers that take the attribute as a parameter.
+         * token constant, or through a helper handed the attribute or a token constant as a parameter.
          */
         val DATA_READ_TOKENS = setOf("ACCENT", "DISABLED_TEXT", "DIVIDER", "NAV_BAR_BACKGROUND", "PLACEHOLDER_IMAGE",
             "PRIMARY_TEXT", "PRIMARY_TEXT_ON_MEDIA", "SURFACE_BACKGROUND", "WASH")
@@ -76,16 +76,58 @@ class MaterialYouTokenFixtureTest {
         val UNCHECKED_TOKENS = setOf("PRIMARY_TEXT", "SHADOW_TEXT_AND_ICON_ON_MEDIA", "SURFACE_BACKGROUND")
 
         /**
-         * The data-reading calls whose attribute the scan can't follow, by build. React Native's
+         * The calls whose attribute the scan can't follow, by build. React Native's
          * PlatformColor (`A02`, called from FabricUIManager.getColor) looks an attribute up by the name
          * the JavaScript gives it, and Mapbox's ColorUtils looks up colorAccent, colorPrimary and
          * colorPrimaryDark, which aren't FDS tokens. The JavaScript ships compressed, so PlatformColor's
          * names were logged on 580 instead (2026-09-30): Marketplace home, a listing, search and its
          * results asked it for none, since React Native's colours there arrive as ints.
+         *
+         * The rest are in methods that check `type` for only some calls or hand the TypedValue on, and
+         * none is an FDS token (looked at on 580, 2026-09-30): `A2O.A0Q` and `FVu.A00` read only
+         * `resourceId`; `fA7.Eu1` passes attributes it keeps in fields to `gi9.A00`, which reads a
+         * dimension; `g4w.A05`, `g7C`'s constructor and `g7C.A0Z` read `gAp.errorColorAttr`, a text
+         * input's border states, whose four attributes (0x7f040456, 0x7f040459, 0x7f040448, 0x7f040458)
+         * the token enum doesn't hold; and `fFB.D8G`'s text colours come from builder fields that
+         * `g60.A0V`, `g65.A01` and `hk8.invoke` only ever set to 0x7f040458, its third call an image
+         * resource through `giD.A01`. 577 has the same code under other names (8Qk, iv6, PHA, PJ4,
+         * QPv, QS3), and `kWD.A1B` is Mapbox's and MapLibre's ColorUtils lookup by name, kept in one
+         * helper there.
          */
         val UNRESOLVED = mapOf(
-            "577.0.0.50.72" to setOf("LX/CHJ;->A02(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/Integer;@88"),
+            "577.0.0.50.72" to setOf(
+                "LX/8Qk;->A0Q(Ljava/lang/Integer;)V@16",
+                "LX/CHJ;->A02(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/Integer;@88",
+                "LX/PHA;->Eqj(LX/RDk;)V@135",
+                "LX/PHA;->Eqj(LX/RDk;)V@146",
+                "LX/PHA;->Eqj(LX/RDk;)V@47",
+                "LX/PHA;->Eqj(LX/RDk;)V@57",
+                "LX/PHA;->Eqj(LX/RDk;)V@67",
+                "LX/PHA;->Eqj(LX/RDk;)V@71",
+                "LX/PJ4;->D7V(LX/hQW;I)V@168",
+                "LX/PJ4;->D7V(LX/hQW;I)V@224",
+                "LX/PJ4;->D7V(LX/hQW;I)V@32",
+                "LX/QPv;->A04(LX/QPv;LX/QUd;)V@9",
+                "LX/QS3;-><init>(Landroid/content/Context;)V@114",
+                "LX/QS3;->A0f()V@35",
+                "LX/iv6;->A00(Landroid/content/Context;Lcom/facebook/react/bridge/ReadableMap;)Landroid/graphics/drawable/Drawable;@20",
+                "LX/kWD;->A1B(Landroid/content/Context;Landroid/content/res/Resources\$Theme;Landroid/content/res/Resources;Landroid/util/TypedValue;Ljava/lang/String;)V@6",
+            ),
             "580.0.0.51.74" to setOf(
+                "LX/A2O;->A0Q(Ljava/lang/Integer;)V@16",
+                "LX/FVu;->A00(Landroid/content/Context;Lcom/facebook/react/bridge/ReadableMap;)Landroid/graphics/drawable/Drawable;@20",
+                "LX/fA7;->Eu1(LX/grb;)V@131",
+                "LX/fA7;->Eu1(LX/grb;)V@142",
+                "LX/fA7;->Eu1(LX/grb;)V@43",
+                "LX/fA7;->Eu1(LX/grb;)V@53",
+                "LX/fA7;->Eu1(LX/grb;)V@63",
+                "LX/fA7;->Eu1(LX/grb;)V@67",
+                "LX/fFB;->D8G(LX/ewK;I)V@170",
+                "LX/fFB;->D8G(LX/ewK;I)V@226",
+                "LX/fFB;->D8G(LX/ewK;I)V@33",
+                "LX/g4w;->A05(LX/g4w;LX/gAp;)V@11",
+                "LX/g7C;-><init>(Landroid/content/Context;)V@114",
+                "LX/g7C;->A0Z()V@36",
                 "LX/Cyv;->A02(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/Integer;@88",
                 "Lcom/mapbox/mapboxsdk/utils/ColorUtils;->getAccentColor(Landroid/content/Context;)I@13",
                 "Lcom/mapbox/mapboxsdk/utils/ColorUtils;->getPrimaryColor(Landroid/content/Context;)I@13",
