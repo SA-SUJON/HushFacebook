@@ -136,7 +136,9 @@ internal fun isPluginCheck(instruction: Instruction, owner: String): Boolean {
 /**
  * Reads the socket out of [method], which loads [PILL_SOCKET] and [META_AI_PILL]. Refuses when the
  * plugin names go to more than one register, when no per-plugin check is followed by a move-result,
- * or when a register the hook hands over doesn't fit the call's four bits.
+ * when a register the hook hands over doesn't fit the call's four bits, when a way past a hook's
+ * spot skips it, and when a check can be reached with anything but a plugin's name in the name
+ * register or answers into it. A check is numbered by its move-result in every refusal.
  */
 internal fun pillSocket(method: Method): PillSocket {
     val code = method.implementation!!.instructions.toList()
@@ -171,12 +173,12 @@ private fun requirePluginNames(method: Method, nameRegister: Int, answers: List<
     for (answer in answers) {
         val check = answer - 1
         if ((code[answer] as OneRegisterInstruction).registerA == nameRegister) {
-            refuse("in $where the plugin check at $check answers into v$nameRegister, the plugin's name its hook hands over")
+            refuse("in $where the plugin check at $answer answers into v$nameRegister, the plugin's name its hook hands over")
         }
         val strangers = method.writersReaching(check, nameRegister).filterNot { it >= 0 && isPluginName(code[it]) }
         if (strangers.isNotEmpty()) {
             val ways = strangers.joinToString(" and ") { if (it < 0) "the method's start" else "the write at $it" }
-            refuse("in $where the plugin check at $check can get v$nameRegister from $ways, not only from a plugin's name")
+            refuse("in $where the plugin check at $answer can get v$nameRegister from $ways, not only from a plugin's name")
         }
     }
 }

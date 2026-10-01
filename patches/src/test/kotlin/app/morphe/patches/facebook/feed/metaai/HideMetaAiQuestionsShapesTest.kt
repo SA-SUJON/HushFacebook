@@ -344,10 +344,10 @@ class HideMetaAiQuestionsShapesTest {
         assertEquals(listOf(2, 7), pillSocket(checks()).answers)
 
         val written = assertThrows(PatchException::class.java) { pillSocket(checks(beforeSecond = "const/4 v7, 0x0")) }.message!!
-        assertTrue(written, "the plugin check at 7 can get v7 from the write at 6, not only from a plugin's name" in written)
+        assertTrue(written, "the plugin check at 8 can get v7 from the write at 6, not only from a plugin's name" in written)
 
         val fromStart = assertThrows(PatchException::class.java) { pillSocket(checks(start = "if-eqz v15, :next")) }.message!!
-        assertTrue(fromStart, "the plugin check at 7 can get v7 from the method's start, not only from a plugin's name" in fromStart)
+        assertTrue(fromStart, "the plugin check at 8 can get v7 from the method's start, not only from a plugin's name" in fromStart)
 
         val intoName = method(
             """
@@ -363,7 +363,7 @@ class HideMetaAiQuestionsShapesTest {
             """,
         )
         val answered = assertThrows(PatchException::class.java) { pillSocket(intoName) }.message!!
-        assertTrue(answered, "the plugin check at 1 answers into v7, the plugin's name its hook hands over" in answered)
+        assertTrue(answered, "the plugin check at 2 answers into v7, the plugin's name its hook hands over" in answered)
     }
 
     /**
