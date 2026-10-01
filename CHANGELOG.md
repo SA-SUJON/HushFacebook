@@ -4,6 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Tooling:** `Hide Meta AI questions under posts` refuses a Facebook build where anything but a plugin check's answer can reach the branch after a check, or where a try block or a catch handler sits on that branch. Each check's hook goes in front of the branch, so another way in would skip it. The second check, which feeds the log and jumps back to the branch, still applies, since its own hook took that answer.
 * **Facebook:** The Turkish settings now write Facebook'u, Reels'e and GitHub'ı with a straight apostrophe on every row. Seven rows had a curly one, so the note to restart Facebook looked different from one row to the next.
 * **Tooling:** `Keep post dates` refuses a Facebook build where the post header's choice reaches a branch on it only through a catch handler. The branch between the rotating subtitle and the one line runs when nothing throws, so that one isn't it, and the hook would have gone in and changed nothing.
 * **Tooling:** `Hide the Feeds header` refuses a Facebook build with a try block over, or starting or ending at, a spot where one of its hooks goes in, as the hand-over to the filters' controller already did. That covers each answer to whether the tab gets a title row and the branch that gives the posts room for the filters. A try block there could take the hook's call in and hand its handler the registers the hook writes.

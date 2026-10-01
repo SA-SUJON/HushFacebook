@@ -349,6 +349,41 @@ private fun Method.walkFromDefinition(
 }
 
 /**
+ * Every instruction whose write of [register] can be what that register holds as the instruction
+ * at [index] starts, found by walking back along every way in. A way in from a handler passes the
+ * instruction that threw, which never wrote its destination. -1 stands for the method's start,
+ * reached with [register] never written on the way.
+ */
+fun Method.writersReaching(index: Int, register: Int): List<Int> {
+    val flow = ControlFlow.of(this)
+    val count = flow.instructions.size
+    val normalInto = Array(count) { mutableListOf<Int>() }
+    val thrownInto = Array(count) { mutableListOf<Int>() }
+    for (from in 0 until count) {
+        flow.normal[from].forEach { normalInto[it] += from }
+        if (flow.instructions[from].opcode.canThrow()) flow.exceptional[from].forEach { thrownInto[it] += from }
+    }
+    val writers = sortedSetOf<Int>()
+    val seen = BitSet()
+    val pending = ArrayDeque<Int>()
+    fun passThrough(at: Int) {
+        if (seen[at]) return
+        seen.set(at)
+        pending += at
+    }
+    if (index == 0) writers += -1
+    for (from in normalInto[index]) if (writesRegister(flow.instructions[from], register)) writers += from else passThrough(from)
+    thrownInto[index].forEach(::passThrough)
+    while (pending.isNotEmpty()) {
+        val at = pending.removeFirst()
+        if (at == 0) writers += -1
+        for (from in normalInto[at]) if (writesRegister(flow.instructions[from], register)) writers += from else passThrough(from)
+        thrownInto[at].forEach(::passThrough)
+    }
+    return writers.toList()
+}
+
+/**
  * Every instruction that can read what [register] holds once the instruction at [index] has
  * run, before something writes it again. Empty means code inserted right after that
  * instruction may use the register for itself. The instruction's own handlers are included:

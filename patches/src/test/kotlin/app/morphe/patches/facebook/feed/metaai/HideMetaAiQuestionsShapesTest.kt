@@ -253,6 +253,87 @@ class HideMetaAiQuestionsShapesTest {
     }
 
     /**
+     * The socket's checks as 577 and 580 lay them out: the plugin's name, the check and its answer
+     * in v14, the branch on it, and a second check that feeds the log and jumps back to that branch.
+     * [beforeSecond] goes in front of the second check, and [extra] after the jump back, where
+     * nothing reaches it.
+     */
+    private fun checks(start: String = "", beforeSecond: String = "", extra: String = "") = method(
+        """
+            $start
+            const-string v7, "$META_AI_PILL"
+            invoke-static { v4, v8 }, Lfixture/PillSocket;->A0E(Ljava/lang/Object;I)Z
+            move-result v14
+            :branch
+            if-eqz v14, :next
+            const-string v0, "the pill"
+            return-object v0
+            :next
+            $beforeSecond
+            invoke-static { v4, v8 }, Lfixture/PillSocket;->A0E(Ljava/lang/Object;I)Z
+            move-result v14
+            invoke-static { v14 }, Lfixture/Log;->note(Z)V
+            goto :branch
+            $extra
+        """,
+    )
+
+    /**
+     * The hook after each check goes in front of the instruction after its move-result, and a jump
+     * there skips it. The second check's jump back carries an answer its own hook took, so it
+     * applies. One that carries anything else is refused, the method's start included.
+     */
+    @Test
+    fun `a way past a check's hook is refused unless its answer went through a hook`() {
+        val plain = checks()
+        assertEquals(listOf(2, 7), pillSocket(plain).answers)
+        val other = """
+            if-nez v8, :other
+        """
+        val written = checks(beforeSecond = other, extra = """
+            :other
+            const/4 v14, 0x1
+            goto :branch
+        """)
+        val constant = written.body().indexOfFirst { it.opcode == Opcode.CONST_4 }
+        val refusal = assertThrows(PatchException::class.java) { pillSocket(written) }.message!!
+        assertTrue(refusal, "the instruction after the plugin check at 2 can get v14 from the write at $constant, not only from a plugin check" in refusal)
+        val fromStart = assertThrows(PatchException::class.java) { pillSocket(checks(start = "if-eqz v15, :branch")) }.message!!
+        assertTrue(fromStart, "the instruction after the plugin check at 3 can get v14 from the method's start" in fromStart)
+    }
+
+    /**
+     * A catch handler at the instruction after a check would skip its hook, and a try block over it,
+     * or starting or ending there, would take the hook's call in or leave it out. A try block over
+     * the check alone, ending at its move-result, still applies.
+     */
+    @Test
+    fun `a handler or a try block at a check's hook is refused`() {
+        val extra = """
+            move-exception v13
+            throw v13
+        """
+        fun caught(from: Int, to: Int, handler: Int? = null) = checks(extra = extra).apply {
+            val thrown = handler ?: body().indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+            implementation!!.apply {
+                addCatch("Ljava/lang/Exception;", newLabelForIndex(from), newLabelForIndex(to), newLabelForIndex(thrown))
+            }
+        }
+        val shapes = mapOf(
+            "a handler at the branch" to (caught(5, 6, handler = 3) to "a catch handler starts at"),
+            "a try block ending at the branch" to (caught(1, 3) to "a try block ends at"),
+            "a try block starting at the branch" to (caught(3, 4) to "a try block starts at"),
+            "a try block over the branch" to (caught(1, 4) to "a try block covers"),
+        )
+        for ((shape, case) in shapes) {
+            val (method, edge) = case
+            val refusal = assertThrows(shape, PatchException::class.java) { pillSocket(method) }.message!!
+            assertTrue("$shape: $refusal", "$edge the instruction after the plugin check at 2, where its hook goes" in refusal)
+        }
+        assertEquals(listOf(2, 7), pillSocket(caught(1, 2)).answers)
+    }
+
+    /**
      * The hook's answer sits in the name's register until the name's load writes over it, so a
      * catch handler over that load sees the answer there when the load itself throws. One that
      * reads the register is refused. One that writes it first, or never reads it, still applies

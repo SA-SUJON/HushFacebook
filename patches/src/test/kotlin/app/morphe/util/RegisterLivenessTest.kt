@@ -460,6 +460,49 @@ class RegisterLivenessTest {
         assertEquals(listOf(4), method.readsAfter(1, 2))          // v2 is read further down
     }
 
+    /**
+     * The writes that can reach a branch: one on each way in, the jump back of a loop included,
+     * and the method's start where a way never writes the register. A handler's way in goes past
+     * the instruction that threw, which never wrote its destination, to the write before it.
+     */
+    @Test
+    fun `the writes reaching an instruction, back along every way in`() {
+        val method = smali(
+            registers = 3, params = listOf("I"),
+            body = """
+                if-eqz p0, :branch
+                const/4 v0, 0x1
+                :branch
+                if-eqz v0, :next
+                return-void
+                :next
+                invoke-static {}, Lcom/example/Check;->ask()Z
+                move-result v0
+                goto :branch
+            """,
+        )
+        assertEquals(listOf(-1, 1, 5), method.writersReaching(2, 0))
+        assertEquals(listOf(5), method.writersReaching(6, 0))
+        assertEquals(listOf(-1), method.writersReaching(0, 0))
+
+        val caught = smali(
+            registers = 2, params = emptyList(),
+            body = """
+                const/4 v0, 0x0
+                invoke-static {}, Lcom/example/Check;->ask()Z
+                move-result v0
+                return-void
+                invoke-static {v0}, Lcom/example/Log;->note(Z)V
+                return-void
+            """,
+        ).apply {
+            // The call and its move-result in a try block whose handler is the note.
+            implementation!!.apply { addCatch(newLabelForIndex(1), newLabelForIndex(3), newLabelForIndex(4)) }
+        }
+        assertEquals("the handler sees v0 from before the call that threw", listOf(0), caught.writersReaching(4, 0))
+        assertEquals(listOf(2), caught.writersReaching(3, 0))
+    }
+
     private fun smali(registers: Int, params: List<String>, body: String) = MutableMethod(
         ImmutableMethod(
             "Lcom/example/Host;", "run", params.map { ImmutableMethodParameter(it, null, null) }, "V",

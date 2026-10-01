@@ -22,6 +22,7 @@ import app.morphe.util.ControlFlow
 import app.morphe.util.RegisterLiveness
 import app.morphe.util.findMutableMethodOf
 import app.morphe.util.namedRegisters
+import app.morphe.util.writersReaching
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
@@ -150,7 +151,37 @@ internal fun pillSocket(method: Method): PillSocket {
     if (answers.isEmpty()) refuse("found no (model, index) -> Z check in ${method.definingClass}->${method.name}")
     val registers = answers.map { (code[it] as OneRegisterInstruction).registerA } + nameRegister
     if (registers.any { it > 15 }) refuse("a register the hook hands over is past v15: $registers")
+    requireAnswerSpots(method, answers)
     return PillSocket(method, nameRegister, answers)
+}
+
+/**
+ * Proves each check's hook can go in at the instruction after its move-result. The hook goes in
+ * front of that instruction, and dexlib2 keeps the instruction's labels on it, so any other way
+ * in skips the hook. That way's answer has to be one a hook already took, like the second check's
+ * that feeds the log and jumps back to the first one's branch. A catch handler starting there
+ * would skip the hook the same way, and a try block over it, or starting or ending there, would
+ * take the hook's call in or leave it out.
+ */
+private fun requireAnswerSpots(method: Method, answers: List<Int>) {
+    val where = "${method.definingClass}->${method.name}"
+    val code = method.implementation!!.instructions.toList()
+    for (answer in answers) {
+        val spot = answer + 1
+        val edges = tryEdgesAt(method, spot)
+        if (edges.isNotEmpty()) {
+            refuse("in $where ${edges.joinToString(" and ")} at the instruction after the plugin check at $answer, where its hook goes")
+        }
+        if (tryBlockOver(method, spot)) {
+            refuse("in $where a try block covers the instruction after the plugin check at $answer, where its hook goes")
+        }
+        val register = (code[answer] as OneRegisterInstruction).registerA
+        val unhooked = method.writersReaching(spot, register).filterNot { it in answers }
+        if (unhooked.isNotEmpty()) {
+            val ways = unhooked.joinToString(" and ") { if (it < 0) "the method's start" else "the write at $it" }
+            refuse("in $where the instruction after the plugin check at $answer can get v$register from $ways, not only from a plugin check")
+        }
+    }
 }
 
 /** The one method that loads both [PILL_SOCKET] and [META_AI_PILL], read as a socket. Changes nothing. */
@@ -301,6 +332,13 @@ private fun tryEdgesAt(method: Method, index: Int): List<String> {
             "a try block ends".takeIf { block.startCodeAddress + block.codeUnitCount == address },
         ) + block.exceptionHandlers.filter { it.handlerCodeAddress == address }.map { "a catch handler starts" }
     }.distinct()
+}
+
+/** Whether one of [method]'s try blocks covers the instruction at [index] without starting there. */
+private fun tryBlockOver(method: Method, index: Int): Boolean {
+    val implementation = method.implementation!!
+    val address = implementation.instructions.take(index).sumOf { it.codeUnits }
+    return implementation.tryBlocks.any { address > it.startCodeAddress && address < it.startCodeAddress + it.codeUnitCount }
 }
 
 /**
