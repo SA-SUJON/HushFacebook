@@ -153,6 +153,26 @@ class KeepPostDatesShapesTest {
     }
 
     /**
+     * The branch between the two subtitles is on the way the header takes when nothing throws. A
+     * branch on the answer that only the log's call throwing leads to isn't it, so with the one
+     * real branch on another register the method is refused, by name.
+     */
+    @Test
+    fun `a branch on the answer only a catch handler leads to isn't the branch on the choice`() {
+        val method = header(branch = "if-eqz v5, :one_line", tail = "move-exception v0\nif-eqz v17, :one_line\nreturn-object v3")
+        val code = method.body()
+        val log = code.indexOfFirst { (it as? ReferenceInstruction)?.reference?.toString() == VALUE_OF_BOOLEAN }
+        val handler = code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+        method.implementation!!.apply {
+            addCatch("Ljava/lang/Exception;", newLabelForIndex(log), newLabelForIndex(log + 1), newLabelForIndex(handler))
+        }
+        assertEquals("the try block is in the flow", listOf(handler), ControlFlow.of(method).exceptional[log])
+        val refusal = assertThrows(PatchException::class.java) { cyclingChoice(method) }.message!!
+        assertTrue(refusal, "in Lfixture/PostHeaderSubtitle;->render the log of \"$CYCLING_LOG\" leads to a branch on v17 only " +
+            "through a catch handler" in refusal)
+    }
+
+    /**
      * A branch on the answer in a handler that only a nop leads to is on no way from the log, since
      * a nop can't throw. With the one real branch on another register the method is refused, the
      * same as without the try block.

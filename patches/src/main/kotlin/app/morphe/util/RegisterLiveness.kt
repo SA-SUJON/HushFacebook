@@ -275,13 +275,14 @@ fun Method.rewrittenReads(index: Int): List<Int> {
 /**
  * On each way from the instruction at [index], the first instruction [stops] takes, when that way
  * still holds the value the instruction at [index] writes: the other half of [firstAfterRewrite],
- * over the same ways.
+ * over the same ways. Those go into a handler only from an instruction that can throw, and with
+ * [handlers] false never, which leaves the ways the method takes when nothing throws.
  *
  * @throws IllegalArgumentException when the instruction at [index] writes no single register.
  */
-fun Method.firstHolding(index: Int, stops: (Instruction) -> Boolean): List<Int> {
+fun Method.firstHolding(index: Int, stops: (Instruction) -> Boolean, handlers: Boolean = true): List<Int> {
     val found = sortedSetOf<Int>()
-    walkFromDefinition(index) { at, instruction, _, rewritten ->
+    walkFromDefinition(index, handlers) { at, instruction, _, rewritten ->
         if (!stops(instruction)) return@walkFromDefinition true
         if (!rewritten) found += at
         false
@@ -309,12 +310,16 @@ fun Method.firstAfterRewrite(index: Int, stops: (Instruction) -> Boolean): List<
 
 /**
  * Walks every way from the instruction at [index], which writes one register, into the handlers
- * of what can throw on it too, visiting each instruction at most twice: still holding the
- * definition's value, and written again. [visit]
+ * of what can throw on it too unless [handlers] is false, visiting each instruction at most twice:
+ * still holding the definition's value, and written again. [visit]
  * gets the instruction, the register and whether it was written again, and answers whether the
  * way goes on past it.
  */
-private fun Method.walkFromDefinition(index: Int, visit: (Int, Instruction, Int, Boolean) -> Boolean) {
+private fun Method.walkFromDefinition(
+    index: Int,
+    handlers: Boolean = true,
+    visit: (Int, Instruction, Int, Boolean) -> Boolean,
+) {
     val flow = ControlFlow.of(this)
     val definition = flow.instructions[index]
     require(definition.opcode.setsRegister() && !definition.opcode.setsWideRegister()) {
@@ -333,7 +338,7 @@ private fun Method.walkFromDefinition(index: Int, visit: (Int, Instruction, Int,
         if (!visit(at, instruction, register, state == 1)) continue
         // Only an instruction that can throw reaches its handlers, and one that throws never writes
         // its destination, so they see what it held.
-        if (instruction.opcode.canThrow()) enqueue(flow.exceptional[at], state)
+        if (handlers && instruction.opcode.canThrow()) enqueue(flow.exceptional[at], state)
         val next = when {
             at == index -> 0
             writesRegister(instruction, register) -> 1

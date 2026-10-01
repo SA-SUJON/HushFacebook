@@ -404,6 +404,8 @@ class RegisterLivenessTest {
         assertEquals(emptyList<Int>(), caught(1).firstAfterRewrite(0, branchOn(0)))
         assertEquals(listOf(6), caught(3).firstAfterRewrite(0, branchOn(0)))
         assertEquals(listOf(6), caught(3).rewrittenReads(0))
+        assertEquals("the handler's branch still holds the value", listOf(6), caught(1).firstHolding(0, branchOn(0)))
+        assertEquals("without handlers no way gets there", emptyList<Int>(), caught(1).firstHolding(0, branchOn(0), handlers = false))
         // A try block over a write and a nop, neither of which can throw, never reaches its handler.
         val unthrown = smali(
             registers = 3, params = emptyList(),
