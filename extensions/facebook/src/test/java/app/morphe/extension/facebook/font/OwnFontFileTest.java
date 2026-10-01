@@ -186,6 +186,56 @@ public class OwnFontFileTest {
     }
 
     /**
+     * The calls that answer the phone's sans-serif by name, or from one of its typefaces, take the
+     * picked file at the weight and slant Android answered: "sans-serif-medium" at its medium, a
+     * span's bold of the paint's typeface at bold. Another family stays Android's, and so does
+     * everything while no file is picked.
+     */
+    @Test
+    public void theSansSerifFacebookAsksForByNameTakesThePickedFont() throws Exception {
+        Typeface medium = Typeface.create("sans-serif-medium", Typeface.NORMAL);
+        Typeface bold = Typeface.create((Typeface) null, Typeface.BOLD);
+        assertSame("no file picked, and Android's answer stays", medium, OwnFont.create("sans-serif-medium", Typeface.NORMAL));
+        assertSame(bold, OwnFont.create((Typeface) null, Typeface.BOLD));
+        assertSame(Typeface.SANS_SERIF, OwnFont.sansSerif());
+
+        pick(FontFileTest.STATIC_FONT, "Rubik-Regular.ttf");
+        assertSame(OwnFont.typeface(medium.getWeight(), false), OwnFont.create("sans-serif-medium", Typeface.NORMAL));
+        // Android has no Roboto-Medium on every phone, so the file comes at the weight Android answered.
+        assertSame(OwnFont.typeface(Typeface.create("Roboto-Medium", Typeface.NORMAL).getWeight(), false),
+                OwnFont.create("Roboto-Medium", Typeface.NORMAL));
+        assertSame(OwnFont.typeface(400, false), OwnFont.sansSerif());
+        assertSame(OwnFont.typeface(bold.getWeight(), false), OwnFont.create((Typeface) null, Typeface.BOLD));
+        Typeface picked = OwnFont.defaultTypeface();
+        assertSame("the picked font's own bold", OwnFont.typeface(Typeface.create(picked, Typeface.BOLD).getWeight(), false),
+                OwnFont.create(picked, Typeface.BOLD));
+        assertSame(OwnFont.typeface(500, true), OwnFont.create(Typeface.DEFAULT, 500, true));
+
+        Typeface mono = Typeface.create("monospace", Typeface.NORMAL);
+        assertSame("another family stays Android's", mono, OwnFont.create("monospace", Typeface.NORMAL));
+        assertSame(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD), OwnFont.create(Typeface.MONOSPACE, Typeface.BOLD));
+        assertTrue(OwnFont.isPhoneSans(null) && OwnFont.isPhoneSans("sans-serif") && OwnFont.isPhoneSans("roboto"));
+        assertTrue(OwnFont.isPhoneSans("sans-serif-black") && OwnFont.isPhoneSans("roboto-regular"));
+        for (String other : new String[]{"InstagramSans-Bold", "serif", "sans-serif-monospace", "sans-serif-condensed",
+                "sans-serif-smallcaps", "roboto-flex", "san-serif-condensed", "sans-serifx"}) {
+            assertFalse(other, OwnFont.isPhoneSans(other));
+        }
+        assertSame("Android's monospace by its sans-serif name stays", Typeface.create("sans-serif-monospace", Typeface.NORMAL),
+                OwnFont.create("sans-serif-monospace", Typeface.NORMAL));
+
+        Settings.USE_SYSTEM_FONT.save(false);
+        assertSame(medium, OwnFont.create("sans-serif-medium", Typeface.NORMAL));
+        assertSame(Typeface.create(picked, Typeface.BOLD), OwnFont.create(picked, Typeface.BOLD));
+        Settings.USE_SYSTEM_FONT.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        try {
+            assertSame("paused, Android's answer stands", Typeface.SANS_SERIF, OwnFont.sansSerif());
+        } finally {
+            PauseForTests.resume();
+        }
+    }
+
+    /**
      * A variable font is built along its 'wght' axis. Noto Sans Khmer's early axis runs from 26 to
      * 190, so any weight past 190 is its heaviest, and that heaviest is told it's the weight asked
      * for, so Android doesn't embolden it a second time.

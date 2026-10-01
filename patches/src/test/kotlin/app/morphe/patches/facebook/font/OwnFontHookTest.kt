@@ -451,6 +451,91 @@ class OwnFontHookTest {
         assertEquals("the extension's reads were sent", 4, kept)
     }
 
+    private fun staticMethod(type: String, registers: Int, params: List<String>, body: String) = MutableMethod(
+        ImmutableMethod(
+            type, "run", params.map { ImmutableMethodParameter(it, null, null) }, TYPEFACE,
+            AccessFlags.PUBLIC.value or AccessFlags.STATIC.value, null, null,
+            ImmutableMethodImplementation(registers, emptyList(), null, null),
+        ),
+    ).apply { addInstructionsWithLabels(0, body.trimIndent()) }
+
+    /**
+     * A field read whose every use compares it with another typeface, by equals or by identity,
+     * stays Android's, so the check still asks whether a typeface is the phone's default. Litho's
+     * text asks that before it sets a typeface on its paint. A read that's also drawn with is sent.
+     */
+    @Test
+    fun `a default read only compared with another typeface stays Android's`() {
+        val type = "Lfixture/TextPaints;"
+        val method = staticMethod(
+            type, registers = 3, params = listOf(TYPEFACE),
+            body = """
+                sget-object v0, $TYPEFACE->DEFAULT:$TYPEFACE
+                invoke-virtual { p0, v0 }, Ljava/lang/Object;->equals(Ljava/lang/Object;)Z
+                move-result v1
+                if-nez v1, :done
+                sget-object v0, $TYPEFACE->DEFAULT_BOLD:$TYPEFACE
+                if-eq p0, v0, :done
+                sget-object v0, $TYPEFACE->SANS_SERIF:$TYPEFACE
+                return-object v0
+                :done
+                sget-object v0, $TYPEFACE->DEFAULT:$TYPEFACE
+                if-eq p0, v0, :same
+                :same
+                return-object v0
+            """,
+        )
+        assertEquals(listOf(true, true, false, false), listOf(0, 4, 6, 8).map(method::onlyCompared))
+        val context = PatchContexts.of(listOf(robotoClass(type, method)))
+        assertEquals("the drawn SANS_SERIF and DEFAULT", 2, context.hookDefaultTypefaces())
+        val body = context.mutableClassDefBy(type).methods.single().implementation!!.instructions.toList()
+        assertEquals(listOf("$TYPEFACE->DEFAULT:$TYPEFACE", "$TYPEFACE->DEFAULT_BOLD:$TYPEFACE"),
+            body.mapNotNull(::defaultRead))
+        assertEquals(listOf("$OWN_FONT->sansSerif()$TYPEFACE", "$OWN_FONT->defaultTypeface()$TYPEFACE"),
+            body.mapNotNull(::reference).filter { it.startsWith(OWN_FONT) })
+    }
+
+    /**
+     * Each Typeface.create Facebook makes goes to the extension's create of the same arguments, on
+     * the same registers in the same form: by family name, plain and range, from a typeface at a
+     * style, and at a weight.
+     */
+    @Test
+    fun `each create call goes to the extension on its own registers`() {
+        val type = "Lfixture/Medium;"
+        val method = staticMethod(
+            type, registers = 4, params = emptyList(),
+            body = """
+                const-string v0, "sans-serif-medium"
+                const/4 v1, 0x1
+                invoke-static { v0, v1 }, $CREATE_FROM_NAME
+                move-result-object v2
+                invoke-static/range { v0 .. v1 }, $CREATE_FROM_NAME
+                move-result-object v2
+                invoke-static { v2, v1 }, $CREATE_FROM_TYPEFACE
+                move-result-object v2
+                const/16 v3, 0x1f4
+                invoke-static { v2, v3, v1 }, $CREATE_AT_WEIGHT
+                move-result-object v2
+                return-object v2
+            """,
+        )
+        val context = PatchContexts.of(listOf(robotoClass(type, method)))
+        assertEquals(4, context.hookDefaultTypefaces())
+        val body = context.mutableClassDefBy(type).methods.single().implementation!!.instructions.toList()
+        val calls = body.filter { it.opcode == Opcode.INVOKE_STATIC || it.opcode == Opcode.INVOKE_STATIC_RANGE }
+        assertEquals(listOf(CREATE_FROM_NAME, CREATE_FROM_NAME, CREATE_FROM_TYPEFACE, CREATE_AT_WEIGHT).map(::ownCall),
+            calls.map(::reference))
+        assertEquals(listOf(listOf(0, 1), listOf(0, 1), listOf(2, 1), listOf(2, 3, 1)), calls.map { call ->
+            when (call) {
+                is RegisterRangeInstruction -> (call.startRegister until call.startRegister + call.registerCount).toList()
+                else -> (call as FiveRegisterInstruction).let { listOf(it.registerC, it.registerD, it.registerE).take(it.registerCount) }
+            }
+        })
+        assertEquals(Opcode.INVOKE_STATIC_RANGE, calls[1].opcode)
+        assertEquals("nothing else moved", method.implementation!!.instructions.size, body.size)
+    }
+
     /**
      * A try block over the read alone covers its getter and the move after it, and one that starts
      * right after the read leaves both out, as it left the read out.
@@ -516,7 +601,9 @@ class OwnFontHookTest {
             .filter { AccessFlags.PUBLIC.isSet(it.accessFlags) && AccessFlags.STATIC.isSet(it.accessFlags) }
             .map { "$OWN_FONT->${it.name}(${it.parameterTypes.joinToString("")})${it.returnType}" }
         val getters = DEFAULT_TYPEFACES.values.map { "$OWN_FONT->$it()$TYPEFACE" }
-        for (call in listOf(REPLACE, REMEMBER_VARIATION, REPLACE_BUILT, REPLACE_REACT_NATIVE, REPLACE_PHONE_FONT, OWN_DEFAULT_FROM_STYLE) + getters) {
+        val calls = DEFAULT_CALLS.map(::ownCall)
+        assertTrue(OWN_DEFAULT_FROM_STYLE in calls)
+        for (call in listOf(REPLACE, REMEMBER_VARIATION, REPLACE_BUILT, REPLACE_REACT_NATIVE, REPLACE_PHONE_FONT) + getters + calls) {
             assertTrue("OwnFont declares no public static $call: $declared", call in declared)
         }
     }

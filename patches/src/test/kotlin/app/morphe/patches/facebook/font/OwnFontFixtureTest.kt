@@ -29,6 +29,8 @@ import java.io.File
  * builders it makes, and React Native's typeface resolver, with the frames the injections need.
  */
 class OwnFontFixtureTest {
+    private val TEXT_PAINT = "Landroid/text/TextPaint;"
+
     /** The families the switch swaps. OwnFontTest holds the extension to the same twelve. */
     private val metaFamilies = sortedSetOf(
         "FACEBOOK_SANS_VARIABLE", "OPTIMISTIC_AI", "OPTIMISTIC_AI_1_BETA", "OPTIMISTIC_AI_2_BETA",
@@ -70,8 +72,8 @@ class OwnFontFixtureTest {
 
     /**
      * Each declared build reads Android's default bold in a text span's draw, which is how the names
-     * bolded in a post's header get the phone's bold, and calls defaultFromStyle only in a form the
-     * patch rewrites: the style alone, in a plain or a range call.
+     * bolded in a post's header get the phone's bold, and the rewrite of those reads and of the
+     * calls that answer the phone's typefaces runs over every class making them.
      */
     @Test
     fun `each declared build reads Android's default bold in a text span`() = bundles { bundle ->
@@ -88,22 +90,34 @@ class OwnFontFixtureTest {
         }
         assertTrue("${bundle.name}: no defaultFromStyle call", styleCalls.isNotEmpty())
 
-        // The rewrite itself, over every class that reads them: each read goes to the extension,
-        // in its own place, a field read's answer comes back into the register the read wrote, and
-        // no read of the framework's is left.
+        // The rewrite itself, over every class that reads them. A field read only ever compared
+        // with another typeface stays, Litho's text paint's compare with Typeface.DEFAULT among
+        // them. Every other read goes to the extension in its own place, a field read's answer
+        // comes back into the register the read wrote, and each call to the extension's own.
         val owners = FixtureDex.classes(bundle, readers.map { it.definingClass }.toSet())
+        fun keptIn(method: Method) = method.implementation!!.instructions.toList().withIndex()
+            .filter { (at, instruction) -> defaultRead(instruction) in DEFAULT_TYPEFACES && method.onlyCompared(at) }.map { it.index }
+        val kept = readers.flatMap { method -> keptIn(method).map { method } }
+        assertTrue("${bundle.name}: no read is only compared", kept.isNotEmpty())
+        assertTrue("${bundle.name}: no text paint builder keeps its compare with Typeface.DEFAULT", kept.any { method ->
+            method.returnType == TEXT_PAINT && method.implementation!!.instructions.any { defaultRead(it) == DEFAULT_FROM_STYLE }
+        })
         val context = PatchContexts.of(owners.values)
-        assertEquals("${bundle.name}: reads sent", reads.size, context.hookDefaultTypefaces())
+        assertEquals("${bundle.name}: reads sent", reads.size - kept.size, context.hookDefaultTypefaces())
         val getters = DEFAULT_TYPEFACES.values.map { "$OWN_FONT->$it()$TYPEFACE" }.toSet()
-        var styles = 0
+        val sent = mutableMapOf<String, Int>()
         for ((type, original) in owners) {
             for (method in context.mutableClassDefBy(type).methods) {
                 val body = method.implementation?.instructions?.toList() ?: continue
                 val where = "${bundle.name}: $type->${method.name}"
-                assertEquals("$where still reads a default", null, body.firstNotNullOfOrNull(::defaultRead))
-                val wanted = original.methods.single { it.name == method.name && it.parameterTypes.map(CharSequence::toString) == method.parameterTypes.map(CharSequence::toString) &&
-                    it.returnType == method.returnType }.implementation!!.instructions
-                    .filter { defaultRead(it) in DEFAULT_TYPEFACES }.map { (it as OneRegisterInstruction).registerA }
+                val before = original.methods.single { it.name == method.name && it.parameterTypes.map(CharSequence::toString) == method.parameterTypes.map(CharSequence::toString) &&
+                    it.returnType == method.returnType }
+                val code = before.implementation!!.instructions.toList()
+                val stays = keptIn(before).toSet()
+                assertEquals("$where: the reads left are the ones only compared", stays.map { defaultRead(code[it]) },
+                    body.mapNotNull(::defaultRead))
+                val wanted = code.indices.filter { defaultRead(code[it]) in DEFAULT_TYPEFACES && it !in stays }
+                    .map { (code[it] as OneRegisterInstruction).registerA }
                 val given = body.indices.filter { at ->
                     (body[at] as? ReferenceInstruction)?.reference?.toString() in getters
                 }.map { at ->
@@ -111,10 +125,15 @@ class OwnFontFixtureTest {
                     (body[at + 1] as OneRegisterInstruction).registerA
                 }
                 assertEquals("$where: the registers the reads wrote", wanted, given)
-                styles += body.count { (it as? ReferenceInstruction)?.reference?.toString() == OWN_DEFAULT_FROM_STYLE }
+                for (call in DEFAULT_CALLS) {
+                    sent.merge(call, body.count { (it as? ReferenceInstruction)?.reference?.toString() == ownCall(call) }, Int::plus)
+                }
             }
         }
-        assertEquals("${bundle.name}: defaultFromStyle calls sent", styleCalls.size, styles)
+        for (call in DEFAULT_CALLS) {
+            assertEquals("${bundle.name}: $call calls sent", reads.count { it == call }, sent[call])
+        }
+        assertEquals("${bundle.name}: defaultFromStyle calls sent", styleCalls.size, sent[DEFAULT_FROM_STYLE])
     }
 
     private fun checkResolver(bundle: File, owner: ClassDef) {

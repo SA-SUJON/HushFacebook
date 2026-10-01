@@ -77,12 +77,14 @@ val useSystemFontPatch = bytecodePatch(
 
 /**
  * Facebook's own reads of Android's default typefaces: Typeface.DEFAULT, DEFAULT_BOLD and
- * defaultFromStyle. That's where the spans that bold a name in a post's header or a notification
- * get the phone's bold, and where plenty of other text gets the phone's font without asking the
- * text engine. Each read of either field becomes a call of the extension's getter for it, with the
- * answer moved into the read's register, and each defaultFromStyle call goes to the extension's
- * own, which makes the framework's call itself. Both answer a picked font file at the same weight
- * and slant, and the framework's typeface otherwise. The call takes the read's place, so a jump
+ * SANS_SERIF, defaultFromStyle, and Typeface.create by family name, or from a typeface at a style
+ * or a weight. That's where the spans that bold a name in a post's header or a notification get
+ * the phone's bold, where "sans-serif-medium" names are drawn, and where plenty of other text gets
+ * the phone's font without asking the text engine. Each read of a field becomes a call of the
+ * extension's getter for it, with the answer moved into the read's register, and each call goes
+ * to the extension's method of the same name, which makes the framework's call itself. They answer
+ * a picked font file at the same weight and slant where the answer is the phone's sans-serif, and
+ * the framework's typeface otherwise. A field read only compared with another typeface stays. The call takes the read's place, so a jump
  * to the read or a try block's edge on it stays where it was, and the move after it goes in front
  * of whatever followed the read, so a jump there still skips it. The extension's own classes are
  * left alone, since they read the defaults themselves. Answers how many reads it sent.
@@ -100,18 +102,27 @@ internal fun BytecodePatchContext.hookDefaultTypefaces(): Int {
     return sent
 }
 
-/** Sends each read of Android's default typefaces in this method to the extension, last first. Answers how many. */
+/**
+ * Sends each read of Android's default typefaces in this method to the extension, last first.
+ * Answers how many. A field read whose value is only ever compared with another typeface stays
+ * Android's ([onlyCompared]), so the comparison still asks whether that typeface is the phone's
+ * default, which is what Facebook means by it.
+ */
 internal fun MutableMethod.sendDefaultReads(): Int {
     val sites = (implementation ?: return 0).instructions.withIndex()
         .mapNotNull { (index, instruction) -> defaultRead(instruction)?.let { Triple(index, instruction, it) } }
+        .filterNot { (index, _, read) -> read in DEFAULT_TYPEFACES && onlyCompared(index) }
     sites.asReversed().forEach { (index, instruction, read) ->
-        if (read == DEFAULT_FROM_STYLE) {
-            val style = when (instruction) {
-                is RegisterRangeInstruction -> "invoke-static/range { v${instruction.startRegister} .. v${instruction.startRegister} }"
-                is FiveRegisterInstruction -> "invoke-static { v${instruction.registerC} }"
+        if (read in DEFAULT_CALLS) {
+            val arguments = when (instruction) {
+                is RegisterRangeInstruction ->
+                    "invoke-static/range { v${instruction.startRegister} .. v${instruction.startRegister + instruction.registerCount - 1} }"
+                is FiveRegisterInstruction -> "invoke-static { " + listOf(
+                    instruction.registerC, instruction.registerD, instruction.registerE, instruction.registerF, instruction.registerG,
+                ).take(instruction.registerCount).joinToString { "v$it" } + " }"
                 else -> throw PatchException("$PATCH: $definingClass->$name calls $read in an unexpected form")
             }
-            replaceInstruction(index, "$style, $OWN_DEFAULT_FROM_STYLE")
+            replaceInstruction(index, "$arguments, ${ownCall(read)}")
         } else {
             val register = (instruction as OneRegisterInstruction).registerA
             replaceInstruction(index, "invoke-static { }, $OWN_FONT->${DEFAULT_TYPEFACES.getValue(read)}()$TYPEFACE")

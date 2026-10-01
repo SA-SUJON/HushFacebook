@@ -5,6 +5,7 @@
 package app.morphe.patches.facebook.font
 
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.util.literalReads
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -66,16 +67,52 @@ internal const val NO_ROBOTO = "Unable to create roboto typeface: %s"
 internal val DEFAULT_TYPEFACES = mapOf(
     "$TYPEFACE->DEFAULT:$TYPEFACE" to "defaultTypeface",
     "$TYPEFACE->DEFAULT_BOLD:$TYPEFACE" to "defaultBold",
+    "$TYPEFACE->SANS_SERIF:$TYPEFACE" to "sansSerif",
 )
 
 /** The framework call answering Android's default typeface for a style. */
 internal const val DEFAULT_FROM_STYLE = "$TYPEFACE->defaultFromStyle(I)$TYPEFACE"
 
+/** The framework calls answering a typeface of a family by name, and of a typeface at a style or a weight. */
+internal const val CREATE_FROM_NAME = "$TYPEFACE->create(Ljava/lang/String;I)$TYPEFACE"
+internal const val CREATE_FROM_TYPEFACE = "$TYPEFACE->create(${TYPEFACE}I)$TYPEFACE"
+internal const val CREATE_AT_WEIGHT = "$TYPEFACE->create(${TYPEFACE}IZ)$TYPEFACE"
+
+/**
+ * The framework calls that can answer one of the phone's typefaces. Each goes to the extension's
+ * static method of the same name and arguments ([ownCall]), which makes the call itself first.
+ * The "sans-serif-medium" Facebook asks for by name (580 `LX/3st;-><clinit>` among twenty) and the
+ * spans that bold a word with Typeface.create(paint's typeface, style) go through these.
+ */
+internal val DEFAULT_CALLS = setOf(DEFAULT_FROM_STYLE, CREATE_FROM_NAME, CREATE_FROM_TYPEFACE, CREATE_AT_WEIGHT)
+
+/** The extension's stand-in for [call], one of [DEFAULT_CALLS]. */
+internal fun ownCall(call: String): String = call.replaceFirst("$TYPEFACE->", "$OWN_FONT->")
+
+/**
+ * Whether every use of the typeface the field read at [index] loads is a comparison with another
+ * typeface: an if-eq or if-ne, or an equals call it's handed to. Litho's text sets a typeface on
+ * its paint only when it isn't Typeface.DEFAULT (580 `LX/3qU;->A00`), so with both sides of that
+ * check the picked font, plain text would never get it. A read nothing uses isn't one.
+ */
+internal fun Method.onlyCompared(index: Int): Boolean {
+    val code = implementation!!.instructions.toList()
+    val uses = literalReads(index)
+    return uses.isNotEmpty() && uses.all { at ->
+        when (code[at].opcode) {
+            Opcode.IF_EQ, Opcode.IF_NE -> true
+            else -> ((code[at] as? ReferenceInstruction)?.reference as? MethodReference)?.let { call ->
+                call.name == "equals" && call.returnType == "Z" && call.parameterTypes.all { it.toString() == OBJECT }
+            } == true
+        }
+    }
+}
+
 /** The field or call [instruction] reads one of Android's default typefaces through, or null when it reads none. */
 internal fun defaultRead(instruction: Instruction): String? = when (instruction.opcode) {
     Opcode.SGET_OBJECT -> (instruction as ReferenceInstruction).reference.toString().takeIf { it in DEFAULT_TYPEFACES }
     Opcode.INVOKE_STATIC, Opcode.INVOKE_STATIC_RANGE ->
-        (instruction as ReferenceInstruction).reference.toString().takeIf { it == DEFAULT_FROM_STYLE }
+        (instruction as ReferenceInstruction).reference.toString().takeIf { it in DEFAULT_CALLS }
     else -> null
 }
 

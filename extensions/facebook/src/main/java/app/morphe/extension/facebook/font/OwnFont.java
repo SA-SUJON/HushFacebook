@@ -10,8 +10,12 @@ import android.graphics.Typeface;
 import androidx.annotation.Nullable;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -95,6 +99,9 @@ public final class OwnFont {
     private static final ConcurrentHashMap<String, Integer> REACT_FAMILIES = new ConcurrentHashMap<>();
     /** Past this many names, a new one is worked out each time rather than kept. */
     private static final int MAX_REACT_FAMILIES = 256;
+    /** The weights Android and Facebook name after "sans-serif-" and "roboto-". */
+    private static final Set<String> SANS_WEIGHTS = new HashSet<>(Arrays.asList(
+            "thin", "light", "regular", "medium", "bold", "black"));
 
     /** The picked font as last read, or null before the first read and after a change. */
     @Nullable
@@ -208,6 +215,72 @@ public final class OwnFont {
     /** {@link Typeface#defaultFromStyle} for Facebook's own code: the picked font in [style] while one is picked. */
     public static Typeface defaultFromStyle(int style) {
         return pickedInstead(Typeface.defaultFromStyle(style), DEFAULTS);
+    }
+
+    /** {@link Typeface#SANS_SERIF} for Facebook's own code: the picked font at 400 while one is picked. */
+    public static Typeface sansSerif() {
+        return pickedInstead(Typeface.SANS_SERIF, DEFAULTS);
+    }
+
+    /**
+     * {@link Typeface#create(String, int)} for Facebook's own code. Android answers first. For one
+     * of the phone's sans-serif families, the picked font takes its place at the weight and slant
+     * Android answered, so "sans-serif-medium" gets the file at 500. Any other family is Android's.
+     */
+    public static Typeface create(@Nullable String family, int style) {
+        Typeface answer = Typeface.create(family, style);
+        return isPhoneSans(family) ? pickedInstead(answer, DEFAULTS) : answer;
+    }
+
+    /**
+     * {@link Typeface#create(Typeface, int)} for Facebook's own code: Android's answer, which the
+     * picked font takes the place of when [family] is the phone's default, none at all, or the
+     * picked font already. The spans that bold a word take the paint's typeface and a style.
+     */
+    public static Typeface create(@Nullable Typeface family, int style) {
+        Typeface answer = Typeface.create(family, style);
+        return isPhoneOrPicked(family) ? pickedInstead(answer, DEFAULTS) : answer;
+    }
+
+    /**
+     * {@link Typeface#create(Typeface, int, boolean)} for Facebook's own code, the same way as the
+     * style form, at the weight asked for.
+     */
+    public static Typeface create(@Nullable Typeface family, int weight, boolean italic) {
+        Typeface answer = Typeface.create(family, weight, italic);
+        return isPhoneOrPicked(family) ? pickedInstead(answer, DEFAULTS) : answer;
+    }
+
+    /**
+     * Whether Android draws [family] in the phone's own sans-serif: no family, "sans-serif" and its
+     * named weights, and Roboto under the names Facebook asks for it by. Android's condensed,
+     * smallcaps and "sans-serif-monospace" are fonts of their own, and stay Android's.
+     */
+    static boolean isPhoneSans(@Nullable String family) {
+        if (family == null || family.isEmpty()) return true;
+        String name = family.toLowerCase(Locale.ROOT);
+        for (String sans : new String[]{"sans-serif", "roboto"}) {
+            if (name.equals(sans)) return true;
+            if (name.startsWith(sans + "-")) return SANS_WEIGHTS.contains(name.substring(sans.length() + 1));
+        }
+        return false;
+    }
+
+
+    /** Whether [family] is none, one of Android's sans-serif defaults, or a typeface built from the picked file. */
+    private static boolean isPhoneOrPicked(@Nullable Typeface family) {
+        if (family == null || family == Typeface.DEFAULT || family == Typeface.DEFAULT_BOLD
+                || family == Typeface.SANS_SERIF) {
+            return true;
+        }
+        try {
+            if (!Utils.settingsReady() || !Settings.USE_SYSTEM_FONT.get()) return false;
+            Picked font = picked();
+            return font != null && font.built(family);
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.SYSTEM_FONT, DEFAULTS, failure);
+            return false;
+        }
     }
 
     /**
@@ -401,6 +474,11 @@ public final class OwnFont {
                 return new Picked(source, file, null, null);
             }
             return new Picked(source, file, base, FontFile.weightAxis(file));
+        }
+
+        /** Whether [typeface] is the copy or one of the weights built from it. */
+        boolean built(Typeface typeface) {
+            return typeface == base || styles.containsValue(typeface);
         }
 
         /** The copy at [weight] and [italic], or null when it has nothing to build. */
