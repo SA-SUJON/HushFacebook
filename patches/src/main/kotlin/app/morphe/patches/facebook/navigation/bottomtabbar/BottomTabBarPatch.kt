@@ -14,6 +14,7 @@ import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
+import app.morphe.util.ControlFlow
 import app.morphe.util.findMutableMethodOf
 import app.morphe.util.literalReads
 import com.android.tools.smali.dexlib2.Opcode
@@ -115,7 +116,9 @@ internal fun overrideKeyField(holders: List<ClassDef>): FieldReference {
  * nowhere else. A load that goes straight into a call answering nothing, which also takes a
  * boolean or a TriState, is a write, the way Facebook's tab menu stores the key, and left alone.
  * Refuses a load that's neither, and one whose key anything past that call reads again, since a
- * read there would go unseen.
+ * read there would go unseen. Refuses a read that anything but the key's load leads to, and an
+ * ordinal that anything but that read's TriState leads to, since another key's answer arriving
+ * there would go through the hook too.
  */
 internal fun overrideReads(method: Method, key: FieldReference): List<OverrideRead> {
     val code = method.implementation?.instructions?.toList() ?: return emptyList()
@@ -144,6 +147,17 @@ internal fun overrideReads(method: Method, key: FieldReference): List<OverrideRe
             ordinal.namedRegisters() == listOf((triState as OneRegisterInstruction).registerA) &&
             result?.opcode == Opcode.MOVE_RESULT
         if (!takesOrdinal) refuse("$where doesn't take the ordinal of the override's TriState right after reading it")
+        // In a read like prefs.read(other ? OTHER_KEY : KEY), the other key's way jumps to the
+        // read call and its TriState would come out of the hook as the override's.
+        val flow = ControlFlow.of(method)
+        fun into(at: Int) = flow.normal.indices.filter { at in flow.normal[it] } +
+            flow.exceptional.indices.filter { at in flow.exceptional[it] }
+        if (into(load + 1) != listOf(load)) {
+            refuse("in $where the read of the override at ${load + 1} can be reached from ${into(load + 1)}, not only from the key's load")
+        }
+        if (into(load + 3) != listOf(load + 2)) {
+            refuse("in $where the override's ordinal at ${load + 3} can be reached from ${into(load + 3)}, not only from its read")
+        }
         // Anything else reading the TriState would decide the bar from Facebook's answer, past the hook.
         if (method.literalReads(load + 2) != listOf(load + 3)) {
             refuse("$where uses the override's TriState past its ordinal, where the hook can't change it")

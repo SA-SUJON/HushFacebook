@@ -185,6 +185,20 @@ class BottomTabBarShapesTest {
                 (menuWrite("invoke-static { v0, v1, v2 }, Lfixture/Editor;->A1F(Lfixture/Editor;${keyType}Z)V\n" +
                     "invoke-static { v3, v1 }, Lfixture/Prefs;->tri($FB_SHARED_PREFERENCES$keyType)$TRI_STATE") to
                     "Lfixture/TabMenu;->A0H uses the override's key loaded at 1 past the call it goes into"),
+            "another key's way into the read" to
+                (gate(read = ":read\ninvoke-interface { v1, v0 }, $FB_SHARED_PREFERENCES->B2w($keyType)$TRI_STATE",
+                    tail = "sget-object v0, Lfixture/OtherOverride;->A01:$keyType\ngoto :read") to
+                    "in Lfixture/TabBarGate;->A06 the read of the override at 1 can be reached from [0, 11], not only from the key's load"),
+            "another TriState's way into the ordinal" to
+                (gate(ordinal = ":ordinal\ninvoke-virtual { v0 }, Ljava/lang/Enum;->ordinal()I",
+                    tail = "sget-object v0, Lfixture/Tri;->NO:$TRI_STATE\ngoto :ordinal") to
+                    "in Lfixture/TabBarGate;->A06 the override's ordinal at 3 can be reached from [2, 11], not only from its read"),
+            "a handler at the ordinal" to
+                (gate().apply {
+                    implementation!!.apply {
+                        addCatch("Ljava/lang/Exception;", newLabelForIndex(0), newLabelForIndex(1), newLabelForIndex(3))
+                    }
+                } to "the override's ordinal at 3 can be reached from [2, 0], not only from its read"),
             "the key read a second time from one load" to
                 (gate(afterRead = "move-result-object v3", ordinal = "invoke-virtual { v3 }, Ljava/lang/Enum;->ordinal()I",
                     afterOrdinal = "move-result v2\ninvoke-interface { v1, v0 }, $FB_SHARED_PREFERENCES->B2w($keyType)$TRI_STATE") to
