@@ -276,11 +276,15 @@ public class PausedHooksTest {
         // A post header's yes to rotating its subtitle is answered as a no, so it keeps the one line.
         probes.put(PatchFamily.POST_DATES, Collections.singletonList(() -> !PostDates.cycling(true)));
         // The Feeds tab's yes to a title row is answered as a no, its filters go to a container
-        // that's never on screen, and its posts get no room for them.
+        // that's never on screen, and its posts get no room for them. The room follows what the
+        // tab did with its filters, so that probe builds a tab first.
         probes.put(PatchFamily.FEEDS_HEADER, Arrays.asList(
                 () -> !FeedsHeader.navBar(true),
                 () -> FeedsHeader.hidesFilters(new FrameLayout(RuntimeEnvironment.getApplication())),
-                () -> !FeedsHeader.roomForFilters(true)));
+                () -> {
+                    FeedsHeader.hidesFilters(new FrameLayout(RuntimeEnvironment.getApplication()));
+                    return !FeedsHeader.roomForFilters(true);
+                }));
         probes.put(PatchFamily.SPONSORED_STORIES, Collections.singletonList(FeedFilter::hideSponsoredStories));
         // A tray of a friend's bucket, a suggested one and one labelled SUGGESTED keeps only the friend's.
         probes.put(PatchFamily.SUGGESTED_STORIES, Collections.singletonList(SuggestedStoriesForTests::hidesSuggestions));

@@ -31,7 +31,7 @@ import app.morphe.extension.shared.settings.PauseForTests;
  * Hide the Feeds header: with the switch on, the Feeds tab's yes to a title row is answered as a
  * no, its filters go to a copy of their container, and its posts get no room for them, each
  * counted. Off, which is how it starts, or paused, Facebook's answers stand, and a missing
- * container is never copied.
+ * container is never copied. The posts' room follows what the tab did with its filters.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -77,8 +77,8 @@ public class FeedsHeaderTest {
         Settings.HIDE_FEEDS_HEADER.save(true);
         assertFalse("the Feeds tab still gets its title row", FeedsHeader.navBar(true));
         assertFalse("a fragment that wants no title row was given one", FeedsHeader.navBar(false));
-        assertTrue("the filters stay on screen", FeedsHeader.hidesFilters(container()));
         assertFalse("a missing container was copied", FeedsHeader.hidesFilters(null));
+        assertTrue("the filters stay on screen", FeedsHeader.hidesFilters(container()));
         assertFalse("the posts still sit under the filters' room", FeedsHeader.roomForFilters(true));
         assertFalse("posts without filters were given room for them", FeedsHeader.roomForFilters(false));
         assertEquals(FamilyNames.FEEDS_HEADER + ": invoked 6, 3 found, 0 missing. Counted: "
@@ -97,5 +97,26 @@ public class FeedsHeaderTest {
             assertTrue("a Hushfacebook paused by " + reason + " left out the filters' room", FeedsHeader.roomForFilters(true));
             PauseForTests.resume();
         }
+    }
+
+    /**
+     * Facebook asks about the posts' room again each time the filters load, long after the tab was
+     * built, and the answer follows what that tab did with its filters. Turning the switch off
+     * while the filters are hidden can't move the posts down to a gap, and turning it on while
+     * they show can't slide the posts under them. A missing container left nothing hidden.
+     */
+    @Test
+    public void thePostsRoomFollowsWhatTheTabDidWithItsFilters() {
+        Settings.HIDE_FEEDS_HEADER.save(true);
+        assertTrue(FeedsHeader.hidesFilters(container()));
+        Settings.HIDE_FEEDS_HEADER.save(false);
+        assertFalse("turned off with the filters hidden, the posts moved down to a gap", FeedsHeader.roomForFilters(true));
+
+        assertFalse(FeedsHeader.hidesFilters(container()));
+        Settings.HIDE_FEEDS_HEADER.save(true);
+        assertTrue("turned on with the filters showing, the posts went under them", FeedsHeader.roomForFilters(true));
+
+        assertFalse(FeedsHeader.hidesFilters(null));
+        assertTrue("with no container to copy, the posts lost their room", FeedsHeader.roomForFilters(true));
     }
 }

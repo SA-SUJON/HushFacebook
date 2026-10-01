@@ -23,8 +23,12 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * filters' height once they show, and {@link #roomForFilters} tells it they don't, so the posts
  * start at the top.
  *
- * <p>Off, paused, before the settings are ready, or when anything here fails, Facebook's answer
- * stands. Both are settled as the Feeds tab is built, so a change shows after a restart.
+ * <p>Off, paused, before the settings are ready, or when anything here fails, Facebook's answers
+ * stand. The title row and the filters are settled as the Feeds tab is built, so a change shows
+ * after a restart. Facebook asks about the posts' room again each time the filters load, long
+ * after that, so that answer follows what was done with the filters of the last Feeds tab built
+ * rather than the switch as it is then. A switch flipped while the tab is open can't leave a gap
+ * where hidden filters would go, or slide the posts under filters that show.
  */
 public final class FeedsHeader {
     /** Counted under the patch's name each time the Feeds tab's wish for a title row is answered no. */
@@ -44,6 +48,9 @@ public final class FeedsHeader {
     private static final String FAMILY = FamilyNames.FEEDS_HEADER;
 
     private static volatile boolean logged;
+
+    /** Whether the last Feeds tab built had its filters go to the copy, which the posts' room follows. */
+    private static volatile boolean filtersLeftOut;
 
     private FeedsHeader() {
     }
@@ -69,15 +76,18 @@ public final class FeedsHeader {
     /**
      * The hook, right before the Feeds fragment builds the controller of its filters, handed the
      * container on screen. True while the switch is on and there's a container to copy, and the
-     * patch then hands the controller a new one built the same way.
+     * patch then hands the controller a new one built the same way. The answer is kept for
+     * {@link #roomForFilters}.
      */
     public static boolean hidesFilters(View container) {
+        filtersLeftOut = false;
         try {
             HookStatus.invoked(FAMILY);
             HookStatus.bound(FAMILY, FILTERS);
             if (container == null || !hides()) return false;
             HookStatus.counted(FAMILY, NO_FILTERS);
             log();
+            filtersLeftOut = true;
             return true;
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, FILTERS, failure);
@@ -87,14 +97,14 @@ public final class FeedsHeader {
 
     /**
      * The hook, where Facebook decides how far down the Feeds tab's posts go: as far as the filters
-     * are tall when it says they show, and to the top when they don't. Answers that they don't while
-     * the switch is on, and Facebook's answer otherwise.
+     * are tall when it says they show, and to the top when they don't. Answers that they don't when
+     * the last Feeds tab built had its filters go to the copy, and Facebook's answer otherwise.
      */
     public static boolean roomForFilters(boolean shown) {
         try {
             HookStatus.invoked(FAMILY);
             HookStatus.bound(FAMILY, ROOM);
-            if (!shown || !hides()) return shown;
+            if (!shown || !filtersLeftOut) return shown;
             HookStatus.counted(FAMILY, NO_ROOM);
             log();
             return false;
