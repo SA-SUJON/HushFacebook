@@ -159,8 +159,12 @@ public final class SuggestedStories {
             return false;
         }
 
-        /** " (off: suggested, contact import card)", naming the switches this build has that are off, or "". */
+        /**
+         * " (off: suggested, contact import card)", naming the switches this build has that are off, or "";
+         * " (switches not read)" when they weren't, so the line doesn't call them off.
+         */
         String offNote() {
+            if (this == NONE) return " (switches not read)";
             List<String> off = new ArrayList<>();
             if (!suggested) off.add(SUGGESTED);
             if (peopleYouMayKnowInBuild && !peopleYouMayKnow) off.add(PEOPLE_YOU_MAY_KNOW);

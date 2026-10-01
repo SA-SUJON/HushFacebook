@@ -538,6 +538,14 @@ public class SuggestedStoriesTest {
         }
     }
 
+    /** Before the settings are ready, or when they can't be read, the debug line doesn't call the switches off. */
+    @Test
+    public void switchesNotReadArentCalledOff() {
+        assertEquals(" (switches not read)", SuggestedStories.Switches.NONE.offNote());
+        assertEquals(" (off: suggested, contact import card)",
+                new SuggestedStories.Switches(false, false, false, false).offNote());
+    }
+
     @Test
     public void theProbesHideTheCards() {
         assertTrue(SuggestedStoriesForTests.hidesPeopleYouMayKnow());

@@ -93,7 +93,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `Hide sponsored search results` | Removes the ads from Facebook's search results, the sponsored posts and ad cards between the people, pages and posts you searched for. |
 | `Hide sponsored stories` | Removes ad cards from the story viewer, so swiping through stories only shows stories people posted. |
 | `Hide Stories tray` | Removes the row of stories at the top of the news feed, Create story included. |
-| `Hide suggested stories` | Removes the stories Facebook suggests from people and Pages you don't follow, the ones marked Suggested in the Stories tray, and the tray's Find friends from contacts card. Your friends' stories, the Pages you follow and Create story stay. |
+| `Hide suggested stories` | Removes the stories Facebook suggests from people and Pages you don't follow, the ones marked Suggested in the Stories tray, and the tray's Find friends from contacts card. With Hide suggested and promoted posts in the build too, the tray's People you may know cards go as well. Your friends' stories, the Pages you follow and Create story stay. |
 | `Hide Reels in the feed` | Removes the rows of reels between posts in the news feed, and the reels Facebook adds where your feed ends. A reel a friend posts stays. |
 | `Hide the Reels tab` | Takes the Reels tab, which some accounts call Video, off the tab bar, and its shortcut out of the long-press menu of Facebook's icon. Reel links and the reels in your feed still open. Facebook's own Hide in its tab bar settings keeps working, and a change to the switch shows once Facebook restarts. |
 | `Hide the Reels tab dot` | Takes the new-item dot and count off the Reels tab, which some accounts call Video. Every other tab keeps its own. |
@@ -228,7 +228,7 @@ Reels turn up in four places, and no one switch covers them all. The Reels and W
 | Hide posts by words | Off. Posts with your words come back. Your lists stay as you left them. |
 | Hide post prompts | Off. The strip on some posts comes back. |
 | Hide sponsored stories | Off. |
-| Hide suggested stories | Off. Suggested stories come back to the Stories tray the next time it loads. Hide "Find friends from contacts" off brings that card back the same way. |
+| Hide suggested stories | Off. Suggested stories and the tray's Find friends from contacts and People you may know cards come back to the Stories tray the next time it loads. |
 | Stop Story auto-advance | Off. Stories use Facebook's timing. |
 | View stories anonymously | Off. The stories you watch put you on their viewer lists again. |
 | Hide sponsored reels | Partly. Ads inside a page of reels come back. Banners over a reel and mid-roll ads stay blocked, and so do ads the app adds on its own. |
