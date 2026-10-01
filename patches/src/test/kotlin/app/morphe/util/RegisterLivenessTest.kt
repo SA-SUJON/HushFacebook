@@ -404,6 +404,26 @@ class RegisterLivenessTest {
         assertEquals(emptyList<Int>(), caught(1).firstAfterRewrite(0, branchOn(0)))
         assertEquals(listOf(6), caught(3).firstAfterRewrite(0, branchOn(0)))
         assertEquals(listOf(6), caught(3).rewrittenReads(0))
+        // A try block over a write and a nop, neither of which can throw, never reaches its handler.
+        val unthrown = smali(
+            registers = 3, params = emptyList(),
+            body = """
+                const/4 v0, 0x1
+                const/4 v0, 0x0
+                nop
+                return-void
+                move-exception v1
+                if-eqz v0, :done
+                :done
+                return-void
+            """,
+        ).apply {
+            implementation!!.addCatch("Ljava/lang/Exception;", implementation!!.newLabelForIndex(1),
+                implementation!!.newLabelForIndex(3), implementation!!.newLabelForIndex(4))
+        }
+        assertEquals("the try block is in the flow", listOf(4), ControlFlow.of(unthrown).exceptional[2])
+        assertEquals(emptyList<Int>(), unthrown.firstAfterRewrite(0, branchOn(0)))
+        assertEquals(emptyList<Int>(), unthrown.rewrittenReads(0))
         // A wide write into the register below writes this one too.
         val wide = smali(
             registers = 2, params = emptyList(),

@@ -290,8 +290,9 @@ fun Method.firstAfterRewrite(index: Int, stops: (Instruction) -> Boolean): List<
 }
 
 /**
- * Walks every way from the instruction at [index], which writes one register, visiting each
- * instruction at most twice: still holding the definition's value, and written again. [visit]
+ * Walks every way from the instruction at [index], which writes one register, into the handlers
+ * of what can throw on it too, visiting each instruction at most twice: still holding the
+ * definition's value, and written again. [visit]
  * gets the instruction, the register and whether it was written again, and answers whether the
  * way goes on past it.
  */
@@ -312,8 +313,9 @@ private fun Method.walkFromDefinition(index: Int, visit: (Int, Instruction, Int,
         val (at, state) = pending.removeFirst()
         val instruction = flow.instructions[at]
         if (!visit(at, instruction, register, state == 1)) continue
-        // An instruction that throws never writes its destination, so its handlers see what it held.
-        enqueue(flow.exceptional[at], state)
+        // Only an instruction that can throw reaches its handlers, and one that throws never writes
+        // its destination, so they see what it held.
+        if (instruction.opcode.canThrow()) enqueue(flow.exceptional[at], state)
         val next = when {
             at == index -> 0
             writesRegister(instruction, register) -> 1

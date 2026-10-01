@@ -112,6 +112,8 @@ class KeepPostDatesShapesTest {
                 (header(branch = "const/4 v5, 0x0", tail = "if-eqz v17, :one_line") to "nothing in"),
             "the answer's register written again on one way to the branch" to
                 (header(secondLog = "if-eqz v5, :keep\nconst/16 v17, 0x1\n:keep") to "some ways from the log"),
+            "a wide write over the answer's register on one way to the branch" to
+                (header(secondLog = "if-eqz v5, :keep\nconst-wide/16 v16, 0x0\n:keep") to "some ways from the log"),
             "a way that skips the branch on the answer and branches on another value" to
                 (header(secondLog = "if-nez v5, :skip", tail = ":skip\nconst/16 v17, 0x0\nif-eqz v17, :one_line\nreturn-object v3") to
                     "some ways from the log"),
@@ -124,6 +126,53 @@ class KeepPostDatesShapesTest {
             val message = refusal.message!!
             assertTrue("$shape: $message", message.startsWith("$PATCH: ") && reason in message)
         }
+    }
+
+    /**
+     * A handler reached from the log's call, which can throw, starts a way of its own that still
+     * holds the answer: a branch on the register there reads the choice, and one past a write of
+     * that register refuses the patch.
+     */
+    @Test
+    fun `a handler reached from the choice is one more way from the log`() {
+        fun caught(handler: String) = header(tail = "move-exception v0\n$handler\nreturn-object v3").apply {
+            val code = body()
+            val log = code.indexOfFirst { (it as? ReferenceInstruction)?.reference?.toString() == VALUE_OF_BOOLEAN }
+            val start = code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+            implementation!!.apply {
+                addCatch("Ljava/lang/Exception;", newLabelForIndex(log), newLabelForIndex(log + 1), newLabelForIndex(start))
+            }
+        }
+        val reading = caught("if-eqz v17, :one_line")
+        val log = reading.body().indexOfFirst { (it as? ReferenceInstruction)?.reference?.toString() == VALUE_OF_BOOLEAN }
+        assertEquals("the try block is in the flow", listOf(reading.body().indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }),
+            ControlFlow.of(reading).exceptional[log])
+        assertEquals(17, cyclingChoice(reading).register)
+        val refusal = assertThrows(PatchException::class.java) { cyclingChoice(caught("const/16 v17, 0x1\nif-eqz v17, :one_line")) }
+        assertTrue(refusal.message!!, "some ways from the log of \"$CYCLING_LOG\" write v17 again before the branch" in refusal.message!!)
+    }
+
+    /**
+     * A try block over a write of the answer's register and a nop can't reach its handler, since
+     * neither can throw, so the branch in that handler is on no way from the log and the choice
+     * reads as it does without the try block.
+     */
+    @Test
+    fun `a try block over what can't throw between the choice and its branch changes nothing`() {
+        val tail = ":skip\nconst/16 v17, 0x0\nnop\nreturn-object v3\nmove-exception v0\nif-eqz v17, :one_line\nreturn-object v3"
+        val plain = header(secondLog = "if-nez v5, :skip", tail = tail)
+        val method = header(secondLog = "if-nez v5, :skip", tail = tail)
+        val code = method.body()
+        val rewrite = code.indexOfFirst { it.opcode == Opcode.CONST_16 && (it as OneRegisterInstruction).registerA == 17 }
+        assertEquals(Opcode.NOP, code[rewrite + 1].opcode)
+        val handler = code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+        method.implementation!!.apply {
+            addCatch("Ljava/lang/Exception;", newLabelForIndex(rewrite), newLabelForIndex(rewrite + 2), newLabelForIndex(handler))
+        }
+        assertEquals("the try block is in the flow", listOf(handler), ControlFlow.of(method).exceptional[rewrite + 1])
+        val choice = cyclingChoice(method)
+        val without = cyclingChoice(plain)
+        assertEquals(without.logIndex to without.register, choice.logIndex to choice.register)
     }
 
     /**

@@ -4,6 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Tooling:** `Keep post dates` follows a try block's handler only from what can throw, the way Hide Meta AI questions under posts does, so a try block over code that can't throw no longer gets a Facebook build refused.
 * **Tooling:** `Hide Meta AI questions under posts` refuses a Facebook build with a catch handler, or a try block's start or end, on the `stars` name's load, where its hook goes in. A handler there would have skipped the hook, so a Meta AI row reaching it would still have been drawn.
 * **Tooling:** `Hide Meta AI questions under posts` follows a try block's handler only from what can throw, so a try block over the branch on the `meta_ai` answer no longer stops the patch. A row a handler returns before that branch is refused without saying which way it's on, since the type isn't known there yet.
 * **Tooling:** `Keep post dates` now wants the first branch on the post header's choice along every way from its log to read the choice itself, so a later Facebook build where one way skips that branch, writes the register and branches on something else is refused. A choice made again inside a loop no longer counts as another value on the next pass, since the hook runs on every pass.

@@ -99,8 +99,9 @@ private fun stringOf(instruction: Instruction): String? =
  * Reads the choice out of [method], which loads [CYCLING_LOG] and [CYCLING_COUNT_LOG]. Refuses
  * unless the log's name is loaded once, right after a call's boolean answer and right before
  * String.valueOf of that same register (a plain call while the register fits in four bits, a range
- * call past them), and unless an if-eqz reads that same answer: the branch between the rotating
- * subtitle and the one line.
+ * call past them), and unless, on every way from the log, a handler's included, the first if-eqz on
+ * that register reads the answer itself rather than a value written over it: the branch between
+ * the rotating subtitle and the one line.
  */
 internal fun cyclingChoice(method: Method): CyclingChoice {
     val code = method.implementation!!.instructions.toList()
