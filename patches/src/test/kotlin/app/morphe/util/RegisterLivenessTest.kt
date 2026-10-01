@@ -299,6 +299,39 @@ class RegisterLivenessTest {
     }
 
     @Test
+    fun `a read past a write on only one way reads both the literal and another value`() {
+        val method = smali(
+            registers = 3, params = listOf("Z"),
+            body = """
+                const/4 v0, 0x1
+                if-eqz p0, :keep
+                const/4 v0, 0x0
+                :keep
+                invoke-static {v0}, Lcom/example/Log;->note(I)V
+                const/4 v0, 0x2
+                invoke-static {v0}, Lcom/example/Log;->note(I)V
+                return-void
+            """,
+        )
+        // The first note reads the 1 when p0 is false and the 0 when it isn't; the second reads only the 2.
+        assertEquals(listOf(3), method.literalReads(0))
+        assertEquals(listOf(3, 5), method.rewrittenReads(0))
+        // A backward jump that writes the register first brings another value round to an earlier read.
+        val loop = smali(
+            registers = 3, params = emptyList(),
+            body = """
+                const/4 v0, 0x1
+                :top
+                invoke-static {v0}, Lcom/example/Log;->note(I)V
+                const/4 v0, 0x0
+                goto :top
+            """,
+        )
+        assertEquals(listOf(1), loop.literalReads(0))
+        assertEquals(listOf(1), loop.rewrittenReads(0))
+    }
+
+    @Test
     fun `reads after an instruction end at the next write, and a later read keeps the register busy`() {
         val method = smali(
             registers = 3, params = emptyList(),

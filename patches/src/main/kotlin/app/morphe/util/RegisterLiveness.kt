@@ -254,6 +254,40 @@ fun Method.literalReads(index: Int): List<Int> {
 }
 
 /**
+ * Every instruction that can read the register the instruction at [index] writes on a way from
+ * it that writes that register again first, so a read of some other value. With [literalReads]
+ * it splits the reads the ways from the definition reach, and an instruction in both reads the
+ * definition's value on one way and another value on another.
+ *
+ * @throws IllegalArgumentException when the instruction at [index] writes no single register.
+ */
+fun Method.rewrittenReads(index: Int): List<Int> {
+    val flow = ControlFlow.of(this)
+    val definition = flow.instructions[index]
+    require(definition.opcode.setsRegister() && !definition.opcode.setsWideRegister()) {
+        "Instruction $index of $this does not write a single register."
+    }
+    val register = (definition as OneRegisterInstruction).registerA
+    val reads = sortedSetOf<Int>()
+    // One walk over each instruction twice at most: still holding the definition's value, and written again.
+    val seen = arrayOf(BitSet(), BitSet())
+    val pending = ArrayDeque<Pair<Int, Int>>()
+    fun enqueue(successors: List<Int>, state: Int) = successors.forEach {
+        if (!seen[state][it]) { seen[state].set(it); pending += it to state }
+    }
+    enqueue(flow.normal[index], 0)
+    while (pending.isNotEmpty()) {
+        val (at, state) = pending.removeFirst()
+        val instruction = flow.instructions[at]
+        if (state == 1 && readsRegister(instruction, register)) reads += at
+        // An instruction that throws never writes its destination, so its handlers see what it held.
+        enqueue(flow.exceptional[at], state)
+        enqueue(flow.normal[at], if (writesRegister(instruction, register)) 1 else state)
+    }
+    return reads.toList()
+}
+
+/**
  * Every instruction that can read what [register] holds once the instruction at [index] has
  * run, before something writes it again. Empty means code inserted right after that
  * instruction may use the register for itself. The instruction's own handlers are included:

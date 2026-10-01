@@ -17,6 +17,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
 import app.morphe.util.literalReads
+import app.morphe.util.rewrittenReads
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
@@ -119,16 +120,22 @@ internal fun cyclingChoice(method: Method): CyclingChoice {
     if (!writesTheAnswer || (written as ReferenceInstruction).reference.toString() != VALUE_OF_BOOLEAN) {
         refuse("the log of \"$CYCLING_LOG\" in $where doesn't write v$register")
     }
-    // The branch has to read this answer. An if-eqz on the same register after something wrote it
-    // again tests another value (577 reuses v12 as an iterator further on), and a hook there would
-    // only change what the log says.
+    // The branch has to read this answer, on every way from the log. An if-eqz on the same register
+    // after something wrote it again tests another value (577 reuses v12 as an iterator further on),
+    // and a hook there would only change what the log says.
     fun branchesOn(instruction: Instruction) =
         instruction.opcode == Opcode.IF_EQZ && (instruction as OneRegisterInstruction).registerA == register
-    if (method.literalReads(index - 1).none { branchesOn(code[it]) }) {
-        if (code.drop(index + 1).any(::branchesOn)) {
+    val onAnswer = method.literalReads(index - 1).filter { branchesOn(code[it]) }
+    val onOther = method.rewrittenReads(index - 1).filter { branchesOn(code[it]) }
+    if (onAnswer.isEmpty()) {
+        if (onOther.isNotEmpty()) {
             refuse("v$register is written again in $where before the branch on it after the log of \"$CYCLING_LOG\"")
         }
         refuse("nothing in $where branches on v$register after the log of \"$CYCLING_LOG\"")
+    }
+    val mixed = onAnswer.filter { it in onOther }
+    if (mixed.isNotEmpty()) {
+        refuse("in $where some ways from the log of \"$CYCLING_LOG\" write v$register again before the branch on it at $mixed")
     }
     return CyclingChoice(method, index, register)
 }

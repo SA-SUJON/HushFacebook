@@ -106,6 +106,10 @@ class KeepPostDatesShapesTest {
             "a branch on another register" to (header(branch = "if-eqz v5, :one_line") to "branches on v17"),
             "the answer's register written again before the branch" to
                 (header(secondLog = "const/16 v17, 0x1") to "v17 is written again"),
+            "a branch no way from the log reaches" to
+                (header(branch = "const/4 v5, 0x0", tail = "if-eqz v17, :one_line") to "nothing in"),
+            "the answer's register written again on one way to the branch" to
+                (header(secondLog = "if-eqz v5, :keep\nconst/16 v17, 0x1\n:keep") to "some ways from the log"),
             "the name loaded twice" to
                 (header(secondLog = "const-string v4, \"$CYCLING_LOG\"") to "expected one load of \"$CYCLING_LOG\""),
         )
@@ -115,6 +119,13 @@ class KeepPostDatesShapesTest {
             val message = refusal.message!!
             assertTrue("$shape: $message", message.startsWith("$PATCH: ") && reason in message)
         }
+    }
+
+    /** 577 uses the answer's register again further on, after the branch, and that's no reason to refuse. */
+    @Test
+    fun `a branch on the register after it's written again past the choice is left alone`() {
+        val method = header(branch = "if-eqz v17, :one_line\nconst/16 v17, 0x3\nif-eqz v17, :one_line")
+        assertEquals(17, cyclingChoice(method).register)
     }
 
     /**
