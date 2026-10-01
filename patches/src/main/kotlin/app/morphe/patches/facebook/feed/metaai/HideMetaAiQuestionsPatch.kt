@@ -19,6 +19,7 @@ import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.ControlFlow
+import app.morphe.util.RegisterLiveness
 import app.morphe.util.findMutableMethodOf
 import app.morphe.util.namedRegisters
 import com.android.tools.smali.dexlib2.Opcode
@@ -223,7 +224,8 @@ private fun keyOf(code: List<Instruction>, index: Int, register: Int): Long? {
 /**
  * Where the socket's default way of drawing a pill gets its hook: the [STARS_TYPE] name's load at
  * [index], right after the pill's type is read into [typeRegister]. The name's own register,
- * [freeRegister], is written by that load, so the hook can use it until then.
+ * [freeRegister], is written by that load, and no catch handler over it reads that register, so
+ * the hook can use it until then.
  */
 internal class DefaultPill(val index: Int, val typeRegister: Int, val freeRegister: Int)
 
@@ -232,8 +234,9 @@ internal class DefaultPill(val index: Int, val typeRegister: Int, val freeRegist
  * compares a pill's type with [META_AI_TYPE] once, reading it with a literal key, and compares the
  * type read with that key from the same tree with [STARS_TYPE] once, unless that compare can only
  * be reached through the read just before it, with no try block's edge or handler on its name's
- * load, and unless every path from the [META_AI_TYPE]
- * compare gets there before it returns, through the catch handlers of what can throw on it too.
+ * load and no catch handler over that load reading the name's register, and unless every path
+ * from the [META_AI_TYPE] compare gets there before it returns, through the catch handlers of what
+ * can throw on it too.
  */
 internal fun defaultPill(method: Method): DefaultPill {
     val code = method.implementation!!.instructions.toList()
@@ -259,6 +262,12 @@ internal fun defaultPill(method: Method): DefaultPill {
     // take it in, and one starting there would leave it out.
     val edges = tryEdgesAt(method, site.nameIndex)
     if (edges.isNotEmpty()) refuse("in $where ${edges.joinToString(" and ")} at the \"$STARS_TYPE\" compare's name, where the hook goes")
+    // The hook leaves its answer in the name's register ahead of the load, which writes over it on
+    // normal flow only. A catch handler over the load still sees the answer there, and one that
+    // reads the register as the name would fail verification, taking the whole class with it.
+    if (site.nameRegister in RegisterLiveness.of(method).liveInto(site.nameIndex)) {
+        refuse("in $where a catch handler over the \"$STARS_TYPE\" compare's name reads v${site.nameRegister}, where the hook leaves its answer")
+    }
     // A pill typed meta_ai that could be returned before the stars compare would be drawn with the
     // hook in place, so every way on from the meta_ai compare has to pass it first. A return only on
     // the way where the type isn't meta_ai is refused too, since 577 and 580 join both ways before

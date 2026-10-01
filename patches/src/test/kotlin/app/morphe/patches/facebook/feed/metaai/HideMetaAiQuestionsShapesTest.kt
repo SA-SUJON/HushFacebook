@@ -253,6 +253,37 @@ class HideMetaAiQuestionsShapesTest {
     }
 
     /**
+     * The hook's answer sits in the name's register until the name's load writes over it, so a
+     * catch handler over that load sees the answer there when the load or the hook's call throws.
+     * One that reads the register is refused. One that writes it first, or never reads it, still
+     * applies with the same hook point.
+     */
+    @Test
+    fun `a catch handler over the stars name that reads its register is refused`() {
+        fun caught(handler: String) = socket(extra = "move-exception v13\n$handler\nthrow v13").apply {
+            val code = body()
+            val stars = indexOfString(code, STARS_TYPE)
+            val thrown = code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+            implementation!!.apply {
+                addCatch("Ljava/lang/Exception;", newLabelForIndex(stars - 2), newLabelForIndex(stars + 2), newLabelForIndex(thrown))
+            }
+        }
+        val reads = caught("invoke-static { v8 }, Lfixture/Log;->name(Ljava/lang/String;)V")
+        val stars = indexOfString(reads.body(), STARS_TYPE)
+        assertEquals("the try block is in the flow", listOf(reads.body().indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }),
+            ControlFlow.of(reads).exceptional[stars])
+        val refusal = assertThrows(PatchException::class.java) { defaultPill(reads) }.message!!
+        assertTrue(refusal, "a catch handler over the \"$STARS_TYPE\" compare's name reads v8, where the hook leaves its answer" in refusal)
+
+        val plain = defaultPill(socket())
+        for (handler in listOf("const-string v8, \"logged\"\ninvoke-static { v8 }, Lfixture/Log;->name(Ljava/lang/String;)V", "nop")) {
+            val pill = defaultPill(caught(handler))
+            assertEquals("$handler: the hook point, the type's register and the name's",
+                Triple(plain.index, plain.typeRegister, plain.freeRegister), Triple(pill.index, pill.typeRegister, pill.freeRegister))
+        }
+    }
+
+    /**
      * A try block covering only the answer's move and the branch on it can't hand anything to its
      * handler, so the socket applies as it does without one, though the handler returns.
      */
