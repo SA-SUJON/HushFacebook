@@ -323,15 +323,16 @@ public class PausedHooksTest {
         // A long press on a reel goes to Facebook's speed-up wherever it lands, the reel gets its
         // release listener, a hold speed of normal becomes 2x, the lift of a hold puts the speed back,
         // and that lift's speed is the one the reel had before the hold.
+        // Each in a build with Hold a reel for 2x, as its patch's status says in one.
         probes.put(PatchFamily.REEL_HOLD, Arrays.asList(
-                () -> ReelHold.longPress(false),
-                () -> ReelHold.anywhere(false),
-                () -> ReelHold.speedUp(false),
-                () -> ReelHold.holdSpeed(1.0) != 1.0,
-                () -> {
+                () -> ReelHoldForTests.withHold(() -> ReelHold.longPress(false)),
+                () -> ReelHoldForTests.withHold(() -> ReelHold.anywhere(false)),
+                () -> ReelHoldForTests.withHold(() -> ReelHold.speedUp(false)),
+                () -> ReelHoldForTests.withHold(() -> ReelHold.holdSpeed(1.0) != 1.0),
+                () -> ReelHoldForTests.withHold(() -> {
                     ReelHold.held();
                     return ReelHold.release(false);
-                },
+                }),
                 ReelHoldForTests::putsBackTheSpeedBeforeAHold));
         // A speed picked on a reel is set on the next reel the viewer starts.
         probes.put(PatchFamily.KEEP_REEL_SPEED, Collections.singletonList(ReelSpeedForTests::keepsAPickedSpeed));

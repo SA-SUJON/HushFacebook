@@ -142,6 +142,24 @@ public class ReelLiftGuardTest {
                 line(FamilyNames.HOLD_REEL_FOR_2X));
     }
 
+    /**
+     * The guard goes in before either patch does its own part, so a build whose Keep the reel speed
+     * refused, and that has no Hold a reel for 2x, carries these hooks with neither patch's status
+     * on, which is how an unpatched extension reads. Facebook's answers stand there even with
+     * Hold's switch on.
+     */
+    @Test
+    public void withTheGuardButNeitherPatchsStatusFacebooksAnswersStand() {
+        ReelHold.holdInBuildForTests = null;
+        ReelHold.keepInBuildForTests = null;
+        assertTrue(Settings.HOLD_REEL_FOR_2X.get());
+        finger(MotionEvent.ACTION_DOWN);
+        finger(MotionEvent.ACTION_UP);
+        assertTrue("a tap's lift lost Facebook's put-back", ReelHold.release(true));
+        assertNull("a family was counted with neither patch in the build",
+                line(FamilyNames.HOLD_REEL_FOR_2X));
+    }
+
     @Test
     public void holdSwitchedOffWithKeepTheReelSpeedOnStillGuards() {
         ReelHold.holdInBuildForTests = true;

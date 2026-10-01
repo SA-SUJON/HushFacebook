@@ -5,6 +5,7 @@
 package app.morphe.extension.facebook.media;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.os.SystemClock;
@@ -28,8 +29,10 @@ import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.diagnostics.HookStatus;
+import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
+import app.morphe.extension.shared.settings.preference.LogBufferManager;
 
 /**
  * Keep the reel speed: a speed picked in a reel's menu is kept for the viewer the reel played in,
@@ -158,6 +161,8 @@ public class ReelSpeedTest {
     public void restore() {
         PauseForTests.resume();
         Settings.KEEP_REEL_SPEED.resetToDefault();
+        BaseSettings.DEBUG.resetToDefault();
+        LogBufferManager.clearLogBuffer();
         ReelSpeed.forget();
         ReelHoldForTests.forget();
         HookStatus.clear();
@@ -261,6 +266,29 @@ public class ReelSpeedTest {
         assertEquals("a gear pick on a Watch video was kept", 1f, ReelSpeed.kept(VIDEO_TAB), 0f);
         play(players.player(VIDEO_TAB));
         assertEquals("a reel after a Watch video's gear pick was sped up", List.of(), players.set);
+    }
+
+    /**
+     * A gear pick that isn't kept says why with Debug logging on: no player was just set to its speed,
+     * its player's video couldn't be read, or the video isn't a reel. One line said "isn't a reel"
+     * for all three.
+     */
+    @Test
+    public void aGearPickThatIsntKeptSaysWhy() {
+        BaseSettings.DEBUG.save(true);
+        LogBufferManager.clearLogBuffer();
+        ReelSpeed.gearPicked(1.5f);
+        gearPick(players.player(VIDEO_TAB), 1.25f);
+        Object video = players.player(VIDEO_TAB, NOT_A_REEL);
+        play(video);
+        gearPick(video, 2f);
+        assertEquals("a gear pick that should have stayed with its video was kept", 1f, ReelSpeed.kept(VIDEO_TAB), 0f);
+        String log = LogBufferManager.buildExportText();
+        assertTrue(log, log.contains("Reel speed: 1.5x picked in the gear menu, but no player found that was just set to it, so it isn't kept"));
+        assertTrue(log, log.contains("Reel speed: 1.25x picked in the gear menu, but its player's video couldn't be read, so it isn't kept"));
+        assertTrue(log, log.contains("Reel speed: 2.0x picked in the gear menu on a video that isn't a reel, it stays with that video"));
+        assertFalse(log, log.contains("Reel speed: 1.5x picked in the gear menu on a video that isn't a reel"));
+        assertFalse(log, log.contains("Reel speed: 1.25x picked in the gear menu on a video that isn't a reel"));
     }
 
     /**

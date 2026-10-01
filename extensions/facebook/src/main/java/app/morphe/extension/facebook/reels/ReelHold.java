@@ -304,12 +304,14 @@ public final class ReelHold {
     }
 
     /**
-     * Whether Hold a reel for 2x is in this build. These hooks come with it or with Keep the reel
-     * speed, so whenever they run, a build without Keep the reel speed has it.
+     * Whether Hold a reel for 2x is in this build: its own patch applied. These hooks come with it or
+     * with Keep the reel speed, and the guard goes in before either patch does its own part, so when
+     * Keep the reel speed's part refuses and Hold a reel for 2x wasn't picked, the hooks are there
+     * with neither status on. They leave every answer to Facebook then, whatever Hold's switch says.
      */
     static boolean holdInBuild() {
         Boolean forced = holdInBuildForTests;
-        return forced != null ? forced : SettingsStatus.reelHold() || !SettingsStatus.keepReelSpeed();
+        return forced != null ? forced : SettingsStatus.reelHold();
     }
 
     static boolean keepInBuild() {

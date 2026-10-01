@@ -13,6 +13,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
@@ -137,8 +138,18 @@ class ReelItemStoryFixtureTest {
                 assertEquals("${item.type}->${item.getter.name}()$GRAPHQL_STORY", story[1].methodReference.toString())
 
                 val data = body(REEL_SPONSORED_DATA_STUB)
+                assertEquals(listOf(Opcode.CHECK_CAST, Opcode.INVOKE_VIRTUAL, Opcode.MOVE_RESULT_OBJECT, Opcode.RETURN_OBJECT),
+                    data.take(4).map { it.opcode })
+                // The story comes in as the parameter, and the stub uses no other register.
+                val argument = p0(REEL_SPONSORED_DATA_STUB)
+                assertEquals("${bundle.name}: the sponsored data stub's cast", GRAPHQL_STORY to argument,
+                    ((data[0] as ReferenceInstruction).reference as TypeReference).type to (data[0] as OneRegisterInstruction).registerA)
+                val call = data[1] as FiveRegisterInstruction
+                assertEquals("${bundle.name}: the sponsored data call's register", 1 to argument, call.registerCount to call.registerC)
                 assertEquals("$GRAPHQL_STORY->${item.sponsoredData.name}()${item.sponsoredData.returnType}",
                     data[1].methodReference.toString())
+                assertEquals("${bundle.name}: the sponsored data stub's result", argument to argument,
+                    (data[2] as OneRegisterInstruction).registerA to (data[3] as OneRegisterInstruction).registerA)
                 checked += version
             }
         }

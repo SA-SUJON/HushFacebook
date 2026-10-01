@@ -214,8 +214,16 @@ public final class ReelSpeed {
             HookStatus.bound(FAMILY, where);
             Object player = pickedPlayer(speed, SystemClock.uptimeMillis());
             if (reelsOnly) {
-                Object video = player == null ? null : access.params(player);
-                if (video == null || !access.reel(video)) {
+                if (player == null) {
+                    Logger.printDebug(() -> "Reel speed: " + speed + "x picked in the gear menu, but no player found that was just set to it, so it isn't kept");
+                    return;
+                }
+                Object video = access.params(player);
+                if (video == null) {
+                    Logger.printDebug(() -> "Reel speed: " + speed + "x picked in the gear menu, but its player's video couldn't be read, so it isn't kept");
+                    return;
+                }
+                if (!access.reel(video)) {
                     Logger.printDebug(() -> "Reel speed: " + speed + "x picked in the gear menu on a video that isn't a reel, it stays with that video");
                     return;
                 }

@@ -196,13 +196,17 @@ public class ColdStartHooksTest {
         assertNotNull("a double tap like before the context lost its key", DoubleTapLike.likeKey("reel"));
         assertFalse("a like from a double tap before the context was held back", DoubleTapLike.holdBackLike("DOUBLE_TAP"));
         assertFalse("an attachment's double tap before the context was left unhandled", DoubleTapLike.holdBackTap());
-        assertFalse("a long press on a reel before the context went to the speed-up", ReelHold.longPress(false));
-        assertFalse("a hold before the context counted anywhere on a reel", ReelHold.anywhere(false));
-        assertFalse("a reel before the context got a release listener", ReelHold.speedUp(false));
-        ReelHold.held();
-        assertEquals("a speed set before the context changed", 2f, ReelHold.speedSet(new Object(), 2f), 0f);
-        assertEquals("a hold speed read before the context changed", 1.0, ReelHold.holdSpeed(1.0), 0.0);
-        assertFalse("a lift after a hold before the context put a speed back", ReelHold.release(false));
+        // In a build with Hold a reel for 2x, so each answer is the context check's.
+        ReelHoldForTests.withHold(() -> {
+            assertFalse("a long press on a reel before the context went to the speed-up", ReelHold.longPress(false));
+            assertFalse("a hold before the context counted anywhere on a reel", ReelHold.anywhere(false));
+            assertFalse("a reel before the context got a release listener", ReelHold.speedUp(false));
+            ReelHold.held();
+            assertEquals("a speed set before the context changed", 2f, ReelHold.speedSet(new Object(), 2f), 0f);
+            assertEquals("a hold speed read before the context changed", 1.0, ReelHold.holdSpeed(1.0), 0.0);
+            assertFalse("a lift after a hold before the context put a speed back", ReelHold.release(false));
+            return true;
+        });
         assertFalse("a lift's speed before the context was changed", ReelHoldForTests.putsBackTheSpeedBeforeAHold());
         assertFalse("stories viewed before the context were kept off their viewer lists", StorySeen.holdBack());
         assertFalse(PlayerSourcesForTests.recordsAPlayer());
