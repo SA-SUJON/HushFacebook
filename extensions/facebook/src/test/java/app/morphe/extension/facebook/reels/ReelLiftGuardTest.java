@@ -138,8 +138,18 @@ public class ReelLiftGuardTest {
         finger(MotionEvent.ACTION_DOWN);
         finger(MotionEvent.ACTION_UP);
         assertTrue(ReelHold.release(true));
-        assertNull("a family was counted with neither patch in the build",
+        Reel reel = new Reel(1.5f);
+        facebooksHold(reel, 1f);
+        assertEquals("Facebook's put-back after its own hold was changed", 1f, reel.speed, 0f);
+        assertNoFamilyCounted();
+    }
+
+    /** Neither reel patch's line in the report, so the guard's hooks counted under no family. */
+    private static void assertNoFamilyCounted() {
+        assertNull("Hold a reel for 2x counted the guard's hooks with neither patch in the build",
                 line(FamilyNames.HOLD_REEL_FOR_2X));
+        assertNull("Keep the reel speed counted the guard's hooks with neither patch in the build",
+                line(FamilyNames.KEEP_REEL_SPEED));
     }
 
     /**
@@ -156,8 +166,10 @@ public class ReelLiftGuardTest {
         finger(MotionEvent.ACTION_DOWN);
         finger(MotionEvent.ACTION_UP);
         assertTrue("a tap's lift lost Facebook's put-back", ReelHold.release(true));
-        assertNull("a family was counted with neither patch in the build",
-                line(FamilyNames.HOLD_REEL_FOR_2X));
+        Reel reel = new Reel(1.5f);
+        facebooksHold(reel, 1f);
+        assertEquals("Facebook's put-back after its own hold was changed", 1f, reel.speed, 0f);
+        assertNoFamilyCounted();
     }
 
     @Test

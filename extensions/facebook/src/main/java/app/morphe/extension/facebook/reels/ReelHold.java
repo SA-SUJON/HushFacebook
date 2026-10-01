@@ -150,7 +150,7 @@ public final class ReelHold {
                 lifted = true;
             }
         } catch (Throwable failure) {
-            HookStatus.threw(family(), "touch", failure);
+            threwShared("touch", failure);
         }
     }
 
@@ -165,7 +165,7 @@ public final class ReelHold {
      * only on its way to the speed-up: past the flag, the ad check and the edge check. A hold.
      */
     public static void held() {
-        HookStatus.invoked(family());
+        invokedShared();
         boolean hold = on("hold");
         if (!hold && !keeping("hold")) return;
         again = holding && !restored;
@@ -189,7 +189,7 @@ public final class ReelHold {
      */
     public static float speedSet(Object player, float speed) {
         try {
-            HookStatus.invoked(family());
+            invokedShared();
             if (!on("speed set") && !keeping("speed set")) return speed;
             if (speedUpNext) {
                 speedUpNext = false;
@@ -222,7 +222,7 @@ public final class ReelHold {
                 Logger.printDebug(() -> "Reel hold: back to " + speed + "x");
             }
         } catch (Throwable failure) {
-            HookStatus.threw(family(), "speed set", failure);
+            threwShared("speed set", failure);
         }
         return speed;
     }
@@ -259,7 +259,7 @@ public final class ReelHold {
      * outside one, so a lift that ended no hold puts back nothing.
      */
     public static boolean release(boolean facebooks) {
-        HookStatus.invoked(family());
+        invokedShared();
         boolean hold = on("release");
         if (!hold && !keeping("release")) return facebooks;
         boolean yes = hold ? holding : facebooks && holding;
@@ -319,9 +319,31 @@ public final class ReelHold {
         return forced != null ? forced : SettingsStatus.keepReelSpeed();
     }
 
-    /** The family the shared hooks count under: this patch's when it's in the build, else Keep the reel speed's. */
+    /**
+     * The family the shared hooks count under: this patch's when it's in the build, else Keep the
+     * reel speed's when that one is, else none, so a build carrying only the guard reports no
+     * family's hooks as run.
+     */
+    @Nullable
     private static String family() {
-        return holdInBuild() ? FAMILY : FamilyNames.KEEP_REEL_SPEED;
+        if (holdInBuild()) return FAMILY;
+        return keepInBuild() ? FamilyNames.KEEP_REEL_SPEED : null;
+    }
+
+    /** One more run of a shared hook, under {@link #family()} when there is one. */
+    private static void invokedShared() {
+        String family = family();
+        if (family != null) HookStatus.invoked(family);
+    }
+
+    /** A shared hook's throw, under {@link #family()}, or in the log when neither patch is in the build. */
+    private static void threwShared(String where, Throwable failure) {
+        String family = family();
+        if (family != null) {
+            HookStatus.threw(family, where, failure);
+        } else {
+            Logger.printException(() -> "Reel hold: the '" + where + "' hook threw with neither reel patch in the build", failure);
+        }
     }
 
     /** Forgets the hold, the gesture and the speed before the hold, and reads speeds through the patch's getter. For tests. */
