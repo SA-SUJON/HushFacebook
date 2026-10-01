@@ -17,7 +17,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
 import app.morphe.util.firstAfterRewrite
-import app.morphe.util.literalReads
+import app.morphe.util.firstHolding
 import app.morphe.util.rewrittenReads
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
@@ -99,9 +99,9 @@ private fun stringOf(instruction: Instruction): String? =
  * Reads the choice out of [method], which loads [CYCLING_LOG] and [CYCLING_COUNT_LOG]. Refuses
  * unless the log's name is loaded once, right after a call's boolean answer and right before
  * String.valueOf of that same register (a plain call while the register fits in four bits, a range
- * call past them), and unless, on every way from the log, a handler's included, the first if-eqz on
- * that register reads the answer itself rather than a value written over it: the branch between
- * the rotating subtitle and the one line.
+ * call past them), and unless some way from the log reaches an if-eqz on that register and, on every
+ * way, into the handlers of what can throw too, the first one reads the answer itself rather than
+ * a value written over it: the branch between the rotating subtitle and the one line.
  */
 internal fun cyclingChoice(method: Method): CyclingChoice {
     val code = method.implementation!!.instructions.toList()
@@ -125,10 +125,11 @@ internal fun cyclingChoice(method: Method): CyclingChoice {
     // On every way from the log, the first branch on the register has to read this answer. One
     // after something wrote it again tests another value, and a hook there would only change what
     // the log says. A branch past the answer's own decides something else: 577 reuses v12 as an
-    // iterator further on.
+    // iterator further on. Both walks go into a handler only from what can throw, so a branch in a
+    // handler nothing can reach counts for neither.
     fun branchesOn(instruction: Instruction) =
         instruction.opcode == Opcode.IF_EQZ && (instruction as OneRegisterInstruction).registerA == register
-    if (method.literalReads(index - 1).none { branchesOn(code[it]) }) {
+    if (method.firstHolding(index - 1, ::branchesOn).isEmpty()) {
         if (method.rewrittenReads(index - 1).any { branchesOn(code[it]) }) {
             refuse("v$register is written again in $where before the branch on it after the log of \"$CYCLING_LOG\"")
         }

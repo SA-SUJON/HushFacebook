@@ -255,10 +255,11 @@ fun Method.literalReads(index: Int): List<Int> {
 
 /**
  * Every instruction that can read the register the instruction at [index] writes on a way from
- * it that writes that register again first, so a read of some other value. With [literalReads]
- * it splits the reads the ways from the definition reach, and an instruction in both reads the
- * definition's value on one way and another value on another. A way that comes back round to
- * the definition holds its value again.
+ * it that writes that register again first, so a read of some other value. Its ways go into a
+ * handler only from what can throw, as those of [firstHolding] and [firstAfterRewrite] do, while
+ * [literalReads] follows every handler. An instruction can read the definition's value on one
+ * way and another value on another. A way that comes back round to the definition holds its
+ * value again.
  *
  * @throws IllegalArgumentException when the instruction at [index] writes no single register.
  */
@@ -269,6 +270,23 @@ fun Method.rewrittenReads(index: Int): List<Int> {
         true
     }
     return reads.toList()
+}
+
+/**
+ * On each way from the instruction at [index], the first instruction [stops] takes, when that way
+ * still holds the value the instruction at [index] writes: the other half of [firstAfterRewrite],
+ * over the same ways.
+ *
+ * @throws IllegalArgumentException when the instruction at [index] writes no single register.
+ */
+fun Method.firstHolding(index: Int, stops: (Instruction) -> Boolean): List<Int> {
+    val found = sortedSetOf<Int>()
+    walkFromDefinition(index) { at, instruction, _, rewritten ->
+        if (!stops(instruction)) return@walkFromDefinition true
+        if (!rewritten) found += at
+        false
+    }
+    return found.toList()
 }
 
 /**

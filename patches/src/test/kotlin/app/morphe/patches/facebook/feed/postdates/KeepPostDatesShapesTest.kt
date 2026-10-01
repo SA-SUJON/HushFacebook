@@ -153,6 +153,31 @@ class KeepPostDatesShapesTest {
     }
 
     /**
+     * A branch on the answer in a handler that only a nop leads to is on no way from the log, since
+     * a nop can't throw. With the one real branch on another register the method is refused, the
+     * same as without the try block.
+     */
+    @Test
+    fun `a branch on the answer in a handler only a nop leads to isn't the branch on the choice`() {
+        val tail = "move-exception v0\nif-eqz v17, :one_line\nreturn-object v3"
+        fun shape(caught: Boolean) = header(secondLog = "nop", branch = "if-eqz v5, :one_line", tail = tail).apply {
+            if (!caught) return@apply
+            val code = body()
+            val nop = code.indexOfFirst { it.opcode == Opcode.NOP }
+            val handler = code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+            implementation!!.apply {
+                addCatch("Ljava/lang/Exception;", newLabelForIndex(nop), newLabelForIndex(nop + 1), newLabelForIndex(handler))
+            }
+            assertEquals("the try block is in the flow", listOf(handler), ControlFlow.of(this).exceptional[nop])
+        }
+        val reason = "nothing in Lfixture/PostHeaderSubtitle;->render branches on v17 after the log of \"$CYCLING_LOG\""
+        for (caught in listOf(false, true)) {
+            val refusal = assertThrows(PatchException::class.java) { cyclingChoice(shape(caught)) }.message!!
+            assertTrue("caught $caught: $refusal", reason in refusal)
+        }
+    }
+
+    /**
      * A try block over a write of the answer's register and a nop can't reach its handler, since
      * neither can throw, so the branch in that handler is on no way from the log and the choice
      * reads as it does without the try block.

@@ -424,6 +424,8 @@ class RegisterLivenessTest {
         assertEquals("the try block is in the flow", listOf(4), ControlFlow.of(unthrown).exceptional[2])
         assertEquals(emptyList<Int>(), unthrown.firstAfterRewrite(0, branchOn(0)))
         assertEquals(emptyList<Int>(), unthrown.rewrittenReads(0))
+        assertEquals("the handler's branch is on no way from the write", emptyList<Int>(), unthrown.firstHolding(0, branchOn(0)))
+        assertEquals("every handler is followed for the literal reads", listOf(5), unthrown.literalReads(0))
         // A wide write into the register below writes this one too.
         val wide = smali(
             registers = 2, params = emptyList(),
