@@ -141,6 +141,7 @@ public class TapToPlayTest {
         assertTrue(TapToPlay.armed(opened));
         assertTrue("the opened video's own restarts", decide(opened, Trigger.BY_PLAYER, now + 500));
         assertFalse("the next player's BY_USER start", decide(new Object(), Trigger.BY_USER, now + 600));
+        assertFalse("an unrelated player's BY_USER start, an ad say", decide(new Object(), Trigger.BY_USER, now + 650));
         assertFalse("an unrelated player, an ad say", decide(new Object(), Trigger.BY_AUTOPLAY, now + 700));
         assertEquals(1, TapToPlay.armedCount());
     }
@@ -172,6 +173,43 @@ public class TapToPlayTest {
         assertFalse("and it's gone after that", decide(new Object(), Trigger.BY_USER, now - 2));
         TapToPlay.linkOpened(now + 5);
         assertFalse("a link the clock hasn't reached yet", decide(new Object(), Trigger.BY_USER, now));
+    }
+
+    /**
+     * A link waiting goes to no player after a swipe, a tap or a control: the person moved on or
+     * started something themselves, and the next player's BY_USER start is held.
+     */
+    @Test
+    public void aSwipeATapOrAControlDropsAWaitingLink() {
+        long now = 100_000;
+        TapToPlay.linkOpened(now - 100);
+        TapToPlay.nonTapGesture();
+        assertFalse("the next item after a swipe", decide(new Object(), Trigger.BY_USER, now));
+
+        TapToPlay.linkOpened(now - 100);
+        tapAt(now - 10);
+        assertTrue(decide(new Object(), Trigger.BY_AUTOPLAY, now));
+        assertFalse("another player after a tapped start", decide(new Object(), Trigger.BY_USER, now + 2_000));
+
+        TapToPlay.linkOpened(now + 3_000);
+        assertTrue(decide(new Object(), Trigger.BY_MEDIA_SESSION_CONTROLS, now + 3_100));
+        assertFalse("another player after a control", decide(new Object(), Trigger.BY_USER, now + 3_200));
+    }
+
+    /**
+     * An armed player's own BY_USER restart leaves the link for the player it opened, and a start
+     * whose clock was read before the link came doesn't take it.
+     */
+    @Test
+    public void onlyAHeldStartTakesTheLink() {
+        long now = 100_000;
+        Object playing = new Object();
+        tapAt(now - 10);
+        assertTrue(decide(playing, Trigger.BY_USER, now));
+        TapToPlay.linkOpened(now + 2_000);
+        assertTrue("the armed player's restart", decide(playing, Trigger.BY_USER, now + 2_100));
+        assertFalse("a start from before the link", decide(new Object(), Trigger.BY_USER, now + 1_999));
+        assertTrue("the opened player still gets it", decide(new Object(), Trigger.BY_USER, now + 2_200));
     }
 
     /** A start a tap let through takes the link too, so a later start can't use it. */
