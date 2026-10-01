@@ -4,6 +4,10 @@
  */
 package app.morphe.extension.facebook.media;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.os.SystemClock;
 
 import androidx.annotation.Nullable;
@@ -17,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
@@ -44,6 +49,10 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *   <li>A tap ended no more than {@link #TAP_WINDOW_MS} ago ({@link TapClock}) and the trigger isn't
  *       one Facebook sends because something came into view or came back ({@link #visibilityDriven}).
  *       BY_AUTOPLAY is let through here, since the Story you tap starts with it.</li>
+ *   <li>A link another app handed Facebook opened a screen no more than {@link #LINK_WINDOW_MS}
+ *       ago, the trigger is BY_USER, and no BY_USER start has come since ({@link #activityCreated}).
+ *       Facebook's video player opens a shared video from a browser with BY_USER and no tap, and
+ *       it has no play button of its own to tap.</li>
  * </ul>
  *
  * <p>Every other start is held, and the player stays where it was, showing its first frame or its
@@ -65,6 +74,18 @@ public final class TapToPlay {
     static final long BIND_GRACE_MS = 2000;
 
     /**
+     * How long after a link from another app opens a Facebook screen the first BY_USER start still
+     * counts as the one that link asked for. A cold start and a slow network both fit.
+     */
+    static final long LINK_WINDOW_MS = 15_000;
+
+    /** The trigger Facebook's player gets when it opens a video a link asked for. */
+    private static final String BY_USER = "BY_USER";
+
+    /** No link waiting: none came, or a BY_USER start took it. */
+    private static final long NO_LINK = Long.MIN_VALUE;
+
+    /**
      * Triggers that go ahead with no tap, because only something you did sends them: the media
      * controls in the notification and on the lock screen, the seek bar, whose drag moves too far to
      * be a tap, and BY_MUSIC_PLAYER, which only the music picker you open while making a post or a
@@ -83,6 +104,8 @@ public final class TapToPlay {
     private static final String OFF = "OFF";
 
     private static final ArmedPlayers ARMED = new ArmedPlayers();
+    /** When a link from another app last opened a Facebook screen, on the uptime clock. */
+    private static final AtomicLong LINK_OPENED_AT = new AtomicLong(NO_LINK);
     private static final Object LOG_LOCK = new Object();
     private static int decisions;
     private static int allowedSinceSummary;
@@ -127,6 +150,41 @@ public final class TapToPlay {
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.TAP_TO_PLAY, "player rebind", failure);
         }
+    }
+
+    /**
+     * Hushfacebook's activity watcher, as each Facebook screen is created. A screen made fresh, not
+     * brought back, for a link (a VIEW intent with a link in it) that some app other than Facebook
+     * sent records that link, so the first BY_USER start within {@link #LINK_WINDOW_MS} plays. One
+     * link plays one start: any BY_USER start takes it, and nothing else can.
+     */
+    public static void activityCreated(Activity activity, @Nullable Bundle state) {
+        try {
+            if (state != null || !on()) return;
+            Intent intent = activity.getIntent();
+            if (intent == null || !Intent.ACTION_VIEW.equals(intent.getAction()) || intent.getData() == null) return;
+            Uri referrer = activity.getReferrer();
+            String from = referrer == null ? null : referrer.getHost();
+            if (activity.getPackageName().equals(from)) return;
+            linkOpened(SystemClock.uptimeMillis());
+            String screen = activity.getClass().getSimpleName();
+            Logger.diagnosticDebug(DiagnosticCategory.OTHER, SOURCE, () -> "Tap to play: a link from "
+                    + (from == null ? "an app that didn't say" : from) + " opened " + screen
+                    + ", so the first BY_USER start in the next " + LINK_WINDOW_MS / 1000 + " s plays");
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.TAP_TO_PLAY, "link opened", failure);
+        }
+    }
+
+    /** Records a link from another app opening a screen at [now]. */
+    static void linkOpened(long now) {
+        LINK_OPENED_AT.set(now);
+    }
+
+    /** Whether a link is waiting at [now] for a BY_USER start. Taking it leaves none, either way. */
+    private static boolean takeLink(long now) {
+        long at = LINK_OPENED_AT.getAndSet(NO_LINK);
+        return at != NO_LINK && now >= at && now - at <= LINK_WINDOW_MS;
     }
 
     /** A swipe keeps the current video armed, but the next bind must wait for its own start. */
@@ -234,11 +292,13 @@ public final class TapToPlay {
         boolean armed = ARMED.armed(player);
         long sinceTap = TapClock.msSinceTap(now);
         boolean control = trigger != null && CONTROLS.contains(trigger);
+        boolean linked = BY_USER.equals(trigger) && takeLink(now);
         boolean allowed = armed
                 || control
+                || linked
                 || (sinceTap >= 0 && sinceTap <= TAP_WINDOW_MS && !visibilityDriven(trigger));
         if (allowed && (!armed || control)) ARMED.arm(player, now);
-        logDecision(allowed, trigger, sinceTap, armed, path);
+        logDecision(allowed, trigger, sinceTap, armed, linked ? path + " (a link asked for it)" : path);
         return allowed;
     }
 
@@ -299,6 +359,7 @@ public final class TapToPlay {
     /** Forgets every armed player and the log's counts. For tests. */
     static void forget() {
         ARMED.clear();
+        LINK_OPENED_AT.set(NO_LINK);
         synchronized (LOG_LOCK) {
             decisions = 0;
             allowedSinceSummary = 0;
