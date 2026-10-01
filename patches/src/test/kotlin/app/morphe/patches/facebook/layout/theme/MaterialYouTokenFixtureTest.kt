@@ -66,6 +66,30 @@ class MaterialYouTokenFixtureTest {
          */
         val DATA_READ_TOKENS = setOf("ACCENT", "DISABLED_TEXT", "DIVIDER", "NAV_BAR_BACKGROUND", "PLACEHOLDER_IMAGE",
             "PRIMARY_TEXT", "PRIMARY_TEXT_ON_MEDIA", "SURFACE_BACKGROUND", "WASH")
+
+        /**
+         * The tokens 577 and 580 resolve in a method that reads `TypedValue.type` for only some of its
+         * calls, or reads neither field and hands the value on. Each was looked at: PRIMARY_TEXT and
+         * SURFACE_BACKGROUND are in [DATA_READ_TOKENS] anyway, and SHADOW_TEXT_AND_ICON_ON_MEDIA goes
+         * through a helper that returns the TypedValue to a caller reading its `resourceId`.
+         */
+        val UNCHECKED_TOKENS = setOf("PRIMARY_TEXT", "SHADOW_TEXT_AND_ICON_ON_MEDIA", "SURFACE_BACKGROUND")
+
+        /**
+         * The data-reading calls whose attribute the scan can't follow, by build. React Native's
+         * PlatformColor (`A02`, called from FabricUIManager.getColor) looks an attribute up by the name
+         * the JavaScript gives it, and Mapbox's ColorUtils looks up colorAccent, colorPrimary and
+         * colorPrimaryDark, which aren't FDS tokens.
+         */
+        val UNRESOLVED = mapOf(
+            "577.0.0.50.72" to setOf("LX/CHJ;->A02(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/Integer;@88"),
+            "580.0.0.51.74" to setOf(
+                "LX/Cyv;->A02(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/Integer;@88",
+                "Lcom/mapbox/mapboxsdk/utils/ColorUtils;->getAccentColor(Landroid/content/Context;)I@13",
+                "Lcom/mapbox/mapboxsdk/utils/ColorUtils;->getPrimaryColor(Landroid/content/Context;)I@13",
+                "Lcom/mapbox/mapboxsdk/utils/ColorUtils;->getPrimaryDarkColor(Landroid/content/Context;)I@13",
+            ),
+        )
     }
 
     private val theme = File(RepoFiles.root,
@@ -272,7 +296,8 @@ class MaterialYouTokenFixtureTest {
      * <p>Some of Facebook's code resolves a token's attribute and reads `TypedValue.data` as its colour,
      * which a colour state list doesn't give. The patch finds those tokens in each build's dex, the
      * same [DATA_READ_TOKENS] in both, and each item it changes for one of them has to be a plain
-     * colour, while every other item keeps its state list.
+     * colour, while every other item keeps its state list. What the scan can't settle is pinned as
+     * well ([UNCHECKED_TOKENS], [UNRESOLVED]), so a new build's changes there get looked at.
      */
     @Test
     fun `every night style item the patch changes is a listed token and colour in each declared build`() {
@@ -283,20 +308,23 @@ class MaterialYouTokenFixtureTest {
         for (target in AppCompatibilities.facebook().single().targets) {
             val version = checkNotNull(target.version)
             for (fixture in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
-                withBaseApk(fixture) { apk -> checkNightStyles(fixture.name, apk, listed) }
+                withBaseApk(fixture) { apk -> checkNightStyles(fixture.name, version, apk, listed) }
                 builds++
             }
         }
         assertEquals("one fixture for each declared build", AppCompatibilities.facebook().single().targets.size, builds)
     }
 
-    private fun checkNightStyles(build: String, apk: File, listed: Map<String, Set<Int>>) {
+    private fun checkNightStyles(build: String, version: String, apk: File, listed: Map<String, Set<Int>>) {
         val attributes = tokenAttributes(apk)
         val (initializer, tokenType) = tokenInitializer(apk)
         assertEquals("$build: the patch reads other token attributes", attributes, patchTokenAttributes(initializer, tokenType))
         val tokens = attributes.entries.associate { (token, attribute) -> "attr_0x%08x".format(attribute) to token }
-        val plain = scannedPlainTokens(apk, initializer, tokenType)
+        val scan = scannedTokens(apk, initializer, tokenType)
+        val plain = scan.tokens
         assertEquals("$build: the tokens read as TypedValue data", DATA_READ_TOKENS, plain)
+        assertEquals("$build: the tokens resolved where the read isn't checked", UNCHECKED_TOKENS, scan.unchecked.keys)
+        assertEquals("$build: the data reads the scan can't follow", UNRESOLVED[version], scan.unresolved)
 
         val styles = fdsStyles(apk, attributes.values.toSet())
         val light = styles.values.single { it.parent == 0 && it.sets > 300 }
@@ -345,8 +373,8 @@ class MaterialYouTokenFixtureTest {
             "PRIMARY_TEXT @color/hushfacebook_you_neutral_95" in plainTones)
     }
 
-    /** The FDS tokens the patch finds read through `TypedValue.data`, over every class in [apk]. */
-    private fun scannedPlainTokens(apk: File, initializer: Method, tokenType: String): Set<String> {
+    /** What the patch's scan for tokens read through `TypedValue.data` finds over every class in [apk]. */
+    private fun scannedTokens(apk: File, initializer: Method, tokenType: String): DataReadScan {
         val container = DexFileFactory.loadDexContainer(apk, Opcodes.getDefault())
         val forEachClass: ((ClassDef) -> Unit) -> Unit = { visit ->
             for (name in container.dexEntryNames) container.getEntry(name)!!.dexFile.classes.forEach(visit)

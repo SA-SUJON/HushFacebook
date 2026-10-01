@@ -13,9 +13,12 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.PayloadInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.SwitchPayload
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -136,7 +139,7 @@ internal val fdsTokenAttributesPatch = bytecodePatch {
         check(tokenAttributeNames.size > FULL_THEME_ITEMS) {
             "The FDS token enum has too few constants with a theme attribute, so no style item can be matched"
         }
-        plainTokens = dataReadTokens({ visit -> classDefForEach { visit(it) } }, constants, tokenAttributeField(tokenClass))
+        plainTokens = dataReadTokens({ visit -> classDefForEach { visit(it) } }, constants, tokenAttributeField(tokenClass)).tokens
     }
 }
 
@@ -217,85 +220,138 @@ private const val TYPED_VALUE = "Landroid/util/TypedValue;"
 
 /** Where a register's value came from, as far as a look back up the method goes. */
 private sealed interface Origin {
-    class Literal(val value: Int) : Origin
-    class Token(val field: String) : Origin
-    class Parameter(val index: Int) : Origin
+    data class Literal(val value: Int) : Origin
+    data class Token(val field: String) : Origin
+    data class Parameter(val index: Int) : Origin
     object Other : Origin
+}
+
+/** How a method that calls `resolveAttribute` reads the `TypedValue` back. */
+private enum class Read { DATA, TYPE, NEITHER }
+
+/**
+ * What [dataReadTokens] found: the tokens some code reads as `TypedValue.data` without looking at
+ * `TypedValue.type`, each with the methods that do ([readers]); the tokens that reach `resolveAttribute` in a method that reads `type` for fewer
+ * calls than it makes, or reads neither field and so hands the value on ([unchecked], each with the
+ * methods); and the data-reading calls whose attribute the scan can't follow ([unresolved], each
+ * `method@instruction`). The last two are for a person to look at: the fixture test pins them.
+ */
+internal class DataReadScan(
+    val readers: Map<String, Set<String>>,
+    val unchecked: Map<String, Set<String>>,
+    val unresolved: Set<String>,
+) {
+    /** The tokens [readers] lists, each with the methods reading it. */
+    val tokens: Set<String> get() = readers.keys
 }
 
 /**
  * The FDS tokens Facebook's code resolves with `Theme.resolveAttribute` and then reads as
  * `TypedValue.data` without looking at `TypedValue.type`. A night style item pointing at a colour
  * state list resolves to the file's name there, not a colour, so these tokens' items keep a plain
- * colour. Each method reading `data` but never `type` is looked at: the attribute it resolves is a
- * token's literal, a token constant's [attributeField], or a parameter, which makes the method a
- * helper whose callers are looked at the same way. [forEachClass] walks every class, twice.
+ * colour. Every call is looked at: each value the attribute register can hold there (the last write
+ * on each path to the call, so both arms of a branch) is a token's literal, a token constant's
+ * [attributeField], or a parameter, which makes the method a helper whose callers are looked at the
+ * same way, a token constant passed in included, and a helper's helpers after them until no new one
+ * turns up. [forEachClass] walks every class, once per round.
  */
 internal fun dataReadTokens(
     forEachClass: ((ClassDef) -> Unit) -> Unit,
     constants: TokenConstants,
     attributeField: String,
-): Set<String> {
+): DataReadScan {
     val byAttribute = constants.attributes.entries.associate { (name, attribute) -> attribute to name }
-    val found = sortedSetOf<String>()
-    fun note(origin: Origin) {
-        when (origin) {
-            is Origin.Literal -> byAttribute[origin.value]?.let { found += it }
-            is Origin.Token -> constants.fields[origin.field]?.let { found += it }
-            else -> Unit
+    val readers = sortedMapOf<String, MutableSet<String>>()
+    val unchecked = sortedMapOf<String, MutableSet<String>>()
+    val unresolved = sortedSetOf<String>()
+    val helpers = mutableMapOf<String, MutableSet<Pair<Int, Read>>>()
+    var fresh = mutableMapOf<String, MutableSet<Pair<Int, Read>>>()
+
+    fun note(origins: Set<Origin>, read: Read, method: String, at: Int) {
+        for (origin in origins) {
+            val name = when (origin) {
+                is Origin.Literal -> byAttribute[origin.value]
+                is Origin.Token -> constants.fields[origin.field]
+                is Origin.Parameter -> {
+                    if (helpers.getOrPut(method) { mutableSetOf() }.add(origin.index to read)) {
+                        fresh.getOrPut(method) { mutableSetOf() } += origin.index to read
+                    }
+                    null
+                }
+                Origin.Other -> {
+                    if (read == Read.DATA) unresolved += "$method@$at"
+                    null
+                }
+            } ?: continue
+            (if (read == Read.DATA) readers else unchecked).getOrPut(name) { sortedSetOf() } += method
         }
     }
 
-    val helpers = mutableMapOf<String, Int>()
     forEachClass { classDef ->
         if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@forEachClass
         for (method in classDef.methods) {
             val instructions = method.implementation?.instructions ?: continue
-            if (!readsDataWithoutType(instructions)) continue
-            val listed = instructions.toList()
-            for ((index, instruction) in listed.withIndex()) {
+            val calls = instructions.count { (it as? ReferenceInstruction)?.reference?.toString() == RESOLVE_ATTRIBUTE }
+            if (calls == 0) continue
+            val read = reads(instructions, calls)
+            if (read == Read.TYPE) continue
+            val flow = Flow(method)
+            val key = method.key()
+            for ((index, instruction) in flow.instructions.withIndex()) {
                 if ((instruction as? ReferenceInstruction)?.reference?.toString() != RESOLVE_ATTRIBUTE) continue
-                when (val origin = origin(method, listed, index, instruction.arguments()[1], constants, attributeField)) {
-                    is Origin.Parameter -> helpers[method.key()] = origin.index
-                    else -> note(origin)
+                note(origins(flow, index, instruction.arguments()[1], constants, attributeField), read, key, index)
+            }
+        }
+    }
+
+    while (fresh.isNotEmpty()) {
+        val round = fresh
+        fresh = mutableMapOf()
+        val roundTypes = round.keys.map { it.substringBefore("->") }.toSet()
+        forEachClass { classDef ->
+            if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@forEachClass
+            for (method in classDef.methods) {
+                val instructions = method.implementation?.instructions ?: continue
+                var flow: Flow? = null
+                for ((index, instruction) in instructions.withIndex()) {
+                    val target = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: continue
+                    if (target.definingClass !in roundTypes) continue
+                    val uses = round[target.key()] ?: continue
+                    val caller = flow ?: Flow(method).also { flow = it }
+                    val static = instruction.opcode == Opcode.INVOKE_STATIC || instruction.opcode == Opcode.INVOKE_STATIC_RANGE
+                    for ((parameter, read) in uses) {
+                        val slot = (if (static) 0 else 1) +
+                            target.parameterTypes.take(parameter).sumOf { if (it.toString() == "J" || it.toString() == "D") 2 else 1 }
+                        note(origins(caller, index, instruction.arguments()[slot], constants, attributeField), read, method.key(), index)
+                    }
                 }
             }
         }
     }
-    if (helpers.isEmpty()) return found
-
-    val helperTypes = helpers.keys.map { it.substringBefore("->") }.toSet()
-    forEachClass { classDef ->
-        if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@forEachClass
-        for (method in classDef.methods) {
-            val instructions = method.implementation?.instructions ?: continue
-            var listed: List<Instruction>? = null
-            for ((index, instruction) in instructions.withIndex()) {
-                val target = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: continue
-                if (target.definingClass !in helperTypes) continue
-                val parameter = helpers[target.key()] ?: continue
-                val static = instruction.opcode == Opcode.INVOKE_STATIC || instruction.opcode == Opcode.INVOKE_STATIC_RANGE
-                val slot = (if (static) 0 else 1) +
-                    target.parameterTypes.take(parameter).sumOf { if (it.toString() == "J" || it.toString() == "D") 2 else 1 }
-                val all = listed ?: instructions.toList().also { listed = it }
-                note(origin(method, all, index, instruction.arguments()[slot], constants, attributeField))
-            }
-        }
-    }
-    return found
+    return DataReadScan(readers, unchecked, unresolved)
 }
 
-private fun readsDataWithoutType(instructions: Iterable<Instruction>): Boolean {
+/**
+ * [Read.DATA] when [instructions] read `TypedValue.data` and never `type`; [Read.TYPE] when they
+ * read `type` at least once for each of their [calls] to `resolveAttribute`; otherwise, a method
+ * that reads `type` for only some calls or reads neither field, [Read.NEITHER].
+ */
+private fun reads(instructions: Iterable<Instruction>, calls: Int): Read {
     var data = false
+    var type = 0
     for (instruction in instructions) {
         val field = (instruction as? ReferenceInstruction)?.reference as? FieldReference ?: continue
         if (field.definingClass != TYPED_VALUE) continue
         when (field.name) {
-            "type" -> return false
+            "type" -> type++
             "data" -> data = true
         }
     }
-    return data
+    return when {
+        type == 0 && data -> Read.DATA
+        type >= calls -> Read.TYPE
+        else -> Read.NEITHER
+    }
 }
 
 private fun MethodReference.key(): String = "$definingClass->$name(${parameterTypes.joinToString("")})$returnType"
@@ -307,40 +363,99 @@ private fun Instruction.arguments(): List<Int> = when (this) {
 }
 
 /**
- * What last went into [register] before instruction [at], looking back in code order: a literal, a
- * token constant's attribute read off its static field, one of [method]'s parameters, or something
- * else.
+ * [method]'s instructions and, for each, the ones control can come to it from: the one above when
+ * that one carries on, every branch and switch case aimed at it, and for an exception handler, what
+ * comes before each instruction its try block covers. -1 stands for the method's start.
  */
-private fun origin(
-    method: Method,
-    instructions: List<Instruction>,
+private class Flow(val method: Method) {
+    val instructions: List<Instruction> = method.implementation!!.instructions.toList()
+    val predecessors: Array<MutableList<Int>> = Array(instructions.size) { mutableListOf() }
+
+    init {
+        val addresses = IntArray(instructions.size)
+        var address = 0
+        for ((index, instruction) in instructions.withIndex()) {
+            addresses[index] = address
+            address += instruction.codeUnits
+        }
+        val byAddress = addresses.withIndex().associate { (index, start) -> start to index }
+        if (instructions.isNotEmpty()) predecessors[0] += -1
+        for ((index, instruction) in instructions.withIndex()) {
+            if (instruction is PayloadInstruction) continue
+            if (instruction.opcode.canContinue() && index + 1 < instructions.size) predecessors[index + 1] += index
+            if (instruction !is OffsetInstruction || instruction.opcode == Opcode.FILL_ARRAY_DATA) continue
+            val aimed = byAddress.getValue(addresses[index] + instruction.codeOffset)
+            val payload = instructions[aimed]
+            if (payload is SwitchPayload) {
+                for (case in payload.switchElements) predecessors[byAddress.getValue(addresses[index] + case.offset)] += index
+            } else {
+                predecessors[aimed] += index
+            }
+        }
+        val handlerPredecessors = mutableMapOf<Int, MutableSet<Int>>()
+        for (tryBlock in method.implementation!!.tryBlocks) {
+            val covered = instructions.indices.filter {
+                addresses[it] >= tryBlock.startCodeAddress && addresses[it] < tryBlock.startCodeAddress + tryBlock.codeUnitCount
+            }
+            for (handler in tryBlock.exceptionHandlers) {
+                handlerPredecessors.getOrPut(byAddress.getValue(handler.handlerCodeAddress)) { linkedSetOf() } +=
+                    covered.flatMap { predecessors[it] }
+            }
+        }
+        for ((handler, from) in handlerPredecessors) predecessors[handler] += from
+    }
+}
+
+/**
+ * Every value that can be in [register] at instruction [at]: what the last write to it on each
+ * path to [at] put there (a literal, a token constant's attribute read off its static field or off
+ * a parameter, one of the method's parameters, or something else), or the parameter in it on a path
+ * from the method's start that never writes it.
+ */
+private fun origins(
+    flow: Flow,
     at: Int,
     register: Int,
     constants: TokenConstants,
     attributeField: String,
-): Origin {
-    for (index in at - 1 downTo 0) {
-        val instruction = instructions[index]
-        if (!instruction.opcode.setsRegister()) continue
-        val target = (instruction as OneRegisterInstruction).registerA
-        if (instruction.opcode.setsWideRegister() && target + 1 == register) return Origin.Other
-        if (target != register) continue
-        return when {
-            instruction is NarrowLiteralInstruction -> Origin.Literal(instruction.narrowLiteral)
+    seen: MutableSet<Long> = hashSetOf(),
+): Set<Origin> {
+    if (!seen.add(at.toLong() shl 32 or register.toLong())) return emptySet()
+    val found = linkedSetOf<Origin>()
+    val visited = BooleanArray(flow.instructions.size)
+    val pending = ArrayDeque(flow.predecessors[at])
+    while (pending.isNotEmpty()) {
+        val index = pending.removeLast()
+        if (index < 0) {
+            found += flow.method.parameterTypes.indices.firstOrNull { flow.method.parameterRegisterNumber(it) == register }
+                ?.let { Origin.Parameter(it) } ?: Origin.Other
+            continue
+        }
+        if (visited[index]) continue
+        visited[index] = true
+        val instruction = flow.instructions[index]
+        val target = if (instruction.opcode.setsRegister()) (instruction as OneRegisterInstruction).registerA else -1
+        val wide = instruction.opcode.setsWideRegister() && target + 1 == register
+        if (target != register && !wide) {
+            pending += flow.predecessors[index]
+            continue
+        }
+        found += when {
+            wide -> setOf(Origin.Other)
+            instruction is NarrowLiteralInstruction -> setOf(Origin.Literal(instruction.narrowLiteral))
             instruction.opcode == Opcode.IGET && (instruction as ReferenceInstruction).reference.toString() == attributeField ->
-                origin(method, instructions, index, (instruction as TwoRegisterInstruction).registerB, constants, attributeField)
-                    .takeIf { it is Origin.Token } ?: Origin.Other
+                origins(flow, index, (instruction as TwoRegisterInstruction).registerB, constants, attributeField, seen)
+                    .map { if (it is Origin.Token || it is Origin.Parameter) it else Origin.Other }
             instruction.opcode == Opcode.SGET_OBJECT -> {
                 val field = (instruction as ReferenceInstruction).reference as FieldReference
-                if (field.definingClass == constants.type && field.type == constants.type) Origin.Token(field.name) else Origin.Other
+                setOf(if (field.definingClass == constants.type && field.type == constants.type) Origin.Token(field.name) else Origin.Other)
             }
             instruction.opcode in MOVES ->
-                origin(method, instructions, index, (instruction as TwoRegisterInstruction).registerB, constants, attributeField)
-            else -> Origin.Other
+                origins(flow, index, (instruction as TwoRegisterInstruction).registerB, constants, attributeField, seen)
+            else -> setOf(Origin.Other)
         }
     }
-    return method.parameterTypes.indices.firstOrNull { method.parameterRegisterNumber(it) == register }
-        ?.let { Origin.Parameter(it) } ?: Origin.Other
+    return found
 }
 
 private val MOVES = setOf(Opcode.MOVE, Opcode.MOVE_FROM16, Opcode.MOVE_16, Opcode.MOVE_OBJECT,
