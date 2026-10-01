@@ -517,6 +517,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_keep_post_dates", TRUE);
 
     /**
+     * The Feeds tab opens on its posts, without the title row or the filters under it
+     * ({@link app.morphe.extension.facebook.feed.FeedsHeader}). Facebook settles both as the tab is
+     * built, so a change waits for a restart.
+     */
+    public static final BooleanSetting HIDE_FEEDS_HEADER =
+            new BooleanSetting("hushfacebook_hide_feeds_header", FALSE, true);
+
+    /**
      * Reels come without the "Are you interested in this reel?" prompt
      * ({@link app.morphe.extension.facebook.reels.ReelPrompts}). A change shows on the reels built
      * after it.

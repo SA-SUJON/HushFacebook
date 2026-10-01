@@ -214,6 +214,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean feedsHeader() {
+        return false;
+    }
+
     public static boolean reelPrompts() {
         return false;
     }

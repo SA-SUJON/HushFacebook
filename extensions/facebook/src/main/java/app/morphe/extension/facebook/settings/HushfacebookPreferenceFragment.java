@@ -326,7 +326,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 || build.contains(PatchFamily.POST_WORDS)
                 || build.contains(PatchFamily.POST_PROMPTS)
                 || build.contains(PatchFamily.META_AI_QUESTIONS)
-                || build.contains(PatchFamily.POST_DATES)) {
+                || build.contains(PatchFamily.POST_DATES)
+                || build.contains(PatchFamily.FEEDS_HEADER)) {
             PreferenceCategory feed = category(screen, L10n.t("News feed"));
             if (build.contains(PatchFamily.SPONSORED_POSTS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_SPONSORED_POSTS, L10n.t("Hide sponsored posts"),
@@ -400,6 +401,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 feed.addPreference(toggle(context, Settings.KEEP_POST_DATES, L10n.t("Keep post dates"),
                         L10n.t("The line under the poster's name keeps the post's date instead of Facebook's "
                                 + "rotating details, which go blank on some phones.")));
+            }
+            if (build.contains(PatchFamily.FEEDS_HEADER)) {
+                // Facebook settles the Feeds tab's header as the tab is built, so a change waits for a restart.
+                feed.addPreference(toggle(context, Settings.HIDE_FEEDS_HEADER, L10n.t("Hide the Feeds header"),
+                        L10n.t("Open the Feeds tab on its posts, without the title row or the filters under it. "
+                                + "Restart Facebook after changing it.")));
             }
             if (build.contains(PatchFamily.RETURN_REFRESH)) {
                 feed.addPreference(toggle(context, Settings.BLOCK_RETURN_REFRESH,
