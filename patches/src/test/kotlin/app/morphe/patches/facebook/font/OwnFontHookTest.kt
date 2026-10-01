@@ -578,6 +578,119 @@ class OwnFontHookTest {
         })
     }
 
+    private val inflater = "Landroid/view/LayoutInflater;"
+
+    /** A constructor, <init>(Context)V, of [type], whose body is [smali] with this in v0. */
+    private fun constructor(type: String, smali: String) = MutableMethod(
+        ImmutableMethod(
+            type, "<init>", listOf(ImmutableMethodParameter(CONTEXT, null, null)), "V",
+            AccessFlags.PUBLIC.value or AccessFlags.CONSTRUCTOR.value, null, null,
+            ImmutableMethodImplementation(2, emptyList(), null, null),
+        ),
+    ).apply { addInstructionsWithLabels(0, smali.trimIndent()) }
+
+    /** Builds a Button, an EditText by range and an ImageView, and asks an inflater for a view twice. */
+    private fun rows(type: String) = MutableMethod(
+        ImmutableMethod(
+            type, "rows", listOf(ImmutableMethodParameter(CONTEXT, null, null), ImmutableMethodParameter(inflater, null, null)),
+            VIEW, AccessFlags.PUBLIC.value or AccessFlags.STATIC.value, null, null,
+            ImmutableMethodImplementation(8, emptyList(), null, null),
+        ),
+    ).apply {
+        addInstructionsWithLabels(
+            0,
+            """
+                if-eqz v6, :built
+                new-instance v0, Landroid/widget/Button;
+                invoke-direct { v0, v6 }, Landroid/widget/Button;-><init>($CONTEXT)V
+                :built
+                new-instance v4, Landroid/widget/EditText;
+                move-object v5, v6
+                invoke-direct/range { v4 .. v5 }, Landroid/widget/EditText;-><init>($CONTEXT)V
+                new-instance v1, Landroid/widget/ImageView;
+                invoke-direct { v1, v6 }, Landroid/widget/ImageView;-><init>($CONTEXT)V
+                const-string v1, "TextView"
+                const-string v2, "android.widget."
+                const/4 v3, 0x0
+                invoke-virtual { v7, v1, v2, v3 }, $CREATE_VIEW
+                move-result-object v0
+                invoke-virtual { v7, v1, v2, v3 }, $CREATE_VIEW
+                return-object v0
+            """.trimIndent(),
+        )
+    }
+
+    /**
+     * Through the patcher: each of Android's text views a method builds goes to the extension right
+     * after its constructor, on the register the constructor got, by `new` in either form and as a
+     * view's super call, and so does each view an inflater's createView answers. The jump past the
+     * Button still lands on what followed its constructor, so a path where it was never built skips
+     * the hook. A view of another kind, a super call to a view that isn't Android's, an answer
+     * nothing keeps and the extension's own classes are left alone.
+     */
+    @Test
+    fun `each text view Facebook builds goes to the extension right after it's built`() {
+        val rowsType = "Lfixture/Rows;"
+        val label = "Lfixture/Label;"
+        val compat = "Lfixture/CompatLabel;"
+        val extension = "Lapp/morphe/extension/facebook/font/Stub;"
+        val context = PatchContexts.of(
+            listOf(
+                robotoClass(rowsType, rows(rowsType)),
+                ImmutableClassDef(label, AccessFlags.PUBLIC.value, TEXT_VIEW, null, null, null, null, listOf(
+                    constructor(label, """
+                        invoke-direct { p0, p1 }, $TEXT_VIEW-><init>($CONTEXT)V
+                        return-void
+                    """),
+                )),
+                ImmutableClassDef(compat, AccessFlags.PUBLIC.value, "Landroidx/appcompat/widget/AppCompatTextView;", null, null, null, null, listOf(
+                    constructor(compat, """
+                        invoke-direct { p0, p1 }, Landroidx/appcompat/widget/AppCompatTextView;-><init>($CONTEXT)V
+                        return-void
+                    """),
+                )),
+                robotoClass(extension, rows(extension)),
+            ),
+        )
+        assertEquals("the Button, the EditText, the inflated view and Label's super call", 4, context.hookTextViews())
+
+        val body = context.mutableClassDefBy(rowsType).methods.single().implementation!!.instructions.toList()
+        assertEquals(
+            listOf(
+                Opcode.IF_EQZ, Opcode.NEW_INSTANCE, Opcode.INVOKE_DIRECT, Opcode.INVOKE_STATIC_RANGE,
+                Opcode.NEW_INSTANCE, Opcode.MOVE_OBJECT, Opcode.INVOKE_DIRECT_RANGE, Opcode.INVOKE_STATIC_RANGE,
+                Opcode.NEW_INSTANCE, Opcode.INVOKE_DIRECT, Opcode.CONST_STRING, Opcode.CONST_STRING, Opcode.CONST_4,
+                Opcode.INVOKE_VIRTUAL, Opcode.MOVE_RESULT_OBJECT, Opcode.INVOKE_STATIC_RANGE, Opcode.INVOKE_VIRTUAL,
+                Opcode.RETURN_OBJECT,
+            ),
+            body.map { it.opcode },
+        )
+        val hooks = listOf(3, 7, 15).map { body[it] as RegisterRangeInstruction }
+        assertEquals(listOf(OWN_TEXT_VIEW, OWN_TEXT_VIEW, OWN_INFLATED), hooks.map(::reference))
+        assertEquals("the Button's, the EditText's and the answer's register, one each",
+            listOf(listOf(0, 1), listOf(4, 1), listOf(0, 1)), hooks.map { listOf(it.startRegister, it.registerCount) })
+        val addresses = body.runningFold(0) { at, instruction -> at + instruction.codeUnits }
+        assertEquals("the jump past the Button lands on the EditText's new-instance", 4,
+            addresses.indexOf(addresses[0] + (body[0] as OffsetInstruction).codeOffset))
+
+        val built = context.mutableClassDefBy(label).methods.single().implementation!!.instructions.toList()
+        assertEquals(listOf(Opcode.INVOKE_DIRECT, Opcode.INVOKE_STATIC_RANGE, Opcode.RETURN_VOID), built.map { it.opcode })
+        assertEquals(listOf(OWN_TEXT_VIEW, "0"), (built[1] as RegisterRangeInstruction).let { listOf(reference(it), "${it.startRegister}") })
+        assertEquals(2, context.mutableClassDefBy(compat).methods.single().implementation!!.instructions.count())
+        assertTrue("the extension's views were sent", context.mutableClassDefBy(extension).methods.single().implementation!!
+            .instructions.none { reference(it)?.startsWith(OWN_FONT) == true })
+    }
+
+    /** A build where nothing outside the extension builds one of Android's text views stops the patch. */
+    @Test
+    fun `a build that builds no text view stops the patch`() {
+        val extension = "Lapp/morphe/extension/facebook/font/Stub;"
+        val refused = assertThrows(PatchException::class.java) {
+            PatchContexts.of(listOf(robotoClass(extension, rows(extension)))).hookTextViews()
+        }
+        assertTrue(refused.message, "found no text view Facebook builds" in refused.message.orEmpty())
+    }
+
     /** A build where nothing outside the extension reads Android's defaults stops the patch. */
     @Test
     fun `a build reading none of Android's default typefaces stops the patch`() {
@@ -603,7 +716,8 @@ class OwnFontHookTest {
         val getters = DEFAULT_TYPEFACES.values.map { "$OWN_FONT->$it()$TYPEFACE" }
         val calls = DEFAULT_CALLS.map(::ownCall)
         assertTrue(OWN_DEFAULT_FROM_STYLE in calls)
-        for (call in listOf(REPLACE, REMEMBER_VARIATION, REPLACE_BUILT, REPLACE_REACT_NATIVE, REPLACE_PHONE_FONT) + getters + calls) {
+        val views = listOf(OWN_TEXT_VIEW, OWN_INFLATED)
+        for (call in listOf(REPLACE, REMEMBER_VARIATION, REPLACE_BUILT, REPLACE_REACT_NATIVE, REPLACE_PHONE_FONT) + getters + calls + views) {
             assertTrue("OwnFont declares no public static $call: $declared", call in declared)
         }
     }

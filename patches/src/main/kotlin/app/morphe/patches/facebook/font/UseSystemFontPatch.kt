@@ -25,6 +25,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
 import app.morphe.util.superclassChain
+import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
@@ -38,6 +39,10 @@ internal const val REPLACE_BUILT = "$OWN_FONT->replaceBuilt(${TYPEFACE}Ljava/lan
 internal const val REPLACE_REACT_NATIVE = "$OWN_FONT->replaceReactNative($TYPEFACE$STRING)$TYPEFACE"
 internal const val REPLACE_PHONE_FONT = "$OWN_FONT->replacePhoneFont($TYPEFACE)$TYPEFACE"
 internal const val OWN_DEFAULT_FROM_STYLE = "$OWN_FONT->defaultFromStyle(I)$TYPEFACE"
+internal const val OWN_TEXT_VIEW = "$OWN_FONT->textView($TEXT_VIEW)V"
+internal const val OWN_INFLATED = "$OWN_FONT->inflated($VIEW)V"
+private const val TEXT_VIEW_BUILT = "invoke-static/range { v%d .. v%d }, $OWN_TEXT_VIEW"
+private const val VIEW_INFLATED = "invoke-static/range { v%d .. v%d }, $OWN_INFLATED"
 
 /**
  * Facebook draws its interface in Meta's Optimistic family, handed out by one typeface
@@ -51,7 +56,8 @@ internal const val OWN_DEFAULT_FROM_STYLE = "$OWN_FONT->defaultFromStyle(I)$TYPE
  * Facebook's own builder, which is how posts, comments and menus get the phone's font on accounts
  * without Optimistic, and its answer goes through the extension so a picked file reaches them too.
  * So do Facebook's own reads of Android's default typefaces, where the names bolded in a post's
- * header or a notification get theirs.
+ * header or a notification get theirs, and each of Android's text views Facebook builds, which
+ * take their typeface from a layout or never set one.
  */
 @Suppress("unused")
 val useSystemFontPatch = bytecodePatch(
@@ -71,6 +77,7 @@ val useSystemFontPatch = bytecodePatch(
         hookReactNativeFonts()
         hookRobotoBuilder()
         hookDefaultTypefaces()
+        hookTextViews()
         enableStatus("systemFont")
     }
 }
@@ -84,10 +91,11 @@ val useSystemFontPatch = bytecodePatch(
  * extension's getter for it, with the answer moved into the read's register, and each call goes
  * to the extension's method of the same name, which makes the framework's call itself. They answer
  * a picked font file at the same weight and slant where the answer is the phone's sans-serif, and
- * the framework's typeface otherwise. A field read only compared with another typeface stays. The call takes the read's place, so a jump
- * to the read or a try block's edge on it stays where it was, and the move after it goes in front
- * of whatever followed the read, so a jump there still skips it. The extension's own classes are
- * left alone, since they read the defaults themselves. Answers how many reads it sent.
+ * the framework's typeface otherwise. A field read only compared with another typeface stays. The
+ * call takes the read's place, so a jump to the read or a try block's edge on it stays where it
+ * was, and the move after it goes in front of whatever followed the read, so a jump there still
+ * skips it. The extension's own classes are left alone, since they read the defaults themselves.
+ * Answers how many reads it sent.
  */
 internal fun BytecodePatchContext.hookDefaultTypefaces(): Int {
     val owners = mutableSetOf<String>()
@@ -129,6 +137,53 @@ internal fun MutableMethod.sendDefaultReads(): Int {
             addInstruction(index + 1, "move-result-object v$register")
         }
     }
+    return sites.size
+}
+
+/**
+ * Each of Android's text views Facebook builds, with `new` or as the super call of a view of its
+ * own, and each view its layout inflaters make from a layout's tag, goes to the extension right
+ * after it's built. Android's constructor reads the typeface from the layout, a style or bold
+ * there included, or leaves none, and draws a view with none in the phone's default, all in
+ * Android's own code. The extension gives a view with none or with the phone's sans-serif the
+ * picked file at that weight and slant, and leaves the rest. A view of Facebook's own sets its
+ * typeface after its super call, so that still wins. The call goes in after the constructor's, or
+ * after the move of the inflater's answer, so a jump to what followed still skips it, and it names
+ * one register by range, so any register fits. Answers how many it hooked.
+ */
+internal fun BytecodePatchContext.hookTextViews(): Int {
+    val owners = mutableSetOf<String>()
+    classDefForEach { classDef ->
+        if (classDef.type.startsWith(EXTENSION_CLASSES)) return@classDefForEach
+        if (classDef.methods.any { method ->
+                method.implementation?.instructions?.any { builtTextView(it) != null || makesView(it) } == true
+            }
+        ) {
+            owners += classDef.type
+        }
+    }
+    val hooked = owners.sumOf { type -> mutableClassDefByOrNull(type)?.methods?.sumOf { it.sendTextViews() } ?: 0 }
+    if (hooked == 0) throw PatchException("$PATCH: found no text view Facebook builds")
+    return hooked
+}
+
+/**
+ * Hands each text view this method builds, and each view an inflater's [CREATE_VIEW] answers, to
+ * the extension, last first. An answer nothing moves out of has no view to hand over. Answers how
+ * many.
+ */
+internal fun MutableMethod.sendTextViews(): Int {
+    val instructions = (implementation ?: return 0).instructions.toList()
+    val sites = instructions.withIndex().mapNotNull { (index, instruction) ->
+        builtTextView(instruction)?.let { register -> index to TEXT_VIEW_BUILT.format(register, register) }
+            ?: instructions.getOrNull(index + 1)
+                ?.takeIf { makesView(instruction) && it.opcode == Opcode.MOVE_RESULT_OBJECT }
+                ?.let { move ->
+                    val register = (move as OneRegisterInstruction).registerA
+                    index + 1 to VIEW_INFLATED.format(register, register)
+                }
+    }
+    sites.asReversed().forEach { (after, call) -> addInstruction(after + 1, call) }
     return sites.size
 }
 

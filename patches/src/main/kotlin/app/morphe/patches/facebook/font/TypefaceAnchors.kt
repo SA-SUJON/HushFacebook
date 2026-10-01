@@ -10,8 +10,10 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
@@ -115,6 +117,42 @@ internal fun defaultRead(instruction: Instruction): String? = when (instruction.
         (instruction as ReferenceInstruction).reference.toString().takeIf { it in DEFAULT_CALLS }
     else -> null
 }
+
+/**
+ * Android's text views, the ones Facebook builds with `new` or extends. Each one's constructor
+ * reads its typeface from the layout or leaves it unset, and Android's own code does that, where
+ * no rewrite of Facebook's reaches.
+ */
+internal val FRAMEWORK_TEXT_VIEWS = setOf(
+    "TextView", "EditText", "Button", "AutoCompleteTextView", "MultiAutoCompleteTextView", "CheckedTextView",
+    "CompoundButton", "CheckBox", "RadioButton", "Switch", "ToggleButton",
+).map { "Landroid/widget/$it;" }.toSet()
+
+internal const val TEXT_VIEW = "Landroid/widget/TextView;"
+internal const val VIEW = "Landroid/view/View;"
+
+/** How Facebook's layout inflaters make a view of one of Android's classes from a layout's tag. */
+internal const val CREATE_VIEW = "Landroid/view/LayoutInflater;->createView($STRING${STRING}Landroid/util/AttributeSet;)$VIEW"
+
+/**
+ * The register holding the text view [instruction] builds, when it's the constructor call of one
+ * of [FRAMEWORK_TEXT_VIEWS], as `new` or as a view's super call. Null for anything else.
+ */
+internal fun builtTextView(instruction: Instruction): Int? {
+    if (instruction.opcode != Opcode.INVOKE_DIRECT && instruction.opcode != Opcode.INVOKE_DIRECT_RANGE) return null
+    val called = (instruction as ReferenceInstruction).reference as? MethodReference ?: return null
+    if (called.name != "<init>" || called.definingClass !in FRAMEWORK_TEXT_VIEWS) return null
+    return when (instruction) {
+        is RegisterRangeInstruction -> instruction.startRegister
+        is FiveRegisterInstruction -> instruction.registerC
+        else -> null
+    }
+}
+
+/** Whether [instruction] is a layout inflater's call of [CREATE_VIEW]. */
+internal fun makesView(instruction: Instruction): Boolean =
+    (instruction.opcode == Opcode.INVOKE_VIRTUAL || instruction.opcode == Opcode.INVOKE_VIRTUAL_RANGE) &&
+        (instruction as ReferenceInstruction).reference.toString() == CREATE_VIEW
 
 /**
  * The family constants the extension swaps: Meta's interface families, by the names the enum

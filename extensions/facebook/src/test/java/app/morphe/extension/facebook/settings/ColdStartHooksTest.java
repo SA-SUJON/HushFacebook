@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.widget.TextView;
 
 import com.facebook.graphql.model.GraphQLPagesYouMayLikeFeedUnit;
 import com.facebook.graphql.model.GraphQLStory;
@@ -258,6 +259,12 @@ public class ColdStartHooksTest {
                 OwnFont.replaceBuilt(Typeface.SERIF, fontBuilder));
         assertSame("React Native text drawn before the context was swapped", Typeface.SERIF,
                 OwnFont.replaceReactNative(Typeface.SERIF, "Optimistic VF App Lite 500"));
+        assertSame("Android's default bold read before the context was swapped", Typeface.DEFAULT_BOLD,
+                OwnFont.defaultBold());
+        TextView builtEarly = new TextView(RuntimeEnvironment.getApplication());
+        Typeface given = builtEarly.getTypeface();
+        OwnFont.textView(builtEarly);
+        assertSame("a text view built before the context was given another typeface", given, builtEarly.getTypeface());
         // Facebook warms its emoji font from an app init task, which can ask the provider this early.
         assertNull("an emoji typeface asked for before the context was answered", SystemEmoji.typeface());
         assertFalse("a chat's big emoji asked for before the context lost Meta's picture", SystemEmoji.skipRemoteEmoji());

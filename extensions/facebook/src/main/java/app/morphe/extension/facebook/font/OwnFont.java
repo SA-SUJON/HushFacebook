@@ -6,6 +6,8 @@ package app.morphe.extension.facebook.font;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -13,6 +15,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -90,6 +93,7 @@ public final class OwnFont {
     private static final String REACT_NATIVE = "React Native font manager";
     private static final String ROBOTO = "Roboto builder";
     private static final String DEFAULTS = "Android's default typefaces";
+    private static final String VIEWS = "text views";
 
     /**
      * What each family name a React Native screen asked for came to: the weight it ends in, 0 for
@@ -102,6 +106,17 @@ public final class OwnFont {
     /** The weights Android and Facebook name after "sans-serif-" and "roboto-". */
     private static final Set<String> SANS_WEIGHTS = new HashSet<>(Arrays.asList(
             "thin", "light", "regular", "medium", "bold", "black"));
+
+    /** The phone's sans-serif and its named weights, the families {@link #isPhoneTypeface} knows by name. */
+    private static final String[] PHONE_SANS = {
+            "sans-serif", "sans-serif-thin", "sans-serif-light", "sans-serif-medium", "sans-serif-black"};
+
+    /** What {@link #isPhoneTypeface} compares with, built the first time it's asked. */
+    @Nullable
+    private static volatile Set<Typeface> phoneTypefaces;
+
+    /** Whether {@link #askedEarly} has logged already. */
+    private static volatile boolean askedEarly;
 
     /** The picked font as last read, or null before the first read and after a change. */
     @Nullable
@@ -266,13 +281,9 @@ public final class OwnFont {
         return false;
     }
 
-
-    /** Whether [family] is none, one of Android's sans-serif defaults, or a typeface built from the picked file. */
+    /** Whether [family] is none, one of the phone's sans-serif typefaces, or a typeface built from the picked file. */
     private static boolean isPhoneOrPicked(@Nullable Typeface family) {
-        if (family == null || family == Typeface.DEFAULT || family == Typeface.DEFAULT_BOLD
-                || family == Typeface.SANS_SERIF) {
-            return true;
-        }
+        if (isPhoneTypeface(family)) return true;
         try {
             if (!Utils.settingsReady() || !Settings.USE_SYSTEM_FONT.get()) return false;
             Picked font = picked();
@@ -284,6 +295,90 @@ public final class OwnFont {
     }
 
     /**
+     * Whether Android hands out [typeface] for the phone's sans-serif: none at all, the defaults,
+     * defaultFromStyle's four, and "sans-serif" and each of its named weights in each style, which
+     * is what a text view's layout gets for a style or one of those families. Compared by identity,
+     * since Android keeps one typeface of each and hands the same one out every time.
+     */
+    static boolean isPhoneTypeface(@Nullable Typeface typeface) {
+        if (typeface == null || typeface == Typeface.DEFAULT || typeface == Typeface.DEFAULT_BOLD
+                || typeface == Typeface.SANS_SERIF) {
+            return true;
+        }
+        Set<Typeface> known = phoneTypefaces;
+        if (known == null) {
+            Set<Typeface> built = Collections.newSetFromMap(new IdentityHashMap<>());
+            for (int style = Typeface.NORMAL; style <= Typeface.BOLD_ITALIC; style++) {
+                built.add(Typeface.defaultFromStyle(style));
+            }
+            for (String name : PHONE_SANS) {
+                Typeface base = Typeface.create(name, Typeface.NORMAL);
+                for (int style = Typeface.NORMAL; style <= Typeface.BOLD_ITALIC; style++) {
+                    built.add(Typeface.create(base, style));
+                }
+            }
+            // A layout's text weight with no family is a weight of the default.
+            for (int weight = 100; weight <= 900; weight += 100) {
+                built.add(Typeface.create(Typeface.DEFAULT, weight, false));
+                built.add(Typeface.create(Typeface.DEFAULT, weight, true));
+            }
+            // Published only once it's full, and never changed after, so readers need no lock.
+            phoneTypefaces = known = built;
+        }
+        return known.contains(typeface);
+    }
+
+    /**
+     * One of Android's text views Facebook just built, with its typeface from the layout or none.
+     * While a font file is picked, a view with none or with one of the phone's sans-serif
+     * typefaces takes the file at that weight and slant. Android draws a view with none in the
+     * phone's default, in its own code, so this is the one place to reach it. A view with any other
+     * typeface keeps it, and a view of Facebook's own sets its typeface after this, so that still
+     * wins. Called right after the view's constructor, on whichever thread built it.
+     */
+    public static void textView(@Nullable TextView view) {
+        if (view == null) return;
+        try {
+            Typeface current = view.getTypeface();
+            if (!isPhoneTypeface(current)) return;
+            Typeface base = current == null ? Typeface.DEFAULT : current;
+            Typeface instead = pickedInstead(base, VIEWS);
+            if (instead != base) view.setTypeface(instead);
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.SYSTEM_FONT, VIEWS, failure);
+        }
+    }
+
+    /**
+     * A view one of Facebook's layout inflaters just made from a layout's tag, which goes through
+     * {@link #textView} when it's a text view.
+     */
+    public static void inflated(@Nullable View view) {
+        if (view instanceof TextView) textView((TextView) view);
+    }
+
+    /**
+     * Logs, once, that Facebook asked for a typeface through [road] before the settings could be
+     * read, so it got Android's. Facebook keeps some it gets while a class loads, and one kept that
+     * early would never take the picked file. The context comes at the start of the application's
+     * onCreate, and Facebook's text classes load after it.
+     */
+    private static void askedEarly(String road) {
+        if (askedEarly) return;
+        askedEarly = true;
+        String caller = "";
+        for (StackTraceElement frame : new Throwable().getStackTrace()) {
+            if (!frame.getClassName().equals(OwnFont.class.getName())) {
+                caller = frame.getClassName() + "." + frame.getMethodName();
+                break;
+            }
+        }
+        String from = caller;
+        Logger.printInfo(() -> "A typeface was asked for through the " + road + " before the settings loaded, by "
+                + from + ", so it stays Android's");
+    }
+
+    /**
      * The picked font at [answer]'s weight and slant while the switch is on and a font file is
      * picked, otherwise [answer], a typeface of the phone's font that Facebook got from [road].
      */
@@ -291,7 +386,11 @@ public final class OwnFont {
         try {
             HookStatus.invoked(FamilyNames.SYSTEM_FONT);
             if (answer == null) return null;
-            if (!Utils.settingsReady() || !Settings.USE_SYSTEM_FONT.get()) return answer;
+            if (!Utils.settingsReady()) {
+                askedEarly(road);
+                return answer;
+            }
+            if (!Settings.USE_SYSTEM_FONT.get()) return answer;
             HookStatus.bound(FamilyNames.SYSTEM_FONT, road);
             Picked font = picked();
             Typeface styled = font == null ? null : font.styled(clamped(answer.getWeight()), answer.isItalic());

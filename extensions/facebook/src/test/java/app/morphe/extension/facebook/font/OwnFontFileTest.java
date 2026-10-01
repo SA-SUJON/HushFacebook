@@ -18,6 +18,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.view.View;
+import android.widget.TextView;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -33,6 +35,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Arrays;
 
+import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.settings.HushfacebookPause;
@@ -230,6 +233,76 @@ public class OwnFontFileTest {
         PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
         try {
             assertSame("paused, Android's answer stands", Typeface.SANS_SERIF, OwnFont.sansSerif());
+        } finally {
+            PauseForTests.resume();
+        }
+    }
+
+    /**
+     * One of Android's text views Facebook builds takes the picked file when it has no typeface, or
+     * one of the phone's sans-serif typefaces from its layout: a style, "sans-serif-medium" or a
+     * text weight. One with another typeface keeps it. With no file picked, the switch off or
+     * Hushfacebook paused, every view keeps what Android gave it. The phone's emoji go on getting
+     * Android's own default, whatever is picked.
+     */
+    @Test
+    public void textViewsFacebookBuildsTakeThePickedFont() throws Exception {
+        Context app = RuntimeEnvironment.getApplication();
+        TextView plain = new TextView(app);
+        Typeface unset = plain.getTypeface();
+        OwnFont.textView(plain);
+        assertSame("no file picked, and the view keeps what Android gave it", unset, plain.getTypeface());
+
+        pick(FontFileTest.STATIC_FONT, "Rubik-Regular.ttf");
+        TextView none = new TextView(app);
+        none.setTypeface(null);
+        OwnFont.textView(none);
+        assertSame(OwnFont.typeface(400, false), none.getTypeface());
+        TextView bold = new TextView(app);
+        bold.setTypeface(null, Typeface.BOLD);
+        OwnFont.textView(bold);
+        assertSame("a layout's bold", OwnFont.typeface(700, false), bold.getTypeface());
+        Typeface medium = Typeface.create("sans-serif-medium", Typeface.NORMAL);
+        TextView named = new TextView(app);
+        named.setTypeface(Typeface.create(medium, Typeface.ITALIC));
+        OwnFont.inflated(named);
+        assertSame("a layout's sans-serif-medium in italic", OwnFont.typeface(medium.getWeight(), true), named.getTypeface());
+        TextView weighted = new TextView(app);
+        weighted.setTypeface(Typeface.create(Typeface.DEFAULT, 600, false));
+        OwnFont.textView(weighted);
+        assertSame("a layout's text weight", OwnFont.typeface(600, false), weighted.getTypeface());
+
+        Typeface mono = Typeface.create("sans-serif-monospace", Typeface.NORMAL);
+        for (Typeface other : new Typeface[]{Typeface.SERIF, mono, Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)}) {
+            TextView kept = new TextView(app);
+            kept.setTypeface(other);
+            OwnFont.textView(kept);
+            assertSame("another family stays", other, kept.getTypeface());
+        }
+        OwnFont.inflated(new View(app));
+        OwnFont.textView(null);
+        OwnFont.inflated(null);
+
+        Settings.USE_SYSTEM_EMOJI.save(true);
+        try {
+            assertSame("the emoji keep Android's default", Typeface.DEFAULT, SystemEmoji.typeface());
+        } finally {
+            Settings.USE_SYSTEM_EMOJI.resetToDefault();
+        }
+
+        Settings.USE_SYSTEM_FONT.save(false);
+        TextView off = new TextView(app);
+        off.setTypeface(null, Typeface.BOLD);
+        Typeface offBold = off.getTypeface();
+        OwnFont.textView(off);
+        assertSame(offBold, off.getTypeface());
+        Settings.USE_SYSTEM_FONT.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        try {
+            TextView paused = new TextView(app);
+            paused.setTypeface(null);
+            OwnFont.textView(paused);
+            assertSame("paused, the view keeps what Android gave it", null, paused.getTypeface());
         } finally {
             PauseForTests.resume();
         }

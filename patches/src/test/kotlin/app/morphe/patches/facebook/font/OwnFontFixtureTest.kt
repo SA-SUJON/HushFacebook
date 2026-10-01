@@ -13,8 +13,10 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -134,6 +136,57 @@ class OwnFontFixtureTest {
             assertEquals("${bundle.name}: $call calls sent", reads.count { it == call }, sent[call])
         }
         assertEquals("${bundle.name}: defaultFromStyle calls sent", styleCalls.size, sent[DEFAULT_FROM_STYLE])
+    }
+
+    /**
+     * Each declared build builds Android's text views, by `new` and as the super call of views of
+     * its own, and its layout inflaters make views from a layout's tag through createView. The hook
+     * runs over every class doing either, and each site gets the extension's call right after it,
+     * on the site's register: the one the constructor got first, or the one the inflater's answer
+     * moves into. Nothing else in those methods changes.
+     */
+    @Test
+    fun `each declared build's text views go to the extension right after they're built`() = bundles { bundle ->
+        fun sitesIn(code: List<Instruction>) = code.indices.mapNotNull { at ->
+            builtTextView(code[at])
+                ?: code.getOrNull(at + 1)?.takeIf { makesView(code[at]) && it.opcode == Opcode.MOVE_RESULT_OBJECT }
+                    ?.let { (it as OneRegisterInstruction).registerA }
+        }
+        val builders = FixtureDex.methodsWhere(bundle, { true }) { method ->
+            method.implementation?.instructions?.any { builtTextView(it) != null || makesView(it) } == true
+        }
+        val sites = builders.sumOf { method -> sitesIn(method.implementation!!.instructions.toList()).size }
+        val inflated = builders.sumOf { method -> method.implementation!!.instructions.count(::makesView) }
+        assertTrue("${bundle.name}: $sites text views built", sites > 200)
+        // 577's own inflater makes views from a tag, and 580 adds a factory that does it too.
+        assertTrue("${bundle.name}: layout inflaters make views $inflated times", inflated >= 1)
+
+        val owners = FixtureDex.classes(bundle, builders.map { it.definingClass }.toSet())
+        val context = PatchContexts.of(owners.values)
+        assertEquals("${bundle.name}: sites hooked", sites, context.hookTextViews())
+        val hooks = setOf(OWN_TEXT_VIEW, OWN_INFLATED)
+        for ((type, original) in owners) {
+            for (method in context.mutableClassDefBy(type).methods) {
+                val body = method.implementation?.instructions?.toList() ?: continue
+                val where = "${bundle.name}: $type->${method.name}"
+                val before = original.methods.single { it.name == method.name && it.parameterTypes.map(CharSequence::toString) == method.parameterTypes.map(CharSequence::toString) &&
+                    it.returnType == method.returnType }
+                val code = before.implementation!!.instructions.toList()
+                val at = body.indices.filter { (body[it] as? ReferenceInstruction)?.reference?.toString() in hooks }
+                assertEquals("$where: the registers handed over", sitesIn(code), at.map { (body[it] as RegisterRangeInstruction).startRegister })
+                for (hook in at) {
+                    val prior = body[hook - 1]
+                    assertTrue("$where: the hook at $hook follows what it hands over",
+                        builtTextView(prior) != null || prior.opcode == Opcode.MOVE_RESULT_OBJECT && makesView(body[hook - 2]))
+                    assertEquals("$where: one register", 1, (body[hook] as RegisterRangeInstruction).registerCount)
+                }
+                // The assembler pads a payload that follows the hook to its alignment with a nop.
+                val was = code.map { it.opcode }.filter { it != Opcode.NOP }
+                val left = body.filterIndexed { index, _ -> index !in at }.map { it.opcode }.filter { it != Opcode.NOP }
+                val first = (0 until maxOf(was.size, left.size)).firstOrNull { was.getOrNull(it) != left.getOrNull(it) }
+                assertEquals("$where: nothing else changed, first difference at", null, first)
+            }
+        }
     }
 
     private fun checkResolver(bundle: File, owner: ClassDef) {
