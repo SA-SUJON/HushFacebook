@@ -213,6 +213,57 @@ class HideMetaAiQuestionsShapesTest {
     }
 
     /**
+     * A try block covering only the answer's move and the branch on it can't hand anything to its
+     * handler, so the socket applies as it does without one, though the handler returns.
+     */
+    @Test
+    fun `a try block over what can't throw changes nothing`() {
+        val extra = """
+            move-exception v13
+            return-object v13
+        """
+        val plain = socket(extra = extra)
+        val method = socket(extra = extra)
+        val code = method.body()
+        val answer = indexOfString(code, META_AI_TYPE) + 2
+        assertEquals(listOf(Opcode.MOVE_RESULT, Opcode.IF_EQZ), listOf(code[answer].opcode, code[answer + 1].opcode))
+        val handler = code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+        method.implementation!!.apply {
+            addCatch("Ljava/lang/Exception;", newLabelForIndex(answer), newLabelForIndex(answer + 2), newLabelForIndex(handler))
+        }
+        assertEquals(listOf(handler), ControlFlow.of(method).exceptional[answer])
+        val pill = defaultPill(method)
+        val without = defaultPill(plain)
+        assertEquals(
+            "the hook point, the type's register and the name's",
+            Triple(without.index, without.typeRegister, without.freeRegister),
+            Triple(pill.index, pill.typeRegister, pill.freeRegister),
+        )
+    }
+
+    /**
+     * A handler covering the meta_ai compare's own call, which returns, is reached before anything
+     * branches on the answer, so the refusal says a pill is returned without naming either way.
+     */
+    @Test
+    fun `a return reached through a handler before the branch names no way`() {
+        val method = socket(
+            extra = """
+                move-exception v13
+                return-object v13
+            """,
+        )
+        val code = method.body()
+        val call = indexOfString(code, META_AI_TYPE) + 1
+        val handler = code.indexOfFirst { it.opcode == Opcode.MOVE_EXCEPTION }
+        method.implementation!!.apply {
+            addCatch("Ljava/lang/Exception;", newLabelForIndex(call), newLabelForIndex(call + 1), newLabelForIndex(handler))
+        }
+        val refusal = assertThrows(PatchException::class.java) { defaultPill(method) }.message!!
+        assertTrue(refusal, "a pill can be returned at [${handler + 1}] after the \"$META_AI_TYPE\" compare, before" in refusal)
+    }
+
+    /**
      * The hook goes in right after the type's read: the type goes to the extension, its answer
      * into the name's register, a yes returns no pill, and a no goes on to the stars compare.
      */

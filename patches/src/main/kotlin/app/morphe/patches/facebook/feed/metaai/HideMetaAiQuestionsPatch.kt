@@ -232,7 +232,7 @@ internal class DefaultPill(val index: Int, val typeRegister: Int, val freeRegist
  * compares a pill's type with [META_AI_TYPE] once, reading it with a literal key, and compares the
  * type read with that key from the same tree with [STARS_TYPE] once, unless that compare can only
  * be reached through the read just before it, and unless every path from the [META_AI_TYPE]
- * compare gets there before it returns, a catch handler's included.
+ * compare gets there before it returns, through the catch handlers of what can throw on it too.
  */
 internal fun defaultPill(method: Method): DefaultPill {
     val code = method.implementation!!.instructions.toList()
@@ -256,12 +256,15 @@ internal fun defaultPill(method: Method): DefaultPill {
     // A pill typed meta_ai that could be returned before the stars compare would be drawn with the
     // hook in place, so every way on from the meta_ai compare has to pass it first. A return only on
     // the way where the type isn't meta_ai is refused too, since 577 and 580 join both ways before
-    // the stars compare, and the refusal names that way.
+    // the stars compare, and the refusal names that way. A return a handler reaches before the
+    // branch on the compare's answer is on neither way, so that refusal names none.
     val (reaches, returns) = pathsFrom(flow, icon.nameIndex, site.nameIndex)
     if (returns.isNotEmpty()) {
-        val (branch, way) = metaAiWay(code, flow, icon)
-            ?: refuse("in $where a pill can be returned at $returns after the \"$META_AI_TYPE\" compare, before the \"$STARS_TYPE\" compare")
-        val onMetaAi = pathsFrom(flow, icon.nameIndex, site.nameIndex, branch, way).second
+        val anyType = "in $where a pill can be returned at $returns after the \"$META_AI_TYPE\" compare, before the \"$STARS_TYPE\" compare"
+        val (branch, way) = metaAiWay(code, flow, icon) ?: refuse(anyType)
+        val beforeBranch = pathsFrom(flow, icon.nameIndex, site.nameIndex) { if (it == branch) emptyList() else flow.normal[it] }.second
+        if (beforeBranch.isNotEmpty()) refuse(anyType)
+        val onMetaAi = pathsFrom(flow, way, site.nameIndex) { if (it == branch) listOf(way) else flow.normal[it] }.second
         if (onMetaAi.isEmpty()) {
             refuse("in $where a pill whose type isn't \"$META_AI_TYPE\" can be returned at $returns before the \"$STARS_TYPE\" compare")
         }
@@ -274,11 +277,16 @@ internal fun defaultPill(method: Method): DefaultPill {
 private val RETURNS = setOf(Opcode.RETURN_OBJECT, Opcode.RETURN, Opcode.RETURN_WIDE, Opcode.RETURN_VOID)
 
 /**
- * Follows every path from [from] in [flow], into the catch handlers of what it passes too, stopping
- * at [to]: whether one gets there, and the returns reached without passing it. At [branch] it
- * takes only [way].
+ * Follows every path from [from] in [flow], into the catch handlers of what can throw on it too,
+ * stopping at [to]: whether one gets there, and the returns reached without passing it. [next]
+ * names the ways on from an instruction that doesn't end its path, its normal ones by default.
  */
-private fun pathsFrom(flow: ControlFlow, from: Int, to: Int, branch: Int = -1, way: Int = -1): Pair<Boolean, List<Int>> {
+private fun pathsFrom(
+    flow: ControlFlow,
+    from: Int,
+    to: Int,
+    next: (Int) -> List<Int> = { flow.normal[it] },
+): Pair<Boolean, List<Int>> {
     val seen = mutableSetOf<Int>()
     val pending = ArrayDeque(listOf(from))
     val returns = sortedSetOf<Int>()
@@ -294,8 +302,8 @@ private fun pathsFrom(flow: ControlFlow, from: Int, to: Int, branch: Int = -1, w
             returns += at
             continue
         }
-        pending += if (at == branch) listOf(way) else flow.normal[at]
-        pending += flow.exceptional[at]
+        pending += next(at)
+        if (flow.instructions[at].opcode.canThrow()) pending += flow.exceptional[at]
     }
     return reaches to returns.toList()
 }
