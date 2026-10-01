@@ -189,6 +189,12 @@ class BottomTabBarShapesTest {
                 (gate(read = ":read\ninvoke-interface { v1, v0 }, $FB_SHARED_PREFERENCES->B2w($keyType)$TRI_STATE",
                     tail = "sget-object v0, Lfixture/OtherOverride;->A01:$keyType\ngoto :read") to
                     "in Lfixture/TabBarGate;->A06 the read of the override at 1 can be reached from [0, 11], not only from the key's load"),
+            "a handler at the read" to
+                (gate().apply {
+                    implementation!!.apply {
+                        addCatch("Ljava/lang/Exception;", newLabelForIndex(0), newLabelForIndex(1), newLabelForIndex(1))
+                    }
+                } to "the read of the override at 1 can be reached from [0, 0], not only from the key's load"),
             "another TriState's way into the ordinal" to
                 (gate(ordinal = ":ordinal\ninvoke-virtual { v0 }, Ljava/lang/Enum;->ordinal()I",
                     tail = "sget-object v0, Lfixture/Tri;->NO:$TRI_STATE\ngoto :ordinal") to

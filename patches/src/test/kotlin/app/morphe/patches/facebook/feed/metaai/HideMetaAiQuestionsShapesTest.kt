@@ -254,9 +254,9 @@ class HideMetaAiQuestionsShapesTest {
 
     /**
      * The hook's answer sits in the name's register until the name's load writes over it, so a
-     * catch handler over that load sees the answer there when the load or the hook's call throws.
-     * One that reads the register is refused. One that writes it first, or never reads it, still
-     * applies with the same hook point.
+     * catch handler over that load sees the answer there when the load itself throws. One that
+     * reads the register is refused. One that writes it first, or never reads it, still applies
+     * with the same hook point.
      */
     @Test
     fun `a catch handler over the stars name that reads its register is refused`() {
