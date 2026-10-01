@@ -254,16 +254,18 @@ public final class MaterialYouTheme {
     }
 
     /**
-     * A background a React Native screen sets, after AMOLED's rule: as {@link #react}, and in dark
-     * mode a grey {@link #FDS_DARK} lists for any token takes the palette's neutral at the same
-     * lightness too, as that token would. React's own dark theme paints its cards with them:
+     * A background a React Native screen sets: as {@link #react}, and once Facebook has said dark
+     * mode is on, a grey {@link #FDS_DARK} lists for any token takes the palette's neutral at the
+     * same lightness too, as that token would. React's own dark theme paints its cards with them:
      * Marketplace's Message seller card on a listing is #333334 (CARD_BACKGROUND) on the #252728
-     * page. Text keeps {@link #react}, where a grey stays as it came.
+     * page. The table's lighter greys, like #F2F4F7, are light mode's colours as well, so before
+     * Facebook answers they stay, as {@link #FDS_SHARED}'s do. Text keeps {@link #react}, where a
+     * grey stays as it came.
      */
     static int reactBackground(int color) {
         HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
         int themed = withoutToken(color);
-        if (themed != color || !DarkMode.on() || Arrays.binarySearch(DARK_GREYS, color) < 0) return themed;
+        if (themed != color || !DarkMode.saidOn() || Arrays.binarySearch(DARK_GREYS, color) < 0) return themed;
         return palette().sameLightness(TonePalette.NEUTRAL, color);
     }
 

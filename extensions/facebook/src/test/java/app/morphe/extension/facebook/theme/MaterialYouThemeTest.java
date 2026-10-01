@@ -434,6 +434,34 @@ public class MaterialYouThemeTest {
     }
 
     /**
+     * The dark table's lighter greys, like #F2F4F7, are light mode's colours too, so a React
+     * background keeps them until Facebook says dark mode is on. And with both themes, what AMOLED
+     * turned a colour into is AMOLED's: under a #212121 Background colour its card is #333334, a
+     * listed grey that Material You leaves, while a listed grey AMOLED didn't touch still takes the
+     * palette.
+     */
+    @Test
+    public void aReactBackgroundWaitsForFacebookAndLeavesAmoledsColours() {
+        DarkMode.forget();
+        assertEquals("a light grey before Facebook answers", 0xFFF2F4F7, MaterialYouTheme.reactBackground(0xFFF2F4F7));
+        assertEquals("the card before Facebook answers", 0xFF333334, MaterialYouTheme.reactBackground(0xFF333334));
+
+        DarkMode.answer(true);
+        assertEquals("a light grey once dark mode is said on", palette.sameLightness(TonePalette.NEUTRAL, 0xFFF2F4F7),
+                MaterialYouTheme.reactBackground(0xFFF2F4F7));
+        assertEquals("AMOLED's card on black", 0xFF121213, ReactColours.background(0xFF333334, true, true));
+        assertEquals("a listed grey AMOLED leaves", palette.sameLightness(TonePalette.NEUTRAL, 0xFFB0B3B8),
+                ReactColours.background(0xFFB0B3B8, true, true));
+        try {
+            AmoledTheme.useBackground(0xFF212121);
+            assertEquals("AMOLED's card on #212121", 0xFF333334, ReactColours.background(0xFF333334, true, true));
+            assertEquals("AMOLED's page on #212121", 0xFF212121, ReactColours.background(0xFF252728, true, true));
+        } finally {
+            AmoledTheme.useBackground(AmoledTheme.backgroundColour());
+        }
+    }
+
+    /**
      * With neither theme in the build (a test JVM's SettingsStatus says so), React's colours pass
      * through as they came, a border or tint React didn't set stays null, and one it did set comes
      * back as the same object.

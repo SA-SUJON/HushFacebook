@@ -244,9 +244,18 @@ public final class AmoledTheme {
         return withoutToken(color);
     }
 
+    /**
+     * Whether route four's rule takes [color] as one of AMOLED's, black and the Background colour
+     * included, even where it gives the colour back as it came. With a Background colour of
+     * #212121 a card's #333334 comes back as #333334, so only this says AMOLED decided it.
+     */
+    static boolean ownsWithoutToken(int color) {
+        return isDarkNeutral(color, MAX_SERVER_CARD_CHANNEL) && DarkMode.on();
+    }
+
     /** Route four's rule for a colour that comes with no token. */
     private static int withoutToken(int color) {
-        if (!isDarkNeutral(color, MAX_SERVER_CARD_CHANNEL) || !DarkMode.on()) return color;
+        if (!ownsWithoutToken(color)) return color;
         if (color == BLACK || color == background) return color;
         return isDarkNeutral(color, MAX_CHANNEL) ? background : raise(background, color - RAISED_SHIFT * 0x010101);
     }
