@@ -397,6 +397,10 @@ export GITHUB_TOKEN=<a token with read:packages>
 
 The bundle lands in `patches/build/release/patches-<version>.mpp`, beside its SHA-256 and `patches-<version>.cdx.json`. That's a CycloneDX SBOM of every library that goes into the bundle, at the version Gradle resolved, and releases from 0.1.3 on publish it beside the bundle. Run `generatePatchesList` before `buildAndroid`, or the bundle loses its Android payload.
 
+Source builds also write `patches-<version>.tooling.json`. It records the resolved settings-plugin, project build and test dependencies, with their graphs and artifact hashes. The report binds to the bundle hash, source commit and `gradle/tooling-scopes.txt`. The payload SBOM keeps its existing shipping scope.
+
+New schema-3 release receipts require this tooling report and a completed advisory audit. Publish the report beside the bundle and list its hash in `SHA256SUMS.txt`. The publication check downloads and audits it again. HIGH, CRITICAL and unscored findings require remediation or an explained applicability review in `scripts/tooling-advisory-exceptions.txt`, expiring within 90 days. Affected Guava versions require the same review despite the vendor's Moderate rating, even when OSV has no match. Skipping the tooling audit permits a local receipt, but that receipt cannot authorize publication. Older releases retain their receipt's original schema.
+
 Tests: `./gradlew :patches:test :extensions:facebook:testDebugUnitTest`. Set `HUSHFACEBOOK_FIXTURE_DIR` to a folder holding the Facebook bundles to run the tests that read real builds. Without it they skip and say so.
 
 The MP4 join test also reads packets and decodes real H.264, AV1, VP9 and AAC tracks. Install FFmpeg with the `libx264`, `libsvtav1` and `libvpx-vp9` encoders, and put `ffmpeg` and `ffprobe` on PATH. To choose executable files explicitly, set `HUSHFACEBOOK_TEST_FFMPEG` and `HUSHFACEBOOK_TEST_FFPROBE` to their full paths. An explicit path that doesn't exist or isn't executable fails the test. Missing optional tools on a local checkout skip the named codec test and count as one skipped test. Release validation refuses skipped runtime tests, including this one.

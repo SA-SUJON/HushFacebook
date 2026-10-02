@@ -4,6 +4,8 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+- Record resolved settings-plugin, build and test dependency graphs separately from the payload SBOM. New release receipts bind the tooling report to their source and bundle, and publication refuses skipped audits, serious advisories and expired applicability reviews. Align Guava, Commons Lang and jose4j with their reviewed fixes.
+
 * **Docs:** Troubleshooting now reflects the confirmed Media settings, WhatsApp-compatible saves and top-bar Reels results. The original-quality Xiaomi Gallery file and the separate RTL and other top-layout checks remain open.
 
 * **Facebook:** Marketplace search now limits the size and depth of an answer before building its result tree. A large complete answer could bypass the old limit, and deeply nested data could exhaust the parser stack. When a limit is reached, its listings stay available and deferred fields still reach the correct result after an earlier ad was removed. Diagnostics count the reason without recording search content.
