@@ -4,6 +4,8 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+- All 59 patches were verified on both supported Facebook builds with English, Arabic and Persian patcher locales. Each run passed the manifest, resource-table and injected-code checks, and every generated DEX matched the English run byte for byte. Existing instruction formatting already meets this requirement.
+
 - Keep retired Facebook sources separate from active records while retaining their reachable historical code and license evidence. The census now checks whether a watched path still exists, so its deletion commit can't be mistaken for current Facebook code. A returning source or lost historical pin requires review.
 
 - Include each declared domain's supported-link state in copied and saved diagnostic reports, with link-handling permission and explicit unavailable states. Unicode domain labels, including combining marks, survive only in their structured manifest-state lines; visited URLs and other report data keep their privacy filters. Link ownership is read without changing it.
