@@ -8,7 +8,8 @@
     verifier message, so a tally only counts once dex2oat has read a file of the pushed size, and
     dex2oat exits 0 while logging that the file it was given doesn't exist. The devices are shared,
     so the log is never cleared: the fake refuses a clear, puts another run's verifier and
-    missing-file lines ahead of this run's mark, and can lose the mark to a rotated buffer.
+    missing-file lines ahead of this run's mark and another run's mark after it, and can lose the
+    mark to a rotated buffer that keeps only someone else's.
 #>
 [CmdletBinding()]
 param([string]$Root)
@@ -79,6 +80,9 @@ try {
                     "W dex2oat64: Skipping non-existent dex file '/data/local/tmp/hushfacebook-verify-other.apk'"
                 )
                 $marked = "10-02 12:00:01.000  4001  4001 I HushfacebookVerify: $($state.Mark)"
+                # A run that started while this one was still going. Only its mark is this run's
+                # business: a helper that takes it for this run's own loses this run's lines.
+                $foreign = '10-02 12:00:02.000  4002  4002 I HushfacebookVerify: case-fedcba9876543210fedcba9876543210'
                 if ($FailureStage -eq 'log-read-throw') {
                     throw 'fake ADB threw while reading logcat'
                 } elseif ($FailureStage -eq 'log-read') {
@@ -87,13 +91,16 @@ try {
                     $output = $older + $marked +
                         @("W dex2oat64: Skipping non-existent dex file '/data/local/tmp/hushfacebook-verify-case.apk'")
                 } elseif ($FailureStage -eq 'rotated') {
-                    # The buffer rolled over: this run's lines are there, its mark isn't.
-                    $output = @('I dex2oat64: Verification error in Lfixture/Host;')
+                    # The buffer rolled over: this run's lines are there, its mark isn't, and a later
+                    # run's mark is.
+                    $output = @('I dex2oat64: Verification error in Lfixture/Host;', $foreign)
                 } else {
-                    # The mark twice, with an older line between: only what follows the last copy counts.
+                    # The mark twice, with an older line between: only what follows the last copy counts,
+                    # and another run's mark among those lines doesn't end them.
                     $output = $older + $marked + @('I dex2oat64: Verification error in Lfixture/Stale;') + $marked + @(
                         'I dex2oat64: Verification error in Lfixture/Host;',
                         'I dex2oat64: Verification error in Lfixture/Host;',
+                        $foreign,
                         'W dex2oat: VerifyError in Lfixture/Other;'
                     )
                 }
@@ -199,16 +206,20 @@ try {
     [void](Invoke-AndroidVerifierTally -Adb 'fake-adb' -Serial 'SERIAL' -Local $fixture -Label 'case' -AdbInvoker $second.Invoker)
     Assert-True ($second.State.Mark -ne $success.State.Mark) 'Two runs used the same log mark.'
 
-    # The helper's own text, with the run's lines taken back to the whole log: the older run's
-    # lines above have to fail it. A copy that keeps the scoping has to pass.
+    # The helper's own text, with the run's lines taken back to the whole log, or cut at any
+    # run's mark rather than this one's: the other runs' lines above have to fail both. A copy
+    # that keeps the scoping has to pass.
     $helperText = [System.IO.File]::ReadAllText((Join-Path $PSScriptRoot 'injected-register-device.ps1'))
     $scoping = 'Select-VerifierRunLines -Lines $logResult.Output -Mark $mark'
     Assert-True ($helperText.Contains($scoping)) 'The helper no longer takes the run''s lines from the log.'
+    $ownMark = ' -and $Lines[$i].Contains($Mark)'
+    Assert-True ($helperText.Contains($ownMark)) 'The helper no longer looks for the run''s own mark.'
     $helperCopy = Join-Path ([System.IO.Path]::GetTempPath()) `
         ("hushfacebook-device-helper-" + [guid]::NewGuid().ToString('N') + '.ps1')
     try {
         foreach ($copy in @(@{ Name = 'the helper unchanged'; Text = $helperText; Passes = $true },
-                @{ Name = 'the helper counting the whole log'; Text = $helperText.Replace($scoping, ', @($logResult.Output)'); Passes = $false })) {
+                @{ Name = 'the helper counting the whole log'; Text = $helperText.Replace($scoping, ', @($logResult.Output)'); Passes = $false },
+                @{ Name = 'the helper taking any run''s mark'; Text = $helperText.Replace($ownMark, ''); Passes = $false })) {
             [System.IO.File]::WriteAllText($helperCopy, $copy.Text)
             $mutant = New-FakeAdb
             $passed = & {

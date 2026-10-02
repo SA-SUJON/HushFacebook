@@ -12,7 +12,7 @@ Every Hushfacebook release, newest first.
 
 - Tighten how the system font patch spots a typeface compare. A static call on two objects now counts only when its own code does nothing but compare them, the way Kotlin's areEqual does, and any other call like that gets the picked font file. Both supported Facebook builds patch exactly as before.
 
-- Stop the injected-register device check from clearing the log of a shared phone or emulator. It writes a line of its own to the log before dex2oat runs and counts only what comes after it, and it refuses the run when that line has already rolled out of the buffer. The fixture suite's fake ADB fails on any log clear and puts another run's lines ahead of the marker, so a tally that counts them fails too.
+- Stop the injected-register device check from clearing the log of a shared phone or emulator. It writes a line of its own to the log before dex2oat runs and counts only what comes after it, and it refuses the run when that line has already rolled out of the buffer. The fixture suite's fake ADB fails on any log clear and puts another run's lines ahead of the marker, so a tally that counts them fails too. It also puts another run's marker after this one, so a check that stops at any run's marker instead of its own fails as well.
 
 - Review a new GPL Facebook Lite candidate, four forks and changed branch history. Shared Messenger compatibility constants now have a watch path. The 2026-10-02 census keeps historical and licensing restrictions and its public counts match the records. Global GitLab code search is still unverified and recorded as skipped.
 
