@@ -691,3 +691,12 @@ Hide "Find friends from contacts"	Sembunyikan “Temukan teman dari kontak”
 The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.	Kartu di baki cerita yang meminta Anda mengunggah kontak. Berlaku saat Facebook memuat ulang baki.
 # context: summary of Hide "People you may know" when the build also hides tray cards; Add is the card's button
 The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.	Deretan saran pertemanan di antara postingan, deretan di profilmu sendiri, dan kartu dengan tombol Tambah di baki cerita.
+Feeds opens on	Feed dibuka di
+All	Semua
+Favorites	Favorit
+Groups	Grup
+Pages	Halaman
+When Facebook opens on Feeds, the Feeds tab opens on the filter Facebook picks.	Saat Facebook terbuka di Feed, tab Feed terbuka di filter yang dipilih Facebook.
+When Facebook opens on Feeds, the Feeds tab opens on %1$s. If your Feeds tab doesn't have it, it opens as usual.	Saat Facebook terbuka di Feed, tab Feed terbuka di %1$s. Jika tab Feed kamu tidak memilikinya, tab itu terbuka seperti biasa.
+The Feeds tab will open on the filter Facebook picks.	Tab Feed akan terbuka di filter yang dipilih Facebook.
+The Feeds tab will open on %1$s.	Tab Feed akan terbuka di %1$s.

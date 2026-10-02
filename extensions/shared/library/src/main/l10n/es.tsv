@@ -691,3 +691,12 @@ Hide "Find friends from contacts"	Ocultar “Encontrar amigos en tus contactos�
 The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.	La tarjeta de la bandeja de historias que te pide subir tus contactos. Se aplica cuando Facebook vuelve a cargarla.
 # context: summary of Hide "People you may know" when the build also hides tray cards; Add is the card's button
 The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.	La fila de sugerencias de amistad entre las publicaciones, la de tu propio perfil y las tarjetas con el botón Agregar en la bandeja de historias.
+Feeds opens on	Feeds se abre en
+All	Todo
+Favorites	Favoritos
+Groups	Grupos
+Pages	Páginas
+When Facebook opens on Feeds, the Feeds tab opens on the filter Facebook picks.	Cuando Facebook se abre en Feeds, la pestaña Feeds se abre en el filtro que elija Facebook.
+When Facebook opens on Feeds, the Feeds tab opens on %1$s. If your Feeds tab doesn't have it, it opens as usual.	Cuando Facebook se abre en Feeds, la pestaña Feeds se abre en %1$s. Si tu pestaña Feeds no lo tiene, se abre como siempre.
+The Feeds tab will open on the filter Facebook picks.	La pestaña Feeds se abrirá en el filtro que elija Facebook.
+The Feeds tab will open on %1$s.	La pestaña Feeds se abrirá en %1$s.

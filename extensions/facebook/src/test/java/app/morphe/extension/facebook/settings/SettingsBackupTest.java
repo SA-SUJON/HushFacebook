@@ -78,6 +78,7 @@ import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.feed.PostWordsTest;
 import app.morphe.extension.facebook.feed.WordsCorpus;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -170,6 +171,7 @@ public class SettingsBackupTest {
         Settings.DOWNLOAD_QUALITY.resetToDefault();
         Settings.FILENAME_TEMPLATE.resetToDefault();
         Settings.START_TAB.resetToDefault();
+        Settings.FEEDS_SUBTAB.resetToDefault();
         Settings.COMMENT_ORDER.resetToDefault();
         Settings.PLAYBACK_QUALITY.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
@@ -221,8 +223,8 @@ public class SettingsBackupTest {
         }
         assertEquals(Arrays.<Setting<?>>asList(Settings.HIDDEN_WORDS, Settings.KEPT_WORDS, Settings.SAVE_TO,
                 Settings.SAVE_FOLDER, Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE, Settings.DOWNLOAD_ACTION,
-                Settings.SEND_TO_APP, Settings.START_TAB, Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY),
-                SettingsBackup.VALUES);
+                Settings.SEND_TO_APP, Settings.START_TAB, Settings.FEEDS_SUBTAB, Settings.COMMENT_ORDER,
+                Settings.PLAYBACK_QUALITY), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_TO, SettingsBackup.TO);
         assertEquals(Settings.HIDDEN_WORDS, SettingsBackup.HIDDEN);
         assertEquals(Settings.KEPT_WORDS, SettingsBackup.KEPT);
@@ -230,6 +232,7 @@ public class SettingsBackupTest {
         assertEquals(Settings.DOWNLOAD_QUALITY, SettingsBackup.QUALITY);
         assertEquals(Settings.FILENAME_TEMPLATE, SettingsBackup.FILE_NAME);
         assertEquals(Settings.START_TAB, SettingsBackup.START);
+        assertEquals(Settings.FEEDS_SUBTAB, SettingsBackup.SUBTAB);
         assertEquals(Settings.COMMENT_ORDER, SettingsBackup.ORDER);
         assertEquals(Settings.PLAYBACK_QUALITY, SettingsBackup.PLAYBACK);
         assertEquals(Settings.DOWNLOAD_ACTION, SettingsBackup.ACTION);
@@ -1219,6 +1222,70 @@ public class SettingsBackupTest {
         assertNull(SettingsBackup.Snapshot.fromBundle(state).start);
         state.putInt("start_tab", 3);
         assertNull(SettingsBackup.Snapshot.fromBundle(state).start);
+    }
+
+    /**
+     * The Feeds filter goes out as its file value and comes back only as one this build offers,
+     * like the start tab, and the preview and the toast each say what it does (#56).
+     */
+    @Test
+    public void theFeedsFilterRoundTripsAndComesBackOnlyAsOneThisBuildOffers() throws Exception {
+        for (FeedsSubtab subtab : FeedsSubtab.values()) {
+            Settings.FEEDS_SUBTAB.save(subtab);
+            String file = SettingsBackup.create();
+            assertEquals(subtab.fileValue, new JSONObject(file).getJSONObject("settings").get(SettingsBackup.SUBTAB.key));
+            Settings.FEEDS_SUBTAB.save(subtab == FeedsSubtab.ALL ? FeedsSubtab.PAGES : FeedsSubtab.ALL);
+
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+            assertEquals(subtab, snapshot.subtab);
+            assertEquals(subtab, snapshot.subtabChange());
+            assertEquals(Collections.singletonMap(SettingsBackup.SUBTAB, subtab), snapshot.changes());
+            assertEquals(1, SettingsBackup.apply(snapshot));
+            assertEquals(subtab, Settings.FEEDS_SUBTAB.savedValue());
+            assertEquals("a file read back is the file", file, SettingsBackup.create());
+            assertEquals("the same filter again changes nothing", 0, SettingsBackup.parse(file).changes().size());
+        }
+
+        Settings.FEEDS_SUBTAB.save(FeedsSubtab.GROUPS);
+        String file = SettingsBackup.create();
+        Map<String, ?> before = store();
+        for (Object refused : new Object[]{"GROUPS", "Groups", "group", "most_recent_group", "", 3, true,
+                JSONObject.NULL, new JSONObject(), new org.json.JSONArray()}) {
+            JSONObject hostile = new JSONObject(file);
+            hostile.getJSONObject("settings").put(SettingsBackup.SUBTAB.key, refused);
+            try {
+                SettingsBackup.parse(hostile.toString());
+                fail("a file with the Feeds filter " + printable(String.valueOf(refused)) + " was read");
+            } catch (SettingsBackup.Rejected rejected) {
+                assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the filter was carried leaves it alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.subtab);
+        assertNull(older.subtabChange());
+        SettingsBackup.apply(older);
+        assertEquals(FeedsSubtab.GROUPS, Settings.FEEDS_SUBTAB.savedValue());
+
+        // A preview kept across a rebuild keeps its filter, and only one this build offers comes back.
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(FeedsSubtab.GROUPS, SettingsBackup.Snapshot.fromBundle(state).subtab);
+        state.putString("feeds_subtab", "GROUPS");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).subtab);
+
+        // What the preview and the toast say it does.
+        assertEquals(Collections.singletonList(L10n.f("The Feeds tab will open on %1$s.", L10n.t("Groups"))),
+                SettingsBackupPreference.valueSentences(null, null, null, null, null, null, null, null, null, null,
+                        null, FeedsSubtab.GROUPS));
+        assertEquals("Settings imported. " + L10n.t("The Feeds tab will open on the filter Facebook picks."),
+                SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null, null,
+                        null, null, FeedsSubtab.ALL));
+        assertEquals("the folder alone keeps its own sentence",
+                SettingsBackupPreference.importedMessage(0, "Hush", null, null, null),
+                SettingsBackupPreference.importedMessage(0, "Hush", null, null, null, null, null, null, null, null,
+                        null, null, null));
     }
 
     /**

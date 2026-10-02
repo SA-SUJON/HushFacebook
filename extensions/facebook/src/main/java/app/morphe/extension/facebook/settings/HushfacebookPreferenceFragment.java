@@ -48,6 +48,7 @@ import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.navigation.MarketplaceOnly;
 import app.morphe.extension.facebook.settings.SettingsRows.Heading;
@@ -56,6 +57,7 @@ import app.morphe.extension.facebook.settings.SettingsRows.SaveRow;
 import app.morphe.extension.facebook.settings.SettingsRows.Toggle;
 import app.morphe.extension.facebook.settings.ValueRows.CommentOrderRow;
 import app.morphe.extension.facebook.settings.ValueRows.DownloadActionRow;
+import app.morphe.extension.facebook.settings.ValueRows.FeedsSubtabRow;
 import app.morphe.extension.facebook.settings.ValueRows.FileNameRow;
 import app.morphe.extension.facebook.settings.ValueRows.FolderRow;
 import app.morphe.extension.facebook.settings.ValueRows.PlaybackQualityRow;
@@ -673,6 +675,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             tab.setSummary(selected ? L10n.t("Marketplace mode chooses the opening tab. Your previous choice stays saved.")
                     : startTabSummary(Settings.START_TAB.savedValue()));
         }
+        Preference subtab = findPreference(Settings.FEEDS_SUBTAB.key);
+        if (subtab != null) {
+            subtab.setEnabled(!selected);
+            subtab.setSummary(selected ? L10n.t("Marketplace mode chooses the opening tab. Your previous choice stays saved.")
+                    : feedsSubtabSummary(Settings.FEEDS_SUBTAB.savedValue()));
+        }
     }
 
     /** The AMOLED row under Patched: black, or the Background colour the patch was given (issue #34). */
@@ -893,6 +901,58 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * The filter the Feeds tab opens on after a start the start tab sends there (#56). Like the
+     * start tab row, its values are the setting's own names and its summary says what the choice
+     * does.
+     */
+    static FeedsSubtabRow feedsSubtabRow(Context context) {
+        FeedsSubtabRow row = new FeedsSubtabRow(context);
+        row.setKey(Settings.FEEDS_SUBTAB.key);
+        row.setTitle(L10n.t("Feeds opens on"));
+        row.setDialogTitle(L10n.t("Feeds opens on"));
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        FeedsSubtab[] subtabs = FeedsSubtab.values();
+        CharSequence[] entries = new CharSequence[subtabs.length];
+        CharSequence[] values = new CharSequence[subtabs.length];
+        for (int i = 0; i < subtabs.length; i++) {
+            entries[i] = feedsSubtabLabel(subtabs[i]);
+            values[i] = subtabs[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.FEEDS_SUBTAB.savedValue().name());
+        return row;
+    }
+
+    /** What the list, its summary and an import's preview call [subtab]: the filter's name in Facebook. */
+    static String feedsSubtabLabel(FeedsSubtab subtab) {
+        switch (subtab) {
+            case FAVORITES:
+                return L10n.t("Favorites");
+            case FRIENDS:
+                return L10n.t("Friends");
+            case GROUPS:
+                return L10n.t("Groups");
+            case PAGES:
+                return L10n.t("Pages");
+            default:
+                return L10n.t("All");
+        }
+    }
+
+    /**
+     * What a start on the Feeds tab does with [subtab], for the row's summary. A filter the Feeds
+     * tab hasn't got leaves it as it opened, so the summary says so rather than promise the filter.
+     */
+    static String feedsSubtabSummary(FeedsSubtab subtab) {
+        if (subtab == FeedsSubtab.ALL) {
+            return L10n.t("When Facebook opens on Feeds, the Feeds tab opens on the filter Facebook picks.");
+        }
+        return L10n.f("When Facebook opens on Feeds, the Feeds tab opens on %1$s. If your Feeds tab doesn't "
+                + "have it, it opens as usual.", feedsSubtabLabel(subtab));
+    }
+
+    /**
      * The order comment sheets ask for. Like the start tab row, its values are the setting's own
      * names and its summary says what the choice does.
      */
@@ -1002,8 +1062,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
-     * The quality, download action, start tab, comment order and playback quality rows' summaries
-     * are sentences of their own rather than the chosen entry.
+     * The quality, download action, start tab, Feeds filter, comment order and playback quality
+     * rows' summaries are sentences of their own rather than the chosen entry.
      */
     @Override
     protected void updateListPreferenceSummary(ListPreference listPreference, Setting<?> setting) {
@@ -1015,6 +1075,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((SaveToRow) listPreference).showSummary();
         } else if (listPreference instanceof StartTabRow) {
             ((StartTabRow) listPreference).showSummary();
+        } else if (listPreference instanceof FeedsSubtabRow) {
+            ((FeedsSubtabRow) listPreference).showSummary();
         } else if (listPreference instanceof CommentOrderRow) {
             ((CommentOrderRow) listPreference).showSummary();
         } else if (listPreference instanceof PlaybackQualityRow) {

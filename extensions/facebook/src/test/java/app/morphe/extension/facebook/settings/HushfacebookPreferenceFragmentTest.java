@@ -26,6 +26,7 @@ import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWordsForTests;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -796,8 +797,58 @@ public class HushfacebookPreferenceFragmentTest {
             for (Preference row : rowsOf(controller)) {
                 assertFalse("a start tab row with no Open on a chosen tab in the build",
                         row instanceof ValueRows.StartTabRow);
+                assertFalse("a Feeds filter row with no Open on a chosen tab in the build",
+                        row instanceof ValueRows.FeedsSubtabRow);
                 assertFalse(Settings.OPEN_ON_CHOSEN_TAB.key.equals(row.getKey()));
             }
+        }
+    }
+
+    /**
+     * Under the start tab's list, the Feeds filter's list offers each filter by its name in
+     * Facebook, says what the chosen one does, and reaches the setting the way its dialog sends a
+     * pick (#56).
+     */
+    @Test
+    public void theFeedsFilterRowOffersEveryFilterAndSaysWhatItDoes() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.START_TAB, PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment page = new HushfacebookPreferenceFragment();
+            controller.get().getFragmentManager().beginTransaction().add(android.R.id.content, page).commitNow();
+            List<Preference> rows = new ArrayList<>();
+            collect(page.getPreferenceScreen(), rows);
+            assertTrue(rows.get(3) instanceof ValueRows.StartTabRow);
+            assertTrue(rows.get(4) instanceof ValueRows.FeedsSubtabRow);
+            ValueRows.FeedsSubtabRow subtab = (ValueRows.FeedsSubtabRow) rows.get(4);
+            assertEquals(Settings.FEEDS_SUBTAB.key, subtab.getKey());
+            assertEquals("Feeds opens on", String.valueOf(subtab.getTitle()));
+
+            List<String> entries = new ArrayList<>();
+            for (CharSequence entry : subtab.getEntries()) entries.add(String.valueOf(entry));
+            assertEquals(Arrays.asList("All", "Favorites", "Friends", "Groups", "Pages"), entries);
+            List<String> values = new ArrayList<>();
+            for (CharSequence value : subtab.getEntryValues()) values.add(String.valueOf(value));
+            List<String> names = new ArrayList<>();
+            for (FeedsSubtab each : FeedsSubtab.values()) names.add(each.name());
+            assertEquals(names, values);
+
+            assertEquals("ALL", subtab.getValue());
+            assertEquals("When Facebook opens on Feeds, the Feeds tab opens on the filter Facebook picks.",
+                    String.valueOf(subtab.getSummary()));
+
+            subtab.setValue("GROUPS");
+            ShadowLooper.idleMainLooper();
+            assertEquals(FeedsSubtab.GROUPS, Settings.FEEDS_SUBTAB.savedValue());
+            assertEquals("When Facebook opens on Feeds, the Feeds tab opens on Groups. If your Feeds tab doesn't "
+                    + "have it, it opens as usual.", String.valueOf(subtab.getSummary()));
+
+            Settings.FEEDS_SUBTAB.save(FeedsSubtab.FAVORITES);
+            page.refreshSwitches();
+            assertEquals("FAVORITES", subtab.getValue());
+            assertEquals(HushfacebookPreferenceFragment.feedsSubtabSummary(FeedsSubtab.FAVORITES),
+                    String.valueOf(subtab.getSummary()));
+        } finally {
+            Settings.FEEDS_SUBTAB.resetToDefault();
         }
     }
 

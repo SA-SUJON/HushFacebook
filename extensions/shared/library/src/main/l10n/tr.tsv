@@ -691,3 +691,12 @@ Hide "Find friends from contacts"	“Kişilerinden arkadaş bul” kartını giz
 The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.	Hikaye tepsisinde kişilerini yüklemeni isteyen kart. Facebook tepsiyi yeniden yüklediğinde uygulanır.
 # context: summary of Hide "People you may know" when the build also hides tray cards; Add is the card's button
 The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.	Gönderilerin arasındaki arkadaş önerileri satırı, kendi profilindeki satır ve hikaye tepsisindeki Ekle düğmeli kartlar.
+Feeds opens on	Akışlar şurada açılır
+All	Tümü
+Favorites	Favoriler
+Groups	Gruplar
+Pages	Sayfalar
+When Facebook opens on Feeds, the Feeds tab opens on the filter Facebook picks.	Facebook Akışlar sekmesinde açıldığında Akışlar, Facebook'un seçtiği filtrede açılır.
+When Facebook opens on Feeds, the Feeds tab opens on %1$s. If your Feeds tab doesn't have it, it opens as usual.	Facebook Akışlar sekmesinde açıldığında Akışlar %1$s filtresinde açılır. Akışlar sekmende bu filtre yoksa her zamanki gibi açılır.
+The Feeds tab will open on the filter Facebook picks.	Akışlar sekmesi Facebook'un seçtiği filtrede açılacak.
+The Feeds tab will open on %1$s.	Akışlar sekmesi %1$s filtresinde açılacak.
