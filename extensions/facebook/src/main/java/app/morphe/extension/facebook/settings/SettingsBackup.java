@@ -64,16 +64,20 @@ import app.morphe.extension.shared.settings.StringSetting;
  * one tab, one comment order and one playback quality. The word lists go only into the file the
  * person picks, with the rest. An import applies what it read in one preference commit. A file
  * that is too large, isn't JSON, names something twice, holds a value of the wrong type, a word
- * list that isn't one clean list, a folder or a template that isn't one clean name, an app that
- * isn't a package name, or a top folder, quality, download action, tab or comment order this build
- * doesn't offer, or comes from a newer version changes nothing.
+ * list that isn't one clean list, word lists past the room they share, a folder or a template
+ * that isn't one clean name, an app that isn't a package name, or a top folder, quality, download
+ * action, tab or comment order this build doesn't offer, or comes from a newer version changes
+ * nothing.
  * <p>The release check stays out of the file: it puts the phone online, so it's switched on
  * from the phone's own screen, never by a file.
  *
  * <p>Call the file and preference work on a worker thread.
  */
 public final class SettingsBackup {
-    /** Far more than a settings file needs: one is a few hundred bytes. */
+    /**
+     * Far more than a settings file needs: one is a few hundred bytes, or 62 KB at most with both
+     * word lists filling the room they share.
+     */
     public static final int MAX_BYTES = 64 * 1024;
     public static final String FORMAT = "hushfacebook-settings";
     /** The file shape this build writes and the newest it reads. A file declaring more is refused. */
@@ -163,7 +167,8 @@ public final class SettingsBackup {
      * The word filter's two lists, held in a file exactly as the settings row stores them: one
      * phrase per line within {@link PostWords}' bounds. A value {@link PostWords#clean} would change
      * refuses the whole file, as a switch that isn't true or false does, so a file can't slip in a
-     * list longer or looser than the row allows.
+     * list longer or looser than the row allows. So do lists past the room the two share
+     * ({@link PostWords#MAX_LIST_BYTES}), which every file this class writes fits whole.
      */
     static final StringSetting HIDDEN = Settings.HIDDEN_WORDS;
     static final StringSetting KEPT = Settings.KEPT_WORDS;
@@ -274,6 +279,8 @@ public final class SettingsBackup {
         SCHEMA,
         /** A switch whose value isn't true or false. */
         VALUE,
+        /** Word lists that, beside the one it leaves as it is, don't fit in the room the two share. */
+        WORDS,
         /** The file couldn't be opened or read to the end. */
         UNREADABLE
     }
@@ -778,6 +785,12 @@ public final class SettingsBackup {
                 throw new Rejected(Reason.VALUE, "Not true or false: " + name);
             }
             found.put(setting, (Boolean) value);
+        }
+        // The lists share their room. One the file leaves out stays as it is, so it counts as stored.
+        if ((hidden != null || kept != null) && !PostWords.fits(
+                hidden != null ? hidden : PostWords.clean(HIDDEN.savedValue()),
+                kept != null ? kept : PostWords.clean(KEPT.savedValue()))) {
+            throw new Rejected(Reason.WORDS, "Word lists past the room they share");
         }
         Map<BooleanSetting, Boolean> ordered = new LinkedHashMap<>();
         for (BooleanSetting setting : ALLOWLIST) {

@@ -27,8 +27,10 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.GraphicsMode;
+import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowLooper;
 
 import java.util.EnumSet;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import app.morphe.extension.facebook.feed.PostWords;
+import app.morphe.extension.facebook.feed.PostWordsTest;
 import app.morphe.extension.shared.SettingsContextRule;
 
 /**
@@ -53,6 +56,7 @@ public class EditDialogKeyboardTest {
         PatchFamily.inBuildForTests = null;
         ScreenColors.shown = null;
         Settings.HIDDEN_WORDS.resetToDefault();
+        Settings.KEPT_WORDS.resetToDefault();
         RuntimeEnvironment.setFontScale(1f);
     }
 
@@ -190,6 +194,62 @@ public class EditDialogKeyboardTest {
     @Test
     public void aDialogWithNoWindowIsLeftAlone() {
         HushfacebookPreferenceFragment.fitAboveKeyboard(null);
+    }
+
+    /**
+     * #58: Save refuses a list past the room the two lists share, or one of more than a thousand
+     * phrases, with its dialog still open and what was typed whole, and says why. The line under the
+     * explanation says it as the list is typed. A list that fits saves and closes the dialog.
+     */
+    @Test
+    public void aListThatDoesntFitIsRefusedWithItsDialogStillOpen() {
+        Settings.KEPT_WORDS.save(PostWordsTest.asciiOfBytes(PostWords.MAX_LIST_BYTES - 10));
+        PatchFamily.inBuildForTests = EnumSet.allOf(PatchFamily.class);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment.WordsRow row =
+                    (HushfacebookPreferenceFragment.WordsRow) shown(controller, Settings.HIDDEN_WORDS.key);
+            AlertDialog dialog = (AlertDialog) row.getDialog();
+            String fits = "spoiler";
+            String tooLong = "spoiler\ngiveaway now";
+            String tooMany = lines(PostWords.MAX_PHRASES + 1);
+            for (String typed : new String[]{tooLong, tooMany}) {
+                ShadowAlertDialog.reset();
+                row.getEditText().setText(typed);
+                String why = HushfacebookPreferenceFragment.wordsRefusal(
+                        PostWords.size(typed, PostWords.MAX_LIST_BYTES - 10));
+                assertNotNull(why);
+                ArrayList<View> lines = new ArrayList<>();
+                dialog.getWindow().getDecorView().findViewsWithText(lines, why, View.FIND_VIEWS_WITH_TEXT);
+                assertFalse("the dialog doesn't say why as it's typed", lines.isEmpty());
+
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                ShadowLooper.idleMainLooper();
+                assertTrue("Save closed the dialog", dialog.isShowing());
+                assertEquals("what was typed was cut", typed, row.getEditText().getText().toString());
+                assertEquals("", Settings.HIDDEN_WORDS.savedValue());
+                AlertDialog said = ShadowAlertDialog.getLatestAlertDialog();
+                assertTrue(said != null && said != dialog);
+                assertEquals(why, Shadows.shadowOf(said).getMessage().toString());
+                said.dismiss();
+            }
+            assertTrue(why(PostWords.size(tooLong, PostWords.MAX_LIST_BYTES - 10)).contains("101"));
+
+            row.getEditText().setText(fits);
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+            ShadowLooper.idleMainLooper();
+            assertFalse(dialog.isShowing());
+            assertEquals(fits, Settings.HIDDEN_WORDS.savedValue());
+        }
+    }
+
+    private static String why(PostWords.Size size) {
+        return HushfacebookPreferenceFragment.wordsRefusal(size);
+    }
+
+    private static String lines(int count) {
+        StringBuilder lines = new StringBuilder();
+        for (int i = 0; i < count; i++) lines.append(i == 0 ? "" : "\n").append("w").append(i);
+        return lines.toString();
     }
 
     private static void assertResizes(String key) {

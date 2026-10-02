@@ -494,7 +494,7 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals("2 words or phrases.", String.valueOf(hide.getSummary()));
             assertLeftOut("Words to hide", "2 lines were left out. A phrase needs 2 to 60 characters, or just one "
                     + "for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
-                    + "once, and a list holds 50.");
+                    + "once.");
 
             ShadowAlertDialog.reset();
             assertTrue("a clean list was changed", ok.onPreferenceChange(hide, "spoiler"));
@@ -510,7 +510,7 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals("1 word or phrase.", String.valueOf(keep.getSummary()));
             assertLeftOut("Words that keep a post", "1 line was left out. A phrase needs 2 to 60 characters, or just "
                     + "one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
-                    + "once, and a list holds 50.");
+                    + "once.");
         }
 
         PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);

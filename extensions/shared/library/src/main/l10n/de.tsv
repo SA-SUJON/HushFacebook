@@ -206,6 +206,8 @@ That file isn't readable text, so it may have been damaged on the way. Nothing w
 That file lists a setting twice, so there's no telling which value to use. Nothing was changed.	Diese Datei führt eine Einstellung zweimal auf, daher ist unklar, welcher Wert gilt. Es wurde nichts geändert.
 That isn't a Hushfacebook settings file. Nothing was changed.	Das ist keine Hushfacebook-Einstellungsdatei. Es wurde nichts geändert.
 That settings file holds a value Hushfacebook can't read. Nothing was changed.	Diese Einstellungsdatei enthält einen Wert, den Hushfacebook nicht lesen kann. Es wurde nichts geändert.
+# context: a settings file refused on import: its word lists, beside one it leaves as it is, take more than the room the two lists share
+The word lists in that file are longer than the two lists have room for. Nothing was changed.	Die Wortlisten in dieser Datei brauchen mehr Platz, als die beiden Listen haben. Es wurde nichts geändert.
 That settings file is damaged or only partly downloaded. Nothing was changed.	Diese Einstellungsdatei ist beschädigt oder nur teilweise heruntergeladen. Es wurde nichts geändert.
 That settings file was written by a newer Hushfacebook than this one. Nothing was changed.	Diese Einstellungsdatei stammt aus einer neueren Hushfacebook-Version als dieser. Es wurde nichts geändert.
 the Audience Network block	die Sperre für das Audience Network
@@ -438,10 +440,10 @@ One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or j
 A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable.	Ein Beitrag mit einem dieser Wörter bleibt, auch wenn er ein Wort zum Ausblenden enthält. Eins pro Zeile, bis zu %1$d, jeweils %2$d bis %3$d Zeichen lang, oder nur eins bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe.
 # context: hint in the empty text box of both word list dialogs
 One word or phrase per line	Ein Wort oder eine Wortfolge pro Zeile
-# context: toast after saving a word list, one line left out; %2$d and %3$d are the shortest and longest phrase in characters, %4$d how many a list holds
-%1$d line was left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts once, and a list holds %4$d.	%1$d Zeile wurde weggelassen. Eine Wortfolge braucht %2$d bis %3$d Zeichen, bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe nur eins. Eine doppelte zählt einmal, und eine Liste fasst %4$d.
-# context: toast after saving a word list, several lines left out; %2$d and %3$d are the shortest and longest phrase in characters, %4$d how many a list holds
-%1$d lines were left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts once, and a list holds %4$d.	%1$d Zeilen wurden weggelassen. Eine Wortfolge braucht %2$d bis %3$d Zeichen, bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe nur eins. Eine doppelte zählt einmal, und eine Liste fasst %4$d.
+# context: toast after saving a word list, one line left out; %2$d and %3$d are the shortest and longest phrase in characters
+%1$d line was left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts once.	%1$d Zeile wurde weggelassen. Eine Wortfolge braucht %2$d bis %3$d Zeichen, bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe nur eins. Eine doppelte zählt einmal.
+# context: toast after saving a word list, several lines left out; %2$d and %3$d are the shortest and longest phrase in characters
+%1$d lines were left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts once.	%1$d Zeilen wurden weggelassen. Eine Wortfolge braucht %2$d bis %3$d Zeichen, bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe nur eins. Eine doppelte zählt einmal.
 # context: summary of the Words to hide row while it's empty
 No words yet, so no post is hidden.	Noch keine Wörter, also wird kein Beitrag ausgeblendet.
 # context: summary of the Words that keep a post row while it's empty
@@ -450,6 +452,12 @@ No words yet.	Noch keine Wörter.
 %1$d word or phrase.	%1$d Wort oder Wortfolge.
 # context: summary of a word list row holding several phrases
 %1$d words or phrases.	%1$d Wörter oder Wortfolgen.
+# context: line under a word list being edited: how full the room both lists share would be; %1$d is a whole percent
+Both lists together fill %1$d%% of the room they share.	Beide Listen zusammen füllen %1$d %% des Platzes, den sie sich teilen.
+# context: under a word list being edited, and when its Save is refused: more phrases than a list holds; %1$d is the most a list holds
+A list holds up to %1$d phrases, and this one has more. Remove some, then save again.	Eine Liste fasst bis zu %1$d Wortfolgen, und diese hat mehr. Entferne einige und speichere dann noch einmal.
+# context: under a word list being edited, and when its Save is refused: both lists would take more than the room they share; %1$d is a whole percent past 100
+Both lists together would fill %1$d%% of the room they share. Remove or shorten some phrases, then save again.	Beide Listen zusammen würden %1$d %% des Platzes füllen, den sie sich teilen. Entferne oder kürze einige Wortfolgen und speichere dann noch einmal.
 # context: added to the Words to hide summary: posts the filter hid since Facebook last started, one
 Hid %1$d post since Facebook started.	Seit dem Start von Facebook %1$d Beitrag ausgeblendet.
 # context: added to the Words to hide summary: posts the filter hid since Facebook last started, several

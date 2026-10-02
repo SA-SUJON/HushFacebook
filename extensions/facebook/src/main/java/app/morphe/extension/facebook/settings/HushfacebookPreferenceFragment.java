@@ -1249,6 +1249,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         field.setMinLines(3);
         field.setHint(L10n.t("One word or phrase per line"));
         row.setText(setting.savedValue());
+        row.refused = why -> show(new AlertDialog.Builder(row.getContext())
+                .setTitle(title)
+                .setMessage(why)
+                .setPositiveButton(L10n.t("OK"), null));
         row.setOnPreferenceChangeListener((preference, typed) -> {
             String raw = typed == null ? "" : typed.toString();
             String clean = PostWords.clean(raw);
@@ -1259,14 +1263,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             if (leftOut > 0) {
                 // A dialog, not a toast: Android 12 and later cut a toast to two lines, and the
                 // reasons run past that, most of all at a large text size.
+                // Too many phrases never get here: Save refuses those with the dialog still open.
                 String why = L10n.quantity(leftOut,
                         "%1$d line was left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, "
-                                + "a Chinese character, a kana or a Hangul syllable. One given twice counts once, "
-                                + "and a list holds %4$d.",
+                                + "a Chinese character, a kana or a Hangul syllable. One given twice counts once.",
                         "%1$d lines were left out. A phrase needs %2$d to %3$d characters, or just one for an "
                                 + "emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
-                                + "once, and a list holds %4$d.",
-                        leftOut, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH, PostWords.MAX_PHRASES);
+                                + "once.",
+                        leftOut, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH);
                 show(new AlertDialog.Builder(preference.getContext())
                         .setTitle(title)
                         .setMessage(why)
@@ -1293,6 +1297,31 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                     "Hid %1$d posts since Facebook started.", hidden);
         }
         return summary;
+    }
+
+    /**
+     * What a word list's dialog says under its explanation as the list is typed: how many phrases
+     * it holds and how full the room the two lists share would be, or why it can't be saved.
+     */
+    static String wordsEditorLine(PostWords.Size size) {
+        if (size.tooMany()) return wordsRefusal(size);
+        String count = size.phrases == 0 ? L10n.t("No words yet.")
+                : L10n.quantity(size.phrases, "%1$d word or phrase.", "%1$d words or phrases.", size.phrases);
+        String why = wordsRefusal(size);
+        return count + " " + (why != null ? why
+                : L10n.f("Both lists together fill %1$d%% of the room they share.", size.percent()));
+    }
+
+    /** Why a typed list can't be saved, the same in its dialog and when Save is tapped, or null when it can be. */
+    @Nullable
+    static String wordsRefusal(PostWords.Size size) {
+        if (size.tooMany()) {
+            return L10n.f("A list holds up to %1$d phrases, and this one has more. Remove some, then save again.",
+                    PostWords.MAX_PHRASES);
+        }
+        if (size.fits()) return null;
+        return L10n.f("Both lists together would fill %1$d%% of the room they share. Remove or shorten some "
+                + "phrases, then save again.", size.percent());
     }
 
     static Preference mark(Preference row, String icon) {

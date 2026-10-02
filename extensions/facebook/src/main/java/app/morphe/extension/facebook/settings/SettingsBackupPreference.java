@@ -306,6 +306,8 @@ public class SettingsBackupPreference extends Preference {
                 return L10n.t("That settings file was written by a newer Hushfacebook than this one. Nothing was changed.");
             case VALUE:
                 return L10n.t("That settings file holds a value Hushfacebook can't read. Nothing was changed.");
+            case WORDS:
+                return L10n.t("The word lists in that file are longer than the two lists have room for. Nothing was changed.");
             default:
                 return L10n.t("Couldn't open that file. Nothing was changed.");
         }

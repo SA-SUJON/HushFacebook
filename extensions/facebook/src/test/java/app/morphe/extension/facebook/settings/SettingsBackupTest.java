@@ -69,10 +69,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.download.FileNameTemplate;
+import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.feed.PostWords;
+import app.morphe.extension.facebook.feed.PostWordsTest;
+import app.morphe.extension.facebook.feed.WordsCorpus;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -728,8 +732,9 @@ public class SettingsBackupTest {
         assertEquals("the same lists again change nothing", 0, SettingsBackup.parse(file).changes().size());
 
         Map<String, ?> before = store();
+        // One phrase past the most a list holds.
         StringBuilder long51 = new StringBuilder("w0");
-        for (int i = 1; i <= 50; i++) long51.append("\nw").append(i);
+        for (int i = 1; i <= PostWords.MAX_PHRASES; i++) long51.append("\nw").append(i);
         for (Object refused : new Object[]{" spoiler", "spoiler\n", "spoiler\nSPOILER", "a", repeat('a', 61),
                 "spoiler\n\nleak", long51.toString(), 5, true, JSONObject.NULL, new JSONObject()}) {
             for (Setting<?> list : Arrays.<Setting<?>>asList(SettingsBackup.HIDDEN, SettingsBackup.KEPT)) {
@@ -772,23 +777,37 @@ public class SettingsBackupTest {
     }
 
     /**
-     * The longest lists the row keeps, 50 phrases of 60 characters that each take two chars, go
-     * out and come back whole, both at once, in a file inside the size limit.
+     * #58: lists that fill the room the two share to the byte, written with emoji, a CJK
+     * character, an escaped slash and plain letters, go out and come back whole, both at once, with
+     * every other value a file carries at its longest, in a file inside the size limit.
      */
     @Test
-    public void theLongestWordListsRoundTripWhole() throws Exception {
-        String hidden = longestList(0x1F600);
-        String kept = longestList(0x20000);
-        assertEquals(PostWords.MAX_STORED_CHARS, hidden.length());
-        assertEquals(PostWords.MAX_STORED_CHARS, kept.length());
-        assertTrue(PostWords.isClean(hidden));
-        assertTrue(PostWords.isClean(kept));
-        assertEquals(PostWords.MAX_PHRASES, PostWords.count(hidden));
+    public void wordListsFillingTheirRoomRoundTripWithEverythingElseAtItsLongest() throws Exception {
+        String hidden = roomFilling(PostWords.MAX_LIST_BYTES / 2);
+        String kept = PostWordsTest.asciiOfBytes(PostWords.MAX_LIST_BYTES - PostWords.encodedBytes(hidden));
+        assertEquals(PostWords.MAX_LIST_BYTES, PostWords.encodedBytes(hidden) + PostWords.encodedBytes(kept));
+        assertTrue(PostWords.fits(hidden, kept));
+        assertFalse(PostWords.fits(hidden, kept + "x"));
         Settings.HIDDEN_WORDS.save(hidden);
         Settings.KEPT_WORDS.save(kept);
+        // Every other value at the longest a file takes back: a folder and a file name kept from
+        // a run of four-byte characters longer than either row keeps, and an app name of the
+        // parser's longest string.
+        String folder = SaveFolder.sanitize(emoji(80));
+        assertEquals("a folder keeps fifty", emoji(50), folder);
+        Settings.SAVE_FOLDER.save(folder);
+        String fileName = FileNameTemplate.sanitize(emoji(80));
+        assertEquals(fileName, FileNameTemplate.sanitize(fileName));
+        assertEquals("a file name keeps fifty, its date token included", 50,
+                fileName.codePointCount(0, fileName.length()));
+        Settings.FILENAME_TEMPLATE.save(fileName);
+        String app = "a." + repeat('b', 1024 - 2);
+        assertTrue(SendLink.isFileApp(app));
+        Settings.SEND_TO_APP.save(app);
         String file = SettingsBackup.create();
-        assertTrue("a file of " + file.getBytes(StandardCharsets.UTF_8).length + " bytes",
-                file.getBytes(StandardCharsets.UTF_8).length <= SettingsBackup.MAX_BYTES);
+        int size = file.getBytes(StandardCharsets.UTF_8).length;
+        assertTrue("a file of " + size + " bytes", size <= SettingsBackup.MAX_BYTES);
+        assertTrue("MAX_BYTES says 62 KB at most: " + size, size <= 62 * 1024);
         Settings.HIDDEN_WORDS.resetToDefault();
         Settings.KEPT_WORDS.resetToDefault();
 
@@ -799,6 +818,48 @@ public class SettingsBackupTest {
         assertEquals(hidden, Settings.HIDDEN_WORDS.savedValue());
         assertEquals(kept, Settings.KEPT_WORDS.savedValue());
         assertEquals("a file read back is the file", file, SettingsBackup.create());
+    }
+
+    /** #58: a thousand short phrases in each list go out and come back whole. */
+    @Test
+    public void aThousandShortPhrasesInEachListRoundTrip() throws Exception {
+        String hidden = WordsCorpus.hide();
+        String kept = WordsCorpus.keep();
+        Settings.HIDDEN_WORDS.save(hidden);
+        Settings.KEPT_WORDS.save(kept);
+        String file = SettingsBackup.create();
+        assertTrue(file.getBytes(StandardCharsets.UTF_8).length <= SettingsBackup.MAX_BYTES);
+        Settings.HIDDEN_WORDS.resetToDefault();
+        Settings.KEPT_WORDS.resetToDefault();
+        assertEquals(2, SettingsBackup.apply(SettingsBackup.parse(file)));
+        assertEquals(1000, PostWords.count(Settings.HIDDEN_WORDS.savedValue()));
+        assertEquals(hidden, Settings.HIDDEN_WORDS.savedValue());
+        assertEquals(kept, Settings.KEPT_WORDS.savedValue());
+    }
+
+    /**
+     * #58: lists past the room they share are refused whole, and nothing changes: two in one file,
+     * or one beside the list the file leaves as it is on the phone. Within the room, both come in.
+     */
+    @Test
+    public void wordListsPastTheirRoomAreRefusedAndChangeNothing() throws Exception {
+        String half = PostWordsTest.asciiOfBytes(PostWords.MAX_LIST_BYTES / 2);
+        String more = PostWordsTest.asciiOfBytes(PostWords.MAX_LIST_BYTES / 2 + 1);
+        JSONObject both = new JSONObject(SettingsBackup.create());
+        both.getJSONObject("settings").put(SettingsBackup.HIDDEN.key, half).put(SettingsBackup.KEPT.key, more);
+        assertEquals(SettingsBackup.Reason.WORDS, reasonFor(both.toString()));
+
+        Settings.KEPT_WORDS.save(more);
+        Map<String, ?> before = store();
+        JSONObject one = new JSONObject(SettingsBackup.create());
+        one.getJSONObject("settings").put(SettingsBackup.HIDDEN.key, half).remove(SettingsBackup.KEPT.key);
+        assertEquals("beside the phone's list", SettingsBackup.Reason.WORDS, reasonFor(one.toString()));
+        assertEquals(before, store());
+
+        Settings.KEPT_WORDS.save(half);
+        assertEquals(half, SettingsBackup.parse(one.toString()).hiddenChange());
+        both.getJSONObject("settings").put(SettingsBackup.KEPT.key, half);
+        assertEquals(half, SettingsBackup.parse(both.toString()).hiddenChange());
     }
 
     /** Lists of 1,024 and 1,025 chars, the most a file's string could be before, both come back. */
@@ -829,7 +890,7 @@ public class SettingsBackupTest {
         Settings.HIDE_SUGGESTED_POSTS.save(!Settings.HIDE_SUGGESTED_POSTS.defaultValue);
         String file = SettingsBackup.create();
         Map<String, ?> before = store();
-        String past = longestList(0x1F600) + "x";
+        String past = repeat('x', SettingsBackup.MAX_STRING_CHARS + 1);
 
         JSONObject asList = new JSONObject(file);
         asList.getJSONObject("settings").put(SettingsBackup.HIDDEN.key, past);
@@ -846,21 +907,42 @@ public class SettingsBackupTest {
         assertEquals(SettingsBackup.Reason.SIZE, reasonFor(oversized));
         assertEquals(SettingsBackup.Reason.SIZE, readReason(new ByteArrayInputStream(oversized.getBytes(StandardCharsets.UTF_8))));
 
-        // The longest list itself still comes in.
-        JSONObject longest = new JSONObject(file);
-        longest.getJSONObject("settings").put(SettingsBackup.HIDDEN.key, longestList(0x1F600));
-        assertEquals(longestList(0x1F600), SettingsBackup.parse(longest.toString()).hiddenChange());
+        // The longest list beside the kept one still comes in.
+        String longest = PostWordsTest.asciiOfBytes(PostWords.MAX_LIST_BYTES - PostWords.encodedBytes("my team"));
+        JSONObject withLongest = new JSONObject(file);
+        withLongest.getJSONObject("settings").put(SettingsBackup.HIDDEN.key, longest);
+        assertEquals(longest, SettingsBackup.parse(withLongest.toString()).hiddenChange());
         assertEquals("a refused file wrote something", before, store());
     }
 
-    /** {@link PostWords#MAX_PHRASES} phrases of {@link PostWords#MAX_LENGTH} copies of a code point from [first] on. */
-    private static String longestList(int first) {
-        StringBuilder list = new StringBuilder();
-        for (int phrase = 0; phrase < PostWords.MAX_PHRASES; phrase++) {
-            if (phrase > 0) list.append('\n');
-            for (int i = 0; i < PostWords.MAX_LENGTH; i++) list.appendCodePoint(first + phrase);
+    /** [count] grinning faces, four bytes each in UTF-8. */
+    private static String emoji(int count) {
+        StringBuilder run = new StringBuilder();
+        for (int i = 0; i < count; i++) run.appendCodePoint(0x1F600);
+        return run.toString();
+    }
+
+    /**
+     * A clean list taking exactly [bytes] in a file: phrases of a CJK character, a slash and emoji
+     * to sixty characters, each its own emoji, then plain letters for the rest.
+     */
+    private static String roomFilling(int bytes) {
+        List<String> phrases = new ArrayList<>();
+        int used = 0;
+        for (int phrase = 0; ; phrase++) {
+            StringBuilder next = new StringBuilder("猫/");
+            while (next.codePointCount(0, next.length()) < PostWords.MAX_LENGTH) next.appendCodePoint(0x1F600 + phrase);
+            int cost = PostWords.encodedBytes(next.toString()) + (phrases.isEmpty() ? 0 : 2);
+            // Leave the letters a line break and a phrase of eight at least.
+            if (used + cost > bytes - 2 - 8) break;
+            phrases.add(next.toString());
+            used += cost;
         }
-        return list.toString();
+        String letters = PostWordsTest.asciiOfBytes(bytes - used - 2);
+        String list = String.join("\n", phrases) + "\n" + letters;
+        assertTrue(PostWords.isClean(list));
+        assertEquals(bytes, PostWords.encodedBytes(list));
+        return list;
     }
 
     /** A clean list of plain letters exactly [length] chars long. */
@@ -2009,8 +2091,8 @@ public class SettingsBackupTest {
     }
 
     /**
-     * Malformed, oversized, duplicate-name, wrong-type and newer-version files each say why and
-     * change nothing: no preview, no write, the switches as they were.
+     * Malformed, oversized, duplicate-name, wrong-type, newer-version and word-lists-past-their-room
+     * files each say why and change nothing: no preview, no write, the switches as they were.
      */
     @Test
     public void aRefusedFileSaysWhyAndChangesNothing() throws Exception {
@@ -2026,6 +2108,11 @@ public class SettingsBackupTest {
         files.put(wrongType.toString(), SettingsBackup.Reason.VALUE);
         files.put(new JSONObject(good).put("schema", 2).toString(), SettingsBackup.Reason.SCHEMA);
         files.put(new JSONObject(good).put("format", "something else").toString(), SettingsBackup.Reason.FORMAT);
+        JSONObject pastTheRoom = new JSONObject(good);
+        pastTheRoom.getJSONObject("settings")
+                .put(SettingsBackup.HIDDEN.key, PostWordsTest.asciiOfBytes(PostWords.MAX_LIST_BYTES / 2))
+                .put(SettingsBackup.KEPT.key, PostWordsTest.asciiOfBytes(PostWords.MAX_LIST_BYTES / 2 + 1));
+        files.put(pastTheRoom.toString(), SettingsBackup.Reason.WORDS);
         try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
             Activity activity = controller.get();
             HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
