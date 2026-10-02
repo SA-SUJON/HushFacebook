@@ -29,6 +29,7 @@ val reviewedNettyModules = setOf(
 allprojects {
     configurations.configureEach {
         val alignUtpNetty = name in utpNettyScopes
+        val alignUtpHttp = name == "_internal-unified-test-platform-android-test-plugin-result-listener-gradle"
         resolutionStrategy.eachDependency {
             if (requested.group == "org.bouncycastle") {
                 useVersion(reviewedBouncyCastle)
@@ -42,6 +43,11 @@ allprojects {
             if (alignUtpNetty && requested.group == "io.netty" && requested.name in reviewedNettyModules) {
                 useVersion("4.1.138.Final")
                 because("AGP's internal gRPC tooling must use the reviewed Netty security release.")
+            }
+            if (alignUtpHttp && requested.group == "org.apache.httpcomponents" &&
+                requested.name in setOf("httpclient", "httpmime")) {
+                useVersion("4.5.14")
+                because("UTP result-listener requests must not use HttpClient's affected URI authority parser.")
             }
         }
     }

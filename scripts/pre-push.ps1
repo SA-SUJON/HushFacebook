@@ -463,7 +463,7 @@ try {
     $toolingClasspathInputs = @(
         'build.gradle.kts', 'settings.gradle.kts', 'patches/build.gradle.kts',
         'gradle/libs.versions.toml', 'gradle/verification-metadata.xml', 'gradle/tooling-scopes.txt',
-        'scripts/ToolingClasspathSmoke.java', 'scripts/test-tooling-classpaths.ps1'
+        'scripts/ToolingClasspathSmoke.java', 'scripts/ToolingHttpSmoke.java', 'scripts/test-tooling-classpaths.ps1'
     )
     $touchesToolingClasspaths = @($paths | Where-Object { $_ -in $toolingClasspathInputs }).Count -gt 0
     $touchesCode = @($paths | Where-Object {
@@ -761,7 +761,7 @@ try {
                     if (-not (Test-Path -LiteralPath $compatibility -PathType Leaf)) {
                         throw 'scripts/test-tooling-classpaths.ps1 is missing from the dependency change being pushed.'
                     }
-                    Write-Step 'checking the resolved gRPC/Netty transports and Jetifier JDOM API'
+                    Write-Step 'checking the resolved gRPC/Netty transports, JDOM API and HttpClient/HttpMime'
                     $global:LASTEXITCODE = 0
                     if ($gateRoot -eq $Root) {
                         Invoke-WithoutGitEnvironment { & $compatibility -Root $gateRoot }

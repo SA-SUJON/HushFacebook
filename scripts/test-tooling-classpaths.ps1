@@ -1,4 +1,4 @@
-<# Exercise the resolved UTP gRPC transports and Jetifier's JDOM API without a device. #>
+<# Exercise resolved UTP gRPC/HTTP transports and Jetifier's JDOM API without a device. #>
 [CmdletBinding()]
 param([string]$Root, [string]$Report, [string]$Java)
 $ErrorActionPreference = 'Stop'
@@ -97,4 +97,23 @@ try {
     }
     Write-Host "[tooling] JDOM $($jdom[0].version) in settings/buildscript/classpath"
     Invoke-ToolingJava $Java @('-cp', ($work + $separator + (Get-ToolingClasspath 'settings/buildscript/classpath')), 'ToolingClasspathSmoke$Xml')
+    $listeners = @($tooling.Scopes | Where-Object { $_.id.EndsWith('/configuration/_internal-unified-test-platform-android-test-plugin-result-listener-gradle') })
+    if ($listeners.Count -ne 3 -or @($listeners | Where-Object { $_.status -cne 'resolved' }).Count) {
+        throw 'The compatibility check requires all three resolved UTP result-listener graphs.'
+    }
+    $httpClasspath = $null
+    foreach ($scope in $listeners) {
+        $client = @($tooling.Components | Where-Object { $_.group -ceq 'org.apache.httpcomponents' -and $_.name -ceq 'httpclient' -and $_.scopes -ccontains $scope.id })
+        $mime = @($tooling.Components | Where-Object { $_.group -ceq 'org.apache.httpcomponents' -and $_.name -ceq 'httpmime' -and $_.scopes -ccontains $scope.id })
+        if ($client.Count -ne 1 -or $mime.Count -ne 1 -or $client[0].version -cne $mime[0].version -or
+            [version]$client[0].version -lt [version]'4.5.13' -or [version]$client[0].version -ge [version]'5.0.0') {
+            throw 'The UTP result-listener needs aligned, fixed HttpClient/HttpMime 4.x modules.'
+        }
+        $classpath = Get-ToolingClasspath $scope.id
+        if ($httpClasspath -and $httpClasspath -cne $classpath) { throw 'UTP result-listener graphs have different verified artifacts.' }
+        $httpClasspath = $classpath
+    }
+    Write-Host "[tooling] HttpClient/HttpMime $($client[0].version) in UTP result-listener tooling"
+    Invoke-ToolingJava $javac @('--release', '8', '-cp', $httpClasspath, '-d', $work, (Join-Path $PSScriptRoot 'ToolingHttpSmoke.java'))
+    Invoke-ToolingJava $Java @('-cp', ($work + $separator + $httpClasspath), 'ToolingHttpSmoke')
 } finally { Remove-GeneratedPath -Path $work -Root $tempRoot }

@@ -4,6 +4,8 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+- Align the Android test result-listener's HttpClient and HttpMime with 4.5.14. The compatibility gate rejects malformed URI authorities that the old parser routed to a host, while checking ordinary host selection and multipart report construction.
+
 - Update the Android test transports to Netty 4.1.138.Final and Jetifier's settings dependency to JDOM2 2.0.6.1. Dependency changes now exercise both gRPC transports and the JDOM parser before a push, using the resolved artifact hashes. The shipping payload and Android plugin pairing stay the same.
 
 - Record resolved settings-plugin, build and test dependency graphs separately from the payload SBOM. New release receipts bind the tooling report to their source and bundle, and publication refuses skipped audits, serious advisories and expired applicability reviews. Align Guava, Commons Lang and jose4j with their reviewed fixes.

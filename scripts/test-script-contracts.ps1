@@ -2410,7 +2410,7 @@ try {
 
     foreach ($toolingInput in @('build.gradle.kts', 'settings.gradle.kts', 'patches/build.gradle.kts',
             'gradle/libs.versions.toml', 'gradle/verification-metadata.xml', 'gradle/tooling-scopes.txt',
-            'scripts/ToolingClasspathSmoke.java', 'scripts/test-tooling-classpaths.ps1')) {
+            'scripts/ToolingClasspathSmoke.java', 'scripts/ToolingHttpSmoke.java', 'scripts/test-tooling-classpaths.ps1')) {
         Invoke-Hook -Paths @($toolingInput)
         Assert-True ((Get-Content -LiteralPath $buildMarker -Raw) -like '*:patches:releaseTooling*' -and
             (Test-Path -LiteralPath $toolingMarker)) `
