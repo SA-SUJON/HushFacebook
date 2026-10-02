@@ -398,6 +398,8 @@ The bundle lands in `patches/build/release/patches-<version>.mpp`, beside its SH
 
 Tests: `./gradlew :patches:test :extensions:facebook:testDebugUnitTest`. Set `HUSHFACEBOOK_FIXTURE_DIR` to a folder holding the Facebook bundles to run the tests that read real builds. Without it they skip and say so.
 
+The MP4 join test also reads packets and decodes real H.264, AV1, VP9 and AAC tracks. Install FFmpeg with the `libx264`, `libsvtav1` and `libvpx-vp9` encoders, and put `ffmpeg` and `ffprobe` on PATH. To choose executable files explicitly, set `HUSHFACEBOOK_TEST_FFMPEG` and `HUSHFACEBOOK_TEST_FFPROBE` to their full paths. An explicit path that doesn't exist or isn't executable fails the test. Missing optional tools on a local checkout skip the named codec test and count as one skipped test. Release validation refuses skipped runtime tests, including this one.
+
 To apply every patch to a real build and check the result, run `scripts/verify-all-patches.ps1 -Apk <facebook .apkm> -DesktopJar <morphe-desktop jar> -WorkDir <scratch folder>`. It holds the patched resource table to Meta's. It also checks the code the patches inject for the shapes Android's verifier rejects, such as branches into the middle of an instruction, calls with the wrong registers, values read at the wrong width and broken try ranges. And it requires exactly one feed guard where Facebook adds a post to the feed, since two stacked there broke builds before, and exactly one more where Facebook swaps a post in over another one, because those swaps never pass the first. These rules are this project's, not the verifier's. [CONTRIBUTING.md](CONTRIBUTING.md) has the rest.
 
 ## License
