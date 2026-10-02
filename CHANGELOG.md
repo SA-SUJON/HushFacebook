@@ -4,6 +4,8 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+- Update the Android test transports to Netty 4.1.138.Final and Jetifier's settings dependency to JDOM2 2.0.6.1. Dependency changes now exercise both gRPC transports and the JDOM parser before a push, using the resolved artifact hashes. The shipping payload and Android plugin pairing stay the same.
+
 - Record resolved settings-plugin, build and test dependency graphs separately from the payload SBOM. New release receipts bind the tooling report to their source and bundle, and publication refuses skipped audits, serious advisories and expired applicability reviews. Align Guava, Commons Lang and jose4j with their reviewed fixes.
 
 * **Docs:** Troubleshooting now reflects the confirmed Media settings, WhatsApp-compatible saves and top-bar Reels results. The original-quality Xiaomi Gallery file and the separate RTL and other top-layout checks remain open.

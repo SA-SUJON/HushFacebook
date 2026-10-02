@@ -399,6 +399,8 @@ The bundle lands in `patches/build/release/patches-<version>.mpp`, beside its SH
 
 Source builds also write `patches-<version>.tooling.json`. It records the resolved settings-plugin, project build and test dependencies, with their graphs and artifact hashes. The report binds to the bundle hash, source commit and `gradle/tooling-scopes.txt`. The payload SBOM keeps its existing shipping scope.
 
+Dependency changes also run `pwsh -File scripts/test-tooling-classpaths.ps1` after `:patches:releaseTooling`. This check loads the report's hash-matched cached JARs, sends a real loopback request through both resolved gRPC/Netty transports and exercises Jetifier's JDOM parser API. It needs a JDK and no device. Pre-push runs it when the tooling inputs change. Netty overrides stay in the six UTP transport configurations, and the JDOM override stays in the settings-plugin classpath.
+
 New schema-3 release receipts require this tooling report and a completed advisory audit. Publish the report beside the bundle and list its hash in `SHA256SUMS.txt`. The publication check downloads and audits it again. HIGH, CRITICAL and unscored findings require remediation or an explained applicability review in `scripts/tooling-advisory-exceptions.txt`, expiring within 90 days. Affected Guava versions require the same review despite the vendor's Moderate rating, even when OSV has no match. Skipping the tooling audit permits a local receipt, but that receipt cannot authorize publication. Older releases retain their receipt's original schema.
 
 Tests: `./gradlew :patches:test :extensions:facebook:testDebugUnitTest`. Set `HUSHFACEBOOK_FIXTURE_DIR` to a folder holding the Facebook bundles to run the tests that read real builds. Without it they skip and say so.
