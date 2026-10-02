@@ -4,6 +4,8 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Facebook:** The diagnostic report has a new **Last screen left** section for the missing reel Download button (issue #18). Each time you leave a Facebook screen, it notes which kinds of views sit under two points at that screen's right edge, where a reel's buttons are, by class and resource name only. Nothing the screen says goes in. Reports from affected phones showed neither of the two sidebars the button goes into, so a report taken after leaving one of those reels (press Home while it's on screen, then open Hushfacebook settings and export) should show what draws their buttons instead.
+
 * **Facebook:** When Meta App Manager is on your phone and Facebook's web addresses don't open in Hushfacebook, a new **Meta App Manager** row under Supported links opens App Manager's link page (issue #30). App Manager comes preinstalled on many phones and Android verifies it for facebook.com, so the switches on Hushfacebook's own Open by default page kept turning themselves back off. Turn off Open supported links for App Manager, then select the addresses for Hushfacebook. Diagnostic reports now say whether App Manager is installed and enabled.
 
 * **Facebook:** New **Force dark mode** switch under Appearance keeps Facebook dark whatever its own Dark mode setting says (issue #64). Facebook's Settings page comes from its servers, and on some tablets it has no Dark mode row at all, so there was no way to turn it on. The switch starts off. Turn it on and restart Facebook, and both dark themes follow it too. Pause Hushfacebook and Facebook goes back to its own setting once it restarts. Export settings carries the switch.
