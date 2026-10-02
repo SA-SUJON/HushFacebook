@@ -6,7 +6,7 @@ Every Hushfacebook release, newest first.
 
 - Include each declared domain's supported-link state in copied and saved diagnostic reports, with link-handling permission and explicit unavailable states. Unicode domain labels, including combining marks, survive only in their structured manifest-state lines; visited URLs and other report data keep their privacy filters. Link ownership is read without changing it.
 
-- Enforce the real-codec test's subprocess deadline during execution, including owned descendants. Temporary output files retain failure diagnostics without waiting for a pipe to close. Regression checks cover hanging tools, orphaned descendants, nonzero exits and complete large output.
+- Enforce the real-codec test's subprocess deadline during execution. Temporary output files retain failure diagnostics without waiting for a pipe to close. Regression checks cover hanging tools, tracked descendants, nonzero exits and complete large output. A parent that exits between polls can still leave an untracked child; this remains under investigation.
 
 - Reuse expanded fixture DEX files between patch-anchor scans. The temporary cache checks the bundle's content hash and every reused DEX, refuses changed or corrupt bytes, and cleans up when the test worker exits. Existing checks still run on both exact Facebook builds.
 
