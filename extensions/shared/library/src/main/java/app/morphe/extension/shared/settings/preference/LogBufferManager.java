@@ -480,7 +480,7 @@ public final class LogBufferManager {
                 String host = arrow < 0 ? "" : line.substring(0, arrow);
                 String state = arrow < 0 ? "" : line.substring(arrow + 4);
                 boolean domainState = declared != null && declared.contains(host)
-                        && host.matches("[\\p{L}\\p{N}_.*-]+")
+                        && host.matches("[\\p{L}\\p{M}\\p{N}_.*-]+")
                         && (state.equals("verified") || state.equals("selected") || state.equals("none") || state.equals("unknown"));
                 sectionText.append(domainState ? line : DiagnosticRedactor.redact(line)).append('\n');
             }

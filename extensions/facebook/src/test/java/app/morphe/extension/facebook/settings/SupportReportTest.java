@@ -138,6 +138,7 @@ public class SupportReportTest {
         Map<String, Integer> hosts = new LinkedHashMap<>();
         hosts.put("www.facebook.com", DomainVerificationUserState.DOMAIN_STATE_SELECTED);
         hosts.put("m.facebook.com", DomainVerificationUserState.DOMAIN_STATE_NONE);
+        hosts.put("z\u0301.facebook.com", DomainVerificationUserState.DOMAIN_STATE_SELECTED);
         DomainVerificationUserState user = ReflectionHelpers.callConstructor(DomainVerificationUserState.class,
                 ClassParameter.from(UUID.class, UUID.randomUUID()), ClassParameter.from(String.class, context.getPackageName()),
                 ClassParameter.from(UserHandle.class, Process.myUserHandle()), ClassParameter.from(boolean.class, false),
@@ -158,6 +159,7 @@ public class SupportReportTest {
         for (String report : bothExports()) {
             assertBuildFacts(report);
             assertTrue(report, report.contains("\nlink_handling_allowed: false\nm.facebook.com -> none\nwww.facebook.com -> selected\n"));
+            assertTrue("combining-mark domain omitted or redacted", report.contains("\nz\u0301.facebook.com -> selected\n"));
             assertTrue("duplicate supported-link section", report.indexOf("[SUPPORTED LINKS]") == report.lastIndexOf("[SUPPORTED LINKS]"));
             assertFalse(report.contains("http://") || report.contains("https://") || report.contains("certificate:"));
         }
@@ -167,6 +169,7 @@ public class SupportReportTest {
             assertTrue("event filters or a long crash hid link state", report.contains(
                     "\nlink_handling_allowed: false\nm.facebook.com -> none\nwww.facebook.com -> selected\n"));
             assertFalse("patch sections ignored the selected filter", report.contains("[PATCHES]"));
+            assertTrue("combining-mark domain omitted or redacted", report.contains("\nz\u0301.facebook.com -> selected\n"));
             assertTrue("link state follows a potentially truncated crash", report.indexOf("[SUPPORTED LINKS]") < report.indexOf("[LATEST JAVA CRASH]"));
         }
         assertTrue("both report paths must query the live state", reads.get() >= 2);

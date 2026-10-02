@@ -154,8 +154,9 @@ public class SupportedLinksTest {
         hosts.put("m.facebook.com", NONE);
         hosts.put("future.facebook.com", 99);
         hosts.put("münchen.facebook.com", SELECTED);
+        hosts.put("ki\u0301.facebook.com", SELECTED);
         assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: true",
-                "*.fbsbx.com -> verified", "future.facebook.com -> unknown", "m.facebook.com -> none",
+                "*.fbsbx.com -> verified", "future.facebook.com -> unknown", "ki\u0301.facebook.com -> selected", "m.facebook.com -> none",
                 "münchen.facebook.com -> selected", "www.facebook.com -> selected", "z.facebook.com -> unknown"),
                 reportFor(state(true, hosts)));
         for (String name : askedFor) assertEquals(RuntimeEnvironment.getApplication().getPackageName(), name);

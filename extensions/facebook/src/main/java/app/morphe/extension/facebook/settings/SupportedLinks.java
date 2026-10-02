@@ -96,7 +96,7 @@ final class SupportedLinks {
                     for (Map.Entry<String, Integer> host : hosts.entrySet()) {
                         String name = host.getKey();
                         // Keep Unicode/wildcard manifest hosts, but refuse URLs, userinfo and line injection.
-                        if (name == null || name.isEmpty() || !name.matches("[\\p{L}\\p{N}_.*-]+")) {
+                        if (name == null || name.isEmpty() || !name.matches("[\\p{L}\\p{M}\\p{N}_.*-]+")) {
                             invalid = true;
                             continue;
                         }
