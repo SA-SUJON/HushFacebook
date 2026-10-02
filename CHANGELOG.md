@@ -2,6 +2,10 @@
 
 Every Hushfacebook release, newest first.
 
+## Unreleased
+
+* **Facebook:** Marketplace search now limits the size and depth of an answer before building its result tree. A large complete answer could bypass the old limit, and deeply nested data could exhaust the parser stack. When a limit is reached, its listings stay available and deferred fields still reach the correct result after an earlier ad was removed. Diagnostics count the reason without recording search content.
+
 ## 0.6.0 (2026-10-01)
 
 * **Facebook:** This release gathers everything since v0.5.0: 59 patches for Facebook 580 and 577, up from 51. The eight new ones are `Hide Meta AI questions under posts`, `Keep post dates`, `Hide post prompts`, `Hide reel interest prompts`, `Hide affiliate product links`, `Hide the Feeds header`, `Tab bar at the bottom` and `Start on x86 devices`. The first five start on. `Hide the Feeds header` and `Tab bar at the bottom` go in with their switches off, and `Start on x86 devices` has no switch.
