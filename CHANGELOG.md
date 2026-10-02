@@ -10,6 +10,8 @@ Every Hushfacebook release, newest first.
 
 - Give the settings rows their own classes instead of borrowing the settings page's name, so code outside the settings package can't reach them and tests name them where they live. The page now keeps its Downloads section to itself. The translation check also reads a row helper called through the page's name, which it used to skip.
 
+- Stop the injected-register device check from clearing the log of a shared phone or emulator. It writes a line of its own to the log before dex2oat runs and counts only what comes after it, and it refuses the run when that line has already rolled out of the buffer. The fixture suite's fake ADB fails on any log clear and puts another run's lines ahead of the marker, so a tally that counts them fails too.
+
 - Review a new GPL Facebook Lite candidate, four forks and changed branch history. Shared Messenger compatibility constants now have a watch path. The 2026-10-02 census keeps historical and licensing restrictions and its public counts match the records. Global GitLab code search is still unverified and recorded as skipped.
 
 - All 59 patches were verified on both supported Facebook builds with English, Arabic and Persian patcher locales. Each run passed the manifest, resource-table and injected-code checks, and every generated DEX matched the English run byte for byte. Existing instruction formatting already meets this requirement.
