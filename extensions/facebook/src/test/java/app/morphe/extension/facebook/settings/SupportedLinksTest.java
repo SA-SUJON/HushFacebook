@@ -42,6 +42,7 @@ import org.robolectric.util.ReflectionHelpers.ClassParameter;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -136,6 +137,67 @@ public class SupportedLinksTest {
         Preference row = show(true).findPreference(KEY);
         assertNotNull("no Supported links row", row);
         return String.valueOf(row.getSummary());
+    }
+
+    private List<String> reportFor(Object answer) throws ClassNotFoundException {
+        this.answer = answer;
+        controller = Robolectric.buildActivity(Activity.class).setup();
+        installService(controller.get().getBaseContext());
+        return SupportedLinks.reportLines(controller.get());
+    }
+
+    @Test public void reportsEveryDomainInStableOrderWithExplicitUnknownStates() throws Exception {
+        Map<String, Integer> hosts = new LinkedHashMap<>();
+        hosts.put("z.facebook.com", null);
+        hosts.put("www.facebook.com", SELECTED);
+        hosts.put("*.fbsbx.com", VERIFIED);
+        hosts.put("m.facebook.com", NONE);
+        hosts.put("future.facebook.com", 99);
+        hosts.put("münchen.facebook.com", SELECTED);
+        assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: true",
+                "*.fbsbx.com -> verified", "future.facebook.com -> unknown", "m.facebook.com -> none",
+                "münchen.facebook.com -> selected", "www.facebook.com -> selected", "z.facebook.com -> unknown"),
+                reportFor(state(true, hosts)));
+        for (String name : askedFor) assertEquals(RuntimeEnvironment.getApplication().getPackageName(), name);
+    }
+
+    @Test public void disabledLinkHandlingDoesNotEraseDomainSelectionsOrChangeOwnership() throws Exception {
+        Map<String, Integer> hosts = hosts(SELECTED, NONE);
+        Map<String, Integer> before = new LinkedHashMap<>(hosts);
+        assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: false",
+                "m.facebook.com -> none", "www.facebook.com -> selected"), reportFor(state(false, hosts)));
+        assertEquals(before, hosts);
+    }
+
+    @Test public void anEmptyDomainMapIsDistinctFromAnUnreadableService() throws Exception {
+        assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: true", "domains: none_declared"),
+                reportFor(state(true, new LinkedHashMap<>())));
+    }
+
+    @Test public void aNullServiceAnswerIsExplicitlyUnknown() throws Exception {
+        assertEquals(Arrays.asList("availability: unknown", "link_handling_allowed: unknown", "domains: unknown"), reportFor(null));
+    }
+
+    @Test public void serviceFailuresDoNotPutTheirSensitiveMessageInReports() throws Exception {
+        List<String> report = reportFor(new IllegalStateException("https://www.facebook.com/private?account_id=999000111 certificate:AA:BB"));
+        assertEquals(Arrays.asList("availability: unknown", "link_handling_allowed: unknown", "domains: unknown"), report);
+    }
+
+    @Test public void invalidHostDataCannotInjectUrlsAccountFieldsOrCertificateFields() throws Exception {
+        Map<String, Integer> hosts = hosts(SELECTED, NONE);
+        hosts.put("https://www.facebook.com/private?account_id=999000111", VERIFIED);
+        hosts.put("certificate:AA:BB", VERIFIED);
+        hosts.put("account_id=999000111", VERIFIED);
+        hosts.put("host\nvisited-url", VERIFIED);
+        assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: true",
+                "domains: unknown (invalid host data)", "m.facebook.com -> none", "www.facebook.com -> selected"),
+                reportFor(state(true, hosts)));
+    }
+
+    @Test @Config(sdk = 30) public void android11ReportsThatTheStateCannotBeRead() {
+        assertEquals(Arrays.asList("availability: not_reported (API below 31)", "link_handling_allowed: not_reported",
+                "domains: not_reported"), SupportedLinks.reportLines(RuntimeEnvironment.getApplication()));
+        assertTrue(askedFor.isEmpty());
     }
 
     @Test

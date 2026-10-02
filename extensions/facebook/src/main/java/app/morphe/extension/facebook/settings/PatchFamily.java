@@ -344,6 +344,7 @@ public enum PatchFamily {
      */
     public static void registerDiagnostics() {
         LogBufferManager.registerReportSection(REPORT);
+        LogBufferManager.registerReportSection(SupportedLinks.REPORT);
         for (PatchFamily family : values()) {
             if (family.switches.isEmpty()) HookStatus.runsWhilePaused(family.patchName);
         }
