@@ -4,6 +4,8 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+- Keep retired Facebook sources separate from active records while retaining their reachable historical code and license evidence. The census now checks whether a watched path still exists, so its deletion commit can't be mistaken for current Facebook code. A returning source or lost historical pin requires review.
+
 - Include each declared domain's supported-link state in copied and saved diagnostic reports, with link-handling permission and explicit unavailable states. Unicode domain labels, including combining marks, survive only in their structured manifest-state lines; visited URLs and other report data keep their privacy filters. Link ownership is read without changing it.
 
 - Enforce the real-codec test's subprocess deadline during execution. Temporary output files retain failure diagnostics without waiting for a pipe to close. Regression checks cover hanging tools, tracked descendants, nonzero exits and complete large output. A parent that exits between polls can still leave an untracked child; this remains under investigation.

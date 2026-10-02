@@ -313,24 +313,29 @@
       "branches": [
         {
           "name": "main",
-          "commit": "a3152bfc4b204f92e1ed165918d596d46f8cee13"
+          "commit": "4b5ce29fdbabc7417ed5f4c2108cdf24692896b0"
         },
         {
           "name": "dev",
-          "commit": "a3152bfc4b204f92e1ed165918d596d46f8cee13"
+          "commit": "4b5ce29fdbabc7417ed5f4c2108cdf24692896b0"
         }
       ],
       "watchPaths": [
         "patches/src/main/kotlin/app/facebook"
       ],
+      "availability": {
+        "status": "retired",
+        "reason": "The Facebook source directory was deleted on 2026-09-28. Commit a3152bfc4b204f92e1ed165918d596d46f8cee13 still resolves, but its Facebook directory answers 404. Current main and dev contain unrelated app patches. The pinned history retains the 11 Facebook 573 patches.",
+        "evidence": "https://github.com/mben25/morphe-patches/commit/a3152bfc4b204f92e1ed165918d596d46f8cee13"
+      },
       "license": {
         "spdx": "GPL-3.0",
-        "url": "https://github.com/mben25/morphe-patches/blob/b0995bbca5d9b3b5e4f8fed410c1a9118ff24f14/LICENSE",
+        "url": "https://github.com/mben25/morphe-patches/blob/4b5ce29fdbabc7417ed5f4c2108cdf24692896b0/LICENSE",
         "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
       },
       "contaminatedBy": null,
       "disposition": "candidate",
-      "reason": "A GPL-3.0 copy of Froggo's Facebook 573 patches inside a multi-app bundle, with the clearest current 11-patch source and a Material You resource map. Only its Facebook folder is watched.",
+      "reason": "A historical GPL-3.0 copy of Froggo's 11 Facebook 573 patches inside a multi-app bundle, with a Material You resource map. The source is retired and its reachable Facebook history is retained. Only its Facebook folder is watched.",
       "archived": false,
       "forks": [],
       "contentHashes": [],
