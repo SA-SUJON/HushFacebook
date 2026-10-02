@@ -208,7 +208,8 @@ class SharedPermissionsFixtureTest {
     /**
      * Each declared build as Morphe's Clone app leaves it after the default patches, with each of
      * its two options on and off, then followed by this bundle: nothing names a permission only the
-     * stock app declares, and no authority is one the stock app claims. Two things the runtime half
+     * stock app declares, no authority is one the stock app claims, and nothing it declares is one
+     * Meta's own Facebook declares, so it installs beside that too (#60). Two things the runtime half
      * takes for granted are pinned too: every authority is under Facebook's package, which is what
      * the extension moves, and every process is named after the package, which is how it learns
      * the clone's name before Facebook has a context.
@@ -224,6 +225,9 @@ class SharedPermissionsFixtureTest {
                 val stock = documentOf(xml.duplicate()).apply { renameSharedPermissions() }
                 val stockDeclared = stock.elements("permission").map { it.getAttribute("android:name") }.toSet()
                 val stockAuthorities = stock.ownAuthorities(FACEBOOK)
+                val stockPermissions = stock.ownPermissions(FACEBOOK)
+                val metaDeclared = documentOf(xml.duplicate()).elements("permission").map { it.getAttribute("android:name") }.toSet()
+                assertEquals("${bundle.name}: Facebook's own permissions", 5, stockPermissions.size)
                 assertEquals("${bundle.name}: authorities outside $FACEBOOK", emptyList<String>(),
                     stock.authorities().filterNot { it.trim() in stockAuthorities })
                 assertTrue("${bundle.name}: the dedup provider", "$FACEBOOK.ClientMessagePushDedupInfoProvider" in stockAuthorities)
@@ -237,9 +241,11 @@ class SharedPermissionsFixtureTest {
                         document.renameSharedPermissions()
                         document.cloneApp(clone, permissions, providers)
 
-                        document.followRenamedPackage(FACEBOOK, stockAuthorities)
+                        document.followRenamedPackage(FACEBOOK, stockAuthorities, stockPermissions)
 
                         val declared = document.elements("permission").map { it.getAttribute("android:name") }.toSet()
+                        assertEquals("$where: declarations Meta's Facebook owns", emptySet<String>(), declared.intersect(metaDeclared))
+                        assertEquals("$where: declarations", stockDeclared.size, declared.size)
                         val strays = document.elements("*").flatMap { element ->
                             (0 until element.attributes.length).map { element.attributes.item(it) as Attr }
                                 .filterNot { element.tagName == "permission" && it.name == "android:name" }
