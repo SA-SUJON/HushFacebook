@@ -162,8 +162,10 @@ class OwnFontFixtureTest {
      * `LX/302;->A0k`) are among them. A read that's also set on a paint goes to the extension, and
      * its check compares the very typeface it then sets, as AppCompat's switch does to see whether
      * its paint has that one already. Each build has that switch, and its check has to see the
-     * picked file too: one still asking about Android's would skip the set on a paint that holds
-     * Android's typeface, and the switch would keep it.
+     * picked file too, since it asks about the value it's about to set, not about Android's.
+     *
+     * The only static call either build's reads reach is Kotlin's areEqual, so that's pinned too: a
+     * new one turning up is a call the rule hasn't been checked against on real code.
      */
     @Test
     fun `every check of whether a typeface is Android's default still asks about Android's`() = bundles { bundle ->
@@ -210,6 +212,19 @@ class OwnFontFixtureTest {
         assertTrue("${bundle.name}: no check goes through Kotlin's areEqual", throughKotlin >= 1)
         assertTrue("${bundle.name}: no read is both checked and set on a paint", alsoSet >= 1)
         assertTrue("${bundle.name}: Litho's text paint isn't among them", checkers.any { it.returnType == TEXT_PAINT })
+        val staticCalls = readers.flatMap { method ->
+            val code = method.implementation!!.instructions.toList()
+            code.indices.filter { defaultRead(code[it]) in DEFAULT_TYPEFACES }.flatMap { at ->
+                method.literalReads(at).mapNotNull { use ->
+                    ((code[use] as? ReferenceInstruction)?.reference as? MethodReference)?.takeIf { call ->
+                        (code[use].opcode == Opcode.INVOKE_STATIC || code[use].opcode == Opcode.INVOKE_STATIC_RANGE) &&
+                            call.returnType == "Z" && call.parameterTypes.map(CharSequence::toString) == listOf(OBJECT_TYPE, OBJECT_TYPE)
+                    }
+                }
+            }
+        }.distinctBy { it.toString() }
+        assertEquals("${bundle.name}: static two-object calls a default read reaches: $staticCalls", 1, staticCalls.size)
+        assertTrue("${bundle.name}: ${staticCalls.single()} isn't taken for a compare", isEquality(staticCalls.single()))
 
         val owners = FixtureDex.classes(bundle, checkers.map { it.definingClass }.toSet() + staticCheckTypes(checkers))
         val context = PatchContexts.of(owners.values)
