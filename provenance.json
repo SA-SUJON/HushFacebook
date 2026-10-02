@@ -173,6 +173,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/theme/ForceDarkMode.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/layout/theme/ForceDarkModePatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Force dark mode, a switch that has Facebook's dark mode controller answer dark whatever its own setting says, for tablets whose Facebook settings have no Dark mode row (issue #64)."
+    },
+    {
+      "paths": [
         "extensions/shared/library/src/main/java/app/morphe/extension/shared/L10nTranslations.java"
       ],
       "origin": "original",

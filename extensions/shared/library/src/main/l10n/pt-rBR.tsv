@@ -78,6 +78,10 @@ Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook a
 Tab bar at the bottom	Barra de abas embaixo
 # context: description of that switch; Facebook shows the tab bar at the top of the screen on some accounts and at the bottom on others
 Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.	Coloca a barra de abas do Facebook na parte de baixo da tela nas contas que a têm em cima. Reinicie o Facebook depois de alterar esta opção.
+# context: switch title under Appearance; it keeps Facebook's dark mode on whatever Facebook's own Dark mode setting says
+Force dark mode	Forçar modo escuro
+# context: description of that switch; on some tablets Facebook's own Settings page has no Dark mode row
+Keep Facebook in dark mode whatever its own setting says, for tablets where Facebook's settings have no Dark mode. Restart Facebook after changing it.	Mantém o Facebook no modo escuro, seja qual for a configuração dele, para tablets em que as configurações do Facebook não têm o Modo escuro. Reinicie o Facebook depois de alterar esta opção.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Usa a fonte do seu dispositivo ou um arquivo escolhido abaixo. Reinicie o Facebook depois de alterar esta opção.
 Font file	Arquivo de fonte
 Use your phone's font	Usar a fonte do celular

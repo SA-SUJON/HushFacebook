@@ -78,6 +78,10 @@ Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook a
 Tab bar at the bottom	Bilah tab di bawah
 # context: description of that switch; Facebook shows the tab bar at the top of the screen on some accounts and at the bottom on others
 Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.	Memindahkan bilah tab Facebook ke bagian bawah layar pada akun yang menampilkannya di atas. Mulai ulang Facebook setelah mengubahnya.
+# context: switch title under Appearance; it keeps Facebook's dark mode on whatever Facebook's own Dark mode setting says
+Force dark mode	Paksa mode gelap
+# context: description of that switch; on some tablets Facebook's own Settings page has no Dark mode row
+Keep Facebook in dark mode whatever its own setting says, for tablets where Facebook's settings have no Dark mode. Restart Facebook after changing it.	Membuat Facebook tetap dalam mode gelap apa pun pengaturannya sendiri, untuk tablet yang pengaturan Facebook-nya tidak memiliki Mode gelap. Mulai ulang Facebook setelah mengubahnya.
 Use your phone's font or a file chosen below. Restart Facebook after changing it.	Gunakan font ponsel atau file yang dipilih di bawah. Mulai ulang Facebook setelah mengubahnya.
 Font file	File font
 Use your phone's font	Gunakan font ponsel

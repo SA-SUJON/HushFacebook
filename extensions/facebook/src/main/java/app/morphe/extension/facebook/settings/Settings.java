@@ -493,6 +493,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_bottom_tab_bar", FALSE, true);
 
     /**
+     * Facebook's dark mode controller answers dark whatever its own setting says
+     * ({@link app.morphe.extension.facebook.theme.ForceDarkMode}), for tablets whose Facebook
+     * settings have no Dark mode row. Facebook asks as each screen applies its theme, so a change
+     * shows fully after a restart.
+     */
+    public static final BooleanSetting FORCE_DARK_MODE =
+            new BooleanSetting("hushfacebook_force_dark_mode", FALSE, true);
+
+    /**
      * The strip some posts carry ("Are you interested in this post?", "Show less", who recently
      * commented, follow and chat suggestions) goes, and so does the room kept for it
      * ({@link app.morphe.extension.facebook.feed.PostPrompts}). A change shows on the posts drawn

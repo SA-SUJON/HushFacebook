@@ -151,6 +151,7 @@ public final class SettingsBackup {
             Settings.HIDE_REELS_TAB,
             Settings.HIDE_REELS_TAB_DOT,
             Settings.BOTTOM_TAB_BAR,
+            Settings.FORCE_DARK_MODE,
             Settings.HIDE_REEL_PROMPTS,
             Settings.HIDE_GET_MESSENGER_CARD,
             Settings.OPEN_MESSENGER_APP,
