@@ -4,6 +4,8 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+- Enforce the real-codec test's subprocess deadline during execution, including owned descendants. Temporary output files retain failure diagnostics without waiting for a pipe to close. Regression checks cover hanging tools, orphaned descendants, nonzero exits and complete large output.
+
 - Reuse expanded fixture DEX files between patch-anchor scans. The temporary cache checks the bundle's content hash and every reused DEX, refuses changed or corrupt bytes, and cleans up when the test worker exits. Existing checks still run on both exact Facebook builds.
 
 - Align the Android test result-listener's HttpClient and HttpMime with 4.5.14. The compatibility gate rejects malformed URI authorities that the old parser routed to a host, while checking ordinary host selection and multipart report construction.
