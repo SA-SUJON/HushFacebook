@@ -23,6 +23,8 @@ A source with no licence, or one whose licence can't be combined with GPL-3.0, i
 
 The audit never downloads anyone's code. It reads what the forges' APIs say about a repository and hashes licence text in memory. The only files it writes are its report and the ledger's dates.
 
+Global GitLab code search wasn't run in the 2026-10-02 audit. The ledger retains that skip. All recorded GitLab sources were read; complete search coverage still needs a credentialed run.
+
 ## The two Facebook sources that matter
 
 **[andrewliang25/morphe-patches](https://github.com/andrewliang25/morphe-patches)** (GPL-3.0) targets Facebook 577.0.0.50.72. It's the careful one. Facebook renames almost every class on every weekly release, and Andrew's patches never write one of those names down. They find what they need through names Facebook keeps (GraphQL models, log strings, enum names, method shapes) and fail loudly at patch time when an anchor moves, instead of shipping a patch that quietly does nothing. Most of Hushfacebook's patches are ported from here, with fixes, from commit 5db2e57e. The file headers and [provenance.json](../provenance.json) say which ones. It's the only adopted source. The bundle also patches LINE, so the audit only watches its Facebook, shared and extension code.

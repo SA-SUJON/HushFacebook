@@ -4,7 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
-- Refresh the source census to 2026-10-02 after reviewing a new GPL Facebook Lite candidate, four forks and changed branch history. Shared Messenger compatibility constants now have a watch path. The census keeps historical and licensing restrictions and the public source counts match its records.
+- Review a new GPL Facebook Lite candidate, four forks and changed branch history. Shared Messenger compatibility constants now have a watch path. The 2026-10-02 census keeps historical and licensing restrictions and its public counts match the records. Global GitLab code search is still unverified and recorded as skipped.
 
 - All 59 patches were verified on both supported Facebook builds with English, Arabic and Persian patcher locales. Each run passed the manifest, resource-table and injected-code checks, and every generated DEX matched the English run byte for byte. Existing instruction formatting already meets this requirement.
 
