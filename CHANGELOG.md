@@ -4,6 +4,8 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+* **Facebook:** When Meta App Manager is on your phone and Facebook's web addresses don't open in Hushfacebook, a new **Meta App Manager** row under Supported links opens App Manager's link page (issue #30). App Manager comes preinstalled on many phones and Android verifies it for facebook.com, so the switches on Hushfacebook's own Open by default page kept turning themselves back off. Turn off Open supported links for App Manager, then select the addresses for Hushfacebook. Diagnostic reports now say whether App Manager is installed and enabled.
+
 * **Facebook:** New **Force dark mode** switch under Appearance keeps Facebook dark whatever its own Dark mode setting says (issue #64). Facebook's Settings page comes from its servers, and on some tablets it has no Dark mode row at all, so there was no way to turn it on. The switch starts off. Turn it on and restart Facebook, and both dark themes follow it too. Pause Hushfacebook and Facebook goes back to its own setting once it restarts. Export settings carries the switch.
 
 * **Facebook:** A copy made with Morphe's **Clone app** now installs next to the official Facebook (issue #60). With Clone app's **Update permissions** off, which is how it comes, the copy kept five of Facebook's own permission names, and Android won't let a second app signed with another key declare them. Hushfacebook now moves those under the copy's own name and points everything that asks for one at the moved name, the same way it already moved the copy's providers.

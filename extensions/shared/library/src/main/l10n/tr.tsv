@@ -549,6 +549,14 @@ Android 11 doesn't say which links open here. Tap to open this app's settings, t
 Selecting links by hand	Bağlantıları elle seçme
 Android checks Facebook's links against Meta's signing key, which a re-signed build doesn't have. Selecting the addresses sends their links here again. It doesn't restore Meta's verification, and your other link settings stay as they are.	Android, Facebook'un bağlantılarını Meta'nın imzalama anahtarıyla denetler ve yeniden imzalanmış bir sürümde bu anahtar yoktur. Adresleri seçmek bağlantılarını yeniden buraya gönderir. Bu, Meta'nın doğrulamasını geri getirmez ve diğer bağlantı ayarlarınız olduğu gibi kalır.
 Android's settings for this app didn't open. Open App info from Facebook's icon, then Open by default.	Bu uygulamanın Android ayarları açılamadı. Facebook simgesinden Uygulama bilgileri'ni, ardından Varsayılan olarak aç'ı açın.
+# context: title of a row under Links; Meta App Manager is the name of Meta's preinstalled app, keep it as is
+Meta App Manager	Meta App Manager
+# context: that row once Facebook's web addresses go to this app
+Facebook's web addresses open here now.	Facebook'un web adresleri artık burada açılıyor.
+# context: that row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
+Meta App Manager can keep Facebook's web addresses for itself, so their links skip this app. Tap and turn off Open supported links there, then check Supported links above.	Meta App Manager, Facebook'un web adreslerini kendine alabilir ve bu durumda bağlantılar bu uygulamayı atlar. Dokunup oradaki “Desteklenen bağlantıları aç” seçeneğini kapatın, ardından yukarıdaki Desteklenen bağlantılar'ı kontrol edin.
+# context: message when Android's page for Meta App Manager doesn't open; "Open by default" is Android's page name
+Meta App Manager's settings didn't open. Find it in Android's app list with system apps shown, then Open by default.	Meta App Manager ayarları açılamadı. Sistem uygulamaları gösterilirken Android'in uygulama listesinde bulun, ardından Varsayılan olarak aç'ı açın.
 # context: message when a save starts and its notification can't show (Facebook's notifications or the saves channel are off); Downloads is the settings section that lists running saves, each with its own Cancel
 Saving... Cancel: Downloads in Hushfacebook.	Kaydediliyor... İptal: Hushfacebook'ta İndirmeler.
 # context: switch title under Reels and Watch; on, a double tap on a reel or a video doesn't like it

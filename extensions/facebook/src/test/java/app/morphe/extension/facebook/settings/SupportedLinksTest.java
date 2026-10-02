@@ -14,6 +14,8 @@ import static org.robolectric.Shadows.shadowOf;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.ResolveInfo;
 import android.content.pm.verify.domain.DomainVerificationManager;
 import android.content.pm.verify.domain.DomainVerificationUserState;
@@ -66,6 +68,11 @@ public class SupportedLinksTest {
     private static final int NONE = 0;
     private static final int SELECTED = 1;
     private static final int VERIFIED = 2;
+    /** The report's last line on a phone without Meta App Manager, as Robolectric's is. */
+    private static final String ABSENT = "meta_app_manager: absent";
+    private static final String APP_MANAGER_KEY = "action_app_manager_links";
+    private static final String APP_MANAGER_SUMMARY = "Meta App Manager can keep Facebook's web addresses for itself, "
+            + "so their links skip this app. Tap and turn off Open supported links there, then check Supported links above.";
 
     private ActivityController<Activity> controller;
     /** What the fake service answers, or throws. */
@@ -139,6 +146,16 @@ public class SupportedLinksTest {
         return String.valueOf(row.getSummary());
     }
 
+    /** Meta App Manager on the phone, enabled or not, as a system app it can't be uninstalled from. */
+    private static void installAppManager(boolean enabled) {
+        PackageInfo info = new PackageInfo();
+        info.packageName = SupportedLinks.APP_MANAGER;
+        info.applicationInfo = new ApplicationInfo();
+        info.applicationInfo.packageName = SupportedLinks.APP_MANAGER;
+        info.applicationInfo.enabled = enabled;
+        shadowOf(RuntimeEnvironment.getApplication().getPackageManager()).installPackage(info);
+    }
+
     private List<String> reportFor(Object answer) throws ClassNotFoundException {
         this.answer = answer;
         controller = Robolectric.buildActivity(Activity.class).setup();
@@ -157,7 +174,7 @@ public class SupportedLinksTest {
         hosts.put("ki\u0301.facebook.com", SELECTED);
         assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: true",
                 "*.fbsbx.com -> verified", "future.facebook.com -> unknown", "ki\u0301.facebook.com -> selected", "m.facebook.com -> none",
-                "münchen.facebook.com -> selected", "www.facebook.com -> selected", "z.facebook.com -> unknown"),
+                "münchen.facebook.com -> selected", "www.facebook.com -> selected", "z.facebook.com -> unknown", ABSENT),
                 reportFor(state(true, hosts)));
         for (String name : askedFor) assertEquals(RuntimeEnvironment.getApplication().getPackageName(), name);
     }
@@ -166,22 +183,22 @@ public class SupportedLinksTest {
         Map<String, Integer> hosts = hosts(SELECTED, NONE);
         Map<String, Integer> before = new LinkedHashMap<>(hosts);
         assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: false",
-                "m.facebook.com -> none", "www.facebook.com -> selected"), reportFor(state(false, hosts)));
+                "m.facebook.com -> none", "www.facebook.com -> selected", ABSENT), reportFor(state(false, hosts)));
         assertEquals(before, hosts);
     }
 
     @Test public void anEmptyDomainMapIsDistinctFromAnUnreadableService() throws Exception {
-        assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: true", "domains: none_declared"),
+        assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: true", "domains: none_declared", ABSENT),
                 reportFor(state(true, new LinkedHashMap<>())));
     }
 
     @Test public void aNullServiceAnswerIsExplicitlyUnknown() throws Exception {
-        assertEquals(Arrays.asList("availability: unknown", "link_handling_allowed: unknown", "domains: unknown"), reportFor(null));
+        assertEquals(Arrays.asList("availability: unknown", "link_handling_allowed: unknown", "domains: unknown", ABSENT), reportFor(null));
     }
 
     @Test public void serviceFailuresDoNotPutTheirSensitiveMessageInReports() throws Exception {
         List<String> report = reportFor(new IllegalStateException("https://www.facebook.com/private?account_id=999000111 certificate:AA:BB"));
-        assertEquals(Arrays.asList("availability: unknown", "link_handling_allowed: unknown", "domains: unknown"), report);
+        assertEquals(Arrays.asList("availability: unknown", "link_handling_allowed: unknown", "domains: unknown", ABSENT), report);
     }
 
     @Test public void invalidHostDataCannotInjectUrlsAccountFieldsOrCertificateFields() throws Exception {
@@ -191,13 +208,13 @@ public class SupportedLinksTest {
         hosts.put("account_id=999000111", VERIFIED);
         hosts.put("host\nvisited-url", VERIFIED);
         assertEquals(Arrays.asList("availability: reported", "link_handling_allowed: true",
-                "domains: unknown (invalid host data)", "m.facebook.com -> none", "www.facebook.com -> selected"),
+                "domains: unknown (invalid host data)", "m.facebook.com -> none", "www.facebook.com -> selected", ABSENT),
                 reportFor(state(true, hosts)));
     }
 
     @Test @Config(sdk = 30) public void android11ReportsThatTheStateCannotBeRead() {
         assertEquals(Arrays.asList("availability: not_reported (API below 31)", "link_handling_allowed: not_reported",
-                "domains: not_reported"), SupportedLinks.reportLines(RuntimeEnvironment.getApplication()));
+                "domains: not_reported", ABSENT), SupportedLinks.reportLines(RuntimeEnvironment.getApplication()));
         assertTrue(askedFor.isEmpty());
     }
 
@@ -357,5 +374,86 @@ public class SupportedLinksTest {
         assertFalse(explanation.isSelectable());
         assertTrue(String.valueOf(explanation.getSummary()), String.valueOf(explanation.getSummary())
                 .contains("doesn't restore"));
+    }
+
+    /**
+     * Meta App Manager keeps Facebook's addresses on many phones, and Android then won't let them be
+     * selected here (#30). Its row opens its own link page, and says so once the addresses open here.
+     */
+    @Test
+    public void appManagerOnThePhoneGetsARowToItsLinkPage() throws Exception {
+        installAppManager(true);
+        answer = state(true, hosts(NONE, NONE));
+        HushfacebookPreferenceFragment page = show(true);
+        Preference row = page.findPreference(APP_MANAGER_KEY);
+        assertNotNull("no Meta App Manager row", row);
+        assertEquals("Meta App Manager", String.valueOf(row.getTitle()));
+        assertEquals(APP_MANAGER_SUMMARY, String.valueOf(row.getSummary()));
+        PreferenceGroup links = row.getParent();
+        int at = -1;
+        for (int i = 0; i < links.getPreferenceCount(); i++) if (links.getPreference(i) == row) at = i;
+        assertTrue("not under Supported links", at > 0);
+        assertEquals("not right under Supported links", page.findPreference(KEY), links.getPreference(at - 1));
+        assertTrue(row.getOnPreferenceClickListener().onPreferenceClick(row));
+        Intent started = shadowOf(controller.get()).getNextStartedActivity();
+        assertNotNull(started);
+        assertEquals(android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS, started.getAction());
+        assertEquals("package:" + SupportedLinks.APP_MANAGER, started.getDataString());
+
+        answer = state(true, hosts(SELECTED, SELECTED));
+        controller.pause().resume();
+        assertEquals("Facebook's web addresses open here now.",
+                String.valueOf(page.findPreference(APP_MANAGER_KEY).getSummary()));
+    }
+
+    /** Only while an address doesn't open here: this app's own Open supported links switch is its own row's job. */
+    @Test
+    public void theAppManagerRowShowsOnlyWhileAnAddressOpensElsewhere() throws Exception {
+        installAppManager(true);
+        answer = state(true, hosts(SELECTED, NONE));
+        assertNotNull("some selected", show(true).findPreference(APP_MANAGER_KEY));
+        controller.close();
+        answer = state(true, hosts(SELECTED, SELECTED));
+        assertNull("all selected", show(true).findPreference(APP_MANAGER_KEY));
+        controller.close();
+        answer = state(true, hosts(VERIFIED, VERIFIED));
+        assertNull("verified", show(true).findPreference(APP_MANAGER_KEY));
+        controller.close();
+        answer = state(false, hosts(NONE, NONE));
+        assertNull("link handling off", show(true).findPreference(APP_MANAGER_KEY));
+    }
+
+    @Test
+    public void noAppManagerRowWithoutAppManagerOrWithItDisabled() throws Exception {
+        answer = state(true, hosts(NONE, NONE));
+        assertNull("not installed", show(true).findPreference(APP_MANAGER_KEY));
+        controller.close();
+        installAppManager(false);
+        assertNull("disabled", show(true).findPreference(APP_MANAGER_KEY));
+    }
+
+    @Test
+    public void theReportSaysWhetherAppManagerIsThere() throws Exception {
+        installAppManager(true);
+        List<String> on = reportFor(state(true, hosts(NONE, NONE)));
+        assertEquals("meta_app_manager: enabled", on.get(on.size() - 1));
+        controller.close();
+        installAppManager(false);
+        List<String> off = reportFor(state(true, hosts(NONE, NONE)));
+        assertEquals("meta_app_manager: disabled", off.get(off.size() - 1));
+    }
+
+    /** Android 11 doesn't say where the links go, so with App Manager there the row shows and opens its page. */
+    @Test
+    @Config(sdk = 30)
+    public void android11WithAppManagerShowsTheRow() throws Exception {
+        installAppManager(true);
+        Preference row = show(false).findPreference(APP_MANAGER_KEY);
+        assertNotNull(row);
+        assertTrue(row.getOnPreferenceClickListener().onPreferenceClick(row));
+        Intent started = shadowOf(controller.get()).getNextStartedActivity();
+        assertNotNull(started);
+        assertEquals(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, started.getAction());
+        assertEquals("package:" + SupportedLinks.APP_MANAGER, started.getDataString());
     }
 }

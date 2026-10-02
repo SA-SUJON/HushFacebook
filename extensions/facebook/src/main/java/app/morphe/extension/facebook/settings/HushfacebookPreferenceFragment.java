@@ -101,6 +101,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     static final String CHECK_NOW = "action_check_for_release";
     /** The Supported links row's key. It stores nothing either. */
     static final String SUPPORTED_LINKS = "action_supported_links";
+    /** The Meta App Manager row's key, under Supported links. It stores nothing either. */
+    static final String APP_MANAGER_LINKS = "action_app_manager_links";
     /** The key of the row naming the default patches this build lacks. It stores nothing either. */
     static final String MISSING_DEFAULTS = "action_missing_default_patches";
 
@@ -578,14 +580,47 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         return row;
     }
 
+    /**
+     * The way to Meta App Manager's link page, under Supported links, when Meta App Manager is on
+     * the phone and Facebook's addresses don't all open here (#30), or null. Android won't let a
+     * person select an address another app is verified for, so App Manager has to let go first.
+     */
+    @Nullable
+    Preference appManagerLinksRow(Context context) {
+        SupportedLinks.State state = SupportedLinks.read(context);
+        if (!SupportedLinks.appManagerMayHoldLinks(state, SupportedLinks.appManagerOn(context))) return null;
+        Row row = new Row(context);
+        row.setKey(APP_MANAGER_LINKS);
+        row.setTitle(L10n.t("Meta App Manager"));
+        row.setPersistent(false);
+        row.setSummary(SupportedLinks.appManagerSummary(state));
+        row.setOnPreferenceClickListener(p -> {
+            openLinkPage(SupportedLinks.appManagerIntents(), "Meta App Manager",
+                    L10n.t("Meta App Manager's settings didn't open. Find it in Android's app list with system apps "
+                            + "shown, then Open by default."));
+            return true;
+        });
+        return row;
+    }
+
     private void showSupportedLinks() {
         if (getPreferenceScreen() == null) return;
         Preference row = findPreference(SUPPORTED_LINKS);
-        if (row != null) row.setSummary(SupportedLinks.summary(SupportedLinks.read(row.getContext())));
+        if (row == null) return;
+        SupportedLinks.State state = SupportedLinks.read(row.getContext());
+        row.setSummary(SupportedLinks.summary(state));
+        Preference appManager = findPreference(APP_MANAGER_LINKS);
+        if (appManager != null) appManager.setSummary(SupportedLinks.appManagerSummary(state));
     }
 
     private void openLinkSettings(Context context) {
-        for (Intent page : SupportedLinks.settingsIntents(context)) {
+        openLinkPage(SupportedLinks.settingsIntents(context), "supported links",
+                L10n.t("Android's settings for this app didn't open. Open App info from Facebook's icon, "
+                        + "then Open by default."));
+    }
+
+    private void openLinkPage(List<Intent> pages, String what, String failure) {
+        for (Intent page : pages) {
             try {
                 startActivity(page);
                 return;
@@ -593,9 +628,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 // A phone without Open by default still has the app's own page, which leads there.
             }
         }
-        Logger.printInfo(() -> "No settings page opened for supported links");
-        Utils.showToastLong(L10n.t("Android's settings for this app didn't open. Open App info from Facebook's icon, "
-                + "then Open by default."));
+        Logger.printInfo(() -> "No settings page opened for " + what);
+        Utils.showToastLong(failure);
     }
 
     @Override
