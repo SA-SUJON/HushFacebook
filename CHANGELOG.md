@@ -14,6 +14,8 @@ Every Hushfacebook release, newest first.
 
 * **Facebook:** **Words to hide** and **Words that keep a post** now hold up to 1,000 phrases each, up from 50 (issue #58). The two lists share 56 KB of room, enough for 1,000 short phrases in each, so they always fit in an exported settings file. The line under each editor says how full that room would be as you type. Save turns down a list with too many phrases, or one that would overfill the room, and leaves the editor open with everything you typed, so nothing gets cut off. An import whose lists wouldn't fit changes nothing. Each post's text is now read once, however long the lists are, where before every phrase was looked for on its own.
 
+- Check that every supported Facebook build still names Meta App Manager in its manifest's package queries. Facebook doesn't ask to see every app, so without that entry Android hides App Manager from it and the new row under Supported links would never show.
+
 - Give the settings rows their own classes instead of borrowing the settings page's name, so code outside the settings package can't reach them and tests name them where they live. The page now keeps its Downloads section to itself. The translation check also reads a row helper called through the page's name, which it used to skip.
 
 - Tighten how the system font patch spots a typeface compare. A static call on two objects now counts only when its own code does nothing but compare them, the way Kotlin's areEqual does, and any other call like that gets the picked font file. Both supported Facebook builds patch exactly as before.

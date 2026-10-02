@@ -329,11 +329,41 @@ class SharedPermissionsFixtureTest {
         assertEquals("a declared build has no fixture", versions, checked)
     }
 
+    /**
+     * The Meta App Manager row under Supported links (issue #30) reads App Manager's package without
+     * QUERY_ALL_PACKAGES. Android 11 and later only answer for a package the manifest names under
+     * `<queries>`, so a build that drops the name would hide the row on every phone, silently.
+     */
+    @Test
+    fun eachDeclaredBuildQueriesMetaAppManagerByName() {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        val checked = mutableSetOf<String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                val document = documentOf(manifestOf(bundle))
+                val queried = document.elements("queries").flatMap { queries ->
+                    val packages = queries.getElementsByTagName("package")
+                    (0 until packages.length).map { (packages.item(it) as Element).getAttribute("android:name") }
+                }
+                assertTrue("${bundle.name}: <queries> doesn't name $APP_MANAGER", APP_MANAGER in queried)
+                assertTrue("${bundle.name}: asks for every package, so <queries> isn't what makes App Manager visible",
+                    document.elements("uses-permission").none {
+                        it.getAttribute("android:name") == "android.permission.QUERY_ALL_PACKAGES"
+                    })
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", versions, checked)
+    }
+
     private fun Document.authorities(): List<String> =
         elements("provider").flatMap { it.getAttribute("android:authorities").split(';') }
 
     private companion object {
         const val FACEBOOK = AppCompatibilities.FACEBOOK_PACKAGE
+
+        /** SupportedLinks.APP_MANAGER in the extension. */
+        const val APP_MANAGER = "com.facebook.appmanager"
 
         /** Loads of an own authority per build, counted off the fixtures with a separate dex scan. */
         val AUTHORITY_LOADS = mapOf("580.0.0.51.74" to 13, "577.0.0.50.72" to 13)
