@@ -50,6 +50,20 @@ import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.navigation.MarketplaceOnly;
+import app.morphe.extension.facebook.settings.SettingsRows.Heading;
+import app.morphe.extension.facebook.settings.SettingsRows.Row;
+import app.morphe.extension.facebook.settings.SettingsRows.SaveRow;
+import app.morphe.extension.facebook.settings.SettingsRows.Toggle;
+import app.morphe.extension.facebook.settings.ValueRows.CommentOrderRow;
+import app.morphe.extension.facebook.settings.ValueRows.DownloadActionRow;
+import app.morphe.extension.facebook.settings.ValueRows.FileNameRow;
+import app.morphe.extension.facebook.settings.ValueRows.FolderRow;
+import app.morphe.extension.facebook.settings.ValueRows.PlaybackQualityRow;
+import app.morphe.extension.facebook.settings.ValueRows.QualityRow;
+import app.morphe.extension.facebook.settings.ValueRows.SaveToRow;
+import app.morphe.extension.facebook.settings.ValueRows.SendAppRow;
+import app.morphe.extension.facebook.settings.ValueRows.StartTabRow;
+import app.morphe.extension.facebook.settings.ValueRows.WordsRow;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
@@ -75,7 +89,7 @@ import app.morphe.extension.shared.settings.preference.LogBufferManager;
  */
 @SuppressWarnings("deprecation")
 public final class HushfacebookPreferenceFragment extends AbstractPreferenceFragment
-        implements ReleaseCheck.Listener, SettingsRows, ValueRows {
+        implements ReleaseCheck.Listener {
     /** The repository as a link, and as a person reads it. ExtensionHostsTest reads the link. */
     static final String SOURCE_URL = "https://github.com/SysAdminDoc/Hushfacebook";
     static final String SOURCE_ADDRESS = SOURCE_URL.substring(SOURCE_URL.indexOf("://") + 3);
@@ -128,7 +142,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
 
     /** The Downloads section, where the running saves are listed, or null when no download patch is in. */
     @Nullable
-    PreferenceCategory downloads;
+    private PreferenceCategory downloads;
 
     /** The rows of the saves running now, by save number. */
     private final Map<Integer, SaveRow> saveRows = new HashMap<>();
@@ -271,7 +285,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         FeedPages.comments(this, screen, context, build);
         FeedPages.writing(this, screen, context, build);
         VideoPages.playback(this, screen, context, build);
-        VideoPages.downloads(this, screen, context, build);
+        downloads = VideoPages.downloads(screen, context, build);
         AppPages.chats(this, screen, context, build);
         AppPages.menu(this, screen, context, build);
         AppPages.search(this, screen, context, build);

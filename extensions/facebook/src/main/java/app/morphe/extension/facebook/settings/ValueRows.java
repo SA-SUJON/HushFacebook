@@ -51,14 +51,15 @@ import app.morphe.extension.facebook.settings.SettingsRows.RowSemantics;
 import app.morphe.extension.shared.L10n;
 
 /**
- * The rows that edit a value: the text rows, whose dialogs fit above the keyboard, and the lists.
- * The page implements this, so a row is also known by the page's name,
- * {@code HushfacebookPreferenceFragment.FolderRow}. Each row's builder and summary are the
- * page's, such as {@link HushfacebookPreferenceFragment#qualityRow} and
+ * The rows that edit a value: the text rows, whose dialogs fit above the keyboard, and the lists,
+ * each known by this class's name, as {@code ValueRows.FolderRow}. Each row's builder and summary
+ * are the page's, such as {@link HushfacebookPreferenceFragment#qualityRow} and
  * {@link HushfacebookPreferenceFragment#qualitySummary}.
  */
 @SuppressWarnings("deprecation")
-interface ValueRows {
+final class ValueRows {
+    private ValueRows() { }
+
     /**
      * The save folder's row. Its summary follows its text, whoever sets it: the person, the shared
      * page syncing it from the setting, or an import.

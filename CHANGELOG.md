@@ -6,6 +6,8 @@ Every Hushfacebook release, newest first.
 
 * **Facebook:** **Words to hide** and **Words that keep a post** now hold up to 1,000 phrases each, up from 50 (issue #58). The two lists share 56 KB of room, enough for 1,000 short phrases in each, so they always fit in an exported settings file. The line under each editor says how full that room would be as you type. Save turns down a list with too many phrases, or one that would overfill the room, and leaves the editor open with everything you typed, so nothing gets cut off. An import whose lists wouldn't fit changes nothing. Each post's text is now read once, however long the lists are, where before every phrase was looked for on its own.
 
+- Give the settings rows their own classes instead of borrowing the settings page's name, so code outside the settings package can't reach them and tests name them where they live. The page now keeps its Downloads section to itself. The translation check also reads a row helper called through the page's name, which it used to skip.
+
 - Review a new GPL Facebook Lite candidate, four forks and changed branch history. Shared Messenger compatibility constants now have a watch path. The 2026-10-02 census keeps historical and licensing restrictions and its public counts match the records. Global GitLab code search is still unverified and recorded as skipped.
 
 - All 59 patches were verified on both supported Facebook builds with English, Arabic and Persian patcher locales. Each run passed the manifest, resource-table and injected-code checks, and every generated DEX matched the English run byte for byte. Existing instruction formatting already meets this requirement.

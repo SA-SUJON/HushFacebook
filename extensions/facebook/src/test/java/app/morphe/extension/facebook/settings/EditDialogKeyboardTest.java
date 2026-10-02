@@ -115,8 +115,8 @@ public class EditDialogKeyboardTest {
         Settings.HIDDEN_WORDS.save(list);
         PatchFamily.inBuildForTests = EnumSet.allOf(PatchFamily.class);
         try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
-            HushfacebookPreferenceFragment.WordsRow row =
-                    (HushfacebookPreferenceFragment.WordsRow) shown(controller, Settings.HIDDEN_WORDS.key);
+            ValueRows.WordsRow row =
+                    (ValueRows.WordsRow) shown(controller, Settings.HIDDEN_WORDS.key);
             AlertDialog dialog = (AlertDialog) row.getDialog();
             try {
                 EditText field = row.getEditText();
@@ -206,8 +206,8 @@ public class EditDialogKeyboardTest {
         Settings.KEPT_WORDS.save(PostWordsTest.asciiOfBytes(PostWords.MAX_LIST_BYTES - 10));
         PatchFamily.inBuildForTests = EnumSet.allOf(PatchFamily.class);
         try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
-            HushfacebookPreferenceFragment.WordsRow row =
-                    (HushfacebookPreferenceFragment.WordsRow) shown(controller, Settings.HIDDEN_WORDS.key);
+            ValueRows.WordsRow row =
+                    (ValueRows.WordsRow) shown(controller, Settings.HIDDEN_WORDS.key);
             AlertDialog dialog = (AlertDialog) row.getDialog();
             String fits = "spoiler";
             String tooLong = "spoiler\ngiveaway now";
@@ -260,7 +260,7 @@ public class EditDialogKeyboardTest {
                 int mode = row.getDialog().getWindow().getAttributes().softInputMode;
                 assertEquals(key + " doesn't resize above the keyboard", WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE,
                         mode & WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST);
-                if (row instanceof HushfacebookPreferenceFragment.WordsRow) {
+                if (row instanceof ValueRows.WordsRow) {
                     int flags = EditorInfo.IME_FLAG_NO_FULLSCREEN | EditorInfo.IME_FLAG_NO_EXTRACT_UI;
                     assertEquals("the landscape keyboard can replace the word dialog", flags,
                             row.getEditText().getImeOptions() & flags);
@@ -281,12 +281,12 @@ public class EditDialogKeyboardTest {
         assertTrue("no preference page", page instanceof HushfacebookPreferenceFragment);
         EditTextPreference row = (EditTextPreference) ((HushfacebookPreferenceFragment) page).findPreference(key);
         assertNotNull("no row for " + key, row);
-        if (row instanceof HushfacebookPreferenceFragment.FolderRow) {
-            ((HushfacebookPreferenceFragment.FolderRow) row).showDialog(null);
-        } else if (row instanceof HushfacebookPreferenceFragment.FileNameRow) {
-            ((HushfacebookPreferenceFragment.FileNameRow) row).showDialog(null);
-        } else if (row instanceof HushfacebookPreferenceFragment.WordsRow) {
-            ((HushfacebookPreferenceFragment.WordsRow) row).showDialog(null);
+        if (row instanceof ValueRows.FolderRow) {
+            ((ValueRows.FolderRow) row).showDialog(null);
+        } else if (row instanceof ValueRows.FileNameRow) {
+            ((ValueRows.FileNameRow) row).showDialog(null);
+        } else if (row instanceof ValueRows.WordsRow) {
+            ((ValueRows.WordsRow) row).showDialog(null);
         } else {
             fail(key + " is a " + row.getClass().getName() + ", not one of the page's edit rows");
         }
