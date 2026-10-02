@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "note": "Every public source found for com.facebook.katana, com.facebook.orca and com.facebook.lite, with the branches and commits it was last read at, its licence and what Hushfacebook may take from it. scripts/facebook-sources.ps1 holds it to its rules, scripts/audit-facebook-sources.ps1 refreshes it, and a local release needs a census from the last 14 days. docs/sources.md is the readable version.",
   "census": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-02",
     "skipped": [
       "gitlab-code-search"
     ]
@@ -24,7 +24,7 @@
       "hushfacebook": {
         "status": "listed",
         "url": "https://morphe-patches.software/data/bundles.json",
-        "checked": "2026-09-30"
+        "checked": "2026-10-02"
       }
     },
     {
@@ -34,7 +34,7 @@
       "hushfacebook": {
         "status": "listed",
         "url": "https://github.com/nvbangg/awesome-morphe/blob/main/data/bundles/SysAdminDoc~Hushfacebook~main.json",
-        "checked": "2026-09-30"
+        "checked": "2026-10-02"
       }
     },
     {
@@ -44,7 +44,7 @@
       "hushfacebook": {
         "status": "listed",
         "url": "https://drnx64.github.io/morphe-track-patches/#/bundle/sysadmindoc",
-        "checked": "2026-09-30"
+        "checked": "2026-10-02"
       }
     },
     {
@@ -54,7 +54,7 @@
       "hushfacebook": {
         "status": "listed",
         "url": "https://github.com/Jman-Github/ReVanced-Patch-Bundles/blob/bundles/patch-bundles/hushfacebook-patch-bundles/hushfacebook-latest-patches-bundle.json",
-        "checked": "2026-09-30"
+        "checked": "2026-10-02"
       }
     },
     {
@@ -64,7 +64,7 @@
       "hushfacebook": {
         "status": "listed",
         "url": "https://github.com/rushiforai/morphe-archive/tree/main/examplepatches/SysAdminDoc/Hushfacebook",
-        "checked": "2026-09-30"
+        "checked": "2026-10-02"
       }
     }
   ],
@@ -148,7 +148,7 @@
         "45c4ac7df021b93577bf0ecb90d2df55f675c320"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "froggo",
@@ -210,7 +210,7 @@
         "6ad43cc9a59f0b906b51e0cfbd4dd650f83c22e0"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "froggo-arun",
@@ -281,7 +281,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "froggo-mben",
@@ -340,7 +340,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "froggo-anemia",
@@ -384,7 +384,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "nambara",
@@ -431,7 +431,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "revanced",
@@ -509,6 +509,7 @@
         "chandler.bing/ecoscan-80488462-deletion_scheduled-86949965",
         "chandler.bing/ecoscan-80488462-deletion_scheduled-86981388",
         "chandler.bing/ecoscan-80488462-deletion_scheduled-87026966",
+        "chandler.bing/ecoscan-80488462-deletion_scheduled-87117622",
         "Crafter-Y/revanced-patches",
         "culpen0/revanced-patches",
         "dangphuc2470/revanced-patches",
@@ -529,6 +530,7 @@
         "Indranil012/revanced-patches",
         "isdzjfs/revanced-patches",
         "jakahudoklin/revanced-patches",
+        "joan.comas.fdz/revanced-patches",
         "joshi33/revanced-patches",
         "kadirtml01/revanced-patches",
         "kamilstyrna047/revanced-patches",
@@ -563,6 +565,7 @@
         "rachel.green.r/ecoscan-80488462-deletion_scheduled-86783510",
         "rachel.green.r/ecoscan-80488462-deletion_scheduled-86849772",
         "rachel.green.r/ecoscan-80488462-deletion_scheduled-86892377",
+        "rachel.green.r/ecoscan-80488462-deletion_scheduled-87072100",
         "RikoDEV/revanced-patches",
         "rosset.nocpes/revanced-patches",
         "samolego/revanced-patches",
@@ -824,7 +827,7 @@
           ]
         }
       ],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "revanced-brskt",
@@ -870,7 +873,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "meridian",
@@ -922,7 +925,7 @@
         "941a9697b3629f7374a1f98c5a81c724cf95da6c"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "devanced",
@@ -1031,7 +1034,7 @@
       ],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "rushiranpise",
@@ -1065,11 +1068,16 @@
       "branches": [
         {
           "name": "main",
-          "commit": "19f790360286cb34bfbac68cc6e5f896185e92ec"
+          "commit": "e3bb3af54e13ecfac60eb8bf9bdf287330f0529f"
+        },
+        {
+          "name": "dev",
+          "commit": "16de803e23dacb75c036a7767ed49aab22cbfd9d"
         }
       ],
       "watchPaths": [
-        "patches/src/main/kotlin/app/template/patches/messenger"
+        "patches/src/main/kotlin/app/template/patches/messenger",
+        "patches/src/main/kotlin/app/template/patches/shared/Constants.kt"
       ],
       "license": {
         "spdx": "GPL-3.0",
@@ -1078,7 +1086,7 @@
       },
       "contaminatedBy": null,
       "disposition": "candidate",
-      "reason": "The largest GPL-3.0 Messenger set, inside a 278-patch multi-app bundle. Screen capture in encrypted chats and the screenshot-detection bypass change what other people are told, so they would not ship by default.",
+      "reason": "The largest GPL-3.0 Messenger set, inside a 278-patch multi-app bundle. Screen capture in encrypted chats and the screenshot-detection bypass change what other people are told, so they would not ship by default. The watched shared Constants.kt carries the declared Messenger compatibility. The 2026-10-02 review found the Messenger tree unchanged but compatibility constants changed from the old pin; Lenart12 adds BlockBlast work while retaining the same Messenger tree.",
       "archived": false,
       "forks": [
         "ahmedkhbas/admods-patches",
@@ -1108,6 +1116,7 @@
         "JanManfreda/morphe-patches",
         "kanaminusaena/morphe-patches",
         "lanadilan/morphe-patches",
+        "Lenart12/morphe-patches",
         "liyinanch/morphe-patches",
         "Maege79/morphe-patches",
         "mian196/morphe-patches",
@@ -1138,6 +1147,7 @@
         "188138d4dbcd77fd9877e2e321787a7b5b068660",
         "1cc78763d5365704bfbad0ff6471ee490704885b",
         "2db41038c33d40be44a62f0b9ea04b2ad45bc264",
+        "551782dae6a630ce677903d43a14c888bb3bfbdf",
         "660a6680de5fdcb21b88c824b07b84a460a15b8e",
         "76631720e74cdb322ea0ee285a862b061f425814",
         "81a602da184e8b5fd06a6844c9dd304b28271068",
@@ -1174,7 +1184,7 @@
           ]
         }
       ],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "chirag127",
@@ -1218,7 +1228,7 @@
         "999a5f925d66e32779b32a7592fd77756fb863f4"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "astronaut10",
@@ -1254,7 +1264,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "loukious",
@@ -1302,7 +1312,7 @@
       ],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "loukious-gamer765",
@@ -1357,7 +1367,7 @@
         "921478b4426176fafe40da970334ce53d9796824"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "nexalloy",
@@ -1394,8 +1404,12 @@
           "commit": "248dda171caddfc954a595d289e0cf1203f1d26d"
         },
         {
-          "name": "sync-and-fix",
-          "commit": "1dbc275339e227d04798cdaf686018599409a6d2"
+          "name": "fix",
+          "commit": "ea28423bdb0e8480d2ff99568773a57bfeb7b413"
+        },
+        {
+          "name": "tiktok-split-apk",
+          "commit": "ea28423bdb0e8480d2ff99568773a57bfeb7b413"
         }
       ],
       "watchPaths": [
@@ -1412,7 +1426,7 @@
         "evidence": "https://github.com/gnadgnaoh/NexAlloy-XES/blob/7333cd8c93be223a8ec2804938449de4777be685/app/src/main/java/io/github/nexalloy/revanced/facebook/ad/HideFacebookAdsPatch.kt"
       },
       "disposition": "behavior-only",
-      "reason": "GPL-3.0 at the repository level, but its Facebook master patch says it ports every FacebookAppAdsRemover hook, and that code has no licence. The Facebook subtree is behavior-only until Loukious licenses it.",
+      "reason": "GPL-3.0 at the repository level, but its Facebook master patch says it ports every FacebookAppAdsRemover hook, and that code has no licence. The Facebook subtree is behavior-only until Loukious licenses it. The 2026-10-02 fix/tiktok-split-apk branches diverge from the removed sync-and-fix branch and change FacebookAdHelpers.kt and ad/Fingerprints.kt. The feature list is a branch union: Reels shopping hooks remain on root/nonroot, but were absent from sync-and-fix and remain absent from both new branches.",
       "archived": false,
       "forks": [
         "49ronind/NexAlloy",
@@ -1429,7 +1443,7 @@
       ],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "byrafael",
@@ -1468,7 +1482,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "messengerex",
@@ -1511,7 +1525,7 @@
         "5a3b82b13b9db90538e5cb8248b9f6aa1a574fcb"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "messenger-cleaner",
@@ -1550,7 +1564,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "messenger-z",
@@ -1590,7 +1604,7 @@
         "f3d80ddc2f77b8b48be055b8db95c4afcf869adf"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "messengerpro",
@@ -1688,7 +1702,7 @@
       ],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "messengerpro-pedguedes",
@@ -1737,7 +1751,7 @@
         "e2935628a7f9a85ee1957c4a0a0487d308523250"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "shuhaib",
@@ -1775,7 +1789,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "fblitepro",
@@ -1809,7 +1823,7 @@
       "forks": [],
       "contentHashes": [],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "onetapvideodownload",
@@ -1876,7 +1890,7 @@
         "e14a8cb96f828fac33b7c9a96f79549dd1bf5c2f"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "metaplusxposed",
@@ -1910,7 +1924,7 @@
         "161acbab4e391eba322f7913bbb9a9434793b175"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "xposedbase",
@@ -1946,7 +1960,7 @@
         "0a296e233b82039b948e3d0f53daac687c545220"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "glitchdraft",
@@ -1988,7 +2002,7 @@
         "03ed03d4419127ba57f994dc7f350ba2bebf588e"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "chatheadenabler",
@@ -2030,7 +2044,7 @@
         "8444abcffc0439bd3fc99e692b0d17c712c13d41"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "id": "messengerpeep",
@@ -2068,94 +2082,162 @@
         "1c79a7145de83aeeb074fa5888e7d4eea6d0c8e2"
       ],
       "mirrors": [],
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
+    },
+    {
+      "id": "tothanggtvt-fb-lite",
+      "repository": "https://github.com/ToThangGTVT/morphe-fb-lite",
+      "lineage": "tothanggtvt-fb-lite",
+      "upstream": "https://github.com/MorpheApp/morphe-patches-template",
+      "kind": "morphe-patches",
+      "packages": [
+        "com.facebook.lite"
+      ],
+      "targetVersions": {
+        "com.facebook.lite": [
+          "530.0.0.8.106"
+        ]
+      },
+      "features": [
+        "Hide sponsored posts",
+        "Install beside Meta's apps",
+        "Morphe settings",
+        "Use system font",
+        "Use system font in feed",
+        "Video download and auto next reel"
+      ],
+      "branches": [
+        {
+          "name": "main",
+          "commit": "d69c0d6904a75f48256c7dede8559390b5e1e606"
+        },
+        {
+          "name": "dev",
+          "commit": "d69c0d6904a75f48256c7dede8559390b5e1e606"
+        },
+        {
+          "name": "dependabot/github_actions/dev/actions/setup-java-6.0.1",
+          "commit": "cb5fd572bf97c4256410853277f46ad6ad97576a"
+        },
+        {
+          "name": "dependabot/gradle/dev/gradle-wrapper-9.8.0",
+          "commit": "cb5fd572bf97c4256410853277f46ad6ad97576a"
+        }
+      ],
+      "watchPaths": [
+        "patches/src/main/kotlin/app/fblite",
+        "extensions",
+        "gradle/rename-obfuscated-classes.gradle.kts",
+        "patches-list.json"
+      ],
+      "license": {
+        "spdx": "GPL-3.0",
+        "url": "https://github.com/ToThangGTVT/morphe-fb-lite/blob/d69c0d6904a75f48256c7dede8559390b5e1e606/LICENSE",
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      },
+      "contaminatedBy": null,
+      "disposition": "candidate",
+      "reason": "A GPL-3.0 Lite source for 530.0.0.8.106. Main/dev declare six patches; the older dependency branches retain the three font/coexistence patches. This is a source candidate, not adopted code or proof its native stubs can be redistributed. NOTICE requires distinct derivative branding (https://github.com/ToThangGTVT/morphe-fb-lite/blob/d69c0d6904a75f48256c7dede8559390b5e1e606/NOTICE, SHA256 a22a6e13b1b08b1976a272a5327a7cb1a8d6d45cb45fedc78ab57df593309da4). The author states Meta rasterizer code loads from the installed app at runtime; stub origins and current Hushfacebook Lite compatibility need independent proof.",
+      "archived": false,
+      "forks": [],
+      "contentHashes": [
+        "2bd1cddeb156279910e819840c29cb41a5d5dde5",
+        "6750db0c04a60d2a5a3f33a98cca805dbba1afb7"
+      ],
+      "mirrors": [],
+      "lastChecked": "2026-10-02"
     }
   ],
   "outOfScope": [
     {
       "repository": "https://github.com/ycngmn/Nobook",
       "reason": "A WebView wrapper around facebook.com, archived. It patches no Facebook package, though it shows demand for a low-data client.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/NoMore201/materialbook",
       "reason": "A WebView wrapper around facebook.com. It patches no Facebook package, and the repository is gone.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/Arc157/Virtualapp",
       "reason": "An app-virtualization project whose sample app list names Facebook's package. No Facebook patch.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/Cross2pro/VirtualApp",
       "reason": "An app-virtualization project whose sample app list names Facebook's package. No Facebook patch.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/D4vRAM369/WhatsMicFix-LSPosed",
       "reason": "An LSPosed microphone fix for WhatsApp voice notes that names Messenger's package. Nothing to do with Messenger's clutter.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/Firefds/FirefdsKit",
       "reason": "A Samsung system tweak module that names Facebook's package in a list.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/LeeHDsniper/APKAnalyserModules",
       "reason": "A captured logcat that mentions Facebook's package. No code for it.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/life2015/OPAmbientMod",
       "reason": "A OnePlus ambient display module that names Facebook and Messenger for their notifications.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/MinaMichita/MiuiEULocalizationToolsBox",
       "reason": "A MIUI localization module that names Facebook's package in a list.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/peter9811/ReVanced-APKs-output",
       "reason": "Build output that lists ReVanced's patches. No patch code.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/rhe91709-netizen/HyperOS3EULocalization",
       "reason": "A HyperOS localization module that names Facebook's package in a list.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/SodaWithoutSparkles/revanced-troubleshooting-guide",
       "reason": "A troubleshooting guide that keeps copies of ReVanced's patch lists.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/townbull/XposedExp",
       "reason": "A 2015 Samsung contacts experiment that names Facebook's package.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/TR-TECH-GUIDE/VirtualApp",
       "reason": "An app-virtualization project whose sample app list names Facebook's package. No Facebook patch.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/user2user1/rvmm-config-gen",
       "reason": "A build configuration generator that keeps a copy of ReVanced's patch list.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/xbyl1234/instagram_lite_bot",
       "reason": "An Instagram Lite account bot whose analysis hook names Facebook's packages.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
     },
     {
       "repository": "https://github.com/NexAlloy/NexAlloy",
       "reason": "The XES fork's upstream. Its own tree has no com.facebook.katana code, and its Morphe submodule (NexAlloy/morphe-patches, branch nexalloy) holds only Litho and Yoga stubs for its YouTube patches, not a Facebook patch.",
-      "lastChecked": "2026-09-30"
+      "lastChecked": "2026-10-02"
+    },
+    {
+      "repository": "https://github.com/anxyis/anxy-patches",
+      "reason": "An Alight Motion patch source. Its main/dev catalog names only com.alightcreative.motion; the com.facebook.katana search hit is an Alight Motion ProxyAuth string. Evidence: https://github.com/anxyis/anxy-patches/blob/b498ecc7199f658c8618b99346e5298b628f9605/patches-list.json.",
+      "lastChecked": "2026-10-02"
     }
   ]
 }

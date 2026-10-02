@@ -6,7 +6,7 @@ Several Facebook patch sources sit among forks and copies, and Messenger has a b
 
 This page is the readable version. The one the scripts hold us to is [sources/facebook-sources.json](../sources/facebook-sources.json), which records every source with its branches and the commits we last read them at, its licence and a hash of the licence text, the Facebook builds it declares, its features, and what we're allowed to take from it.
 
-The ledger retains 30 source records in 18 lineages. There are 29 active records and 1 retired record. Active means the recorded source remains present, including archived repositories and older targets. It doesn't mean a source patches the newest Facebook build. A retired source keeps its historical targets and immutable source pins. Unavailable means those historical source pins no longer resolve. Availability is separate from a source's licence disposition and the repository's archived flag.
+The ledger retains 31 source records in 19 lineages. There are 30 active records and 1 retired record. Active means the recorded source remains present, including archived repositories and older targets. It doesn't mean a source patches the newest Facebook build. A retired source keeps its historical targets and immutable source pins. Unavailable means those historical source pins no longer resolve. Availability is separate from a source's licence disposition and the repository's archived flag.
 
 ## How a source gets in
 
@@ -40,7 +40,7 @@ Two more GPL-3.0 repositories retain Froggo's work for 573. [ArunTS96/FroggoMorp
 - [meridianfresco/morphe-meta-patches](https://github.com/meridianfresco/morphe-meta-patches) (GPL-3.0) is a Morphe port of the ReVanced pair.
 - [chirag127/morphe-patches](https://github.com/chirag127/morphe-patches) has one Facebook patch, labelled STUB, and [Astronaut10/facebook-morphe-patches](https://github.com/Astronaut10/facebook-morphe-patches) is still the unmodified Morphe template. Both are rejected.
 
-More than twenty other repositories are copies of ReVanced's Facebook and Messenger files, most of them byte for byte and some from older releases. The ledger records them as copies of ReVanced rather than as sources, and so does the audit when it finds another one. Sixteen more are recorded as out of scope: two WebView wrappers around facebook.com, and repositories that only name a Facebook package somewhere, like a launcher list, a localization table, a captured logcat or a build config.
+More than twenty other repositories are copies of ReVanced's Facebook and Messenger files, most of them byte for byte and some from older releases. The ledger records them as copies of ReVanced rather than as sources, and so does the audit when it finds another one. Eighteen more are excluded: two WebView wrappers around facebook.com, and repositories that only name a Facebook package somewhere, like a launcher list, a localization table, a captured logcat or a build config. The 2026-10-02 review added four fork records without new lineages. Joan's extra work targets BaconReader, and Lenart12's targets BlockBlast. Their Facebook-family code remains upstream code. Alight Motion's [anxyis/anxy-patches](https://github.com/anxyis/anxy-patches) is another package-reference hit, not a Facebook patch source.
 
 ## Messenger
 
@@ -50,7 +50,11 @@ Two Xposed modules are MIT-licensed and worth reading for a Messenger sibling: [
 
 ## Facebook Lite
 
-The only Facebook Lite patch we found is on the dev branch of [ShuhaibNC/morphe-patches](https://github.com/ShuhaibNC/morphe-patches): it sends links to your own browser, on any version. [Ashish-Bansal/OneTapVideoDownload](https://github.com/Ashish-Bansal/OneTapVideoDownload) has GPL-3.0 download hooks for Facebook and Lite from 2018, too old to anchor anything today. [BERTO-bid/FBLitePro](https://github.com/BERTO-bid/FBLitePro) hands out a rebuilt Lite APK that extracts cookies, has no licence, and is behavior-only.
+[ToThangGTVT/morphe-fb-lite](https://github.com/ToThangGTVT/morphe-fb-lite) declares six patches for Lite 530.0.0.8.106: sponsored posts, coexistence with Meta's app, settings, two font controls and video download with automatic next-Reel control. Main/dev carry that catalog; two older dependency branches retain three font/coexistence patches. Its GPL-3.0 license and source pins were checked on 2026-10-02. The ledger records a candidate. Before adoption, its [NOTICE](https://github.com/ToThangGTVT/morphe-fb-lite/blob/d69c0d6904a75f48256c7dede8559390b5e1e606/NOTICE) requires distinct derivative branding, and the origins of native stubs need independent proof. This doesn't establish Lite support in Hushfacebook.
+
+The dev branch of [ShuhaibNC/morphe-patches](https://github.com/ShuhaibNC/morphe-patches) sends Lite links to your own browser on any version. [Ashish-Bansal/OneTapVideoDownload](https://github.com/Ashish-Bansal/OneTapVideoDownload) has GPL-3.0 download hooks for Facebook and Lite from 2018. [BERTO-bid/FBLitePro](https://github.com/BERTO-bid/FBLitePro) hands out a rebuilt Lite APK that extracts cookies, has no licence, and is behavior-only.
+
+On 2026-10-02, rushiranpise's Messenger tree was unchanged, but its shared compatibility constants moved from the older source pin to 576.0.0.47.92. Those constants now have their own watch path. NexAlloy's new fix/tiktok-split-apk branches diverge from the removed sync-and-fix history; only FacebookAdHelpers.kt and ad/Fingerprints.kt changed in the Facebook tree comparison. Reels shopping hooks remain on root/nonroot. The new branches still lack them and retain the same behavior-only licensing restriction.
 
 ## Outside Morphe
 
