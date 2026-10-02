@@ -18,7 +18,7 @@
 
 Hushfacebook is a Morphe patch bundle for Android that takes the clutter out of Facebook and puts useful controls back in your hands.
 
-The latest release is [v0.5.0](https://github.com/SysAdminDoc/Hushfacebook/releases/tag/v0.5.0), with 51 patches. It includes all changes since v0.4.0, among them eight new patches such as Hide the Reels tab dot, Keep the reel speed and Hold a reel for 2x, and the Suggested for you groups row hidden again, as the [changelog](CHANGELOG.md) describes.
+The latest release is [v0.6.0](https://github.com/SysAdminDoc/Hushfacebook/releases/tag/v0.6.0), with 59 patches. It includes all changes since v0.5.0, among them eight new patches such as Hide Meta AI questions under posts and Tab bar at the bottom, plus a choice of folder for saves, as the [changelog](CHANGELOG.md) describes.
 
 [Add to Morphe](https://morphe.software/add-source?github=SysAdminDoc%2FHushfacebook) | [Download a release](https://github.com/SysAdminDoc/Hushfacebook/releases/latest) | [Browse the patches](#patches)
 
