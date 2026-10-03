@@ -18,6 +18,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+- Fragmented video saves now reject samples that point into box headers, gaps or past a media-data payload. Valid codec joins keep their existing samples, including media stored before a fragment or across several boxes.
 - Java lookup now returns the executable's full path when a suitable JDK is already on PATH. Push checks and explicit JDK validation use the same executable.
 - Cancellation and gallery publication now choose one winner. A cancellation accepted through the final flush leaves no saved entry. Once publication starts, progress stays visible and Cancel is disabled. A failed gallery close or update reports failure and removes the unfinished entry.
 
