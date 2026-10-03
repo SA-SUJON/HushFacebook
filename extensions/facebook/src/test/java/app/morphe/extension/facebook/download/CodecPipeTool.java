@@ -16,6 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /** An owned, short-lived stand-in for a tool holding its output descriptor open. */
 public final class CodecPipeTool {
@@ -42,23 +45,34 @@ public final class CodecPipeTool {
             System.out.println("encoder-error");
             System.exit(7);
         }
-        if (mode.equals("child") || mode.equals("branch")) {
-            System.out.println("child-ready");
-            System.out.flush();
-            if (mode.equals("branch")) {
-                // The orphan's parent exits before this grandchild exists.
-                Thread.sleep(600);
+        if (mode.equals("child") || mode.equals("branch") || mode.equals("orphan-branch")) {
+            if (!mode.equals("child")) {
+                if (mode.equals("orphan-branch")) {
+                    // Start the grandchild after the actual parent exit, not an assumed delay.
+                    Optional<?> parent = (Optional<?>) handle.getMethod("of", long.class)
+                            .invoke(null, Long.parseLong(args[2]));
+                    if (parent.isPresent()) {
+                        CompletableFuture<?> exited = (CompletableFuture<?>) handle.getMethod("onExit").invoke(parent.get());
+                        exited.get(6, TimeUnit.SECONDS);
+                    }
+                }
                 File java = new File(System.getProperty("java.home"), "bin/" + (File.separatorChar == '\\' ? "java.exe" : "java"));
                 File classes = new File(CodecPipeTool.class.getProtectionDomain().getCodeSource().getLocation().toURI());
                 new ProcessBuilder(java.getPath(), "-cp", classes.getPath(), CodecPipeTool.class.getName(), "child", marker.getPath())
                         .inheritIO().start();
+            } else {
+                // Only the final output-holding descendant reports readiness after recording its PID.
+                System.out.println("child-ready");
+                System.out.flush();
             }
         } else {
             System.out.println("parent-ready");
             if (mode.equals("tree") || mode.equals("orphan")) {
                 File java = new File(System.getProperty("java.home"), "bin/" + (File.separatorChar == '\\' ? "java.exe" : "java"));
                 File classes = new File(CodecPipeTool.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-                new ProcessBuilder(java.getPath(), "-cp", classes.getPath(), CodecPipeTool.class.getName(), "branch", marker.getPath())
+                String branch = mode.equals("orphan") ? "orphan-branch" : "branch";
+                new ProcessBuilder(java.getPath(), "-cp", classes.getPath(), CodecPipeTool.class.getName(), branch,
+                        marker.getPath(), Long.toString(pid))
                         .inheritIO().start();
                 if (mode.equals("orphan")) return;
             }
