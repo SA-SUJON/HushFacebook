@@ -13,6 +13,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.robolectric.util.ReflectionHelpers;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -90,6 +92,18 @@ public class SavedShortcutTest {
         assertFalse(saved.getIntent().getBooleanExtra(SettingsEntry.EXTRA_OPEN_SETTINGS, false));
         assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK,
                 saved.getIntent().getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
+    @Test public void launcherIconDoesNotBorrowAnotherPackagesResource() {
+        Settings.SAVED_SHORTCUT.save(true);
+        assertTrue(aStartPublishes());
+        Context context = RuntimeEnvironment.getApplication();
+        Icon icon = ReflectionHelpers.callInstanceMethod(
+                shortcut(context.getSystemService(ShortcutManager.class)), "getIcon");
+        assertNotNull(icon);
+        assertTrue("Android rejects resource icons outside the shortcut owner package",
+                icon.getType() != Icon.TYPE_RESOURCE
+                        || context.getPackageName().equals(icon.getResPackage()));
     }
 
     @Test public void fullLauncherNeverEvictsOrReordersFacebooksEntries() {

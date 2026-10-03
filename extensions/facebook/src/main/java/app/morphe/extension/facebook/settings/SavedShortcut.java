@@ -9,6 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 
@@ -87,7 +90,7 @@ final class SavedShortcut {
                     >= manager.getMaxShortcutCountPerActivity()) return Result.NO_ROOM;
             ShortcutInfo shortcut = new ShortcutInfo.Builder(context, ID)
                     .setShortLabel(label).setLongLabel(label)
-                    .setIcon(Icon.createWithResource("android", android.R.drawable.ic_menu_save))
+                    .setIcon(icon(context))
                     .setIntent(route).setRank(existing == null ? rank : existing.getRank()).build();
             // addDynamicShortcuts refuses a full activity. pushDynamicShortcut would evict its last entry.
             boolean published = existing == null
@@ -98,5 +101,16 @@ final class SavedShortcut {
             Logger.printException(() -> "Saved shortcut: could not update the launcher entry", failure);
             return Result.UNAVAILABLE;
         }
+    }
+
+    private static Icon icon(Context context) {
+        int size = Math.max(1, Math.round(48 * context.getResources().getDisplayMetrics().density));
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Drawable drawable = context.getDrawable(android.R.drawable.ic_menu_save);
+        if (drawable == null) throw new IllegalStateException("Saved icon unavailable");
+        drawable.setBounds(0, 0, size, size);
+        drawable.draw(new Canvas(bitmap));
+        // Android rejects resource icons from a package other than the shortcut's owner.
+        return Icon.createWithBitmap(bitmap);
     }
 }

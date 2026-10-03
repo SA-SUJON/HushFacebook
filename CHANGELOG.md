@@ -7,7 +7,7 @@ Every Hushfacebook release, newest first.
 ### Added
 
 - Debug diagnostics for Marketplace response shapes, including the themed-ad and related-ad queries and the stock local-pickup/radius request fields. The report records fixed field names and types with model counts, leaves private values out, and identifies incomplete captures. It doesn't enable another listing filter.
-- An optional Saved shortcut under Menu. It starts off, opens Saved in the same Facebook install, and leaves every existing launcher entry in place. A full launcher or missing Saved route gives a status message. Cold and warm device navigation still need verification.
+- An optional Saved shortcut under Menu. It starts off, opens Saved in the same Facebook install, and leaves every existing launcher entry in place. A full launcher or missing Saved route gives a status message. The Saved route has been checked from cold and warm starts on a phone. Its icon is rendered locally because Android rejects shortcut resources borrowed from another package.
 
 ### Changed
 
