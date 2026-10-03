@@ -16,6 +16,10 @@ Every Hushfacebook release, newest first.
 - Source audits now fail when GitLab search is skipped, denied, unresolved or malformed, and keep the existing census date. GitLab.com's disabled global code search is documented instead of treating a token as the missing requirement.
 - Codec tests now own each tool's descendants before it starts, so an immediately exiting parent can't leave a child holding output open. Windows checks preserve the exact native Unicode arguments. Windows and Linux checks pass. macOS remains unverified.
 
+### Fixed
+
+- Cancellation and gallery publication now choose one winner. A cancellation accepted through the final flush leaves no saved entry. Once publication starts, progress stays visible and Cancel is disabled. A failed gallery close or update reports failure and removes the unfinished entry.
+
 ## 0.7.0 (2026-10-02)
 
 * **Facebook:** This release gathers everything since v0.6.0: 60 patches, up from 59, now for Facebook 581.0.0.45.58, the newest release. Facebook 580.0.0.51.74 and 577.0.0.50.72 still work. The new patch is `Force dark mode`, for tablets whose Settings page has no Dark mode row. Morphe Manager 1.33.0 or newer is required.

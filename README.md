@@ -144,7 +144,7 @@ The two themes work alone or together. With both, backgrounds stay true black an
 
 ### Saving videos
 
-While a save runs, a notification shows how far it's got, with a Cancel button. Facebook has to be allowed to post notifications for it. You can also turn off its "Hushfacebook saves" channel in Facebook's notification settings, and a save then runs with just a message when it starts and one when it ends. Either way, every save that's running is listed at the top of Downloads in Hushfacebook's settings, with what it's doing and a Cancel button of its own. A cancelled save leaves nothing behind. One that Android stops halfway leaves nothing in the gallery either. The next time Facebook starts, it clears what that save left in its cache and takes down its notification.
+While a save runs, a notification shows how far it's got, with a Cancel button. Facebook has to be allowed to post notifications for it. You can also turn off its "Hushfacebook saves" channel in Facebook's notification settings, and a save then runs with just a message when it starts and one when it ends. Either way, every save that's running is listed at the top of Downloads in Hushfacebook's settings, with what it's doing and a Cancel button of its own. In source builds after v0.7.0, Cancel stays available through the final copy and flush. Once gallery publication starts, Cancel is disabled and progress stays visible until it finishes. A cancelled save leaves nothing behind. One that Android stops halfway leaves nothing in the gallery either. The next time Facebook starts, it clears what that save left in its cache and takes down its notification.
 
 ## Marketplace settings preview
 
