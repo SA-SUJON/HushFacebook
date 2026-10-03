@@ -720,3 +720,9 @@ Saved shortcut	Pintasan Tersimpan
 Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay.	Menambahkan Tersimpan ke menu ikon Facebook jika ada ruang. Pintasan yang ada tetap tersedia.
 Your launcher has no room for another shortcut.	Peluncur tidak memiliki ruang untuk pintasan lain.
 Saved isn't available in this build.	Tersimpan tidak tersedia dalam versi ini.
+# context: The optional matching mode for both post word lists.
+Match whole words	Cocokkan kata utuh
+Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.	Gunakan pencocokan kata utuh untuk kedua daftar. Misalnya, hat cocok dengan hat!, tetapi tidak dengan what atau hats.
+Off	Nonaktif
+On	Aktif
+Saved now %1$s. After import %2$s.	Tersimpan sekarang %1$s. Setelah impor %2$s.

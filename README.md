@@ -134,6 +134,8 @@ Neither path can be tried against a real block until the check reaches sideloads
 
 Source builds after v0.7.0 split `Hide Stories tray` into **Hide the Stories tray**, for the top row, and **Hide Stories between posts** under News feed. Both start on when the patch is selected. Upgrading carries the old choice to both, preserving any independent choice you've already saved. Imports still read the old combined key, while exports use the two new keys. Published v0.7.0 keeps its combined control.
 
+Those source builds also offer **Match whole words** below the post-filter lists. It starts off, keeping the existing substring behavior. Turn it on and `hat` matches `hat!`, while `what` and `hats` stay. The rule applies to both lists, and a matching keep phrase still wins. Settings imports now name every changed switch and show its saved current and incoming states before you apply the file, even while Hushfacebook is paused. Word-list previews keep the phrases private.
+
 ### Dark mode themes
 
 Both themes show in Facebook's dark mode. If your Facebook's settings have no Dark mode row, as on some tablets, turn on Force dark mode under Appearance.

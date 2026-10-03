@@ -720,3 +720,9 @@ Saved shortcut	Acceso directo a Guardado
 Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay.	Añade Guardado al menú del icono de Facebook si hay espacio. Los accesos directos existentes se conservan.
 Your launcher has no room for another shortcut.	Tu lanzador no tiene espacio para otro acceso directo.
 Saved isn't available in this build.	Guardado no está disponible en esta versión.
+# context: The optional matching mode for both post word lists.
+Match whole words	Coincidir con palabras completas
+Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.	Aplica la coincidencia de palabras completas a ambas listas. Por ejemplo, hat coincide con hat!, pero no con what ni hats.
+Off	Desactivado
+On	Activado
+Saved now %1$s. After import %2$s.	Guardado ahora %1$s. Después de importar %2$s.

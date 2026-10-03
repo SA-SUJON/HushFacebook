@@ -720,3 +720,9 @@ Saved shortcut	Verknüpfung zu Gespeichert
 Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay.	Fügt Gespeichert zum Symbolmenü von Facebook hinzu, wenn Platz ist. Vorhandene Verknüpfungen bleiben.
 Your launcher has no room for another shortcut.	Dein Launcher hat keinen Platz für eine weitere Verknüpfung.
 Saved isn't available in this build.	Gespeichert ist in dieser Version nicht verfügbar.
+# context: The optional matching mode for both post word lists.
+Match whole words	Ganze Wörter abgleichen
+Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.	Die Ganzwortsuche gilt für beide Listen. Zum Beispiel findet hat auch hat!, aber nicht what oder hats.
+Off	Aus
+On	Ein
+Saved now %1$s. After import %2$s.	Aktuell gespeichert %1$s. Nach dem Import %2$s.

@@ -814,6 +814,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         return category;
     }
 
+    static SwitchPreference toggle(Context context, BooleanSetting setting, String summary) {
+        return toggle(context, setting, SwitchLabels.title(setting), summary);
+    }
+
     static SwitchPreference toggle(Context context, BooleanSetting setting, String title, String summary) {
         SwitchPreference preference = new Toggle(context);
         preference.setKey(setting.key);

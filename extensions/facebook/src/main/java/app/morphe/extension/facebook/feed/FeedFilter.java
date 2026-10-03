@@ -532,7 +532,8 @@ public final class FeedFilter {
      */
     private static String wordsReason(Object feedUnit, StoryFlag.Accessor message, StoryFlag.Accessor attached) {
         FeedFilterCounters.sawList(WORDS_ROUTE, 1);
-        PostWords.Rules rules = PostWords.rules(Settings.HIDDEN_WORDS.get(), Settings.KEPT_WORDS.get());
+        PostWords.Rules rules = PostWords.rules(Settings.HIDDEN_WORDS.get(), Settings.KEPT_WORDS.get(),
+                Settings.POST_WORDS_WHOLE_WORDS.get());
         if (rules.hidesNothing()) {
             FeedFilterCounters.sawKind(WORDS_ROUTE, NO_WORDS);
             return null;

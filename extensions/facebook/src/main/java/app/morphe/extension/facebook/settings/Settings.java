@@ -139,6 +139,10 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_POSTS_WITH_WORDS =
             new BooleanSetting("hushfacebook_hide_posts_with_words", FALSE);
 
+    /** Applies word-run boundaries to both lists. Existing installs keep substring matching. */
+    public static final BooleanSetting POST_WORDS_WHOLE_WORDS =
+            new BooleanSetting("hushfacebook_post_words_whole_words", FALSE);
+
     /**
      * The words and phrases that hide a post while {@link #HIDE_POSTS_WITH_WORDS} is on, one per
      * line, bounded wherever it's read. It isn't a switch, and a paused Facebook reads it as empty.

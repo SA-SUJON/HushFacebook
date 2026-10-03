@@ -50,7 +50,7 @@ public enum PatchFamily {
     AI_DETECTED_POSTS(FamilyNames.AI_DETECTED_POSTS, "aiDetectedPosts", null,
             Settings.HIDE_AI_DETECTED_POSTS, Settings.HIDE_AI_LABELLED_POSTS, Settings.HIDE_AI_DETECTED_REELS),
     POST_WORDS(FamilyNames.POST_WORDS, "postWords", null,
-            Settings.HIDE_POSTS_WITH_WORDS),
+            Settings.HIDE_POSTS_WITH_WORDS, Settings.POST_WORDS_WHOLE_WORDS),
     POST_PROMPTS(FamilyNames.POST_PROMPTS, "postPrompts", null,
             Settings.HIDE_POST_PROMPTS),
     META_AI_QUESTIONS(FamilyNames.META_AI_QUESTIONS, "metaAiQuestions", null,
@@ -319,7 +319,7 @@ public enum PatchFamily {
 
     /**
      * "on", "disabled by its switch" or "disabled while paused", then the saved switches. A
-     * family with two switches is on while either is: each hides its own kind of post.
+     * family with independent switches is on while either is. Options need their main switch.
      */
     private String reportLine(boolean paused) {
         StringBuilder line = new StringBuilder(patchName).append(": ");
@@ -328,8 +328,9 @@ public enum PatchFamily {
         }
         boolean anyOn = false;
         for (BooleanSetting setting : switches) anyOn |= setting.savedValue();
-        // Marketplace's extra switches need its main mode; they cannot enable the family alone.
+        // Options cannot enable these families without their main switch.
         if (this == MARKETPLACE_ONLY) anyOn = Settings.MARKETPLACE_ONLY.savedValue();
+        if (this == POST_WORDS) anyOn = Settings.HIDE_POSTS_WITH_WORDS.savedValue();
         line.append(paused ? "disabled while paused (saved " : anyOn ? "on (" : "disabled by its switch (");
         for (int i = 0; i < switches.size(); i++) {
             if (i > 0) line.append(", ");

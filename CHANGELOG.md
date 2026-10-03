@@ -6,6 +6,8 @@ Every Hushfacebook release, newest first.
 
 ### Added
 
+- Optional whole-word matching for both post-filter lists. It starts off, preserves existing imports, and respects Unicode word boundaries and keep-list overrides.
+- Settings-import previews name each changed switch and show its saved current and incoming state. Long lists scroll above the actions, with spoken state labels and no phrase contents.
 - Separate controls for the top Stories tray and Stories between posts. Upgrades keep the old choice, imports accept the combined or independent values, and exports save the independent choices.
 - Diagnostic reports now carry a build identity that also appears in status and About. Later source builds bind it to the packaged bytes and their source inputs. Missing or inconsistent metadata remains unknown or unverified.
 - Debug diagnostics for Marketplace response shapes, including the themed-ad and related-ad queries and the stock local-pickup/radius request fields. The report records fixed field names and types with model counts, leaves private values out, and identifies incomplete captures. It doesn't enable another listing filter.

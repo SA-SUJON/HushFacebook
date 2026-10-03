@@ -614,3 +614,9 @@ Saved shortcut	Atalho para Salvos
 Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay.	Adiciona Salvos ao menu do ícone do Facebook quando há espaço. Os atalhos existentes ficam.
 Your launcher has no room for another shortcut.	Seu launcher não tem espaço para outro atalho.
 Saved isn't available in this build.	Salvos não está disponível nesta versão.
+# context: The optional matching mode for both post word lists.
+Match whole words	Corresponder palavras inteiras
+Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.	A correspondência de palavras inteiras vale para as duas listas. Por exemplo, hat corresponde a hat!, mas não a what ou hats.
+Off	Desativado
+On	Ativado
+Saved now %1$s. After import %2$s.	Salvo agora %1$s. Após importar %2$s.
