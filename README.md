@@ -5,7 +5,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-blue" alt="License GPL-3.0"></a>
   <img src="https://img.shields.io/badge/platform-Android%2011%2B-3DDC84" alt="Platform Android 11+">
   <img src="https://img.shields.io/badge/Facebook-581.0.0.45.58-0866FF" alt="Facebook 581.0.0.45.58">
-  <img src="https://img.shields.io/badge/for-Morphe%20Manager%201.32.0%2B-8A2BE2" alt="For Morphe Manager 1.32.0 or newer">
+  <img src="https://img.shields.io/badge/for-Morphe%20Manager%201.33.0%2B-8A2BE2" alt="For Morphe Manager 1.33.0 or newer">
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@ This project has no connection to Meta or to the Morphe project. Neither endorse
 
 ## Install
 
-1. Install [Morphe Manager](https://github.com/MorpheApp/morphe-manager) 1.32.0 or newer.
+1. Install [Morphe Manager](https://github.com/MorpheApp/morphe-manager) 1.33.0 or newer.
 2. Add Hushfacebook as a patch source: https://morphe.software/add-source?github=SysAdminDoc%2FHushfacebook
 3. Get Facebook 581.0.0.45.58 from [APKMirror](https://www.apkmirror.com/apk/facebook-2/facebook/) and take the bundle labelled (arm64-v8a) (320-640dpi) (Android 11+), a .apkm file. That's build 475215365, the one these patches are checked against. APKMirror has several other arm64-v8a builds of the same version, and Morphe Manager warns about those ([Unsupported Version](#unsupported-version) explains why). Facebook 580.0.0.51.74 works too, in its (arm64-v8a) (240-640dpi) (Android 11+) bundle, and so does 577.0.0.50.72 in its (arm64-v8a) (360-480dpi) (Android 11+) bundle.
 4. In Morphe Manager, pick that file, keep the default patch selection or change it, and patch.
