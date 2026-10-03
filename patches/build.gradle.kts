@@ -1,6 +1,8 @@
 import app.morphe.patches.gradle.ExtensionExtension
 import app.morphe.patches.gradle.ExtensionPlugin
 import app.morphe.patches.gradle.PatchesExtension
+import org.apache.tools.ant.DirectoryScanner
+import org.apache.tools.ant.types.selectors.SelectorUtils
 import org.gradle.api.artifacts.component.ComponentIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
@@ -73,20 +75,33 @@ val sourceDateEpoch: Long = run {
 }
 
 /** Actual producer inputs, including new untracked source files, rather than HEAD alone. */
-val buildIdentityInputs = files(
-    rootProject.fileTree("patches/src/main"),
-    rootProject.fileTree("patches/stub/src/main"),
-    rootProject.fileTree("extensions") {
-        include("**/src/main/**", "**/build.gradle.kts", "**/*.pro")
-        exclude("**/build/**")
-    },
-    rootProject.fileTree("patches") {
-        include("**/build.gradle.kts")
-        exclude("**/build/**")
-    },
-    rootProject.fileTree("gradle"),
-    rootProject.files("build.gradle.kts", "settings.gradle.kts", "gradle.properties", "gradlew", "gradlew.bat", "NOTICE"),
+val identityInputTrees = listOf(
+    Triple("patches/src/main", emptyList<String>(), emptyList<String>()),
+    Triple("patches/stub/src/main", emptyList<String>(), emptyList<String>()),
+    Triple("extensions", listOf("**/src/main/**", "**/build.gradle.kts", "**/*.pro"), listOf("**/build/**")),
+    Triple("patches", listOf("**/build.gradle.kts"), listOf("**/build/**")),
+    Triple("gradle", emptyList<String>(), emptyList<String>()),
 )
+val identityInputFiles = listOf("build.gradle.kts", "settings.gradle.kts", "gradle.properties", "gradlew", "gradlew.bat", "NOTICE")
+val buildIdentityInputs = files(
+    identityInputTrees.map { (directory, includes, excludes) ->
+        rootProject.fileTree(directory) {
+            include(includes)
+            exclude(excludes)
+        }
+    },
+    rootProject.files(identityInputFiles),
+)
+
+// Match absent HEAD paths with the same patterns and Ant default exclusions as the file trees.
+// Ant's path matcher needs native separators to handle a leading ** consistently on Windows.
+fun isBuildIdentityInput(path: String): Boolean = path in identityInputFiles || identityInputTrees.any { (directory, includes, excludes) ->
+    if (!path.startsWith("$directory/")) return@any false
+    val relative = path.removePrefix("$directory/").replace('/', File.separatorChar)
+    fun matches(pattern: String) = SelectorUtils.matchPath(pattern.replace('/', File.separatorChar), relative, true)
+    (includes.isEmpty() || includes.any(::matches)) && excludes.none(::matches) &&
+        DirectoryScanner.getDefaultExcludes().none(::matches)
+}
 
 data class BuildSourceSnapshot(val commit: String, val tree: String, val state: String, val inputs: String)
 
@@ -125,8 +140,9 @@ fun snapshotBuildIdentity(): BuildSourceSnapshot {
         }.standardOutput.asText.get().split('\u0000').filter { it.isNotEmpty() }.associate {
             it.substringAfter('\t') to it.substringBefore('\t').substringAfterLast(' ')
         }
-        // Index flags can hide modified files from status. Compare the bytes Git would store,
-        // including repository line-ending rules, directly with HEAD's immutable blobs instead.
+        // Index flags can hide modified or deleted files from status. Require the same eligible
+        // paths in both directions, then compare the bytes Git would store with immutable HEAD blobs.
+        val headPaths = blobs.keys.filter(::isBuildIdentityInput).toSet()
         val paths = inputFiles.map { it.relativeTo(rootDir).invariantSeparatorsPath }
         // Chunk the arguments for Windows' command-line bound. Provider exec deliberately does
         // not accept a custom stdin stream, so --stdin-paths cannot be used here.
@@ -137,7 +153,8 @@ fun snapshotBuildIdentity(): BuildSourceSnapshot {
             }.standardOutput.asText.get().trim().lines()
         }
         if (source.size == 2 && source.all { it.matches(Regex("[0-9a-f]{40}")) }) {
-            val matchesHead = actualBlobs.size == paths.size && paths.zip(actualBlobs).all { (path, hash) -> blobs[path] == hash }
+            val matchesHead = headPaths == paths.toSet() && actualBlobs.size == paths.size &&
+                paths.zip(actualBlobs).all { (path, hash) -> blobs[path] == hash }
             return BuildSourceSnapshot(source[0], source[1], if (changes.isEmpty() && matchesHead) "clean" else "dirty", inputs)
         }
     } catch (_: Exception) {

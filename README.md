@@ -402,7 +402,7 @@ Every source file says where it came from in its header, and [provenance.json](p
 
 Source builds after v0.7.0 include an optional Saved shortcut under Menu. It adds Saved to Facebook's icon menu only when Android has room, without replacing existing shortcuts. It starts off and follows Pause. The Saved route has been checked from cold and warm starts on a phone. This control isn't part of the published v0.7.0 bundle.
 
-Later source builds show a build identity in diagnostic reports and in status and About. It identifies the packaged patch and runtime bytes, with the producer's source commit, tree and input digest. The patcher checks that binding before writing it into Facebook. Dirty inputs are marked dirty. Archives keep their source unknown, and missing or inconsistent metadata stays unknown or unverified. The identity identifies a build. It isn't a signature or a safety verdict.
+Later source builds show a build identity in diagnostic reports and in status and About. It identifies the packaged patch and runtime bytes, with the producer's source commit, tree and input digest. The patcher checks that binding before writing it into Facebook. A clean claim requires the complete input set to match the committed tree, even when Git hides a removal. Dirty inputs are marked dirty. Archives keep their source unknown, and missing or inconsistent metadata stays unknown or unverified. The identity identifies a build. It isn't a signature or a safety verdict.
 
 You need JDK 17 or newer and the Android SDK. The Morphe patcher comes from GitHub Packages, so you also need a GitHub token with `read:packages`. On Windows, run the unit tests on JDK 25 or newer, such as the JBR that comes with Android Studio. Older JDKs there can't rename a file over an existing one, and one of the tests needs that.
 
@@ -424,6 +424,8 @@ Dependency changes also run `pwsh -File scripts/test-tooling-classpaths.ps1` aft
 New schema-3 release receipts require this tooling report and a completed advisory audit. Publish the report beside the bundle and list its hash in `SHA256SUMS.txt`. The publication check downloads and audits it again. HIGH, CRITICAL and unscored findings require remediation or an explained applicability review in `scripts/tooling-advisory-exceptions.txt`, expiring within 90 days. Affected Guava versions require the same review despite the vendor's Moderate rating, even when OSV has no match. Skipping the tooling audit permits a local receipt, but that receipt cannot authorize publication. Older releases retain their receipt's original schema.
 
 Tests: `./gradlew :patches:test :extensions:facebook:testDebugUnitTest`. Set `HUSHFACEBOOK_FIXTURE_DIR` to a folder holding the Facebook bundles to run the tests that read real builds. Without it they skip and say so.
+
+Run `python scripts/test-build-identity-producer.py` with the build's JDK and registry credentials to check the actual producer's clean and dirty source claims. It uses a private copied checkout, including removals hidden by Git index flags, and leaves your checkout untouched. This matrix has been verified on Windows.
 
 Fixture anchor scans reuse expanded DEX files in the test worker's temporary directory. The cache checks bundle content and reused DEX bytes, never relies on file names or timestamps, and removes its own files at worker shutdown. Every scan still reads one DEX at a time and runs the same anchor checks.
 
