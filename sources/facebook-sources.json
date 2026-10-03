@@ -128,8 +128,9 @@
       "adopted": {
         "commit": "5db2e57e133aede5297c48b419168cf30fd89953",
         "fixtures": {
-          "receipt": "https://github.com/SysAdminDoc/Hushfacebook/releases/download/v0.1.2/release-receipt-0.1.2.json",
+          "receipt": "https://github.com/SysAdminDoc/Hushfacebook/releases/download/v0.7.0/release-receipt-0.7.0.json",
           "builds": [
+            "581.0.0.45.58",
             "580.0.0.51.74",
             "577.0.0.50.72"
           ]
