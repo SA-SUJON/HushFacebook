@@ -617,7 +617,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             row.setKey(holder.rowKey);
             row.setTitle(holder.title());
             row.setPersistent(false);
-            row.setSummary(SupportedLinks.holderSummary(holder, state));
+            row.setSummary(SupportedLinks.holderSummary(holder, state, notOpen));
             row.setOnPreferenceClickListener(p -> {
                 openLinkPage(SupportedLinks.holderIntents(holder), holder.reportKey, holder.notOpened());
                 return true;
@@ -633,9 +633,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (row == null) return;
         SupportedLinks.State state = SupportedLinks.read(row.getContext());
         row.setSummary(SupportedLinks.summary(state));
+        Set<String> notOpen = SupportedLinks.hostsNotOpen(row.getContext());
         for (SupportedLinks.Holder holder : SupportedLinks.Holder.values()) {
             Preference holderRow = findPreference(holder.rowKey);
-            if (holderRow != null) holderRow.setSummary(SupportedLinks.holderSummary(holder, state));
+            if (holderRow != null) holderRow.setSummary(SupportedLinks.holderSummary(holder, state, notOpen));
         }
     }
 

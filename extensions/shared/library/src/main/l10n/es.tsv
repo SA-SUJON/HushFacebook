@@ -581,6 +581,10 @@ Instagram can keep facebook.com links for itself, so their switches for this app
 Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.	No se abrieron los ajustes de Messenger. Abre Información de la app desde el icono de Messenger y luego Abrir de forma predeterminada.
 # context: message when Android's page for Instagram doesn't open; "App info" and "Open by default" are Android's page names
 Instagram's settings didn't open. Open App info from Instagram's icon, then Open by default.	No se abrieron los ajustes de Instagram. Abre Información de la app desde el icono de Instagram y luego Abrir de forma predeterminada.
+# context: the Messenger row's description once both addresses open in this app; keep facebook.com and m.me as is
+facebook.com and m.me links open here now.	Los enlaces de facebook.com y m.me ahora se abren aquí.
+# context: the Instagram row's description once its addresses open in this app; keep facebook.com as is
+facebook.com links open here now.	Los enlaces de facebook.com ahora se abren aquí.
 # context: message when a save starts and its notification can't show (Facebook's notifications or the saves channel are off); Downloads is the settings section that lists running saves, each with its own Cancel
 Saving... Cancel: Downloads in Hushfacebook.	Guardando... Cancelar: Descargas en Hushfacebook.
 # context: switch title under Reels and Watch; on, a double tap on a reel or a video doesn't like it

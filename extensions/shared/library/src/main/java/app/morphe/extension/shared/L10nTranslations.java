@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(1126);
+        Map<String, String> table = new HashMap<>(1130);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -1188,6 +1188,10 @@ public final class L10nTranslations {
                 "Deine Schalter entsprechen bereits dieser Datei, es \u00e4ndert sich also nichts.");
         table.put("answered",
                 "beantwortet");
+        table.put("facebook.com and m.me links open here now.",
+                "facebook.com- und m.me-Links \u00f6ffnen sich jetzt hier.");
+        table.put("facebook.com links open here now.",
+                "facebook.com-Links \u00f6ffnen sich jetzt hier.");
         table.put("failed (%1$s)",
                 "fehlgeschlagen (%1$s)");
         table.put("no answer",
@@ -1215,7 +1219,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(1126);
+        Map<String, String> table = new HashMap<>(1130);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -2359,6 +2363,10 @@ public final class L10nTranslations {
                 "Tus interruptores ya coinciden con ese archivo, as\u00ed que no cambiar\u00e1 nada.");
         table.put("answered",
                 "respondi\u00f3");
+        table.put("facebook.com and m.me links open here now.",
+                "Los enlaces de facebook.com y m.me ahora se abren aqu\u00ed.");
+        table.put("facebook.com links open here now.",
+                "Los enlaces de facebook.com ahora se abren aqu\u00ed.");
         table.put("failed (%1$s)",
                 "fall\u00f3 (%1$s)");
         table.put("no answer",
@@ -2386,7 +2394,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(1126);
+        Map<String, String> table = new HashMap<>(1130);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -3530,6 +3538,10 @@ public final class L10nTranslations {
                 "Sakelar Anda sudah sesuai dengan file itu, jadi tidak ada yang akan berubah.");
         table.put("answered",
                 "dijawab");
+        table.put("facebook.com and m.me links open here now.",
+                "Tautan facebook.com dan m.me kini terbuka di sini.");
+        table.put("facebook.com links open here now.",
+                "Tautan facebook.com kini terbuka di sini.");
         table.put("failed (%1$s)",
                 "gagal (%1$s)");
         table.put("no answer",
@@ -3557,7 +3569,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(1126);
+        Map<String, String> table = new HashMap<>(1130);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -4701,6 +4713,10 @@ public final class L10nTranslations {
                 "Suas op\u00e7\u00f5es j\u00e1 correspondem \u00e0s desse arquivo, ent\u00e3o nada ser\u00e1 alterado.");
         table.put("answered",
                 "respondeu");
+        table.put("facebook.com and m.me links open here now.",
+                "Os links de facebook.com e m.me agora abrem aqui.");
+        table.put("facebook.com links open here now.",
+                "Os links de facebook.com agora abrem aqui.");
         table.put("failed (%1$s)",
                 "falhou (%1$s)");
         table.put("no answer",
@@ -4728,7 +4744,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(1126);
+        Map<String, String> table = new HashMap<>(1130);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -5872,6 +5888,10 @@ public final class L10nTranslations {
                 "Anahtarlar\u0131n zaten o dosyayla ayn\u0131, bu y\u00fczden hi\u00e7bir \u015fey de\u011fi\u015fmeyecek.");
         table.put("answered",
                 "yan\u0131t verdi");
+        table.put("facebook.com and m.me links open here now.",
+                "facebook.com ve m.me ba\u011flant\u0131lar\u0131 art\u0131k burada a\u00e7\u0131l\u0131yor.");
+        table.put("facebook.com links open here now.",
+                "facebook.com ba\u011flant\u0131lar\u0131 art\u0131k burada a\u00e7\u0131l\u0131yor.");
         table.put("failed (%1$s)",
                 "ba\u015far\u0131s\u0131z (%1$s)");
         table.put("no answer",

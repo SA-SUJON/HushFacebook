@@ -540,6 +540,29 @@ public class SupportedLinksTest {
         assertNull("link handling off", page.findPreference("action_instagram_links"));
     }
 
+    /**
+     * The rows stay until the page is rebuilt, so on the way back from Android's pages each says
+     * whether its own app's addresses open here now. Seen on a phone: Instagram's row kept asking
+     * to turn its links off after its three addresses were selected.
+     */
+    @Test
+    public void onTheWayBackARowSaysItsOwnAddressesOpenHere() throws Exception {
+        install(SupportedLinks.MESSENGER, true);
+        install(SupportedLinks.INSTAGRAM, true);
+        answer = state(true, facebookHosts(NONE, NONE, NONE, NONE, NONE, NONE));
+        HushfacebookPreferenceFragment page = show(true);
+        answer = state(true, facebookHosts(SELECTED, SELECTED, SELECTED, NONE, NONE, SELECTED));
+        controller.pause().resume();
+        assertEquals("facebook.com links open here now.",
+                String.valueOf(page.findPreference("action_instagram_links").getSummary()));
+        assertTrue(String.valueOf(page.findPreference("action_messenger_links").getSummary())
+                .startsWith("Messenger can keep facebook.com and m.me links"));
+        answer = state(true, facebookHosts(SELECTED, SELECTED, SELECTED, SELECTED, SELECTED, NONE));
+        controller.pause().resume();
+        assertEquals("facebook.com and m.me links open here now.",
+                String.valueOf(page.findPreference("action_messenger_links").getSummary()));
+    }
+
     @Test
     public void noRowForMessengerOrInstagramDisabledOrAbsent() throws Exception {
         answer = state(true, facebookHosts(NONE, NONE, NONE, NONE, NONE, NONE));

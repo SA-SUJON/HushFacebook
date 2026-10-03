@@ -104,6 +104,15 @@ final class SupportedLinks {
             }
         }
 
+        /** What the row says once the addresses it may hold open here, while others still don't. */
+        String released() {
+            switch (this) {
+                case MESSENGER: return L10n.t("facebook.com and m.me links open here now.");
+                case INSTAGRAM: return L10n.t("facebook.com links open here now.");
+                default: return L10n.t("Facebook's web addresses open here now.");
+            }
+        }
+
         String notOpened() {
             switch (this) {
                 case MESSENGER:
@@ -306,15 +315,23 @@ final class SupportedLinks {
      */
     static boolean mayHoldLinks(Holder holder, State state, boolean on, @Nullable Set<String> notOpen) {
         if (!on || !(state == State.NONE || state == State.SOME || state == State.NOT_REPORTED)) return false;
-        if (holder.hosts.isEmpty() || notOpen == null) return true;
+        return holder.hosts.isEmpty() || notOpen == null || holdsOneOf(holder, notOpen);
+    }
+
+    private static boolean holdsOneOf(Holder holder, Set<String> notOpen) {
         for (String host : holder.hosts) if (notOpen.contains(host)) return true;
         return false;
     }
 
-    static String holderSummary(Holder holder, State state) {
+    /**
+     * The row's summary, read again on the way back from Android's pages: the row stays until the
+     * page is rebuilt, so once the addresses its app may hold open here it says so.
+     */
+    static String holderSummary(Holder holder, State state, @Nullable Set<String> notOpen) {
         if (state == State.VERIFIED || state == State.SELECTED) {
             return L10n.t("Facebook's web addresses open here now.");
         }
+        if (!holder.hosts.isEmpty() && notOpen != null && !holdsOneOf(holder, notOpen)) return holder.released();
         return holder.holding();
     }
 
