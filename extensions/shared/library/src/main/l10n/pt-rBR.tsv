@@ -65,8 +65,10 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	O Facebook não baixa anúncios nem seu modelo de anúncios em segundo plano.
 Facebook doesn't serve ads to other apps on this phone.	O Facebook não fornece anúncios a outros aplicativos neste dispositivo.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	O modo escuro do Facebook e esta tela usam as cores do seu papel de parede. No Android 11, é usado azul. Ative o modo escuro do Facebook para vê-lo.
+Hide Stories between posts	Ocultar stories entre publicações
 Joining the picture and sound	Juntando a imagem e o som
 From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	A partir da próxima abertura, todas as opções, menos o Registro de depuração, funcionam como se estivessem desligadas. O que foi definido ao aplicar os patches continua ativo, e suas escolhas ficam salvas.
+Rows, large tiles and viewers of Stories between posts, starting with the next feed Facebook loads. The top Stories tray has its own switch.	Fileiras, blocos grandes e visualizadores de stories entre publicações, a partir do próximo feed que o Facebook carregar. A bandeja de stories no topo tem seu próprio botão.
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Configurações exportadas. O app que guarda o arquivo não deixou o Hushfacebook lê-lo de volta, então ele não foi conferido.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	O app que guarda esse arquivo está demorando demais, então o Hushfacebook parou de esperar. Nada foi alterado.
 The app holding the last settings file still hasn't answered. Try again later.	O app do último arquivo de configurações ainda não respondeu. Tente de novo mais tarde.
@@ -220,7 +222,7 @@ the re-signed build fix	a correção para versão reassinada
 the start-up fix for x86 devices	a correção de inicialização para dispositivos x86
 the recoloured dark mode	a nova coloração do modo escuro
 The row of friend suggestions between posts, and the one on your own profile.	A linha de sugestões de amizade entre as publicações e a linha no seu próprio perfil.
-The row of stories at the top of the feed, Create story included, and the rows of stories between posts.	A linha de Stories no topo do feed, incluindo “Criar Story”, e as linhas de Stories entre as publicações.
+The row of stories at the top of the feed, Create story included.	A fileira de stories no topo do feed, incluindo Criar story.
 The rows of reels between posts, and the reels Facebook adds where your feed ends.	As linhas de Reels entre as publicações e os Reels que o Facebook adiciona ao final do feed.
 The setting couldn't finish updating. Its saved value is shown.	Não foi possível concluir a atualização da configuração. O valor salvo está sendo mostrado.
 There's no diagnostic data to clear.	Não há dados de diagnóstico para limpar.

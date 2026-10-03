@@ -101,7 +101,8 @@ public final class SettingsBackup {
             Settings.HIDE_PEOPLE_YOU_MAY_KNOW,
             Settings.HIDE_SUGGESTED_GROUPS,
             Settings.HIDE_STORIES_YOU_MIGHT_LIKE,
-            Settings.HIDE_STORIES_TRAY,
+            Settings.HIDE_TOP_STORIES_TRAY,
+            Settings.HIDE_STORIES_BETWEEN_POSTS,
             Settings.HIDE_FEED_REELS,
             Settings.BLOCK_RETURN_REFRESH,
             Settings.RETURN_REFRESH_NO_LIMIT,
@@ -728,6 +729,7 @@ public final class SettingsBackup {
         Map<String, BooleanSetting> known = new HashMap<>();
         for (BooleanSetting setting : ALLOWLIST) known.put(setting.key, setting);
         Map<BooleanSetting, Boolean> found = new HashMap<>();
+        Boolean legacyStories = null;
         String folder = null;
         DownloadQuality quality = null;
         String fileName = null;
@@ -743,6 +745,14 @@ public final class SettingsBackup {
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
+            if (StoriesSetting.LEGACY_KEY.equals(name)) {
+                Object value = values.opt(name);
+                if (!(value instanceof Boolean)) {
+                    throw new Rejected(Reason.VALUE, "Not true or false: " + name);
+                }
+                legacyStories = (Boolean) value;
+                continue;
+            }
             if (FOLDER.key.equals(name)) {
                 Object value = values.opt(name);
                 if (!(value instanceof String) || !SaveFolder.isImportable((String) value)) {
@@ -826,6 +836,12 @@ public final class SettingsBackup {
             }
             found.put(setting, (Boolean) value);
         }
+        if (legacyStories != null) {
+            // The alias supplies both choices. Explicit independent keys take precedence, whatever
+            // order the JSON object uses, and an absent alias supplies nothing.
+            found.putIfAbsent(Settings.HIDE_TOP_STORIES_TRAY, legacyStories);
+            found.putIfAbsent(Settings.HIDE_STORIES_BETWEEN_POSTS, legacyStories);
+        }
         // The lists share their room. One the file leaves out stays as it is, so it counts as stored.
         if ((hidden != null || kept != null) && !PostWords.fits(
                 hidden != null ? hidden : PostWords.clean(HIDDEN.savedValue()),
@@ -854,6 +870,7 @@ public final class SettingsBackup {
         Map<Setting<?>, Object> changes = snapshot.changes();
         if (changes.isEmpty()) return 0;
         try {
+            StoriesSetting.finishMigration();
             Setting.saveAll(changes);
             return changes.size();
         } catch (Setting.BatchFailed failed) {

@@ -65,8 +65,10 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook reklamları veya reklam modelini arka planda indirmez.
 Facebook doesn't serve ads to other apps on this phone.	Facebook bu telefondaki diğer uygulamalara reklam sunmaz.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebook karanlık modu ve bu ekran duvar kâğıdının renklerini kullanır. Android 11 bunun yerine mavi kullanır. Görmek için Facebook karanlık modunu aç.
+Hide Stories between posts	Gönderiler arasındaki Hikayeleri gizle
 Joining the picture and sound	Görüntü ve ses birleştiriliyor
 From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Sonraki açılıştan itibaren Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır ve tercihlerin kayıtlı kalır.
+Rows, large tiles and viewers of Stories between posts, starting with the next feed Facebook loads. The top Stories tray has its own switch.	Gönderiler arasındaki Hikaye sıraları, büyük kutucuklar ve görüntüleyiciler. Facebook'un yükleyeceği sonraki akıştan itibaren geçerlidir. Üstteki Hikaye tepsisinin ayrı bir anahtarı vardır.
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Ayarlar dışa aktarıldı. Dosyayı tutan uygulama Hushfacebook'un onu geri okumasına izin vermedi, bu yüzden kontrol edilmedi.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	O dosyayı tutan uygulama çok uzun sürüyor, bu yüzden Hushfacebook beklemeyi bıraktı. Hiçbir şey değiştirilmedi.
 The app holding the last settings file still hasn't answered. Try again later.	Son ayar dosyasını tutan uygulama hâlâ yanıt vermedi. Daha sonra tekrar dene.
@@ -227,7 +229,7 @@ the re-signed build fix	yeniden imzalanmış sürüm düzeltmesi
 the start-up fix for x86 devices	x86 cihazlar için açılış düzeltmesi
 the recoloured dark mode	yeniden renklendirilmiş karanlık mod
 The row of friend suggestions between posts, and the one on your own profile.	Gönderilerin arasındaki arkadaş önerileri satırı ve kendi profilindeki satır.
-The row of stories at the top of the feed, Create story included, and the rows of stories between posts.	Akışın en üstündeki hikaye şeridi, “Hikaye oluştur” da dahil, ve gönderilerin arasındaki hikaye sıraları.
+The row of stories at the top of the feed, Create story included.	Akışın üstündeki hikaye sırası, Hikaye oluştur dahil.
 The rows of reels between posts, and the reels Facebook adds where your feed ends.	Gönderilerin arasındaki Reels sıraları ve Facebook'un akışının bittiği yere eklediği Reels videoları.
 The setting couldn't finish updating. Its saved value is shown.	Ayarın güncellenmesi tamamlanamadı. Kayıtlı değeri gösteriliyor.
 There's no diagnostic data to clear.	Temizlenecek tanılama verisi yok.

@@ -65,8 +65,10 @@ Facebook crashed or froze within a minute of starting three times in a row, so H
 Facebook doesn't download ads or its ad model in the background.	Facebook tidak mengunduh iklan atau model iklannya di latar belakang.
 Facebook doesn't serve ads to other apps on this phone.	Facebook tidak menayangkan iklan ke aplikasi lain di ponsel ini.
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Mode gelap Facebook dan halaman ini memakai warna wallpaper Anda. Android 11 memakai biru. Aktifkan mode gelap Facebook untuk melihatnya.
+Hide Stories between posts	Sembunyikan Cerita di antara postingan
 Joining the picture and sound	Menggabungkan gambar dan suara
 From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Mulai peluncuran berikutnya, semua sakelar kecuali Pencatatan debug dianggap nonaktif. Yang diatur saat Anda menambal tetap aktif, dan pilihan Anda tetap tersimpan.
+Rows, large tiles and viewers of Stories between posts, starting with the next feed Facebook loads. The top Stories tray has its own switch.	Deretan, ubin besar, dan penampil Cerita di antara postingan, mulai dari beranda berikutnya yang dimuat Facebook. Baki Cerita di bagian atas memiliki sakelar sendiri.
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Pengaturan diekspor. Aplikasi yang menyimpan file itu tidak mengizinkan Hushfacebook membacanya kembali, jadi file itu tidak diperiksa.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	Aplikasi yang menyimpan file itu terlalu lama, jadi Hushfacebook berhenti menunggu. Tidak ada yang diubah.
 The app holding the last settings file still hasn't answered. Try again later.	Aplikasi yang menyimpan file pengaturan terakhir masih belum merespons. Coba lagi nanti.
@@ -227,7 +229,7 @@ the re-signed build fix	perbaikan build yang ditandatangani ulang
 the start-up fix for x86 devices	perbaikan saat mulai untuk perangkat x86
 the recoloured dark mode	mode gelap yang diwarnai ulang
 The row of friend suggestions between posts, and the one on your own profile.	Deretan saran pertemanan di antara postingan, dan deretan di profilmu sendiri.
-The row of stories at the top of the feed, Create story included, and the rows of stories between posts.	Deretan cerita di bagian atas Kabar Beranda, termasuk “Buat cerita”, dan deretan cerita di antara postingan.
+The row of stories at the top of the feed, Create story included.	Deretan cerita di bagian atas beranda, termasuk Buat cerita.
 The rows of reels between posts, and the reels Facebook adds where your feed ends.	Deretan Reels di antara postingan, dan Reels yang ditambahkan Facebook di akhir Kabar Beranda Anda.
 The setting couldn't finish updating. Its saved value is shown.	Pengaturan ini tidak dapat selesai diperbarui. Nilai yang tersimpan ditampilkan.
 There's no diagnostic data to clear.	Tidak ada data diagnostik yang dapat dihapus.

@@ -137,10 +137,13 @@ final class FeedPages {
             if (build.contains(PatchFamily.STORIES_TRAY)) {
                 // Facebook builds the feed's adapters once, when the feed is set up, and the tray is
                 // one of them. The hook is asked then and not again, so a change waits for a restart.
-                feed.addPreference(toggle(context, Settings.HIDE_STORIES_TRAY, L10n.t("Hide the Stories tray"),
-                        L10n.t("The row of stories at the top of the feed, Create story included, and the rows of "
-                                + "stories between posts.") + " "
+                feed.addPreference(toggle(context, Settings.HIDE_TOP_STORIES_TRAY, L10n.t("Hide the Stories tray"),
+                        L10n.t("The row of stories at the top of the feed, Create story included.") + " "
                                 + L10n.t("The switch takes effect when Facebook restarts.")));
+                feed.addPreference(toggle(context, Settings.HIDE_STORIES_BETWEEN_POSTS,
+                        L10n.t("Hide Stories between posts"),
+                        L10n.t("Rows, large tiles and viewers of Stories between posts, starting with the next "
+                                + "feed Facebook loads. The top Stories tray has its own switch.")));
             }
             if (build.contains(PatchFamily.FEED_REELS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_FEED_REELS, L10n.t("Hide Reels in the feed"),

@@ -369,7 +369,7 @@ public final class FeedFilter {
                     }
                 }
             }
-            if (reason == null && trayPatched && Settings.HIDE_STORIES_TRAY.get()) {
+            if (reason == null && trayPatched && Settings.HIDE_STORIES_BETWEEN_POSTS.get()) {
                 reason = storiesRowReason(typeName(feedUnit));
             }
             boolean aiLabelled = aiPatched && Settings.HIDE_AI_LABELLED_POSTS.get();
@@ -737,7 +737,7 @@ public final class FeedFilter {
             String kind = adapter == UNIFIED_TRAY ? "unified" : "legacy";
             FeedFilterCounters.sawList(TRAY_ROUTE, 1);
             FeedFilterCounters.sawKind(TRAY_ROUTE, kind);
-            boolean hide = Utils.settingsReady() && Settings.HIDE_STORIES_TRAY.get();
+            boolean hide = Utils.settingsReady() && Settings.HIDE_TOP_STORIES_TRAY.get();
             if (hide) FeedFilterCounters.removed(TRAY_ROUTE, 1, kind + " adapter skipped");
             logTrayOnce(adapter, kind, hide);
             return hide;

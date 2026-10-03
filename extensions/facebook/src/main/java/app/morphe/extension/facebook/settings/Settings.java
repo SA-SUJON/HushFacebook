@@ -35,6 +35,10 @@ import app.morphe.extension.shared.settings.StringSetting;
  */
 @SuppressWarnings("unused")
 public class Settings extends BaseSettings {
+    static {
+        StoriesSetting.migrate();
+    }
+
     /** Feed edges Facebook files under the SPONSORED story category. */
     public static final BooleanSetting HIDE_SPONSORED_POSTS =
             new BooleanSetting("hushfacebook_hide_sponsored_posts", TRUE);
@@ -82,8 +86,12 @@ public class Settings extends BaseSettings {
      * The row of stories at the top of the feed. The feed's adapter list builds it as an adapter of
      * its own, and the patch has both tray adapters return nothing while this is on.
      */
-    public static final BooleanSetting HIDE_STORIES_TRAY =
-            new BooleanSetting("hushfacebook_hide_stories_tray", TRUE);
+    public static final BooleanSetting HIDE_TOP_STORIES_TRAY =
+            new StoriesSetting(StoriesSetting.TOP_KEY);
+
+    /** Rows, large tiles and inline viewers of Stories between feed posts. */
+    public static final BooleanSetting HIDE_STORIES_BETWEEN_POSTS =
+            new StoriesSetting(StoriesSetting.BETWEEN_KEY);
 
     /**
      * The feed's rows of reels: the "Reels" carousels between posts and the reels Facebook adds where
