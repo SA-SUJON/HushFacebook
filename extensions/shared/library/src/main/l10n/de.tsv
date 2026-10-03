@@ -147,6 +147,8 @@ Posts Facebook files as promotions rather than as ads.	Beiträge, die Facebook a
 Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.	Beiträge von Personen und Seiten, denen du nicht folgst, und aus Gruppen, denen du nicht beigetreten bist, die Facebook in deinen Feed schiebt.
 Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.	Beiträge, die Facebooks eigene Erkennung als mit KI erstellt markiert. Ein Beitrag, den nur die Person, die ihn erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardmäßig aus, weil er noch nicht in einem echten Feed getestet wurde.
 Profiles and some Settings pages open again on this re-signed build.	Profile und einige Einstellungsseiten öffnen sich in diesem neu signierten Build wieder.
+Profiles and some Settings pages won't open	Profile und einige Einstellungsseiten öffnen sich nicht
+Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.	Wähle %1$s aus und patche erneut. Neu signierte Builds brauchen diesen Patch für Profile und einige Facebook-Einstellungsseiten.
 Re-signed build fix	Fix für neu signierte Builds
 Reading the settings file	Einstellungsdatei wird gelesen
 Reels and Watch	Reels und Watch

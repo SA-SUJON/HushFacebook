@@ -289,7 +289,10 @@ final class SettingsNavigation extends BaseAdapter {
             for (Section section : sections) if (!section.primary) visible.add(section.link);
         } else {
             visible.add(screen.getPreference(0));
-            // Only in a build that lacks a default patch: the card's own line under it.
+            // Only in a build that lacks Restore screens on a re-signed install: its own line under the card.
+            Preference restore = screen.findPreference(HushfacebookPreferenceFragment.MISSING_RESTORE_TRUST);
+            if (restore != null) visible.add(restore);
+            // Only in a build that lacks another default patch: the card's own line under it.
             Preference missing = screen.findPreference(HushfacebookPreferenceFragment.MISSING_DEFAULTS);
             if (missing != null) visible.add(missing);
             visible.add(browse);

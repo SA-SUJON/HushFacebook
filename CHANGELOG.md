@@ -24,6 +24,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+- The overview now calls out a missing Restore screens on re-signed builds patch directly, including the profile and Settings pages it can break. Root Mount installs don't show that warning.
 - Patch tests ignore nested fixture extraction files when checking their inputs. Top-level fixture changes still rerun tests, and an empty or invalid configured folder can't reuse a skipped result.
 - Build identity detects missing source inputs even when Git hides their removal. A clean claim requires the complete input set to match the committed tree.
 - Fragmented video saves now reject samples that point into box headers, gaps or past a media-data payload. Valid codec joins keep their existing samples, including media stored before a fragment or across several boxes.

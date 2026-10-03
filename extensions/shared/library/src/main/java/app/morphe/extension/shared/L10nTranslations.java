@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(1110);
+        Map<String, String> table = new HashMap<>(1114);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -714,6 +714,8 @@ public final class L10nTranslations {
                 "Seiten");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Bezahlte Anzeigen im Feed. Diese werden aussortiert, bevor Facebook sie einf\u00fcgt, sodass keine L\u00fccke bleibt.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
+                "W\u00e4hle %1$s aus und patche erneut. Neu signierte Builds brauchen diesen Patch f\u00fcr Profile und einige Facebook-Einstellungsseiten.");
         table.put("Pause",
                 "Pausieren");
         table.put("Pause Hushfacebook",
@@ -744,6 +746,8 @@ public final class L10nTranslations {
                 "Beitr\u00e4ge, deren Text ein Wort oder eine Wortfolge aus deiner Liste unten enth\u00e4lt. Ein Beitrag mit einem Wort aus deiner Liste zum Behalten bleibt, ebenso ein Beitrag ohne Text. Deine W\u00f6rter verlassen das Handy nur in einer Einstellungsdatei, die du exportierst.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profile und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
+        table.put("Profiles and some Settings pages won't open",
+                "Profile und einige Einstellungsseiten \u00f6ffnen sich nicht");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
                 "Setzt die Tab-Leiste von Facebook an den unteren Bildschirmrand, bei Konten, die sie oben haben. Starte Facebook nach der \u00c4nderung neu.");
         table.put("Quality, format and file names",
@@ -790,13 +794,13 @@ public final class L10nTranslations {
                 "Lange Videos fortsetzen");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Setzt Videos \u00fcber zwei Minuten an deiner letzten Stelle fort. Die Suchleiste \u00e4ndert den Start. Reels, Live-Videos und Werbung starten wie gewohnt.");
+    }
+
+    private static void fillDe6(Map<String, String> table) {
         table.put("Retry",
                 "Erneut versuchen");
         table.put("Return to regular Facebook",
                 "Zur\u00fcck zum normalen Facebook");
-    }
-
-    private static void fillDe6(Map<String, String> table) {
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Wenn du innerhalb von zehn Minuten zu Facebook zur\u00fcckkehrst, bleibst du an derselben Stelle. Zum Aktualisieren kannst du weiter nach unten ziehen.");
         table.put("Room for Meta's apps",
@@ -913,13 +917,13 @@ public final class L10nTranslations {
                 "Update-Aufforderungen stoppen");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Verwendet die Schriftdatei nicht mehr und kehrt zur Schriftart deines Handys zur\u00fcck.");
+    }
+
+    private static void fillDe7(Map<String, String> table) {
         table.put("Stories",
                 "Stories");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
                 "Vorschl\u00e4ge, Speichern, automatischer Wechsel und anonymes Ansehen");
-    }
-
-    private static void fillDe7(Map<String, String> table) {
         table.put("Supported links",
                 "Unterst\u00fctzte Links");
         table.put("Tab bar at the bottom",
@@ -1036,13 +1040,13 @@ public final class L10nTranslations {
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
         table.put("There's no diagnostic data to put back.",
                 "Es gibt keine Diagnosedaten zum Wiederherstellen.");
+    }
+
+    private static void fillDe8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Diese werden beim Patchen in Morphe Manager ausgew\u00e4hlt, und die Pause schaltet sie nicht aus. Patche erneut, um sie zu \u00e4ndern.");
         table.put("This build can't run the Messenger link test.",
                 "Dieser Build kann den Test der Messenger-Verbindung nicht ausf\u00fchren.");
-    }
-
-    private static void fillDe8(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Dieses Handy hat keine Dateiauswahl, hier l\u00e4sst sich also keine Datei w\u00e4hlen.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
@@ -1159,13 +1163,13 @@ public final class L10nTranslations {
                 "Deine Liste der W\u00f6rter, bei denen ein Beitrag bleibt, enth\u00e4lt dann %1$d Wort oder Wortfolge.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "Deine Liste der W\u00f6rter, bei denen ein Beitrag bleibt, enth\u00e4lt dann %1$d W\u00f6rter oder Wortfolgen.");
+    }
+
+    private static void fillDe9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Deine Liste der W\u00f6rter zum Ausblenden ist dann leer.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
                 "Deine Liste der W\u00f6rter zum Ausblenden enth\u00e4lt dann %1$d Wort oder Wortfolge.");
-    }
-
-    private static void fillDe9(Map<String, String> table) {
         table.put("Your list of words to hide will hold %1$d words or phrases.",
                 "Deine Liste der W\u00f6rter zum Ausblenden enth\u00e4lt dann %1$d W\u00f6rter oder Wortfolgen.");
         table.put("Your switches already match that file, so nothing will change.",
@@ -1199,7 +1203,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(1110);
+        Map<String, String> table = new HashMap<>(1114);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1869,6 +1873,8 @@ public final class L10nTranslations {
                 "P\u00e1ginas");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Anuncios pagados en el feed. Se eliminan antes de que Facebook los inserte, as\u00ed que no queda ning\u00fan espacio vac\u00edo.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
+                "Vuelve a parchear con %1$s seleccionado. Las versiones firmadas de nuevo lo necesitan para los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n de Facebook.");
         table.put("Pause",
                 "Pausar");
         table.put("Pause Hushfacebook",
@@ -1899,6 +1905,8 @@ public final class L10nTranslations {
                 "Publicaciones cuyo texto tiene una palabra o frase de tu lista de abajo. Una publicaci\u00f3n con una palabra de tu lista para conservar se mantiene, igual que una publicaci\u00f3n sin texto. Tus palabras solo salen del tel\u00e9fono en un archivo de configuraci\u00f3n que exportes.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
+        table.put("Profiles and some Settings pages won't open",
+                "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n no se abrir\u00e1n");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
                 "Pone la barra de pesta\u00f1as de Facebook en la parte inferior de la pantalla en las cuentas que la tienen arriba. Reinicia Facebook despu\u00e9s de cambiarlo.");
         table.put("Quality, format and file names",
@@ -1945,13 +1953,13 @@ public final class L10nTranslations {
                 "Reanudar videos largos");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Reanuda v\u00eddeos de m\u00e1s de dos minutos donde los dejaste. Usa la barra para cambiar el inicio. Reels, directos y anuncios empiezan como siempre.");
+    }
+
+    private static void fillEs6(Map<String, String> table) {
         table.put("Retry",
                 "Reintentar");
         table.put("Return to regular Facebook",
                 "Volver a Facebook normal");
-    }
-
-    private static void fillEs6(Map<String, String> table) {
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Si vuelves a Facebook en menos de diez minutos, seguir\u00e1s donde estabas. Puedes deslizar hacia abajo para actualizar.");
         table.put("Room for Meta's apps",
@@ -2068,13 +2076,13 @@ public final class L10nTranslations {
                 "Detener los avisos de actualizaci\u00f3n");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Deja de usar el archivo de fuente y vuelve a la fuente de tu tel\u00e9fono.");
+    }
+
+    private static void fillEs7(Map<String, String> table) {
         table.put("Stories",
                 "Historias");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
                 "Sugerencias, guardado, avance autom\u00e1tico y visualizaci\u00f3n an\u00f3nima");
-    }
-
-    private static void fillEs7(Map<String, String> table) {
         table.put("Supported links",
                 "Enlaces compatibles");
         table.put("Tab bar at the bottom",
@@ -2191,13 +2199,13 @@ public final class L10nTranslations {
                 "No hay datos de diagn\u00f3stico que borrar.");
         table.put("There's no diagnostic data to put back.",
                 "No hay datos de diagn\u00f3stico que restaurar.");
+    }
+
+    private static void fillEs8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Se eligen en Morphe Manager al parchear, y Pausar no los desactiva. Vuelve a parchear para cambiarlos.");
         table.put("This build can't run the Messenger link test.",
                 "Esta versi\u00f3n no puede hacer la prueba de la conexi\u00f3n con Messenger.");
-    }
-
-    private static void fillEs8(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este tel\u00e9fono no tiene selector de archivos, as\u00ed que aqu\u00ed no hay forma de elegir un archivo.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
@@ -2314,13 +2322,13 @@ public final class L10nTranslations {
                 "Tu lista de palabras que mantienen una publicaci\u00f3n tendr\u00e1 %1$d palabra o frase.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "Tu lista de palabras que mantienen una publicaci\u00f3n tendr\u00e1 %1$d palabras o frases.");
+    }
+
+    private static void fillEs9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Tu lista de palabras para ocultar quedar\u00e1 vac\u00eda.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
                 "Tu lista de palabras para ocultar tendr\u00e1 %1$d palabra o frase.");
-    }
-
-    private static void fillEs9(Map<String, String> table) {
         table.put("Your list of words to hide will hold %1$d words or phrases.",
                 "Tu lista de palabras para ocultar tendr\u00e1 %1$d palabras o frases.");
         table.put("Your switches already match that file, so nothing will change.",
@@ -2354,7 +2362,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(1110);
+        Map<String, String> table = new HashMap<>(1114);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -3024,6 +3032,8 @@ public final class L10nTranslations {
                 "Halaman");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Iklan berbayar di Kabar Beranda. Iklannya dibuang sebelum ditambahkan Facebook, jadi tidak meninggalkan ruang kosong.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
+                "Tambal ulang dengan %1$s dipilih. Build yang ditandatangani ulang membutuhkannya untuk profil dan beberapa halaman Pengaturan Facebook.");
         table.put("Pause",
                 "Jeda");
         table.put("Pause Hushfacebook",
@@ -3054,6 +3064,8 @@ public final class L10nTranslations {
                 "Postingan yang teksnya berisi kata atau frasa dari daftar Anda di bawah. Postingan dengan kata dari daftar pertahankan Anda tetap ada, begitu juga postingan tanpa teks. Kata-kata Anda hanya keluar dari ponsel dalam file pengaturan yang Anda ekspor.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
+        table.put("Profiles and some Settings pages won't open",
+                "Profil dan beberapa halaman Pengaturan tidak akan terbuka");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
                 "Memindahkan bilah tab Facebook ke bagian bawah layar pada akun yang menampilkannya di atas. Mulai ulang Facebook setelah mengubahnya.");
         table.put("Quality, format and file names",
@@ -3100,13 +3112,13 @@ public final class L10nTranslations {
                 "Lanjutkan video panjang");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Lanjutkan video lebih dari dua menit dari posisi terakhir. Geser bilah untuk posisi lain. Reel, video langsung, dan iklan mulai seperti biasa.");
+    }
+
+    private static void fillIn6(Map<String, String> table) {
         table.put("Retry",
                 "Coba lagi");
         table.put("Return to regular Facebook",
                 "Kembali ke Facebook biasa");
-    }
-
-    private static void fillIn6(Map<String, String> table) {
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Jika kembali ke Facebook dalam sepuluh menit, posisi beranda tetap sama. Tarik ke bawah untuk memuat ulang masih berfungsi.");
         table.put("Room for Meta's apps",
@@ -3223,13 +3235,13 @@ public final class L10nTranslations {
                 "Hentikan permintaan pembaruan");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Berhenti memakai file font dan kembali ke font ponsel Anda.");
+    }
+
+    private static void fillIn7(Map<String, String> table) {
         table.put("Stories",
                 "Cerita");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
                 "Saran, penyimpanan, perpindahan otomatis, dan melihat secara anonim");
-    }
-
-    private static void fillIn7(Map<String, String> table) {
         table.put("Supported links",
                 "Tautan yang didukung");
         table.put("Tab bar at the bottom",
@@ -3346,13 +3358,13 @@ public final class L10nTranslations {
                 "Tidak ada data diagnostik yang dapat dihapus.");
         table.put("There's no diagnostic data to put back.",
                 "Tidak ada data diagnostik yang dapat dikembalikan.");
+    }
+
+    private static void fillIn8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Semua ini dipilih di Morphe Manager saat Anda menambal, dan Jeda tidak mematikannya. Tambal ulang untuk mengubahnya.");
         table.put("This build can't run the Messenger link test.",
                 "Build ini tidak dapat menjalankan uji koneksi Messenger.");
-    }
-
-    private static void fillIn8(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Ponsel ini tidak memiliki pemilih file, jadi file tidak dapat dipilih di sini.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
@@ -3469,13 +3481,13 @@ public final class L10nTranslations {
                 "Daftar kata yang mempertahankan postingan akan berisi %1$d kata atau frasa.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "Daftar kata yang mempertahankan postingan akan berisi %1$d kata atau frasa.");
+    }
+
+    private static void fillIn9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Daftar kata untuk disembunyikan akan kosong.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
                 "Daftar kata untuk disembunyikan akan berisi %1$d kata atau frasa.");
-    }
-
-    private static void fillIn9(Map<String, String> table) {
         table.put("Your list of words to hide will hold %1$d words or phrases.",
                 "Daftar kata untuk disembunyikan akan berisi %1$d kata atau frasa.");
         table.put("Your switches already match that file, so nothing will change.",
@@ -3509,7 +3521,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(1110);
+        Map<String, String> table = new HashMap<>(1114);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -4179,6 +4191,8 @@ public final class L10nTranslations {
                 "P\u00e1ginas");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "An\u00fancios pagos no feed. Eles s\u00e3o removidos antes de o Facebook adicion\u00e1-los, portanto n\u00e3o fica nenhum espa\u00e7o vazio.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
+                "Aplique os patches novamente com %1$s selecionado. Vers\u00f5es com nova assinatura precisam dele para perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es do Facebook.");
         table.put("Pause",
                 "Pausar");
         table.put("Pause Hushfacebook",
@@ -4209,6 +4223,8 @@ public final class L10nTranslations {
                 "Publica\u00e7\u00f5es cujo texto cont\u00e9m uma palavra ou frase da lista abaixo. Uma publica\u00e7\u00e3o com uma palavra da lista para manter permanece, assim como uma publica\u00e7\u00e3o sem texto. Suas palavras s\u00f3 saem do dispositivo em um arquivo de configura\u00e7\u00f5es que voc\u00ea exportar.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o com nova assinatura.");
+        table.put("Profiles and some Settings pages won't open",
+                "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es n\u00e3o v\u00e3o abrir");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
                 "Coloca a barra de abas do Facebook na parte de baixo da tela nas contas que a t\u00eam em cima. Reinicie o Facebook depois de alterar esta op\u00e7\u00e3o.");
         table.put("Quality, format and file names",
@@ -4255,13 +4271,13 @@ public final class L10nTranslations {
                 "Retomar v\u00eddeos longos");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Retoma v\u00eddeos com mais de dois minutos de onde voc\u00ea parou. Arraste a barra de progresso para come\u00e7ar em outro ponto. Reels, v\u00eddeos ao vivo e an\u00fancios come\u00e7am normalmente.");
+    }
+
+    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Retry",
                 "Tentar novamente");
         table.put("Return to regular Facebook",
                 "Voltar ao Facebook normal");
-    }
-
-    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Ao voltar ao Facebook em at\u00e9 dez minutos, voc\u00ea continuar\u00e1 no ponto em que estava. O gesto de puxar para baixo para atualizar continuar\u00e1 funcionando.");
         table.put("Room for Meta's apps",
@@ -4378,13 +4394,13 @@ public final class L10nTranslations {
                 "Parar os avisos de atualiza\u00e7\u00e3o");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Deixa de usar o arquivo de fonte e volta para a fonte do seu celular.");
+    }
+
+    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("Stories",
                 "Stories");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
                 "Sugest\u00f5es, salvamento, avan\u00e7o autom\u00e1tico e visualiza\u00e7\u00e3o an\u00f4nima");
-    }
-
-    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("Supported links",
                 "Links compat\u00edveis");
         table.put("Tab bar at the bottom",
@@ -4501,13 +4517,13 @@ public final class L10nTranslations {
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
         table.put("There's no diagnostic data to put back.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para restaurar.");
+    }
+
+    private static void fillPt_rBR8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Eles s\u00e3o escolhidos no Morphe Manager quando voc\u00ea aplica os patches, e a pausa n\u00e3o os desativa. Aplique os patches novamente para alter\u00e1-los.");
         table.put("This build can't run the Messenger link test.",
                 "Esta vers\u00e3o n\u00e3o pode fazer o teste da conex\u00e3o com o Messenger.");
-    }
-
-    private static void fillPt_rBR8(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Este dispositivo n\u00e3o tem seletor de arquivos, ent\u00e3o n\u00e3o \u00e9 poss\u00edvel escolher um arquivo aqui.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
@@ -4624,13 +4640,13 @@ public final class L10nTranslations {
                 "Sua lista de palavras que mant\u00eam uma publica\u00e7\u00e3o ter\u00e1 %1$d palavra ou frase.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "Sua lista de palavras que mant\u00eam uma publica\u00e7\u00e3o ter\u00e1 %1$d palavras ou frases.");
+    }
+
+    private static void fillPt_rBR9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Sua lista de palavras a ocultar ficar\u00e1 vazia.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
                 "Sua lista de palavras a ocultar ter\u00e1 %1$d palavra ou frase.");
-    }
-
-    private static void fillPt_rBR9(Map<String, String> table) {
         table.put("Your list of words to hide will hold %1$d words or phrases.",
                 "Sua lista de palavras a ocultar ter\u00e1 %1$d palavras ou frases.");
         table.put("Your switches already match that file, so nothing will change.",
@@ -4664,7 +4680,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(1110);
+        Map<String, String> table = new HashMap<>(1114);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -5334,6 +5350,8 @@ public final class L10nTranslations {
                 "Sayfalar");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Ak\u0131\u015ftaki \u00fccretli reklamlar. Facebook eklemeden \u00f6nce \u00e7\u0131kar\u0131ld\u0131klar\u0131 i\u00e7in yerlerinde bo\u015fluk kalmaz.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
+                "%1$s se\u00e7iliyken yeniden yamala. Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmler profiller ve baz\u0131 Facebook Ayarlar\u0131 sayfalar\u0131 i\u00e7in buna ihtiya\u00e7 duyar.");
         table.put("Pause",
                 "Duraklat");
         table.put("Pause Hushfacebook",
@@ -5364,6 +5382,8 @@ public final class L10nTranslations {
                 "Metninde a\u015fa\u011f\u0131daki listenden bir kelime veya ifade ge\u00e7en g\u00f6nderiler. Tutma listendeki bir kelimeyi i\u00e7eren g\u00f6nderi kal\u0131r, metni olmayan g\u00f6nderi de kal\u0131r. Kelimelerin telefondan yaln\u0131zca d\u0131\u015fa aktard\u0131\u011f\u0131n bir ayar dosyas\u0131yla \u00e7\u0131kar.");
         table.put("Profiles and some Settings pages open again on this re-signed build.",
                 "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
+        table.put("Profiles and some Settings pages won't open",
+                "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 a\u00e7\u0131lmayacak");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
                 "Facebook'un sekme \u00e7ubu\u011funu, onu \u00fcstte g\u00f6steren hesaplarda ekran\u0131n alt\u0131na ta\u015f\u0131r. De\u011fi\u015ftirdikten sonra Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Quality, format and file names",
@@ -5410,13 +5430,13 @@ public final class L10nTranslations {
                 "Uzun videolara kald\u0131\u011f\u0131n yerden devam et");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "\u0130ki dakikadan uzun videolar kald\u0131\u011f\u0131 yerden devam eder. Ba\u015fka bir yerden ba\u015flatmak i\u00e7in \u00e7ubu\u011fu kayd\u0131r\u0131n. Reels, canl\u0131 videolar ve reklamlar normal ba\u015flar.");
+    }
+
+    private static void fillTr6(Map<String, String> table) {
         table.put("Retry",
                 "Yeniden dene");
         table.put("Return to regular Facebook",
                 "Normal Facebook'a d\u00f6n");
-    }
-
-    private static void fillTr6(Map<String, String> table) {
         table.put("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.",
                 "Facebook'a on dakika i\u00e7inde d\u00f6nersen kald\u0131\u011f\u0131n yer korunur. Yenilemek i\u00e7in a\u015fa\u011f\u0131 \u00e7ekmeye devam edebilirsin.");
         table.put("Room for Meta's apps",
@@ -5533,13 +5553,13 @@ public final class L10nTranslations {
                 "G\u00fcncelleme uyar\u0131lar\u0131n\u0131 durdur");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Yaz\u0131 tipi dosyas\u0131n\u0131 b\u0131rak\u0131r ve telefonunun yaz\u0131 tipine geri d\u00f6ner.");
+    }
+
+    private static void fillTr7(Map<String, String> table) {
         table.put("Stories",
                 "Hikayeler");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
                 "\u00d6neriler, kaydetme, otomatik ilerleme ve anonim izleme");
-    }
-
-    private static void fillTr7(Map<String, String> table) {
         table.put("Supported links",
                 "Desteklenen ba\u011flant\u0131lar");
         table.put("Tab bar at the bottom",
@@ -5656,13 +5676,13 @@ public final class L10nTranslations {
                 "Temizlenecek tan\u0131lama verisi yok.");
         table.put("There's no diagnostic data to put back.",
                 "Geri getirilecek tan\u0131lama verisi yok.");
+    }
+
+    private static void fillTr8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Bunlar yamalarken Morphe Manager'da se\u00e7ilir ve Duraklatma bunlar\u0131 kapatmaz. De\u011fi\u015ftirmek i\u00e7in yeniden yamala.");
         table.put("This build can't run the Messenger link test.",
                 "Bu s\u00fcr\u00fcm Messenger ba\u011flant\u0131 testini \u00e7al\u0131\u015ft\u0131ramaz.");
-    }
-
-    private static void fillTr8(Map<String, String> table) {
         table.put("This phone has no file picker, so there's no way to choose a file here.",
                 "Bu telefonda dosya se\u00e7ici yok, bu y\u00fczden burada dosya se\u00e7menin bir yolu yok.");
         table.put("Trending videos and the reels Facebook picked for you stop showing up in your notifications.",
@@ -5779,13 +5799,13 @@ public final class L10nTranslations {
                 "G\u00f6nderiyi tutan kelimeler listende %1$d kelime veya ifade olacak.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "G\u00f6nderiyi tutan kelimeler listende %1$d kelime veya ifade olacak.");
+    }
+
+    private static void fillTr9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Gizlenecek kelimeler listen bo\u015f olacak.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
                 "Gizlenecek kelimeler listende %1$d kelime veya ifade olacak.");
-    }
-
-    private static void fillTr9(Map<String, String> table) {
         table.put("Your list of words to hide will hold %1$d words or phrases.",
                 "Gizlenecek kelimeler listende %1$d kelime veya ifade olacak.");
         table.put("Your switches already match that file, so nothing will change.",

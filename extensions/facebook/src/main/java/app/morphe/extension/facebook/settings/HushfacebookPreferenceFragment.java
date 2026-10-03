@@ -39,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import app.morphe.extension.facebook.coexist.FamilySignatureTrust;
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
@@ -103,6 +104,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     static final String SUPPORTED_LINKS = "action_supported_links";
     /** The Meta App Manager row's key, under Supported links. It stores nothing either. */
     static final String APP_MANAGER_LINKS = "action_app_manager_links";
+    /** The key of the overview row explaining a missing re-signed build fix. */
+    static final String MISSING_RESTORE_TRUST = "action_missing_restore_trust";
     /** The key of the row naming the default patches this build lacks. It stores nothing either. */
     static final String MISSING_DEFAULTS = "action_missing_default_patches";
 
@@ -302,7 +305,9 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         HushfacebookPages.pause(this, screen, context, build);
         HushfacebookPages.about(this, screen, context, build);
 
-        // The overview shows it under the card by its key. Last in the model, it moves no other row.
+        // The overview shows these under the card by key. Last in the model, they move no other row.
+        Preference restore = missingRestoreTrustRow(context, build);
+        if (restore != null) screen.addPreference(restore);
         Preference lacking = missingDefaultsRow(context, build);
         if (lacking != null) screen.addPreference(lacking);
     }
@@ -465,6 +470,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     @Nullable
     private static Preference missingDefaultsRow(Context context, Set<PatchFamily> build) {
         List<String> missing = PatchFamily.missingDefaults(build);
+        missing.remove(PatchFamily.RESTORE_TRUST.patchName);
         if (missing.isEmpty()) return null;
         List<String> names = new ArrayList<>();
         for (String name : missing) names.add(L10n.isolate(name));
@@ -487,6 +493,22 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             p.setSummary(closed.contentEquals(p.getSummary()) ? open : closed);
             return true;
         });
+        return row;
+    }
+
+    /**
+     * A missing Restore screens patch breaks profiles on ordinary re-signed installs. Pull it out of
+     * the generic missing-defaults list so the overview says exactly what fails (#68). Root Mount
+     * installs still carry Meta's key and do not need this patch.
+     */
+    @Nullable
+    private static Preference missingRestoreTrustRow(Context context, Set<PatchFamily> build) {
+        if (build.contains(PatchFamily.RESTORE_TRUST)) return null;
+        if (FamilySignatureTrust.thisBuildCarriesMetaKey(context)) return null;
+        Preference row = info(context, L10n.t("Profiles and some Settings pages won't open"),
+                L10n.f("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook "
+                        + "Settings pages.", L10n.isolate(FamilyNames.RESTORE_TRUST)));
+        row.setKey(MISSING_RESTORE_TRUST);
         return row;
     }
 

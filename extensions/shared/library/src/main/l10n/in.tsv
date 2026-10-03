@@ -147,6 +147,8 @@ Posts Facebook files as promotions rather than as ads.	Postingan yang dikategori
 Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.	Postingan dari orang dan Halaman yang tidak Anda ikuti serta dari grup tempat Anda belum bergabung, yang diselipkan Facebook ke Kabar Beranda Anda.
 Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.	Postingan yang ditandai deteksi Facebook sendiri sebagai buatan AI. Postingan yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.
 Profiles and some Settings pages open again on this re-signed build.	Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.
+Profiles and some Settings pages won't open	Profil dan beberapa halaman Pengaturan tidak akan terbuka
+Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.	Tambal ulang dengan %1$s dipilih. Build yang ditandatangani ulang membutuhkannya untuk profil dan beberapa halaman Pengaturan Facebook.
 Re-signed build fix	Perbaikan build yang ditandatangani ulang
 Reading the settings file	Membaca file pengaturan
 Reels and Watch	Reels dan Watch
