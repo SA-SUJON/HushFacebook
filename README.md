@@ -373,6 +373,8 @@ Questions about setting up or whether a Facebook build works belong in [Discussi
 
 ## Privacy
 
+Source builds after v0.7.0 also include Marketplace shape diagnostics when Debug logging is enabled. They record only fixed query/model names, field types and bounded counts. Listing text, IDs, prices, location values and URLs stay out of the report, and incomplete captures are identified. These diagnostics don't block additional queries or listings.
+
 Development builds include a Supported links section in diagnostic reports. On Android 12 and later, both Copy and Save list the app's declared domains in order, each as verified, selected, none or unknown, plus whether link handling is allowed and whether Meta App Manager is installed and enabled. Android 11 says the state isn't reported. Only these manifest-domain state lines retain host names; visited URLs and private event data keep their existing redaction. They also have a Last screen left section, read each time you leave a Facebook screen: the views under two points at its right edge, each by class and resource name, so a reel whose buttons Hushfacebook can't reach shows what draws them. Nothing the screen says goes in.
 
 Android generally assigns a selected domain to one app at a time. The report reads that choice and leaves ownership alone. Selecting a domain doesn't restore Meta's signing verification, and this API doesn't expose verifier-specific error codes. See [Android's domain-state API](https://developer.android.com/reference/android/content/pm/verify/domain/DomainVerificationUserState).

@@ -6,10 +6,13 @@ Every Hushfacebook release, newest first.
 
 ### Added
 
+- Debug diagnostics for Marketplace response shapes, including the themed-ad and related-ad queries and the stock local-pickup/radius request fields. The report records fixed field names and types with model counts, leaves private values out, and identifies incomplete captures. It doesn't enable another listing filter.
 - An optional Saved shortcut under Menu. It starts off, opens Saved in the same Facebook install, and leaves every existing launcher entry in place. A full launcher or missing Saved route gives a status message. Cold and warm device navigation still need verification.
 
 ### Changed
 
+- The black-Reels report in #62 was traced to a custom ROM, with stock-firmware playback confirmed by the reporter. The Stories-between-posts fix (#45) and suggested Groups/Stories fixes (#8/#10) also have reporter confirmation. Their remaining switch and preserved-content comparisons are still tracked.
+- Messenger and Threads support have their own projects and release schedules, [HushMessenger](https://github.com/SysAdminDoc/HushMessenger) and [HushThreads](https://github.com/SysAdminDoc/HushThreads).
 - Source audits now fail when GitLab search is skipped, denied, unresolved or malformed, and keep the existing census date. GitLab.com's disabled global code search is documented instead of treating a token as the missing requirement.
 - Codec tests now own each tool's descendants before it starts, so an immediately exiting parent can't leave a child holding output open. Windows checks preserve the exact native Unicode arguments. Windows and Linux checks pass. macOS remains unverified.
 
