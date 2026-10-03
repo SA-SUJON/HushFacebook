@@ -21,6 +21,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+- Patch tests ignore nested fixture extraction files when checking their inputs. Top-level fixture changes still rerun tests, and an empty or invalid configured folder can't reuse a skipped result.
 - Build identity detects missing source inputs even when Git hides their removal. A clean claim requires the complete input set to match the committed tree.
 - Fragmented video saves now reject samples that point into box headers, gaps or past a media-data payload. Valid codec joins keep their existing samples, including media stored before a fragment or across several boxes.
 - Java lookup now returns the executable's full path when a suitable JDK is already on PATH. Push checks and explicit JDK validation use the same executable.

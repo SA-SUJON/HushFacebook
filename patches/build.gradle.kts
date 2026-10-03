@@ -1089,7 +1089,16 @@ tasks {
         // read only the folder's top level, and name only would call that move no change.
         // Blank counts as unset, as Fixtures.kt reads it; File("") would be the whole project.
         val fixtureDirectory = providers.environmentVariable("HUSHFACEBOOK_FIXTURE_DIR")
-        inputs.files(fixtureDirectory.map { if (it.isBlank()) emptyList() else listOf(File(it)) }.orElse(emptyList()))
+        // A configured empty folder must run and fail, never reuse an unset folder's skip.
+        inputs.property("fixturesConfigured", fixtureDirectory.map { it.isNotBlank() }.orElse(false))
+        inputs.files(fixtureDirectory.map { configured ->
+            if (configured.isBlank()) emptyList() else {
+                val directory = File(configured)
+                check(directory.isDirectory) { "HUSHFACEBOOK_FIXTURE_DIR names $directory, which is not a folder." }
+                checkNotNull(directory.listFiles()) { "HUSHFACEBOOK_FIXTURE_DIR names $directory, which cannot be read." }
+                    .filter { it.isFile }
+            }
+        }.orElse(emptyList()))
             .withPropertyName("fixtures")
             .withPathSensitivity(PathSensitivity.RELATIVE)
     }

@@ -425,6 +425,8 @@ New schema-3 release receipts require this tooling report and a completed adviso
 
 Tests: `./gradlew :patches:test :extensions:facebook:testDebugUnitTest`. Set `HUSHFACEBOOK_FIXTURE_DIR` to a folder holding the Facebook bundles to run the tests that read real builds. Without it they skip and say so.
 
+Patch tests read regular files at that folder's top level. Nested extraction files aren't test inputs. Run `python scripts/test-fixture-inputs.py` with the build's JDK and registry credentials to check actual Gradle input changes and skipped or invalid setups in a private copy.
+
 Run `python scripts/test-build-identity-producer.py` with the build's JDK and registry credentials to check the actual producer's clean and dirty source claims. It uses a private copied checkout, including removals hidden by Git index flags, and leaves your checkout untouched. This matrix has been verified on Windows.
 
 Fixture anchor scans reuse expanded DEX files in the test worker's temporary directory. The cache checks bundle content and reused DEX bytes, never relies on file names or timestamps, and removes its own files at worker shutdown. Every scan still reads one DEX at a time and runs the same anchor checks.
