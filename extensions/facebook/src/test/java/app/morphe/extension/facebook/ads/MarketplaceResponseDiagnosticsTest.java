@@ -214,4 +214,76 @@ public class MarketplaceResponseDiagnosticsTest {
         assertTrue(report, report.contains("capture=incomplete"));
         assertFalse(report.contains("capture=complete"));
     }
+
+    @Test
+    public void repeatedShapesStayCompleteAtTheLimitButANewShapeMakesTheResponseIncomplete() {
+        for (int fields = 1; fields <= MarketplaceResponseDiagnostics.MAX_SHAPES; fields++) {
+            String response = privateShape(fields);
+            assertSame(response, MarketplaceAdFilterForTests.responseWhole(THEMED, response));
+        }
+        String report = LogBufferManager.buildExportText();
+        assertEquals(MarketplaceResponseDiagnostics.MAX_SHAPES, report.split("model=none", -1).length - 1);
+        LogBufferManager.clearLogBuffer();
+
+        Object repeated = new Object();
+        String retained = privateShape(1);
+        assertSame(retained, MarketplaceAdFilterForTests.responsePiece(THEMED, retained, repeated));
+        assertSame(retained, MarketplaceAdFilterForTests.responsePiece(THEMED, retained, repeated));
+        assertNull(MarketplaceAdFilter.responseEnd(repeated));
+        report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("payloads=2 capture=complete"));
+        assertFalse(report.contains("capture=incomplete"));
+        LogBufferManager.clearLogBuffer();
+
+        Object omitted = new Object();
+        String overflow = privateShape(MarketplaceResponseDiagnostics.MAX_SHAPES + 1);
+        assertSame(overflow, MarketplaceAdFilterForTests.responsePiece(THEMED, overflow, omitted));
+        assertNull(MarketplaceAdFilter.responseEnd(omitted));
+        report = LogBufferManager.buildExportText();
+        assertTrue(report, report.contains("payloads=1 capture=incomplete"));
+        assertFalse(report.contains("capture=complete"));
+        assertFalse(report.contains("other_string:" + (MarketplaceResponseDiagnostics.MAX_SHAPES + 1)));
+        assertPrivateShapeDataAbsent(report);
+    }
+
+    @Test
+    public void newSummariesBeyondTheLimitEmitOneNoticeAndDuplicatesDoNotUseTheBudget() {
+        String payload = privateShape(1);
+        for (int payloads = 1; payloads <= 8; payloads++) {
+            String response = payload.repeat(payloads);
+            assertSame(response, MarketplaceAdFilterForTests.responseWhole(RELATED, response));
+        }
+        String report = LogBufferManager.buildExportText();
+        assertEquals(8, report.split("response summary payloads=", -1).length - 1);
+        LogBufferManager.clearLogBuffer();
+        assertSame(payload, MarketplaceAdFilterForTests.responseWhole(RELATED, payload));
+        assertFalse(LogBufferManager.buildExportText().contains("summary omitted"));
+
+        Object request = new Object();
+        String overflow = payload.repeat(9);
+        assertSame(overflow, MarketplaceAdFilterForTests.responsePiece(RELATED, overflow, request));
+        assertNull(MarketplaceAdFilter.responseEnd(request));
+        assertSame(overflow, MarketplaceAdFilterForTests.responseWhole(RELATED, overflow));
+        report = LogBufferManager.buildExportText();
+        assertEquals(report, 1, report.split("response summary omitted: summary budget", -1).length - 1);
+        assertFalse(report.contains("response summary payloads="));
+        assertPrivateShapeDataAbsent(report);
+    }
+
+    private static String privateShape(int fields) {
+        StringBuilder response = new StringBuilder("{");
+        for (int field = 0; field < fields; field++) {
+            if (field > 0) response.append(',');
+            response.append("\"private_location_name_").append(field).append("\":")
+                    .append("\"SensitivePrivateValue https://private.example/987654321012345 34.123456789\"");
+        }
+        return response.append('}').toString();
+    }
+
+    private static void assertPrivateShapeDataAbsent(String report) {
+        for (String privateText : new String[] {"private_location_name", "SensitivePrivateValue",
+                "private.example", "987654321012345", "34.123456789"}) {
+            assertFalse(privateText + " reached the diagnostic report", report.contains(privateText));
+        }
+    }
 }

@@ -56,6 +56,7 @@ final class MarketplaceResponseDiagnostics {
             "localOnly", "shippedOnly", "radius", "search_radius_in_meters"));
     private static final Map<Object, Observer> observers = new WeakHashMap<>();
     private static final Map<String, Set<String>> shapes = new HashMap<>();
+    private static final Set<String> summaryBudgetNotices = new HashSet<>();
 
     private MarketplaceResponseDiagnostics() {
     }
@@ -202,7 +203,7 @@ final class MarketplaceResponseDiagnostics {
                 String model = model(text, value);
                 if (model.equals("unrecognized")) unrecognizedModels++;
                 else if (!model.equals("none")) models.put(model, models.getOrDefault(model, 0) + 1);
-                record(query, path + " model=" + model + " " + fields(text, value));
+                if (!record(query, path + " model=" + model + " " + fields(text, value))) complete = false;
                 for (int i = 0; i < value.items.size(); i++) {
                     MarketplaceSearchAds.Value child = value.items.get(i);
                     if (child.kind != '{' && child.kind != '[') continue;
@@ -272,23 +273,33 @@ final class MarketplaceResponseDiagnostics {
         return first == '-' || first >= '0' && first <= '9' ? "number" : "literal";
     }
 
-    private static void record(String query, String shape) {
-        record(query, shape, false);
+    private static boolean record(String query, String shape) {
+        return record(query, shape, false);
     }
 
-    private static void record(String query, String shape, boolean summary) {
+    private static boolean record(String query, String shape, boolean summary) {
+        boolean retained = true;
         synchronized (shapes) {
             String key = query + (summary ? " summary" : " shapes");
             Set<String> seen = shapes.get(key);
             if (seen == null) { seen = new HashSet<>(); shapes.put(key, seen); }
-            if (seen.size() >= (summary ? 8 : MAX_SHAPES) || !seen.add(shape)) return;
+            // A duplicate is already retained, even when this query has filled its budget.
+            if (seen.contains(shape)) return true;
+            if (seen.size() >= (summary ? 8 : MAX_SHAPES)) {
+                if (!summary || !summaryBudgetNotices.add(query)) return false;
+                retained = false;
+            } else {
+                seen.add(shape);
+            }
         }
+        String message = retained ? shape : "response summary omitted: summary budget";
         Logger.diagnosticDebug(DiagnosticCategory.FEED_AND_NAVIGATION, "MarketplaceResponseDiagnostics",
-                () -> PREFIX + query + " " + shape);
+                () -> PREFIX + query + " " + message);
+        return retained;
     }
 
     static void forget() {
         synchronized (observers) { observers.clear(); }
-        synchronized (shapes) { shapes.clear(); }
+        synchronized (shapes) { shapes.clear(); summaryBudgetNotices.clear(); }
     }
 }
