@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import app.morphe.extension.shared.L10n;
+import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.Setting;
@@ -403,12 +404,13 @@ final class SettingsNavigation extends BaseAdapter {
         boolean nextPaused = HushfacebookPause.pausesNextStart(screen.getContext());
         boolean paused = HushfacebookPause.isPaused();
         TextView summary = row.findViewById(android.R.id.summary);
+        String build = "\n" + L10n.f("Build %1$s", L10n.isolate(Utils.getPatchesBuildIdentity()));
         if (!paused && !nextPaused && ReleaseCheck.statusLine() == null) {
-            summary.setText(L10n.t("Your controls are active."));
+            summary.setText(L10n.t("Your controls are active.") + build);
         } else if (paused && nextPaused && HushfacebookPause.reason() == HushfacebookPause.Reason.SWITCH
                 && !markerLeft()) {
             // A marker Resume couldn't remove keeps the card's own line, which says what to do.
-            summary.setText(L10n.t("Your choices are saved. Tap Resume, then restart Facebook."));
+            summary.setText(L10n.t("Your choices are saved. Tap Resume, then restart Facebook.") + build);
         }
         bindAction(row, paused, nextPaused);
     }

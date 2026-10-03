@@ -210,7 +210,8 @@ $behaviorOnly = [string]@($entries | Where-Object { $_.disposition -eq 'behavior
 Test-Broken { param($c) } '*credits*but the ledger lists it as behavior-only*' 'A provenance rule crediting a behavior-only source' {
     $path = Join-Path $rulesRoot 'provenance.json'
     $document = [IO.File]::ReadAllText($path) | ConvertFrom-Json
-    $document.rules[0].via = @(@($document.rules[0].via) + $behaviorOnly)
+    $rule = @($document.rules | Where-Object { $_.origin -eq 'ported' })[0]
+    $rule.via = @(@($rule.via) + $behaviorOnly)
     [IO.File]::WriteAllText($path, ($document | ConvertTo-Json -Depth 10))
 }
 Test-Broken { param($c) $e = Get-Entry $c $adoptedId; $e.disposition = 'candidate'; $e.PSObject.Properties.Remove('adopted') } '*ports files from*not adopted*' `
@@ -220,19 +221,20 @@ Test-Broken { param($c) $e = Get-Entry $c $adoptedId; $e.disposition = 'candidat
 $forkedEntry = @($entries | Where-Object { $_.disposition -eq 'behavior-only' -and @($_.forks | Where-Object { $_ }).Count -gt 0 })[0]
 $behaviorOnlyFork = 'https://' + (ConvertTo-SourceKey $forkedEntry.repository).Split('/')[0] + '/' + @($forkedEntry.forks)[0]
 $recordedMirror = [string]@(@($entries | Where-Object { @($_.mirrors | Where-Object { $_ }).Count -gt 0 })[0].mirrors)[0].repository
-function Set-FirstRule {
+function Set-FirstPortedRule {
     param([string]$Property, [string]$Value)
     $path = Join-Path $rulesRoot 'provenance.json'
     $document = [IO.File]::ReadAllText($path) | ConvertFrom-Json
-    $document.rules[0].$Property = if ($Property -eq 'via') { @(@($document.rules[0].via) + $Value) } else { $Value }
+    $rule = @($document.rules | Where-Object { $_.origin -eq 'ported' })[0]
+    $rule.$Property = if ($Property -eq 'via') { @(@($rule.via) + $Value) } else { $Value }
     [IO.File]::WriteAllText($path, ($document | ConvertTo-Json -Depth 10))
 }
 Test-Broken { param($c) } '*credits*as a fork of*behavior-only*' 'A provenance rule crediting a fork of a behavior-only source' {
-    Set-FirstRule 'via' $behaviorOnlyFork }
+    Set-FirstPortedRule 'via' $behaviorOnlyFork }
 Test-Broken { param($c) } '*ports files from*only as a fork of*' 'A ported provenance rule from a fork of a behavior-only source' {
-    Set-FirstRule 'upstream' $behaviorOnlyFork }
+    Set-FirstPortedRule 'upstream' $behaviorOnlyFork }
 Test-Broken { param($c) } '*ports files from*only as a mirror of*' 'A ported provenance rule from a recorded mirror' {
-    Set-FirstRule 'upstream' $recordedMirror }
+    Set-FirstPortedRule 'upstream' $recordedMirror }
 
 # The records themselves.
 Test-Broken { param($c) $c.indexes[0].hushfacebook.status = '' } '*records no Hushfacebook listing*' 'An index with no listing record'

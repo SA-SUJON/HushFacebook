@@ -400,6 +400,8 @@ Every source file says where it came from in its header, and [provenance.json](p
 
 Source builds after v0.7.0 include an optional Saved shortcut under Menu. It adds Saved to Facebook's icon menu only when Android has room, without replacing existing shortcuts. It starts off and follows Pause. The Saved route has been checked from cold and warm starts on a phone. This control isn't part of the published v0.7.0 bundle.
 
+Later source builds show a build identity in diagnostic reports and in status and About. It identifies the packaged patch and runtime bytes, with the producer's source commit, tree and input digest. The patcher checks that binding before writing it into Facebook. Dirty inputs are marked dirty. Archives keep their source unknown, and missing or inconsistent metadata stays unknown or unverified. The identity identifies a build. It isn't a signature or a safety verdict.
+
 You need JDK 17 or newer and the Android SDK. The Morphe patcher comes from GitHub Packages, so you also need a GitHub token with `read:packages`. On Windows, run the unit tests on JDK 25 or newer, such as the JBR that comes with Android Studio. Older JDKs there can't rename a file over an existing one, and one of the tests needs that.
 
 Codec fixture tests also need FFmpeg and ffprobe on PATH. Windows gives each test tool its own Job object before execution, and Linux uses a private process group. Their cleanup checks include an immediately exiting parent and preserve unrelated processes. JNA belongs only to the host tests and isn't included in the Android bundle. macOS process ownership hasn't been verified.

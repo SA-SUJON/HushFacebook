@@ -1,5 +1,6 @@
 # Turkish for Hushfacebook: the English key, a tab, the translation. One row per string.
 # After editing, run python scripts/gen-l10n.py from the repository root.
+Build %1$s	Derleme %1$s
 "Pages you may like" cards and the cards Facebook uses to push its own features. In-feed surveys go too.	“Beğenebileceğin Sayfalar” kartları ve Facebook'un kendi özelliklerini öne çıkardığı kartlar. Akıştaki anketler de kalkar.
 %1$d item in that file isn't a setting this version of Hushfacebook knows, so it'll be left out.	O dosyadaki %1$d öğe, Hushfacebook'un bu sürümünün tanıdığı ayarlardan değil, bu yüzden atlanacak.
 %1$d items in that file aren't settings this version of Hushfacebook knows, so they'll be left out.	O dosyadaki %1$d öğe, Hushfacebook'un bu sürümünün tanıdığı ayarlardan değil, bu yüzden atlanacak.

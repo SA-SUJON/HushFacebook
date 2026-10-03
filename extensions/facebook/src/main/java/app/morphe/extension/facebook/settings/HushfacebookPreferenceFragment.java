@@ -506,7 +506,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                     ? L10n.f("The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.", file, folder)
                     : L10n.f("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
                     file, folder);
-            statusCard.setSummary(left);
+            statusCard.setSummary(left + "\n" + L10n.f("Build %1$s", L10n.isolate(Utils.getPatchesBuildIdentity())));
             // Resume can be tapped on a category page too, where the card isn't in view.
             Utils.showToastLong(left);
             return;
@@ -537,6 +537,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         } else {
             status = L10n.t("Hushfacebook turns back on when Facebook restarts.");
         }
+        status += "\n" + L10n.f("Build %1$s", L10n.isolate(Utils.getPatchesBuildIdentity()));
         String release = ReleaseCheck.statusLine();
         card.setSummary(release == null ? status : status + "\n" + release);
     }

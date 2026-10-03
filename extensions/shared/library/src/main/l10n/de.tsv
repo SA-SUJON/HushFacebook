@@ -1,5 +1,6 @@
 # German for Hushfacebook: the English key, a tab, the translation. One row per string.
 # After editing, run python scripts/gen-l10n.py from the repository root.
+Build %1$s	Build %1$s
 "Pages you may like" cards and the cards Facebook uses to push its own features. In-feed surveys go too.	„Seiten, die dir gefallen könnten“ und die Karten, mit denen Facebook für eigene Funktionen wirbt. Die Umfragen im Feed verschwinden auch.
 %1$d item in that file isn't a setting this version of Hushfacebook knows, so it'll be left out.	%1$d Eintrag in dieser Datei ist keine Einstellung, die diese Version von Hushfacebook kennt, und wird deshalb ausgelassen.
 %1$d items in that file aren't settings this version of Hushfacebook knows, so they'll be left out.	%1$d Einträge in dieser Datei sind keine Einstellungen, die diese Version von Hushfacebook kennt, und werden deshalb ausgelassen.

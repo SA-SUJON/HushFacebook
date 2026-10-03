@@ -511,7 +511,7 @@ try {
     $commitSeconds = 1700000000L
     function New-TestBundle {
         param([string]$Path, [string]$Version = '9.9.9', [long]$Timestamp = 1700000000000L,
-            [string]$Patcher = '1.12.0', [hashtable]$Entries = @{})
+            [string]$Patcher = '1.12.0', [hashtable]$Entries = @{}, [hashtable]$Source = @{})
         if (Test-Path -LiteralPath $Path) { Remove-Item -LiteralPath $Path -Force }
         $archive = [System.IO.Compression.ZipFile]::Open(
             $Path, [System.IO.Compression.ZipArchiveMode]::Create)
@@ -520,7 +520,9 @@ try {
             $writer = New-Object System.IO.StreamWriter($entry.Open())
             try {
                 $writer.Write("Manifest-Version: 1.0`nVersion: $Version`n" +
-                    "Timestamp: $Timestamp`nPatcher-Version: $Patcher`n`n")
+                    "Timestamp: $Timestamp`nPatcher-Version: $Patcher`n")
+                foreach ($name in @($Source.Keys | Sort-Object)) { $writer.Write("${name}: $($Source[$name])`n") }
+                $writer.Write("`n")
             } finally { $writer.Dispose() }
             foreach ($name in @($Entries.Keys | Sort-Object)) {
                 $writer = New-Object System.IO.StreamWriter($archive.CreateEntry($name).Open())
@@ -667,15 +669,73 @@ try {
     }
 
     function Test-TestReceipt {
-        param($Receipt, [string[]]$Approved = @())
+        param($Receipt, [string[]]$Approved = @(), [string]$BundlePath = $bundle)
         return Test-ReleaseReceipt -Receipt $Receipt -ExpectedVersion '9.9.9' `
             -ExpectedPatchNames @('Alpha', 'Beta') -ExpectedPatcherVersion '1.12.0' `
             -ExpectedManagerFloor '1.29.0' -ExpectedPackageName 'com.example.host' -ExpectedPackageVersions $declaredBuilds `
-            -ExpectedPackageVersionCodes $declaredCodes -BundlePath $bundle -ApprovedManifestDelta $Approved
+            -ExpectedPackageVersionCodes $declaredCodes -BundlePath $BundlePath -ApprovedManifestDelta $Approved
     }
 
     $valid = Test-TestReceipt -Receipt (New-TestReceipt)
     Assert-True $valid.Valid "A complete receipt was refused: $($valid.Reason)"
+
+    # New source fields must be covered by the payload digest. Legacy release bytes stay valid.
+    Assert-True (-not (Get-BundleIdentityFacts -BundlePath $bundle).Present) 'A legacy bundle fabricated build identity.'
+    $identityRoot = Join-Path $allowlistRoot 'identity'
+    New-Item -ItemType Directory -Path $identityRoot -Force | Out-Null
+    $identityBundle = Join-Path $identityRoot 'patches-9.9.9.mpp'
+    function New-IdentityBundle([string]$State = 'clean', [string]$Commit = $template.release.commit) {
+        $source = @{
+            'Hushfacebook-Source-State' = $State; 'Hushfacebook-Source-Commit' = $Commit
+            'Hushfacebook-Source-Tree' = ('a' * 40); 'Hushfacebook-Input-SHA256' = ('b' * 64)
+        }
+        if ($State -ceq 'unknown') { $source['Hushfacebook-Source-Commit'] = 'unknown'; $source['Hushfacebook-Source-Tree'] = 'unknown' }
+        New-TestBundle -Path $identityBundle -Source $source -Entries @{
+            'classes.dex' = "dex`n035 payload"; 'META-INF/hushfacebook-build.identity' = 'placeholder'
+        }
+        $zip = [IO.Compression.ZipFile]::OpenRead($identityBundle)
+        try { $payload = Get-BundlePayloadSha256 -Archive $zip } finally { $zip.Dispose() }
+        $zip = [IO.Compression.ZipFile]::Open($identityBundle, [IO.Compression.ZipArchiveMode]::Update)
+        try {
+            $zip.GetEntry('META-INF/hushfacebook-build.identity').Delete()
+            $writer = [IO.StreamWriter]::new($zip.CreateEntry('META-INF/hushfacebook-build.identity').Open())
+            try { $writer.Write("hushfacebook-bundle-1`n$payload`n") } finally { $writer.Dispose() }
+        } finally { $zip.Dispose() }
+    }
+    function Test-IdentityReceipt {
+        $receipt = New-TestReceipt
+        $receipt.bundle.sha256 = Get-Sha256Hex -Path $identityBundle
+        $receipt.bundle.sizeBytes = (Get-Item -LiteralPath $identityBundle).Length
+        return Test-TestReceipt -Receipt $receipt -BundlePath $identityBundle
+    }
+    New-IdentityBundle
+    $identity = Get-BundleIdentityFacts -BundlePath $identityBundle
+    Assert-True ($identity.Present -and $identity.Valid -and $identity.SourceState -ceq 'clean' -and
+        $identity.SourceCommit -ceq $template.release.commit) 'Bound clean identity was not read.'
+    Assert-True (Test-IdentityReceipt).Valid 'A receipt refused its bound clean bundle identity.'
+    foreach ($state in @('dirty', 'unknown')) {
+        New-IdentityBundle -State $state
+        Assert-True (Get-BundleIdentityFacts -BundlePath $identityBundle).Valid "Honest $state identity was rejected by the reader."
+        $answer = Test-IdentityReceipt
+        Assert-True (-not $answer.Valid -and $answer.Reason -like '*build identity*') "A release accepted $state source identity."
+    }
+    New-IdentityBundle -Commit ('c' * 40)
+    $answer = Test-IdentityReceipt
+    Assert-True (-not $answer.Valid -and $answer.Reason -like '*build identity*') 'A receipt accepted another producer commit.'
+    New-IdentityBundle
+    $zip = [IO.Compression.ZipFile]::Open($identityBundle, [IO.Compression.ZipArchiveMode]::Update)
+    try {
+        $zip.GetEntry('classes.dex').Delete()
+        $writer = [IO.StreamWriter]::new($zip.CreateEntry('classes.dex').Open())
+        try { $writer.Write('changed payload') } finally { $writer.Dispose() }
+    } finally { $zip.Dispose() }
+    Assert-True (-not (Get-BundleIdentityFacts -BundlePath $identityBundle).Valid) 'Copied metadata verified a changed payload.'
+    Assert-True (-not (Test-IdentityReceipt).Valid) 'A rehashed receipt accepted stale build identity.'
+    New-IdentityBundle
+    $zip = [IO.Compression.ZipFile]::Open($identityBundle, [IO.Compression.ZipArchiveMode]::Update)
+    try { $zip.GetEntry('META-INF/hushfacebook-build.identity').Delete() } finally { $zip.Dispose() }
+    $identity = Get-BundleIdentityFacts -BundlePath $identityBundle
+    Assert-True ($identity.Present -and -not $identity.Valid) 'Removing identity downgraded a new bundle to legacy.'
 
     # Every fact the receipt exists to pin, put in front of the check one at a time. A gate that
     # has never been shown to fail is a gate nobody has tested.

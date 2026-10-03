@@ -238,7 +238,7 @@ public class HushfacebookPreferenceFragmentTest {
             Preference card = rowsOf(controller).get(0);
             assertEquals("Hushfacebook is paused", String.valueOf(card.getTitle()));
             assertEquals(HushfacebookPreferenceFragment.pausedSummary(HushfacebookPause.Reason.CRASH_LOOP, RuntimeEnvironment.getApplication().getPackageName())
-                    + " Tap to turn it back on.", String.valueOf(card.getSummary()));
+                    + " Tap to turn it back on.\n" + L10n.f("Build %1$s", L10n.isolate("unknown")), String.valueOf(card.getSummary()));
         }
     }
 
@@ -259,12 +259,14 @@ public class HushfacebookPreferenceFragmentTest {
             Preference card = rows.get(0);
             assertEquals("Hushfacebook is on", String.valueOf(card.getTitle()));
             assertTrue(String.valueOf(card.getSummary()), String.valueOf(card.getSummary()).contains(L10n.isolate(facebook)));
+            assertTrue(String.valueOf(card.getSummary()), String.valueOf(card.getSummary()).contains(L10n.isolate("unknown")));
             Preference version = null;
             for (Preference row : rows) {
                 if ("Version".contentEquals(row.getTitle())) version = row;
             }
             assertNotNull("no Version row", version);
             assertTrue(String.valueOf(version.getSummary()), String.valueOf(version.getSummary()).contains(L10n.isolate(facebook)));
+            assertTrue(String.valueOf(version.getSummary()), String.valueOf(version.getSummary()).contains(L10n.isolate("unknown")));
         }
     }
 
