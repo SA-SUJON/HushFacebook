@@ -398,6 +398,8 @@ Every source file says where it came from in its header, and [provenance.json](p
 
 You need JDK 17 or newer and the Android SDK. The Morphe patcher comes from GitHub Packages, so you also need a GitHub token with `read:packages`. On Windows, run the unit tests on JDK 25 or newer, such as the JBR that comes with Android Studio. Older JDKs there can't rename a file over an existing one, and one of the tests needs that.
 
+Codec fixture tests also need FFmpeg and ffprobe on PATH. Windows gives each test tool its own Job object before execution, and Linux uses a private process group. Their cleanup checks include an immediately exiting parent and preserve unrelated processes. JNA belongs only to the host tests and isn't included in the Android bundle. macOS process ownership hasn't been verified.
+
 ```bash
 export GITHUB_ACTOR=<your GitHub user>
 export GITHUB_TOKEN=<a token with read:packages>
