@@ -18,6 +18,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+- Java lookup now returns the executable's full path when a suitable JDK is already on PATH. Push checks and explicit JDK validation use the same executable.
 - Cancellation and gallery publication now choose one winner. A cancellation accepted through the final flush leaves no saved entry. Once publication starts, progress stays visible and Cancel is disabled. A failed gallery close or update reports failure and removes the unfinished entry.
 
 ## 0.7.0 (2026-10-02)

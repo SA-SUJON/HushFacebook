@@ -293,6 +293,12 @@ exit /b 19
         Resolve-Java -Explicit $emptyJdk
     } "*$emptyJdk*" 'An explicit directory without bin/java fell through to the PATH Java.'
 
+    $pathCandidate = Resolve-Java -Explicit 'java' -Minimum 1
+    Assert-True ([System.IO.Path]::IsPathRooted($pathCandidate)) `
+        'A PATH Java selection returned a bare command instead of its executable path.'
+    Assert-True ($pathCandidate -eq (Get-Command java -CommandType Application | Select-Object -First 1).Source) `
+        'A PATH Java selection did not identify the executable that passed its version check.'
+
     $pathJava = Resolve-Java
     $jdkRoot = Split-Path -Parent (Split-Path -Parent $pathJava)
     $resolvedJava = Resolve-Java -Explicit $jdkRoot
