@@ -24,7 +24,7 @@ class BundleIdentityTest {
     private val inputs = "3".repeat(64)
 
     private fun entries(state: String = "clean", source: String = commit, sourceTree: String = tree) = linkedMapOf(
-        "META-INF/MANIFEST.MF" to ("Manifest-Version: 1.0\r\nVersion: 0.7.0\r\n" +
+        "META-INF/MANIFEST.MF" to ("Manifest-Version: 1.0\r\nVersion: 0.7.1\r\n" +
             "Hushfacebook-Source-State: $state\r\nHushfacebook-Source-Commit: $source\r\n" +
             "Hushfacebook-Source-Tree: $sourceTree\r\nHushfacebook-Input-SHA256: $inputs\r\n\r\n").toByteArray(),
         "classes.dex" to byteArrayOf(1, 2, 3),

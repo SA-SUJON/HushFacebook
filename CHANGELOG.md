@@ -4,33 +4,35 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+## 0.7.1 (2026-10-03)
+
 ### Added
 
-- Completed native saves now keep a generic notification with Open and Share actions for the committed gallery file. It uses temporary read grants and stores no source links or post details.
-- Optional whole-word matching for both post-filter lists. It starts off, preserves existing imports, and respects Unicode word boundaries and keep-list overrides.
-- Settings-import previews name each changed switch and show its saved current and incoming state. Long lists scroll above the actions, with spoken state labels and no phrase contents.
-- Separate controls for the top Stories tray and Stories between posts. Upgrades keep the old choice, imports accept the combined or independent values, and exports save the independent choices.
-- Diagnostic reports now carry a build identity that also appears in status and About. Later source builds bind it to the packaged bytes and their source inputs. Missing or inconsistent metadata remains unknown or unverified.
-- Debug diagnostics for Marketplace response shapes, including the themed-ad and related-ad queries and the stock local-pickup/radius request fields. The report records fixed field names and types with model counts, leaves private values out, and identifies incomplete captures. It doesn't enable another listing filter.
-- An optional Saved shortcut under Menu. It starts off, opens Saved in the same Facebook install, and leaves every existing launcher entry in place. A full launcher or missing Saved route gives a status message. The Saved route has been checked from cold and warm starts on a phone. Its icon is rendered locally because Android rejects shortcut resources borrowed from another package.
+* **Facebook:** Completed native saves now keep a generic notification with Open and Share actions for the committed gallery file. It uses temporary read grants and stores no source links or post details.
+* **Facebook:** Optional whole-word matching for both post-filter lists. It starts off, preserves existing imports, and respects Unicode word boundaries and keep-list overrides.
+* **Facebook:** Settings-import previews name each changed switch and show its saved current and incoming state. Long lists scroll above the actions, with spoken state labels and no phrase contents.
+* **Facebook:** Separate controls for the top Stories tray and Stories between posts. Upgrades keep the old choice, imports accept the combined or independent values, and exports save the independent choices.
+* **Facebook:** Diagnostic reports now carry a build identity that also appears in status and About. Later source builds bind it to the packaged bytes and their source inputs. Missing or inconsistent metadata remains unknown or unverified.
+* **Facebook:** Debug diagnostics for Marketplace response shapes, including the themed-ad and related-ad queries and the stock local-pickup/radius request fields. The report records fixed field names and types with model counts, leaves private values out, and identifies incomplete captures. It doesn't enable another listing filter.
+* **Facebook:** An optional Saved shortcut under Menu. It starts off, opens Saved in the same Facebook install, and leaves every existing launcher entry in place. A full launcher or missing Saved route gives a status message. The Saved route has been checked from cold and warm starts on a phone. Its icon is rendered locally because Android rejects shortcut resources borrowed from another package.
 
 ### Changed
 
-- Source-build notes now explain Saved's launcher limits and the codec runner's verified process ownership.
-- The black-Reels report in #62 was traced to a custom ROM, with stock-firmware playback confirmed by the reporter. The Stories-between-posts fix (#45) and suggested Groups/Stories fixes (#8/#10) also have reporter confirmation. Their remaining switch and preserved-content comparisons are still tracked.
-- Messenger and Threads support have their own projects and release schedules, [HushMessenger](https://github.com/SysAdminDoc/HushMessenger) and [HushThreads](https://github.com/SysAdminDoc/HushThreads).
-- Source audits now fail when GitLab search is skipped, denied, unresolved or malformed, and keep the existing census date. GitLab.com's disabled global code search is documented instead of treating a token as the missing requirement.
-- Codec tests now own each tool's descendants before it starts, so an immediately exiting parent can't leave a child holding output open. Windows checks preserve the exact native Unicode arguments. Windows and Linux checks pass. macOS remains unverified.
+* **Tooling:** Source-build notes now explain Saved's launcher limits and the codec runner's verified process ownership.
+* **Facebook:** The black-Reels report in #62 was traced to a custom ROM, with stock-firmware playback confirmed by the reporter. The Stories-between-posts fix (#45) and suggested Groups/Stories fixes (#8/#10) also have reporter confirmation. Their remaining switch and preserved-content comparisons are still tracked.
+* **Facebook:** Messenger and Threads support have their own projects and release schedules, [HushMessenger](https://github.com/SysAdminDoc/HushMessenger) and [HushThreads](https://github.com/SysAdminDoc/HushThreads).
+* **Tooling:** Source audits now fail when GitLab search is skipped, denied, unresolved or malformed, and keep the existing census date. GitLab.com's disabled global code search is documented instead of treating a token as the missing requirement.
+* **Tooling:** Codec tests now own each tool's descendants before it starts, so an immediately exiting parent can't leave a child holding output open. Windows checks preserve the exact native Unicode arguments. Windows and Linux checks pass. macOS remains unverified.
 
 ### Fixed
 
-- Codec test cleanup no longer fails a successful tool run just because the launcher closes its control pipe while exiting.
-- The overview now calls out a missing Restore screens on re-signed builds patch directly, including the profile and Settings pages it can break. Root Mount installs don't show that warning.
-- Patch tests ignore nested fixture extraction files when checking their inputs. Top-level fixture changes still rerun tests, and an empty or invalid configured folder can't reuse a skipped result.
-- Build identity detects missing source inputs even when Git hides their removal. A clean claim requires the complete input set to match the committed tree.
-- Fragmented video saves now reject samples that point into box headers, gaps or past a media-data payload. Valid codec joins keep their existing samples, including media stored before a fragment or across several boxes.
-- Java lookup now returns the executable's full path when a suitable JDK is already on PATH. Push checks and explicit JDK validation use the same executable.
-- Cancellation and gallery publication now choose one winner. A cancellation accepted through the final flush leaves no saved entry. Once publication starts, progress stays visible and Cancel is disabled. A failed gallery close or update reports failure and removes the unfinished entry.
+* **Tooling:** Codec test cleanup no longer fails a successful tool run just because the launcher closes its control pipe while exiting.
+* **Facebook:** The overview now calls out a missing Restore screens on re-signed builds patch directly, including the profile and Settings pages it can break. Root Mount installs don't show that warning.
+* **Tooling:** Patch tests ignore nested fixture extraction files when checking their inputs. Top-level fixture changes still rerun tests, and an empty or invalid configured folder can't reuse a skipped result.
+* **Facebook:** Build identity detects missing source inputs even when Git hides their removal. A clean claim requires the complete input set to match the committed tree.
+* **Facebook:** Fragmented video saves now reject samples that point into box headers, gaps or past a media-data payload. Valid codec joins keep their existing samples, including media stored before a fragment or across several boxes.
+* **Tooling:** Java lookup now returns the executable's full path when a suitable JDK is already on PATH. Push checks and explicit JDK validation use the same executable.
+* **Facebook:** Cancellation and gallery publication now choose one winner. A cancellation accepted through the final flush leaves no saved entry. Once publication starts, progress stays visible and Cancel is disabled. A failed gallery close or update reports failure and removes the unfinished entry.
 
 ## 0.7.0 (2026-10-02)
 

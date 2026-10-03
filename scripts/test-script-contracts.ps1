@@ -2029,7 +2029,7 @@ try {
         $windowReadme = Get-Content -LiteralPath (Join-Path $factsRoot 'README.md') -Raw
         foreach ($stale in @(
                 @{ Pattern = '*version badge names 0.1.0*'; Edit = { param($text) $text -replace 'badge/version-\d+(?:\.\d+)+-', 'badge/version-0.1.0-' } },
-                @{ Pattern = '*latest release is v0.1.0*'; Edit = { param($text) $text -replace '(latest release is \[v)\d+(?:\.\d+)+', '${1}0.1.0' } })) {
+                @{ Pattern = '*latest release is v0.1.0*'; Edit = { param($text) $text -replace '(?i)(latest (?:published )?release is (?:still )?\[?v)\d+(?:\.\d+)+', '${1}0.1.0' } })) {
             Set-FactsFile 'README.md' $stale.Edit
             Assert-Throws { & $factsScript -Root $factsRoot -SkipDescriptionTestCount -AllowPublishedIndexLag -SkipUrlCheck 6> $null } `
                 $stale.Pattern "The gate accepted a $window README naming a version that is neither the source's nor the published one."
@@ -2167,13 +2167,13 @@ try {
             @{ Name = 'no version badge'; Pattern = '*no version badge*'
                 Edit = { param($text) $text -replace '<img src="https://img\.shields\.io/badge/version-[^>]*>', '' } },
             @{ Name = 'a latest release of another version'; Pattern = '*latest release is v0.1.0*'
-                Edit = { param($text) $text -replace '(latest release is \[v)\d+(?:\.\d+)+(\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', '${1}0.1.0${2}0.1.0' } },
+                Edit = { param($text) $text -replace '(?i)(latest (?:published )?release is (?:still )?\[v)\d+(?:\.\d+)+(\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', '${1}0.1.0${2}0.1.0' -replace '(?i)(latest (?:published )?release is (?:still )?v)\d+(?:\.\d+)+', '${1}0.1.0' } },
             @{ Name = 'a latest release linked to another tag'; Pattern = '*links it to*/tag/v0.1.0*'
-                Edit = { param($text) $text -replace '(latest release is \[v\d+(?:\.\d+)+\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', '${1}0.1.0' } },
+                Edit = { param($text) $text -replace '(?i)(latest (?:published )?release is (?:still )?\[v\d+(?:\.\d+)+\]\([^)\s]*/tag/v)\d+(?:\.\d+)+', '${1}0.1.0' -replace '(?i)(latest (?:published )?release is (?:still )?)v(\d+(?:\.\d+)+)', '${1}[v${2}](https://github.com/SysAdminDoc/Hushfacebook/releases/tag/v0.1.0)' } },
             @{ Name = 'a latest release counting other patches'; Pattern = '*latest release has 13 patches*'
-                Edit = { param($text) $text -replace '(latest release is \[v[^\]]+\]\([^)\s]*\), with )\d+( patches)', '${1}13${2}' } },
+                Edit = { param($text) $text -replace '(?i)(latest (?:published )?release is (?:still )?(?:\[v[^\]]+\]\([^)\s]*\)|v\d+(?:\.\d+)+), with )\d+( patches)', '${1}13${2}' } },
             @{ Name = 'no sentence naming the latest release'; Pattern = '*does not say which release is the latest*'
-                Edit = { param($text) $text -replace 'The latest release is \[v[^\]]+\]\([^)\s]*\), with \d+ patches\.', 'Releases are on GitHub.' } })) {
+                Edit = { param($text) $text -replace '(?i)The latest (?:published )?release is (?:still )?(?:\[v[^\]]+\]\([^)\s]*\)|v\d+(?:\.\d+)+), with \d+ patches\.', 'Releases are on GitHub.' } })) {
         $unedited = Get-Content -LiteralPath (Join-Path $factsRoot 'README.md') -Raw
         Set-FactsFile 'README.md' $case.Edit
         try {
