@@ -426,6 +426,10 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting CHECK_FOR_RELEASES =
             new BooleanSetting("hushfacebook_check_releases", FALSE);
 
+    /** A launcher shortcut to Saved, added only when it won't displace an existing entry. */
+    public static final BooleanSetting SAVED_SHORTCUT =
+            new BooleanSetting("hushfacebook_saved_shortcut", FALSE);
+
     /**
      * The story viewer's menu offers Save on anyone's story, and Save runs Hushfacebook's own
      * download. Off, only your own stories offer it, and it's Facebook's own save.

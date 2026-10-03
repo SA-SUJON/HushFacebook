@@ -712,3 +712,8 @@ When Facebook opens on Feeds, the Feeds tab opens on the filter Facebook picks.	
 When Facebook opens on Feeds, the Feeds tab opens on %1$s. If your Feeds tab doesn't have it, it opens as usual.	Facebook Akışlar sekmesinde açıldığında Akışlar %1$s filtresinde açılır. Akışlar sekmende bu filtre yoksa her zamanki gibi açılır.
 The Feeds tab will open on the filter Facebook picks.	Akışlar sekmesi Facebook'un seçtiği filtrede açılacak.
 The Feeds tab will open on %1$s.	Akışlar sekmesi %1$s filtresinde açılacak.
+Saved	Kaydedilenler
+Saved shortcut	Kaydedilenler kısayolu
+Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay.	Yer varsa Kaydedilenler seçeneğini Facebook simge menüsüne ekler. Mevcut kısayollar kalır.
+Your launcher has no room for another shortcut.	Başlatıcınızda başka bir kısayol için yer yok.
+Saved isn't available in this build.	Kaydedilenler bu sürümde kullanılamıyor.

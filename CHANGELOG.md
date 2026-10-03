@@ -4,6 +4,10 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+### Added
+
+- An optional Saved shortcut under Menu. It starts off, opens Saved in the same Facebook install, and leaves every existing launcher entry in place. A full launcher or missing Saved route gives a status message. Cold and warm device navigation still need verification.
+
 ### Changed
 
 - Source audits now fail when GitLab search is skipped, denied, unresolved or malformed, and keep the existing census date. GitLab.com's disabled global code search is documented instead of treating a token as the missing requirement.

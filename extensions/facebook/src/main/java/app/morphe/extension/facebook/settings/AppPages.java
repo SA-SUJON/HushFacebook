@@ -14,6 +14,7 @@ import android.content.Context;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 
 import java.util.Set;
 
@@ -51,8 +52,16 @@ final class AppPages {
     /** Menu: the sections of Facebook's Menu that sell something. */
     static void menu(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
+        PreferenceCategory menu = category(screen, L10n.t("Menu"));
+        SwitchPreference saved = toggle(context, Settings.SAVED_SHORTCUT, L10n.t("Saved shortcut"),
+                L10n.t("Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay."));
+        saved.setOnPreferenceChangeListener((preference, value) -> {
+            Settings.SAVED_SHORTCUT.save((Boolean) value);
+            SavedShortcut.changed(context);
+            return true;
+        });
+        menu.addPreference(saved);
         if (build.contains(PatchFamily.MENU_PROMOTIONS)) {
-            PreferenceCategory menu = category(screen, L10n.t("Menu"));
             menu.addPreference(toggle(context, Settings.HIDE_MENU_UPGRADES, L10n.t("Hide Upgrades"),
                     L10n.t("The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support "
                             + "and the rest of the Menu stay.")));

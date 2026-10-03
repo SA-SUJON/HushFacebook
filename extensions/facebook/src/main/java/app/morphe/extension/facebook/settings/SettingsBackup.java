@@ -145,6 +145,7 @@ public final class SettingsBackup {
             Settings.DOWNLOAD_VIDEOS,
             Settings.DOWNLOAD_COMPATIBLE,
             Settings.OPEN_ON_CHOSEN_TAB,
+            Settings.SAVED_SHORTCUT,
             Settings.MARKETPLACE_ONLY,
             Settings.MARKETPLACE_QUIET_NOTIFICATIONS,
             Settings.MARKETPLACE_SKIP_FEED_PREFETCH,

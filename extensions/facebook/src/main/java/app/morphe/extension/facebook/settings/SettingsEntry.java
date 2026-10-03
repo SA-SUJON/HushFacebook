@@ -123,6 +123,7 @@ public final class SettingsEntry {
         Utils.runOnBackgroundThread(() -> {
             ReelsTab.removePublished(app);
             publishShortcutNow(app);
+            SavedShortcut.refreshNow(app);
         });
     }
 
@@ -279,6 +280,7 @@ public final class SettingsEntry {
             boolean queued = Utils.runOnBackgroundThread(() -> {
                 keepFirstQueued.set(false);
                 keepFirstNow(app);
+                SavedShortcut.refreshNow(app);
             });
             if (!queued) keepFirstQueued.set(false);
         } catch (Throwable t) {
@@ -459,6 +461,7 @@ public final class SettingsEntry {
             resumed = new WeakReference<>(activity);
             if (openPending) openWhenSettled(activity);
             relabelIfStale(activity);
+            SavedShortcut.refresh(activity);
         }
 
         @Override
