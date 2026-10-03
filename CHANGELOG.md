@@ -13,6 +13,7 @@ Every Hushfacebook release, newest first.
 
 ### Changed
 
+- Source-build notes now explain Saved's launcher limits and the codec runner's verified process ownership.
 - The black-Reels report in #62 was traced to a custom ROM, with stock-firmware playback confirmed by the reporter. The Stories-between-posts fix (#45) and suggested Groups/Stories fixes (#8/#10) also have reporter confirmation. Their remaining switch and preserved-content comparisons are still tracked.
 - Messenger and Threads support have their own projects and release schedules, [HushMessenger](https://github.com/SysAdminDoc/HushMessenger) and [HushThreads](https://github.com/SysAdminDoc/HushThreads).
 - Source audits now fail when GitLab search is skipped, denied, unresolved or malformed, and keep the existing census date. GitLab.com's disabled global code search is documented instead of treating a token as the missing requirement.
