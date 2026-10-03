@@ -189,10 +189,7 @@ public final class CodecProcess implements AutoCloseable {
         } catch (Throwable cleanup) { failure = cleanup; }
         if (launcher != null) {
             try {
-                if (launcher.isAlive()) {
-                    launcher.getOutputStream().write(RELEASE);
-                    launcher.getOutputStream().flush();
-                }
+                releaseLauncher(until, interrupted);
                 launcher.getOutputStream().close();
                 if (!waitLauncher(until, interrupted)) {
                     launcher.destroyForcibly();
@@ -224,6 +221,17 @@ public final class CodecProcess implements AutoCloseable {
         if (failure != null) {
             if (failure instanceof Exception) throw (Exception) failure;
             throw (Error) failure;
+        }
+    }
+
+    private void releaseLauncher(long until, boolean[] interrupted) throws IOException {
+        if (!launcher.isAlive()) return;
+        try {
+            launcher.getOutputStream().write(RELEASE);
+            launcher.getOutputStream().flush();
+        } catch (IOException closed) {
+            long soon = Math.min(until, System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(100));
+            if (!waitLauncher(soon, interrupted)) throw closed;
         }
     }
 

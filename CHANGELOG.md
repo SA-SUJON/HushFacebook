@@ -24,6 +24,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+- Codec test cleanup no longer fails a successful tool run just because the launcher closes its control pipe while exiting.
 - The overview now calls out a missing Restore screens on re-signed builds patch directly, including the profile and Settings pages it can break. Root Mount installs don't show that warning.
 - Patch tests ignore nested fixture extraction files when checking their inputs. Top-level fixture changes still rerun tests, and an empty or invalid configured folder can't reuse a skipped result.
 - Build identity detects missing source inputs even when Git hides their removal. A clean claim requires the complete input set to match the committed tree.
