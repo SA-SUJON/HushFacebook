@@ -6,6 +6,7 @@ Every Hushfacebook release, newest first.
 
 ### Changed
 
+- Source audits now fail when GitLab search is skipped, denied, unresolved or malformed, and keep the existing census date. GitLab.com's disabled global code search is documented instead of treating a token as the missing requirement.
 - Codec tests now own each tool's descendants before it starts, so an immediately exiting parent can't leave a child holding output open. Windows checks preserve the exact native Unicode arguments. Windows and Linux checks pass. macOS remains unverified.
 
 ## 0.7.0 (2026-10-02)
