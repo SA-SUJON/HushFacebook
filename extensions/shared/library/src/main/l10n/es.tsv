@@ -569,6 +569,18 @@ Facebook's web addresses open here now.	Las direcciones web de Facebook ahora se
 Meta App Manager can keep Facebook's web addresses for itself, so their links skip this app. Tap and turn off Open supported links there, then check Supported links above.	Meta App Manager puede quedarse con las direcciones web de Facebook, y entonces sus enlaces no llegan a esta app. Toca y desactiva “Abrir enlaces compatibles” allí, y luego revisa Enlaces compatibles más arriba.
 # context: message when Android's page for Meta App Manager doesn't open; "Open by default" is Android's page name
 Meta App Manager's settings didn't open. Find it in Android's app list with system apps shown, then Open by default.	No se abrieron los ajustes de Meta App Manager. Búscala en la lista de apps de Android mostrando las apps del sistema y luego Abrir de forma predeterminada.
+# context: title of a row under Links; Messenger is the name of Meta's app, keep it as is
+Messenger	Messenger
+# context: title of a row under Links; Instagram is the name of Meta's app, keep it as is
+Instagram	Instagram
+# context: the Messenger row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
+Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.	Messenger puede quedarse con los enlaces de facebook.com y m.me, y entonces sus interruptores para esta app se vuelven a desactivar solos. Toca y desactiva “Abrir enlaces compatibles” allí, y luego revisa Enlaces compatibles más arriba.
+# context: the Instagram row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
+Instagram can keep facebook.com links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.	Instagram puede quedarse con los enlaces de facebook.com, y entonces sus interruptores para esta app se vuelven a desactivar solos. Toca y desactiva “Abrir enlaces compatibles” allí, y luego revisa Enlaces compatibles más arriba.
+# context: message when Android's page for Messenger doesn't open; "App info" and "Open by default" are Android's page names
+Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.	No se abrieron los ajustes de Messenger. Abre Información de la app desde el icono de Messenger y luego Abrir de forma predeterminada.
+# context: message when Android's page for Instagram doesn't open; "App info" and "Open by default" are Android's page names
+Instagram's settings didn't open. Open App info from Instagram's icon, then Open by default.	No se abrieron los ajustes de Instagram. Abre Información de la app desde el icono de Instagram y luego Abrir de forma predeterminada.
 # context: message when a save starts and its notification can't show (Facebook's notifications or the saves channel are off); Downloads is the settings section that lists running saves, each with its own Cancel
 Saving... Cancel: Downloads in Hushfacebook.	Guardando... Cancelar: Descargas en Hushfacebook.
 # context: switch title under Reels and Watch; on, a double tap on a reel or a video doesn't like it

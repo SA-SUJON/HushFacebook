@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(1114);
+        Map<String, String> table = new HashMap<>(1126);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -565,6 +565,12 @@ public final class L10nTranslations {
                 "Unter Wiedergabe blockiert \u201eZum Abspielen tippen\u201c die automatische Wiedergabe, sodass Reels und andere Videos auf dein Antippen warten.");
         table.put("In Reels and Watch, Hide the Reels tab blocks it after a restart.",
                 "Unter \u201eReels und Watch\u201c blockiert \u201eReels-Tab ausblenden\u201c ihn nach einem Neustart.");
+        table.put("Instagram",
+                "Instagram");
+        table.put("Instagram can keep facebook.com links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "Instagram kann facebook.com-Links f\u00fcr sich behalten, dann schalten sich ihre Schalter f\u00fcr diese App wieder aus. Tippe und schalte dort \u201eUnterst\u00fctzte Links \u00f6ffnen\u201c aus, dann pr\u00fcfe \u201eUnterst\u00fctzte Links\u201c oben.");
+        table.put("Instagram's settings didn't open. Open App info from Instagram's icon, then Open by default.",
+                "Die Einstellungen von Instagram lie\u00dfen sich nicht \u00f6ffnen. \u00d6ffne die App-Info \u00fcber das Instagram-Symbol, dann \u201eStandardm\u00e4\u00dfig \u00f6ffnen\u201c.");
         table.put("It targets Facebook %1$s.",
                 "Es ist f\u00fcr Facebook %1$s gedacht.");
         table.put("Joining the picture and sound",
@@ -617,6 +623,12 @@ public final class L10nTranslations {
                 "Men\u00fc");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
                 "Nachrichten, Freundschaftsanfragen, Kommentare, Erw\u00e4hnungen, Anrufe und Anmeldewarnungen, dazu jede Art, die Hushfacebook nicht kennt. Androids eigene Einstellungen f\u00fcr die Benachrichtigungskategorien von Facebook wirken ebenfalls, denn Facebook verwirft eine Benachrichtigung, deren Kategorie du ausgeschaltet hast. Welche Kategorien du bekommst, entscheidet allerdings Facebooks Server, deshalb trennen sie diese Arten vielleicht nicht.");
+        table.put("Messenger",
+                "Messenger");
+        table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "Messenger kann facebook.com- und m.me-Links f\u00fcr sich behalten, dann schalten sich ihre Schalter f\u00fcr diese App wieder aus. Tippe und schalte dort \u201eUnterst\u00fctzte Links \u00f6ffnen\u201c aus, dann pr\u00fcfe \u201eUnterst\u00fctzte Links\u201c oben.");
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "Die Einstellungen von Messenger lie\u00dfen sich nicht \u00f6ffnen. \u00d6ffne die App-Info \u00fcber das Messenger-Symbol, dann \u201eStandardm\u00e4\u00dfig \u00f6ffnen\u201c.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite und Workplace lassen sich neben diesem Facebook installieren. Es gibt den zwei Berechtigungen, die sie mit ihm teilen, eigene Namen.");
         table.put("Meta App Manager",
@@ -659,6 +671,9 @@ public final class L10nTranslations {
                 "Keine gew\u00e4hlt, deshalb wird die Schriftart deines Handys verwendet. W\u00e4hle eine TrueType- oder OpenType-Datei mit bis zu %1$d MB.");
         table.put("None of Facebook's web addresses are selected for this app, so their links open elsewhere. Tap to select them in Android's settings.",
                 "Keine Webadresse von Facebook ist f\u00fcr diese App ausgew\u00e4hlt, deshalb \u00f6ffnen sich ihre Links woanders. Tippe, um sie in den Android-Einstellungen auszuw\u00e4hlen.");
+    }
+
+    private static void fillDe5(Map<String, String> table) {
         table.put("Not in this build. To block this, choose the %1$s patch in Morphe Manager and patch again.",
                 "Nicht in diesem Build. Um das zu blockieren, w\u00e4hle in Morphe Manager den Patch %1$s und patche erneut.");
         table.put("Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.",
@@ -671,9 +686,6 @@ public final class L10nTranslations {
                 "Nicht gespeichert: Die Datei ist \u00fcber 512 MB gro\u00df");
         table.put("Notifications",
                 "Benachrichtigungen");
-    }
-
-    private static void fillDe5(Map<String, String> table) {
         table.put("OK",
                 "OK");
         table.put("Off",
@@ -782,6 +794,9 @@ public final class L10nTranslations {
                 "Die Buttons Remix, Vorlage verwenden, \u201eDu bist dran\u201c und Edits sowie die f\u00fcr Sterne, Spiele, Partner-Apps und externe Links. Der Song und andere Hinweise bleiben.");
         table.put("Remove tracking from shared links",
                 "Tracking aus geteilten Links entfernen");
+    }
+
+    private static void fillDe6(Map<String, String> table) {
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "Neustart erforderlich. Der Marketplace-Modus wird beim n\u00e4chsten Start von Facebook aktiviert.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -794,9 +809,6 @@ public final class L10nTranslations {
                 "Lange Videos fortsetzen");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Setzt Videos \u00fcber zwei Minuten an deiner letzten Stelle fort. Die Suchleiste \u00e4ndert den Start. Reels, Live-Videos und Werbung starten wie gewohnt.");
-    }
-
-    private static void fillDe6(Map<String, String> table) {
         table.put("Retry",
                 "Erneut versuchen");
         table.put("Return to regular Facebook",
@@ -905,6 +917,9 @@ public final class L10nTranslations {
                 "Feed-Vorladen \u00fcberspringen");
         table.put("Smallest",
                 "Kleinste");
+    }
+
+    private static void fillDe7(Map<String, String> table) {
         table.put("Source code and issues",
                 "Quellcode und Issues");
         table.put("Stays in while paused",
@@ -917,9 +932,6 @@ public final class L10nTranslations {
                 "Update-Aufforderungen stoppen");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Verwendet die Schriftdatei nicht mehr und kehrt zur Schriftart deines Handys zur\u00fcck.");
-    }
-
-    private static void fillDe7(Map<String, String> table) {
         table.put("Stories",
                 "Stories");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
@@ -1028,6 +1040,9 @@ public final class L10nTranslations {
                 "Die Einstellung lie\u00df sich nicht vollst\u00e4ndig aktualisieren. Der gespeicherte Wert wird angezeigt.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zur\u00fcck, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.");
+    }
+
+    private static void fillDe8(Map<String, String> table) {
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "Der Streifen bei manchen Beitr\u00e4gen, etwa \u201eInteressiert dich dieser Beitrag?\u201c, \u201eWeniger anzeigen\u201c oder wer vor Kurzem kommentiert hat, und die Vorschl\u00e4ge zum Folgen und Chatten an derselben Stelle. Der Beitrag bleibt.");
         table.put("The switch takes effect when Facebook restarts.",
@@ -1040,9 +1055,6 @@ public final class L10nTranslations {
                 "Es gibt keine Diagnosedaten zum L\u00f6schen.");
         table.put("There's no diagnostic data to put back.",
                 "Es gibt keine Diagnosedaten zum Wiederherstellen.");
-    }
-
-    private static void fillDe8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Diese werden beim Patchen in Morphe Manager ausgew\u00e4hlt, und die Pause schaltet sie nicht aus. Patche erneut, um sie zu \u00e4ndern.");
         table.put("This build can't run the Messenger link test.",
@@ -1151,6 +1163,9 @@ public final class L10nTranslations {
                 "Du hast die neueste Version von Hushfacebook.");
         table.put("You paused Hushfacebook.",
                 "Du hast Hushfacebook pausiert.");
+    }
+
+    private static void fillDe9(Map<String, String> table) {
         table.put("Your choices are saved. Tap Resume, then restart Facebook.",
                 "Deine Auswahl bleibt gespeichert. Tippe auf Fortsetzen und starte Facebook dann neu.");
         table.put("Your controls are active.",
@@ -1163,9 +1178,6 @@ public final class L10nTranslations {
                 "Deine Liste der W\u00f6rter, bei denen ein Beitrag bleibt, enth\u00e4lt dann %1$d Wort oder Wortfolge.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "Deine Liste der W\u00f6rter, bei denen ein Beitrag bleibt, enth\u00e4lt dann %1$d W\u00f6rter oder Wortfolgen.");
-    }
-
-    private static void fillDe9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Deine Liste der W\u00f6rter zum Ausblenden ist dann leer.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
@@ -1203,7 +1215,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(1114);
+        Map<String, String> table = new HashMap<>(1126);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1724,6 +1736,12 @@ public final class L10nTranslations {
                 "En Reproducci\u00f3n, \u201cToca para reproducir\u201d bloquea la reproducci\u00f3n autom\u00e1tica, as\u00ed que los reels y otros v\u00eddeos esperan a que toques.");
         table.put("In Reels and Watch, Hide the Reels tab blocks it after a restart.",
                 "En \u201cReels y Watch\u201d, \u201cOcultar la pesta\u00f1a Reels\u201d la bloquea tras un reinicio.");
+        table.put("Instagram",
+                "Instagram");
+        table.put("Instagram can keep facebook.com links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "Instagram puede quedarse con los enlaces de facebook.com, y entonces sus interruptores para esta app se vuelven a desactivar solos. Toca y desactiva \u201cAbrir enlaces compatibles\u201d all\u00ed, y luego revisa Enlaces compatibles m\u00e1s arriba.");
+        table.put("Instagram's settings didn't open. Open App info from Instagram's icon, then Open by default.",
+                "No se abrieron los ajustes de Instagram. Abre Informaci\u00f3n de la app desde el icono de Instagram y luego Abrir de forma predeterminada.");
         table.put("It targets Facebook %1$s.",
                 "Est\u00e1 pensado para Facebook %1$s.");
         table.put("Joining the picture and sound",
@@ -1776,6 +1794,12 @@ public final class L10nTranslations {
                 "Men\u00fa");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
                 "Los mensajes, las solicitudes de amistad, los comentarios, las menciones, las llamadas y las alertas de inicio de sesi\u00f3n, adem\u00e1s de cualquier tipo que Hushfacebook no conozca. Los ajustes propios de Android para las categor\u00edas de notificaciones de Facebook tambi\u00e9n funcionan, porque Facebook descarta una notificaci\u00f3n cuya categor\u00eda hayas desactivado. Pero es el servidor de Facebook el que decide qu\u00e9 categor\u00edas tienes, as\u00ed que puede que no separen estos tipos.");
+        table.put("Messenger",
+                "Messenger");
+        table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "Messenger puede quedarse con los enlaces de facebook.com y m.me, y entonces sus interruptores para esta app se vuelven a desactivar solos. Toca y desactiva \u201cAbrir enlaces compatibles\u201d all\u00ed, y luego revisa Enlaces compatibles m\u00e1s arriba.");
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "No se abrieron los ajustes de Messenger. Abre Informaci\u00f3n de la app desde el icono de Messenger y luego Abrir de forma predeterminada.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite y Workplace se instalan junto a este Facebook. Les da nombres propios a los dos permisos que comparten con \u00e9l.");
         table.put("Meta App Manager",
@@ -1818,6 +1842,9 @@ public final class L10nTranslations {
                 "No hay ninguno, as\u00ed que se usa la fuente de tu tel\u00e9fono. Elige un archivo TrueType u OpenType de hasta %1$d MB.");
         table.put("None of Facebook's web addresses are selected for this app, so their links open elsewhere. Tap to select them in Android's settings.",
                 "Ninguna direcci\u00f3n web de Facebook est\u00e1 seleccionada para esta app, as\u00ed que sus enlaces se abren en otro sitio. Toca para seleccionarlas en los ajustes de Android.");
+    }
+
+    private static void fillEs5(Map<String, String> table) {
         table.put("Not in this build. To block this, choose the %1$s patch in Morphe Manager and patch again.",
                 "No est\u00e1 en esta compilaci\u00f3n. Para bloquearlo, elige el parche %1$s en Morphe Manager y vuelve a parchear.");
         table.put("Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.",
@@ -1830,9 +1857,6 @@ public final class L10nTranslations {
                 "No se guard\u00f3: el archivo supera los 512 MB");
         table.put("Notifications",
                 "Notificaciones");
-    }
-
-    private static void fillEs5(Map<String, String> table) {
         table.put("OK",
                 "Aceptar");
         table.put("Off",
@@ -1941,6 +1965,9 @@ public final class L10nTranslations {
                 "Los botones para hacer un remix, usar la plantilla, sumar el tuyo o abrir Edits, y los de estrellas, juegos, apps asociadas y enlaces externos. La canci\u00f3n y las dem\u00e1s etiquetas se quedan.");
         table.put("Remove tracking from shared links",
                 "Quitar el seguimiento de los enlaces compartidos");
+    }
+
+    private static void fillEs6(Map<String, String> table) {
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "Es necesario reiniciar. El modo Marketplace se activar\u00e1 la pr\u00f3xima vez que se inicie Facebook.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -1953,9 +1980,6 @@ public final class L10nTranslations {
                 "Reanudar videos largos");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Reanuda v\u00eddeos de m\u00e1s de dos minutos donde los dejaste. Usa la barra para cambiar el inicio. Reels, directos y anuncios empiezan como siempre.");
-    }
-
-    private static void fillEs6(Map<String, String> table) {
         table.put("Retry",
                 "Reintentar");
         table.put("Return to regular Facebook",
@@ -2064,6 +2088,9 @@ public final class L10nTranslations {
                 "Omitir la precarga del feed");
         table.put("Smallest",
                 "La m\u00e1s peque\u00f1a");
+    }
+
+    private static void fillEs7(Map<String, String> table) {
         table.put("Source code and issues",
                 "C\u00f3digo fuente e incidencias");
         table.put("Stays in while paused",
@@ -2076,9 +2103,6 @@ public final class L10nTranslations {
                 "Detener los avisos de actualizaci\u00f3n");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Deja de usar el archivo de fuente y vuelve a la fuente de tu tel\u00e9fono.");
-    }
-
-    private static void fillEs7(Map<String, String> table) {
         table.put("Stories",
                 "Historias");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
@@ -2187,6 +2211,9 @@ public final class L10nTranslations {
                 "No se pudo terminar de actualizar el ajuste. Se muestra su valor guardado.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "El archivo de configuraci\u00f3n se guard\u00f3, pero al volver a leerlo no coincide con lo que se escribi\u00f3. Gu\u00e1rdalo de nuevo como un archivo nuevo.");
+    }
+
+    private static void fillEs8(Map<String, String> table) {
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "La franja en algunas publicaciones, como \u201c\u00bfTe interesa esta publicaci\u00f3n?\u201d, \u201cMostrar menos\u201d o qui\u00e9n coment\u00f3 hace poco, y las sugerencias para seguir o chatear en el mismo lugar. La publicaci\u00f3n se queda.");
         table.put("The switch takes effect when Facebook restarts.",
@@ -2199,9 +2226,6 @@ public final class L10nTranslations {
                 "No hay datos de diagn\u00f3stico que borrar.");
         table.put("There's no diagnostic data to put back.",
                 "No hay datos de diagn\u00f3stico que restaurar.");
-    }
-
-    private static void fillEs8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Se eligen en Morphe Manager al parchear, y Pausar no los desactiva. Vuelve a parchear para cambiarlos.");
         table.put("This build can't run the Messenger link test.",
@@ -2310,6 +2334,9 @@ public final class L10nTranslations {
                 "Tienes la versi\u00f3n m\u00e1s reciente de Hushfacebook.");
         table.put("You paused Hushfacebook.",
                 "Pausaste Hushfacebook.");
+    }
+
+    private static void fillEs9(Map<String, String> table) {
         table.put("Your choices are saved. Tap Resume, then restart Facebook.",
                 "Tus preferencias est\u00e1n guardadas. Toca Reanudar y luego reinicia Facebook.");
         table.put("Your controls are active.",
@@ -2322,9 +2349,6 @@ public final class L10nTranslations {
                 "Tu lista de palabras que mantienen una publicaci\u00f3n tendr\u00e1 %1$d palabra o frase.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "Tu lista de palabras que mantienen una publicaci\u00f3n tendr\u00e1 %1$d palabras o frases.");
-    }
-
-    private static void fillEs9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Tu lista de palabras para ocultar quedar\u00e1 vac\u00eda.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
@@ -2362,7 +2386,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(1114);
+        Map<String, String> table = new HashMap<>(1126);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -2883,6 +2907,12 @@ public final class L10nTranslations {
                 "Di Pemutaran, \u201cKetuk untuk memutar\u201d memblokir putar otomatis, jadi Reels dan video lain menunggu ketukan Anda.");
         table.put("In Reels and Watch, Hide the Reels tab blocks it after a restart.",
                 "Di \u201cReels dan Watch\u201d, \u201cSembunyikan tab Reels\u201d memblokirnya setelah dimulai ulang.");
+        table.put("Instagram",
+                "Instagram");
+        table.put("Instagram can keep facebook.com links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "Instagram bisa mengambil tautan facebook.com untuk dirinya sendiri, sehingga tombolnya untuk aplikasi ini mati lagi dengan sendirinya. Ketuk dan nonaktifkan \u201cBuka link yang didukung\u201d di sana, lalu periksa Tautan yang didukung di atas.");
+        table.put("Instagram's settings didn't open. Open App info from Instagram's icon, then Open by default.",
+                "Pengaturan Instagram tidak terbuka. Buka Info aplikasi dari ikon Instagram, lalu Buka secara default.");
         table.put("It targets Facebook %1$s.",
                 "Rilis ini ditujukan untuk Facebook %1$s.");
         table.put("Joining the picture and sound",
@@ -2935,6 +2965,12 @@ public final class L10nTranslations {
                 "Menu");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
                 "Pesan, permintaan pertemanan, komentar, sebutan, panggilan, dan peringatan login, ditambah jenis apa pun yang tidak dikenal Hushfacebook. Pengaturan Android sendiri untuk kategori notifikasi Facebook juga berfungsi, karena Facebook membuang notifikasi yang kategorinya Anda matikan. Namun server Facebook yang menentukan kategori apa saja yang Anda dapat, jadi kategori itu mungkin tidak memisahkan jenis-jenis ini.");
+        table.put("Messenger",
+                "Messenger");
+        table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "Messenger bisa mengambil tautan facebook.com dan m.me untuk dirinya sendiri, sehingga tombolnya untuk aplikasi ini mati lagi dengan sendirinya. Ketuk dan nonaktifkan \u201cBuka link yang didukung\u201d di sana, lalu periksa Tautan yang didukung di atas.");
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "Pengaturan Messenger tidak terbuka. Buka Info aplikasi dari ikon Messenger, lalu Buka secara default.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite, dan Workplace dapat dipasang di samping Facebook ini. Facebook ini memberi nama sendiri pada dua izin yang mereka gunakan bersama dengannya.");
         table.put("Meta App Manager",
@@ -2977,6 +3013,9 @@ public final class L10nTranslations {
                 "Belum ada yang dipilih, jadi font ponsel Anda yang dipakai. Pilih file TrueType atau OpenType hingga %1$d MB.");
         table.put("None of Facebook's web addresses are selected for this app, so their links open elsewhere. Tap to select them in Android's settings.",
                 "Tidak ada alamat web Facebook yang dipilih untuk aplikasi ini, jadi tautannya terbuka di tempat lain. Ketuk untuk memilihnya di pengaturan Android.");
+    }
+
+    private static void fillIn5(Map<String, String> table) {
         table.put("Not in this build. To block this, choose the %1$s patch in Morphe Manager and patch again.",
                 "Tidak ada di build ini. Untuk memblokirnya, pilih tambalan %1$s di Morphe Manager lalu tambal ulang.");
         table.put("Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.",
@@ -2989,9 +3028,6 @@ public final class L10nTranslations {
                 "Tidak disimpan: file lebih dari 512 MB");
         table.put("Notifications",
                 "Notifikasi");
-    }
-
-    private static void fillIn5(Map<String, String> table) {
         table.put("OK",
                 "Oke");
         table.put("Off",
@@ -3100,6 +3136,9 @@ public final class L10nTranslations {
                 "Tombol untuk Remix, memakai templat, menambahkan milik Anda, dan Edits, serta tombol Bintang, game, aplikasi mitra, dan tautan eksternal. Lagu dan label lainnya tetap ada.");
         table.put("Remove tracking from shared links",
                 "Hapus pelacakan dari tautan yang dibagikan");
+    }
+
+    private static void fillIn6(Map<String, String> table) {
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "Perlu dimulai ulang. Mode Marketplace akan aktif saat Facebook dimulai lagi.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -3112,9 +3151,6 @@ public final class L10nTranslations {
                 "Lanjutkan video panjang");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Lanjutkan video lebih dari dua menit dari posisi terakhir. Geser bilah untuk posisi lain. Reel, video langsung, dan iklan mulai seperti biasa.");
-    }
-
-    private static void fillIn6(Map<String, String> table) {
         table.put("Retry",
                 "Coba lagi");
         table.put("Return to regular Facebook",
@@ -3223,6 +3259,9 @@ public final class L10nTranslations {
                 "Lewati pramuat beranda");
         table.put("Smallest",
                 "Terkecil");
+    }
+
+    private static void fillIn7(Map<String, String> table) {
         table.put("Source code and issues",
                 "Kode sumber dan laporan masalah");
         table.put("Stays in while paused",
@@ -3235,9 +3274,6 @@ public final class L10nTranslations {
                 "Hentikan permintaan pembaruan");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Berhenti memakai file font dan kembali ke font ponsel Anda.");
-    }
-
-    private static void fillIn7(Map<String, String> table) {
         table.put("Stories",
                 "Cerita");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
@@ -3346,6 +3382,9 @@ public final class L10nTranslations {
                 "Pengaturan ini tidak dapat selesai diperbarui. Nilai yang tersimpan ditampilkan.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "File pengaturan sudah disimpan, tetapi isinya saat dibaca kembali tidak sama dengan yang ditulis. Simpan lagi sebagai file baru.");
+    }
+
+    private static void fillIn8(Map<String, String> table) {
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "Strip pada beberapa postingan, seperti \u201cApakah Anda tertarik dengan postingan ini?\u201d, \u201cTampilkan lebih sedikit\u201d atau siapa yang baru saja berkomentar, serta saran untuk mengikuti dan mengobrol di tempat yang sama. Postingannya tetap ada.");
         table.put("The switch takes effect when Facebook restarts.",
@@ -3358,9 +3397,6 @@ public final class L10nTranslations {
                 "Tidak ada data diagnostik yang dapat dihapus.");
         table.put("There's no diagnostic data to put back.",
                 "Tidak ada data diagnostik yang dapat dikembalikan.");
-    }
-
-    private static void fillIn8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Semua ini dipilih di Morphe Manager saat Anda menambal, dan Jeda tidak mematikannya. Tambal ulang untuk mengubahnya.");
         table.put("This build can't run the Messenger link test.",
@@ -3469,6 +3505,9 @@ public final class L10nTranslations {
                 "Anda sudah memakai rilis Hushfacebook terbaru.");
         table.put("You paused Hushfacebook.",
                 "Anda menjeda Hushfacebook.");
+    }
+
+    private static void fillIn9(Map<String, String> table) {
         table.put("Your choices are saved. Tap Resume, then restart Facebook.",
                 "Pilihan Anda tersimpan. Ketuk Lanjutkan, lalu mulai ulang Facebook.");
         table.put("Your controls are active.",
@@ -3481,9 +3520,6 @@ public final class L10nTranslations {
                 "Daftar kata yang mempertahankan postingan akan berisi %1$d kata atau frasa.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "Daftar kata yang mempertahankan postingan akan berisi %1$d kata atau frasa.");
-    }
-
-    private static void fillIn9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Daftar kata untuk disembunyikan akan kosong.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
@@ -3521,7 +3557,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(1114);
+        Map<String, String> table = new HashMap<>(1126);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -4042,6 +4078,12 @@ public final class L10nTranslations {
                 "Em Reprodu\u00e7\u00e3o, \u201cTocar para reproduzir\u201d bloqueia a reprodu\u00e7\u00e3o autom\u00e1tica, ent\u00e3o os Reels e outros v\u00eddeos aguardam seu toque.");
         table.put("In Reels and Watch, Hide the Reels tab blocks it after a restart.",
                 "Em \u201cReels e Watch\u201d, \u201cOcultar a aba Reels\u201d bloqueia a aba depois de reiniciar.");
+        table.put("Instagram",
+                "Instagram");
+        table.put("Instagram can keep facebook.com links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "O Instagram pode ficar com os links de facebook.com, e a\u00ed as chaves deles para este app voltam a se desligar sozinhas. Toque e desative \u201cAbrir links compat\u00edveis\u201d l\u00e1, depois confira Links compat\u00edveis acima.");
+        table.put("Instagram's settings didn't open. Open App info from Instagram's icon, then Open by default.",
+                "As configura\u00e7\u00f5es do Instagram n\u00e3o abriram. Abra Informa\u00e7\u00f5es do app pelo \u00edcone do Instagram e depois Abrir por padr\u00e3o.");
         table.put("It targets Facebook %1$s.",
                 "Compat\u00edvel com o Facebook %1$s.");
         table.put("Joining the picture and sound",
@@ -4094,6 +4136,12 @@ public final class L10nTranslations {
                 "Menu");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
                 "Mensagens, solicita\u00e7\u00f5es de amizade, coment\u00e1rios, men\u00e7\u00f5es, chamadas e alertas de login, al\u00e9m de qualquer tipo de notifica\u00e7\u00e3o que o Hushfacebook n\u00e3o conhe\u00e7a. As configura\u00e7\u00f5es do Android para as categorias de notifica\u00e7\u00e3o do Facebook tamb\u00e9m funcionam, pois o Facebook descarta uma notifica\u00e7\u00e3o cuja categoria voc\u00ea desativou. No entanto, o servidor do Facebook decide quais categorias voc\u00ea recebe, ent\u00e3o esses tipos podem n\u00e3o aparecer separados.");
+        table.put("Messenger",
+                "Messenger");
+        table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "O Messenger pode ficar com os links de facebook.com e m.me, e a\u00ed as chaves deles para este app voltam a se desligar sozinhas. Toque e desative \u201cAbrir links compat\u00edveis\u201d l\u00e1, depois confira Links compat\u00edveis acima.");
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "As configura\u00e7\u00f5es do Messenger n\u00e3o abriram. Abra Informa\u00e7\u00f5es do app pelo \u00edcone do Messenger e depois Abrir por padr\u00e3o.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite e Workplace s\u00e3o instalados ao lado deste Facebook. Ele d\u00e1 nomes pr\u00f3prios \u00e0s duas permiss\u00f5es que esses aplicativos compartilham com ele.");
         table.put("Meta App Manager",
@@ -4136,6 +4184,9 @@ public final class L10nTranslations {
                 "Nenhuma fonte foi escolhida, ent\u00e3o a fonte do seu dispositivo ser\u00e1 usada. Escolha um arquivo TrueType ou OpenType de at\u00e9 %1$d MB.");
         table.put("None of Facebook's web addresses are selected for this app, so their links open elsewhere. Tap to select them in Android's settings.",
                 "Nenhum endere\u00e7o web do Facebook est\u00e1 selecionado para este app, ent\u00e3o os links deles abrem em outro lugar. Toque para selecion\u00e1-los nas configura\u00e7\u00f5es do Android.");
+    }
+
+    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("Not in this build. To block this, choose the %1$s patch in Morphe Manager and patch again.",
                 "N\u00e3o faz parte desta vers\u00e3o. Para bloquear isso, escolha o patch %1$s no Morphe Manager e aplique os patches novamente.");
         table.put("Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.",
@@ -4148,9 +4199,6 @@ public final class L10nTranslations {
                 "N\u00e3o foi salvo: o arquivo tem mais de 512 MB");
         table.put("Notifications",
                 "Notifica\u00e7\u00f5es");
-    }
-
-    private static void fillPt_rBR5(Map<String, String> table) {
         table.put("OK",
                 "OK");
         table.put("Off",
@@ -4259,6 +4307,9 @@ public final class L10nTranslations {
                 "Bot\u00f5es Remix, Usar modelo, Adicionar o seu e Edits, al\u00e9m de Estrelas, jogos, aplicativos parceiros e links externos. A m\u00fasica e os demais r\u00f3tulos permanecem.");
         table.put("Remove tracking from shared links",
                 "Remover o rastreamento dos links compartilhados");
+    }
+
+    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "\u00c9 preciso reiniciar. O modo Marketplace ser\u00e1 ativado na pr\u00f3xima vez que o Facebook for iniciado.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -4271,9 +4322,6 @@ public final class L10nTranslations {
                 "Retomar v\u00eddeos longos");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "Retoma v\u00eddeos com mais de dois minutos de onde voc\u00ea parou. Arraste a barra de progresso para come\u00e7ar em outro ponto. Reels, v\u00eddeos ao vivo e an\u00fancios come\u00e7am normalmente.");
-    }
-
-    private static void fillPt_rBR6(Map<String, String> table) {
         table.put("Retry",
                 "Tentar novamente");
         table.put("Return to regular Facebook",
@@ -4382,6 +4430,9 @@ public final class L10nTranslations {
                 "Ignorar o pr\u00e9-carregamento do feed");
         table.put("Smallest",
                 "A menor");
+    }
+
+    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("Source code and issues",
                 "C\u00f3digo-fonte e relatos de problemas");
         table.put("Stays in while paused",
@@ -4394,9 +4445,6 @@ public final class L10nTranslations {
                 "Parar os avisos de atualiza\u00e7\u00e3o");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Deixa de usar o arquivo de fonte e volta para a fonte do seu celular.");
-    }
-
-    private static void fillPt_rBR7(Map<String, String> table) {
         table.put("Stories",
                 "Stories");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
@@ -4505,6 +4553,9 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel concluir a atualiza\u00e7\u00e3o da configura\u00e7\u00e3o. O valor salvo est\u00e1 sendo mostrado.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "O arquivo de configura\u00e7\u00f5es foi salvo, mas ao ser lido de volta n\u00e3o corresponde ao que foi gravado. Salve de novo como um arquivo novo.");
+    }
+
+    private static void fillPt_rBR8(Map<String, String> table) {
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "A faixa em algumas publica\u00e7\u00f5es, como \u201cVoc\u00ea tem interesse nesta publica\u00e7\u00e3o?\u201d, \u201cMostrar menos\u201d ou quem comentou h\u00e1 pouco, e as sugest\u00f5es para seguir e conversar no mesmo lugar. A publica\u00e7\u00e3o fica.");
         table.put("The switch takes effect when Facebook restarts.",
@@ -4517,9 +4568,6 @@ public final class L10nTranslations {
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para limpar.");
         table.put("There's no diagnostic data to put back.",
                 "N\u00e3o h\u00e1 dados de diagn\u00f3stico para restaurar.");
-    }
-
-    private static void fillPt_rBR8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Eles s\u00e3o escolhidos no Morphe Manager quando voc\u00ea aplica os patches, e a pausa n\u00e3o os desativa. Aplique os patches novamente para alter\u00e1-los.");
         table.put("This build can't run the Messenger link test.",
@@ -4628,6 +4676,9 @@ public final class L10nTranslations {
                 "Voc\u00ea j\u00e1 est\u00e1 usando a vers\u00e3o mais nova do Hushfacebook.");
         table.put("You paused Hushfacebook.",
                 "Voc\u00ea pausou o Hushfacebook.");
+    }
+
+    private static void fillPt_rBR9(Map<String, String> table) {
         table.put("Your choices are saved. Tap Resume, then restart Facebook.",
                 "Suas escolhas est\u00e3o salvas. Toque em Retomar e depois reinicie o Facebook.");
         table.put("Your controls are active.",
@@ -4640,9 +4691,6 @@ public final class L10nTranslations {
                 "Sua lista de palavras que mant\u00eam uma publica\u00e7\u00e3o ter\u00e1 %1$d palavra ou frase.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "Sua lista de palavras que mant\u00eam uma publica\u00e7\u00e3o ter\u00e1 %1$d palavras ou frases.");
-    }
-
-    private static void fillPt_rBR9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Sua lista de palavras a ocultar ficar\u00e1 vazia.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",
@@ -4680,7 +4728,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(1114);
+        Map<String, String> table = new HashMap<>(1126);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -5201,6 +5249,12 @@ public final class L10nTranslations {
                 "Oynatma b\u00f6l\u00fcm\u00fcndeki \u201cOynatmak i\u00e7in dokun\u201d, otomatik oynatmay\u0131 engeller. B\u00f6ylece Reels ve di\u011fer videolar dokunman\u0131 bekler.");
         table.put("In Reels and Watch, Hide the Reels tab blocks it after a restart.",
                 "\u201cReels ve Watch\u201d b\u00f6l\u00fcm\u00fcndeki \u201cReels sekmesini gizle\u201d, yeniden ba\u015flatmadan sonra onu engeller.");
+        table.put("Instagram",
+                "Instagram");
+        table.put("Instagram can keep facebook.com links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "Instagram, facebook.com ba\u011flant\u0131lar\u0131n\u0131 kendine alabilir ve bu durumda bu uygulama i\u00e7in anahtarlar\u0131 kendili\u011finden yeniden kapan\u0131r. Dokunup oradaki \u201cDesteklenen ba\u011flant\u0131lar\u0131 a\u00e7\u201d se\u00e7ene\u011fini kapat\u0131n, ard\u0131ndan yukar\u0131daki Desteklenen ba\u011flant\u0131lar'\u0131 kontrol edin.");
+        table.put("Instagram's settings didn't open. Open App info from Instagram's icon, then Open by default.",
+                "Instagram ayarlar\u0131 a\u00e7\u0131lamad\u0131. Instagram simgesinden Uygulama bilgileri'ni, ard\u0131ndan Varsay\u0131lan olarak a\u00e7'\u0131 a\u00e7\u0131n.");
         table.put("It targets Facebook %1$s.",
                 "Facebook %1$s i\u00e7in haz\u0131rland\u0131.");
         table.put("Joining the picture and sound",
@@ -5253,6 +5307,12 @@ public final class L10nTranslations {
                 "Men\u00fc");
         table.put("Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.",
                 "Mesajlar, arkada\u015fl\u0131k istekleri, yorumlar, bahsetmeler, aramalar ve giri\u015f uyar\u0131lar\u0131, bir de Hushfacebook'un tan\u0131mad\u0131\u011f\u0131 her t\u00fcr. Android'in Facebook bildirim kategorileri i\u00e7in kendi ayarlar\u0131 da i\u015fe yarar, \u00e7\u00fcnk\u00fc Facebook kategorisini kapatt\u0131\u011f\u0131n bir bildirimi g\u00f6stermez. Yine de hangi kategorileri alaca\u011f\u0131na Facebook'un sunucusu karar verir, bu y\u00fczden bu t\u00fcrleri ay\u0131rmayabilirler.");
+        table.put("Messenger",
+                "Messenger");
+        table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
+                "Messenger, facebook.com ve m.me ba\u011flant\u0131lar\u0131n\u0131 kendine alabilir ve bu durumda bu uygulama i\u00e7in anahtarlar\u0131 kendili\u011finden yeniden kapan\u0131r. Dokunup oradaki \u201cDesteklenen ba\u011flant\u0131lar\u0131 a\u00e7\u201d se\u00e7ene\u011fini kapat\u0131n, ard\u0131ndan yukar\u0131daki Desteklenen ba\u011flant\u0131lar'\u0131 kontrol edin.");
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "Messenger ayarlar\u0131 a\u00e7\u0131lamad\u0131. Messenger simgesinden Uygulama bilgileri'ni, ard\u0131ndan Varsay\u0131lan olarak a\u00e7'\u0131 a\u00e7\u0131n.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite ve Workplace bu Facebook'un yan\u0131na y\u00fcklenebilir. Onlarla payla\u015ft\u0131\u011f\u0131 iki izne kendi adlar\u0131n\u0131 verir.");
         table.put("Meta App Manager",
@@ -5295,6 +5355,9 @@ public final class L10nTranslations {
                 "Hi\u00e7biri se\u00e7ilmedi, bu y\u00fczden telefonunun yaz\u0131 tipi kullan\u0131l\u0131yor. En fazla %1$d MB boyutunda bir TrueType veya OpenType dosyas\u0131 se\u00e7.");
         table.put("None of Facebook's web addresses are selected for this app, so their links open elsewhere. Tap to select them in Android's settings.",
                 "Facebook'un web adreslerinden hi\u00e7biri bu uygulama i\u00e7in se\u00e7ili de\u011fil, bu y\u00fczden ba\u011flant\u0131lar\u0131 ba\u015fka yerde a\u00e7\u0131l\u0131r. Android ayarlar\u0131nda se\u00e7mek i\u00e7in dokunun.");
+    }
+
+    private static void fillTr5(Map<String, String> table) {
         table.put("Not in this build. To block this, choose the %1$s patch in Morphe Manager and patch again.",
                 "Bu s\u00fcr\u00fcmde yok. Bunu engellemek i\u00e7in Morphe Manager'da %1$s yamas\u0131n\u0131 se\u00e7 ve yeniden yamala.");
         table.put("Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to get what it does.",
@@ -5307,9 +5370,6 @@ public final class L10nTranslations {
                 "Kaydedilmedi: Dosya 512 MB'tan b\u00fcy\u00fck");
         table.put("Notifications",
                 "Bildirimler");
-    }
-
-    private static void fillTr5(Map<String, String> table) {
         table.put("OK",
                 "Tamam");
         table.put("Off",
@@ -5418,6 +5478,9 @@ public final class L10nTranslations {
                 "Remix, \u015fablon kullanma, kendi videonu ekleme ve Edits d\u00fc\u011fmeleri ile y\u0131ld\u0131z, oyun, i\u015f orta\u011f\u0131 uygulamas\u0131 ve d\u0131\u015f ba\u011flant\u0131 d\u00fc\u011fmeleri. \u015eark\u0131 ve di\u011fer etiketler kal\u0131r.");
         table.put("Remove tracking from shared links",
                 "Payla\u015f\u0131lan ba\u011flant\u0131lardan izlemeyi kald\u0131r");
+    }
+
+    private static void fillTr6(Map<String, String> table) {
         table.put("Restart needed. Marketplace mode will turn on the next time Facebook starts.",
                 "Yeniden ba\u015flatma gerekiyor. Marketplace modu, Facebook bir sonraki a\u00e7\u0131l\u0131\u015f\u0131nda etkinle\u015fecek.");
         table.put("Restart needed. The normal tabs will return the next time Facebook starts.",
@@ -5430,9 +5493,6 @@ public final class L10nTranslations {
                 "Uzun videolara kald\u0131\u011f\u0131n yerden devam et");
         table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
                 "\u0130ki dakikadan uzun videolar kald\u0131\u011f\u0131 yerden devam eder. Ba\u015fka bir yerden ba\u015flatmak i\u00e7in \u00e7ubu\u011fu kayd\u0131r\u0131n. Reels, canl\u0131 videolar ve reklamlar normal ba\u015flar.");
-    }
-
-    private static void fillTr6(Map<String, String> table) {
         table.put("Retry",
                 "Yeniden dene");
         table.put("Return to regular Facebook",
@@ -5541,6 +5601,9 @@ public final class L10nTranslations {
                 "Ak\u0131\u015f \u00f6n y\u00fcklemesini atla");
         table.put("Smallest",
                 "En k\u00fc\u00e7\u00fck");
+    }
+
+    private static void fillTr7(Map<String, String> table) {
         table.put("Source code and issues",
                 "Kaynak kodu ve sorunlar");
         table.put("Stays in while paused",
@@ -5553,9 +5616,6 @@ public final class L10nTranslations {
                 "G\u00fcncelleme uyar\u0131lar\u0131n\u0131 durdur");
         table.put("Stops using the font file and goes back to your phone's font.",
                 "Yaz\u0131 tipi dosyas\u0131n\u0131 b\u0131rak\u0131r ve telefonunun yaz\u0131 tipine geri d\u00f6ner.");
-    }
-
-    private static void fillTr7(Map<String, String> table) {
         table.put("Stories",
                 "Hikayeler");
         table.put("Suggestions, saving, auto-advance and viewing anonymously",
@@ -5664,6 +5724,9 @@ public final class L10nTranslations {
                 "Ayar\u0131n g\u00fcncellenmesi tamamlanamad\u0131. Kay\u0131tl\u0131 de\u011feri g\u00f6steriliyor.");
         table.put("The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.",
                 "Ayar dosyas\u0131 kaydedildi, ancak geri okundu\u011funda yaz\u0131lanla ayn\u0131 de\u011fil. Yeni bir dosya olarak tekrar kaydet.");
+    }
+
+    private static void fillTr8(Map<String, String> table) {
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "Baz\u0131 g\u00f6nderilerdeki \u015ferit, \u00f6rne\u011fin \u201cBu g\u00f6nderiyle ilgileniyor musun?\u201d, \u201cDaha az g\u00f6ster\u201d veya kimin az \u00f6nce yorum yapt\u0131\u011f\u0131, ve ayn\u0131 yerdeki takip ve sohbet \u00f6nerileri. G\u00f6nderi kal\u0131r.");
         table.put("The switch takes effect when Facebook restarts.",
@@ -5676,9 +5739,6 @@ public final class L10nTranslations {
                 "Temizlenecek tan\u0131lama verisi yok.");
         table.put("There's no diagnostic data to put back.",
                 "Geri getirilecek tan\u0131lama verisi yok.");
-    }
-
-    private static void fillTr8(Map<String, String> table) {
         table.put("They're chosen in Morphe Manager when you patch, and Pause doesn't turn them off. Patch again to change them.",
                 "Bunlar yamalarken Morphe Manager'da se\u00e7ilir ve Duraklatma bunlar\u0131 kapatmaz. De\u011fi\u015ftirmek i\u00e7in yeniden yamala.");
         table.put("This build can't run the Messenger link test.",
@@ -5787,6 +5847,9 @@ public final class L10nTranslations {
                 "En yeni Hushfacebook s\u00fcr\u00fcm\u00fcn\u00fc kullan\u0131yorsun.");
         table.put("You paused Hushfacebook.",
                 "Hushfacebook'u duraklatt\u0131n.");
+    }
+
+    private static void fillTr9(Map<String, String> table) {
         table.put("Your choices are saved. Tap Resume, then restart Facebook.",
                 "Tercihleriniz kay\u0131tl\u0131. Devam et'e dokunun, sonra Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Your controls are active.",
@@ -5799,9 +5862,6 @@ public final class L10nTranslations {
                 "G\u00f6nderiyi tutan kelimeler listende %1$d kelime veya ifade olacak.");
         table.put("Your list of words that keep a post will hold %1$d words or phrases.",
                 "G\u00f6nderiyi tutan kelimeler listende %1$d kelime veya ifade olacak.");
-    }
-
-    private static void fillTr9(Map<String, String> table) {
         table.put("Your list of words to hide will be empty.",
                 "Gizlenecek kelimeler listen bo\u015f olacak.");
         table.put("Your list of words to hide will hold %1$d word or phrase.",

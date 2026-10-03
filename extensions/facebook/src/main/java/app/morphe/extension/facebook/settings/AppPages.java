@@ -145,8 +145,7 @@ final class AppPages {
                             + "facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.")));
         }
         links.addPreference(page.supportedLinksRow(context));
-        Preference appManager = page.appManagerLinksRow(context);
-        if (appManager != null) links.addPreference(appManager);
+        for (Preference holder : page.linkHolderRows(context)) links.addPreference(holder);
         links.addPreference(info(context, L10n.t("Selecting links by hand"),
                 L10n.t("Android checks Facebook's links against Meta's signing key, which a re-signed build doesn't have. "
                         + "Selecting the addresses sends their links here again. It doesn't restore Meta's verification, "

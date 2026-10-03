@@ -4,6 +4,14 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+### Added
+
+* **Facebook:** Messenger and Instagram rows under Supported links, next to the Meta App Manager one (issue #78). Android verifies Meta's own Messenger for facebook.com, www.facebook.com, m.me and www.m.me, and Instagram for facebook.com, www.facebook.com and m.facebook.com. With either one installed, those switches on Hushfacebook's Open by default page kept turning themselves back off, and links to those addresses went through the browser first. Each row shows only while one of that app's addresses doesn't open here. A tap opens that app's own page, where you turn off Open supported links before selecting the addresses for Hushfacebook. Diagnostic reports now say whether Messenger and Instagram are installed and enabled.
+
+### Changed
+
+* **Tooling:** The manifest check now also makes sure every supported Facebook build keeps the plain launcher query that lets it see Messenger and Instagram. Facebook doesn't name either app, and without that query their rows would never show.
+
 ## 0.7.1 (2026-10-03)
 
 ### Added

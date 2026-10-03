@@ -102,8 +102,6 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     static final String CHECK_NOW = "action_check_for_release";
     /** The Supported links row's key. It stores nothing either. */
     static final String SUPPORTED_LINKS = "action_supported_links";
-    /** The Meta App Manager row's key, under Supported links. It stores nothing either. */
-    static final String APP_MANAGER_LINKS = "action_app_manager_links";
     /** The key of the overview row explaining a missing re-signed build fix. */
     static final String MISSING_RESTORE_TRUST = "action_missing_restore_trust";
     /** The key of the row naming the default patches this build lacks. It stores nothing either. */
@@ -604,26 +602,29 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
-     * The way to Meta App Manager's link page, under Supported links, when Meta App Manager is on
-     * the phone and Facebook's addresses don't all open here (#30), or null. Android won't let a
-     * person select an address another app is verified for, so App Manager has to let go first.
+     * The way to the link page of each of Meta's apps on the phone that may hold an address that
+     * doesn't open here, under Supported links: Meta App Manager (#30), Messenger and Instagram
+     * (#78). Android won't let a person select an address another app is verified for, so that app
+     * has to let go first.
      */
-    @Nullable
-    Preference appManagerLinksRow(Context context) {
+    List<Preference> linkHolderRows(Context context) {
         SupportedLinks.State state = SupportedLinks.read(context);
-        if (!SupportedLinks.appManagerMayHoldLinks(state, SupportedLinks.appManagerOn(context))) return null;
-        Row row = new Row(context);
-        row.setKey(APP_MANAGER_LINKS);
-        row.setTitle(L10n.t("Meta App Manager"));
-        row.setPersistent(false);
-        row.setSummary(SupportedLinks.appManagerSummary(state));
-        row.setOnPreferenceClickListener(p -> {
-            openLinkPage(SupportedLinks.appManagerIntents(), "Meta App Manager",
-                    L10n.t("Meta App Manager's settings didn't open. Find it in Android's app list with system apps "
-                            + "shown, then Open by default."));
-            return true;
-        });
-        return row;
+        Set<String> notOpen = SupportedLinks.hostsNotOpen(context);
+        List<Preference> rows = new ArrayList<>();
+        for (SupportedLinks.Holder holder : SupportedLinks.Holder.values()) {
+            if (!SupportedLinks.mayHoldLinks(holder, state, SupportedLinks.isOn(context, holder), notOpen)) continue;
+            Row row = new Row(context);
+            row.setKey(holder.rowKey);
+            row.setTitle(holder.title());
+            row.setPersistent(false);
+            row.setSummary(SupportedLinks.holderSummary(holder, state));
+            row.setOnPreferenceClickListener(p -> {
+                openLinkPage(SupportedLinks.holderIntents(holder), holder.reportKey, holder.notOpened());
+                return true;
+            });
+            rows.add(row);
+        }
+        return rows;
     }
 
     private void showSupportedLinks() {
@@ -632,8 +633,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (row == null) return;
         SupportedLinks.State state = SupportedLinks.read(row.getContext());
         row.setSummary(SupportedLinks.summary(state));
-        Preference appManager = findPreference(APP_MANAGER_LINKS);
-        if (appManager != null) appManager.setSummary(SupportedLinks.appManagerSummary(state));
+        for (SupportedLinks.Holder holder : SupportedLinks.Holder.values()) {
+            Preference holderRow = findPreference(holder.rowKey);
+            if (holderRow != null) holderRow.setSummary(SupportedLinks.holderSummary(holder, state));
+        }
     }
 
     private void openLinkSettings(Context context) {
