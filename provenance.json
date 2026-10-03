@@ -199,6 +199,7 @@
     {
       "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/SaveControl.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/SavedFileActions.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/SaveLeftovers.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/Mp4Join.java"
       ],

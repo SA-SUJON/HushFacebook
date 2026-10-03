@@ -36,6 +36,7 @@ Copy quick report	Salin laporan singkat
 Copying to the gallery	Menyalin ke galeri
 Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.	Pengaturan tidak dapat diimpor, dan pengaturan sebelumnya tidak dapat dikembalikan. Periksa sakelar di layar ini.
 Couldn't import the settings. Nothing was changed.	Pengaturan tidak dapat diimpor. Tidak ada yang diubah.
+Couldn't open or share that saved file. Try again.	File yang disimpan itu tidak bisa dibuka atau dibagikan. Coba lagi.
 Couldn't open that file. Nothing was changed.	File itu tidak dapat dibuka. Tidak ada yang diubah.
 Couldn't open the file picker. Try again.	Pemilih file tidak dapat dibuka. Coba lagi.
 Couldn't put back the diagnostic data. Try again.	Data diagnostik tidak dapat dikembalikan. Coba lagi.
@@ -69,12 +70,17 @@ Hide Stories between posts	Sembunyikan Cerita di antara postingan
 Joining the picture and sound	Menggabungkan gambar dan suara
 From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Mulai peluncuran berikutnya, semua sakelar kecuali Pencatatan debug dianggap nonaktif. Yang diatur saat Anda menambal tetap aktif, dan pilihan Anda tetap tersimpan.
 Rows, large tiles and viewers of Stories between posts, starting with the next feed Facebook loads. The top Stories tray has its own switch.	Deretan, ubin besar, dan penampil Cerita di antara postingan, mulai dari beranda berikutnya yang dimuat Facebook. Baki Cerita di bagian atas memiliki sakelar sendiri.
+Open	Buka
+Photo saved	Foto tersimpan
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Pengaturan diekspor. Aplikasi yang menyimpan file itu tidak mengizinkan Hushfacebook membacanya kembali, jadi file itu tidak diperiksa.
+Share	Bagikan
+That saved file is no longer available.	File yang disimpan itu tidak tersedia lagi.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	Aplikasi yang menyimpan file itu terlalu lama, jadi Hushfacebook berhenti menunggu. Tidak ada yang diubah.
 The app holding the last settings file still hasn't answered. Try again later.	Aplikasi yang menyimpan file pengaturan terakhir masih belum merespons. Coba lagi nanti.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Aplikasi yang menyimpan file pengaturan terlalu lama, jadi Hushfacebook berhenti menunggu. Aplikasi itu mungkin masih menyelesaikan penyimpanannya, jadi periksa file itu sebelum mengandalkannya.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	File %1$s tidak dapat dihapus. Hapus file itu dari %2$s, lalu ketuk Lanjutkan lagi.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	File pengaturan sudah disimpan, tetapi isinya saat dibaca kembali tidak sama dengan yang ditulis. Simpan lagi sebagai file baru.
+There's no app here that can open or share this saved file.	Tidak ada aplikasi yang bisa membuka atau membagikan file yang disimpan ini.
 Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Sampai Anda melanjutkan, semua sakelar kecuali Pencatatan debug dianggap nonaktif. Yang diatur saat Anda menambal tetap aktif.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Gunakan emoji ponsel. Reaksi dan stiker tetap sama. Mulai ulang Facebook setelah mengubahnya.
 # context: switch title under Appearance; the tab bar is Facebook's row of tabs, Home, Video, Marketplace and the rest
@@ -186,6 +192,7 @@ Checking GitHub now.	Sedang memeriksa GitHub.
 Hushfacebook %1$s is out. Update it in Morphe Manager.	Hushfacebook %1$s sudah dirilis. Perbarui di Morphe Manager.
 It targets Facebook %1$s.	Rilis ini ditujukan untuk Facebook %1$s.
 Hushfacebook %1$s targets Facebook %2$s.	Hushfacebook %1$s ditujukan untuk Facebook %2$s.
+Video saved	Video tersimpan
 You have the newest Hushfacebook release.	Anda sudah memakai rilis Hushfacebook terbaru.
 The newest Hushfacebook release is %1$s.	Rilis Hushfacebook terbaru adalah %1$s.
 Couldn't reach GitHub. Try again later.	GitHub tidak dapat dihubungi. Coba lagi nanti.

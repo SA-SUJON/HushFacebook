@@ -37,7 +37,8 @@ import app.morphe.extension.shared.L10n;
  *
  * <p>A save used to say "Saving..." when it started and nothing more until it ended, so a large
  * video looked stuck and nothing could stop one. The notification goes when the save ends, and the
- * toast that says how it ended stays as it was. A video WhatsApp may refuse leaves one note of its
+ * toast that says how it ended stays as it was. Successful publication leaves generic file actions.
+ * A video WhatsApp may refuse leaves one note of its
  * own behind, with a button to the switch that avoids it ({@link #showRefused}).
  *
  * <p>Cancel is a broadcast to a receiver registered in Facebook's process, not a component added to
@@ -234,6 +235,34 @@ public final class SaveControl {
         } catch (Throwable t) {
             MediaDownload.failure(() -> "could not show the note about the saved format", t);
             return false;
+        }
+    }
+
+    /** Finished file actions require both the atomic success state and the writer's committed row. */
+    static void showCompleted(Save save, MediaStoreWriter writer) {
+        if (save.state() != State.SUCCEEDED || writer.publishedUri() == null || writer.publishedMime() == null) return;
+        NotificationManager manager = notifications(save.application);
+        if (manager == null) return;
+        try {
+            PendingIntent open = SavedFileActions.button(save.application, writer.publishedUri(), writer.publishedMime(), false);
+            PendingIntent share = SavedFileActions.button(save.application, writer.publishedUri(), writer.publishedMime(), true);
+            Notification note = new Notification.Builder(save.application, CHANNEL)
+                .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                .setContentTitle(save.video ? L10n.t(save.application, "Video saved") : L10n.t(save.application, "Photo saved"))
+                .setCategory(Notification.CATEGORY_STATUS)
+                .setShowWhen(false)
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(true)
+                .setContentIntent(open)
+                .addAction(new Notification.Action.Builder((Icon) null, L10n.t(save.application, "Open"), open).build())
+                .addAction(new Notification.Action.Builder((Icon) null, L10n.t(save.application, "Share"), share).build())
+                .build();
+            // URI identity also survives a process restarting its numeric running-save counter.
+            manager.notify(SavedFileActions.TAG + writer.publishedUri(), 0, note);
+        } catch (Throwable failure) {
+            // An exception's message may contain the local URI. Report only its class.
+            String kind = failure.getClass().getSimpleName();
+            MediaDownload.failure(() -> "could not show completed save actions (" + kind + ")", null);
         }
     }
 

@@ -36,6 +36,7 @@ Copy quick report	Hızlı raporu kopyala
 Copying to the gallery	Galeriye kopyalanıyor
 Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.	Ayarlar içe aktarılamadı ve önceki ayarların geri yüklenemedi. Bu ekrandaki anahtarları kontrol et.
 Couldn't import the settings. Nothing was changed.	Ayarlar içe aktarılamadı. Hiçbir şey değiştirilmedi.
+Couldn't open or share that saved file. Try again.	Kaydedilen dosya açılamadı veya paylaşılamadı. Tekrar deneyin.
 Couldn't open that file. Nothing was changed.	Bu dosya açılamadı. Hiçbir şey değiştirilmedi.
 Couldn't open the file picker. Try again.	Dosya seçici açılamadı. Tekrar dene.
 Couldn't put back the diagnostic data. Try again.	Tanılama verileri geri getirilemedi. Tekrar dene.
@@ -69,12 +70,17 @@ Hide Stories between posts	Gönderiler arasındaki Hikayeleri gizle
 Joining the picture and sound	Görüntü ve ses birleştiriliyor
 From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Sonraki açılıştan itibaren Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır ve tercihlerin kayıtlı kalır.
 Rows, large tiles and viewers of Stories between posts, starting with the next feed Facebook loads. The top Stories tray has its own switch.	Gönderiler arasındaki Hikaye sıraları, büyük kutucuklar ve görüntüleyiciler. Facebook'un yükleyeceği sonraki akıştan itibaren geçerlidir. Üstteki Hikaye tepsisinin ayrı bir anahtarı vardır.
+Open	Aç
+Photo saved	Fotoğraf kaydedildi
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Ayarlar dışa aktarıldı. Dosyayı tutan uygulama Hushfacebook'un onu geri okumasına izin vermedi, bu yüzden kontrol edilmedi.
+Share	Paylaş
+That saved file is no longer available.	Kaydedilen dosya artık kullanılamıyor.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	O dosyayı tutan uygulama çok uzun sürüyor, bu yüzden Hushfacebook beklemeyi bıraktı. Hiçbir şey değiştirilmedi.
 The app holding the last settings file still hasn't answered. Try again later.	Son ayar dosyasını tutan uygulama hâlâ yanıt vermedi. Daha sonra tekrar dene.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Ayar dosyasını tutan uygulama çok uzun sürüyor, bu yüzden Hushfacebook beklemeyi bıraktı. O uygulama kaydetmeyi yine de bitirebilir, bu yüzden dosyaya güvenmeden önce onu kontrol et.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	%1$s dosyası kaldırılamadı. Onu %2$s içinden sil, sonra yeniden Devam et'e dokun.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Ayar dosyası kaydedildi, ancak geri okunduğunda yazılanla aynı değil. Yeni bir dosya olarak tekrar kaydet.
+There's no app here that can open or share this saved file.	Bu kaydedilen dosyayı açabilecek veya paylaşabilecek bir uygulama yok.
 Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Devam ettirene kadar Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Telefonunuzun emojilerini kullanır. İfadeler ve çıkartmalar aynı kalır. Değiştirdikten sonra Facebook'u yeniden başlatın.
 # context: switch title under Appearance; the tab bar is Facebook's row of tabs, Home, Video, Marketplace and the rest
@@ -186,6 +192,7 @@ Checking GitHub now.	GitHub şu anda denetleniyor.
 Hushfacebook %1$s is out. Update it in Morphe Manager.	Hushfacebook %1$s çıktı. Morphe Manager'da güncelle.
 It targets Facebook %1$s.	Facebook %1$s için hazırlandı.
 Hushfacebook %1$s targets Facebook %2$s.	Hushfacebook %1$s, Facebook %2$s için hazırlandı.
+Video saved	Video kaydedildi
 You have the newest Hushfacebook release.	En yeni Hushfacebook sürümünü kullanıyorsun.
 The newest Hushfacebook release is %1$s.	En yeni Hushfacebook sürümü %1$s.
 Couldn't reach GitHub. Try again later.	GitHub'a ulaşılamadı. Daha sonra tekrar dene.

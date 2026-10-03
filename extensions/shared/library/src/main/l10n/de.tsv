@@ -36,6 +36,7 @@ Copy quick report	Kurzbericht kopieren
 Copying to the gallery	Wird in die Galerie kopiert
 Couldn't import the settings, and couldn't put back the ones you had. Check the switches on this screen.	Die Einstellungen ließen sich nicht importieren, und deine vorherigen ließen sich nicht wiederherstellen. Prüfe die Schalter auf diesem Bildschirm.
 Couldn't import the settings. Nothing was changed.	Die Einstellungen ließen sich nicht importieren. Es wurde nichts geändert.
+Couldn't open or share that saved file. Try again.	Die gespeicherte Datei konnte nicht geöffnet oder geteilt werden. Versuch es noch einmal.
 Couldn't open that file. Nothing was changed.	Diese Datei ließ sich nicht öffnen. Es wurde nichts geändert.
 Couldn't open the file picker. Try again.	Die Dateiauswahl ließ sich nicht öffnen. Versuche es noch einmal.
 Couldn't put back the diagnostic data. Try again.	Die Diagnosedaten ließen sich nicht wiederherstellen. Versuche es noch einmal.
@@ -69,12 +70,17 @@ Hide Stories between posts	Stories zwischen Beiträgen ausblenden
 Joining the picture and sound	Bild und Ton werden zusammengefügt
 From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Ab dem nächsten Start verhält sich jeder Schalter außer der Debug-Protokollierung, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv, und deine Auswahl bleibt gespeichert.
 Rows, large tiles and viewers of Stories between posts, starting with the next feed Facebook loads. The top Stories tray has its own switch.	Story-Reihen, große Kacheln und Story-Viewer zwischen Beiträgen, ab dem nächsten von Facebook geladenen Feed. Die Story-Leiste oben hat einen eigenen Schalter.
+Open	Öffnen
+Photo saved	Foto gespeichert
 Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Einstellungen exportiert. Die App, in der die Datei liegt, ließ Hushfacebook sie nicht zurücklesen, daher wurde sie nicht geprüft.
+Share	Teilen
+That saved file is no longer available.	Die gespeicherte Datei ist nicht mehr verfügbar.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	Die App, in der die Datei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Es wurde nichts geändert.
 The app holding the last settings file still hasn't answered. Try again later.	Die App mit der letzten Einstellungsdatei hat noch immer nicht geantwortet. Versuche es später noch einmal.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Die App, in der die Einstellungsdatei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Sie kann das Speichern noch abschließen, also prüfe die Datei, bevor du dich darauf verlässt.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	Die Datei %1$s ließ sich nicht entfernen. Lösche sie aus %2$s und tippe dann noch einmal auf Fortsetzen.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zurück, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.
+There's no app here that can open or share this saved file.	Keine App kann diese gespeicherte Datei öffnen oder teilen.
 Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Bis zum Fortsetzen verhält sich jeder Schalter außer der Debug-Protokollierung, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Nutzt die Emoji deines Telefons. Reaktionen und Sticker bleiben gleich. Starte Facebook nach der Änderung neu.
 # context: switch title under Appearance; the tab bar is Facebook's row of tabs, Home, Video, Marketplace and the rest
@@ -186,6 +192,7 @@ Checking GitHub now.	GitHub wird gerade gefragt.
 Hushfacebook %1$s is out. Update it in Morphe Manager.	Hushfacebook %1$s ist erschienen. Aktualisiere es im Morphe Manager.
 It targets Facebook %1$s.	Es ist für Facebook %1$s gedacht.
 Hushfacebook %1$s targets Facebook %2$s.	Hushfacebook %1$s ist für Facebook %2$s gedacht.
+Video saved	Video gespeichert
 You have the newest Hushfacebook release.	Du hast die neueste Version von Hushfacebook.
 The newest Hushfacebook release is %1$s.	Die neueste Version von Hushfacebook ist %1$s.
 Couldn't reach GitHub. Try again later.	GitHub war nicht erreichbar. Versuche es später noch einmal.

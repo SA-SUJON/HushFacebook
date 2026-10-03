@@ -865,6 +865,7 @@ public final class MediaDownload {
                 if (result.ok() || cancelled) info(() -> "save finished: " + result);
                 else failure(() -> "save finished: " + result, null);
                 String text = message(application, result.status, writer.savedLocation(), result.lower);
+                if (result.ok()) SaveControl.showCompleted(save, writer);
                 if (result.ok() && result.refused && !compatibleSaves()) {
                     info(() -> "the saved file has a track WhatsApp and some editors refuse, with Save videos "
                         + "other apps can open off");

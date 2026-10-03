@@ -135,10 +135,10 @@ public class SaveProgressTest {
         return RuntimeEnvironment.getApplication().getSystemService(NotificationManager.class);
     }
 
-    /** The save's notification, or null when none is showing. */
+    /** The running save's progress notification, or null after it ends. */
     private static Notification saveNotification() {
-        for (Notification shown : Shadows.shadowOf(notifications()).getAllNotifications()) {
-            if (SaveControl.CHANNEL.equals(shown.getChannelId())) return shown;
+        for (android.service.notification.StatusBarNotification shown : notifications().getActiveNotifications()) {
+            if (SaveControl.TAG.equals(shown.getTag())) return shown.getNotification();
         }
         return null;
     }

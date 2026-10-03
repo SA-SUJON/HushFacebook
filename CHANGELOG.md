@@ -6,6 +6,7 @@ Every Hushfacebook release, newest first.
 
 ### Added
 
+- Completed native saves now keep a generic notification with Open and Share actions for the committed gallery file. It uses temporary read grants and stores no source links or post details.
 - Optional whole-word matching for both post-filter lists. It starts off, preserves existing imports, and respects Unicode word boundaries and keep-list overrides.
 - Settings-import previews name each changed switch and show its saved current and incoming state. Long lists scroll above the actions, with spoken state labels and no phrase contents.
 - Separate controls for the top Stories tray and Stories between posts. Upgrades keep the old choice, imports accept the combined or independent values, and exports save the independent choices.

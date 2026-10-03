@@ -39,6 +39,7 @@ import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.facebook.download.SaveLeftovers;
+import app.morphe.extension.facebook.download.SavedFileActions;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.media.ResumePlayback;
 import app.morphe.extension.facebook.media.TapToPlay;
@@ -292,6 +293,7 @@ public final class SettingsEntry {
     /** Injected at the start of every Facebook activity's {@code onCreate}. */
     public static void onActivityCreate(Activity activity) {
         try {
+            SavedFileActions.receive(activity.getIntent());
             noteIntent(activity.getIntent());
         } catch (Exception ex) {
             Logger.printException(() -> "Settings entry: onActivityCreate failure", ex);
@@ -301,6 +303,7 @@ public final class SettingsEntry {
     /** Injected at the start of every Facebook activity's {@code onNewIntent}. */
     public static void onNewIntent(Activity activity, Intent intent) {
         try {
+            SavedFileActions.receive(intent);
             noteIntent(intent);
         } catch (Exception ex) {
             Logger.printException(() -> "Settings entry: onNewIntent failure", ex);
@@ -459,6 +462,7 @@ public final class SettingsEntry {
         @Override
         public void onActivityResumed(Activity activity) {
             resumed = new WeakReference<>(activity);
+            SavedFileActions.onResumed(activity);
             if (openPending) openWhenSettled(activity);
             relabelIfStale(activity);
             SavedShortcut.refresh(activity);
@@ -466,6 +470,7 @@ public final class SettingsEntry {
 
         @Override
         public void onActivityPaused(Activity activity) {
+            SavedFileActions.onPaused(activity);
             if (resumed != null && resumed.get() == activity) resumed = null;
             LastScreen.read(activity);
         }
@@ -480,6 +485,7 @@ public final class SettingsEntry {
         @Override public void onActivitySaveInstanceState(Activity activity, Bundle state) { }
         @Override
         public void onActivityDestroyed(Activity activity) {
+            SavedFileActions.onPaused(activity);
             // The screen can land on an activity just before it clears itself for the next one.
             // If its host goes away before the person closed it, ask again.
             WeakReference<Activity> shownOver = host;
