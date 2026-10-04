@@ -179,8 +179,7 @@ public class SettingsNavigationTest {
             String[] lines = String.valueOf(((Preference) list().getItemAtPosition(0)).getSummary()).split("\n", 2);
             String line = lines[0];
             assertTrue(line, line.contains("couldn't be removed") && line.endsWith("then tap Resume again."));
-            assertEquals(app.morphe.extension.shared.L10n.f("Build %1$s",
-                    app.morphe.extension.shared.L10n.isolate(app.morphe.extension.shared.Utils.getPatchesBuildIdentity())), lines[1]);
+            assertEquals(HushfacebookPreferenceFragment.overviewBuildDetails(), lines[1]);
         } finally {
             held.delete();
             marker.delete();
@@ -369,17 +368,16 @@ public class SettingsNavigationTest {
         layout(dialog.getView());
         TextView summary = list().getChildAt(0).findViewById(android.R.id.summary);
         String[] lines = summary.getText().toString().split("\n", 2);
-        assertEquals("Your choices are saved. Tap Resume, then restart Facebook.", lines[0]);
-        assertEquals(app.morphe.extension.shared.L10n.f("Build %1$s",
-                app.morphe.extension.shared.L10n.isolate(app.morphe.extension.shared.Utils.getPatchesBuildIdentity())), lines[1]);
+        assertEquals("Tap Resume, then restart Facebook.", lines[0]);
+        assertEquals(HushfacebookPreferenceFragment.overviewBuildDetails(), lines[1]);
     }
 
     /**
      * At twice the text size the button beside the status text left the name too little room and
-     * "Hushfacebook" broke inside the word. From one and a half times, the button goes under the text.
+     * "Hushfacebook" broke inside the word. The button now precedes long recovery advice too.
      */
     @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
-    public void atLargeTextTheStatusActionSitsUnderItsText() {
+    public void atLargeTextTheStatusActionSitsBetweenItsTitleAndAdvice() {
         org.robolectric.RuntimeEnvironment.setFontScale(2f);
         try {
             recreate();
@@ -396,7 +394,8 @@ public class SettingsNavigationTest {
             android.widget.Button action = firstButton(row);
             assertNotNull("no Pause button in the status row", action);
             assertEquals(summary.getParent(), action.getParent());
-            assertTrue("the button isn't under the text", action.getTop() >= summary.getBottom());
+            assertTrue("the button overlaps the title", action.getTop() >= title.getBottom());
+            assertTrue("the button overlaps the advice", action.getBottom() <= summary.getTop());
             assertEquals("Pause", action.getText().toString());
         } finally {
             org.robolectric.RuntimeEnvironment.setFontScale(1f);

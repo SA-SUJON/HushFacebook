@@ -10,6 +10,7 @@ Every Hushfacebook release, newest first.
 
 ### Changed
 
+* **Settings:** The overview shows the version and a short build identity with its source state. About and diagnostic reports retain the full identity. At large text sizes, Pause, Resume and Undo appear before the recovery guidance so they stay in view.
 * **Setup:** Installation help explains Expert mode and how to identify overlapping Facebook patch sources. Bug reports now ask for every source's version and patch selection, including the details needed to diagnose issue #79.
 
 ## 0.7.1 (2026-10-03)
