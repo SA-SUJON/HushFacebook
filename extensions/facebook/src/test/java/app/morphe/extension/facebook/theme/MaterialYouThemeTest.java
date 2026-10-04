@@ -10,6 +10,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 
 import org.junit.After;
 import org.junit.Before;
@@ -648,6 +651,33 @@ public class MaterialYouThemeTest {
 
         Context amoled = ColourResources.context(Collections.singletonMap(ColourResources.VIDEO_BAR, 0xFF000000));
         assertEquals("AMOLED's black", 0xFF000000, MaterialYouTheme.getColor(amoled, ColourResources.VIDEO_BAR, true));
+    }
+
+    /**
+     * The feed's composer row (issue #37): Litho reads SURFACE_BACKGROUND's #252728 as a drawable of
+     * the colour resource. In dark mode it takes the palette, on its own copy of the drawable's state,
+     * so another drawable of the same resource keeps Facebook's grey. Light mode, another colour and
+     * a drawable that is no plain colour come back as they were.
+     */
+    @Test
+    public void theComposerRowsDrawableTakesThePaletteInDarkMode() {
+        ColorDrawable composer = new ColorDrawable(0xFF252728);
+        Drawable sibling = composer.getConstantState().newDrawable();
+
+        DarkMode.answer(true);
+        Drawable themed = MaterialYouTheme.recolour(composer);
+        assertEquals("the composer row", palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728),
+                ((ColorDrawable) themed).getColor());
+        assertEquals("the resource's other drawables", 0xFF252728, ((ColorDrawable) sibling).getColor());
+        ColorDrawable white = new ColorDrawable(0xFFFFFFFF);
+        assertEquals("a colour that is no dark surface", 0xFFFFFFFF, ((ColorDrawable) MaterialYouTheme.recolour(white)).getColor());
+        GradientDrawable shape = new GradientDrawable();
+        assertEquals("a drawable that is no plain colour", shape, MaterialYouTheme.recolour(shape));
+        assertEquals("nothing", null, MaterialYouTheme.recolour(null));
+
+        DarkMode.answer(false);
+        ColorDrawable light = new ColorDrawable(0xFF252728);
+        assertEquals("light mode", 0xFF252728, ((ColorDrawable) MaterialYouTheme.recolour(light)).getColor());
     }
 
     /** The tokens of the bars at the bottom of the screen. */

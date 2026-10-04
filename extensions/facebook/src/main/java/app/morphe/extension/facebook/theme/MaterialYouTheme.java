@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -253,6 +255,36 @@ public final class MaterialYouTheme {
 
     static int getColor(Resources resources, int id, @Nullable Resources.Theme theme, boolean amoled) {
         return withoutToken(amoled ? AmoledTheme.getColor(resources, id, theme) : resources.getColor(id, theme));
+    }
+
+    /**
+     * A colour resource read as a drawable with {@code Context.getDrawable}. Litho resolves a token's
+     * theme attribute to the resource it points at and asks for its drawable (581 {@code LX/2b3;->A05},
+     * 580 {@code LX/2Z3;->A05}, 577 {@code LX/23p;->A05}), so the feed's composer row is a plain
+     * drawable of SURFACE_BACKGROUND's #252728 (issue #37). Facebook keeps that colour only in its
+     * default configuration, and the night style can't move a token some code reads as a plain colour
+     * when no system tone sits close to it. A colour drawable of one of the {@link #SURFACES} takes
+     * the palette here, as a colour read with {@code getColor} does; any other drawable comes back as
+     * it was.
+     */
+    public static Drawable getDrawable(Context context, int id) {
+        return recolour(context.getDrawable(id));
+    }
+
+    /**
+     * The drawable with its colour from {@link #withoutToken}, on a copy of its state: drawables of
+     * one resource share it, and light mode reads the same resource.
+     */
+    @Nullable
+    static Drawable recolour(@Nullable Drawable drawable) {
+        if (!(drawable instanceof ColorDrawable)) return drawable;
+        ColorDrawable plain = (ColorDrawable) drawable;
+        int color = plain.getColor();
+        int themed = withoutToken(color);
+        if (themed == color) return drawable;
+        plain.mutate();
+        plain.setColor(themed);
+        return plain;
     }
 
     /**

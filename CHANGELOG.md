@@ -14,6 +14,10 @@ Every Hushfacebook release, newest first.
 * **Facebook:** With AMOLED black on, unread notifications are easy to spot again (issue #72). Facebook tints an unread row with a very faint blue that looked almost black on a black page, so that tint is now stronger in dark mode. Material You still gives it your palette's accent.
 * **Tooling:** The manifest check now also makes sure every supported Facebook build keeps the plain launcher query that lets it see Messenger and Instagram. Facebook doesn't name either app, and without that query their rows would never show.
 
+### Fixed
+
+* **Facebook:** With `Material You theme` in dark mode, the "What's on your mind?" row at the top of the feed now takes your palette like the rest of the feed, instead of staying Facebook's dark gray (issue #37). Facebook paints that row straight from a gray it keeps in its resources, a path none of the theme's other changes reached.
+
 ## 0.7.1 (2026-10-03)
 
 ### Added
