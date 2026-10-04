@@ -6,6 +6,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+* **Testing:** Codec cleanup no longer fails a completed media test when closing the launcher's input retries a buffered release byte after the process has exited. Cleanup still reports errors while the launcher is alive.
 * **Supported links:** Messenger and Instagram rows no longer say links open here when Android's link handling is off or the relevant address states are missing. The rows refresh together from one Android answer when you return from settings.
 
 ### Changed
