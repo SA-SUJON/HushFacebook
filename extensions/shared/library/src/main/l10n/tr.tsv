@@ -729,6 +729,10 @@ Links go to %1$s. When it isn't installed, Android asks which app.	Bağlantılar
 Hide "Find friends from contacts"	“Kişilerinden arkadaş bul” kartını gizle
 # context: summary of that switch
 The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.	Hikaye tepsisinde kişilerini yüklemeni isteyen kart. Facebook tepsiyi yeniden yüklediğinde uygulanır.
+# context: switch title under Stories; the prompts are the cards beside Create story that suggest a kind of story to make. Keep it distinct from Hide suggested stories
+Hide story prompts	Hikaye fikirlerini gizle
+# context: summary of that switch; Share music you love is the name of one such card
+The cards beside Create story that suggest a story to make, like Share music you love. Applies when Facebook next loads the tray.	Hikaye oluştur'un yanında sana bir hikaye öneren kartlar, örneğin sevdiğin müziği paylaşma kartı. Facebook tepsiyi yeniden yüklediğinde uygulanır.
 # context: summary of Hide "People you may know" when the build also hides tray cards; Add is the card's button
 The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.	Gönderilerin arasındaki arkadaş önerileri satırı, kendi profilindeki satır ve hikaye tepsisindeki Ekle düğmeli kartlar.
 Feeds opens on	Akışlar şurada açılır

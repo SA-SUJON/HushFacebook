@@ -178,6 +178,14 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_CONTACT_IMPORT_CARD =
             new BooleanSetting("hushfacebook_hide_contact_import_card", TRUE);
 
+    /**
+     * The cards beside Create story in the Stories tray that suggest a story to make, such as
+     * "Share music you love": the tray's fetch asks the server to leave out their list,
+     * skip_srtt_item_list, as Facebook does for the Video tab's tray. Off until you turn it on.
+     */
+    public static final BooleanSetting HIDE_STORY_PROMPTS =
+            new BooleanSetting("hushfacebook_hide_story_prompts", FALSE);
+
     /** Keep a finished Story visible until the user navigates. */
     public static final BooleanSetting BLOCK_STORY_AUTO_ADVANCE =
             new BooleanSetting("hushfacebook_block_story_auto_advance", TRUE);

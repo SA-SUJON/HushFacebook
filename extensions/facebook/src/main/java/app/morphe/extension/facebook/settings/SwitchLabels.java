@@ -42,6 +42,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_SPONSORED_STORIES) return L10n.t("Hide sponsored stories");
         if (setting == Settings.HIDE_SUGGESTED_STORIES) return L10n.t("Hide suggested stories");
         if (setting == Settings.HIDE_CONTACT_IMPORT_CARD) return L10n.t("Hide \"Find friends from contacts\"");
+        if (setting == Settings.HIDE_STORY_PROMPTS) return L10n.t("Hide story prompts");
         if (setting == Settings.BLOCK_STORY_AUTO_ADVANCE) return L10n.t("Stop Story auto-advance");
         if (setting == Settings.VIEW_STORIES_ANONYMOUSLY) return L10n.t("View stories anonymously");
         if (setting == Settings.DOWNLOAD_STORIES) return L10n.t("Save any story");

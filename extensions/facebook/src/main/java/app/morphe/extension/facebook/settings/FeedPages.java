@@ -209,6 +209,9 @@ final class FeedPages {
                         L10n.t("Keep friends and followed Pages in the Stories tray. Applies when Facebook next loads the tray.")));
                 stories.addPreference(toggle(context, Settings.HIDE_CONTACT_IMPORT_CARD,
                         L10n.t("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.")));
+                stories.addPreference(toggle(context, Settings.HIDE_STORY_PROMPTS,
+                        L10n.t("The cards beside Create story that suggest a story to make, like Share music you love. "
+                                + "Applies when Facebook next loads the tray.")));
             }
             if (build.contains(PatchFamily.STORY_AUTO_ADVANCE)) {
                 stories.addPreference(toggle(context, Settings.BLOCK_STORY_AUTO_ADVANCE,
