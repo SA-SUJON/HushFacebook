@@ -45,6 +45,23 @@ function New-NotFoundAnswer {
     return $answer
 }
 
+# A combined patch log can fail in another source even when Hushfacebook supports the APK.
+# Reports must retain both the source versions and the selection belonging to each source.
+$bugReportForm = Get-Content -LiteralPath (Join-Path $Root '.github/ISSUE_TEMPLATE/bug_report.yml') -Raw
+foreach ($field in @('patch_sources', 'selected_patches')) {
+    $fieldBlock = [regex]::Match($bugReportForm,
+        ('(?ms)^  - type: textarea\r?\n    id: ' + $field + '\r?\n.*?(?=^  - type:|\z)')).Value
+    Assert-True ($fieldBlock -match '(?m)^      required: true\s*$') `
+        "The bug report must require $field so a mixed-source failure can be traced."
+    if ($field -eq 'patch_sources') {
+        Assert-True ($fieldBlock -match '(?s)Source:.*?version') `
+            'The source field must ask for the patch log Source lines and their versions.'
+    } else {
+        Assert-True ($fieldBlock -match 'each source') `
+            'The patch selection must be reported separately for each source.'
+    }
+}
+
 # --- patch-target.ps1 ------------------------------------------------------------------------
 #
 # Facebook ships a build a week, so the catalog declares the build the bundle was last proved on

@@ -2,6 +2,12 @@
 
 Every Hushfacebook release, newest first.
 
+## Unreleased
+
+### Changed
+
+* **Setup:** Installation help explains Expert mode and how to identify overlapping Facebook patch sources. Bug reports now ask for every source's version and patch selection, including the details needed to diagnose issue #79.
+
 ## 0.7.1 (2026-10-03)
 
 * **Facebook:** This release gathers everything since v0.7.0. It keeps the same 60 patches for Facebook 581.0.0.45.58, and 580.0.0.51.74 and 577.0.0.50.72 still work. New this time are separate switches for the top Stories tray and Stories between posts, Hide story prompts, whole-word matching for the post filters, an optional Saved shortcut, and Open and Share buttons on the notification when a save finishes. Morphe Manager 1.33.0 or newer is still required.
