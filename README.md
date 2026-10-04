@@ -1,7 +1,7 @@
 ![Hushfacebook. Keep the people. Cut the noise.](assets/readme-hero.png)
 
 <p align="center">
-  <a href="https://github.com/SysAdminDoc/Hushfacebook/releases"><img src="https://img.shields.io/badge/version-0.7.1-0866FF" alt="Version 0.7.1"></a>
+  <a href="https://github.com/SysAdminDoc/Hushfacebook/releases"><img src="https://img.shields.io/badge/version-0.7.2-0866FF" alt="Version 0.7.2"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-blue" alt="License GPL-3.0"></a>
   <img src="https://img.shields.io/badge/platform-Android%2011%2B-3DDC84" alt="Platform Android 11+">
   <img src="https://img.shields.io/badge/Facebook-581.0.0.45.58-0866FF" alt="Facebook 581.0.0.45.58">
@@ -17,6 +17,8 @@
 # Hushfacebook
 
 Hushfacebook is a Morphe patch bundle for Android that takes the clutter out of Facebook and puts useful controls back in your hands.
+
+The current source is v0.7.2. It includes settings readability, supported-link status and setup fixes, and hasn't been published as a release.
 
 The latest release is [v0.7.1](https://github.com/SysAdminDoc/Hushfacebook/releases/tag/v0.7.1), with 60 patches. It includes all changes since v0.7.0, among them separate switches for the Stories tray and Stories between posts, Hide story prompts and a stronger unread tint under AMOLED black, as the [changelog](CHANGELOG.md) describes.
 
