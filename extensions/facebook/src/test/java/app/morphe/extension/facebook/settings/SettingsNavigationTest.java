@@ -457,6 +457,81 @@ public class SettingsNavigationTest {
         assertEquals(9, list().getCount());
     }
 
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    @Config(qualifiers = "w320dp-h640dp-night-xhdpi")
+    public void narrowHeaderAndSearchStayReadableAtLargeText() throws Exception {
+        checkHeaderAndSearch(2f, "header-narrow-large");
+    }
+
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    @Config(qualifiers = "ar-rXB-ldrtl-w320dp-h640dp-night-xhdpi")
+    public void narrowRightToLeftHeaderAndSearchStayReadableAtLargeText() throws Exception {
+        checkHeaderAndSearch(2f, "header-narrow-large-rtl");
+    }
+
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void ordinaryHeaderAndSearchKeepTheirSpacing() throws Exception {
+        checkHeaderAndSearch(1f, "header-ordinary");
+    }
+
+    private void checkHeaderAndSearch(float scale, String name) throws Exception {
+        RuntimeEnvironment.setFontScale(scale);
+        try {
+            recreate();
+            View root = dialog.getView();
+            float density = root.getResources().getDisplayMetrics().density;
+            int width = Math.round(root.getResources().getConfiguration().screenWidthDp * density);
+            int height = Math.round(root.getResources().getConfiguration().screenHeightDp * density);
+            android.view.ViewGroup bar = (android.view.ViewGroup) ((android.view.ViewGroup) root).getChildAt(0);
+            TextView title = (TextView) bar.getChildAt(1);
+            EditText search = findSearch(root);
+            android.view.ViewGroup searchBox = (android.view.ViewGroup) search.getParent();
+            View clear = searchBox.getChildAt(2);
+            for (int pass = 0; pass < 3; pass++) {
+                root.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));
+                root.layout(0, 0, width, height);
+                ShadowLooper.idleMainLooper();
+            }
+            File folder = new File("build/reports/settings-design");
+            assertTrue(folder.isDirectory() || folder.mkdirs());
+            Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            root.draw(new Canvas(image));
+            try (FileOutputStream out = new FileOutputStream(new File(folder, name + ".png"))) {
+                assertTrue(image.compress(Bitmap.CompressFormat.PNG, 100, out));
+            }
+            image.recycle();
+            assertEquals("Hushfacebook", title.getText().toString());
+            assertEquals("The app name must not break inside the word", 1, title.getLineCount());
+            assertTrue("The whole title must fit", title.getPaint().measureText(title.getText().toString())
+                    <= title.getWidth() - title.getCompoundPaddingLeft() - title.getCompoundPaddingRight());
+            assertTrue("The whole search hint must fit", search.getPaint().measureText(search.getHint().toString())
+                    <= search.getWidth() - search.getCompoundPaddingLeft() - search.getCompoundPaddingRight());
+            assertEquals(L10n.t("Search settings"), search.getContentDescription().toString());
+            assertTrue(search.isFocusable());
+            View back = bar.getChildAt(0);
+            assertEquals(L10n.t("Back"), back.getContentDescription().toString());
+            assertTrue(back.getWidth() >= 48 * density && back.getHeight() >= 48 * density);
+            if (scale == 1f) {
+                assertEquals(24 * density, title.getTextSize(), 0.1f);
+                assertEquals(View.INVISIBLE, clear.getVisibility());
+                assertEquals(4 * density, bar.getPaddingStart(), 0.1f);
+                assertEquals(16 * density, bar.getPaddingEnd(), 0.1f);
+            }
+            search.setText("video");
+            assertEquals(View.VISIBLE, clear.getVisibility());
+            assertTrue(clear.isClickable());
+            assertTrue(clear.performClick());
+            assertEquals("", search.getText().toString());
+            assertEquals(9, list().getCount());
+            android.app.Dialog shown = dialog.getDialog();
+            assertTrue(back.performClick());
+            assertFalse(shown.isShowing());
+        } finally {
+            RuntimeEnvironment.setFontScale(1f);
+        }
+    }
+
     /**
      * On the S22 with TalkBack, typing a search said only "Edit box": the list changed without a
      * word. The count now sits in a polite live region, written once the typing settles.
