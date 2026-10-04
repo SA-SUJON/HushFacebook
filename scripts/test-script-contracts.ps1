@@ -713,6 +713,21 @@ try {
     Assert-True ($identity.Present -and $identity.Valid -and $identity.SourceState -ceq 'clean' -and
         $identity.SourceCommit -ceq $template.release.commit) 'Bound clean identity was not read.'
     Assert-True (Test-IdentityReceipt).Valid 'A receipt refused its bound clean bundle identity.'
+    # The SBOM check holds that identity to the commit it's given, as the receipt build and the
+    # receipt check both call it; given none, it says so rather than refusing every new bundle.
+    $identitySbom = Join-Path $identityRoot 'patches-9.9.9.cdx.json'
+    New-TestSbom -Path $identitySbom -Bundle $identityBundle
+    $identitySbomRead = Read-ReleaseSbom -Path $identitySbom
+    $bound = Test-ReleaseSbom -Sbom $identitySbomRead -BundlePath $identityBundle -BundleName 'patches-9.9.9.mpp' `
+        -ExpectedCommit $template.release.commit
+    Assert-True $bound.Valid "An SBOM refused a bundle whose identity names the commit given: $($bound.Reason)"
+    $bound = Test-ReleaseSbom -Sbom $identitySbomRead -BundlePath $identityBundle -BundleName 'patches-9.9.9.mpp' `
+        -ExpectedCommit ('c' * 40)
+    Assert-True (-not $bound.Valid -and $bound.Reason -like '*build identity does not bind*') `
+        "An SBOM accepted a bundle whose identity names another commit: $($bound.Reason)"
+    $bound = Test-ReleaseSbom -Sbom $identitySbomRead -BundlePath $identityBundle -BundleName 'patches-9.9.9.mpp'
+    Assert-True (-not $bound.Valid -and $bound.Reason -like '*no source commit was given*') `
+        "An SBOM check with no commit to hold an identity to answered: $($bound.Reason)"
     foreach ($state in @('dirty', 'unknown')) {
         New-IdentityBundle -State $state
         Assert-True (Get-BundleIdentityFacts -BundlePath $identityBundle).Valid "Honest $state identity was rejected by the reader."

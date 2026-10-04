@@ -209,12 +209,14 @@ function Test-ReleaseSbom {
         bundle's manifest, and every extension payload the bundle carries with the SHA-256 of its
         bytes. An SBOM left beside a newer build fails on the hash, and one dated from the clock
         rather than from the pinned stamp fails on the timestamp. -BundleName is the name the
-        bundle is published under, since a downloaded copy has a temporary one.
+        bundle is published under, since a downloaded copy has a temporary one. -ExpectedCommit is
+        the clean commit a bundle carrying a build identity must name; a legacy bundle has none.
     #>
     param(
         [Parameter(Mandatory = $true)]$Sbom,
         [Parameter(Mandatory = $true)][string]$BundlePath,
-        [Parameter(Mandatory = $true)][string]$BundleName
+        [Parameter(Mandatory = $true)][string]$BundleName,
+        [string]$ExpectedCommit
     )
 
     function Fail { param([string]$Reason) return [pscustomobject]@{ Valid = $false; Reason = $Reason } }
@@ -229,6 +231,9 @@ function Test-ReleaseSbom {
     }
     $manifest = Get-BundleManifestFacts -BundlePath $BundlePath
     $identity = Get-BundleIdentityFacts -BundlePath $BundlePath
+    if ($identity.Present -and -not $ExpectedCommit) {
+        return Fail "$BundleName carries a build identity, and no source commit was given to hold it to."
+    }
     if ($identity.Present -and (-not $identity.Valid -or $identity.SourceState -cne 'clean' -or
             $identity.SourceCommit -cne $ExpectedCommit)) { return Fail 'The bundle build identity does not bind to this clean source commit.' }
     if ($Sbom.BundleVersion -ne $manifest.version) {
@@ -1452,7 +1457,8 @@ function Test-ReleaseReceipt {
                 "it lists $($document.Components.Count).")
         }
         if ($BundlePath) {
-            $bound = Test-ReleaseSbom -Sbom $document -BundlePath $BundlePath -BundleName ([string]$Receipt.bundle.file)
+            $bound = Test-ReleaseSbom -Sbom $document -BundlePath $BundlePath -BundleName ([string]$Receipt.bundle.file) `
+                -ExpectedCommit ([string]$Receipt.release.commit)
             if (-not $bound.Valid) { return Fail $bound.Reason }
         }
     }
