@@ -178,6 +178,26 @@ public class MaterialYouThemeTest {
         }
     }
 
+    /**
+     * Issue #72: with AMOLED in the build its hook goes first, and an unread notification's row
+     * reaches this one at AMOLED's 25%. It takes the palette's accent at that alpha. The same blue
+     * at an alpha AMOLED doesn't give, or on another token, stays Facebook's.
+     */
+    @Test
+    public void amoledsStrongerUnreadTintTakesThePalette() {
+        DarkMode.answer(true);
+        Token row = Token.NEW_NOTIFICATION_BACKGROUND;
+        int amoled = AmoledTheme.apply(DARK[row.ordinal()], row);
+        int drawn = MaterialYouTheme.fds(amoled, row);
+        assertEquals("keeps AMOLED's alpha", AmoledTheme.NEW_NOTIFICATION_ALPHA, drawn >>> 24);
+        assertEquals("the palette's accent", palette.sameLightness(TonePalette.ACCENT, amoled), drawn);
+        assertNotEquals("kept Facebook's blue", amoled, drawn);
+
+        assertEquals("an alpha AMOLED doesn't give", 0x332D88FF, MaterialYouTheme.fds(0x332D88FF, row));
+        assertEquals("AMOLED's alpha on another token", 0x402D88FF,
+                MaterialYouTheme.fds(0x402D88FF, Token.ACCENT_DEEMPHASIZED));
+    }
+
     /** Issue #37: the Like button's blue after you like, a dark-only colour, takes the palette. */
     @Test
     public void theLikeButtonAfterYouLikeTakesThePalette() {

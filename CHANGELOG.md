@@ -10,6 +10,7 @@ Every Hushfacebook release, newest first.
 
 ### Changed
 
+* **Facebook:** With AMOLED black on, unread notifications are easy to spot again (issue #72). Facebook tints an unread row with a very faint blue that looked almost black on a black page, so that tint is now stronger in dark mode. Material You still gives it your palette's accent.
 * **Tooling:** The manifest check now also makes sure every supported Facebook build keeps the plain launcher query that lets it see Messenger and Instagram. Facebook doesn't name either app, and without that query their rows would never show.
 
 ## 0.7.1 (2026-10-03)

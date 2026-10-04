@@ -161,13 +161,14 @@ public final class MaterialYouTheme {
      * Route one, for FDS: a colour a resolver returns for {@code token}.
      *
      * @return the palette's colour if {@code color} is the one Facebook's dark theme gives this
-     * token, otherwise {@code color}
+     * token, or AMOLED's stronger tint of it, otherwise {@code color}
      */
     public static int fds(int color, Object token) {
         HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
         if (!(token instanceof Enum) || !DarkMode.on()) return color;
         String name = ((Enum<?>) token).name();
-        if (listed(FDS.get(name), color) || (listed(SHARED.get(name), color) && DarkMode.saidOn())) {
+        if (listed(FDS.get(name), color) || tintedByAmoled(FDS.get(name), color, name)
+                || (listed(SHARED.get(name), color) && DarkMode.saidOn())) {
             return recolour(palette(), color);
         }
         return color;
@@ -177,6 +178,19 @@ public final class MaterialYouTheme {
         if (colours == null) return false;
         for (int value : colours) {
             if (value == color) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Whether {@code color} is AMOLED's stronger tint of one of {@code colours}: with AMOLED in the
+     * build its hook goes first, so an unread notification's row reaches this one at
+     * {@link AmoledTheme#NEW_NOTIFICATION_ALPHA}, issue #72. The palette's accent keeps that alpha.
+     */
+    private static boolean tintedByAmoled(@Nullable int[] colours, int color, String token) {
+        if (colours == null) return false;
+        for (int value : colours) {
+            if (value != color && AmoledTheme.unreadRow(value, token) == color) return true;
         }
         return false;
     }
