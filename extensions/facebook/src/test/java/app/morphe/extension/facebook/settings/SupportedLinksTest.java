@@ -564,6 +564,77 @@ public class SupportedLinksTest {
     }
 
     @Test
+    public void retainedRowsNeverDeclareDisabledOrUnreadableLinksOpen() throws Exception {
+        installAppManager(true);
+        install(SupportedLinks.MESSENGER, true);
+        install(SupportedLinks.INSTAGRAM, true);
+        answer = state(true, facebookHosts(NONE, NONE, NONE, NONE, NONE, NONE));
+        HushfacebookPreferenceFragment page = show(true);
+        DomainVerificationUserState nullMap = state(true, new LinkedHashMap<>());
+        ReflectionHelpers.setField(nullMap, "mHostToStateMap", null);
+        Map<String, Integer> unknown = facebookHosts(SELECTED, SELECTED, SELECTED, SELECTED, SELECTED, SELECTED);
+        unknown.put("facebook.com", 99);
+        Map<String, Integer> nullValue = new LinkedHashMap<>(unknown);
+        nullValue.put("facebook.com", null);
+        Object[] unreadable = {
+                state(false, facebookHosts(SELECTED, SELECTED, SELECTED, SELECTED, SELECTED, SELECTED)),
+                null, nullMap, state(true, new LinkedHashMap<>()),
+                state(true, unknown), state(true, nullValue), new SecurityException("unavailable")
+        };
+        for (Object value : unreadable) {
+            answer = value;
+            controller.pause().resume();
+            for (SupportedLinks.Holder holder : SupportedLinks.Holder.values()) {
+                Preference row = page.findPreference(holder.rowKey);
+                assertNotNull("retained " + holder, row);
+                assertFalse("unreadable " + holder + ": " + row.getSummary(),
+                        String.valueOf(row.getSummary()).contains("open here now"));
+            }
+        }
+    }
+
+    @Test
+    public void retainedRowsRequirePositiveStateForEveryRelevantHost() throws Exception {
+        install(SupportedLinks.MESSENGER, true);
+        install(SupportedLinks.INSTAGRAM, true);
+        answer = state(true, facebookHosts(NONE, NONE, NONE, NONE, NONE, NONE));
+        HushfacebookPreferenceFragment page = show(true);
+        Map<String, Integer> incomplete = facebookHosts(SELECTED, SELECTED, SELECTED, SELECTED, SELECTED, SELECTED);
+        incomplete.remove("facebook.com");
+        answer = state(true, incomplete);
+        controller.pause().resume();
+        for (String key : Arrays.asList("action_messenger_links", "action_instagram_links")) {
+            assertFalse(String.valueOf(page.findPreference(key).getSummary()).contains("open here now"));
+        }
+        incomplete.put("facebook.com", VERIFIED);
+        incomplete.put("fb.watch", 99);
+        answer = state(true, incomplete);
+        controller.pause().resume();
+        assertEquals("facebook.com and m.me links open here now.",
+                String.valueOf(page.findPreference("action_messenger_links").getSummary()));
+        assertEquals("facebook.com links open here now.",
+                String.valueOf(page.findPreference("action_instagram_links").getSummary()));
+    }
+
+    @Test
+    public void resumeReadsOneSnapshotForTheMainRowAndEveryHolder() throws Exception {
+        installAppManager(true);
+        install(SupportedLinks.MESSENGER, true);
+        install(SupportedLinks.INSTAGRAM, true);
+        answer = state(true, facebookHosts(NONE, NONE, NONE, NONE, NONE, NONE));
+        HushfacebookPreferenceFragment page = show(true);
+        answer = state(true, facebookHosts(VERIFIED, SELECTED, SELECTED, VERIFIED, SELECTED, SELECTED));
+        askedFor.clear();
+        controller.pause().resume();
+        assertEquals("one Android answer must govern the whole refresh", 1, askedFor.size());
+        assertTrue(String.valueOf(page.findPreference(KEY).getSummary()).contains("selected for this app"));
+        for (SupportedLinks.Holder holder : SupportedLinks.Holder.values()) {
+            assertEquals("Facebook's web addresses open here now.",
+                    String.valueOf(page.findPreference(holder.rowKey).getSummary()));
+        }
+    }
+
+    @Test
     public void noRowForMessengerOrInstagramDisabledOrAbsent() throws Exception {
         answer = state(true, facebookHosts(NONE, NONE, NONE, NONE, NONE, NONE));
         HushfacebookPreferenceFragment page = show(true);

@@ -593,7 +593,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setKey(SUPPORTED_LINKS);
         row.setTitle(L10n.t("Supported links"));
         row.setPersistent(false);
-        row.setSummary(SupportedLinks.summary(SupportedLinks.read(context)));
+        row.setSummary(SupportedLinks.summary(SupportedLinks.read(context).state));
         row.setOnPreferenceClickListener(p -> {
             openLinkSettings(context);
             return true;
@@ -608,16 +608,15 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * has to let go first.
      */
     List<Preference> linkHolderRows(Context context) {
-        SupportedLinks.State state = SupportedLinks.read(context);
-        Set<String> notOpen = SupportedLinks.hostsNotOpen(context);
+        SupportedLinks.Snapshot snapshot = SupportedLinks.read(context);
         List<Preference> rows = new ArrayList<>();
         for (SupportedLinks.Holder holder : SupportedLinks.Holder.values()) {
-            if (!SupportedLinks.mayHoldLinks(holder, state, SupportedLinks.isOn(context, holder), notOpen)) continue;
+            if (!SupportedLinks.mayHoldLinks(holder, snapshot, SupportedLinks.isOn(context, holder))) continue;
             Row row = new Row(context);
             row.setKey(holder.rowKey);
             row.setTitle(holder.title());
             row.setPersistent(false);
-            row.setSummary(SupportedLinks.holderSummary(holder, state, notOpen));
+            row.setSummary(SupportedLinks.holderSummary(holder, snapshot));
             row.setOnPreferenceClickListener(p -> {
                 openLinkPage(SupportedLinks.holderIntents(holder), holder.reportKey, holder.notOpened());
                 return true;
@@ -631,12 +630,11 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (getPreferenceScreen() == null) return;
         Preference row = findPreference(SUPPORTED_LINKS);
         if (row == null) return;
-        SupportedLinks.State state = SupportedLinks.read(row.getContext());
-        row.setSummary(SupportedLinks.summary(state));
-        Set<String> notOpen = SupportedLinks.hostsNotOpen(row.getContext());
+        SupportedLinks.Snapshot snapshot = SupportedLinks.read(row.getContext());
+        row.setSummary(SupportedLinks.summary(snapshot.state));
         for (SupportedLinks.Holder holder : SupportedLinks.Holder.values()) {
             Preference holderRow = findPreference(holder.rowKey);
-            if (holderRow != null) holderRow.setSummary(SupportedLinks.holderSummary(holder, state, notOpen));
+            if (holderRow != null) holderRow.setSummary(SupportedLinks.holderSummary(holder, snapshot));
         }
     }
 

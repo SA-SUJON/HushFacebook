@@ -4,6 +4,10 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+### Fixed
+
+* **Supported links:** Messenger and Instagram rows no longer say links open here when Android's link handling is off or the relevant address states are missing. The rows refresh together from one Android answer when you return from settings.
+
 ### Changed
 
 * **Setup:** Installation help explains Expert mode and how to identify overlapping Facebook patch sources. Bug reports now ask for every source's version and patch selection, including the details needed to diagnose issue #79.

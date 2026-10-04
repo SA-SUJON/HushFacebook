@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -142,22 +143,48 @@ final class SupportedLinks {
 
     private SupportedLinks() {}
 
+    /** One Android answer for the main row and every retained holder row. */
+    static final class Snapshot {
+        final State state;
+        private final Set<String> openHosts = new HashSet<>();
+
+        private Snapshot(State state) {
+            this.state = state;
+        }
+
+        @RequiresApi(Build.VERSION_CODES.S)
+        private Snapshot(boolean allowed, @Nullable Map<String, Integer> hosts) {
+            state = state(allowed, hosts);
+            if (allowed && hosts != null) {
+                for (Map.Entry<String, Integer> host : hosts.entrySet()) {
+                    Integer value = host.getValue();
+                    if (value != null && (value == DomainVerificationUserState.DOMAIN_STATE_SELECTED
+                            || value == DomainVerificationUserState.DOMAIN_STATE_VERIFIED)) {
+                        openHosts.add(host.getKey());
+                    }
+                }
+            }
+        }
+    }
+
     /** What Android says about this app's links, or UNKNOWN when it couldn't be read. */
-    static State read(Context context) {
+    static Snapshot read(@Nullable Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return userState(context);
-        return State.NOT_REPORTED;
+        return new Snapshot(State.NOT_REPORTED);
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    private static State userState(Context context) {
+    private static Snapshot userState(@Nullable Context context) {
         try {
-            DomainVerificationManager manager = context.getSystemService(DomainVerificationManager.class);
-            if (manager == null) return State.UNKNOWN;
+            DomainVerificationManager manager = context == null ? null : context.getSystemService(DomainVerificationManager.class);
+            if (manager == null) return new Snapshot(State.UNKNOWN);
             DomainVerificationUserState user = manager.getDomainVerificationUserState(context.getPackageName());
-            return user == null ? State.UNKNOWN : state(user.isLinkHandlingAllowed(), user.getHostToStateMap());
+            if (user == null) return new Snapshot(State.UNKNOWN);
+            Map<String, Integer> hosts = user.getHostToStateMap();
+            return new Snapshot(user.isLinkHandlingAllowed(), hosts == null ? null : new HashMap<>(hosts));
         } catch (PackageManager.NameNotFoundException | RuntimeException unreadable) {
             Logger.printInfo(() -> "Supported links unreadable: " + unreadable.getClass().getSimpleName());
-            return State.UNKNOWN;
+            return new Snapshot(State.UNKNOWN);
         }
     }
 
@@ -169,30 +196,6 @@ final class SupportedLinks {
         List<String> lines = new ArrayList<>(domainLines(context));
         for (Holder holder : Holder.values()) lines.add(holder.reportKey + ": " + appState(context, holder.packageName));
         return lines;
-    }
-
-    /**
-     * This app's addresses that open elsewhere, or null when Android doesn't say: below Android 12,
-     * or unreadable.
-     */
-    @Nullable
-    static Set<String> hostsNotOpen(@Nullable Context context) {
-        if (context == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return null;
-        try {
-            DomainVerificationManager manager = context.getSystemService(DomainVerificationManager.class);
-            DomainVerificationUserState user = manager == null ? null : manager.getDomainVerificationUserState(context.getPackageName());
-            Map<String, Integer> hosts = user == null ? null : user.getHostToStateMap();
-            if (hosts == null) return null;
-            Set<String> closed = new HashSet<>();
-            for (Map.Entry<String, Integer> host : hosts.entrySet()) {
-                Integer value = host.getValue();
-                if (value != null && value == DomainVerificationUserState.DOMAIN_STATE_NONE) closed.add(host.getKey());
-            }
-            return closed;
-        } catch (PackageManager.NameNotFoundException | RuntimeException unreadable) {
-            Logger.printInfo(() -> "Supported link hosts unreadable: " + unreadable.getClass().getSimpleName());
-            return null;
-        }
     }
 
     private static List<String> domainLines(Context context) {
@@ -310,28 +313,25 @@ final class SupportedLinks {
 
     /**
      * Whether [holder]'s row belongs on the page: it's on the phone, and Facebook's addresses don't
-     * all open here, or Android 11 doesn't say whether they do. With [notOpen] known, one of the
-     * addresses it holds has to be among them, so Instagram isn't sent for once only m.me is left.
+     * all open here, or Android 11 doesn't say whether they do. Once its own addresses open here,
+     * the row isn't needed, so Instagram isn't sent for once only m.me is left.
      */
-    static boolean mayHoldLinks(Holder holder, State state, boolean on, @Nullable Set<String> notOpen) {
+    static boolean mayHoldLinks(Holder holder, Snapshot snapshot, boolean on) {
+        State state = snapshot.state;
         if (!on || !(state == State.NONE || state == State.SOME || state == State.NOT_REPORTED)) return false;
-        return holder.hosts.isEmpty() || notOpen == null || holdsOneOf(holder, notOpen);
-    }
-
-    private static boolean holdsOneOf(Holder holder, Set<String> notOpen) {
-        for (String host : holder.hosts) if (notOpen.contains(host)) return true;
-        return false;
+        return holder.hosts.isEmpty() || !snapshot.openHosts.containsAll(holder.hosts);
     }
 
     /**
      * The row's summary, read again on the way back from Android's pages: the row stays until the
      * page is rebuilt, so once the addresses its app may hold open here it says so.
      */
-    static String holderSummary(Holder holder, State state, @Nullable Set<String> notOpen) {
-        if (state == State.VERIFIED || state == State.SELECTED) {
-            return L10n.t("Facebook's web addresses open here now.");
+    static String holderSummary(Holder holder, Snapshot snapshot) {
+        boolean allOpen = snapshot.state == State.VERIFIED || snapshot.state == State.SELECTED;
+        boolean holderOpen = holder.hosts.isEmpty() ? allOpen : snapshot.openHosts.containsAll(holder.hosts);
+        if (holderOpen) {
+            return allOpen ? L10n.t("Facebook's web addresses open here now.") : holder.released();
         }
-        if (!holder.hosts.isEmpty() && notOpen != null && !holdsOneOf(holder, notOpen)) return holder.released();
         return holder.holding();
     }
 
