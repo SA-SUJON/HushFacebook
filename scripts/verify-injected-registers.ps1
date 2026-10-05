@@ -20,8 +20,8 @@
     placement and try ranges, and the whole APK is held to
     scripts/injected-mutation-contracts.txt: one feed guard, in addNewEdgeToCollection, each
     story-flag stub calling GraphQLStory's accessor before it returns, the showcase stub calling
-    the accessor of the one class answering ShowcaseFeedUnit, the Stories tray hook first in both
-    tray adapter methods, the reels hook first in the pre-EOF injector, and the swap guard once in
+    the accessor of the one class answering ShowcaseFeedUnit, one Stories tray count in each of the
+    two tray adapter classes, the reels hook first in the pre-EOF injector, and the swap guard once in
     the runnable that swaps an edge into the feed, each in the one method its rule's strings and
     shape pick out.
 
