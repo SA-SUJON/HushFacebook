@@ -74,7 +74,7 @@ The [Morphe Patch Tracker](https://drnx64.github.io/morphe-track-patches/#/bundl
 ## What we left out
 
 - An age-verification bypass that one tracker asked for. It gets around a safety control.
-- Meta Plus and Meta AI premium unlocks. Those get around a paywall.
+- Unlocking Meta Plus, Meta AI premium or the paid ad-free subscription by making Facebook think you've paid. Those get around a paywall. Hushfacebook hides ads with its own patches instead.
 - Exporting and importing login sessions. That handles people's credentials.
 - Prebuilt patched APKs. Hushfacebook publishes patches only, never Meta's app.
 
