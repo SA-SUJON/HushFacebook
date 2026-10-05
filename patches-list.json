@@ -2002,7 +2002,7 @@
     },
     {
       "name": "Hushfacebook in the Menu",
-      "description": "Adds a Hushfacebook settings row to Facebook's Menu, at the end of Settings and privacy. The logo long press and the launcher shortcut still open the settings too.",
+      "description": "Adds a Hushfacebook settings row to Facebook's Menu, at the end of Settings and privacy, with a Saved row above it while the Saved shortcut switch is on. The logo long press and the launcher shortcut still open the settings too.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -2596,7 +2596,7 @@
     },
     {
       "name": "Resume long videos",
-      "description": "A video longer than two minutes that you left partway picks up where you left it the next time it plays. Reels, live videos and ads start as usual. Its switch starts off.",
+      "description": "A video longer than two minutes that you left partway picks up where you left it the next time it plays, in the feed or full screen. Short reels, live videos and ads start as usual. Its switch starts off.",
       "category": "Interface",
       "use": true,
       "dependencies": [
