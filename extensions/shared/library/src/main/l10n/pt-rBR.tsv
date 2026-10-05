@@ -546,6 +546,14 @@ answered	respondeu
 failed (%1$s)	falhou (%1$s)
 # context: switch title under Reels and Watch; the dot is the tab bar's new-item badge
 Hide the Reels tab dot	Ocultar o ponto da aba Reels
+Hide the Feeds tab	Ocultar a aba Feeds
+Hide the Friends tab	Ocultar a aba Amigos
+Hide the Marketplace tab	Ocultar a aba Marketplace
+Hide the Groups tab	Ocultar a aba Grupos
+Hide the Gaming tab	Ocultar a aba Jogos
+Hide the Events tab	Ocultar a aba Eventos
+Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after changing it.	Tira a aba da barra de abas. A página dela continua no Menu. Reinicie o Facebook depois de mudar.
+Facebook opens on Home while Hide tabs keeps %1$s off the tab bar. Your choice stays saved.	O Facebook abre no Início enquanto Ocultar abas mantém %1$s fora da barra de abas. Sua escolha continua salva.
 # context: summary of that switch; Video is Facebook's name for the tab on some accounts
 No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.	Sem ponto nem contagem de novidades na aba Reels, chamada Vídeo em algumas contas. As outras abas mantêm os seus.
 # context: title of the overview row under the status card when the build lacks one patch Morphe Manager selects by default

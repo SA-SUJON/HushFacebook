@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import java.util.Set;
 
+import app.morphe.extension.facebook.navigation.HiddenTabs;
 import app.morphe.extension.facebook.coexist.MessengerLinkCheck;
 import app.morphe.extension.facebook.settings.SettingsRows.BackupRow;
 import app.morphe.extension.facebook.settings.SettingsRows.ClearRow;
@@ -77,7 +78,8 @@ final class HushfacebookPages {
     static void appearance(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
         if (build.contains(PatchFamily.SYSTEM_FONT) || build.contains(PatchFamily.SYSTEM_EMOJI)
-                || build.contains(PatchFamily.BOTTOM_TAB_BAR) || build.contains(PatchFamily.FORCE_DARK_MODE)) {
+                || build.contains(PatchFamily.BOTTOM_TAB_BAR) || build.contains(PatchFamily.FORCE_DARK_MODE)
+                || build.contains(PatchFamily.HIDDEN_TABS)) {
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
             if (build.contains(PatchFamily.SYSTEM_FONT)) {
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT,
@@ -101,6 +103,14 @@ final class HushfacebookPages {
                 appearance.addPreference(toggle(context, Settings.BOTTOM_TAB_BAR,
                         L10n.t("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. "
                                 + "Restart Facebook after changing it.")));
+            }
+            if (build.contains(PatchFamily.HIDDEN_TABS)) {
+                // Facebook builds the tab bar once, so a change waits for a restart.
+                for (HiddenTabs.Tab tab : HiddenTabs.Tab.values()) {
+                    appearance.addPreference(toggle(context, tab.setting(),
+                            L10n.t("Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after "
+                                    + "changing it.")));
+                }
             }
             if (build.contains(PatchFamily.FORCE_DARK_MODE)) {
                 // Facebook asks for dark mode as each screen applies its theme, so a change shows fully after a restart.

@@ -652,6 +652,14 @@ answered	beantwortet
 failed (%1$s)	fehlgeschlagen (%1$s)
 # context: switch title under Reels and Watch; the dot is the tab bar's new-item badge
 Hide the Reels tab dot	Punkt am Reels-Tab ausblenden
+Hide the Feeds tab	Feeds-Tab ausblenden
+Hide the Friends tab	Freunde-Tab ausblenden
+Hide the Marketplace tab	Marketplace-Tab ausblenden
+Hide the Groups tab	Gruppen-Tab ausblenden
+Hide the Gaming tab	Gaming-Tab ausblenden
+Hide the Events tab	Veranstaltungen-Tab ausblenden
+Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after changing it.	Nimmt den Tab aus der Tab-Leiste. Seine Seite bleibt im Menü. Starte Facebook nach der Änderung neu.
+Facebook opens on Home while Hide tabs keeps %1$s off the tab bar. Your choice stays saved.	Facebook startet mit Home, solange Tabs ausblenden %1$s aus der Tab-Leiste nimmt. Deine Auswahl bleibt gespeichert.
 # context: summary of that switch; Video is Facebook's name for the tab on some accounts
 No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.	Kein Punkt und keine Neu-Zahl am Reels-Tab, bei manchen Konten Video genannt. Andere Tabs behalten ihre.
 # context: title of the overview row under the status card when the build lacks one patch Morphe Manager selects by default

@@ -106,4 +106,6 @@ Allowing screenshots on the pages Facebook blocks them on is something ReVanced'
 
 Keeping Facebook from noticing screenshots is ReVanced's universal Prevent screenshot detection, and Loukious and NexAlloy block capture detection too. Block screenshot detection is written here. In the 577, 580 and 581 builds every screenshot detector Facebook has shares one photo library observer that keeps its name, so a check goes first in it, and the Android 14 and 15 screen capture and recording requests go through Hushfacebook, which doesn't make them while the switch is on.
 
+Hiding single tabs is something Loukious does for the Marketplace and Games tabs. Hide tabs is written here, as one more rule of the tab bar filter Marketplace only and Hide the Reels tab already use, and it covers Feeds, Friends, Groups and Events too, each by the tab class Facebook keeps the name of.
+
 If you know of a Facebook patch source we missed, open an issue with a link.

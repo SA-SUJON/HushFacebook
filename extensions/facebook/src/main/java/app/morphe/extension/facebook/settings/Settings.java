@@ -545,6 +545,28 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_REELS_TAB_DOT =
             new BooleanSetting("hushfacebook_hide_reels_tab_dot", TRUE);
 
+    /*
+     * The tabs Hide tabs takes off the tab bar ({@link app.morphe.extension.facebook.navigation.HiddenTabs}),
+     * each off until it's picked. Facebook builds the bar once, so a change shows when it restarts.
+     */
+    public static final BooleanSetting HIDE_FEEDS_TAB =
+            new BooleanSetting("hushfacebook_hide_feeds_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_FRIENDS_TAB =
+            new BooleanSetting("hushfacebook_hide_friends_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_MARKETPLACE_TAB =
+            new BooleanSetting("hushfacebook_hide_marketplace_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_GROUPS_TAB =
+            new BooleanSetting("hushfacebook_hide_groups_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_GAMING_TAB =
+            new BooleanSetting("hushfacebook_hide_gaming_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_EVENTS_TAB =
+            new BooleanSetting("hushfacebook_hide_events_tab", FALSE, true);
+
     /**
      * The tab bar goes to the bottom of the screen on accounts Facebook gives it at the top
      * ({@link app.morphe.extension.facebook.navigation.BottomTabBar}). Facebook places the bar as

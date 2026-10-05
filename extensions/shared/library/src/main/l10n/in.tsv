@@ -652,6 +652,14 @@ answered	dijawab
 failed (%1$s)	gagal (%1$s)
 # context: switch title under Reels and Watch; the dot is the tab bar's new-item badge
 Hide the Reels tab dot	Sembunyikan titik di tab Reels
+Hide the Feeds tab	Sembunyikan tab Feed
+Hide the Friends tab	Sembunyikan tab Teman
+Hide the Marketplace tab	Sembunyikan tab Marketplace
+Hide the Groups tab	Sembunyikan tab Grup
+Hide the Gaming tab	Sembunyikan tab Game
+Hide the Events tab	Sembunyikan tab Acara
+Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after changing it.	Menghapus tab dari bilah tab. Halamannya tetap ada di Menu. Mulai ulang Facebook setelah mengubahnya.
+Facebook opens on Home while Hide tabs keeps %1$s off the tab bar. Your choice stays saved.	Facebook terbuka di Beranda selama Sembunyikan tab menjauhkan %1$s dari bilah tab. Pilihanmu tetap tersimpan.
 # context: summary of that switch; Video is Facebook's name for the tab on some accounts
 No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.	Tanpa titik atau jumlah baru di tab Reels, yang di beberapa akun bernama Video. Tab lain tetap menampilkannya.
 # context: title of the overview row under the status card when the build lacks one patch Morphe Manager selects by default

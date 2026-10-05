@@ -214,6 +214,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean hiddenTabs() {
+        return false;
+    }
+
     public static boolean bottomTabBar() {
         return false;
     }

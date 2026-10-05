@@ -628,6 +628,16 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: Block screenshot detection, an idea ReVanced's universal Prevent screenshot detection patch, Loukious and NexAlloy share, written here from Facebook 577, 580 and 581. A check goes first in the kept com.facebook.screenshot.ScreenshotContentObserver's onChange(boolean, Uri), the photo library observer every screenshot detector shares, and every registerScreenCaptureCallback call on an Activity and every WindowManager add/removeScreenRecordingCallback call outside the extension becomes a static call of the extension on the same registers, which doesn't make it while the switch is on."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/navigation/HiddenTabs.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/navigation/hidetabs/HideTabsPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Hide tabs, an idea Loukious has for the Marketplace and Games tabs, written here as another rule of the tab bar filter. Each hideable tab is known by the class Facebook keeps for it (FeedsTab and MostRecentFeedTab, FriendRequestsTab, MarketplaceTab, GroupsTargetedTab, GamesTab and GamesTabWithSNESControllerIcon, EventsTab), and a start meant for a hidden tab opens Home."
     }
   ]
 }

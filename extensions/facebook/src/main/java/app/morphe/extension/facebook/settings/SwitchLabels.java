@@ -50,6 +50,12 @@ final class SwitchLabels {
         if (setting == Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT) return L10n.t("Tag suggestions only after @");
         if (setting == Settings.HIDE_REELS_TAB) return L10n.t("Hide the Reels tab");
         if (setting == Settings.HIDE_REELS_TAB_DOT) return L10n.t("Hide the Reels tab dot");
+        if (setting == Settings.HIDE_FEEDS_TAB) return L10n.t("Hide the Feeds tab");
+        if (setting == Settings.HIDE_FRIENDS_TAB) return L10n.t("Hide the Friends tab");
+        if (setting == Settings.HIDE_MARKETPLACE_TAB) return L10n.t("Hide the Marketplace tab");
+        if (setting == Settings.HIDE_GROUPS_TAB) return L10n.t("Hide the Groups tab");
+        if (setting == Settings.HIDE_GAMING_TAB) return L10n.t("Hide the Gaming tab");
+        if (setting == Settings.HIDE_EVENTS_TAB) return L10n.t("Hide the Events tab");
         if (setting == Settings.HIDE_REEL_PROMPTS) return L10n.t("Hide reel interest prompts");
         if (setting == Settings.HIDE_SPONSORED_REELS) return L10n.t("Hide sponsored reels");
         if (setting == Settings.HIDE_AI_DETECTED_REELS) return L10n.t("Hide AI-detected reels and videos");

@@ -80,6 +80,7 @@ import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.BottomTabBar;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
+import app.morphe.extension.facebook.navigation.HiddenTabsForTests;
 import app.morphe.extension.facebook.navigation.ReelsTabForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
@@ -431,6 +432,8 @@ public class PausedHooksTest {
                 ReelsTabForTests::dropsTheShortcut));
         // The tab bar's count for the Reels tab reads none.
         probes.put(PatchFamily.REELS_TAB_DOT, Collections.singletonList(ReelsTabForTests::clearsTheDot));
+        // The Friends tab comes off the bar.
+        probes.put(PatchFamily.HIDDEN_TABS, Collections.singletonList(HiddenTabsForTests::hidesTheTab));
         // Facebook's own override of where the tab bar goes reads YES, for the bottom, where it read NO.
         probes.put(PatchFamily.BOTTOM_TAB_BAR, Collections.singletonList(
                 () -> BottomTabBar.override(TriState.NO.ordinal()) == TriState.YES.ordinal()));

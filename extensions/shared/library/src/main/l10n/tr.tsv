@@ -652,6 +652,14 @@ answered	yanıt verdi
 failed (%1$s)	başarısız (%1$s)
 # context: switch title under Reels and Watch; the dot is the tab bar's new-item badge
 Hide the Reels tab dot	Reels sekmesindeki noktayı gizle
+Hide the Feeds tab	Akışlar sekmesini gizle
+Hide the Friends tab	Arkadaşlar sekmesini gizle
+Hide the Marketplace tab	Marketplace sekmesini gizle
+Hide the Groups tab	Gruplar sekmesini gizle
+Hide the Gaming tab	Oyun sekmesini gizle
+Hide the Events tab	Etkinlikler sekmesini gizle
+Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after changing it.	Sekmeyi sekme çubuğundan kaldırır. Sayfası Menü'de kalır. Değiştirdikten sonra Facebook'u yeniden başlat.
+Facebook opens on Home while Hide tabs keeps %1$s off the tab bar. Your choice stays saved.	Sekmeleri gizle %1$s sekmesini çubuğun dışında tuttuğu sürece Facebook Ana Sayfa'da açılır. Seçimin kayıtlı kalır.
 # context: summary of that switch; Video is Facebook's name for the tab on some accounts
 No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.	Bazı hesaplarda Video adıyla görünen Reels sekmesinde nokta ya da yeni sayısı olmaz. Diğer sekmeler kendilerininkini korur.
 # context: title of the overview row under the status card when the build lacks one patch Morphe Manager selects by default

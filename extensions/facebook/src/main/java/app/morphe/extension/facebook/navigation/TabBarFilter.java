@@ -33,6 +33,7 @@ public final class TabBarFilter {
                                    @Nullable Set<?> hiddenIds) {
         boolean marketplaceOnly = MarketplaceOnly.hidesTab(hidden, tab, configured, hiddenIds);
         boolean reelsTab = ReelsTab.hidesTab(hidden, tab);
-        return marketplaceOnly || reelsTab;
+        boolean hiddenTabs = HiddenTabs.hidesTab(hidden, tab);
+        return marketplaceOnly || reelsTab || hiddenTabs;
     }
 }
