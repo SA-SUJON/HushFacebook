@@ -926,8 +926,8 @@ public final class L10nTranslations {
                 "Wird gespeichert \u2026");
         table.put("Saving... Cancel: Downloads in Hushfacebook.",
                 "Wird gespeichert \u2026 Abbrechen: Downloads in Hushfacebook.");
-        table.put("Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.",
-                "Bildschirmfotos und Bildschirmaufnahmen zeigen die Seiten, auf denen Facebook sie sperrt, etwa das Kartenformular und aus einem Chat ge\u00f6ffnete Fotos. Eine bereits ge\u00f6ffnete Seite \u00e4ndert sich, wenn du sie erneut \u00f6ffnest.");
+        table.put("Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.",
+                "Bildschirmfotos und Bildschirmaufnahmen zeigen die Seiten, auf denen Facebook sie sperrt. Eine bereits ge\u00f6ffnete Seite \u00e4ndert sich, wenn du sie erneut \u00f6ffnest.");
         table.put("Search",
                 "Suche");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -2151,8 +2151,8 @@ public final class L10nTranslations {
                 "Guardando...");
         table.put("Saving... Cancel: Downloads in Hushfacebook.",
                 "Guardando... Cancelar: Descargas en Hushfacebook.");
-        table.put("Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.",
-                "Las capturas y grabaciones de pantalla muestran las p\u00e1ginas en las que Facebook las bloquea, como el formulario de tarjeta y las fotos abiertas desde un chat. Una p\u00e1gina que ya est\u00e1 abierta cambia cuando la vuelves a abrir.");
+        table.put("Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.",
+                "Las capturas y grabaciones de pantalla muestran las p\u00e1ginas en las que Facebook las bloquea. Una p\u00e1gina que ya est\u00e1 abierta cambia cuando la vuelves a abrir.");
         table.put("Search",
                 "B\u00fasqueda");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -3376,8 +3376,8 @@ public final class L10nTranslations {
                 "Menyimpan...");
         table.put("Saving... Cancel: Downloads in Hushfacebook.",
                 "Menyimpan... Batal: Unduhan di Hushfacebook.");
-        table.put("Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.",
-                "Tangkapan layar dan rekaman layar menampilkan halaman yang diblokir Facebook, seperti formulir kartu dan foto yang dibuka dari obrolan. Halaman yang sudah terbuka berubah saat kamu membukanya lagi.");
+        table.put("Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.",
+                "Tangkapan layar dan rekaman layar menampilkan halaman yang diblokir Facebook. Halaman yang sudah terbuka berubah saat kamu membukanya lagi.");
         table.put("Search",
                 "Pencarian");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -4601,8 +4601,8 @@ public final class L10nTranslations {
                 "Salvando...");
         table.put("Saving... Cancel: Downloads in Hushfacebook.",
                 "Salvando... Cancelar: Downloads no Hushfacebook.");
-        table.put("Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.",
-                "Capturas e grava\u00e7\u00f5es de tela mostram as p\u00e1ginas em que o Facebook as bloqueia, como o formul\u00e1rio do cart\u00e3o e fotos abertas de um chat. Uma p\u00e1gina que j\u00e1 est\u00e1 aberta muda quando voc\u00ea a abre de novo.");
+        table.put("Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.",
+                "Capturas e grava\u00e7\u00f5es de tela mostram as p\u00e1ginas em que o Facebook as bloqueia. Uma p\u00e1gina que j\u00e1 est\u00e1 aberta muda quando voc\u00ea a abre de novo.");
         table.put("Search",
                 "Pesquisa");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",
@@ -5826,8 +5826,8 @@ public final class L10nTranslations {
                 "Kaydediliyor...");
         table.put("Saving... Cancel: Downloads in Hushfacebook.",
                 "Kaydediliyor... \u0130ptal: Hushfacebook'ta \u0130ndirmeler.");
-        table.put("Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.",
-                "Ekran g\u00f6r\u00fcnt\u00fcleri ve ekran kay\u0131tlar\u0131, Facebook'un bunlar\u0131 engelledi\u011fi sayfalar\u0131 da g\u00f6sterir, \u00f6rne\u011fin kart formu ve bir sohbetten a\u00e7\u0131lan foto\u011fraflar. Zaten a\u00e7\u0131k olan bir sayfa, onu yeniden a\u00e7t\u0131\u011f\u0131nda de\u011fi\u015fir.");
+        table.put("Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.",
+                "Ekran g\u00f6r\u00fcnt\u00fcleri ve ekran kay\u0131tlar\u0131, Facebook'un bunlar\u0131 engelledi\u011fi sayfalar\u0131 da g\u00f6sterir. Zaten a\u00e7\u0131k olan bir sayfa, onu yeniden a\u00e7t\u0131\u011f\u0131nda de\u011fi\u015fir.");
         table.put("Search",
                 "Arama");
         table.put("Search results lose the Meta AI answer and the Ask Meta AI prompts, and a suggestion no longer sends your search to Meta AI. People, groups, pages and posts stay, and the Meta AI button still opens Meta AI.",

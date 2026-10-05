@@ -303,7 +303,7 @@ Don't send reel watch history	No enviar el historial de reels vistos
 Hold back analytics uploads	Retener las subidas de analíticas
 Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook deja de subir sus analíticas de la app en segundo plano y omite sus tareas de aprendizaje en el dispositivo. Reinicia Facebook después de cambiarlo.
 Allow screenshots	Permitir capturas de pantalla
-Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.	Las capturas y grabaciones de pantalla muestran las páginas en las que Facebook las bloquea, como el formulario de tarjeta y las fotos abiertas desde un chat. Una página que ya está abierta cambia cuando la vuelves a abrir.
+Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.	Las capturas y grabaciones de pantalla muestran las páginas en las que Facebook las bloquea. Una página que ya está abierta cambia cuando la vuelves a abrir.
 Block screenshot detection	Bloquear la detección de capturas
 Facebook doesn't notice when you take a screenshot or record the screen, so nothing it does in response happens.	Facebook no nota cuando haces una captura o grabas la pantalla, así que no pasa nada de lo que haría en respuesta.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Deja de enviar listas de reels vistos a Facebook. Las usa para ordenar tu feed, así que pueden repetirse reels.

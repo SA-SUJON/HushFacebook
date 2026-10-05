@@ -182,9 +182,8 @@ final class AppPages {
         }
         if (build.contains(PatchFamily.SCREENSHOTS)) {
             privacy.addPreference(toggle(context, Settings.ALLOW_SCREENSHOTS,
-                    L10n.t("Screenshots and screen recordings show the pages Facebook blocks them on, such as the card "
-                            + "form and photos opened from a chat. A page that's already open changes when you "
-                            + "open it again.")));
+                    L10n.t("Screenshots and screen recordings show the pages Facebook blocks them on. A page that's "
+                            + "already open changes when you open it again.")));
         }
     }
 }

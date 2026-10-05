@@ -303,7 +303,7 @@ Don't send reel watch history	Reels izleme geçmişini gönderme
 Hold back analytics uploads	Analiz yüklemelerini beklet
 Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook uygulama analizlerini arka planda yüklemeyi bırakır ve cihaz üzerindeki öğrenme görevlerini atlar. Değiştirdikten sonra Facebook'u yeniden başlatın.
 Allow screenshots	Ekran görüntülerine izin ver
-Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.	Ekran görüntüleri ve ekran kayıtları, Facebook'un bunları engellediği sayfaları da gösterir, örneğin kart formu ve bir sohbetten açılan fotoğraflar. Zaten açık olan bir sayfa, onu yeniden açtığında değişir.
+Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.	Ekran görüntüleri ve ekran kayıtları, Facebook'un bunları engellediği sayfaları da gösterir. Zaten açık olan bir sayfa, onu yeniden açtığında değişir.
 Block screenshot detection	Ekran görüntüsü algılamayı engelle
 Facebook doesn't notice when you take a screenshot or record the screen, so nothing it does in response happens.	Facebook ekran görüntüsü aldığını veya ekranı kaydettiğini fark etmez, bu yüzden buna karşılık yapacağı hiçbir şey olmaz.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	İzlenen Reels listelerini Facebook'a göndermeyi durdurur. Listeler akışı sıraladığından izlenen Reels tekrar görünebilir.
