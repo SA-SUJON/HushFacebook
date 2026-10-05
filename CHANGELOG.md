@@ -8,6 +8,7 @@ Source preparation. The latest published bundle remains v0.7.1.
 
 ### Added
 
+* **Facebook:** Phones with a 32-bit processor can patch Facebook 581.0.0.45.58. Its 32-bit build for Android 11 and newer, 475215364 on APKMirror, keeps its code readable the way the 64-bit build does, and all 60 patches apply to it. Meta's 32-bit builds for Android 8 still pack their code away, so those can't be patched yet (issue #51).
 * **Facebook:** Block account setup reminders, under Notifications, stops the "finish setting up your account" notifications some people keep getting while they're signed in. It starts off like the other notification switches, and login and security alerts still come through (issue #57).
 
 ### Fixed
