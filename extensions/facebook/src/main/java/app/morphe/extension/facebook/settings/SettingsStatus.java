@@ -134,6 +134,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean analyticsUploads() {
+        return false;
+    }
+
     public static boolean audienceNetwork() {
         return false;
     }

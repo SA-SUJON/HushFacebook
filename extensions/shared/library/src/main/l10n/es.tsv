@@ -133,6 +133,7 @@ Importing settings	Importando la configuración
 Licenses	Licencias
 Link expired. Reopen the item and try again	El enlace expiró. Vuelve a abrir el contenido e inténtalo de nuevo
 Links	Enlaces
+Privacy	Privacidad
 Material You theme	Tema Material You
 News feed	Feed
 No screenshot watching for ads, and no reports of which apps you install.	Sin vigilancia de capturas de pantalla para anuncios ni informes sobre las apps que instalas.
@@ -299,6 +300,8 @@ Stop update prompts	Detener los avisos de actualización
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook deja de pedirte que actualices a través de Meta App Manager y deja de hacer que busque una actualización. Las promociones de chat dirigidas a versiones antiguas también desaparecen. Una versión parcheada no puede instalar las actualizaciones de Meta de todos modos.
 Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reels y videos de Watch que la detección propia de Facebook marca como creados con IA, a partir de la próxima tanda que cargue Facebook. Uno que solo su autor etiquetó como IA se mantiene. Este interruptor viene desactivado porque todavía no se probó con una cuenta real.
 Don't send reel watch history	No enviar el historial de reels vistos
+Hold back analytics uploads	Retener las subidas de analíticas
+Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook deja de subir sus analíticas de la app en segundo plano y omite sus tareas de aprendizaje en el dispositivo. Reinicia Facebook después de cambiarlo.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Deja de enviar listas de reels vistos a Facebook. Las usa para ordenar tu feed, así que pueden repetirse reels.
 the rename of the shared permissions	el cambio de nombre de los permisos compartidos
 Room for Meta's apps	Espacio para las apps de Meta

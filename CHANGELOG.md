@@ -8,7 +8,8 @@ Source preparation. The latest published bundle remains v0.7.1.
 
 ### Added
 
-* **Facebook:** Phones with a 32-bit processor can patch Facebook 581.0.0.45.58. Its 32-bit build for Android 11 and newer, 475215364 on APKMirror, keeps its code readable the way the 64-bit build does, and all 60 patches apply to it. Meta's 32-bit builds for Android 8 still pack their code away, so those can't be patched yet (issue #51).
+* **Facebook:** Phones with a 32-bit processor on Android 11 or newer can patch Facebook 581.0.0.45.58. Pick its 32-bit build for Android 11 and newer, 475215364 on APKMirror. It keeps its code readable the way the 64-bit build does, and every patch applies to it.
+* **Facebook:** New patch, `Hold back analytics uploads`, under a new Privacy section. Facebook uploads how you use the app in the background, every three minutes while it's open, and runs Papaya jobs that train models on your phone and report back. With the patch picked and its switch on, the uploads don't start and the Papaya jobs end without running. It's off in Manager's default selection, its switch starts on once it's picked, and a change takes a restart of Facebook.
 * **Facebook:** With the Saved shortcut switch on, Facebook's Menu gets a Saved row at the end of Settings and privacy, right above Hushfacebook settings. It opens your saved items inside Facebook, and unlike the icon's long-press entry it shows on Samsung phones too. It comes with `Hushfacebook in the Menu`.
 * **Facebook:** Block account setup reminders, under Notifications, stops the "finish setting up your account" notifications some people keep getting while they're signed in. It starts off like the other notification switches, and login and security alerts still come through (issue #57).
 

@@ -155,4 +155,16 @@ final class AppPages {
                         + "Selecting the addresses sends their links here again. It doesn't restore Meta's verification, "
                         + "and your other link settings stay as they are.")));
     }
+
+    /** Privacy: what Facebook sends home in the background. */
+    static void privacy(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
+            Set<PatchFamily> build) {
+        if (build.contains(PatchFamily.ANALYTICS_UPLOADS)) {
+            PreferenceCategory privacy = category(screen, L10n.t("Privacy"));
+            // XAnalytics resumes its uploader once, as Facebook starts.
+            privacy.addPreference(toggle(context, Settings.HOLD_ANALYTICS_UPLOADS,
+                    L10n.t("Facebook stops uploading its app analytics in the background and skips its on-device "
+                            + "learning jobs. Restart Facebook after changing it.")));
+        }
+    }
 }

@@ -583,6 +583,17 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: the quality videos play at, an idea De-Vanced also has, written from Facebook's own code. The patch finds, in Facebook 577 and 580, the DASH format evaluator as the class of the one (String)V call in the method holding HeroServicePlayer.setCustomQualityInternal, built with an AbrContextAwareConfiguration; that custom-quality setter's array of tracks and the static method and field it reads a track's label with; and the String field the evaluator hands its own setter at its first choice, its preselected label. The setter asks the extension first with its label, the constructor tells it about the evaluator before each return, and the extension's stubs are filled with the preselected label, the tracks and a track's label. While the switch is on and a quality is chosen, the extension leaves a marker as the preselected label of an evaluator Facebook gave none, and turns it into the label of the track the chosen quality plays when the setter gets it."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/AnalyticsUploads.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/analytics/AnalyticsUploadAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/analytics/HoldAnalyticsUploadsPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Hold back analytics uploads, found in Facebook 577, 580 and 581 by names Facebook keeps. A check goes just before the one kickOffUpload() call, in the run() of the runnable the kept NativeXAnalyticsAppJobHandler schedules every three minutes, and the one resumeUploading(String) call, in the kept NativeXAnalyticsLowPriorityInit, and skips the call on a yes. The Papaya job's start, the most derived onStartJob along the kept FBPapayaJobService's superclasses, passes the answer of its config gate through the extension, so a held job takes Facebook's own off path."
     }
   ]
 }

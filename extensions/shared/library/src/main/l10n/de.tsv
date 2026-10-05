@@ -133,6 +133,7 @@ Importing settings	Einstellungen werden importiert
 Licenses	Lizenzen
 Link expired. Reopen the item and try again	Link abgelaufen. Öffne den Inhalt neu und versuche es noch einmal
 Links	Links
+Privacy	Datenschutz
 Material You theme	Material-You-Design
 News feed	Newsfeed
 No screenshot watching for ads, and no reports of which apps you install.	Keine Screenshot-Erkennung bei Werbung und keine Meldungen darüber, welche Apps du installierst.
@@ -299,6 +300,8 @@ Stop update prompts	Update-Aufforderungen stoppen
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook fordert dich nicht mehr auf, über den Meta App Manager zu aktualisieren, und lässt ihn nicht mehr nach einem Update suchen. Chat-Hinweise für ältere Versionen entfallen ebenfalls. Ein gepatchter Build kann Metas Updates ohnehin nicht installieren.
 Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reels und Watch-Videos, die Facebooks eigene Erkennung als mit KI erstellt markiert, ab den nächsten, die Facebook lädt. Eines, das nur die Person, die es erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardmäßig aus, weil er noch nicht mit einem echten Konto getestet wurde.
 Don't send reel watch history	Reel-Wiedergabeverlauf nicht senden
+Hold back analytics uploads	Analyse-Uploads zurückhalten
+Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook lädt seine App-Analysedaten nicht mehr im Hintergrund hoch und überspringt seine Lernaufgaben auf dem Gerät. Starte Facebook nach der Änderung neu.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Sendet keine Liste angesehener Reels an Facebook. Sie dient der Feed-Sortierung, daher können angesehene Reels wiederkommen.
 the rename of the shared permissions	die Umbenennung der gemeinsamen Berechtigungen
 Room for Meta's apps	Platz für Metas Apps

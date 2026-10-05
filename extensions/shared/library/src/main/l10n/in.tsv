@@ -133,6 +133,7 @@ Importing settings	Mengimpor pengaturan
 Licenses	Lisensi
 Link expired. Reopen the item and try again	Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi
 Links	Tautan
+Privacy	Privasi
 Material You theme	Tema Material You
 News feed	Kabar Beranda
 No screenshot watching for ads, and no reports of which apps you install.	Tangkapan layar iklan tidak dipantau, dan aplikasi yang Anda pasang tidak dilaporkan.
@@ -299,6 +300,8 @@ Stop update prompts	Hentikan permintaan pembaruan
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook berhenti meminta Anda memperbarui lewat Meta App Manager dan berhenti menyuruhnya mencari pembaruan. Promosi obrolan yang ditujukan ke versi lama juga hilang. Build yang dipatch memang tidak bisa memasang pembaruan Meta.
 Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reel dan video Watch yang ditandai deteksi Facebook sendiri sebagai buatan AI, mulai dari kumpulan berikutnya yang dimuat Facebook. Yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji dengan akun sungguhan.
 Don't send reel watch history	Jangan kirim riwayat tontonan reel
+Hold back analytics uploads	Tahan unggahan analitik
+Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook berhenti mengunggah analitik aplikasinya di latar belakang dan melewati tugas pembelajaran di perangkat. Mulai ulang Facebook setelah mengubahnya.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Hentikan pengiriman daftar reel yang ditonton ke Facebook. Daftar itu mengurutkan feed, jadi reel dapat muncul lagi.
 the rename of the shared permissions	penggantian nama izin bersama
 Room for Meta's apps	Ruang untuk aplikasi Meta

@@ -59,6 +59,7 @@ import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
 import app.morphe.extension.facebook.menu.MenuSettingsRow;
+import app.morphe.extension.facebook.misc.AnalyticsUploads;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
@@ -192,6 +193,8 @@ public class ColdStartHooksTest {
         assertFalse(ReelDeclutter.skipHotComment());
         assertFalse(ReelDeclutter.skipSocialBubbles());
         assertFalse("a batch of watched reels sent before the context was held back", SeenStateSendForTests.heldBack());
+        assertFalse("an analytics upload before the context was held back", AnalyticsUploads.holdXAnalyticsUpload());
+        assertTrue("a Papaya job before the context was held back", AnalyticsUploads.papayaOn(true));
         assertNotNull("a double tap before the context lost its handler", DoubleTapLike.handler(new Object()));
         assertNotNull("a double tap before the context lost its heart", DoubleTapLike.heart(new Object()));
         assertNotNull("a double tap like before the context lost its key", DoubleTapLike.likeKey("reel"));

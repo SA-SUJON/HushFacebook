@@ -258,6 +258,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_dont_send_reel_watch_history", TRUE);
 
     /**
+     * Facebook's own analytics uploads ({@link app.morphe.extension.facebook.misc.AnalyticsUploads}):
+     * the XAnalytics event uploader and the Papaya on-device learning jobs. On once the patch is
+     * picked. The uploader is resumed as Facebook starts, so a change shows fully after a restart.
+     */
+    public static final BooleanSetting HOLD_ANALYTICS_UPLOADS =
+            new BooleanSetting("hushfacebook_hold_analytics_uploads", TRUE, true);
+
+    /**
      * A double tap on a reel or a video left without Facebook's like: no heart, no like sent. A
      * single tap and the Like button do what they always did. On once the patch is picked, since
      * picking it is the choice.

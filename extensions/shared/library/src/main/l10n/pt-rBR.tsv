@@ -133,6 +133,7 @@ Importing settings	Importando as configurações
 Licenses	Licenças
 Link expired. Reopen the item and try again	Link expirado. Reabra o item e tente novamente
 Links	Links
+Privacy	Privacidade
 Material You theme	Tema Material You
 News feed	Feed de notícias
 No screenshot watching for ads, and no reports of which apps you install.	Sem monitoramento de capturas de tela de anúncios e sem relatórios sobre quais aplicativos você instala.
@@ -292,6 +293,8 @@ Stop update prompts	Parar os avisos de atualização
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	O Facebook deixa de pedir atualizações pelo Meta App Manager e de fazê-lo procurar por elas. As promoções de chat destinadas a versões antigas também desaparecem. Uma versão com patch não consegue instalar as atualizações da Meta de qualquer forma.
 Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Reels e vídeos do Watch que a detecção do próprio Facebook marca como gerados por IA, a partir do próximo lote carregado pelo Facebook. Um vídeo que apenas o autor marcou como IA continua aparecendo. Esta opção vem desativada por padrão porque ainda não foi testada com uma conta real.
 Don't send reel watch history	Não enviar o histórico de Reels assistidos
+Hold back analytics uploads	Segurar envios de análises
+Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	O Facebook para de enviar as análises do app em segundo plano e pula as tarefas de aprendizado no aparelho. Reinicie o Facebook depois de mudar isso.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Deixa de enviar ao Facebook as listas de Reels assistidos. Ele as usa para classificar seu feed, então Reels já assistidos podem voltar a aparecer.
 the rename of the shared permissions	a renomeação das permissões compartilhadas
 Room for Meta's apps	Espaço para os apps da Meta

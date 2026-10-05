@@ -72,6 +72,7 @@ import app.morphe.extension.facebook.media.ResumePlaybackForTests;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
+import app.morphe.extension.facebook.misc.AnalyticsUploads;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.BottomTabBar;
@@ -454,6 +455,10 @@ public class PausedHooksTest {
                 MetaAiSearchForTests::hidesAnswer,
                 MetaAiSearchForTests::dropsPrompts,
                 MetaAiSearchForTests::stopsSuggestionRoute));
+        // XAnalytics' upload and uploader resume are skipped, and the Papaya job finishes unrun.
+        probes.put(PatchFamily.ANALYTICS_UPLOADS, Arrays.asList(
+                AnalyticsUploads::holdXAnalyticsUpload,
+                () -> !AnalyticsUploads.papayaOn(true)));
         // A push of each kind a notification switch blocks isn't posted.
         probes.put(PatchFamily.PROMO_NOTIFICATIONS, Arrays.asList(
                 NotificationKindsForTests::blocksTrendingVideo,

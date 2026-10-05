@@ -297,6 +297,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         AppPages.marketplace(this, screen, context, build);
         AppPages.notifications(this, screen, context, build);
         AppPages.links(this, screen, context, build);
+        AppPages.privacy(this, screen, context, build);
         HushfacebookPages.updates(this, screen, context, build);
         HushfacebookPages.appearance(this, screen, context, build);
         HushfacebookPages.patched(this, screen, context, build);

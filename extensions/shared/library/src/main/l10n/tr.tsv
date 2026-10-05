@@ -133,6 +133,7 @@ Importing settings	Ayarlar içe aktarılıyor
 Licenses	Lisanslar
 Link expired. Reopen the item and try again	Bağlantının süresi doldu. Öğeyi yeniden açıp tekrar dene
 Links	Bağlantılar
+Privacy	Gizlilik
 Material You theme	Material You teması
 News feed	Akış
 No screenshot watching for ads, and no reports of which apps you install.	Reklamlarda ekran görüntüsü takibi yok, hangi uygulamaları yüklediğine dair rapor da yok.
@@ -299,6 +300,8 @@ Stop update prompts	Güncelleme uyarılarını durdur
 Facebook stops asking you to update through Meta App Manager and stops having it look for one. Chat promotions aimed at older versions go too. A patched build can't install Meta's updates anyway.	Facebook, Meta App Manager üzerinden güncelleme istemeyi ve ona güncelleme aratmayı bırakır. Eski sürümlere yönelik sohbet tanıtımları da kalkar. Yamalı bir sürüm zaten Meta'nın güncellemelerini yükleyemez.
 Reels and Watch videos that Facebook's own detection marks as made with AI, starting with the next batch Facebook loads. One that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real account yet.	Facebook'un kendi tespitinin yapay zekâ ile üretildiğini işaretlediği reels ve Watch videoları, Facebook'un yüklediği bir sonraki gruptan itibaren. Yalnızca oluşturan kişinin yapay zekâ olarak etiketlediği bir video kalır. Bu anahtar henüz gerçek bir hesapla test edilmediği için varsayılan olarak kapalıdır.
 Don't send reel watch history	Reels izleme geçmişini gönderme
+Hold back analytics uploads	Analiz yüklemelerini beklet
+Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook uygulama analizlerini arka planda yüklemeyi bırakır ve cihaz üzerindeki öğrenme görevlerini atlar. Değiştirdikten sonra Facebook'u yeniden başlatın.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	İzlenen Reels listelerini Facebook'a göndermeyi durdurur. Listeler akışı sıraladığından izlenen Reels tekrar görünebilir.
 the rename of the shared permissions	paylaşılan izinlerin yeniden adlandırılması
 Room for Meta's apps	Meta uygulamalarına yer
