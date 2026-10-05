@@ -74,12 +74,13 @@ final class HushfacebookPages {
         ReleaseCheck.watch(page);
     }
 
-    /** Appearance: the font, the emoji, where the tab bar goes, dark mode and haptics. */
+    /** Appearance: the font, the emoji, where the tab bar goes, dark mode, haptics and screen transitions. */
     static void appearance(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
         if (build.contains(PatchFamily.SYSTEM_FONT) || build.contains(PatchFamily.SYSTEM_EMOJI)
                 || build.contains(PatchFamily.BOTTOM_TAB_BAR) || build.contains(PatchFamily.FORCE_DARK_MODE)
-                || build.contains(PatchFamily.HIDDEN_TABS) || build.contains(PatchFamily.HAPTICS)) {
+                || build.contains(PatchFamily.HIDDEN_TABS) || build.contains(PatchFamily.HAPTICS)
+                || build.contains(PatchFamily.SCREEN_TRANSITIONS)) {
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
             if (build.contains(PatchFamily.SYSTEM_FONT)) {
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT,
@@ -122,6 +123,12 @@ final class HushfacebookPages {
                 appearance.addPreference(toggle(context, Settings.TURN_OFF_HAPTICS,
                         L10n.t("No short vibrations on Facebook's own taps and gestures. The keyboard and your "
                                 + "phone's own haptics stay.")));
+            }
+            if (build.contains(PatchFamily.SCREEN_TRANSITIONS)) {
+                // Asked at each tap and each screen change, so a change shows from the next one.
+                appearance.addPreference(toggle(context, Settings.TURN_OFF_SCREEN_TRANSITIONS,
+                        L10n.t("Tabs, the Menu and screens that open over Facebook show at once, without the slide "
+                                + "between them. Swiping between tabs stays.")));
             }
         }
     }

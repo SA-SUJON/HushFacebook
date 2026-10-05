@@ -784,3 +784,5 @@ Build %1$s (source unknown)	Build %1$s (Quelle unbekannt)
 Tap Resume, then restart Facebook.	Tippe auf Fortsetzen und starte Facebook dann neu.
 Turn off haptics	Haptik ausschalten
 No short vibrations on Facebook's own taps and gestures. The keyboard and your phone's own haptics stay.	Keine kurzen Vibrationen bei Facebooks eigenem Tippen und Gesten. Die Tastatur und die Haptik deines Telefons bleiben.
+Turn off screen transitions	Bildschirmübergänge ausschalten
+Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.	Tabs, das Menü und Bildschirme, die sich über Facebook öffnen, erscheinen sofort, ohne das Gleiten dazwischen. Das Wischen zwischen Tabs bleibt.

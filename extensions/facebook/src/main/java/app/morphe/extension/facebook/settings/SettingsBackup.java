@@ -135,6 +135,7 @@ public final class SettingsBackup {
             Settings.HOLD_ANALYTICS_UPLOADS,
             Settings.ALLOW_SCREENSHOTS,
             Settings.TURN_OFF_HAPTICS,
+            Settings.TURN_OFF_SCREEN_TRANSITIONS,
             Settings.BLOCK_SCREENSHOT_DETECTION,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE,
             Settings.KEEP_REEL_SPEED,

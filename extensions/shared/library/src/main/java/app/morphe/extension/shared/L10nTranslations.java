@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(1188);
+        Map<String, String> table = new HashMap<>(1192);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -994,6 +994,8 @@ public final class L10nTranslations {
                 "Tab-Leiste unten");
         table.put("Tab to open on",
                 "Tab beim Start");
+        table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
+                "Tabs, das Men\u00fc und Bildschirme, die sich \u00fcber Facebook \u00f6ffnen, erscheinen sofort, ohne das Gleiten dazwischen. Das Wischen zwischen Tabs bleibt.");
         table.put("Tag suggestions only after @",
                 "Markierungsvorschl\u00e4ge nur nach @");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
@@ -1038,11 +1040,11 @@ public final class L10nTranslations {
                 "Diese Einstellungsdatei stammt aus einer neueren Hushfacebook-Version als dieser. Es wurde nichts ge\u00e4ndert.");
         table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
                 "Der Bereich \u201eAuch von Meta\u201c verschwindet aus dem Facebook-Men\u00fc, mit seinen Links zu Metas anderen Apps und seiner Werbung f\u00fcr Metas Ger\u00e4te. Deine eigenen Verkn\u00fcpfungen bleiben.");
-        table.put("The Feeds tab will open on %1$s.",
-                "Der Feeds-Tab zeigt dann %1$s.");
     }
 
     private static void fillDe8(Map<String, String> table) {
+        table.put("The Feeds tab will open on %1$s.",
+                "Der Feeds-Tab zeigt dann %1$s.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "Der Feeds-Tab zeigt dann den Filter, den Facebook ausw\u00e4hlt.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
@@ -1129,6 +1131,8 @@ public final class L10nTranslations {
                 "Doppeltippen zum Liken ausschalten");
         table.put("Turn off haptics",
                 "Haptik ausschalten");
+        table.put("Turn off screen transitions",
+                "Bildschirm\u00fcberg\u00e4nge ausschalten");
         table.put("Turn on %1$s to save videos they all play.",
                 "Schalte %1$s ein, um Videos zu speichern, die alle abspielen k\u00f6nnen.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
@@ -1159,13 +1163,13 @@ public final class L10nTranslations {
                 "Version");
         table.put("Version %1$s",
                 "Version %1$s");
+    }
+
+    private static void fillDe9(Map<String, String> table) {
         table.put("Video",
                 "Video");
         table.put("Video file name",
                 "Dateiname f\u00fcr Videos");
-    }
-
-    private static void fillDe9(Map<String, String> table) {
         table.put("Video link",
                 "Videolink");
         table.put("Video saved",
@@ -1277,7 +1281,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(1188);
+        Map<String, String> table = new HashMap<>(1192);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -2227,6 +2231,8 @@ public final class L10nTranslations {
                 "Barra de pesta\u00f1as abajo");
         table.put("Tab to open on",
                 "Pesta\u00f1a al abrir");
+        table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
+                "Las pesta\u00f1as, el men\u00fa y las pantallas que se abren sobre Facebook aparecen al instante, sin el deslizamiento entre ellas. Deslizar entre pesta\u00f1as se mantiene.");
         table.put("Tag suggestions only after @",
                 "Sugerencias para etiquetar solo despu\u00e9s de @");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
@@ -2271,11 +2277,11 @@ public final class L10nTranslations {
                 "Ese archivo de configuraci\u00f3n lo escribi\u00f3 una versi\u00f3n de Hushfacebook m\u00e1s reciente que esta. No se cambi\u00f3 nada.");
         table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
                 "La secci\u00f3n \u201cTambi\u00e9n de Meta\u201d desaparece del men\u00fa de Facebook, con sus enlaces a las otras apps de Meta y sus anuncios de dispositivos de Meta. Tus propios accesos directos se quedan.");
-        table.put("The Feeds tab will open on %1$s.",
-                "La pesta\u00f1a Feeds se abrir\u00e1 en %1$s.");
     }
 
     private static void fillEs8(Map<String, String> table) {
+        table.put("The Feeds tab will open on %1$s.",
+                "La pesta\u00f1a Feeds se abrir\u00e1 en %1$s.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "La pesta\u00f1a Feeds se abrir\u00e1 en el filtro que elija Facebook.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
@@ -2362,6 +2368,8 @@ public final class L10nTranslations {
                 "Desactivar tocar dos veces para dar Me gusta");
         table.put("Turn off haptics",
                 "Desactivar la vibraci\u00f3n h\u00e1ptica");
+        table.put("Turn off screen transitions",
+                "Desactivar las transiciones de pantalla");
         table.put("Turn on %1$s to save videos they all play.",
                 "Activa %1$s para guardar videos que todos puedan reproducir.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
@@ -2392,13 +2400,13 @@ public final class L10nTranslations {
                 "Versi\u00f3n");
         table.put("Version %1$s",
                 "Versi\u00f3n %1$s");
+    }
+
+    private static void fillEs9(Map<String, String> table) {
         table.put("Video",
                 "Video");
         table.put("Video file name",
                 "Nombre de archivo de los videos");
-    }
-
-    private static void fillEs9(Map<String, String> table) {
         table.put("Video link",
                 "Enlace del video");
         table.put("Video saved",
@@ -2510,7 +2518,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(1188);
+        Map<String, String> table = new HashMap<>(1192);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -3460,6 +3468,8 @@ public final class L10nTranslations {
                 "Bilah tab di bawah");
         table.put("Tab to open on",
                 "Tab saat dibuka");
+        table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
+                "Tab, Menu, dan layar yang terbuka di atas Facebook langsung muncul, tanpa geseran di antaranya. Mengusap antar tab tetap ada.");
         table.put("Tag suggestions only after @",
                 "Saran menandai hanya setelah @");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
@@ -3504,11 +3514,11 @@ public final class L10nTranslations {
                 "File pengaturan itu dibuat oleh versi Hushfacebook yang lebih baru daripada versi ini. Tidak ada yang diubah.");
         table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
                 "Bagian \u201cJuga dari Meta\u201d hilang dari Menu Facebook, beserta tautannya ke aplikasi Meta lainnya dan iklannya untuk perangkat Meta. Pintasanmu sendiri tetap ada.");
-        table.put("The Feeds tab will open on %1$s.",
-                "Tab Feed akan terbuka di %1$s.");
     }
 
     private static void fillIn8(Map<String, String> table) {
+        table.put("The Feeds tab will open on %1$s.",
+                "Tab Feed akan terbuka di %1$s.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "Tab Feed akan terbuka di filter yang dipilih Facebook.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
@@ -3595,6 +3605,8 @@ public final class L10nTranslations {
                 "Matikan ketuk dua kali untuk menyukai");
         table.put("Turn off haptics",
                 "Matikan haptik");
+        table.put("Turn off screen transitions",
+                "Matikan transisi layar");
         table.put("Turn on %1$s to save videos they all play.",
                 "Aktifkan %1$s untuk menyimpan video yang bisa diputar semuanya.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
@@ -3625,13 +3637,13 @@ public final class L10nTranslations {
                 "Versi");
         table.put("Version %1$s",
                 "Versi %1$s");
+    }
+
+    private static void fillIn9(Map<String, String> table) {
         table.put("Video",
                 "Video");
         table.put("Video file name",
                 "Nama file video");
-    }
-
-    private static void fillIn9(Map<String, String> table) {
         table.put("Video link",
                 "Tautan video");
         table.put("Video saved",
@@ -3743,7 +3755,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(1188);
+        Map<String, String> table = new HashMap<>(1192);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -4693,6 +4705,8 @@ public final class L10nTranslations {
                 "Barra de abas embaixo");
         table.put("Tab to open on",
                 "Aba ao abrir");
+        table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
+                "As abas, o Menu e as telas que abrem sobre o Facebook aparecem na hora, sem o deslize entre elas. Deslizar entre as abas continua.");
         table.put("Tag suggestions only after @",
                 "Sugest\u00f5es de marca\u00e7\u00e3o s\u00f3 depois de @");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
@@ -4737,11 +4751,11 @@ public final class L10nTranslations {
                 "Esse arquivo de configura\u00e7\u00f5es foi criado por uma vers\u00e3o do Hushfacebook mais nova que esta. Nada foi alterado.");
         table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
                 "A se\u00e7\u00e3o \u201cTamb\u00e9m da Meta\u201d \u00e9 removida do Menu do Facebook, incluindo links para outros aplicativos da Meta e an\u00fancios dos dispositivos da Meta. Seus pr\u00f3prios atalhos permanecem.");
-        table.put("The Feeds tab will open on %1$s.",
-                "A aba Feeds vai abrir em %1$s.");
     }
 
     private static void fillPt_rBR8(Map<String, String> table) {
+        table.put("The Feeds tab will open on %1$s.",
+                "A aba Feeds vai abrir em %1$s.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "A aba Feeds vai abrir no filtro que o Facebook escolher.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
@@ -4828,6 +4842,8 @@ public final class L10nTranslations {
                 "Desativar toque duplo para curtir");
         table.put("Turn off haptics",
                 "Desativar a vibra\u00e7\u00e3o t\u00e1til");
+        table.put("Turn off screen transitions",
+                "Desativar as transi\u00e7\u00f5es de tela");
         table.put("Turn on %1$s to save videos they all play.",
                 "Ative %1$s para salvar v\u00eddeos que todos conseguem reproduzir.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
@@ -4858,13 +4874,13 @@ public final class L10nTranslations {
                 "Vers\u00e3o");
         table.put("Version %1$s",
                 "Vers\u00e3o %1$s");
+    }
+
+    private static void fillPt_rBR9(Map<String, String> table) {
         table.put("Video",
                 "V\u00eddeo");
         table.put("Video file name",
                 "Nome do arquivo de v\u00eddeo");
-    }
-
-    private static void fillPt_rBR9(Map<String, String> table) {
         table.put("Video link",
                 "Link do v\u00eddeo");
         table.put("Video saved",
@@ -4976,7 +4992,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(1188);
+        Map<String, String> table = new HashMap<>(1192);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -5926,6 +5942,8 @@ public final class L10nTranslations {
                 "Sekme \u00e7ubu\u011fu altta");
         table.put("Tab to open on",
                 "A\u00e7\u0131l\u0131\u015fta g\u00f6sterilecek sekme");
+        table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
+                "Sekmeler, Men\u00fc ve Facebook'un \u00fczerinde a\u00e7\u0131lan ekranlar, aralar\u0131ndaki kayma olmadan hemen g\u00f6r\u00fcn\u00fcr. Sekmeler aras\u0131nda kayd\u0131rma kal\u0131r.");
         table.put("Tag suggestions only after @",
                 "Etiket \u00f6nerileri yaln\u0131zca @ sonras\u0131nda");
         table.put("Take the Reels tab, called Video on some accounts, off the tab bar. Reel links and reels in the feed still open. Changes show after Facebook restarts.",
@@ -5970,11 +5988,11 @@ public final class L10nTranslations {
                 "Bu ayar dosyas\u0131, Hushfacebook'un bu s\u00fcr\u00fcm\u00fcnden daha yeni bir s\u00fcr\u00fcm\u00fcyle olu\u015fturulmu\u015f. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.",
                 "\u201cMeta'dan di\u011ferleri\u201d b\u00f6l\u00fcm\u00fc, Meta'n\u0131n di\u011fer uygulamalar\u0131na giden ba\u011flant\u0131lar\u0131 ve Meta cihazlar\u0131n\u0131n reklamlar\u0131yla birlikte Facebook men\u00fcs\u00fcnden kalkar. Kendi k\u0131sayollar\u0131n yerinde kal\u0131r.");
-        table.put("The Feeds tab will open on %1$s.",
-                "Ak\u0131\u015flar sekmesi %1$s filtresinde a\u00e7\u0131lacak.");
     }
 
     private static void fillTr8(Map<String, String> table) {
+        table.put("The Feeds tab will open on %1$s.",
+                "Ak\u0131\u015flar sekmesi %1$s filtresinde a\u00e7\u0131lacak.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "Ak\u0131\u015flar sekmesi Facebook'un se\u00e7ti\u011fi filtrede a\u00e7\u0131lacak.");
         table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
@@ -6061,6 +6079,8 @@ public final class L10nTranslations {
                 "Be\u011fenmek i\u00e7in \u00e7ift dokunmay\u0131 kapat");
         table.put("Turn off haptics",
                 "Dokunsal titre\u015fimi kapat");
+        table.put("Turn off screen transitions",
+                "Ekran ge\u00e7i\u015flerini kapat");
         table.put("Turn on %1$s to save videos they all play.",
                 "Hepsinin oynatabilece\u011fi videolar kaydetmek i\u00e7in %1$s ayar\u0131n\u0131 a\u00e7.");
         table.put("Type @ before Facebook suggests someone to tag in posts or comments. Your text stays unchanged.",
@@ -6091,13 +6111,13 @@ public final class L10nTranslations {
                 "S\u00fcr\u00fcm");
         table.put("Version %1$s",
                 "S\u00fcr\u00fcm %1$s");
+    }
+
+    private static void fillTr9(Map<String, String> table) {
         table.put("Video",
                 "Video");
         table.put("Video file name",
                 "Video dosya ad\u0131");
-    }
-
-    private static void fillTr9(Map<String, String> table) {
         table.put("Video link",
                 "Video ba\u011flant\u0131s\u0131");
         table.put("Video saved",

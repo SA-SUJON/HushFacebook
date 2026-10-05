@@ -150,6 +150,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean turnOffScreenTransitions() {
+        return false;
+    }
+
     public static boolean screenshotDetection() {
         return false;
     }

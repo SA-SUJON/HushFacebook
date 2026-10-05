@@ -631,6 +631,18 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ScreenTransitions.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/Fingerprints.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/TransitionAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/TurnOffScreenTransitionsPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Turn off screen transitions, an idea from De-Vanced's Facebook clean-up patch, written here from Facebook 577, 580 and 581. The activity callbacks the settings patch registers ask Android for no transition as a screen comes to the front and as it closes, and the tab bar's pager controller and the sliding panel ask the extension before they decide to slide."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ScreenshotDetection.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/screenshots/BlockScreenshotDetectionPatch.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/screenshots/ScreenshotDetectionAnchors.kt"

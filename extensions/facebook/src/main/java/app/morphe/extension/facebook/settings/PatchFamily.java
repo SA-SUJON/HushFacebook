@@ -110,6 +110,8 @@ public enum PatchFamily {
             Settings.USE_SYSTEM_EMOJI),
     HAPTICS(FamilyNames.HAPTICS, "turnOffHaptics", null,
             Settings.TURN_OFF_HAPTICS),
+    SCREEN_TRANSITIONS(FamilyNames.SCREEN_TRANSITIONS, "turnOffScreenTransitions", null,
+            Settings.TURN_OFF_SCREEN_TRANSITIONS),
     EXTERNAL_BROWSER(FamilyNames.EXTERNAL_BROWSER, "externalBrowser", null,
             Settings.OPEN_LINKS_EXTERNALLY),
     SANITIZE_SHARING_LINKS(FamilyNames.SANITIZE_SHARING_LINKS, "sanitizeSharingLinks", null,

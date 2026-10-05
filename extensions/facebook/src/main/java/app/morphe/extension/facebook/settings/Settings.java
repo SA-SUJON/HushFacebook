@@ -295,6 +295,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_turn_off_haptics", TRUE);
 
     /**
+     * Facebook's screens and tabs show without the slide or fade between them
+     * ({@link app.morphe.extension.facebook.misc.ScreenTransitions}). On once the patch is picked,
+     * since picking it is the choice.
+     */
+    public static final BooleanSetting TURN_OFF_SCREEN_TRANSITIONS =
+            new BooleanSetting("hushfacebook_turn_off_screen_transitions", TRUE);
+
+    /**
      * Facebook's screenshot and screen recording detection
      * ({@link app.morphe.extension.facebook.misc.ScreenshotDetection}). On once the patch is picked.
      */

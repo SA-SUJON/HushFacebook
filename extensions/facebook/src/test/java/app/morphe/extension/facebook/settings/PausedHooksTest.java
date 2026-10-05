@@ -76,6 +76,7 @@ import app.morphe.extension.facebook.menu.MenuSectionsForTests;
 import app.morphe.extension.facebook.misc.AnalyticsUploads;
 import app.morphe.extension.facebook.misc.Haptics;
 import app.morphe.extension.facebook.misc.ScreenshotDetection;
+import app.morphe.extension.facebook.misc.ScreenTransitionsForTests;
 import app.morphe.extension.facebook.misc.Screenshots;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
@@ -477,6 +478,8 @@ public class PausedHooksTest {
                         return true;
                     }
                 }, android.view.HapticFeedbackConstants.LONG_PRESS)));
+        // A tab asked for shows without its slide.
+        probes.put(PatchFamily.SCREEN_TRANSITIONS, Collections.singletonList(() -> !ScreenTransitionsForTests.slides()));
         // A window's secure flag comes out.
         probes.put(PatchFamily.SCREENSHOTS, Collections.singletonList(
                 () -> Screenshots.layoutFlags(0x2000) == 0));
