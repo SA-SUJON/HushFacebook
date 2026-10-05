@@ -77,6 +77,7 @@ public final class FamilyNames {
     public static final String AD_PREFETCH = "Block background ad prefetch";
     public static final String AD_TELEMETRY = "Block ad telemetry";
     public static final String ANALYTICS_UPLOADS = "Hold back analytics uploads";
+    public static final String SCREENSHOTS = "Allow screenshots";
     public static final String AUDIENCE_NETWORK = "Disable Audience Network";
     public static final String GAME_ADS = "Block Instant Games ads";
     public static final String AMOLED_THEME = "AMOLED black theme";

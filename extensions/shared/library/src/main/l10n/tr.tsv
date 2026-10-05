@@ -302,6 +302,8 @@ Reels and Watch videos that Facebook's own detection marks as made with AI, star
 Don't send reel watch history	Reels izleme geçmişini gönderme
 Hold back analytics uploads	Analiz yüklemelerini beklet
 Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook uygulama analizlerini arka planda yüklemeyi bırakır ve cihaz üzerindeki öğrenme görevlerini atlar. Değiştirdikten sonra Facebook'u yeniden başlatın.
+Allow screenshots	Ekran görüntülerine izin ver
+Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.	Ekran görüntüleri ve ekran kayıtları, Facebook'un bunları engellediği sayfaları da gösterir, örneğin kart formu ve bir sohbetten açılan fotoğraflar. Zaten açık olan bir sayfa, onu yeniden açtığında değişir.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	İzlenen Reels listelerini Facebook'a göndermeyi durdurur. Listeler akışı sıraladığından izlenen Reels tekrar görünebilir.
 the rename of the shared permissions	paylaşılan izinlerin yeniden adlandırılması
 Room for Meta's apps	Meta uygulamalarına yer

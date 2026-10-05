@@ -273,6 +273,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hold_analytics_uploads", TRUE, true);
 
     /**
+     * Screenshots of the screens Facebook marks secure ({@link app.morphe.extension.facebook.misc.Screenshots}).
+     * On once the patch is picked. A screen takes it when it's next opened.
+     */
+    public static final BooleanSetting ALLOW_SCREENSHOTS =
+            new BooleanSetting("hushfacebook_allow_screenshots", TRUE);
+
+    /**
      * A double tap on a reel or a video left without Facebook's like: no heart, no like sent. A
      * single tap and the Like button do what they always did. On once the patch is picked, since
      * picking it is the choice.

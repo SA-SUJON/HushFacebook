@@ -302,6 +302,8 @@ Reels and Watch videos that Facebook's own detection marks as made with AI, star
 Don't send reel watch history	Jangan kirim riwayat tontonan reel
 Hold back analytics uploads	Tahan unggahan analitik
 Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook berhenti mengunggah analitik aplikasinya di latar belakang dan melewati tugas pembelajaran di perangkat. Mulai ulang Facebook setelah mengubahnya.
+Allow screenshots	Izinkan tangkapan layar
+Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.	Tangkapan layar dan rekaman layar menampilkan halaman yang diblokir Facebook, seperti formulir kartu dan foto yang dibuka dari obrolan. Halaman yang sudah terbuka berubah saat kamu membukanya lagi.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Hentikan pengiriman daftar reel yang ditonton ke Facebook. Daftar itu mengurutkan feed, jadi reel dapat muncul lagi.
 the rename of the shared permissions	penggantian nama izin bersama
 Room for Meta's apps	Ruang untuk aplikasi Meta

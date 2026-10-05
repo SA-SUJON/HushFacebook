@@ -302,6 +302,8 @@ Reels and Watch videos that Facebook's own detection marks as made with AI, star
 Don't send reel watch history	Reel-Wiedergabeverlauf nicht senden
 Hold back analytics uploads	Analyse-Uploads zurückhalten
 Facebook stops uploading its app analytics in the background and skips its on-device learning jobs. Restart Facebook after changing it.	Facebook lädt seine App-Analysedaten nicht mehr im Hintergrund hoch und überspringt seine Lernaufgaben auf dem Gerät. Starte Facebook nach der Änderung neu.
+Allow screenshots	Bildschirmfotos erlauben
+Screenshots and screen recordings show the pages Facebook blocks them on, such as the card form and photos opened from a chat. A page that's already open changes when you open it again.	Bildschirmfotos und Bildschirmaufnahmen zeigen die Seiten, auf denen Facebook sie sperrt, etwa das Kartenformular und aus einem Chat geöffnete Fotos. Eine bereits geöffnete Seite ändert sich, wenn du sie erneut öffnest.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Sendet keine Liste angesehener Reels an Facebook. Sie dient der Feed-Sortierung, daher können angesehene Reels wiederkommen.
 the rename of the shared permissions	die Umbenennung der gemeinsamen Berechtigungen
 Room for Meta's apps	Platz für Metas Apps

@@ -102,4 +102,6 @@ Hide post prompts and Hide reel interest prompts came from andrewliang25's dev b
 
 Holding back Facebook's analytics uploads, which De-Vanced's Disable analytics and telemetry does with early returns across many upload services, is Hold back analytics uploads, written here from Facebook's own code. Reading the 577, 580 and 581 builds showed that the XAnalytics logger's upload has one caller for its three-minute foreground upload and one for resuming the uploader at start-up, both in classes that keep their names, and that the Papaya job asks Facebook's config whether Papaya is on before it starts anything. The patch skips those two calls and answers that question with no, so a held Papaya job takes the path Facebook's own off switch takes.
 
+Allowing screenshots on the pages Facebook blocks them on is something ReVanced's universal Remove screenshot restriction patch, Loukious and NexAlloy all do. Allow screenshots is written here. Reading the 577, 580 and 581 builds showed Facebook marks a page secure through Android's own window calls and the flags of the window settings it builds dialogs with, so every one of those goes through Hushfacebook, which takes the secure flag out while the switch is on and passes the rest as Facebook asked.
+
 If you know of a Facebook patch source we missed, open an issue with a link.

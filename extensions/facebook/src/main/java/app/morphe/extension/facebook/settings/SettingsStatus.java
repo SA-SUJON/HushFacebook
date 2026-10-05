@@ -142,6 +142,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean allowScreenshots() {
+        return false;
+    }
+
     public static boolean audienceNetwork() {
         return false;
     }

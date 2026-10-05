@@ -606,6 +606,17 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: Block Instant Games ads, an idea De-Vanced also has, written here from Facebook 577, 580 and 581. The game bridge's postMessage(String, String), kept by name for the WebView, holds the five ad message types; the hook goes first in it and, for an ad message with the switch on, rejects the game's promise through the bridge's own (String, String, String) reject method, the one calling the call that holds \"Unexpected exception while constructing JSONObject to be dispatched to Javascript: rejectPromise\", with the SDK's code for an ad it can't serve. De-Vanced drops the message instead."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/Screenshots.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/screenshots/AllowScreenshotsAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/screenshots/AllowScreenshotsPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Allow screenshots, an idea ReVanced's universal Remove screenshot restriction patch, Loukious and NexAlloy share, written here from Facebook 577, 580 and 581. Every Window.addFlags(int) and setFlags(int, int) call outside the extension becomes a static call of the extension on the same registers, and every write of WindowManager.LayoutParams.flags first runs its value through the extension, which takes FLAG_SECURE out while the switch is on."
     }
   ]
 }

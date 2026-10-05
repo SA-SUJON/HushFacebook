@@ -164,12 +164,19 @@ final class AppPages {
     /** Privacy: what Facebook sends home in the background. */
     static void privacy(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
+        if (!build.contains(PatchFamily.ANALYTICS_UPLOADS) && !build.contains(PatchFamily.SCREENSHOTS)) return;
+        PreferenceCategory privacy = category(screen, L10n.t("Privacy"));
         if (build.contains(PatchFamily.ANALYTICS_UPLOADS)) {
-            PreferenceCategory privacy = category(screen, L10n.t("Privacy"));
             // XAnalytics resumes its uploader once, as Facebook starts.
             privacy.addPreference(toggle(context, Settings.HOLD_ANALYTICS_UPLOADS,
                     L10n.t("Facebook stops uploading its app analytics in the background and skips its on-device "
                             + "learning jobs. Restart Facebook after changing it.")));
+        }
+        if (build.contains(PatchFamily.SCREENSHOTS)) {
+            privacy.addPreference(toggle(context, Settings.ALLOW_SCREENSHOTS,
+                    L10n.t("Screenshots and screen recordings show the pages Facebook blocks them on, such as the card "
+                            + "form and photos opened from a chat. A page that's already open changes when you "
+                            + "open it again.")));
         }
     }
 }
