@@ -15,6 +15,7 @@ Source preparation. The latest published bundle remains v0.7.1.
 ### Fixed
 
 * **Facebook:** With Save videos other apps can open on, reels and stories that Facebook sends only as AV1 or VP9 picture with xHE-AAC sound now save at their full resolution. Those used to drop to Facebook's own MP4, which for a story can be 360p. The phone now turns the picture into H.264 and the sound into AAC-LC before joining them, which takes a few seconds for a 1080p reel, and the file keeps the colors the original states (issue #77).
+* **Facebook:** Resume long videos works again for long videos opened full screen. Facebook 581 plays those in its reels viewer, which loops what it plays, so they were skipped as reels. A reel of two minutes or more now resumes like any other long video, and shorter reels still start from the beginning.
 * **Facebook:** At large text sizes on narrow screens, the settings home title stays on one line and the empty search field keeps its whole hint visible. Back and Clear search retain their touch targets.
 * **Tooling:** Codec cleanup no longer fails a completed media test when closing the launcher's input retries a buffered release byte after the process has exited. Cleanup still reports errors while the launcher is alive.
 * **Facebook:** Messenger and Instagram rows no longer say links open here when Android's link handling is off or the relevant address states are missing. The rows refresh together from one Android answer when you return from settings.

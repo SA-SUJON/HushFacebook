@@ -821,8 +821,8 @@ public final class L10nTranslations {
                 "Fortsetzen");
         table.put("Resume long videos",
                 "Lange Videos fortsetzen");
-        table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
-                "Setzt Videos \u00fcber zwei Minuten an deiner letzten Stelle fort. Die Suchleiste \u00e4ndert den Start. Reels, Live-Videos und Werbung starten wie gewohnt.");
+        table.put("Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.",
+                "Setzt Videos \u00fcber zwei Minuten an deiner letzten Stelle fort, im Feed oder im Vollbild. Die Suchleiste \u00e4ndert den Start. Kurze Reels, Live-Videos und Werbung starten wie gewohnt.");
         table.put("Retry",
                 "Erneut versuchen");
         table.put("Return to regular Facebook",
@@ -2012,8 +2012,8 @@ public final class L10nTranslations {
                 "Reanudar");
         table.put("Resume long videos",
                 "Reanudar videos largos");
-        table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
-                "Reanuda v\u00eddeos de m\u00e1s de dos minutos donde los dejaste. Usa la barra para cambiar el inicio. Reels, directos y anuncios empiezan como siempre.");
+        table.put("Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.",
+                "Reanuda v\u00eddeos de m\u00e1s de dos minutos donde los dejaste, en el feed o a pantalla completa. Usa la barra para cambiar el inicio. Reels cortos, directos y anuncios empiezan como siempre.");
         table.put("Retry",
                 "Reintentar");
         table.put("Return to regular Facebook",
@@ -3203,8 +3203,8 @@ public final class L10nTranslations {
                 "Lanjutkan");
         table.put("Resume long videos",
                 "Lanjutkan video panjang");
-        table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
-                "Lanjutkan video lebih dari dua menit dari posisi terakhir. Geser bilah untuk posisi lain. Reel, video langsung, dan iklan mulai seperti biasa.");
+        table.put("Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.",
+                "Lanjutkan video lebih dari dua menit dari posisi terakhir, di feed atau layar penuh. Geser bilah untuk posisi lain. Reel pendek, video langsung, dan iklan mulai seperti biasa.");
         table.put("Retry",
                 "Coba lagi");
         table.put("Return to regular Facebook",
@@ -4394,8 +4394,8 @@ public final class L10nTranslations {
                 "Retomar");
         table.put("Resume long videos",
                 "Retomar v\u00eddeos longos");
-        table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
-                "Retoma v\u00eddeos com mais de dois minutos de onde voc\u00ea parou. Arraste a barra de progresso para come\u00e7ar em outro ponto. Reels, v\u00eddeos ao vivo e an\u00fancios come\u00e7am normalmente.");
+        table.put("Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.",
+                "Retoma v\u00eddeos com mais de dois minutos de onde voc\u00ea parou, no feed ou em tela cheia. Arraste a barra de progresso para come\u00e7ar em outro ponto. Reels curtos, v\u00eddeos ao vivo e an\u00fancios come\u00e7am normalmente.");
         table.put("Retry",
                 "Tentar novamente");
         table.put("Return to regular Facebook",
@@ -5585,8 +5585,8 @@ public final class L10nTranslations {
                 "Devam et");
         table.put("Resume long videos",
                 "Uzun videolara kald\u0131\u011f\u0131n yerden devam et");
-        table.put("Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.",
-                "\u0130ki dakikadan uzun videolar kald\u0131\u011f\u0131 yerden devam eder. Ba\u015fka bir yerden ba\u015flatmak i\u00e7in \u00e7ubu\u011fu kayd\u0131r\u0131n. Reels, canl\u0131 videolar ve reklamlar normal ba\u015flar.");
+        table.put("Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.",
+                "\u0130ki dakikadan uzun videolar ak\u0131\u015fta veya tam ekranda kald\u0131\u011f\u0131 yerden devam eder. Ba\u015fka bir yerden ba\u015flatmak i\u00e7in \u00e7ubu\u011fu kayd\u0131r\u0131n. K\u0131sa Reels, canl\u0131 videolar ve reklamlar normal ba\u015flar.");
         table.put("Retry",
                 "Yeniden dene");
         table.put("Return to regular Facebook",

@@ -500,7 +500,7 @@ Type @ before Facebook suggests someone to tag in posts or comments. Your text s
 # context: switch title under Playback; on, a long video you left partway starts again where you left it
 Resume long videos	Uzun videolara kaldığın yerden devam et
 # context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
-Resume videos over two minutes where you left off. Seek to start elsewhere. Reels, live videos and ads start as usual.	İki dakikadan uzun videolar kaldığı yerden devam eder. Başka bir yerden başlatmak için çubuğu kaydırın. Reels, canlı videolar ve reklamlar normal başlar.
+Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.	İki dakikadan uzun videolar akışta veya tam ekranda kaldığı yerden devam eder. Başka bir yerden başlatmak için çubuğu kaydırın. Kısa Reels, canlı videolar ve reklamlar normal başlar.
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
 Also hide posts labelled as AI	Yapay zekâ olarak etiketlenen gönderileri de gizle
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
