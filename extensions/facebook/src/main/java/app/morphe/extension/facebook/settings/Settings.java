@@ -288,6 +288,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_allow_screenshots", TRUE);
 
     /**
+     * Facebook's haptics on its own taps and gestures ({@link app.morphe.extension.facebook.misc.Haptics}).
+     * On once the patch is picked, since picking it is the choice.
+     */
+    public static final BooleanSetting TURN_OFF_HAPTICS =
+            new BooleanSetting("hushfacebook_turn_off_haptics", TRUE);
+
+    /**
      * Facebook's screenshot and screen recording detection
      * ({@link app.morphe.extension.facebook.misc.ScreenshotDetection}). On once the patch is picked.
      */

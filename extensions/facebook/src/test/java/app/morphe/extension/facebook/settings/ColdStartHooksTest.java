@@ -62,6 +62,7 @@ import app.morphe.extension.facebook.menu.MenuSectionsForTests;
 import app.morphe.extension.facebook.menu.MenuSettingsRow;
 import app.morphe.extension.facebook.misc.AnalyticsUploads;
 import app.morphe.extension.facebook.misc.ScreenshotDetection;
+import app.morphe.extension.facebook.misc.Haptics;
 import app.morphe.extension.facebook.misc.Screenshots;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
@@ -202,6 +203,12 @@ public class ColdStartHooksTest {
                 GameAds.heldPromise("{\"type\":\"loadadasync\",\"content\":{\"promiseID\":\"1\"}}"));
         assertTrue("a Papaya job before the context was held back", AnalyticsUploads.papayaOn(true));
         assertEquals("a window's secure flag before the context was taken out", 0x2000, Screenshots.layoutFlags(0x2000));
+        assertTrue("a haptic before the context was held back", Haptics.performHapticFeedback(new android.view.View(app) {
+            @Override
+            public boolean performHapticFeedback(int feedbackConstant) {
+                return true;
+            }
+        }, android.view.HapticFeedbackConstants.LONG_PRESS));
         assertFalse("a screenshot check before the context was blocked", ScreenshotDetection.ignoresChange());
         assertNotNull("a double tap before the context lost its handler", DoubleTapLike.handler(new Object()));
         assertNotNull("a double tap before the context lost its heart", DoubleTapLike.heart(new Object()));

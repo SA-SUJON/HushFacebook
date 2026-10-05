@@ -76,7 +76,7 @@ import app.morphe.extension.shared.settings.StringSetting;
  */
 public final class SettingsBackup {
     /**
-     * Far more than a settings file needs: one is a few hundred bytes, or 62 KB at most with both
+     * Far more than a settings file needs: one is a few hundred bytes, or 63 KB at most with both
      * word lists filling the room they share.
      */
     public static final int MAX_BYTES = 64 * 1024;
@@ -134,6 +134,7 @@ public final class SettingsBackup {
             Settings.DONT_SEND_REEL_WATCH_HISTORY,
             Settings.HOLD_ANALYTICS_UPLOADS,
             Settings.ALLOW_SCREENSHOTS,
+            Settings.TURN_OFF_HAPTICS,
             Settings.BLOCK_SCREENSHOT_DETECTION,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE,
             Settings.KEEP_REEL_SPEED,

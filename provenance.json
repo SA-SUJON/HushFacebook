@@ -620,6 +620,17 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/Haptics.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/haptics/HapticsAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/haptics/TurnOffHapticsPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Turn off haptics, an idea from De-Vanced's Facebook clean-up patch, written here from Facebook 577, 580 and 581. Every View.performHapticFeedback(int) and (int, int) call outside the extension, and every Vibrator.vibrate call that takes a VibrationEffect, becomes a static call of the extension on the same registers, which skips it while the switch is on. The timed and patterned Vibrator calls are left as they are."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ScreenshotDetection.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/screenshots/BlockScreenshotDetectionPatch.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/screenshots/ScreenshotDetectionAnchors.kt"

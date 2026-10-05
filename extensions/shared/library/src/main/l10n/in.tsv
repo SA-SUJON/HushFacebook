@@ -782,3 +782,5 @@ Build %1$s (modified)	Build %1$s (diubah)
 Build %1$s (source known)	Build %1$s (sumber diketahui)
 Build %1$s (source unknown)	Build %1$s (sumber tidak diketahui)
 Tap Resume, then restart Facebook.	Ketuk Lanjutkan, lalu mulai ulang Facebook.
+Turn off haptics	Matikan haptik
+No short vibrations on Facebook's own taps and gestures. The keyboard and your phone's own haptics stay.	Tanpa getaran singkat pada ketukan dan gestur Facebook sendiri. Keyboard dan haptik ponselmu tetap ada.

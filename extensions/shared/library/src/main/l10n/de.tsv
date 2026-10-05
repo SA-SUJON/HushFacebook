@@ -782,3 +782,5 @@ Build %1$s (modified)	Build %1$s (geändert)
 Build %1$s (source known)	Build %1$s (Quelle bekannt)
 Build %1$s (source unknown)	Build %1$s (Quelle unbekannt)
 Tap Resume, then restart Facebook.	Tippe auf Fortsetzen und starte Facebook dann neu.
+Turn off haptics	Haptik ausschalten
+No short vibrations on Facebook's own taps and gestures. The keyboard and your phone's own haptics stay.	Keine kurzen Vibrationen bei Facebooks eigenem Tippen und Gesten. Die Tastatur und die Haptik deines Telefons bleiben.

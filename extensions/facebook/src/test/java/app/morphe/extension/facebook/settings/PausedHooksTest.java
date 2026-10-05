@@ -74,6 +74,7 @@ import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
 import app.morphe.extension.facebook.misc.AnalyticsUploads;
+import app.morphe.extension.facebook.misc.Haptics;
 import app.morphe.extension.facebook.misc.ScreenshotDetection;
 import app.morphe.extension.facebook.misc.Screenshots;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
@@ -468,6 +469,14 @@ public class PausedHooksTest {
         probes.put(PatchFamily.ANALYTICS_UPLOADS, Arrays.asList(
                 AnalyticsUploads::holdXAnalyticsUpload,
                 () -> !AnalyticsUploads.papayaOn(true)));
+        // A haptic Facebook asks for doesn't play.
+        probes.put(PatchFamily.HAPTICS, Collections.singletonList(
+                () -> !Haptics.performHapticFeedback(new android.view.View(RuntimeEnvironment.getApplication()) {
+                    @Override
+                    public boolean performHapticFeedback(int feedbackConstant) {
+                        return true;
+                    }
+                }, android.view.HapticFeedbackConstants.LONG_PRESS)));
         // A window's secure flag comes out.
         probes.put(PatchFamily.SCREENSHOTS, Collections.singletonList(
                 () -> Screenshots.layoutFlags(0x2000) == 0));

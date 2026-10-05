@@ -74,12 +74,12 @@ final class HushfacebookPages {
         ReleaseCheck.watch(page);
     }
 
-    /** Appearance: the font, the emoji, where the tab bar goes and dark mode. */
+    /** Appearance: the font, the emoji, where the tab bar goes, dark mode and haptics. */
     static void appearance(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
         if (build.contains(PatchFamily.SYSTEM_FONT) || build.contains(PatchFamily.SYSTEM_EMOJI)
                 || build.contains(PatchFamily.BOTTOM_TAB_BAR) || build.contains(PatchFamily.FORCE_DARK_MODE)
-                || build.contains(PatchFamily.HIDDEN_TABS)) {
+                || build.contains(PatchFamily.HIDDEN_TABS) || build.contains(PatchFamily.HAPTICS)) {
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
             if (build.contains(PatchFamily.SYSTEM_FONT)) {
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT,
@@ -117,6 +117,11 @@ final class HushfacebookPages {
                 appearance.addPreference(toggle(context, Settings.FORCE_DARK_MODE,
                         L10n.t("Keep Facebook in dark mode whatever its own setting says, for tablets where Facebook's "
                                 + "settings have no Dark mode. Restart Facebook after changing it.")));
+            }
+            if (build.contains(PatchFamily.HAPTICS)) {
+                appearance.addPreference(toggle(context, Settings.TURN_OFF_HAPTICS,
+                        L10n.t("No short vibrations on Facebook's own taps and gestures. The keyboard and your "
+                                + "phone's own haptics stay.")));
             }
         }
     }

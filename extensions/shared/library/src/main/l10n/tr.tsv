@@ -782,3 +782,5 @@ Build %1$s (modified)	Derleme %1$s (değiştirilmiş)
 Build %1$s (source known)	Derleme %1$s (kaynak biliniyor)
 Build %1$s (source unknown)	Derleme %1$s (kaynak bilinmiyor)
 Tap Resume, then restart Facebook.	Devam et'e dokunun, ardından Facebook'u yeniden başlatın.
+Turn off haptics	Dokunsal titreşimi kapat
+No short vibrations on Facebook's own taps and gestures. The keyboard and your phone's own haptics stay.	Facebook'un kendi dokunuşlarında ve hareketlerinde kısa titreşim olmaz. Klavye ve telefonunun kendi dokunsal titreşimi kalır.
