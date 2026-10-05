@@ -512,6 +512,8 @@ Resume long videos	Lange Videos fortsetzen
 Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.	Setzt Videos über zwei Minuten an deiner letzten Stelle fort, im Feed oder im Vollbild. Die Suchleiste ändert den Start. Kurze Reels, Live-Videos und Werbung starten wie gewohnt.
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
 Also hide posts labelled as AI	Auch als KI gekennzeichnete Beiträge ausblenden
+Hide Meta AI in the feed	Meta AI im Feed ausblenden
+The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.	Die Meta-AI-Karten, die Facebook zwischen Beiträgen in den Feed setzt. Beiträge von Menschen bleiben, egal was sie über KI sagen.
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
 Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Beiträge, die die Person, die sie erstellt hat, als mit KI erstellt gekennzeichnet hat. Facebook zeigt sein KI-Label neben dem Namen bei diesen wie auch bei den Beiträgen, die seine Erkennung gefunden hat, und mit diesem Schalter verschwinden beide. Der Schalter ist standardmäßig aus, weil er noch nicht in einem echten Feed getestet wurde.
 Return to regular Facebook	Zurück zum normalen Facebook

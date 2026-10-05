@@ -512,6 +512,8 @@ Resume long videos	Uzun videolara kaldığın yerden devam et
 Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.	İki dakikadan uzun videolar akışta veya tam ekranda kaldığı yerden devam eder. Başka bir yerden başlatmak için çubuğu kaydırın. Kısa Reels, canlı videolar ve reklamlar normal başlar.
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
 Also hide posts labelled as AI	Yapay zekâ olarak etiketlenen gönderileri de gizle
+Hide Meta AI in the feed	Akışta Meta AI'ı gizle
+The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.	Facebook'un akışta gönderilerin arasına eklediği Meta AI kartları. İnsanların gönderileri, yapay zekâ hakkında ne derlerse desinler kalır.
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
 Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Oluşturan kişinin yapay zekâ ile üretildiğini belirttiği gönderiler. Facebook, yapay zekâ etiketini hem bunlarda hem de kendi tespitinin bulduğu gönderilerde adın yanına koyar ve bu anahtar açıkken ikisi de gizlenir. Henüz gerçek bir akışta test edilmediği için varsayılan olarak kapalıdır.
 Return to regular Facebook	Normal Facebook'a dön

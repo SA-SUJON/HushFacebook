@@ -124,6 +124,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_ai_labelled_posts", FALSE);
 
     /**
+     * The Meta AI cards Facebook adds to the feed between posts, known by their GraphQL type name
+     * alone. On: they're Facebook's own promotion, not anyone's post, and the type can't match a
+     * post.
+     */
+    public static final BooleanSetting HIDE_META_AI_FEED_UNITS =
+            new BooleanSetting("hushfacebook_hide_meta_ai_feed_units", TRUE);
+
+    /**
      * Reels and Watch videos Facebook's own detection marked as made with AI, read off the
      * attribution the Reels viewer draws its AI label from. Off until it has been checked on a
      * signed-in Reels feed, like the feed switch above.

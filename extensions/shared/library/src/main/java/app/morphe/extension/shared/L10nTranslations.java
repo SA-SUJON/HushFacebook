@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(1180);
+        Map<String, String> table = new HashMap<>(1184);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -486,6 +486,8 @@ public final class L10nTranslations {
                 "\u201eAuch von Meta\u201c ausblenden");
         table.put("Hide Meta AI in search",
                 "Meta AI in der Suche ausblenden");
+        table.put("Hide Meta AI in the feed",
+                "Meta AI im Feed ausblenden");
         table.put("Hide Meta AI questions under posts",
                 "Meta-AI-Fragen unter Beitr\u00e4gen ausblenden");
         table.put("Hide Reels in the feed",
@@ -546,11 +548,11 @@ public final class L10nTranslations {
                 "Gruppen-Tab ausblenden");
         table.put("Hide the Marketplace tab",
                 "Marketplace-Tab ausblenden");
-        table.put("Hide the Reels tab",
-                "Reels-Tab ausblenden");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("Hide the Reels tab",
+                "Reels-Tab ausblenden");
         table.put("Hide the Reels tab dot",
                 "Punkt am Reels-Tab ausblenden");
         table.put("Hide the Stories tray",
@@ -669,11 +671,11 @@ public final class L10nTranslations {
                 "Messenger");
         table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
                 "Messenger kann facebook.com- und m.me-Links f\u00fcr sich behalten, dann schalten sich ihre Schalter f\u00fcr diese App wieder aus. Tippe und schalte dort \u201eUnterst\u00fctzte Links \u00f6ffnen\u201c aus, dann pr\u00fcfe \u201eUnterst\u00fctzte Links\u201c oben.");
-        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
-                "Die Einstellungen von Messenger lie\u00dfen sich nicht \u00f6ffnen. \u00d6ffne die App-Info \u00fcber das Messenger-Symbol, dann \u201eStandardm\u00e4\u00dfig \u00f6ffnen\u201c.");
     }
 
     private static void fillDe5(Map<String, String> table) {
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "Die Einstellungen von Messenger lie\u00dfen sich nicht \u00f6ffnen. \u00d6ffne die App-Info \u00fcber das Messenger-Symbol, dann \u201eStandardm\u00e4\u00dfig \u00f6ffnen\u201c.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite und Workplace lassen sich neben diesem Facebook installieren. Es gibt den zwei Berechtigungen, die sie mit ihm teilen, eigene Namen.");
         table.put("Meta App Manager",
@@ -792,11 +794,11 @@ public final class L10nTranslations {
                 "Beitr\u00e4ge, die Facebook als beworben statt als Anzeige einstuft.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Beitr\u00e4ge von Personen und Seiten, denen du nicht folgst, und aus Gruppen, denen du nicht beigetreten bist, die Facebook in deinen Feed schiebt.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Beitr\u00e4ge, die Facebooks eigene Erkennung als mit KI erstellt markiert. Ein Beitrag, den nur die Person, die ihn erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
     }
 
     private static void fillDe6(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Beitr\u00e4ge, die Facebooks eigene Erkennung als mit KI erstellt markiert. Ein Beitrag, den nur die Person, die ihn erstellt hat, als KI gekennzeichnet hat, bleibt sichtbar. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
         table.put("Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.",
                 "Beitr\u00e4ge, die die Person, die sie erstellt hat, als mit KI erstellt gekennzeichnet hat. Facebook zeigt sein KI-Label neben dem Namen bei diesen wie auch bei den Beitr\u00e4gen, die seine Erkennung gefunden hat, und mit diesem Schalter verschwinden beide. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
@@ -915,11 +917,11 @@ public final class L10nTranslations {
                 "Was du speicherst, landet dann in einem Ordner namens %1$s.");
         table.put("Saving a photo",
                 "Foto wird gespeichert");
-        table.put("Saving a video",
-                "Video wird gespeichert");
     }
 
     private static void fillDe7(Map<String, String> table) {
+        table.put("Saving a video",
+                "Video wird gespeichert");
         table.put("Saving the settings file",
                 "Einstellungsdatei wird gespeichert");
         table.put("Saving...",
@@ -1038,13 +1040,15 @@ public final class L10nTranslations {
                 "Der Feeds-Tab zeigt dann %1$s.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "Der Feeds-Tab zeigt dann den Filter, den Facebook ausw\u00e4hlt.");
-        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
-                "Der Folgen-Button neben der Person, die das Reel gepostet hat. \u00dcber ihr Profil kannst du ihr weiterhin folgen.");
     }
 
     private static void fillDe8(Map<String, String> table) {
+        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
+                "Der Folgen-Button neben der Person, die das Reel gepostet hat. \u00dcber ihr Profil kannst du ihr weiterhin folgen.");
         table.put("The Messenger link test couldn't start.",
                 "Der Test der Messenger-Verbindung konnte nicht starten.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
+                "Die Meta-AI-Karten, die Facebook zwischen Beitr\u00e4gen in den Feed setzt. Beitr\u00e4ge von Menschen bleiben, egal was sie \u00fcber KI sagen.");
         table.put("The Reels tab",
                 "Der Reels-Tab");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -1159,13 +1163,13 @@ public final class L10nTranslations {
                 "Videolink");
         table.put("Video saved",
                 "Video gespeichert");
+    }
+
+    private static void fillDe9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.",
                 "Videos und Fotos landen in %1$s, neben denen der Kamera. Was du schon gespeichert hast, bleibt, wo es ist.");
         table.put("Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.",
                 "Videos und Fotos landen in %1$s, bei den anderen Downloads des Handys. Was du schon gespeichert hast, bleibt, wo es ist.");
-    }
-
-    private static void fillDe9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s.",
                 "Videos und Fotos landen in %1$s.");
         table.put("Videos and photos will go to %1$s.",
@@ -1269,7 +1273,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(1180);
+        Map<String, String> table = new HashMap<>(1184);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -1711,6 +1715,8 @@ public final class L10nTranslations {
                 "Ocultar \u201cTambi\u00e9n de Meta\u201d");
         table.put("Hide Meta AI in search",
                 "Ocultar Meta AI en la b\u00fasqueda");
+        table.put("Hide Meta AI in the feed",
+                "Ocultar Meta AI en el feed");
         table.put("Hide Meta AI questions under posts",
                 "Ocultar las preguntas de Meta AI bajo las publicaciones");
         table.put("Hide Reels in the feed",
@@ -1771,11 +1777,11 @@ public final class L10nTranslations {
                 "Ocultar la pesta\u00f1a Grupos");
         table.put("Hide the Marketplace tab",
                 "Ocultar la pesta\u00f1a Marketplace");
-        table.put("Hide the Reels tab",
-                "Ocultar la pesta\u00f1a Reels");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("Hide the Reels tab",
+                "Ocultar la pesta\u00f1a Reels");
         table.put("Hide the Reels tab dot",
                 "Ocultar el punto de la pesta\u00f1a Reels");
         table.put("Hide the Stories tray",
@@ -1894,11 +1900,11 @@ public final class L10nTranslations {
                 "Messenger");
         table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
                 "Messenger puede quedarse con los enlaces de facebook.com y m.me, y entonces sus interruptores para esta app se vuelven a desactivar solos. Toca y desactiva \u201cAbrir enlaces compatibles\u201d all\u00ed, y luego revisa Enlaces compatibles m\u00e1s arriba.");
-        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
-                "No se abrieron los ajustes de Messenger. Abre Informaci\u00f3n de la app desde el icono de Messenger y luego Abrir de forma predeterminada.");
     }
 
     private static void fillEs5(Map<String, String> table) {
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "No se abrieron los ajustes de Messenger. Abre Informaci\u00f3n de la app desde el icono de Messenger y luego Abrir de forma predeterminada.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite y Workplace se instalan junto a este Facebook. Les da nombres propios a los dos permisos que comparten con \u00e9l.");
         table.put("Meta App Manager",
@@ -2017,11 +2023,11 @@ public final class L10nTranslations {
                 "Publicaciones que Facebook clasifica como promociones y no como anuncios.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Publicaciones de personas y p\u00e1ginas que no sigues y de grupos a los que no te has unido que Facebook mete en tu feed.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Publicaciones que la detecci\u00f3n propia de Facebook marca como creadas con IA. Una publicaci\u00f3n que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
     }
 
     private static void fillEs6(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Publicaciones que la detecci\u00f3n propia de Facebook marca como creadas con IA. Una publicaci\u00f3n que solo su autor etiquet\u00f3 como IA se mantiene. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
         table.put("Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.",
                 "Publicaciones que su autor marc\u00f3 como creadas con IA. Facebook pone su etiqueta de IA junto al nombre en estas y tambi\u00e9n en las que encontr\u00f3 su propia detecci\u00f3n, y con este interruptor activado se ocultan las dos. Viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
@@ -2140,11 +2146,11 @@ public final class L10nTranslations {
                 "Lo que guardes ir\u00e1 a una carpeta llamada %1$s.");
         table.put("Saving a photo",
                 "Guardando una foto");
-        table.put("Saving a video",
-                "Guardando un video");
     }
 
     private static void fillEs7(Map<String, String> table) {
+        table.put("Saving a video",
+                "Guardando un video");
         table.put("Saving the settings file",
                 "Guardando el archivo de configuraci\u00f3n");
         table.put("Saving...",
@@ -2263,13 +2269,15 @@ public final class L10nTranslations {
                 "La pesta\u00f1a Feeds se abrir\u00e1 en %1$s.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "La pesta\u00f1a Feeds se abrir\u00e1 en el filtro que elija Facebook.");
-        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
-                "El bot\u00f3n Seguir junto a quien public\u00f3 el reel. Puedes seguir a esa persona desde su perfil.");
     }
 
     private static void fillEs8(Map<String, String> table) {
+        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
+                "El bot\u00f3n Seguir junto a quien public\u00f3 el reel. Puedes seguir a esa persona desde su perfil.");
         table.put("The Messenger link test couldn't start.",
                 "La prueba de la conexi\u00f3n con Messenger no pudo empezar.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
+                "Las tarjetas de Meta AI que Facebook a\u00f1ade al feed entre publicaciones. Las publicaciones de las personas se quedan, digan lo que digan sobre la IA.");
         table.put("The Reels tab",
                 "La pesta\u00f1a Reels");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -2384,13 +2392,13 @@ public final class L10nTranslations {
                 "Enlace del video");
         table.put("Video saved",
                 "Video guardado");
+    }
+
+    private static void fillEs9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.",
                 "Los videos y las fotos van a %1$s, junto a los de la c\u00e1mara. Lo que ya guardaste se queda donde est\u00e1.");
         table.put("Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.",
                 "Los videos y las fotos van a %1$s, con las dem\u00e1s descargas del tel\u00e9fono. Lo que ya guardaste se queda donde est\u00e1.");
-    }
-
-    private static void fillEs9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s.",
                 "Los videos y las fotos van a %1$s.");
         table.put("Videos and photos will go to %1$s.",
@@ -2494,7 +2502,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(1180);
+        Map<String, String> table = new HashMap<>(1184);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -2936,6 +2944,8 @@ public final class L10nTranslations {
                 "Sembunyikan \u201cJuga dari Meta\u201d");
         table.put("Hide Meta AI in search",
                 "Sembunyikan Meta AI di pencarian");
+        table.put("Hide Meta AI in the feed",
+                "Sembunyikan Meta AI di feed");
         table.put("Hide Meta AI questions under posts",
                 "Sembunyikan pertanyaan Meta AI di bawah postingan");
         table.put("Hide Reels in the feed",
@@ -2996,11 +3006,11 @@ public final class L10nTranslations {
                 "Sembunyikan tab Grup");
         table.put("Hide the Marketplace tab",
                 "Sembunyikan tab Marketplace");
-        table.put("Hide the Reels tab",
-                "Sembunyikan tab Reels");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("Hide the Reels tab",
+                "Sembunyikan tab Reels");
         table.put("Hide the Reels tab dot",
                 "Sembunyikan titik di tab Reels");
         table.put("Hide the Stories tray",
@@ -3119,11 +3129,11 @@ public final class L10nTranslations {
                 "Messenger");
         table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
                 "Messenger bisa mengambil tautan facebook.com dan m.me untuk dirinya sendiri, sehingga tombolnya untuk aplikasi ini mati lagi dengan sendirinya. Ketuk dan nonaktifkan \u201cBuka link yang didukung\u201d di sana, lalu periksa Tautan yang didukung di atas.");
-        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
-                "Pengaturan Messenger tidak terbuka. Buka Info aplikasi dari ikon Messenger, lalu Buka secara default.");
     }
 
     private static void fillIn5(Map<String, String> table) {
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "Pengaturan Messenger tidak terbuka. Buka Info aplikasi dari ikon Messenger, lalu Buka secara default.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite, dan Workplace dapat dipasang di samping Facebook ini. Facebook ini memberi nama sendiri pada dua izin yang mereka gunakan bersama dengannya.");
         table.put("Meta App Manager",
@@ -3242,11 +3252,11 @@ public final class L10nTranslations {
                 "Postingan yang dikategorikan Facebook sebagai promosi, bukan iklan.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Postingan dari orang dan Halaman yang tidak Anda ikuti serta dari grup tempat Anda belum bergabung, yang diselipkan Facebook ke Kabar Beranda Anda.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Postingan yang ditandai deteksi Facebook sendiri sebagai buatan AI. Postingan yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
     }
 
     private static void fillIn6(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Postingan yang ditandai deteksi Facebook sendiri sebagai buatan AI. Postingan yang hanya diberi label AI oleh pembuatnya tetap ada. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
         table.put("Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.",
                 "Postingan yang ditandai pembuatnya sebagai buatan AI. Facebook memasang label AI di samping nama pada postingan ini maupun pada postingan yang ditemukan deteksinya, dan saat sakelar ini aktif, keduanya disembunyikan. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
@@ -3365,11 +3375,11 @@ public final class L10nTranslations {
                 "Semua yang Anda simpan akan masuk ke folder bernama %1$s.");
         table.put("Saving a photo",
                 "Menyimpan foto");
-        table.put("Saving a video",
-                "Menyimpan video");
     }
 
     private static void fillIn7(Map<String, String> table) {
+        table.put("Saving a video",
+                "Menyimpan video");
         table.put("Saving the settings file",
                 "Menyimpan file pengaturan");
         table.put("Saving...",
@@ -3488,13 +3498,15 @@ public final class L10nTranslations {
                 "Tab Feed akan terbuka di %1$s.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "Tab Feed akan terbuka di filter yang dipilih Facebook.");
-        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
-                "Tombol Ikuti di samping nama pembuat reel. Anda tetap bisa mengikutinya dari profilnya.");
     }
 
     private static void fillIn8(Map<String, String> table) {
+        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
+                "Tombol Ikuti di samping nama pembuat reel. Anda tetap bisa mengikutinya dari profilnya.");
         table.put("The Messenger link test couldn't start.",
                 "Uji koneksi Messenger tidak dapat dimulai.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
+                "Kartu Meta AI yang ditambahkan Facebook ke feed di antara postingan. Postingan orang tetap ada, apa pun yang mereka katakan tentang AI.");
         table.put("The Reels tab",
                 "Tab Reels");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -3609,13 +3621,13 @@ public final class L10nTranslations {
                 "Tautan video");
         table.put("Video saved",
                 "Video tersimpan");
+    }
+
+    private static void fillIn9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.",
                 "Video dan foto masuk ke %1$s, di samping milik kamera. Simpanan Anda yang sudah ada tetap di tempatnya.");
         table.put("Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.",
                 "Video dan foto masuk ke %1$s, bersama unduhan lain di ponsel. Simpanan Anda yang sudah ada tetap di tempatnya.");
-    }
-
-    private static void fillIn9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s.",
                 "Video dan foto masuk ke %1$s.");
         table.put("Videos and photos will go to %1$s.",
@@ -3719,7 +3731,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(1180);
+        Map<String, String> table = new HashMap<>(1184);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -4161,6 +4173,8 @@ public final class L10nTranslations {
                 "Ocultar \u201cTamb\u00e9m da Meta\u201d");
         table.put("Hide Meta AI in search",
                 "Ocultar a Meta AI na pesquisa");
+        table.put("Hide Meta AI in the feed",
+                "Ocultar a Meta AI no feed");
         table.put("Hide Meta AI questions under posts",
                 "Ocultar as perguntas da Meta AI abaixo das publica\u00e7\u00f5es");
         table.put("Hide Reels in the feed",
@@ -4221,11 +4235,11 @@ public final class L10nTranslations {
                 "Ocultar a aba Grupos");
         table.put("Hide the Marketplace tab",
                 "Ocultar a aba Marketplace");
-        table.put("Hide the Reels tab",
-                "Ocultar a aba Reels");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("Hide the Reels tab",
+                "Ocultar a aba Reels");
         table.put("Hide the Reels tab dot",
                 "Ocultar o ponto da aba Reels");
         table.put("Hide the Stories tray",
@@ -4344,11 +4358,11 @@ public final class L10nTranslations {
                 "Messenger");
         table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
                 "O Messenger pode ficar com os links de facebook.com e m.me, e a\u00ed as chaves deles para este app voltam a se desligar sozinhas. Toque e desative \u201cAbrir links compat\u00edveis\u201d l\u00e1, depois confira Links compat\u00edveis acima.");
-        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
-                "As configura\u00e7\u00f5es do Messenger n\u00e3o abriram. Abra Informa\u00e7\u00f5es do app pelo \u00edcone do Messenger e depois Abrir por padr\u00e3o.");
     }
 
     private static void fillPt_rBR5(Map<String, String> table) {
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "As configura\u00e7\u00f5es do Messenger n\u00e3o abriram. Abra Informa\u00e7\u00f5es do app pelo \u00edcone do Messenger e depois Abrir por padr\u00e3o.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite e Workplace s\u00e3o instalados ao lado deste Facebook. Ele d\u00e1 nomes pr\u00f3prios \u00e0s duas permiss\u00f5es que esses aplicativos compartilham com ele.");
         table.put("Meta App Manager",
@@ -4467,11 +4481,11 @@ public final class L10nTranslations {
                 "Publica\u00e7\u00f5es que o Facebook classifica como promo\u00e7\u00f5es, e n\u00e3o como an\u00fancios.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Publica\u00e7\u00f5es de pessoas e P\u00e1ginas que voc\u00ea n\u00e3o segue e de grupos dos quais voc\u00ea n\u00e3o participa, inseridas pelo Facebook no seu feed.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Publica\u00e7\u00f5es que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como geradas por IA. Uma publica\u00e7\u00e3o que apenas o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desativada por padr\u00e3o porque ainda n\u00e3o foi testada em um feed real.");
     }
 
     private static void fillPt_rBR6(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Publica\u00e7\u00f5es que a detec\u00e7\u00e3o do pr\u00f3prio Facebook marca como geradas por IA. Uma publica\u00e7\u00e3o que apenas o autor marcou como IA continua aparecendo. Esta op\u00e7\u00e3o vem desativada por padr\u00e3o porque ainda n\u00e3o foi testada em um feed real.");
         table.put("Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.",
                 "Publica\u00e7\u00f5es que o autor marcou como geradas por IA. O Facebook coloca o r\u00f3tulo de IA ao lado do nome nessas publica\u00e7\u00f5es e tamb\u00e9m nas que a detec\u00e7\u00e3o dele encontrou, e com esta op\u00e7\u00e3o ativada os dois tipos s\u00e3o ocultados. Esta op\u00e7\u00e3o vem desativada por padr\u00e3o porque ainda n\u00e3o foi testada em um feed real.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
@@ -4590,11 +4604,11 @@ public final class L10nTranslations {
                 "Os arquivos ser\u00e3o salvos em uma pasta chamada %1$s.");
         table.put("Saving a photo",
                 "Salvando uma foto");
-        table.put("Saving a video",
-                "Salvando um v\u00eddeo");
     }
 
     private static void fillPt_rBR7(Map<String, String> table) {
+        table.put("Saving a video",
+                "Salvando um v\u00eddeo");
         table.put("Saving the settings file",
                 "Salvando o arquivo de configura\u00e7\u00f5es");
         table.put("Saving...",
@@ -4713,13 +4727,15 @@ public final class L10nTranslations {
                 "A aba Feeds vai abrir em %1$s.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "A aba Feeds vai abrir no filtro que o Facebook escolher.");
-        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
-                "O bot\u00e3o Seguir ao lado de quem publicou o Reel. Voc\u00ea ainda pode seguir a pessoa pelo perfil dela.");
     }
 
     private static void fillPt_rBR8(Map<String, String> table) {
+        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
+                "O bot\u00e3o Seguir ao lado de quem publicou o Reel. Voc\u00ea ainda pode seguir a pessoa pelo perfil dela.");
         table.put("The Messenger link test couldn't start.",
                 "O teste da conex\u00e3o com o Messenger n\u00e3o p\u00f4de come\u00e7ar.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
+                "Os cart\u00f5es da Meta AI que o Facebook coloca no feed entre as publica\u00e7\u00f5es. As publica\u00e7\u00f5es das pessoas ficam, n\u00e3o importa o que digam sobre IA.");
         table.put("The Reels tab",
                 "A aba Reels");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -4834,13 +4850,13 @@ public final class L10nTranslations {
                 "Link do v\u00eddeo");
         table.put("Video saved",
                 "V\u00eddeo salvo");
+    }
+
+    private static void fillPt_rBR9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.",
                 "V\u00eddeos e fotos v\u00e3o para %1$s, junto com os da c\u00e2mera. O que voc\u00ea j\u00e1 salvou fica onde est\u00e1.");
         table.put("Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.",
                 "V\u00eddeos e fotos v\u00e3o para %1$s, com os outros downloads do celular. O que voc\u00ea j\u00e1 salvou fica onde est\u00e1.");
-    }
-
-    private static void fillPt_rBR9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s.",
                 "V\u00eddeos e fotos v\u00e3o para %1$s.");
         table.put("Videos and photos will go to %1$s.",
@@ -4944,7 +4960,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(1180);
+        Map<String, String> table = new HashMap<>(1184);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -5386,6 +5402,8 @@ public final class L10nTranslations {
                 "\u201cMeta'dan di\u011ferleri\u201d b\u00f6l\u00fcm\u00fcn\u00fc gizle");
         table.put("Hide Meta AI in search",
                 "Aramada Meta AI'\u0131 gizle");
+        table.put("Hide Meta AI in the feed",
+                "Ak\u0131\u015fta Meta AI'\u0131 gizle");
         table.put("Hide Meta AI questions under posts",
                 "G\u00f6nderilerin alt\u0131ndaki Meta AI sorular\u0131n\u0131 gizle");
         table.put("Hide Reels in the feed",
@@ -5446,11 +5464,11 @@ public final class L10nTranslations {
                 "Gruplar sekmesini gizle");
         table.put("Hide the Marketplace tab",
                 "Marketplace sekmesini gizle");
-        table.put("Hide the Reels tab",
-                "Reels sekmesini gizle");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("Hide the Reels tab",
+                "Reels sekmesini gizle");
         table.put("Hide the Reels tab dot",
                 "Reels sekmesindeki noktay\u0131 gizle");
         table.put("Hide the Stories tray",
@@ -5569,11 +5587,11 @@ public final class L10nTranslations {
                 "Messenger");
         table.put("Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.",
                 "Messenger, facebook.com ve m.me ba\u011flant\u0131lar\u0131n\u0131 kendine alabilir ve bu durumda bu uygulama i\u00e7in anahtarlar\u0131 kendili\u011finden yeniden kapan\u0131r. Dokunup oradaki \u201cDesteklenen ba\u011flant\u0131lar\u0131 a\u00e7\u201d se\u00e7ene\u011fini kapat\u0131n, ard\u0131ndan yukar\u0131daki Desteklenen ba\u011flant\u0131lar'\u0131 kontrol edin.");
-        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
-                "Messenger ayarlar\u0131 a\u00e7\u0131lamad\u0131. Messenger simgesinden Uygulama bilgileri'ni, ard\u0131ndan Varsay\u0131lan olarak a\u00e7'\u0131 a\u00e7\u0131n.");
     }
 
     private static void fillTr5(Map<String, String> table) {
+        table.put("Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.",
+                "Messenger ayarlar\u0131 a\u00e7\u0131lamad\u0131. Messenger simgesinden Uygulama bilgileri'ni, ard\u0131ndan Varsay\u0131lan olarak a\u00e7'\u0131 a\u00e7\u0131n.");
         table.put("Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.",
                 "Messenger, Facebook Lite, Business Suite ve Workplace bu Facebook'un yan\u0131na y\u00fcklenebilir. Onlarla payla\u015ft\u0131\u011f\u0131 iki izne kendi adlar\u0131n\u0131 verir.");
         table.put("Meta App Manager",
@@ -5692,11 +5710,11 @@ public final class L10nTranslations {
                 "Facebook'un reklam yerine tan\u0131t\u0131m olarak sayd\u0131\u011f\u0131 g\u00f6nderiler.");
         table.put("Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.",
                 "Takip etmedi\u011fin ki\u015fi ve sayfalardan ve kat\u0131lmad\u0131\u011f\u0131n gruplardan Facebook'un ak\u0131\u015f\u0131na katt\u0131\u011f\u0131 g\u00f6nderiler.");
-        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
-                "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi g\u00f6nderiler. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir g\u00f6nderi kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
     }
 
     private static void fillTr6(Map<String, String> table) {
+        table.put("Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.",
+                "Facebook'un kendi tespitinin yapay zek\u00e2 ile \u00fcretildi\u011fini i\u015faretledi\u011fi g\u00f6nderiler. Yaln\u0131zca olu\u015fturan ki\u015finin yapay zek\u00e2 olarak etiketledi\u011fi bir g\u00f6nderi kal\u0131r. Bu anahtar hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.",
                 "Olu\u015fturan ki\u015finin yapay zek\u00e2 ile \u00fcretildi\u011fini belirtti\u011fi g\u00f6nderiler. Facebook, yapay zek\u00e2 etiketini hem bunlarda hem de kendi tespitinin buldu\u011fu g\u00f6nderilerde ad\u0131n yan\u0131na koyar ve bu anahtar a\u00e7\u0131kken ikisi de gizlenir. Hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
@@ -5815,11 +5833,11 @@ public final class L10nTranslations {
                 "Kaydettiklerin %1$s adl\u0131 bir klas\u00f6re gidecek.");
         table.put("Saving a photo",
                 "Foto\u011fraf kaydediliyor");
-        table.put("Saving a video",
-                "Video kaydediliyor");
     }
 
     private static void fillTr7(Map<String, String> table) {
+        table.put("Saving a video",
+                "Video kaydediliyor");
         table.put("Saving the settings file",
                 "Ayar dosyas\u0131 kaydediliyor");
         table.put("Saving...",
@@ -5938,13 +5956,15 @@ public final class L10nTranslations {
                 "Ak\u0131\u015flar sekmesi %1$s filtresinde a\u00e7\u0131lacak.");
         table.put("The Feeds tab will open on the filter Facebook picks.",
                 "Ak\u0131\u015flar sekmesi Facebook'un se\u00e7ti\u011fi filtrede a\u00e7\u0131lacak.");
-        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
-                "Reels videosunu payla\u015fan ki\u015finin ad\u0131n\u0131n yan\u0131ndaki Takip Et d\u00fc\u011fmesi. Onu profilinden yine takip edebilirsin.");
     }
 
     private static void fillTr8(Map<String, String> table) {
+        table.put("The Follow button next to the reel's author. You can still follow them from their profile.",
+                "Reels videosunu payla\u015fan ki\u015finin ad\u0131n\u0131n yan\u0131ndaki Takip Et d\u00fc\u011fmesi. Onu profilinden yine takip edebilirsin.");
         table.put("The Messenger link test couldn't start.",
                 "Messenger ba\u011flant\u0131 testi ba\u015flat\u0131lamad\u0131.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
+                "Facebook'un ak\u0131\u015fta g\u00f6nderilerin aras\u0131na ekledi\u011fi Meta AI kartlar\u0131. \u0130nsanlar\u0131n g\u00f6nderileri, yapay zek\u00e2 hakk\u0131nda ne derlerse desinler kal\u0131r.");
         table.put("The Reels tab",
                 "Reels sekmesi");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -6059,13 +6079,13 @@ public final class L10nTranslations {
                 "Video ba\u011flant\u0131s\u0131");
         table.put("Video saved",
                 "Video kaydedildi");
+    }
+
+    private static void fillTr9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s, next to the camera's. Saves you already have stay where they are.",
                 "Videolar ve foto\u011fraflar kameran\u0131nkilerin yan\u0131na, %1$s klas\u00f6r\u00fcne kaydedilir. \u00d6nceden kaydettiklerin oldu\u011fu yerde kal\u0131r.");
         table.put("Videos and photos go to %1$s, with the phone's other downloads. Saves you already have stay where they are.",
                 "Videolar ve foto\u011fraflar telefonun di\u011fer indirmeleriyle birlikte %1$s klas\u00f6r\u00fcne kaydedilir. \u00d6nceden kaydettiklerin oldu\u011fu yerde kal\u0131r.");
-    }
-
-    private static void fillTr9(Map<String, String> table) {
         table.put("Videos and photos go to %1$s.",
                 "Videolar ve foto\u011fraflar %1$s klas\u00f6r\u00fcne kaydedilir.");
         table.put("Videos and photos will go to %1$s.",

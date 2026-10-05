@@ -104,6 +104,13 @@ public final class FeedFilter {
      * its table of type names rather than a literal: one large Stories tile, and one person's
      * Stories in a viewer of their own.
      */
+    /**
+     * The type name of the Meta AI card Facebook adds to the feed between posts. Facebook's own feed
+     * unit dispatcher compares a unit's type name with it in 581. Hide AI-detected posts takes it out
+     * under {@link Settings#HIDE_META_AI_FEED_UNITS}.
+     */
+    static final String META_AI_UNIT_TYPE = "XFBFBImplicitMetaAIFeedUnit";
+
     static final String STORIES_LARGE_TILE_UNIT_TYPE = "StoriesOneColumnOneRowLargeTileFeedUnit";
     static final String STORIES_INLINE_VIEWER_UNIT_TYPE = "StoriesSingleBucketInlineViewerFeedUnit";
     /** What Hide the Stories tray's rule adds to the type of a row of Stories it took out of the feed. */
@@ -374,6 +381,10 @@ public final class FeedFilter {
             }
             if (reason == null && trayPatched && Settings.HIDE_STORIES_BETWEEN_POSTS.get()) {
                 reason = storiesRowReason(typeName(feedUnit));
+            }
+            if (reason == null && aiPatched && Settings.HIDE_META_AI_FEED_UNITS.get()
+                    && META_AI_UNIT_TYPE.equals(typeName(feedUnit))) {
+                reason = META_AI_UNIT_TYPE;
             }
             boolean aiLabelled = aiPatched && Settings.HIDE_AI_LABELLED_POSTS.get();
             if (reason == null && aiPatched && (aiLabelled || Settings.HIDE_AI_DETECTED_POSTS.get())) {

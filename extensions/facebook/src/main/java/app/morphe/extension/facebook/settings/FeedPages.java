@@ -177,6 +177,9 @@ final class FeedPages {
                                 + "the name on these as well as on the posts its detection found, and with this on, "
                                 + "both kinds go. It's off by default because it hasn't been tested on a real feed "
                                 + "yet.")));
+                feed.addPreference(toggle(context, Settings.HIDE_META_AI_FEED_UNITS,
+                        L10n.t("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, "
+                                + "whatever they say about AI.")));
             }
             if (build.contains(PatchFamily.POST_WORDS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_POSTS_WITH_WORDS,

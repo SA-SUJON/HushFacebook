@@ -512,6 +512,8 @@ Resume long videos	Lanjutkan video panjang
 Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.	Lanjutkan video lebih dari dua menit dari posisi terakhir, di feed atau layar penuh. Geser bilah untuk posisi lain. Reel pendek, video langsung, dan iklan mulai seperti biasa.
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
 Also hide posts labelled as AI	Sembunyikan juga postingan berlabel AI
+Hide Meta AI in the feed	Sembunyikan Meta AI di feed
+The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.	Kartu Meta AI yang ditambahkan Facebook ke feed di antara postingan. Postingan orang tetap ada, apa pun yang mereka katakan tentang AI.
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
 Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Postingan yang ditandai pembuatnya sebagai buatan AI. Facebook memasang label AI di samping nama pada postingan ini maupun pada postingan yang ditemukan deteksinya, dan saat sakelar ini aktif, keduanya disembunyikan. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.
 Return to regular Facebook	Kembali ke Facebook biasa

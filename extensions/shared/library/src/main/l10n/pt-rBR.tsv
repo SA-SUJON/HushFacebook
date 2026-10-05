@@ -413,6 +413,8 @@ Type @ before Facebook suggests someone to tag in posts or comments. Your text s
 Resume long videos	Retomar vídeos longos
 Resume videos over two minutes where you left off, in the feed or full screen. Seek to start elsewhere. Short reels, live videos and ads start as usual.	Retoma vídeos com mais de dois minutos de onde você parou, no feed ou em tela cheia. Arraste a barra de progresso para começar em outro ponto. Reels curtos, vídeos ao vivo e anúncios começam normalmente.
 Also hide posts labelled as AI	Ocultar também publicações marcadas como IA
+Hide Meta AI in the feed	Ocultar a Meta AI no feed
+The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.	Os cartões da Meta AI que o Facebook coloca no feed entre as publicações. As publicações das pessoas ficam, não importa o que digam sobre IA.
 Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Publicações que o autor marcou como geradas por IA. O Facebook coloca o rótulo de IA ao lado do nome nessas publicações e também nas que a detecção dele encontrou, e com esta opção ativada os dois tipos são ocultados. Esta opção vem desativada por padrão porque ainda não foi testada em um feed real.
 Return to regular Facebook	Voltar ao Facebook normal
 Restore the normal tabs at the next restart. Your other settings stay saved.	Restaura as abas normais ao reiniciar. Suas outras configurações são mantidas.

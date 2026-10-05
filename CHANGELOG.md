@@ -8,6 +8,7 @@ Source preparation. The latest published bundle remains v0.7.1.
 
 ### Added
 
+* **Facebook:** `Hide AI-detected posts` has a new switch, Hide Meta AI in the feed, under News feed. It takes out the Meta AI cards Facebook adds to the feed between posts, by the card's own type, so people's posts stay whatever they say about AI. It starts on.
 * **Facebook:** Phones with a 32-bit processor on Android 11 or newer can patch Facebook 581.0.0.45.58. Pick its 32-bit build for Android 11 and newer, 475215364 on APKMirror. It keeps its code readable the way the 64-bit build does, and every patch applies to it.
 * **Facebook:** New patch, `Block Instant Games ads`, in the default selection with its switch under Menu. A game you play in Facebook that asks for an ad, whether a full-screen one, a rewarded one or a banner, is told there's none to show, the answer Facebook gives when it has no ad. So nothing is fetched or played, a rewarded ad gives no reward, and the game carries on. The idea comes from De-Vanced, which drops those asks.
 * **Facebook:** `Hide sponsored Marketplace listings` also covers Marketplace's video ads. The two components that draw one in the feed draw nothing while the switch is on, and the ad's video isn't fetched. The diagnostic report counts them on its Marketplace ads line. The idea comes from De-Vanced's ad patch.
