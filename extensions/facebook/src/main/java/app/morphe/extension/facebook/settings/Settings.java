@@ -218,6 +218,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_sponsored_marketplace_listings", TRUE);
 
     /**
+     * The ads Instant Games ask Facebook for ({@link app.morphe.extension.facebook.ads.GameAds}): each
+     * request is answered with no ad.
+     */
+    public static final BooleanSetting BLOCK_GAME_ADS =
+            new BooleanSetting("hushfacebook_block_game_ads", TRUE);
+
+    /**
      * The product cards of the shop links a creator attaches to a post go: on a reel, under a feed
      * post and floating over the comment box ({@link app.morphe.extension.facebook.ads.AffiliateLinks}).
      * The "Commission eligible" label stays. A change shows on the reels, posts and comment sheets

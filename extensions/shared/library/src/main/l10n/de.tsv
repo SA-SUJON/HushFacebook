@@ -444,6 +444,8 @@ Hide suggested stories	Vorgeschlagene Stories ausblenden
 Keep friends and followed Pages in the Stories tray. Applies when Facebook next loads the tray.	Behält Freunde und abonnierte Seiten in der Story-Leiste. Gilt beim nächsten Laden der Leiste.
 # context: switch title under Marketplace; the ads Facebook puts between the things people sell in Marketplace's feed
 Hide sponsored Marketplace listings	Gesponserte Marketplace-Angebote ausblenden
+Block Instant Games ads	Werbung in Instant Games blockieren
+Games you play in Facebook get no ads. A game asking for one hears there's none to show, so rewarded ads give no reward.	Spiele, die du in Facebook spielst, bekommen keine Werbung. Fragt ein Spiel nach einer, erfährt es, dass keine verfügbar ist, daher bringt Werbung mit Belohnung keine Belohnung.
 # context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
 Ads and boosted listings in Marketplace's feed and search results. The other listings stay.	Werbung und hervorgehobene Angebote im Marketplace-Feed und in den Suchergebnissen. Die anderen Angebote bleiben.
 # context: switch title under News feed; hides posts whose text holds a word or phrase the person listed

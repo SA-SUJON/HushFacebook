@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import app.morphe.extension.facebook.ads.GameAds;
 import app.morphe.extension.facebook.ads.MarketplaceAdFilterForTests;
 import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
@@ -194,6 +195,8 @@ public class ColdStartHooksTest {
         assertFalse(ReelDeclutter.skipSocialBubbles());
         assertFalse("a batch of watched reels sent before the context was held back", SeenStateSendForTests.heldBack());
         assertFalse("an analytics upload before the context was held back", AnalyticsUploads.holdXAnalyticsUpload());
+        assertNull("a game's ad before the context was answered with no ad",
+                GameAds.heldPromise("{\"type\":\"loadadasync\",\"content\":{\"promiseID\":\"1\"}}"));
         assertTrue("a Papaya job before the context was held back", AnalyticsUploads.papayaOn(true));
         assertNotNull("a double tap before the context lost its handler", DoubleTapLike.handler(new Object()));
         assertNotNull("a double tap before the context lost its heart", DoubleTapLike.heart(new Object()));

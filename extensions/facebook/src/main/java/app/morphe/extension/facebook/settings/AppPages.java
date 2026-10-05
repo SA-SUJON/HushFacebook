@@ -70,6 +70,11 @@ final class AppPages {
                     L10n.t("The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps "
                             + "and its ads for Meta's devices. Your own shortcuts stay.")));
         }
+        if (build.contains(PatchFamily.GAME_ADS)) {
+            menu.addPreference(toggle(context, Settings.BLOCK_GAME_ADS,
+                    L10n.t("Games you play in Facebook get no ads. A game asking for one hears there's none to show, "
+                            + "so rewarded ads give no reward.")));
+        }
     }
 
     /** Search. */

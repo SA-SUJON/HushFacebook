@@ -444,6 +444,8 @@ Hide suggested stories	Önerilen hikayeleri gizle
 Keep friends and followed Pages in the Stories tray. Applies when Facebook next loads the tray.	Hikaye tepsisinde arkadaşlar ve takip edilen Sayfalar kalır. Facebook tepsiyi yeniden yüklediğinde uygulanır.
 # context: switch title under Marketplace; the ads Facebook puts between the things people sell in Marketplace's feed
 Hide sponsored Marketplace listings	Marketplace'teki sponsorlu ilanları gizle
+Block Instant Games ads	Instant Games reklamlarını engelle
+Games you play in Facebook get no ads. A game asking for one hears there's none to show, so rewarded ads give no reward.	Facebook'ta oynadığın oyunlar reklam almaz. Reklam isteyen bir oyuna gösterilecek reklam olmadığı söylenir, bu yüzden ödüllü reklamlar ödül vermez.
 # context: summary of that switch; a boosted listing is one its seller paid Facebook to show to more people
 Ads and boosted listings in Marketplace's feed and search results. The other listings stay.	Marketplace akışındaki ve arama sonuçlarındaki reklamlar ve öne çıkarılan ilanlar. Diğer ilanlar kalır.
 # context: switch title under News feed; hides posts whose text holds a word or phrase the person listed

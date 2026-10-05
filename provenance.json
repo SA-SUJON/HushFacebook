@@ -595,6 +595,17 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: Hold back analytics uploads, found in Facebook 577, 580 and 581 by names Facebook keeps. A check goes just before the one kickOffUpload() call, in the run() of the runnable the kept NativeXAnalyticsAppJobHandler schedules every three minutes, and the one resumeUploading(String) call, in the kept NativeXAnalyticsLowPriorityInit, and skips the call on a yes. The Papaya job's start, the most derived onStartJob along the kept FBPapayaJobService's superclasses, passes the answer of its config gate through the extension, so a held job takes Facebook's own off path."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/ads/GameAds.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/games/BlockInstantGamesAdsPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/games/GameAdAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Block Instant Games ads, an idea De-Vanced also has, written here from Facebook 577, 580 and 581. The game bridge's postMessage(String, String), kept by name for the WebView, holds the five ad message types; the hook goes first in it and, for an ad message with the switch on, rejects the game's promise through the bridge's own (String, String, String) reject method, the one calling the call that holds \"Unexpected exception while constructing JSONObject to be dispatched to Javascript: rejectPromise\", with the SDK's code for an ad it can't serve. De-Vanced drops the message instead."
     }
   ]
 }

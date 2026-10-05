@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 import app.morphe.extension.facebook.ads.AffiliateLinks;
+import app.morphe.extension.facebook.ads.GameAds;
 import app.morphe.extension.facebook.ads.MarketplaceAdFilterForTests;
 import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
@@ -316,6 +317,9 @@ public class PausedHooksTest {
                 MarketplaceAdFilterForTests::asksTheFeedToSkipAds,
                 MarketplaceAdFilterForTests::holdsBackAnAdsQuery,
                 MarketplaceAdFilterForTests::dropsASearchAd));
+        // A game's ad load is answered with no ad.
+        probes.put(PatchFamily.GAME_ADS, Collections.singletonList(
+                () -> GameAds.heldPromise("{\"type\":\"loadadasync\",\"content\":{\"promiseID\":\"1\"}}") != null));
         // A reel's product card is answered away, and so are a feed post's product footer and the
         // comment sheet's floating card.
         probes.put(PatchFamily.AFFILIATE_LINKS, Arrays.asList(
