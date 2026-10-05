@@ -201,12 +201,14 @@
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/SaveControl.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/SavedFileActions.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/SaveLeftovers.java",
-        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/Mp4Join.java"
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/Mp4Join.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/AacReencode.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/VideoTranscode.java"
       ],
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: a running save's notification with its progress and a Cancel button, the removal of the work files and pending gallery rows a save left when Android ended the process, and the MP4 writer that joins a DASH picture and its sound for the formats MediaMuxer won't write, VP9 always and AV1 before Android 14, by copying the fragments' boxes and samples into one plain MP4."
+      "changes": "Written for Hushfacebook: a running save's notification with its progress and a Cancel button, the removal of the work files and pending gallery rows a save left when Android ended the process, and the MP4 writer that joins a DASH picture and its sound for the formats MediaMuxer won't write, VP9 always and AV1 before Android 14, by copying the fragments' boxes and samples into one plain MP4, and the conversions that turn a save's xHE-AAC sound into AAC-LC and its VP9, AV1 or H.265 picture into H.264 for the apps that take only those."
     },
     {
       "paths": [
