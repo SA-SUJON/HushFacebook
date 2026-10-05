@@ -84,7 +84,7 @@ public class Settings extends BaseSettings {
 
     /**
      * The row of stories at the top of the feed. The feed's adapter list builds it as an adapter of
-     * its own, and the patch has both tray adapters return nothing while this is on.
+     * its own, and the patch has both tray adapters count no rows while this is on.
      */
     public static final BooleanSetting HIDE_TOP_STORIES_TRAY =
             new StoriesSetting(StoriesSetting.TOP_KEY);

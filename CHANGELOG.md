@@ -27,6 +27,7 @@ Source preparation. The latest published bundle remains v0.7.1.
 
 ### Changed
 
+* **Facebook:** Hide the Stories tray no longer waits for Facebook to restart. Turn it on or off and the tray goes or comes back the next time you pull the feed down to refresh. Facebook now builds the tray while it's hidden so it can come back without a restart.
 * **Facebook:** Hushfacebook now builds on Morphe patcher 1.15.1, so it needs Morphe Manager 1.34.0 or newer. Manager 1.33.0 carries patcher 1.15.0 and asks for an update before it'll load the bundle.
 * **Facebook:** Checked on a phone with 581: the reel Download button, its quality choices and the save notification's Cancel all have spoken labels for TalkBack, at normal and double font size. With Check for new Hushfacebook releases on, the daily check runs as Facebook starts.
 * **Tooling:** The fixture checks run on desktop CLI 1.18.1, which carries patcher 1.15.1. The patcher's new ARSCLib commit is pinned in the dependency verification metadata.

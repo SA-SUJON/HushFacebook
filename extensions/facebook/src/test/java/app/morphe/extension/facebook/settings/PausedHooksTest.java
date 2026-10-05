@@ -225,10 +225,10 @@ public class PausedHooksTest {
                 () -> FeedGuardForTests.hides(Category.ORGANIC, FeedGuardForTests.storiesRow(true)),
                 // Your own profile's People you may know carousel builds nothing.
                 ProfileSuggestionsForTests::hidesTheCarousel));
-        // Each of the feed's two Stories tray adapters returns nothing.
+        // Each of the feed's two Stories tray adapters, new to the hook, counts no rows.
         probes.put(PatchFamily.STORIES_TRAY, Arrays.asList(
-                () -> FeedFilter.hideStoriesTray(FeedFilter.LEGACY_TRAY),
-                () -> FeedFilter.hideStoriesTray(FeedFilter.UNIFIED_TRAY)));
+                () -> FeedFilter.storiesTrayCount(new Object(), FeedFilter.LEGACY_TRAY, 1) == 0,
+                () -> FeedFilter.storiesTrayCount(new Object(), FeedFilter.UNIFIED_TRAY, 1) == 0));
         // A row of reels between posts, by its category and by its showcase story type, and the
         // Reels row the pre-EOF injector builds without passing the edge guard.
         probes.put(PatchFamily.FEED_REELS, Arrays.asList(

@@ -99,6 +99,8 @@ public final class L10nTranslations {
                 "%1$s. Diese wurden beim Patchen festgelegt, deshalb kann die Pause sie nicht ausschalten. Um eines davon auszuschlie\u00dfen, patche erneut und lass den Patch weg, der in Klammern dahinter steht.");
         table.put("A change here applies after Facebook restarts.",
                 "Eine \u00c4nderung hier gilt erst nach einem Neustart von Facebook.");
+        table.put("A change shows the next time you pull down to refresh.",
+                "Eine \u00c4nderung zeigt sich, wenn du das n\u00e4chste Mal zum Aktualisieren nach unten ziehst.");
         table.put("A diagnostic report is already being saved.",
                 "Ein Diagnosebericht wird bereits gespeichert.");
         table.put("A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like button work as before.",
@@ -177,11 +179,11 @@ public final class L10nTranslations {
                 "Die Android-Einstellungen f\u00fcr diese App lie\u00dfen sich nicht \u00f6ffnen. \u00d6ffne die App-Info \u00fcber das Facebook-Symbol, dann \u201eStandardm\u00e4\u00dfig \u00f6ffnen\u201c.");
         table.put("App to send to",
                 "Ziel-App");
-        table.put("Appearance",
-                "Darstellung");
     }
 
     private static void fillDe1(Map<String, String> table) {
+        table.put("Appearance",
+                "Darstellung");
         table.put("Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.",
                 "Die Ganzwortsuche gilt f\u00fcr beide Listen. Zum Beispiel findet hat auch hat!, aber nicht what oder hats.");
         table.put("Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.",
@@ -300,11 +302,11 @@ public final class L10nTranslations {
                 "Diese Datei lie\u00df sich nicht \u00f6ffnen. Es wurde nichts ge\u00e4ndert.");
         table.put("Couldn't open that file. Your font didn't change.",
                 "Diese Datei lie\u00df sich nicht \u00f6ffnen. Deine Schriftart wurde nicht ge\u00e4ndert.");
-        table.put("Couldn't open the file picker. Try again.",
-                "Die Dateiauswahl lie\u00df sich nicht \u00f6ffnen. Versuche es noch einmal.");
     }
 
     private static void fillDe2(Map<String, String> table) {
+        table.put("Couldn't open the file picker. Try again.",
+                "Die Dateiauswahl lie\u00df sich nicht \u00f6ffnen. Versuche es noch einmal.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "Die Diagnosedaten lie\u00dfen sich nicht wiederherstellen. Versuche es noch einmal.");
         table.put("Couldn't reach GitHub. Try again later.",
@@ -423,11 +425,11 @@ public final class L10nTranslations {
                 "Dateiname");
         table.put("File name set to %1$s.",
                 "Dateiname auf %1$s gesetzt.");
-        table.put("Folder name",
-                "Ordnername");
     }
 
     private static void fillDe3(Map<String, String> table) {
+        table.put("Folder name",
+                "Ordnername");
         table.put("Folder set to %1$s.",
                 "Ordner auf %1$s gesetzt.");
         table.put("Font file",
@@ -546,11 +548,11 @@ public final class L10nTranslations {
                 "Fortschritt beim Speichern eines Fotos oder Videos, mit einem Button zum Abbrechen");
         table.put("How to block Reels",
                 "So blockierst du Reels");
-        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
-                "Hushfacebook %1$s ist erschienen. Aktualisiere es im Morphe Manager.");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
+                "Hushfacebook %1$s ist erschienen. Aktualisiere es im Morphe Manager.");
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Hushfacebook %1$s auf Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -669,11 +671,11 @@ public final class L10nTranslations {
                 "Neueste");
         table.put("News feed",
                 "Newsfeed");
-        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
-                "Keine Frage \u201eInteressiert dich dieses Reel?\u201c bei Reels. Das Reel l\u00e4uft wie gewohnt.");
     }
 
     private static void fillDe5(Map<String, String> table) {
+        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
+                "Keine Frage \u201eInteressiert dich dieses Reel?\u201c bei Reels. Das Reel l\u00e4uft wie gewohnt.");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Keine App auf diesem Handy kann den Link \u00f6ffnen. Die Adresse ist %1$s.");
         table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
@@ -792,11 +794,11 @@ public final class L10nTranslations {
                 "Soziale Benachrichtigungen stummschalten");
         table.put("Re-signed build fix",
                 "Fix f\u00fcr neu signierte Builds");
-        table.put("Reading the settings file",
-                "Einstellungsdatei wird gelesen");
     }
 
     private static void fillDe6(Map<String, String> table) {
+        table.put("Reading the settings file",
+                "Einstellungsdatei wird gelesen");
         table.put("Record patch activity and show errors for a bug report. Leave off during normal use.",
                 "Zeichnet Patch-Aktivit\u00e4t auf und zeigt Fehler f\u00fcr einen Fehlerbericht. Im Alltag ausgeschaltet lassen.");
         table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
@@ -915,11 +917,11 @@ public final class L10nTranslations {
                 "Links von Hand ausw\u00e4hlen");
         table.put("Send the link to",
                 "Link senden an");
-        table.put("Send the link to an app",
-                "Link an eine App senden");
     }
 
     private static void fillDe7(Map<String, String> table) {
+        table.put("Send the link to an app",
+                "Link an eine App senden");
         table.put("Send to app",
                 "An App senden");
         table.put("Set when you patched",
@@ -1038,11 +1040,11 @@ public final class L10nTranslations {
                 "Die Karten neben \u201eStory erstellen\u201c, die dir eine Story zum Erstellen vorschlagen, etwa Musik zu teilen, die du magst. Gilt beim n\u00e4chsten Laden der Leiste.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
                 "Der Kommentar, den Facebook unter einem Reel als Vorschau zeigt, und die Blasen der Freunde, die reagiert haben. \u00d6ffne die Kommentare, um alle zu sehen.");
-        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
-                "Der Diagnosebericht lie\u00df sich noch nicht speichern. Versuche es gleich noch einmal.");
     }
 
     private static void fillDe8(Map<String, String> table) {
+        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
+                "Der Diagnosebericht lie\u00df sich noch nicht speichern. Versuche es gleich noch einmal.");
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Der Diagnosebericht lie\u00df sich nicht speichern. Versuche es noch einmal.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -1077,8 +1079,6 @@ public final class L10nTranslations {
                 "Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zur\u00fcck, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.");
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "Der Streifen bei manchen Beitr\u00e4gen, etwa \u201eInteressiert dich dieser Beitrag?\u201c, \u201eWeniger anzeigen\u201c oder wer vor Kurzem kommentiert hat, und die Vorschl\u00e4ge zum Folgen und Chatten an derselben Stelle. Der Beitrag bleibt.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "Der Schalter wirkt, sobald Facebook neu startet.");
         table.put("The word lists in that file are longer than the two lists have room for. Nothing was changed.",
                 "Die Wortlisten in dieser Datei brauchen mehr Platz, als die beiden Listen haben. Es wurde nichts ge\u00e4ndert.");
         table.put("There's no app here that can open or share this saved file.",
@@ -1304,6 +1304,8 @@ public final class L10nTranslations {
                 "%1$s. Estos cambios se aplicaron al parchear, as\u00ed que Pausar no puede desactivarlos. Para descartar uno, vuelve a parchear sin el parche que aparece entre par\u00e9ntesis despu\u00e9s de \u00e9l.");
         table.put("A change here applies after Facebook restarts.",
                 "Un cambio de aqu\u00ed se aplica cuando Facebook se reinicie.");
+        table.put("A change shows the next time you pull down to refresh.",
+                "El cambio se ve la pr\u00f3xima vez que deslices hacia abajo para actualizar.");
         table.put("A diagnostic report is already being saved.",
                 "Ya se est\u00e1 guardando un informe de diagn\u00f3stico.");
         table.put("A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like button work as before.",
@@ -1382,11 +1384,11 @@ public final class L10nTranslations {
                 "No se abrieron los ajustes de Android para esta app. Abre Informaci\u00f3n de la app desde el icono de Facebook y luego Abrir de forma predeterminada.");
         table.put("App to send to",
                 "App de destino");
-        table.put("Appearance",
-                "Apariencia");
     }
 
     private static void fillEs1(Map<String, String> table) {
+        table.put("Appearance",
+                "Apariencia");
         table.put("Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.",
                 "Aplica la coincidencia de palabras completas a ambas listas. Por ejemplo, hat coincide con hat!, pero no con what ni hats.");
         table.put("Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.",
@@ -1505,11 +1507,11 @@ public final class L10nTranslations {
                 "No se pudo abrir ese archivo. No se cambi\u00f3 nada.");
         table.put("Couldn't open that file. Your font didn't change.",
                 "No se pudo abrir ese archivo. Tu fuente no cambi\u00f3.");
-        table.put("Couldn't open the file picker. Try again.",
-                "No se pudo abrir el selector de archivos. Int\u00e9ntalo de nuevo.");
     }
 
     private static void fillEs2(Map<String, String> table) {
+        table.put("Couldn't open the file picker. Try again.",
+                "No se pudo abrir el selector de archivos. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "No se pudieron restaurar los datos de diagn\u00f3stico. Int\u00e9ntalo de nuevo.");
         table.put("Couldn't reach GitHub. Try again later.",
@@ -1628,11 +1630,11 @@ public final class L10nTranslations {
                 "Nombre de archivo");
         table.put("File name set to %1$s.",
                 "Nombre de archivo establecido en %1$s.");
-        table.put("Folder name",
-                "Nombre de carpeta");
     }
 
     private static void fillEs3(Map<String, String> table) {
+        table.put("Folder name",
+                "Nombre de carpeta");
         table.put("Folder set to %1$s.",
                 "Carpeta establecida en %1$s.");
         table.put("Font file",
@@ -1751,11 +1753,11 @@ public final class L10nTranslations {
                 "El progreso de la foto o el video que est\u00e1s guardando, con un bot\u00f3n para cancelar");
         table.put("How to block Reels",
                 "C\u00f3mo bloquear los reels");
-        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
-                "Ya sali\u00f3 Hushfacebook %1$s. Actual\u00edzalo en Morphe Manager.");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
+                "Ya sali\u00f3 Hushfacebook %1$s. Actual\u00edzalo en Morphe Manager.");
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Hushfacebook %1$s en Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -1874,11 +1876,11 @@ public final class L10nTranslations {
                 "M\u00e1s recientes");
         table.put("News feed",
                 "Feed");
-        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
-                "Sin la pregunta \u201c\u00bfTe interesa este reel?\u201d en los reels. El reel se reproduce como siempre.");
     }
 
     private static void fillEs5(Map<String, String> table) {
+        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
+                "Sin la pregunta \u201c\u00bfTe interesa este reel?\u201d en los reels. El reel se reproduce como siempre.");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Ninguna app de este tel\u00e9fono puede abrir el enlace. La direcci\u00f3n es %1$s.");
         table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
@@ -1997,11 +1999,11 @@ public final class L10nTranslations {
                 "Silenciar notificaciones sociales");
         table.put("Re-signed build fix",
                 "Arreglo para la nueva firma");
-        table.put("Reading the settings file",
-                "Leyendo el archivo de configuraci\u00f3n");
     }
 
     private static void fillEs6(Map<String, String> table) {
+        table.put("Reading the settings file",
+                "Leyendo el archivo de configuraci\u00f3n");
         table.put("Record patch activity and show errors for a bug report. Leave off during normal use.",
                 "Registra la actividad de los parches y muestra errores para un informe. D\u00e9jalo desactivado en el uso normal.");
         table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
@@ -2120,11 +2122,11 @@ public final class L10nTranslations {
                 "Seleccionar enlaces a mano");
         table.put("Send the link to",
                 "Enviar el enlace a");
-        table.put("Send the link to an app",
-                "Enviar el enlace a una app");
     }
 
     private static void fillEs7(Map<String, String> table) {
+        table.put("Send the link to an app",
+                "Enviar el enlace a una app");
         table.put("Send to app",
                 "Enviar a una app");
         table.put("Set when you patched",
@@ -2243,11 +2245,11 @@ public final class L10nTranslations {
                 "Las tarjetas junto a Crear historia que te proponen una historia, como compartir m\u00fasica que te gusta. Se aplica cuando Facebook vuelve a cargar la bandeja.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
                 "El comentario que Facebook muestra como vista previa debajo de un reel y las burbujas de los amigos que reaccionaron. Abre los comentarios para verlos todos.");
-        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
-                "Todav\u00eda no se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo en un momento.");
     }
 
     private static void fillEs8(Map<String, String> table) {
+        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
+                "Todav\u00eda no se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo en un momento.");
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "No se pudo guardar el informe de diagn\u00f3stico. Int\u00e9ntalo de nuevo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -2282,8 +2284,6 @@ public final class L10nTranslations {
                 "El archivo de configuraci\u00f3n se guard\u00f3, pero al volver a leerlo no coincide con lo que se escribi\u00f3. Gu\u00e1rdalo de nuevo como un archivo nuevo.");
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "La franja en algunas publicaciones, como \u201c\u00bfTe interesa esta publicaci\u00f3n?\u201d, \u201cMostrar menos\u201d o qui\u00e9n coment\u00f3 hace poco, y las sugerencias para seguir o chatear en el mismo lugar. La publicaci\u00f3n se queda.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "El interruptor surte efecto cuando Facebook se reinicie.");
         table.put("The word lists in that file are longer than the two lists have room for. Nothing was changed.",
                 "Las listas de palabras de ese archivo ocupan m\u00e1s espacio del que tienen las dos listas. No se cambi\u00f3 nada.");
         table.put("There's no app here that can open or share this saved file.",
@@ -2509,6 +2509,8 @@ public final class L10nTranslations {
                 "%1$s. Ini diatur saat Anda menambal, jadi Jeda tidak dapat mematikannya. Untuk memastikan bukan ini penyebabnya, tambal ulang tanpa tambalan yang tertera dalam kurung setelahnya.");
         table.put("A change here applies after Facebook restarts.",
                 "Perubahan di sini berlaku setelah Facebook dimulai ulang.");
+        table.put("A change shows the next time you pull down to refresh.",
+                "Perubahan terlihat saat berikutnya Anda menarik ke bawah untuk memuat ulang.");
         table.put("A diagnostic report is already being saved.",
                 "Sudah ada laporan diagnostik yang sedang disimpan.");
         table.put("A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like button work as before.",
@@ -2587,11 +2589,11 @@ public final class L10nTranslations {
                 "Pengaturan Android untuk aplikasi ini tidak terbuka. Buka Info aplikasi dari ikon Facebook, lalu Buka secara default.");
         table.put("App to send to",
                 "Aplikasi tujuan");
-        table.put("Appearance",
-                "Tampilan");
     }
 
     private static void fillIn1(Map<String, String> table) {
+        table.put("Appearance",
+                "Tampilan");
         table.put("Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.",
                 "Gunakan pencocokan kata utuh untuk kedua daftar. Misalnya, hat cocok dengan hat!, tetapi tidak dengan what atau hats.");
         table.put("Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.",
@@ -2710,11 +2712,11 @@ public final class L10nTranslations {
                 "File itu tidak dapat dibuka. Tidak ada yang diubah.");
         table.put("Couldn't open that file. Your font didn't change.",
                 "File itu tidak dapat dibuka. Font Anda tidak berubah.");
-        table.put("Couldn't open the file picker. Try again.",
-                "Pemilih file tidak dapat dibuka. Coba lagi.");
     }
 
     private static void fillIn2(Map<String, String> table) {
+        table.put("Couldn't open the file picker. Try again.",
+                "Pemilih file tidak dapat dibuka. Coba lagi.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "Data diagnostik tidak dapat dikembalikan. Coba lagi.");
         table.put("Couldn't reach GitHub. Try again later.",
@@ -2833,11 +2835,11 @@ public final class L10nTranslations {
                 "Nama file");
         table.put("File name set to %1$s.",
                 "Nama file diatur menjadi %1$s.");
-        table.put("Folder name",
-                "Nama folder");
     }
 
     private static void fillIn3(Map<String, String> table) {
+        table.put("Folder name",
+                "Nama folder");
         table.put("Folder set to %1$s.",
                 "Folder diatur menjadi %1$s.");
         table.put("Font file",
@@ -2956,11 +2958,11 @@ public final class L10nTranslations {
                 "Progres foto atau video yang sedang Anda simpan, dengan tombol untuk membatalkannya");
         table.put("How to block Reels",
                 "Cara memblokir Reels");
-        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
-                "Hushfacebook %1$s sudah dirilis. Perbarui di Morphe Manager.");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
+                "Hushfacebook %1$s sudah dirilis. Perbarui di Morphe Manager.");
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Hushfacebook %1$s di Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -3079,11 +3081,11 @@ public final class L10nTranslations {
                 "Terbaru");
         table.put("News feed",
                 "Kabar Beranda");
-        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
-                "Tanpa pertanyaan \u201cApakah Anda tertarik dengan reel ini?\u201d di reel. Reel diputar seperti biasa.");
     }
 
     private static void fillIn5(Map<String, String> table) {
+        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
+                "Tanpa pertanyaan \u201cApakah Anda tertarik dengan reel ini?\u201d di reel. Reel diputar seperti biasa.");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Tidak ada aplikasi di ponsel ini yang dapat membuka tautan ini. Alamatnya %1$s.");
         table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
@@ -3202,11 +3204,11 @@ public final class L10nTranslations {
                 "Senyapkan notifikasi sosial");
         table.put("Re-signed build fix",
                 "Perbaikan build yang ditandatangani ulang");
-        table.put("Reading the settings file",
-                "Membaca file pengaturan");
     }
 
     private static void fillIn6(Map<String, String> table) {
+        table.put("Reading the settings file",
+                "Membaca file pengaturan");
         table.put("Record patch activity and show errors for a bug report. Leave off during normal use.",
                 "Catat aktivitas patch dan tampilkan kesalahan untuk laporan bug. Matikan saat penggunaan biasa.");
         table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
@@ -3325,11 +3327,11 @@ public final class L10nTranslations {
                 "Memilih tautan secara manual");
         table.put("Send the link to",
                 "Kirim tautan ke");
-        table.put("Send the link to an app",
-                "Kirim tautan ke aplikasi");
     }
 
     private static void fillIn7(Map<String, String> table) {
+        table.put("Send the link to an app",
+                "Kirim tautan ke aplikasi");
         table.put("Send to app",
                 "Kirim ke aplikasi");
         table.put("Set when you patched",
@@ -3448,11 +3450,11 @@ public final class L10nTranslations {
                 "Kartu di samping Buat cerita yang menyarankan cerita untuk dibuat, seperti berbagi musik yang Anda suka. Berlaku saat Facebook memuat ulang baki.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
                 "Komentar yang ditampilkan Facebook sebagai pratinjau di bawah reel, dan gelembung teman yang memberi reaksi. Buka komentar untuk melihat semuanya.");
-        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
-                "Laporan diagnostik belum dapat disimpan. Coba lagi dalam beberapa saat.");
     }
 
     private static void fillIn8(Map<String, String> table) {
+        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
+                "Laporan diagnostik belum dapat disimpan. Coba lagi dalam beberapa saat.");
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Laporan diagnostik tidak dapat disimpan. Coba lagi.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -3487,8 +3489,6 @@ public final class L10nTranslations {
                 "File pengaturan sudah disimpan, tetapi isinya saat dibaca kembali tidak sama dengan yang ditulis. Simpan lagi sebagai file baru.");
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "Strip pada beberapa postingan, seperti \u201cApakah Anda tertarik dengan postingan ini?\u201d, \u201cTampilkan lebih sedikit\u201d atau siapa yang baru saja berkomentar, serta saran untuk mengikuti dan mengobrol di tempat yang sama. Postingannya tetap ada.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "Sakelar ini berlaku saat Facebook dimulai ulang.");
         table.put("The word lists in that file are longer than the two lists have room for. Nothing was changed.",
                 "Daftar kata dalam file itu lebih panjang daripada ruang yang dimiliki kedua daftar. Tidak ada yang diubah.");
         table.put("There's no app here that can open or share this saved file.",
@@ -3714,6 +3714,8 @@ public final class L10nTranslations {
                 "%1$s. Esses itens foram definidos quando voc\u00ea aplicou os patches, ent\u00e3o a pausa n\u00e3o pode desativ\u00e1-los. Para descartar um deles, aplique os patches novamente sem o patch entre par\u00eanteses depois dele.");
         table.put("A change here applies after Facebook restarts.",
                 "Uma altera\u00e7\u00e3o daqui vale depois que o Facebook reiniciar.");
+        table.put("A change shows the next time you pull down to refresh.",
+                "A mudan\u00e7a aparece na pr\u00f3xima vez que voc\u00ea puxar para baixo para atualizar.");
         table.put("A diagnostic report is already being saved.",
                 "Um relat\u00f3rio de diagn\u00f3stico j\u00e1 est\u00e1 sendo salvo.");
         table.put("A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like button work as before.",
@@ -3792,11 +3794,11 @@ public final class L10nTranslations {
                 "As configura\u00e7\u00f5es do Android para este app n\u00e3o abriram. Abra Informa\u00e7\u00f5es do app pelo \u00edcone do Facebook e depois Abrir por padr\u00e3o.");
         table.put("App to send to",
                 "App de destino");
-        table.put("Appearance",
-                "Apar\u00eancia");
     }
 
     private static void fillPt_rBR1(Map<String, String> table) {
+        table.put("Appearance",
+                "Apar\u00eancia");
         table.put("Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.",
                 "A correspond\u00eancia de palavras inteiras vale para as duas listas. Por exemplo, hat corresponde a hat!, mas n\u00e3o a what ou hats.");
         table.put("Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.",
@@ -3915,11 +3917,11 @@ public final class L10nTranslations {
                 "N\u00e3o foi poss\u00edvel abrir esse arquivo. Nada foi alterado.");
         table.put("Couldn't open that file. Your font didn't change.",
                 "N\u00e3o foi poss\u00edvel abrir esse arquivo. Sua fonte n\u00e3o mudou.");
-        table.put("Couldn't open the file picker. Try again.",
-                "N\u00e3o foi poss\u00edvel abrir o seletor de arquivos. Tente de novo.");
     }
 
     private static void fillPt_rBR2(Map<String, String> table) {
+        table.put("Couldn't open the file picker. Try again.",
+                "N\u00e3o foi poss\u00edvel abrir o seletor de arquivos. Tente de novo.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "N\u00e3o foi poss\u00edvel restaurar os dados de diagn\u00f3stico. Tente de novo.");
         table.put("Couldn't reach GitHub. Try again later.",
@@ -4038,11 +4040,11 @@ public final class L10nTranslations {
                 "Nome do arquivo");
         table.put("File name set to %1$s.",
                 "Nome do arquivo definido como %1$s.");
-        table.put("Folder name",
-                "Nome da pasta");
     }
 
     private static void fillPt_rBR3(Map<String, String> table) {
+        table.put("Folder name",
+                "Nome da pasta");
         table.put("Folder set to %1$s.",
                 "Pasta definida como %1$s.");
         table.put("Font file",
@@ -4161,11 +4163,11 @@ public final class L10nTranslations {
                 "Indica o progresso do salvamento de uma foto ou v\u00eddeo, com um bot\u00e3o para cancel\u00e1-lo");
         table.put("How to block Reels",
                 "Como bloquear os Reels");
-        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
-                "O Hushfacebook %1$s est\u00e1 dispon\u00edvel. Atualize-o pelo Morphe Manager.");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
+                "O Hushfacebook %1$s est\u00e1 dispon\u00edvel. Atualize-o pelo Morphe Manager.");
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Hushfacebook %1$s no Facebook %2$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -4284,11 +4286,11 @@ public final class L10nTranslations {
                 "Mais recentes");
         table.put("News feed",
                 "Feed de not\u00edcias");
-        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
-                "Sem a pergunta \u201cVoc\u00ea tem interesse neste reel?\u201d nos reels. O reel toca como sempre.");
     }
 
     private static void fillPt_rBR5(Map<String, String> table) {
+        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
+                "Sem a pergunta \u201cVoc\u00ea tem interesse neste reel?\u201d nos reels. O reel toca como sempre.");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Nenhum aplicativo neste dispositivo consegue abrir o link. O endere\u00e7o \u00e9 %1$s.");
         table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
@@ -4407,11 +4409,11 @@ public final class L10nTranslations {
                 "Silenciar notifica\u00e7\u00f5es sociais");
         table.put("Re-signed build fix",
                 "Corre\u00e7\u00e3o para vers\u00e3o com nova assinatura");
-        table.put("Reading the settings file",
-                "Lendo o arquivo de configura\u00e7\u00f5es");
     }
 
     private static void fillPt_rBR6(Map<String, String> table) {
+        table.put("Reading the settings file",
+                "Lendo o arquivo de configura\u00e7\u00f5es");
         table.put("Record patch activity and show errors for a bug report. Leave off during normal use.",
                 "Registra a atividade dos patches e mostra os erros para um relat\u00f3rio de problema. Mantenha desativado durante o uso normal.");
         table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
@@ -4530,11 +4532,11 @@ public final class L10nTranslations {
                 "Selecionar links manualmente");
         table.put("Send the link to",
                 "Enviar o link para");
-        table.put("Send the link to an app",
-                "Enviar o link para um app");
     }
 
     private static void fillPt_rBR7(Map<String, String> table) {
+        table.put("Send the link to an app",
+                "Enviar o link para um app");
         table.put("Send to app",
                 "Enviar para app");
         table.put("Set when you patched",
@@ -4653,11 +4655,11 @@ public final class L10nTranslations {
                 "Os cart\u00f5es ao lado de Criar story que sugerem um story para fazer, como compartilhar m\u00fasicas que voc\u00ea ama. A altera\u00e7\u00e3o ser\u00e1 aplicada na pr\u00f3xima vez que o Facebook carregar a bandeja.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
                 "O coment\u00e1rio que o Facebook mostra como pr\u00e9via abaixo de um Reel e as bolhas dos amigos que reagiram. Abra os coment\u00e1rios para ver todos.");
-        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
-                "O relat\u00f3rio de diagn\u00f3stico ainda n\u00e3o p\u00f4de ser salvo. Tente de novo em instantes.");
     }
 
     private static void fillPt_rBR8(Map<String, String> table) {
+        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
+                "O relat\u00f3rio de diagn\u00f3stico ainda n\u00e3o p\u00f4de ser salvo. Tente de novo em instantes.");
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "N\u00e3o foi poss\u00edvel salvar o relat\u00f3rio de diagn\u00f3stico. Tente de novo.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -4692,8 +4694,6 @@ public final class L10nTranslations {
                 "O arquivo de configura\u00e7\u00f5es foi salvo, mas ao ser lido de volta n\u00e3o corresponde ao que foi gravado. Salve de novo como um arquivo novo.");
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "A faixa em algumas publica\u00e7\u00f5es, como \u201cVoc\u00ea tem interesse nesta publica\u00e7\u00e3o?\u201d, \u201cMostrar menos\u201d ou quem comentou h\u00e1 pouco, e as sugest\u00f5es para seguir e conversar no mesmo lugar. A publica\u00e7\u00e3o fica.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "A op\u00e7\u00e3o entra em vigor quando o Facebook for reiniciado.");
         table.put("The word lists in that file are longer than the two lists have room for. Nothing was changed.",
                 "As listas de palavras desse arquivo ocupam mais espa\u00e7o do que as duas listas t\u00eam. Nada foi alterado.");
         table.put("There's no app here that can open or share this saved file.",
@@ -4919,6 +4919,8 @@ public final class L10nTranslations {
                 "%1$s. Yamalad\u0131\u011f\u0131nda ayarland\u0131klar\u0131 i\u00e7in Duraklatma bunlar\u0131 kapatamaz. Birini elemek i\u00e7in yeniden yamala ve onun ard\u0131ndan parantez i\u00e7inde yazan yamay\u0131 d\u0131\u015far\u0131da b\u0131rak.");
         table.put("A change here applies after Facebook restarts.",
                 "Buradaki bir de\u011fi\u015fiklik Facebook yeniden ba\u015flad\u0131ktan sonra ge\u00e7erli olur.");
+        table.put("A change shows the next time you pull down to refresh.",
+                "De\u011fi\u015fiklik, bir dahaki sefere a\u015fa\u011f\u0131 \u00e7ekip yeniledi\u011finizde g\u00f6r\u00fcn\u00fcr.");
         table.put("A diagnostic report is already being saved.",
                 "Bir tan\u0131lama raporu zaten kaydediliyor.");
         table.put("A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like button work as before.",
@@ -4997,11 +4999,11 @@ public final class L10nTranslations {
                 "Bu uygulaman\u0131n Android ayarlar\u0131 a\u00e7\u0131lamad\u0131. Facebook simgesinden Uygulama bilgileri'ni, ard\u0131ndan Varsay\u0131lan olarak a\u00e7'\u0131 a\u00e7\u0131n.");
         table.put("App to send to",
                 "G\u00f6nderilecek uygulama");
-        table.put("Appearance",
-                "G\u00f6r\u00fcn\u00fcm");
     }
 
     private static void fillTr1(Map<String, String> table) {
+        table.put("Appearance",
+                "G\u00f6r\u00fcn\u00fcm");
         table.put("Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.",
                 "Her iki listede de tam s\u00f6zc\u00fckleri e\u015fle\u015ftirir. \u00d6rne\u011fin, hat s\u00f6zc\u00fc\u011f\u00fc hat! ile e\u015fle\u015fir, what veya hats ile e\u015fle\u015fmez.");
         table.put("Ask GitHub once a day at startup and show newer releases on the overview. Off by default. Nothing is downloaded.",
@@ -5120,11 +5122,11 @@ public final class L10nTranslations {
                 "Bu dosya a\u00e7\u0131lamad\u0131. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("Couldn't open that file. Your font didn't change.",
                 "Bu dosya a\u00e7\u0131lamad\u0131. Yaz\u0131 tipin de\u011fi\u015fmedi.");
-        table.put("Couldn't open the file picker. Try again.",
-                "Dosya se\u00e7ici a\u00e7\u0131lamad\u0131. Tekrar dene.");
     }
 
     private static void fillTr2(Map<String, String> table) {
+        table.put("Couldn't open the file picker. Try again.",
+                "Dosya se\u00e7ici a\u00e7\u0131lamad\u0131. Tekrar dene.");
         table.put("Couldn't put back the diagnostic data. Try again.",
                 "Tan\u0131lama verileri geri getirilemedi. Tekrar dene.");
         table.put("Couldn't reach GitHub. Try again later.",
@@ -5243,11 +5245,11 @@ public final class L10nTranslations {
                 "Dosya ad\u0131");
         table.put("File name set to %1$s.",
                 "Dosya ad\u0131 %1$s olarak ayarland\u0131.");
-        table.put("Folder name",
-                "Klas\u00f6r ad\u0131");
     }
 
     private static void fillTr3(Map<String, String> table) {
+        table.put("Folder name",
+                "Klas\u00f6r ad\u0131");
         table.put("Folder set to %1$s.",
                 "Klas\u00f6r %1$s olarak ayarland\u0131.");
         table.put("Font file",
@@ -5366,11 +5368,11 @@ public final class L10nTranslations {
                 "Kaydetti\u011fin foto\u011fraf veya videonun ilerleme durumu ve iptal etmek i\u00e7in bir d\u00fc\u011fme");
         table.put("How to block Reels",
                 "Reels nas\u0131l engellenir");
-        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
-                "Hushfacebook %1$s \u00e7\u0131kt\u0131. Morphe Manager'da g\u00fcncelle.");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("Hushfacebook %1$s is out. Update it in Morphe Manager.",
+                "Hushfacebook %1$s \u00e7\u0131kt\u0131. Morphe Manager'da g\u00fcncelle.");
         table.put("Hushfacebook %1$s on Facebook %2$s",
                 "Facebook %2$s \u00fczerinde Hushfacebook %1$s");
         table.put("Hushfacebook %1$s targets Facebook %2$s.",
@@ -5489,11 +5491,11 @@ public final class L10nTranslations {
                 "En yeni");
         table.put("News feed",
                 "Ak\u0131\u015f");
-        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
-                "Reels'te \u201cBu reel ile ilgileniyor musun?\u201d sorusu \u00e7\u0131kmaz. Reel her zamanki gibi oynar.");
     }
 
     private static void fillTr5(Map<String, String> table) {
+        table.put("No \"Are you interested in this reel?\" prompt on reels. The reel plays as usual.",
+                "Reels'te \u201cBu reel ile ilgileniyor musun?\u201d sorusu \u00e7\u0131kmaz. Reel her zamanki gibi oynar.");
         table.put("No app on this phone can open the link. The address is %1$s.",
                 "Bu telefondaki hi\u00e7bir uygulama ba\u011flant\u0131y\u0131 a\u00e7am\u0131yor. Adres: %1$s.");
         table.put("No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.",
@@ -5612,11 +5614,11 @@ public final class L10nTranslations {
                 "Sosyal bildirimleri sustur");
         table.put("Re-signed build fix",
                 "Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
-        table.put("Reading the settings file",
-                "Ayar dosyas\u0131 okunuyor");
     }
 
     private static void fillTr6(Map<String, String> table) {
+        table.put("Reading the settings file",
+                "Ayar dosyas\u0131 okunuyor");
         table.put("Record patch activity and show errors for a bug report. Leave off during normal use.",
                 "Hata raporu i\u00e7in yama etkinli\u011fini kaydeder ve hatalar\u0131 g\u00f6sterir. Normal kullan\u0131mda kapal\u0131 b\u0131rak\u0131n.");
         table.put("Reduce background feed loading while Marketplace mode is active. Some loading can still happen during startup.",
@@ -5735,11 +5737,11 @@ public final class L10nTranslations {
                 "Ba\u011flant\u0131lar\u0131 elle se\u00e7me");
         table.put("Send the link to",
                 "Ba\u011flant\u0131y\u0131 g\u00f6nder:");
-        table.put("Send the link to an app",
-                "Ba\u011flant\u0131y\u0131 bir uygulamaya g\u00f6nder");
     }
 
     private static void fillTr7(Map<String, String> table) {
+        table.put("Send the link to an app",
+                "Ba\u011flant\u0131y\u0131 bir uygulamaya g\u00f6nder");
         table.put("Send to app",
                 "Uygulamaya g\u00f6nder");
         table.put("Set when you patched",
@@ -5858,11 +5860,11 @@ public final class L10nTranslations {
                 "Hikaye olu\u015ftur'un yan\u0131nda sana bir hikaye \u00f6neren kartlar, \u00f6rne\u011fin sevdi\u011fin m\u00fczi\u011fi payla\u015fma kart\u0131. Facebook tepsiyi yeniden y\u00fckledi\u011finde uygulan\u0131r.");
         table.put("The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.",
                 "Facebook'un bir Reels videosunun alt\u0131nda \u00f6nizleme olarak g\u00f6sterdi\u011fi yorum ve tepki veren arkada\u015flar\u0131n\u0131n baloncuklar\u0131. Hepsini g\u00f6rmek i\u00e7in yorumlar\u0131 a\u00e7.");
-        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
-                "Tan\u0131lama raporu hen\u00fcz kaydedilemedi. Birazdan tekrar dene.");
     }
 
     private static void fillTr8(Map<String, String> table) {
+        table.put("The diagnostic report couldn't be saved yet. Try again in a moment.",
+                "Tan\u0131lama raporu hen\u00fcz kaydedilemedi. Birazdan tekrar dene.");
         table.put("The diagnostic report couldn't be saved. Try again.",
                 "Tan\u0131lama raporu kaydedilemedi. Tekrar dene.");
         table.put("The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back on.",
@@ -5897,8 +5899,6 @@ public final class L10nTranslations {
                 "Ayar dosyas\u0131 kaydedildi, ancak geri okundu\u011funda yaz\u0131lanla ayn\u0131 de\u011fil. Yeni bir dosya olarak tekrar kaydet.");
         table.put("The strip on some posts, like \"Are you interested in this post?\", \"Show less\" or who recently commented, and the follow and chat suggestions in the same place. The post stays.",
                 "Baz\u0131 g\u00f6nderilerdeki \u015ferit, \u00f6rne\u011fin \u201cBu g\u00f6nderiyle ilgileniyor musun?\u201d, \u201cDaha az g\u00f6ster\u201d veya kimin az \u00f6nce yorum yapt\u0131\u011f\u0131, ve ayn\u0131 yerdeki takip ve sohbet \u00f6nerileri. G\u00f6nderi kal\u0131r.");
-        table.put("The switch takes effect when Facebook restarts.",
-                "Anahtar, Facebook yeniden ba\u015flad\u0131\u011f\u0131nda etkili olur.");
         table.put("The word lists in that file are longer than the two lists have room for. Nothing was changed.",
                 "Bu dosyadaki kelime listeleri iki listenin alan\u0131na s\u0131\u011fm\u0131yor. Hi\u00e7bir \u015fey de\u011fi\u015ftirilmedi.");
         table.put("There's no app here that can open or share this saved file.",

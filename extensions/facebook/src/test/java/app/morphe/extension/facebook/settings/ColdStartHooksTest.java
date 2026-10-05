@@ -142,8 +142,8 @@ public class ColdStartHooksTest {
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.peopleYouMayKnow()));
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, TypedFeedUnit.suggestedGroups()));
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, FeedGuardForTests.storiesRow(true)));
-        assertFalse(FeedFilter.hideStoriesTray(FeedFilter.LEGACY_TRAY));
-        assertFalse(FeedFilter.hideStoriesTray(FeedFilter.UNIFIED_TRAY));
+        assertEquals(1, FeedFilter.storiesTrayCount(new Object(), FeedFilter.LEGACY_TRAY, 1));
+        assertEquals(1, FeedFilter.storiesTrayCount(new Object(), FeedFilter.UNIFIED_TRAY, 1));
         assertFalse(FeedGuardForTests.hidesReels(Category.FB_SHORTS, new Object()));
         assertFalse(FeedGuardForTests.hidesShowcaseReels(Category.SHOWCASE, ShowcaseStoryType.SHOWCASE_SHORT_VIDEO));
         assertFalse(FeedFilter.hidePreEofReels());

@@ -30,12 +30,15 @@
     the reel speed's hook deleted from the Reels menu's speed toast, or put after a branch there, and
     the GenAI reel stub left unfilled, filled with a call that stays in the extension, or calling
     Facebook's finder only after it has returned. Each start-call hook is also put first in a method
-    holding part of what its rule picks by (the tray controller, onPause, another method naming both
-    surfaces, a method holding the emoji provider's log tag alone, an instance method holding the
-    emoji pictures' base address, a method of the tap's shape holding one entry point, a method of
-    another shape holding "long_press", a static method holding the like's trace, a static method
-    holding "translationY", an instance method holding the toast's selector name), and one rule is
-    given two methods to choose from; all eleven fail naming the method the rule picks. The Follow hook is also put first in that other method as
+    holding part of what its rule picks by (onPause, another method naming both surfaces, a method
+    holding the emoji provider's log tag alone, an instance method holding the emoji pictures' base
+    address, a method of the tap's shape holding one entry point, a method of another shape holding
+    "long_press", a static method holding the like's trace, a static method holding "translationY",
+    an instance method holding the toast's selector name, another method of the jewel count's
+    shape), and one rule is given two methods to choose from; all eleven fail naming the method the
+    rule picks. The Stories tray's count call is left out of one tray class, made twice in the
+    other's count, or made in another of its methods, and each fails its count-call rule saying
+    which. The Follow hook is also put first in that other method as
     well as in the check. A register out of range fails as its own finding:
     named by a helper added to a host class, as the upper half of a long read from the last
     register, as a long an extension method writes there, and in the feed guard. Each of the five
@@ -590,14 +593,13 @@ try {
             'Lcom/facebook/graphql/model/GraphQLStory;->A0X()Lfixture/Model; before its first return'))) `
             "The good build's $stub was not reported calling the story's accessor.`n$($good.Output -join "`n")"
     }
+    # The tray count rule finds one call in each tray class's count.
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        'storiesTrayCount(Ljava/lang/Object;II)I in getItemCount 2: 2 call sites, in ' +
+        'Lfixture/ClassicTray;->getItemCount()I, Lfixture/UnifiedTray;->getItemCount()I')) `
+        "The good build's tray counts were not reported, one in each tray class.`n$($good.Output -join "`n")"
     # Each start-call rule finds its one method among others holding part of what it names (the
-    # tray controller, the refresh controller's onPause, two other methods naming both surfaces),
-    # and the hook first there.
-    foreach ($adapter in @('NewsFeedAdapterConfiguration.addStoriesAdapter: first in Lfixture/Adapters;->addStoriesAdapter(',
-            'stories_tray_create_adapter_start stories_tray_create_adapter_stop tofu: first in Lfixture/Adapters;->addUnifiedTray(')) {
-        Assert-True (($good.Output -join "`n") -match [regex]::Escape("hideStoriesTray(I)Z holding $adapter")) `
-            "The good build's tray hook was not reported first in its adapter: $adapter`n$($good.Output -join "`n")"
-    }
+    # refresh controller's onPause, two other methods naming both surfaces), and the hook first there.
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         'hidePreEofReels()Z holding PreEofIfuSectionAdapter: first in Lfixture/PreEof;->injectPreEofIfuEdge$fixture(')) `
         "The good build's reels hook was not reported first in the pre-EOF injector.`n$($good.Output -join "`n")"
@@ -801,7 +803,7 @@ try {
         'bad-stub-other-class' = 'contract'
         'bad-stub-call-after-return' = 'contract'
         'bad-tray-hook-missing' = 'contract'
-        'bad-tray-hook-late' = 'contract'
+        'bad-tray-count-twice' = 'contract'
         'bad-preeof-hook-missing' = 'contract'
         'bad-preeof-hook-late' = 'contract'
         'bad-showcase-stub-not-filled' = 'contract'
@@ -995,10 +997,12 @@ try {
     # two methods answer names both; a register out of range names the instruction, the register it
     # reaches and the count, in the method it sits in. Each FAIL line has to be one of these.
     $wrongPlace = [ordered]@{
-        'bad-tray-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z ' +
-            'is not called in Lfixture/Adapters;->addUnifiedTray(Ljava/lang/Object;)Ljava/lang/Object;, the one method holding ' +
-            '"stories_tray_create_adapter_start", "stories_tray_create_adapter_stop" and "tofu"; the host methods that call it: ' +
-            '*Lfixture/TrayController;->create(Ljava/lang/Object;)Ljava/lang/Object;*'))
+        'bad-tray-hook-missing' = @(('*contract: Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I ' +
+            'has 1 call sites, and must have exactly 2, each in getItemCount of a class of its own: Lfixture/ClassicTray;->getItemCount()I'))
+        'bad-tray-count-twice' = @(('*contract: Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I ' +
+            'is called more than once in one class''s getItemCount: Lfixture/ClassicTray;->getItemCount()I, Lfixture/ClassicTray;->getItemCount()I'))
+        'bad-tray-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I ' +
+            'is called from Lfixture/UnifiedTray;->countRows()I, not from getItemCount'))
         'bad-return-refresh-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z is not ' +
             'called in Lfixture/ReturnController;->resumeAfterBackground(Ljava/lang/Object;)V, the one method holding ' +
             '"FeedRefreshTriggerController" and "onRefresh"; the host methods that call it: Lfixture/ReturnController;->onPause()V'))
@@ -1104,6 +1108,11 @@ try {
             'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z in sometimes (I)Z holding tofu',
             'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z in static I)Z holding tofu',
             'start-call Lapp/morphe/extension/facebook/feed/FeedFilter;->hideStoriesTray(I)Z tofu holding tofu',
+            'count-call Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I in getItemCount',
+            'count-call Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I in getItemCount 0',
+            'count-call Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I in getItemCount two',
+            'count-call Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I on getItemCount 2',
+            'count-call storiesTrayCount in getItemCount 2',
             'first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/lang/Object;)Ljava/lang/Object; on-type-named Lfixture/Showcase;',
             'first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/lang/Object;)Ljava/lang/Object; on-type-named',
             'first-call storyType on-type-named ShowcaseFeedUnit',
