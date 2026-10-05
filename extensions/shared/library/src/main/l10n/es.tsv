@@ -429,6 +429,8 @@ Friend suggestions stop showing up in your notifications. Friend requests still 
 Block nearby and weather notifications	Bloquear notificaciones de lugares cercanos y del clima
 # context: summary of that switch
 Alerts about places near you and about the weather stop.	Dejan de llegar los avisos sobre lugares cercanos y sobre el clima.
+Block account setup reminders	Bloquear recordatorios de configuración de la cuenta
+Reminders to finish setting up a Facebook account stop. Login and security alerts still come through.	Dejan de llegar los recordatorios para terminar de configurar una cuenta de Facebook. Las alertas de inicio de sesión y de seguridad siguen llegando.
 # context: title of a note under Notifications, below the switches; what no switch there blocks
 What always comes through	Lo que siempre llega
 # context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines

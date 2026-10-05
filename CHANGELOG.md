@@ -6,6 +6,10 @@ Every Hushfacebook release, newest first.
 
 Source preparation. The latest published bundle remains v0.7.1.
 
+### Added
+
+* **Facebook:** Block account setup reminders, under Notifications, stops the "finish setting up your account" notifications some people keep getting while they're signed in. It starts off like the other notification switches, and login and security alerts still come through (issue #57).
+
 ### Fixed
 
 * **Facebook:** At large text sizes on narrow screens, the settings home title stays on one line and the empty search field keeps its whole hint visible. Back and Clear search retain their touch targets.

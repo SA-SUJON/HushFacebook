@@ -437,6 +437,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_block_nearby_notifications", FALSE);
 
     /**
+     * Push notifications typed FB_REGISTRATION_REMINDER: "finish setting up your account" reminders
+     * that keep coming to a phone already signed in. Facebook's server sends the type, which its own
+     * NotificationType doesn't name, so Facebook would show them under a generic kind.
+     */
+    public static final BooleanSetting BLOCK_ACCOUNT_SETUP_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_account_setup_notifications", FALSE);
+
+    /**
      * Once a day, when Facebook starts, ask api.github.com whether a newer Hushfacebook release is
      * out, and say so on the settings screen ({@link ReleaseCheck}). It's the settings entry's own
      * switch rather than a patch's, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off

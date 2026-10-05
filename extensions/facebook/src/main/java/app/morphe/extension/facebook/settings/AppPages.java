@@ -120,6 +120,9 @@ final class AppPages {
                             + "through.")));
             notifications.addPreference(toggle(context, Settings.BLOCK_NEARBY_NOTIFICATIONS,
                     L10n.t("Alerts about places near you and about the weather stop.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_ACCOUNT_SETUP_NOTIFICATIONS,
+                    L10n.t("Reminders to finish setting up a Facebook account stop. Login and security alerts "
+                            + "still come through.")));
             notifications.addPreference(info(context, L10n.t("What always comes through"),
                     L10n.t("Messages, friend requests, comments, mentions, calls and login alerts, and any kind "
                             + "Hushfacebook doesn't know. Android's own settings for Facebook's notification "

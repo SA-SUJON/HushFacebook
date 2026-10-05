@@ -80,6 +80,7 @@ final class SwitchLabels {
         if (setting == Settings.BLOCK_HIGHLIGHT_NOTIFICATIONS) return L10n.t("Block group and Page highlights");
         if (setting == Settings.BLOCK_PEOPLE_YOU_MAY_KNOW_NOTIFICATIONS) return L10n.t("Block \"People you may know\"");
         if (setting == Settings.BLOCK_NEARBY_NOTIFICATIONS) return L10n.t("Block nearby and weather notifications");
+        if (setting == Settings.BLOCK_ACCOUNT_SETUP_NOTIFICATIONS) return L10n.t("Block account setup reminders");
         if (setting == Settings.OPEN_LINKS_EXTERNALLY) return L10n.t("Open links in your browser");
         if (setting == Settings.SANITIZE_SHARING_LINKS) return L10n.t("Remove tracking from shared links");
         if (setting == Settings.STOP_UPDATE_PROMPTS) return L10n.t("Stop update prompts");

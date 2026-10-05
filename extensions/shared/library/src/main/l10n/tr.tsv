@@ -429,6 +429,8 @@ Friend suggestions stop showing up in your notifications. Friend requests still 
 Block nearby and weather notifications	Yakındaki yerler ve hava durumu bildirimlerini engelle
 # context: summary of that switch
 Alerts about places near you and about the weather stop.	Yakınındaki yerler ve hava durumuyla ilgili uyarılar gelmez.
+Block account setup reminders	Hesap kurulumu hatırlatıcılarını engelle
+Reminders to finish setting up a Facebook account stop. Login and security alerts still come through.	Bir Facebook hesabının kurulumunu tamamlama hatırlatıcıları gelmez. Giriş ve güvenlik uyarıları gelmeye devam eder.
 # context: title of a note under Notifications, below the switches; what no switch there blocks
 What always comes through	Her zaman gelenler
 # context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines

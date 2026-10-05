@@ -363,6 +363,8 @@ Block "People you may know"	Bloquear “Pessoas que você talvez conheça”
 Friend suggestions stop showing up in your notifications. Friend requests still come through.	As sugestões de amizade deixam de aparecer nas notificações. As solicitações de amizade continuam chegando.
 Block nearby and weather notifications	Bloquear notificações de lugares próximos e do tempo
 Alerts about places near you and about the weather stop.	Alertas sobre lugares próximos e sobre o clima deixam de aparecer.
+Block account setup reminders	Bloquear lembretes de configuração da conta
+Reminders to finish setting up a Facebook account stop. Login and security alerts still come through.	Os lembretes para terminar de configurar uma conta do Facebook deixam de aparecer. Alertas de login e de segurança continuam chegando.
 What always comes through	O que sempre chega
 Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.	Mensagens, solicitações de amizade, comentários, menções, chamadas e alertas de login, além de qualquer tipo de notificação que o Hushfacebook não conheça. As configurações do Android para as categorias de notificação do Facebook também funcionam, pois o Facebook descarta uma notificação cuja categoria você desativou. No entanto, o servidor do Facebook decide quais categorias você recebe, então esses tipos podem não aparecer separados.
 Hide suggested stories	Ocultar Stories sugeridos

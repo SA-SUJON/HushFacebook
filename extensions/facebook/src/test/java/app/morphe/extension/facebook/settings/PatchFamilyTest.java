@@ -369,7 +369,8 @@ public class PatchFamilyTest {
                         + "hushfacebook_block_trending_video_notifications=off, hushfacebook_block_memory_notifications=off, "
                         + "hushfacebook_block_birthday_notifications=off, hushfacebook_block_highlight_notifications=off, "
                         + "hushfacebook_block_people_you_may_know_notifications=off, "
-                        + "hushfacebook_block_nearby_notifications=off)",
+                        + "hushfacebook_block_nearby_notifications=off, "
+                        + "hushfacebook_block_account_setup_notifications=off)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.PROMO_NOTIFICATIONS), false).get(0));
 
         List<String> paused = PatchFamily.reportLines(build, true);

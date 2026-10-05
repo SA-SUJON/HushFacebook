@@ -167,7 +167,8 @@ public final class SettingsBackup {
             Settings.BLOCK_BIRTHDAY_NOTIFICATIONS,
             Settings.BLOCK_HIGHLIGHT_NOTIFICATIONS,
             Settings.BLOCK_PEOPLE_YOU_MAY_KNOW_NOTIFICATIONS,
-            Settings.BLOCK_NEARBY_NOTIFICATIONS));
+            Settings.BLOCK_NEARBY_NOTIFICATIONS,
+            Settings.BLOCK_ACCOUNT_SETUP_NOTIFICATIONS));
 
     /**
      * The word filter's two lists, held in a file exactly as the settings row stores them: one

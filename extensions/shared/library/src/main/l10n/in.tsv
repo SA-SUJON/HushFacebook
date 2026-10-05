@@ -429,6 +429,8 @@ Friend suggestions stop showing up in your notifications. Friend requests still 
 Block nearby and weather notifications	Blokir notifikasi tempat terdekat dan cuaca
 # context: summary of that switch
 Alerts about places near you and about the weather stop.	Peringatan tentang tempat di dekat Anda dan tentang cuaca berhenti.
+Block account setup reminders	Blokir pengingat penyiapan akun
+Reminders to finish setting up a Facebook account stop. Login and security alerts still come through.	Pengingat untuk menyelesaikan penyiapan akun Facebook berhenti. Peringatan login dan keamanan tetap masuk.
 # context: title of a note under Notifications, below the switches; what no switch there blocks
 What always comes through	Yang selalu masuk
 # context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines
