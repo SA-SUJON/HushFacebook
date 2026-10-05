@@ -747,6 +747,7 @@ The Feeds tab will open on %1$s.	Tab Feed akan terbuka di %1$s.
 Saved	Tersimpan
 Saved shortcut	Pintasan Tersimpan
 Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay.	Menambahkan Tersimpan ke menu ikon Facebook jika ada ruang. Pintasan yang ada tetap tersedia.
+Adds Saved to Facebook's icon menu when there's room, and a Saved row at the end of Settings and privacy in the Menu. Existing shortcuts stay.	Menambahkan Tersimpan ke menu ikon Facebook jika ada ruang, dan baris Tersimpan di akhir Pengaturan dan privasi di Menu. Pintasan yang ada tetap tersedia.
 Your launcher has no room for another shortcut.	Peluncur tidak memiliki ruang untuk pintasan lain.
 Saved isn't available in this build.	Tersimpan tidak tersedia dalam versi ini.
 # context: The optional matching mode for both post word lists.

@@ -747,6 +747,7 @@ The Feeds tab will open on %1$s.	Der Feeds-Tab zeigt dann %1$s.
 Saved	Gespeichert
 Saved shortcut	Verknüpfung zu Gespeichert
 Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay.	Fügt Gespeichert zum Symbolmenü von Facebook hinzu, wenn Platz ist. Vorhandene Verknüpfungen bleiben.
+Adds Saved to Facebook's icon menu when there's room, and a Saved row at the end of Settings and privacy in the Menu. Existing shortcuts stay.	Fügt Gespeichert zum Symbolmenü von Facebook hinzu, wenn Platz ist, und eine Zeile Gespeichert am Ende von Einstellungen und Privatsphäre im Menü. Vorhandene Verknüpfungen bleiben.
 Your launcher has no room for another shortcut.	Dein Launcher hat keinen Platz für eine weitere Verknüpfung.
 Saved isn't available in this build.	Gespeichert ist in dieser Version nicht verfügbar.
 # context: The optional matching mode for both post word lists.

@@ -53,8 +53,9 @@ final class AppPages {
     static void menu(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
         PreferenceCategory menu = category(screen, L10n.t("Menu"));
-        SwitchPreference saved = toggle(context, Settings.SAVED_SHORTCUT,
-                L10n.t("Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay."));
+        SwitchPreference saved = toggle(context, Settings.SAVED_SHORTCUT, build.contains(PatchFamily.MENU_SETTINGS_ROW)
+                ? L10n.t("Adds Saved to Facebook's icon menu when there's room, and a Saved row at the end of Settings and privacy in the Menu. Existing shortcuts stay.")
+                : L10n.t("Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay."));
         saved.setOnPreferenceChangeListener((preference, value) -> {
             Settings.SAVED_SHORTCUT.save((Boolean) value);
             SavedShortcut.changed(context);

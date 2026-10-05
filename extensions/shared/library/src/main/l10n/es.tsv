@@ -747,6 +747,7 @@ The Feeds tab will open on %1$s.	La pestaña Feeds se abrirá en %1$s.
 Saved	Guardado
 Saved shortcut	Acceso directo a Guardado
 Adds Saved to Facebook's icon menu when there's room. Existing shortcuts stay.	Añade Guardado al menú del icono de Facebook si hay espacio. Los accesos directos existentes se conservan.
+Adds Saved to Facebook's icon menu when there's room, and a Saved row at the end of Settings and privacy in the Menu. Existing shortcuts stay.	Añade Guardado al menú del icono de Facebook si hay espacio, y una fila Guardado al final de Configuración y privacidad en el Menú. Los accesos directos existentes se conservan.
 Your launcher has no room for another shortcut.	Tu lanzador no tiene espacio para otro acceso directo.
 Saved isn't available in this build.	Guardado no está disponible en esta versión.
 # context: The optional matching mode for both post word lists.
