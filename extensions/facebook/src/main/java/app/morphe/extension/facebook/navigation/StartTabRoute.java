@@ -157,8 +157,9 @@ public final class StartTabRoute {
             if (!marketplaceOnly && !Settings.OPEN_ON_CHOSEN_TAB.get()) return;
             StartTab chosen = marketplaceOnly ? StartTab.MARKETPLACE : Settings.START_TAB.get();
             // A Reels tab Hide the Reels tab keeps off the bar isn't there to open, nor one Hide tabs keeps off.
-            StartTab tab = chosen == StartTab.VIDEO && ReelsTab.offTheBar() || HiddenTabs.offTheBar(chosen)
-                    ? StartTab.HOME : chosen;
+            String keptOff = chosen == StartTab.VIDEO && ReelsTab.offTheBar() ? FamilyNames.REELS_TAB
+                    : HiddenTabs.offTheBar(chosen) ? FamilyNames.HIDDEN_TABS : null;
+            StartTab tab = keptOff != null ? StartTab.HOME : chosen;
             Intent intent = activity.getIntent();
             String leftAlone = whyLeftAlone(intent, savedState);
             if (leftAlone != null) {
@@ -167,7 +168,7 @@ public final class StartTabRoute {
             }
             activity.setIntent(routed(intent, tab));
             if (tab != chosen) {
-                debug(() -> "Hide the Reels tab keeps " + chosen.fileValue + " off the tab bar, so asked for "
+                debug(() -> keptOff + " keeps " + chosen.fileValue + " off the tab bar, so asked for "
                         + tab.fileValue + " instead.");
             }
             debug(() -> "asked Facebook to open on " + tab.fileValue + " (tab " + tab.tabId + "). " + describe(intent));

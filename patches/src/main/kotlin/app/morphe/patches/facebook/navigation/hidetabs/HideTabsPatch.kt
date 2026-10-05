@@ -8,6 +8,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.facebook.navigation.tabbar.tabBarFilterPatch
+import app.morphe.patches.facebook.navigation.tabbar.tabLinksPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 
 /** The classes Facebook keeps the names of for each tab Hide tabs can take off, as the extension's HiddenTabs knows them. */
@@ -24,8 +25,10 @@ internal val HIDEABLE_TABS = mapOf(
  * Takes the tabs you pick off Facebook's tab bar. The tab bar filter (TabBarAnchors.kt) asks the
  * extension about each tab as Facebook builds the bar, right after Facebook's own hidden-tab set
  * answers, and the extension's HiddenTabs drops a tab whose switch is on, known by the classes
- * Facebook keeps for it. A tab Facebook's own tab bar settings hide stays theirs, each page stays
- * in the Menu, and Open on a chosen tab sends a start meant for a hidden tab to Home.
+ * Facebook keeps for it. A tab Facebook's own tab bar settings hide stays theirs, and Open on a
+ * chosen tab sends a start meant for a hidden tab to Home. Each page stays in the Menu: the tab
+ * links patch (TabLinkAnchors.kt) has Facebook open a hidden tab's page on its own screen where it
+ * would otherwise switch to the missing tab.
  *
  * In the default selection with every switch off, so it changes nothing until a tab is picked.
  */
@@ -37,7 +40,7 @@ val hideTabsPatch = bytecodePatch(
     default = true,
 ) {
     category("Interface")
-    dependsOn(settingsPatch, tabBarFilterPatch)
+    dependsOn(settingsPatch, tabBarFilterPatch, tabLinksPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {

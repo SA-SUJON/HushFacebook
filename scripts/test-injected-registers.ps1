@@ -60,8 +60,9 @@
     sole-call rule. The feed guard's call in the runnable that swaps an edge into the feed is left
     out, sent to another method of the runnable holding the first size of its log line with run()
     left alone, sent there as well as in run(), sent twice, and a second run() answers the rule, a
-    build each, each failing the once-call rule for its own reason; the contract file may hold no
-    other once-call rule.
+    build each, each failing the once-call rule for its own reason. Each of the tab links patch's
+    three calls is left out, a build each, failing its own once-call rule; the contract file may
+    hold no other once-call rules.
     The good build carries the joins, copies and reads ART accepts, a zero tested against
     an object among them, so a check made stricter still has to pass them. Each bad build has to
     fail with findings of its own category only, so a check that fires for the wrong reason fails
@@ -713,19 +714,39 @@ try {
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
         "contract $watchRule`: in place of it on v2, v1 in $watchFlush")) `
         "The good build's watch-history hook was not reported in place of the executor call.`n$($good.Output -join "`n")"
-    # The feed guard asks the extension once in the runnable that swaps an edge into the feed. The
-    # contract file's one once-call rule is that guard, so a rule this suite builds no bad fixtures
-    # for can't pass on a count nobody checks.
+    # The feed guard asks the extension once in the runnable that swaps an edge into the feed, and
+    # the tab links patch asks it once in each of the three places Facebook looks a link's tab up in
+    # its configured tabs. The contract file's once-call rules are those four, so a rule this suite
+    # builds no bad fixtures for can't pass on a count nobody checks.
     $swapHook = 'Lapp/morphe/extension/facebook/feed/FeedFilter;->hideSwappedEdge(Ljava/lang/Object;Ljava/lang/Object;)Z'
     $swapRun = 'Lfixture/EdgeSwap;->run()V'
     $swapHeld = '"sizeBefore" and "sizeAfter" with the shape instance ()V'
     $swapRule = "once-call $swapHook in instance ()V holding sizeBefore sizeAfter"
+    $tabFilter = 'Lapp/morphe/extension/facebook/navigation/TabBarFilter;'
+    $tabTag = 'Lcom/facebook/navigation/tabbar/state/model/TabTag;'
+    $session = 'Lcom/facebook/auth/usersession/FbUserSession;'
+    $linkShape = '(Landroid/content/Context;Landroid/content/Intent;*)Landroid/content/Intent;'
+    $linkSite = "(Landroid/content/Context;Landroid/content/Intent;$session)Landroid/content/Intent;"
+    $tabLinkRules = [ordered]@{
+        ("once-call $tabFilter->launchedTab(Ljava/lang/Object;)Ljava/lang/Object; in static " +
+            "(Landroid/content/Intent;$session)$tabTag holding extra_launch_uri") =
+            "Lfixture/TabLinks;->launchTab(Landroid/content/Intent;$session)$tabTag"
+        "once-call $tabFilter->friendsTab(Ljava/lang/Object;)Ljava/lang/Object; in instance $linkShape holding DEEPLINK" =
+            "Lfixture/TabLinks;->friendsLink$linkSite"
+        "once-call $tabFilter->configuresTab(ZLjava/lang/Object;)Z in instance $linkShape holding target_tab_id" =
+            "Lfixture/TabLinks;->targetTabLink$linkSite"
+    }
     $onceCallRules = @(Get-Content -LiteralPath $contracts | Where-Object { $_ -match '^\s*once-call\s' } |
         ForEach-Object { ($_.Trim() -split '\s+') -join ' ' })
-    Assert-True ($onceCallRules.Count -eq 1 -and $onceCallRules[0] -ceq $swapRule) `
-        "The contract file's once-call rules are not the swap guard this suite builds bad fixtures for:`n$($onceCallRules -join "`n")"
+    $expectedOnceCalls = @($swapRule) + @($tabLinkRules.Keys)
+    Assert-True (($onceCallRules -join "`n") -ceq ($expectedOnceCalls -join "`n")) `
+        "The contract file's once-call rules are not the swap guard and tab links this suite builds bad fixtures for:`n$($onceCallRules -join "`n")"
     Assert-True (($good.Output -join "`n") -match [regex]::Escape("contract $swapRule`: once in $swapRun")) `
         "The good build's swap guard was not reported once in the swap runnable.`n$($good.Output -join "`n")"
+    foreach ($rule in $tabLinkRules.Keys) {
+        Assert-True (($good.Output -join "`n") -match [regex]::Escape("contract $rule`: once in $($tabLinkRules[$rule])")) `
+            "The good build's tab link was not reported once in its method: $rule`n$($good.Output -join "`n")"
+    }
 
     $bad = [ordered]@{
         'bad-branch' = 'branch'
@@ -829,6 +850,9 @@ try {
         'bad-reel-speed-hook-late' = 'contract'
         'bad-reels-tab-dot-hook-missing' = 'contract'
         'bad-reels-tab-dot-hook-late' = 'contract'
+        'bad-tab-links-launch-hook-missing' = 'contract'
+        'bad-tab-links-friends-hook-missing' = 'contract'
+        'bad-tab-links-check-hook-missing' = 'contract'
         'bad-logo-hook-missing' = 'contract'
         'bad-logo-hook-other-call' = 'contract'
         'bad-logo-hook-other-view' = 'contract'

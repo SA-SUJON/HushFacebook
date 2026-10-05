@@ -83,7 +83,9 @@ import java.util.Set;
  * tap to like's call to {@code DoubleTapLike} first. And the Reels menu's speed toast, holding its
  * selector's name, with Keep the reel speed's call to {@code ReelSpeed.picked} first. And the tab
  * bar's jewel count, holding its log name, with Hide the Reels tab dot's call to
- * {@code ReelsTabDot.clear} first. Beside each
+ * {@code ReelsTabDot.clear} first. And the three places Facebook asks its configured tabs about a
+ * link, holding "extra_launch_uri", "DEEPLINK" and "target_tab_id", each asking {@code TabBarFilter}
+ * once, as the tab links patch has them. Beside each
  * method a start-call, next-call,
  * sole-call or once-call rule picks sit methods holding part of what it's picked by: the
  * refresh controller's onPause, two other methods naming both surfaces and one
@@ -178,6 +180,12 @@ public class BadDexFixture {
     private static final String TAB_TAG = "Lcom/facebook/navigation/tabbar/state/model/TabTag;";
     private static final String REELS_TAB_DOT = "Lapp/morphe/extension/facebook/navigation/ReelsTabDot;";
     private static final ImmutableMethodReference CLEAR_DOT = method(REELS_TAB_DOT, "clear", "Z", OBJECT);
+    private static final String TAB_LINKS = "Lfixture/TabLinks;";
+    private static final String INTENT = "Landroid/content/Intent;";
+    private static final String TAB_BAR_FILTER = "Lapp/morphe/extension/facebook/navigation/TabBarFilter;";
+    private static final ImmutableMethodReference LAUNCHED_TAB = method(TAB_BAR_FILTER, "launchedTab", OBJECT, OBJECT);
+    private static final ImmutableMethodReference FRIENDS_TAB = method(TAB_BAR_FILTER, "friendsTab", OBJECT, OBJECT);
+    private static final ImmutableMethodReference CONFIGURES_TAB = method(TAB_BAR_FILTER, "configuresTab", "Z", "Z", OBJECT);
 
     private static final String SHORTCUT_MANAGER = "Landroid/content/pm/ShortcutManager;";
     private static final String SHORTCUT_INFO = "Landroid/content/pm/ShortcutInfo;";
@@ -1024,6 +1032,61 @@ public class BadDexFixture {
                                 body(2, new ImmutableInstruction11n(Opcode.CONST_4, 0, 0), op(Opcode.RETURN, 0)), OBJECT)));
     }
 
+    /**
+     * The three places Facebook asks its configured tabs about a link, each holding its string in v0
+     * with no tab in v1: the startActivity lookup, static, taking an Intent and a session and
+     * returning a TabTag; the Friends link and the target_tab_id check, instance methods taking a
+     * context, an Intent and a session and returning the Intent. Each asks the extension when its
+     * flag says so, as the tab links patch does.
+     */
+    private static ClassDef tabLinks(boolean launched, boolean friends, boolean configured) {
+        return new ImmutableClassDef(TAB_LINKS, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Arrays.asList(
+                        define(TAB_LINKS, "launchTab", TAB_TAG, true,
+                                tabLinkBody("extra_launch_uri", launched ? LAUNCHED_TAB : null, 4, 1), INTENT, FB_USER_SESSION),
+                        define(TAB_LINKS, "friendsLink", INTENT, false,
+                                tabLinkBody("DEEPLINK", friends ? FRIENDS_TAB : null, 6, 4), CONTEXT, INTENT, FB_USER_SESSION),
+                        define(TAB_LINKS, "targetTabLink", INTENT, false, configuredTabBody(configured),
+                                CONTEXT, INTENT, FB_USER_SESSION)));
+    }
+
+    /** [string] in v0 and no tab in v1, [hook] asked about the tab with its answer cast back, then v[returned] returned. */
+    private static ImmutableMethodImplementation tabLinkBody(String string, ImmutableMethodReference hook, int registers,
+            int returned) {
+        List<Instruction> instructions = new ArrayList<>();
+        instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference(string)));
+        instructions.add(new ImmutableInstruction11n(Opcode.CONST_4, 1, 0));
+        if (hook != null) {
+            instructions.add(new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, 1, 1, hook));
+            instructions.add(op(Opcode.MOVE_RESULT_OBJECT, 1));
+            instructions.add(new ImmutableInstruction21c(Opcode.CHECK_CAST, 1, new ImmutableTypeReference(TAB_TAG)));
+        }
+        instructions.add(op(Opcode.RETURN_OBJECT, returned));
+        return new ImmutableMethodImplementation(registers, instructions, null, null);
+    }
+
+    /** "target_tab_id" in v0, then a yes in v0 and no tab in v1, the extension asked about both when [hooked], and the Intent returned. */
+    private static ImmutableMethodImplementation configuredTabBody(boolean hooked) {
+        List<Instruction> instructions = new ArrayList<>();
+        instructions.add(new ImmutableInstruction21c(Opcode.CONST_STRING, 0, new ImmutableStringReference("target_tab_id")));
+        instructions.add(new ImmutableInstruction11n(Opcode.CONST_4, 0, 1));
+        instructions.add(new ImmutableInstruction11n(Opcode.CONST_4, 1, 0));
+        if (hooked) {
+            instructions.add(new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, 0, 2, CONFIGURES_TAB));
+            instructions.add(op(Opcode.MOVE_RESULT, 0));
+        }
+        instructions.add(op(Opcode.RETURN_OBJECT, 4));
+        return new ImmutableMethodImplementation(6, instructions, null, null);
+    }
+
+    private static ClassDef tabBarFilter() {
+        return new ImmutableClassDef(TAB_BAR_FILTER, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
+                OBJECT, null, null, null, null, Arrays.asList(
+                        define(TAB_BAR_FILTER, "launchedTab", OBJECT, true, body(1, op(Opcode.RETURN_OBJECT, 0)), OBJECT),
+                        define(TAB_BAR_FILTER, "friendsTab", OBJECT, true, body(1, op(Opcode.RETURN_OBJECT, 0)), OBJECT),
+                        define(TAB_BAR_FILTER, "configuresTab", "Z", true, body(2, op(Opcode.RETURN, 0)), "Z", OBJECT)));
+    }
+
     private static ClassDef reelSpeed() {
         return new ImmutableClassDef(REEL_SPEED, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
                 OBJECT, null, null, null, null, Collections.singletonList(
@@ -1497,7 +1560,8 @@ public class BadDexFixture {
                 reelLikeHelper(likeHook(), Collections.<Instruction>emptyList()),
                 attachmentTap(tapHook(), Collections.<Instruction>emptyList()), doubleTapLike(),
                 speedToast(toastHook(3), Collections.<Instruction>emptyList()), reelSpeed(),
-                jewelController(dotHook(4), Collections.<Instruction>emptyList()), reelsTabDot()));
+                jewelController(dotHook(4), Collections.<Instruction>emptyList()), reelsTabDot(),
+                tabLinks(true, true, true), tabBarFilter()));
         return classes;
     }
 
@@ -1516,7 +1580,8 @@ public class BadDexFixture {
                 reelLikeHelper(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 attachmentTap(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 speedToast(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
-                jewelController(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList())));
+                jewelController(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
+                tabLinks(false, false, false)));
         return classes;
     }
 
@@ -2051,6 +2116,12 @@ public class BadDexFixture {
         // call after a branch.
         dexes.put("bad-reels-tab-dot-hook-missing", replaced(good(), jewelController(noHook, noHook)));
         dexes.put("bad-reels-tab-dot-hook-late", replaced(good(), jewelController(lateDotHook(), noHook)));
+
+        // contract: each place Facebook asks its configured tabs about a link left without the tab
+        // links patch's call.
+        dexes.put("bad-tab-links-launch-hook-missing", replaced(good(), tabLinks(false, true, true)));
+        dexes.put("bad-tab-links-friends-hook-missing", replaced(good(), tabLinks(true, false, true)));
+        dexes.put("bad-tab-links-check-hook-missing", replaced(good(), tabLinks(true, true, false)));
 
         // contract: the GenAI reel stub left as the extension ships it, answering its marker.
         dexes.put("bad-finder-stub-not-filled", withFinderStub(good(), UNFILLED_FINDER_STUB));

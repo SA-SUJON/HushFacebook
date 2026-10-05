@@ -110,3 +110,12 @@ sole-call Lapp/morphe/extension/facebook/reels/ReelWatchHistory;->send(Ljava/uti
 # first thing in it, so the Reels tab's count can read none. Left out, the dot stays; anywhere
 # else, the count it answers isn't the tab bar's.
 start-call Lapp/morphe/extension/facebook/navigation/ReelsTabDot;->clear(Ljava/lang/Object;)Z in static (Lcom/facebook/auth/usersession/FbUserSession;*Lcom/facebook/navigation/tabbar/state/model/TabTag;I)I holding FbMainTabActivityJewelController.getTrackedCountWithLogging
+# Hide tabs and Hide the Reels tab leave a tab a switch took off the bar still configured, and three
+# places Facebook decides a link is a tab look in the configured tabs. The startActivity lookup is
+# the one static method that takes an Intent and an FbUserSession, returns a TabTag and loads the
+# launch URI's extra; the Friends link's switch and the target_tab_id check are each the one method
+# of a kept helper loading their string. Each asks the extension once, so a hidden tab's page opens
+# on its own screen. Left out, the Menu shortcut or link switches to the missing tab and nothing opens.
+once-call Lapp/morphe/extension/facebook/navigation/TabBarFilter;->launchedTab(Ljava/lang/Object;)Ljava/lang/Object; in static (Landroid/content/Intent;Lcom/facebook/auth/usersession/FbUserSession;)Lcom/facebook/navigation/tabbar/state/model/TabTag; holding extra_launch_uri
+once-call Lapp/morphe/extension/facebook/navigation/TabBarFilter;->friendsTab(Ljava/lang/Object;)Ljava/lang/Object; in instance (Landroid/content/Context;Landroid/content/Intent;*)Landroid/content/Intent; holding DEEPLINK
+once-call Lapp/morphe/extension/facebook/navigation/TabBarFilter;->configuresTab(ZLjava/lang/Object;)Z in instance (Landroid/content/Context;Landroid/content/Intent;*)Landroid/content/Intent; holding target_tab_id
