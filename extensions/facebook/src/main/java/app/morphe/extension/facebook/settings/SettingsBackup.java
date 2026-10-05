@@ -133,6 +133,7 @@ public final class SettingsBackup {
             Settings.DONT_SEND_REEL_WATCH_HISTORY,
             Settings.HOLD_ANALYTICS_UPLOADS,
             Settings.ALLOW_SCREENSHOTS,
+            Settings.BLOCK_SCREENSHOT_DETECTION,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE,
             Settings.KEEP_REEL_SPEED,
             Settings.HOLD_REEL_FOR_2X,

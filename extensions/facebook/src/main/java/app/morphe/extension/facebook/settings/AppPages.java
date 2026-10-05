@@ -164,13 +164,21 @@ final class AppPages {
     /** Privacy: what Facebook sends home in the background. */
     static void privacy(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
-        if (!build.contains(PatchFamily.ANALYTICS_UPLOADS) && !build.contains(PatchFamily.SCREENSHOTS)) return;
+        if (!build.contains(PatchFamily.ANALYTICS_UPLOADS) && !build.contains(PatchFamily.SCREENSHOTS)
+                && !build.contains(PatchFamily.SCREENSHOT_DETECTION)) {
+            return;
+        }
         PreferenceCategory privacy = category(screen, L10n.t("Privacy"));
         if (build.contains(PatchFamily.ANALYTICS_UPLOADS)) {
             // XAnalytics resumes its uploader once, as Facebook starts.
             privacy.addPreference(toggle(context, Settings.HOLD_ANALYTICS_UPLOADS,
                     L10n.t("Facebook stops uploading its app analytics in the background and skips its on-device "
                             + "learning jobs. Restart Facebook after changing it.")));
+        }
+        if (build.contains(PatchFamily.SCREENSHOT_DETECTION)) {
+            privacy.addPreference(toggle(context, Settings.BLOCK_SCREENSHOT_DETECTION,
+                    L10n.t("Facebook doesn't notice when you take a screenshot or record the screen, so nothing it does "
+                            + "in response happens.")));
         }
         if (build.contains(PatchFamily.SCREENSHOTS)) {
             privacy.addPreference(toggle(context, Settings.ALLOW_SCREENSHOTS,

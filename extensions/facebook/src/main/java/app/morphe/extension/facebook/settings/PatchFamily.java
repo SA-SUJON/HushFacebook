@@ -143,6 +143,8 @@ public enum PatchFamily {
             Settings.HOLD_ANALYTICS_UPLOADS),
     SCREENSHOTS(FamilyNames.SCREENSHOTS, "allowScreenshots", null,
             Settings.ALLOW_SCREENSHOTS),
+    SCREENSHOT_DETECTION(FamilyNames.SCREENSHOT_DETECTION, "screenshotDetection", null,
+            Settings.BLOCK_SCREENSHOT_DETECTION),
     PROMO_NOTIFICATIONS(FamilyNames.PROMO_NOTIFICATIONS, "promoNotifications", null,
             Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS, Settings.BLOCK_MEMORY_NOTIFICATIONS,
             Settings.BLOCK_BIRTHDAY_NOTIFICATIONS, Settings.BLOCK_HIGHLIGHT_NOTIFICATIONS,

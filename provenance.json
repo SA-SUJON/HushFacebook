@@ -617,6 +617,17 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: Allow screenshots, an idea ReVanced's universal Remove screenshot restriction patch, Loukious and NexAlloy share, written here from Facebook 577, 580 and 581. Every Window.addFlags(int) and setFlags(int, int) call outside the extension becomes a static call of the extension on the same registers, and every write of WindowManager.LayoutParams.flags first runs its value through the extension, which takes FLAG_SECURE out while the switch is on."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ScreenshotDetection.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/screenshots/BlockScreenshotDetectionPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/screenshots/ScreenshotDetectionAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Block screenshot detection, an idea ReVanced's universal Prevent screenshot detection patch, Loukious and NexAlloy share, written here from Facebook 577, 580 and 581. A check goes first in the kept com.facebook.screenshot.ScreenshotContentObserver's onChange(boolean, Uri), the photo library observer every screenshot detector shares, and every registerScreenCaptureCallback call on an Activity and every WindowManager add/removeScreenRecordingCallback call outside the extension becomes a static call of the extension on the same registers, which doesn't make it while the switch is on."
     }
   ]
 }

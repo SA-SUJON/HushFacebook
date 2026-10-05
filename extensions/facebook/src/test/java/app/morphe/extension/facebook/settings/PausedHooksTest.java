@@ -74,6 +74,7 @@ import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
 import app.morphe.extension.facebook.misc.AnalyticsUploads;
+import app.morphe.extension.facebook.misc.ScreenshotDetection;
 import app.morphe.extension.facebook.misc.Screenshots;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
@@ -467,6 +468,9 @@ public class PausedHooksTest {
         // A window's secure flag comes out.
         probes.put(PatchFamily.SCREENSHOTS, Collections.singletonList(
                 () -> Screenshots.layoutFlags(0x2000) == 0));
+        // A new picture in the photo library isn't looked at.
+        probes.put(PatchFamily.SCREENSHOT_DETECTION, Collections.singletonList(
+                ScreenshotDetection::ignoresChange));
         // A push of each kind a notification switch blocks isn't posted.
         probes.put(PatchFamily.PROMO_NOTIFICATIONS, Arrays.asList(
                 NotificationKindsForTests::blocksTrendingVideo,

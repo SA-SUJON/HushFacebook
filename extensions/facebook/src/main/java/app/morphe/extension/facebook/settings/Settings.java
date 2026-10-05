@@ -280,6 +280,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_allow_screenshots", TRUE);
 
     /**
+     * Facebook's screenshot and screen recording detection
+     * ({@link app.morphe.extension.facebook.misc.ScreenshotDetection}). On once the patch is picked.
+     */
+    public static final BooleanSetting BLOCK_SCREENSHOT_DETECTION =
+            new BooleanSetting("hushfacebook_block_screenshot_detection", TRUE);
+
+    /**
      * A double tap on a reel or a video left without Facebook's like: no heart, no like sent. A
      * single tap and the Like button do what they always did. On once the patch is picked, since
      * picking it is the choice.

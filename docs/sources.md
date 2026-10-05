@@ -104,4 +104,6 @@ Holding back Facebook's analytics uploads, which De-Vanced's Disable analytics a
 
 Allowing screenshots on the pages Facebook blocks them on is something ReVanced's universal Remove screenshot restriction patch, Loukious and NexAlloy all do. Allow screenshots is written here. Reading the 577, 580 and 581 builds showed Facebook marks a page secure through Android's own window calls and the flags of the window settings it builds dialogs with, so every one of those goes through Hushfacebook, which takes the secure flag out while the switch is on and passes the rest as Facebook asked.
 
+Keeping Facebook from noticing screenshots is ReVanced's universal Prevent screenshot detection, and Loukious and NexAlloy block capture detection too. Block screenshot detection is written here. In the 577, 580 and 581 builds every screenshot detector Facebook has shares one photo library observer that keeps its name, so a check goes first in it, and the Android 14 and 15 screen capture and recording requests go through Hushfacebook, which doesn't make them while the switch is on.
+
 If you know of a Facebook patch source we missed, open an issue with a link.

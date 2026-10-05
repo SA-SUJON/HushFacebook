@@ -59,6 +59,7 @@ final class SwitchLabels {
         if (setting == Settings.DONT_SEND_REEL_WATCH_HISTORY) return L10n.t("Don't send reel watch history");
         if (setting == Settings.HOLD_ANALYTICS_UPLOADS) return L10n.t("Hold back analytics uploads");
         if (setting == Settings.ALLOW_SCREENSHOTS) return L10n.t("Allow screenshots");
+        if (setting == Settings.BLOCK_SCREENSHOT_DETECTION) return L10n.t("Block screenshot detection");
         if (setting == Settings.TURN_OFF_DOUBLE_TAP_LIKE) return L10n.t("Turn off double tap to like");
         if (setting == Settings.KEEP_REEL_SPEED) return L10n.t("Keep the reel speed");
         if (setting == Settings.HOLD_REEL_FOR_2X) return L10n.t("Hold a reel for 2x");
