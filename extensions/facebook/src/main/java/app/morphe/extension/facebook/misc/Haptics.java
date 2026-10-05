@@ -52,7 +52,6 @@ public final class Haptics {
     }
 
     /** Injection point, in place of each of Facebook's {@code Vibrator.vibrate(VibrationEffect)} calls. */
-    @RequiresApi(26)
     public static void vibrate(Vibrator vibrator, VibrationEffect effect) {
         if (holdsBack("vibration")) return;
         vibrator.vibrate(effect);
