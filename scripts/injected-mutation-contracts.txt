@@ -67,6 +67,10 @@ start-call Lapp/morphe/extension/facebook/emoji/SystemEmoji;->skipRemoteEmoji()Z
 # put later, the icon opens Facebook's Chats whatever the switch says.
 start-call Lapp/morphe/extension/facebook/chats/MessengerIcon;->open(Landroid/content/Context;Z)Z in static (Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;*)V holding entry_point_navbar_global_icon_ entry_point_navbar_global_icon_reels_tab
 start-call Lapp/morphe/extension/facebook/chats/MessengerIcon;->open(Landroid/content/Context;Z)Z in static (Landroid/content/Context;Lcom/facebook/auth/usersession/FbUserSession;Ljava/lang/String;ZZ)V holding long_press
+# Hide typing indicator hands Mailbox's typing setter flag to the extension first thing, in the one
+# method holding the setter's name (its answer is a Redex class, so no shape). Left out or put later,
+# a chat that opens inside Facebook shows the other side you're typing whatever the switch says.
+start-call Lapp/morphe/extension/facebook/chats/TypingIndicator;->chatTyping(Z)Z holding setTypingIndicatorForThreadWithThreadIdentifier
 # Turn off double tap to like asks the extension first thing in the reel like helper's like, the
 # one method in 580 and 577 holding FbShortsMutationUtil's trace, an instance method taking the
 # session first and the like's source last. Left out or put later, the players whose own double-tap
