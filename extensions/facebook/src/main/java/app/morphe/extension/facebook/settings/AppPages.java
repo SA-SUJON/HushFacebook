@@ -168,11 +168,12 @@ final class AppPages {
                         + "and your other link settings stay as they are.")));
     }
 
-    /** Privacy: what Facebook sends home in the background, and what it shows others while you write. */
+    /** Privacy: what Facebook sends home in the background, and what it shows others while you write and read. */
     static void privacy(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
         if (!build.contains(PatchFamily.ANALYTICS_UPLOADS) && !build.contains(PatchFamily.SCREENSHOTS)
-                && !build.contains(PatchFamily.SCREENSHOT_DETECTION) && !build.contains(PatchFamily.TYPING_INDICATOR)) {
+                && !build.contains(PatchFamily.SCREENSHOT_DETECTION) && !build.contains(PatchFamily.TYPING_INDICATOR)
+                && !build.contains(PatchFamily.READ_RECEIPTS)) {
             return;
         }
         PreferenceCategory privacy = category(screen, L10n.t("Privacy"));
@@ -198,6 +199,11 @@ final class AppPages {
                             + "Your messages send as usual.")));
             privacy.addPreference(toggle(context, Settings.HIDE_COMMENT_TYPING,
                     L10n.t("People looking at a post don't see that you're writing a comment.")));
+        }
+        if (build.contains(PatchFamily.READ_RECEIPTS)) {
+            privacy.addPreference(toggle(context, Settings.HIDE_READ_RECEIPTS,
+                    L10n.t("People you chat with in a chat that opens inside Facebook don't see that you've read their "
+                            + "messages. The chat can stay unread on this phone.")));
         }
     }
 }

@@ -49,6 +49,7 @@ import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
 import app.morphe.extension.facebook.chats.MessengerIconForTests;
+import app.morphe.extension.facebook.chats.ReadReceipts;
 import app.morphe.extension.facebook.chats.TypingIndicator;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
@@ -505,6 +506,8 @@ public class PausedHooksTest {
         probes.put(PatchFamily.TYPING_INDICATOR, Arrays.asList(
                 () -> !TypingIndicator.chatTyping(true), TypingIndicator::holdsChatTyping,
                 TypingIndicator::holdsCommentTyping));
+        // Mailbox's mark-read hands back its future without sending the read.
+        probes.put(PatchFamily.READ_RECEIPTS, Collections.singletonList(ReadReceipts::holdsChatRead));
         // A push of each kind a notification switch blocks isn't posted.
         probes.put(PatchFamily.PROMO_NOTIFICATIONS, Arrays.asList(
                 NotificationKindsForTests::blocksTrendingVideo,

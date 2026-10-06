@@ -336,6 +336,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_comment_typing", TRUE);
 
     /**
+     * The sender sees that you've read a chat that opens inside Facebook
+     * ({@link app.morphe.extension.facebook.chats.ReadReceipts}). On once the patch is picked.
+     */
+    public static final BooleanSetting HIDE_READ_RECEIPTS =
+            new BooleanSetting("hushfacebook_hide_read_receipts", TRUE);
+
+    /**
      * A double tap on a reel or a video left without Facebook's like: no heart, no like sent. A
      * single tap and the Like button do what they always did. On once the patch is picked, since
      * picking it is the choice.

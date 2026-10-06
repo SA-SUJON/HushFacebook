@@ -86,6 +86,7 @@ public final class FamilyNames {
     public static final String SCREENSHOTS = "Allow screenshots";
     public static final String SCREENSHOT_DETECTION = "Block screenshot detection";
     public static final String TYPING_INDICATOR = "Hide typing indicator";
+    public static final String READ_RECEIPTS = "Hide read receipts";
     public static final String AUDIENCE_NETWORK = "Disable Audience Network";
     public static final String GAME_ADS = "Block Instant Games ads";
     public static final String AMOLED_THEME = "AMOLED black theme";

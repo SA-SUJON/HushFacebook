@@ -170,6 +170,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean readReceipts() {
+        return false;
+    }
+
     public static boolean audienceNetwork() {
         return false;
     }

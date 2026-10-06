@@ -71,6 +71,10 @@ start-call Lapp/morphe/extension/facebook/chats/MessengerIcon;->open(Landroid/co
 # method holding the setter's name (its answer is a Redex class, so no shape). Left out or put later,
 # a chat that opens inside Facebook shows the other side you're typing whatever the switch says.
 start-call Lapp/morphe/extension/facebook/chats/TypingIndicator;->chatTyping(Z)Z holding setTypingIndicatorForThreadWithThreadIdentifier
+# Hide read receipts asks the extension once in Mailbox's mark-read, the one method holding its API
+# name, after the future is made and before the call is posted. Left out, a chat that opens inside
+# Facebook tells the sender you've read it whatever the switch says.
+once-call Lapp/morphe/extension/facebook/chats/ReadReceipts;->holdsChatRead()Z holding markAsReadThreadWithThreadIdentifier
 # Turn off double tap to like asks the extension first thing in the reel like helper's like, the
 # one method in 580 and 577 holding FbShortsMutationUtil's trace, an instance method taking the
 # session first and the like's source last. Left out or put later, the players whose own double-tap

@@ -79,6 +79,7 @@ final class SwitchLabels {
         if (setting == Settings.BLOCK_SCREENSHOT_DETECTION) return L10n.t("Block screenshot detection");
         if (setting == Settings.HIDE_CHAT_TYPING) return L10n.t("Hide typing in chats");
         if (setting == Settings.HIDE_COMMENT_TYPING) return L10n.t("Hide typing in comments");
+        if (setting == Settings.HIDE_READ_RECEIPTS) return L10n.t("Hide read receipts");
         if (setting == Settings.TURN_OFF_DOUBLE_TAP_LIKE) return L10n.t("Turn off double tap to like");
         if (setting == Settings.KEEP_REEL_SPEED) return L10n.t("Keep the reel speed");
         if (setting == Settings.HOLD_REEL_FOR_2X) return L10n.t("Hold a reel for 2x");

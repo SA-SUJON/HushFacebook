@@ -661,6 +661,17 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/ReadReceipts.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/chats/HideReadReceiptsPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/chats/ReadReceiptAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Hide read receipts, an idea shared with HushMessenger's Hide read receipts, written here from Facebook 577, 580 and 581. Mailbox's mark-read, found by its API name, asks the extension once its future is made and hands that future back unsent while the switch is on."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/PictureInPicture.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/media/pip/PictureInPicturePatch.kt"
       ],

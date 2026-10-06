@@ -163,6 +163,8 @@ public enum PatchFamily {
             Settings.BLOCK_SCREENSHOT_DETECTION),
     TYPING_INDICATOR(FamilyNames.TYPING_INDICATOR, "typingIndicator", null,
             Settings.HIDE_CHAT_TYPING, Settings.HIDE_COMMENT_TYPING),
+    READ_RECEIPTS(FamilyNames.READ_RECEIPTS, "readReceipts", null,
+            Settings.HIDE_READ_RECEIPTS),
     PROMO_NOTIFICATIONS(FamilyNames.PROMO_NOTIFICATIONS, "promoNotifications", null,
             Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS, Settings.BLOCK_MEMORY_NOTIFICATIONS,
             Settings.BLOCK_BIRTHDAY_NOTIFICATIONS, Settings.BLOCK_HIGHLIGHT_NOTIFICATIONS,

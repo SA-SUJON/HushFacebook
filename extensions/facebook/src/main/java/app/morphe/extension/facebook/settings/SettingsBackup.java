@@ -141,6 +141,7 @@ public final class SettingsBackup {
             Settings.BLOCK_SCREENSHOT_DETECTION,
             Settings.HIDE_CHAT_TYPING,
             Settings.HIDE_COMMENT_TYPING,
+            Settings.HIDE_READ_RECEIPTS,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE,
             Settings.KEEP_REEL_SPEED,
             Settings.HOLD_REEL_FOR_2X,
