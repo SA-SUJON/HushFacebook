@@ -188,6 +188,22 @@ public class Settings extends BaseSettings {
     public static final StringSetting KEPT_WORDS =
             new StringSetting("hushfacebook_kept_words", "");
 
+    /**
+     * Feed posts written by a person or Page in {@link #HIDDEN_SOURCES}, or linking to a site in it,
+     * and shares of them ({@link app.morphe.extension.facebook.feed.PostSources}). Off by default,
+     * and with the list empty it reads nothing of any post.
+     */
+    public static final BooleanSetting HIDE_POSTS_FROM_SOURCES =
+            new BooleanSetting("hushfacebook_hide_posts_from_sources", FALSE);
+
+    /**
+     * The people, Pages and sites whose posts {@link #HIDE_POSTS_FROM_SOURCES} hides, one per line:
+     * a name, a profile or Page id, or a site's domain, bounded wherever it's read. It isn't a
+     * switch, and a paused Facebook reads it as empty.
+     */
+    public static final StringSetting HIDDEN_SOURCES =
+            new StringSetting("hushfacebook_hidden_sources", "");
+
     /** The four story bucket sources that splice ad cards into the story viewer. */
     public static final BooleanSetting HIDE_SPONSORED_STORIES =
             new BooleanSetting("hushfacebook_hide_sponsored_stories", TRUE);

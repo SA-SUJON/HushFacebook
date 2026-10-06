@@ -201,6 +201,10 @@ final class FeedPages {
                 feed.addPreference(page.wordsRow(context, Settings.KEPT_WORDS, false));
                 feed.addPreference(toggle(context, Settings.POST_WORDS_WHOLE_WORDS,
                         L10n.t("Apply whole-word matching to both lists. For example, hat matches hat! but not what or hats.")));
+                feed.addPreference(toggle(context, Settings.HIDE_POSTS_FROM_SOURCES,
+                        L10n.t("Posts by a person or Page on your list below, or linking to a site on it, and shares "
+                                + "of them. Your list only leaves the phone in a settings file you export.")));
+                feed.addPreference(page.sourcesRow(context));
             }
         }
     }

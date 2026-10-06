@@ -393,6 +393,19 @@ Block Instant Games ads	Bloquear anúncios do Instant Games
 Games you play in Facebook get no ads. A game asking for one hears there's none to show, so rewarded ads give no reward.	Os jogos que você joga no Facebook não recebem anúncios. Quando um jogo pede um, ele fica sabendo que não há nenhum, então anúncios com recompensa não dão recompensa.
 Ads and boosted listings in Marketplace's feed and search results. The other listings stay.	Propagandas e anúncios impulsionados no feed e nos resultados de busca do Marketplace. Os demais anúncios permanecem.
 Hide posts with words you choose	Ocultar publicações com palavras que você escolher
+Hide posts from people, Pages and sites	Ocultar publicações de pessoas, Páginas e sites
+Posts by a person or Page on your list below, or linking to a site on it, and shares of them. Your list only leaves the phone in a settings file you export.	Publicações de uma pessoa ou Página da sua lista abaixo, ou com link para um site dela, e compartilhamentos delas. Sua lista só sai do celular em um arquivo de configurações que você exportar.
+People, Pages and sites to hide	Pessoas, Páginas e sites para ocultar
+One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, or a site like example.com, which takes its subdomains too. Capital letters don't matter.	Um por linha, até %1$d: um nome como o Facebook mostra, um ID de perfil ou de Página, ou um site como example.com, que inclui também os subdomínios. Maiúsculas não importam.
+One name, id or site per line	Um nome, ID ou site por linha
+%1$d line was left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d linha foi deixada de fora. Uma linha cabe até %2$d caracteres, a lista até %3$d linhas, e uma repetida conta uma vez.
+%1$d lines were left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d linhas foram deixadas de fora. Uma linha cabe até %2$d caracteres, a lista até %3$d linhas, e uma repetida conta uma vez.
+Nobody listed yet, so no post is hidden.	Ninguém na lista ainda, então nenhuma publicação é ocultada.
+%1$d person, Page or site.	%1$d pessoa, Página ou site.
+%1$d people, Pages or sites.	%1$d pessoas, Páginas ou sites.
+Your list of people, Pages and sites to hide will be empty.	Sua lista de pessoas, Páginas e sites para ocultar ficará vazia.
+Your list of people, Pages and sites to hide will hold %1$d entry.	Sua lista de pessoas, Páginas e sites para ocultar terá %1$d item.
+Your list of people, Pages and sites to hide will hold %1$d entries.	Sua lista de pessoas, Páginas e sites para ocultar terá %1$d itens.
 Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.	Publicações cujo texto contém uma palavra ou frase da lista abaixo. Uma publicação com uma palavra da lista para manter permanece, assim como uma publicação sem texto. Suas palavras só saem do dispositivo em um arquivo de configurações que você exportar.
 Words to hide	Palavras para ocultar
 Words that keep a post	Palavras que mantêm uma publicação

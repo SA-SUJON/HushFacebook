@@ -189,6 +189,17 @@ public final class FeedFilter {
     /** The kind a post counts under while the hide list is empty, when nothing of it is read. */
     static final String NO_WORDS = "no words listed";
     /**
+     * The stories the people, Pages and sites rule read, counted only while its switch is on, with
+     * whether a rule matched or why nothing was read as the kind. Never a name, an id or a link.
+     */
+    static final String SOURCES_ROUTE = "Your people, Pages and sites";
+    /** What a post that rule hid counts under, followed by the number of the line that matched. */
+    static final String SOURCES_REASON = "source rule";
+    /** The kind a post counts under while the list is empty, when nothing of it is read. */
+    static final String NO_SOURCES = "nobody listed";
+    /** The kind a post counts under when it was read and no line matched. */
+    static final String NO_SOURCE_MATCH = "no line matched";
+    /**
      * The Stories tray adapters the feed asked for, each call counted with its adapter as the kind,
      * and a skipped one as a removal. The tray is never a feed edge: the feed's adapter list adds it
      * as an adapter of its own, so it never reaches the edge guard.
@@ -458,6 +469,9 @@ public final class FeedFilter {
             if (reason == null && wordsPatched && Settings.HIDE_POSTS_WITH_WORDS.get()) {
                 reason = wordsReason(feedUnit, messageAccessor, attachedAccessor);
             }
+            if (reason == null && wordsPatched) {
+                reason = sourcesReason(feedUnit, PostSources.ACTORS, PostSources.ATTACHMENTS, attachedAccessor);
+            }
             if (reason == null) return false;
 
             FeedFilterCounters.removed(FEED_ROUTE, 1, reason);
@@ -628,6 +642,37 @@ public final class FeedFilter {
             HookStatus.threw(FamilyNames.SUGGESTED_POSTS, "promotion id reader", failure);
             return null;
         }
+    }
+
+    /**
+     * The people, Pages and sites rule: {@link #SOURCES_REASON} and the matching line's number when
+     * one of the post's authors or links, or those of the post it shares, is on the list, otherwise
+     * null. Nothing is read while the switch is off or the list is empty, and a post whose authors
+     * and links can't be read is kept. Each story it reads is counted on its route by outcome.
+     */
+    static String sourcesReason(Object feedUnit, StoryFlag.Accessor actors, StoryFlag.Accessor attachments,
+            StoryFlag.Accessor attached) {
+        if (!Settings.HIDE_POSTS_FROM_SOURCES.get()) return null;
+        FeedFilterCounters.sawList(SOURCES_ROUTE, 1);
+        java.util.List<PostSources.Rule> rules = PostSources.rules(Settings.HIDDEN_SOURCES.get());
+        if (rules.isEmpty()) {
+            FeedFilterCounters.sawKind(SOURCES_ROUTE, NO_SOURCES);
+            return null;
+        }
+        PostSources.Found found = PostSources.read(feedUnit, actors, attachments, attached);
+        if (found.outcome != PostSources.Outcome.READ) {
+            FeedFilterCounters.sawKind(SOURCES_ROUTE, found.outcome.reason);
+            return null;
+        }
+        int line = PostSources.match(rules, found);
+        if (line == 0) {
+            FeedFilterCounters.sawKind(SOURCES_ROUTE, NO_SOURCE_MATCH);
+            return null;
+        }
+        String reason = SOURCES_REASON + " " + line;
+        FeedFilterCounters.sawKind(SOURCES_ROUTE, reason);
+        FeedFilterCounters.removed(SOURCES_ROUTE, 1, reason);
+        return reason;
     }
 
     /**

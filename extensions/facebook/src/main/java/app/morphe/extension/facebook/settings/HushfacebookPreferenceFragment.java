@@ -47,6 +47,7 @@ import app.morphe.extension.facebook.download.SaveControl;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
+import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.HiddenTabs;
@@ -67,6 +68,7 @@ import app.morphe.extension.facebook.settings.ValueRows.QualityRow;
 import app.morphe.extension.facebook.settings.ValueRows.SaveToRow;
 import app.morphe.extension.facebook.settings.ValueRows.SendAppRow;
 import app.morphe.extension.facebook.settings.ValueRows.StartTabRow;
+import app.morphe.extension.facebook.settings.ValueRows.SourcesRow;
 import app.morphe.extension.facebook.settings.ValueRows.WordsRow;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
@@ -1443,6 +1445,63 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             return false;
         });
         return row;
+    }
+
+    /**
+     * The list Hide posts from people, Pages and sites reads. What's typed is cleaned before it's
+     * kept, one rule per line within the bounds {@link PostSources} holds the list to, so the row,
+     * the setting and the filter all read the same rules. A dialog says how many lines were left
+     * out, never which.
+     */
+    SourcesRow sourcesRow(Context context) {
+        SourcesRow row = new SourcesRow(context);
+        row.setKey(Settings.HIDDEN_SOURCES.key);
+        String title = L10n.t("People, Pages and sites to hide");
+        row.setTitle(title);
+        row.setDialogTitle(title);
+        row.setDialogMessage(L10n.f("One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, "
+                + "or a site like example.com, which takes its subdomains too. Capital letters don't matter.",
+                PostSources.MAX_RULES));
+        row.setPositiveButtonText(L10n.t("Save"));
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        EditText field = row.getEditText();
+        field.setSingleLine(false);
+        field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        // A landscape IME's extracted editor replaces the dialog and hides Save and Cancel.
+        field.setImeOptions(field.getImeOptions() | EditorInfo.IME_FLAG_NO_FULLSCREEN
+                | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        field.setMinLines(3);
+        field.setHint(L10n.t("One name, id or site per line"));
+        row.setText(Settings.HIDDEN_SOURCES.savedValue());
+        row.setOnPreferenceChangeListener((preference, typed) -> {
+            String raw = typed == null ? "" : typed.toString();
+            String clean = PostSources.clean(raw);
+            if (clean.equals(raw)) return true;
+            // Keeps the clean list in place of what was typed, as the word lists do.
+            int leftOut = PostSources.leftOut(raw);
+            ((SourcesRow) preference).setText(clean);
+            if (leftOut > 0) {
+                String why = L10n.quantity(leftOut,
+                        "%1$d line was left out. A line holds up to %2$d characters, the list up to %3$d lines, "
+                                + "and one given twice counts once.",
+                        "%1$d lines were left out. A line holds up to %2$d characters, the list up to %3$d lines, "
+                                + "and one given twice counts once.",
+                        leftOut, PostSources.MAX_LENGTH, PostSources.MAX_RULES);
+                show(new AlertDialog.Builder(preference.getContext())
+                        .setTitle(title)
+                        .setMessage(why)
+                        .setPositiveButton(L10n.t("OK"), null));
+            }
+            return false;
+        });
+        return row;
+    }
+
+    /** What the people, Pages and sites row says: how many it holds. Counts only, never a name. */
+    static String sourcesSummary(String stored) {
+        int rules = PostSources.count(stored);
+        if (rules == 0) return L10n.t("Nobody listed yet, so no post is hidden.");
+        return L10n.quantity(rules, "%1$d person, Page or site.", "%1$d people, Pages or sites.", rules);
     }
 
     /**

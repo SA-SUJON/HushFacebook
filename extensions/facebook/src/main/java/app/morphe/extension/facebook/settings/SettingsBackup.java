@@ -37,6 +37,7 @@ import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
+import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
@@ -79,7 +80,7 @@ public final class SettingsBackup {
      * Far more than a settings file needs: one is a few hundred bytes, or 63 KB at most with both
      * word lists filling the room they share.
      */
-    public static final int MAX_BYTES = 64 * 1024;
+    public static final int MAX_BYTES = 80 * 1024;
     public static final String FORMAT = "hushfacebook-settings";
     /** The file shape this build writes and the newest it reads. A file declaring more is refused. */
     static final int SCHEMA = 1;
@@ -115,6 +116,7 @@ public final class SettingsBackup {
             Settings.HIDE_AI_CHARACTER_POSTS,
             Settings.HIDE_AI_DETECTED_REELS,
             Settings.HIDE_POSTS_WITH_WORDS,
+            Settings.HIDE_POSTS_FROM_SOURCES,
             Settings.POST_WORDS_WHOLE_WORDS,
             Settings.HIDE_POST_PROMPTS,
             Settings.HIDE_META_AI_QUESTIONS,
@@ -211,6 +213,13 @@ public final class SettingsBackup {
     static final StringSetting KEPT = Settings.KEPT_WORDS;
 
     /**
+     * The people, Pages and sites list, held in a file exactly as its row stores it, within
+     * {@link PostSources}' bounds. A value {@link PostSources#clean} would change refuses the whole
+     * file, as a word list does.
+     */
+    static final StringSetting SOURCES = Settings.HIDDEN_SOURCES;
+
+    /**
      * The top folder saves go to, held in a file as its {@link SaveTo#fileValue}. Anything else
      * refuses the whole file, as a quality does. Saves already made stay where they are.
      */
@@ -277,8 +286,8 @@ public final class SettingsBackup {
 
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(HIDDEN, KEPT, TO, FOLDER, QUALITY, FILE_NAME, ACTION, APP, START, SUBTAB,
-                    ORDER, PLAYBACK));
+            Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, TO, FOLDER, QUALITY, FILE_NAME, ACTION, APP, START,
+                    SUBTAB, ORDER, PLAYBACK));
 
     /** The longest name or value a file holds that isn't a word list, far past a package name. */
     private static final int MAX_OTHER_CHARS = 1024;
@@ -363,6 +372,7 @@ public final class SettingsBackup {
         private static final String ORDER_NAME = "comment_order";
         private static final String HIDDEN_NAME = "hidden_words";
         private static final String KEPT_NAME = "kept_words";
+        private static final String SOURCES_NAME = "hidden_sources";
         private static final String PLAYBACK_NAME = "playback_quality";
         private static final String ACTION_NAME = "download_action";
         private static final String APP_NAME = "send_to_app";
@@ -407,6 +417,9 @@ public final class SettingsBackup {
         /** The filter the Feeds tab opens on that the file holds, or null when it names none. */
         @Nullable
         final FeedsSubtab subtab;
+        /** The clean people, Pages and sites list the file holds, or null when it names none. */
+        @Nullable
+        final String sources;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -447,6 +460,15 @@ public final class SettingsBackup {
                  @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
                  @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
                  @Nullable FeedsSubtab subtab, int unknown) {
+            this(values, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to, subtab,
+                    null, unknown);
+        }
+
+        Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                 @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                 @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
+                 @Nullable FeedsSubtab subtab, @Nullable String sources, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
@@ -460,6 +482,7 @@ public final class SettingsBackup {
             this.app = app;
             this.to = to;
             this.subtab = subtab;
+            this.sources = sources;
             this.unknown = unknown;
         }
 
@@ -492,6 +515,8 @@ public final class SettingsBackup {
             if (hiddenChange != null) changes.put(HIDDEN, hiddenChange);
             String keptChange = keptChange();
             if (keptChange != null) changes.put(KEPT, keptChange);
+            String sourcesChange = sourcesChange();
+            if (sourcesChange != null) changes.put(SOURCES, sourcesChange);
             PlaybackQuality playbackChange = playbackChange();
             if (playbackChange != null) changes.put(PLAYBACK, playbackChange);
             SendLink.Action actionChange = actionChange();
@@ -591,6 +616,13 @@ public final class SettingsBackup {
             return listChange(kept, KEPT);
         }
 
+        /** The people, Pages and sites list this file sets, or null when it names none or the one already set. */
+        @Nullable
+        String sourcesChange() {
+            if (sources == null) return null;
+            return sources.equals(PostSources.clean(SOURCES.savedValue())) ? null : sources;
+        }
+
         @Nullable
         private static String listChange(@Nullable String list, StringSetting setting) {
             if (list == null) return null;
@@ -612,6 +644,7 @@ public final class SettingsBackup {
             if (order != null) state.putString(ORDER_NAME, order.fileValue);
             if (hidden != null) state.putString(HIDDEN_NAME, hidden);
             if (kept != null) state.putString(KEPT_NAME, kept);
+            if (sources != null) state.putString(SOURCES_NAME, sources);
             if (playback != null) state.putString(PLAYBACK_NAME, playback.fileValue);
             if (action != null) state.putString(ACTION_NAME, action.fileValue);
             if (app != null) state.putString(APP_NAME, app);
@@ -641,6 +674,7 @@ public final class SettingsBackup {
             Object fileName = state.get(FILE_NAME_NAME);
             Object hidden = state.get(HIDDEN_NAME);
             Object kept = state.get(KEPT_NAME);
+            Object sources = state.get(SOURCES_NAME);
             Object app = state.get(APP_NAME);
             return new Snapshot(values, folder instanceof String && SaveFolder.isClean((String) folder)
                     ? (String) folder : null, DownloadQuality.fromFile(state.get(QUALITY_NAME)),
@@ -650,7 +684,8 @@ public final class SettingsBackup {
                     kept instanceof String && PostWords.isClean((String) kept) ? (String) kept : null,
                     PlaybackQuality.fromFile(state.get(PLAYBACK_NAME)), SendLink.Action.fromFile(state.get(ACTION_NAME)),
                     SendLink.isFileApp(app) ? (String) app : null, SaveTo.fromFile(state.get(TO_NAME)),
-                    FeedsSubtab.fromFile(state.get(SUBTAB_NAME)), unknown);
+                    FeedsSubtab.fromFile(state.get(SUBTAB_NAME)),
+                    sources instanceof String && PostSources.isClean((String) sources) ? (String) sources : null, unknown);
         }
     }
 
@@ -678,6 +713,7 @@ public final class SettingsBackup {
         // The lists the filter reads, so a file never carries one an import would refuse.
         switches.put(HIDDEN.key, PostWords.clean(HIDDEN.savedValue()));
         switches.put(KEPT.key, PostWords.clean(KEPT.savedValue()));
+        switches.put(SOURCES.key, PostSources.clean(SOURCES.savedValue()));
         return new JSONObject()
                 .put(FORMAT_NAME, FORMAT)
                 .put(SCHEMA_NAME, SCHEMA)
@@ -770,6 +806,7 @@ public final class SettingsBackup {
         CommentOrder order = null;
         String hidden = null;
         String kept = null;
+        String sources = null;
         PlaybackQuality playback = null;
         SendLink.Action action = null;
         String app = null;
@@ -856,6 +893,15 @@ public final class SettingsBackup {
                 else kept = (String) value;
                 continue;
             }
+            if (SOURCES.key.equals(name)) {
+                Object value = values.opt(name);
+                // The setting's name only, as for the word lists: what was typed stays out of a refusal.
+                if (!(value instanceof String) || !PostSources.isClean((String) value)) {
+                    throw new Rejected(Reason.VALUE, "Not one clean list of people, Pages and sites: " + name);
+                }
+                sources = (String) value;
+                continue;
+            }
             BooleanSetting setting = known.get(name);
             if (setting == null) {
                 // A name this build doesn't know, Pause and the debug settings included: left
@@ -887,7 +933,7 @@ public final class SettingsBackup {
             if (value != null) ordered.put(setting, value);
         }
         return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
-                subtab, unknown);
+                subtab, sources, unknown);
     }
 
     /**

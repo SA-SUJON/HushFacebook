@@ -43,6 +43,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_META_AI_FEED_UNITS) return L10n.t("Hide Meta AI in the feed");
         if (setting == Settings.HIDE_AI_CHARACTER_POSTS) return L10n.t("Hide AI character posts");
         if (setting == Settings.HIDE_POSTS_WITH_WORDS) return L10n.t("Hide posts with words you choose");
+        if (setting == Settings.HIDE_POSTS_FROM_SOURCES) return L10n.t("Hide posts from people, Pages and sites");
         if (setting == Settings.POST_WORDS_WHOLE_WORDS) return L10n.t("Match whole words");
         if (setting == Settings.HIDE_SPONSORED_STORIES) return L10n.t("Hide sponsored stories");
         if (setting == Settings.HIDE_SUGGESTED_STORIES) return L10n.t("Hide suggested stories");

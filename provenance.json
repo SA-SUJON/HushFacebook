@@ -512,6 +512,15 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/PostSources.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: hiding feed posts from people, Pages and sites the person lists. In Facebook 581 GraphQLStory reads its authors with an accessor that asks getCachedModelList for the field keyed actors as the type tagged Actor, and its attachments the same way as StoryAttachment. The patch finds both by their keys and fills two stubs in PostSources. The extension reads each author's id and name and each attachment's url through the kept getCachedString, follows Facebook's l.facebook.com redirect to the site it carries, reads a shared post the same way, matches ids, whole names and sites with their subdomains against the bounded list, keeps any post it can't read, and reports only which line matched by number."
+    },
+    {
+      "paths": [
         "patches/src/main/kotlin/app/morphe/patches/facebook/feed/metaai/**"
       ],
       "origin": "original",

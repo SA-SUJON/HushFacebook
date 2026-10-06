@@ -466,6 +466,19 @@ Games you play in Facebook get no ads. A game asking for one hears there's none 
 Ads and boosted listings in Marketplace's feed and search results. The other listings stay.	Marketplace akışındaki ve arama sonuçlarındaki reklamlar ve öne çıkarılan ilanlar. Diğer ilanlar kalır.
 # context: switch title under News feed; hides posts whose text holds a word or phrase the person listed
 Hide posts with words you choose	Seçtiğin kelimeleri içeren gönderileri gizle
+Hide posts from people, Pages and sites	Kişilerden, sayfalardan ve sitelerden gelen gönderileri gizle
+Posts by a person or Page on your list below, or linking to a site on it, and shares of them. Your list only leaves the phone in a settings file you export.	Aşağıdaki listendeki bir kişinin veya sayfanın gönderileri ya da listendeki bir siteye bağlantı veren gönderiler ve bunların paylaşımları. Listen telefondan yalnızca dışa aktardığın bir ayar dosyasında çıkar.
+People, Pages and sites to hide	Gizlenecek kişiler, sayfalar ve siteler
+One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, or a site like example.com, which takes its subdomains too. Capital letters don't matter.	Her satıra bir tane, en fazla %1$d: Facebook'un gösterdiği şekliyle bir ad, bir profil veya sayfa kimliği ya da alt alan adlarını da kapsayan example.com gibi bir site. Büyük harfler önemli değil.
+One name, id or site per line	Her satıra bir ad, kimlik veya site
+%1$d line was left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d satır dışarıda bırakıldı. Bir satır en fazla %2$d karakter, liste en fazla %3$d satır alır ve iki kez yazılan bir kez sayılır.
+%1$d lines were left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d satır dışarıda bırakıldı. Bir satır en fazla %2$d karakter, liste en fazla %3$d satır alır ve iki kez yazılan bir kez sayılır.
+Nobody listed yet, so no post is hidden.	Henüz kimse eklenmedi, bu yüzden hiçbir gönderi gizlenmiyor.
+%1$d person, Page or site.	%1$d kişi, sayfa veya site.
+%1$d people, Pages or sites.	%1$d kişi, sayfa veya site.
+Your list of people, Pages and sites to hide will be empty.	Gizlenecek kişiler, sayfalar ve siteler listen boş olacak.
+Your list of people, Pages and sites to hide will hold %1$d entry.	Gizlenecek kişiler, sayfalar ve siteler listende %1$d kayıt olacak.
+Your list of people, Pages and sites to hide will hold %1$d entries.	Gizlenecek kişiler, sayfalar ve siteler listende %1$d kayıt olacak.
 # context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes
 Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.	Metninde aşağıdaki listenden bir kelime veya ifade geçen gönderiler. Tutma listendeki bir kelimeyi içeren gönderi kalır, metni olmayan gönderi de kalır. Kelimelerin telefondan yalnızca dışa aktardığın bir ayar dosyasıyla çıkar.
 # context: title of the row and dialog holding the list of words and phrases that hide a post

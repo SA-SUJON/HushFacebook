@@ -466,6 +466,19 @@ Games you play in Facebook get no ads. A game asking for one hears there's none 
 Ads and boosted listings in Marketplace's feed and search results. The other listings stay.	Iklan dan tawaran yang dipromosikan di feed dan hasil pencarian Marketplace. Tawaran lainnya tetap ada.
 # context: switch title under News feed; hides posts whose text holds a word or phrase the person listed
 Hide posts with words you choose	Sembunyikan postingan dengan kata pilihan Anda
+Hide posts from people, Pages and sites	Sembunyikan postingan dari orang, Halaman, dan situs
+Posts by a person or Page on your list below, or linking to a site on it, and shares of them. Your list only leaves the phone in a settings file you export.	Postingan dari orang atau Halaman di daftarmu di bawah, atau yang menautkan ke situs di dalamnya, serta bagikan ulangnya. Daftarmu hanya keluar dari ponsel dalam file pengaturan yang kamu ekspor.
+People, Pages and sites to hide	Orang, Halaman, dan situs yang disembunyikan
+One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, or a site like example.com, which takes its subdomains too. Capital letters don't matter.	Satu per baris, hingga %1$d: nama seperti yang ditampilkan Facebook, ID profil atau Halaman, atau situs seperti example.com, termasuk subdomainnya. Huruf besar tidak berpengaruh.
+One name, id or site per line	Satu nama, ID, atau situs per baris
+%1$d line was left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d baris dihilangkan. Satu baris memuat hingga %2$d karakter, daftar hingga %3$d baris, dan yang ditulis dua kali dihitung sekali.
+%1$d lines were left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d baris dihilangkan. Satu baris memuat hingga %2$d karakter, daftar hingga %3$d baris, dan yang ditulis dua kali dihitung sekali.
+Nobody listed yet, so no post is hidden.	Belum ada yang didaftarkan, jadi tidak ada postingan yang disembunyikan.
+%1$d person, Page or site.	%1$d orang, Halaman, atau situs.
+%1$d people, Pages or sites.	%1$d orang, Halaman, atau situs.
+Your list of people, Pages and sites to hide will be empty.	Daftar orang, Halaman, dan situs yang kamu sembunyikan akan kosong.
+Your list of people, Pages and sites to hide will hold %1$d entry.	Daftar orang, Halaman, dan situs yang kamu sembunyikan akan berisi %1$d entri.
+Your list of people, Pages and sites to hide will hold %1$d entries.	Daftar orang, Halaman, dan situs yang kamu sembunyikan akan berisi %1$d entri.
 # context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes
 Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.	Postingan yang teksnya berisi kata atau frasa dari daftar Anda di bawah. Postingan dengan kata dari daftar pertahankan Anda tetap ada, begitu juga postingan tanpa teks. Kata-kata Anda hanya keluar dari ponsel dalam file pengaturan yang Anda ekspor.
 # context: title of the row and dialog holding the list of words and phrases that hide a post

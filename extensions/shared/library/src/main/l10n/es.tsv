@@ -466,6 +466,19 @@ Games you play in Facebook get no ads. A game asking for one hears there's none 
 Ads and boosted listings in Marketplace's feed and search results. The other listings stay.	Anuncios y artículos promocionados en el feed y en los resultados de búsqueda de Marketplace. Los demás artículos se quedan.
 # context: switch title under News feed; hides posts whose text holds a word or phrase the person listed
 Hide posts with words you choose	Ocultar publicaciones con las palabras que elijas
+Hide posts from people, Pages and sites	Ocultar publicaciones de personas, páginas y sitios
+Posts by a person or Page on your list below, or linking to a site on it, and shares of them. Your list only leaves the phone in a settings file you export.	Publicaciones de una persona o página de tu lista de abajo, o con un enlace a un sitio de ella, y lo que se comparta de ellas. Tu lista solo sale del teléfono en un archivo de ajustes que exportes.
+People, Pages and sites to hide	Personas, páginas y sitios que ocultar
+One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, or a site like example.com, which takes its subdomains too. Capital letters don't matter.	Uno por línea, hasta %1$d: un nombre tal como lo muestra Facebook, un ID de perfil o de página, o un sitio como example.com, que incluye también sus subdominios. Las mayúsculas no importan.
+One name, id or site per line	Un nombre, ID o sitio por línea
+%1$d line was left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	Se omitió %1$d línea. Una línea admite hasta %2$d caracteres, la lista hasta %3$d líneas, y una repetida cuenta una vez.
+%1$d lines were left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	Se omitieron %1$d líneas. Una línea admite hasta %2$d caracteres, la lista hasta %3$d líneas, y una repetida cuenta una vez.
+Nobody listed yet, so no post is hidden.	Todavía no hay nadie en la lista, así que no se oculta ninguna publicación.
+%1$d person, Page or site.	%1$d persona, página o sitio.
+%1$d people, Pages or sites.	%1$d personas, páginas o sitios.
+Your list of people, Pages and sites to hide will be empty.	Tu lista de personas, páginas y sitios que ocultar quedará vacía.
+Your list of people, Pages and sites to hide will hold %1$d entry.	Tu lista de personas, páginas y sitios que ocultar tendrá %1$d entrada.
+Your list of people, Pages and sites to hide will hold %1$d entries.	Tu lista de personas, páginas y sitios que ocultar tendrá %1$d entradas.
 # context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes
 Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.	Publicaciones cuyo texto tiene una palabra o frase de tu lista de abajo. Una publicación con una palabra de tu lista para conservar se mantiene, igual que una publicación sin texto. Tus palabras solo salen del teléfono en un archivo de configuración que exportes.
 # context: title of the row and dialog holding the list of words and phrases that hide a post
