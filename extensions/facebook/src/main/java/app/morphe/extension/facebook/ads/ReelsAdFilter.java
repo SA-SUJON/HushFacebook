@@ -79,8 +79,12 @@ public final class ReelsAdFilter {
     /** What the diagnostic report counts each time an ad-break fetch is answered with a failure. */
     static final String AD_BREAK_FETCH_HELD = "Ad-break fetch held";
 
-    /** What the diagnostic report counts each time an ad's floating button is kept off its comments. */
-    static final String AD_PILL_HELD = "Ad button on comments held";
+    /**
+     * What the diagnostic report counts each time the comment pill asks about an ad's button and
+     * hears no. The pill asks about every plugin it has on each draw, before Facebook's own check of
+     * whether the ad has a button, so this counts the answers, not buttons that would have shown.
+     */
+    static final String AD_PILL_HELD = "Ad button checks answered no";
 
     /**
      * The comment sheet's floating buttons for a reel, Watch or in-stream ad, by the class name of
