@@ -610,6 +610,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_download_videos", TRUE);
 
     /**
+     * Save photo in the photo viewer's menu for every photo, saved at its biggest size where
+     * downloads go. Off, the item shows only where the poster allows it and saves through Facebook.
+     */
+    public static final BooleanSetting DOWNLOAD_PHOTOS =
+            new BooleanSetting("hushfacebook_download_photos", TRUE);
+
+    /**
      * A start from Facebook's launcher icon opens the tab in {@link #START_TAB} instead of the one
      * Facebook would choose. Notifications, links and shortcuts keep their own destination.
      */

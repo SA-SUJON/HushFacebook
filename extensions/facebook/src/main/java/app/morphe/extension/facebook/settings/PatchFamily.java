@@ -129,6 +129,8 @@ public enum PatchFamily {
             Settings.DOWNLOAD_REELS),
     VIDEO_DOWNLOAD(FamilyNames.VIDEO_DOWNLOAD, "videoDownload", null,
             Settings.DOWNLOAD_VIDEOS),
+    PHOTO_DOWNLOAD(FamilyNames.PHOTO_DOWNLOAD, "photoDownload", null,
+            Settings.DOWNLOAD_PHOTOS),
     START_TAB(FamilyNames.START_TAB, "startTab", null,
             Settings.OPEN_ON_CHOSEN_TAB),
     MARKETPLACE_ONLY(FamilyNames.MARKETPLACE_ONLY, "marketplaceOnly", null,
@@ -217,7 +219,7 @@ public enum PatchFamily {
             java.util.Arrays.asList(Settings.CHECK_FOR_RELEASES, Settings.SAVED_SHORTCUT));
 
     /**
-     * The switches the three download patches share and none of them owns: each shapes what every
+     * The switches the download patches share and none of them owns: each shapes what every
      * save picks, a story's, a reel's or a feed video's, so it's on the screen under Downloads
      * whenever one of them is in the build. Today that's saves other apps can open. Pause turns
      * them off like a family's switches, and a paused Facebook makes no Hushfacebook saves anyway.
@@ -226,7 +228,7 @@ public enum PatchFamily {
 
     /** The families whose saves read {@link #DOWNLOAD_SWITCHES}. */
     static final Set<PatchFamily> DOWNLOADS = Collections.unmodifiableSet(
-            EnumSet.of(STORY_DOWNLOAD, REEL_DOWNLOAD, VIDEO_DOWNLOAD));
+            EnumSet.of(STORY_DOWNLOAD, REEL_DOWNLOAD, VIDEO_DOWNLOAD, PHOTO_DOWNLOAD));
 
     /**
      * The patches Morphe Manager selects by default. One of them left out is the usual answer to a
@@ -240,7 +242,7 @@ public enum PatchFamily {
             SPONSORED_REELS, SPONSORED_SEARCH, SPONSORED_PROFILE_POSTS, SPONSORED_MARKETPLACE, GAME_ADS, AFFILIATE_LINKS,
             KEEP_REEL_SPEED,
             RESUME_LONG_VIDEOS, EXTERNAL_BROWSER, SANITIZE_SHARING_LINKS, UPDATE_PROMPTS, STORY_DOWNLOAD,
-            REEL_DOWNLOAD, MARKETPLACE_ONLY, SELLER_VIEW_PROFILE, REELS_TAB_DOT, HIDDEN_TABS, BOTTOM_TAB_BAR, FORCE_DARK_MODE, MESSENGER_CARD, MESSENGER_ICON, MENU_PROMOTIONS,
+            REEL_DOWNLOAD, PHOTO_DOWNLOAD, MARKETPLACE_ONLY, SELLER_VIEW_PROFILE, REELS_TAB_DOT, HIDDEN_TABS, BOTTOM_TAB_BAR, FORCE_DARK_MODE, MESSENGER_CARD, MESSENGER_ICON, MENU_PROMOTIONS,
             META_AI_SEARCH, PROMO_NOTIFICATIONS, AD_PREFETCH, AD_TELEMETRY, AUDIENCE_NETWORK, RESTORE_TRUST,
             TRANSLATED_START, INSTALL_BESIDE_META_APPS, MENU_SETTINGS_ROW));
 

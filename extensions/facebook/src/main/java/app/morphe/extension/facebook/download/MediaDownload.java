@@ -10,6 +10,7 @@ package app.morphe.extension.facebook.download;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -257,6 +258,26 @@ public final class MediaDownload {
             failure(() -> "the video save could not start", t);
             return false;
         }
+    }
+
+    /**
+     * Saves the photo at [url], the biggest image the photo viewer's photo holds, as a story's
+     * photo saves. Answers whether the save started; false lets Facebook's own save run.
+     *
+     * <p>It skips {@link RenditionPicker}'s ranking: the caller already chose by the image's own
+     * width and height, and a full-size photo's address can carry the size marker the ranking
+     * reads as a thumbnail's. The address still has to be on Meta's media servers.
+     */
+    static boolean savePhoto(Context context, String url, PostDetails details) {
+        if (url == null || metaOnly(Collections.singletonList(url)).isEmpty()) {
+            failure(() -> "nothing to save: the photo's image wasn't on Meta's media servers", null);
+            return false;
+        }
+        Context safe = ready(context);
+        if (safe == null) return false;
+        info(() -> "saving the photo's biggest image, a " + describe(url));
+        start(safe, false, details == null ? PostDetails.NONE : details, fileJob(safe, url, Downloader.Kind.IMAGE));
+        return true;
     }
 
     // ---------------------------------------------------------------- internals

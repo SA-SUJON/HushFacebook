@@ -172,11 +172,15 @@ final class VideoPages {
     @Nullable
     static PreferenceCategory downloads(PreferenceScreen screen, Context context, Set<PatchFamily> build) {
         if (build.contains(PatchFamily.STORY_DOWNLOAD) || build.contains(PatchFamily.REEL_DOWNLOAD)
-                || build.contains(PatchFamily.VIDEO_DOWNLOAD)) {
+                || build.contains(PatchFamily.VIDEO_DOWNLOAD) || build.contains(PatchFamily.PHOTO_DOWNLOAD)) {
             PreferenceCategory downloads = category(screen, L10n.t("Downloads"));
             if (build.contains(PatchFamily.VIDEO_DOWNLOAD)) {
                 downloads.addPreference(toggle(context, Settings.DOWNLOAD_VIDEOS,
                         L10n.t("Add Download to phone to feed and Watch video menus. Uses the quality below. Off or paused, Facebook's menu returns.")));
+            }
+            if (build.contains(PatchFamily.PHOTO_DOWNLOAD)) {
+                downloads.addPreference(toggle(context, Settings.DOWNLOAD_PHOTOS,
+                        L10n.t("Shows Save photo on every photo you open, even where the poster turned saving off, and saves the biggest size where your downloads go. Off or paused, Facebook decides again.")));
             }
             // Every save reads it, a story's and a reel's as much as a feed video's, so it's here
             // whichever download patch is in, above the quality it keeps within.

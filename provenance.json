@@ -670,6 +670,17 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/PhotoSave.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/downloads/photo/DownloadPhotoPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/downloads/photo/PhotoSaveAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook from Facebook 577, 580 and 581: the photo viewer's two reads of can_viewer_download ask the switch, and Save photo's kept newSavePhotoAction hands its listener to the extension, which saves the photo's biggest image through Hushfacebook's downloader and falls back to Facebook's own save."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/ReadReceipts.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/chats/HideReadReceiptsPatch.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/chats/ReadReceiptAnchors.kt"

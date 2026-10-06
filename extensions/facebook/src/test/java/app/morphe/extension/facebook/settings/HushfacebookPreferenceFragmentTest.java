@@ -743,7 +743,7 @@ public class HushfacebookPreferenceFragmentTest {
      */
     @Test
     public void theCompatibleSwitchSitsAboveTheQualityWithAnyDownloadIn() {
-        for (PatchFamily download : new PatchFamily[]{PatchFamily.STORY_DOWNLOAD, PatchFamily.REEL_DOWNLOAD,
+        for (PatchFamily download : new PatchFamily[]{PatchFamily.STORY_DOWNLOAD, PatchFamily.REEL_DOWNLOAD, PatchFamily.PHOTO_DOWNLOAD,
                 PatchFamily.VIDEO_DOWNLOAD}) {
             PatchFamily.inBuildForTests = EnumSet.of(download);
             try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {

@@ -222,6 +222,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean photoDownload() {
+        return false;
+    }
+
     public static boolean startTab() {
         return false;
     }
