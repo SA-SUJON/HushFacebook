@@ -447,6 +447,15 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredreels/AdPills.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the floating ad button on a reel or video ad's comments. In Facebook 577, 580 and 581 the comment sheet's indicator pill numbers its eight plugins, one static method turns a number into the plugin's class name, and one static check beside it decides whether that plugin's button shows. The patch finds the name table by the Reels ad plugin's class name and the check by its shape, and has the check ask the extension first with the table's name for its number. While the switch is on, the Reels, Watch and in-stream ad buttons answer no. The pill's other plugins are Facebook's call."
+    },
+    {
+      "paths": [
         "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredreels/ReelsAdPool.kt"
       ],
       "origin": "original",
