@@ -11,12 +11,14 @@ import app.morphe.patches.facebook.feed.GRAPHQL_STORY
 import app.morphe.patches.facebook.feed.methodsHolding
 import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.shared.compat.AppCompatibilities
-import com.android.tools.smali.dexlib2.AccessFlags
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+
+/** Kept field name. An attachment's own list of attachments, read as StoryAttachment models like the story's. */
+private const val SUBATTACHMENTS_FIELD = "subattachments"
 
 /**
  * The AI character side of Hide AI-detected posts, found in the Facebook builds the bundle
@@ -24,8 +26,9 @@ import org.junit.Test
  * GraphQLStoryAttachment's one accessor of its style_infos, and the one static finder the AI
  * character style's literal is handed to, public in a public class and walking style_infos by
  * getTypeName(). The compiled extension's holders of the literal are searched beside Facebook's,
- * as the patcher sees them. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips
- * without it.
+ * as the patcher sees them. Each control passes the right owner and changes one thing, so only the
+ * check under test can turn it away. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and
+ * skips without it.
  */
 class AiCharacterFixtureTest {
     @Test
@@ -33,8 +36,8 @@ class AiCharacterFixtureTest {
         val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }
         assertTrue("the bundle declares no Facebook build", versions.isNotEmpty())
         val extensionHolders = ExtensionDex.classes().flatMap { methodsHolding(it, AI_CHARACTER_STYLE) }
-        assertTrue("the extension no longer holds \"$AI_CHARACTER_STYLE\", so the merged search below is no " +
-            "harder than Facebook's alone: drop this check", extensionHolders.isNotEmpty())
+        assertTrue("the extension no longer holds \"$AI_CHARACTER_STYLE\", so the patcher's search no longer " +
+            "meets it: drop extensionHolders here", extensionHolders.isNotEmpty())
         val checked = mutableSetOf<String>()
         for (version in versions) {
             for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
@@ -50,14 +53,22 @@ class AiCharacterFixtureTest {
                     1, styleLists.size)
                 val styleInfos = styleLists.single()
 
-                // The control: the attachment's own list of attachments is read the same way under
-                // another key, and isn't taken for the story's.
-                assertTrue("${bundle.name}: GraphQLStoryAttachment declares no other list read as StoryAttachment",
-                    attachment.methods.any {
-                        isModelListAccessor(it, GRAPHQL_STORY_ATTACHMENT, "subattachments", ATTACHMENT_TYPE, GRAPHQL_STORY_ATTACHMENT)
-                    })
-                assertTrue("${bundle.name}: an attachment's own list passes for the story's attachments",
-                    attachment.methods.none { isModelListAccessor(it, GRAPHQL_STORY, ATTACHMENTS_FIELD, ATTACHMENT_TYPE) })
+                // The controls. The attachment's own list of attachments has the story's list's type
+                // tag and element class under another key, so only the key check turns it away; the
+                // story's list asked for under another type tag or element class leaves only those.
+                val subattachments = attachment.methods.filter {
+                    isModelListAccessor(it, GRAPHQL_STORY_ATTACHMENT, SUBATTACHMENTS_FIELD, ATTACHMENT_TYPE, GRAPHQL_STORY_ATTACHMENT)
+                }
+                assertEquals("${bundle.name}: GraphQLStoryAttachment's subattachments accessors ${subattachments.map { it.name }}",
+                    1, subattachments.size)
+                assertFalse("${bundle.name}: the subattachments accessor passes under the key of $ATTACHMENTS_FIELD",
+                    isModelListAccessor(subattachments.single(), GRAPHQL_STORY_ATTACHMENT, ATTACHMENTS_FIELD,
+                        ATTACHMENT_TYPE, GRAPHQL_STORY_ATTACHMENT))
+                val storyList = attachmentLists.single()
+                assertFalse("${bundle.name}: the story's attachments pass as $STYLE_INFO_TYPE models",
+                    isModelListAccessor(storyList, GRAPHQL_STORY, ATTACHMENTS_FIELD, STYLE_INFO_TYPE))
+                assertFalse("${bundle.name}: the story's attachments pass as read into GraphQLStory",
+                    isModelListAccessor(storyList, GRAPHQL_STORY, ATTACHMENTS_FIELD, ATTACHMENT_TYPE, GRAPHQL_STORY))
 
                 val holders = FixtureDex.classesHolding(bundle, AI_CHARACTER_STYLE)
                     .flatMap { methodsHolding(it, AI_CHARACTER_STYLE) }
@@ -72,15 +83,10 @@ class AiCharacterFixtureTest {
                 assertTrue("${bundle.name}: ${finder.definingClass}->${finder.name} isn't a public style finder over " +
                     "${styleInfos.name}()", isStyleFinder(method, finderClass, styleInfos))
 
-                // The control: the finder's siblings taking the same parameters don't pass for it.
-                val siblings = finderClass.methods.filter {
-                    it.name != finder.name && AccessFlags.STATIC.isSet(it.accessFlags) &&
-                        it.parameterTypes.map { p -> p.toString() } == finder.parameterTypes.map { p -> p.toString() }
-                }
-                for (sibling in siblings) {
-                    assertFalse("${bundle.name}: ${sibling.name} passes for the style finder too",
-                        isStyleFinder(sibling, finderClass, styleInfos))
-                }
+                // The control: held to another of the attachment's lists, one it doesn't read, the
+                // finder fails on the style_infos read alone.
+                assertFalse("${bundle.name}: ${finder.name} passes as a finder over ${subattachments.single().name}()",
+                    isStyleFinder(method, finderClass, subattachments.single()))
                 checked += version
             }
         }

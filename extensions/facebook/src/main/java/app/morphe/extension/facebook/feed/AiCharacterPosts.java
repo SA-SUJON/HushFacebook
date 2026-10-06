@@ -10,7 +10,7 @@ import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.shared.diagnostics.HookStatus;
 
 /**
- * Hide Meta AI in the feed's rule for posts that carry an AI character: Meta's Creator AI and AI
+ * Hide AI character posts' rule for posts that carry an AI character: Meta's Creator AI and AI
  * Studio characters, which a post offers to chat with or call. Facebook marks such a post's
  * attachment with a style of the GraphQL type {@link #STYLE_TYPE}, and its feed code asks for that
  * style through a finder of its own, which walks the attachment's {@code style_infos} and compares
@@ -18,8 +18,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *
  * <p>The patch fills in two stubs: GraphQLStory's accessor of its {@code attachments}, which Redex
  * renames every build, and a call of Facebook's finder. So a post is judged by the same lookup
- * Facebook draws the character's attachment with. The guard asks only while Hide Meta AI in the
- * feed is on, and what the report counts is one of the kinds below, never the post.
+ * Facebook draws the character's attachment with. The guard asks only while Hide AI character
+ * posts is on, and what the report counts is one of the kinds below, never the post.
  */
 public final class AiCharacterPosts {
     /** The attachment style Facebook gives a post that carries an AI character. */

@@ -50,7 +50,7 @@ public enum PatchFamily {
             Settings.BLOCK_RETURN_REFRESH, Settings.RETURN_REFRESH_NO_LIMIT),
     AI_DETECTED_POSTS(FamilyNames.AI_DETECTED_POSTS, "aiDetectedPosts", null,
             Settings.HIDE_AI_DETECTED_POSTS, Settings.HIDE_AI_LABELLED_POSTS, Settings.HIDE_AI_DETECTED_REELS,
-            Settings.HIDE_META_AI_FEED_UNITS),
+            Settings.HIDE_META_AI_FEED_UNITS, Settings.HIDE_AI_CHARACTER_POSTS),
     POST_WORDS(FamilyNames.POST_WORDS, "postWords", null,
             Settings.HIDE_POSTS_WITH_WORDS, Settings.POST_WORDS_WHOLE_WORDS),
     POST_PROMPTS(FamilyNames.POST_PROMPTS, "postPrompts", null,

@@ -513,7 +513,9 @@ Resume videos over two minutes where you left off, in the feed or full screen. S
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
 Also hide posts labelled as AI	Ocultar también publicaciones etiquetadas como IA
 Hide Meta AI in the feed	Ocultar Meta AI en el feed
-The Meta AI cards Facebook adds to the feed between posts, and posts featuring one of Meta's AI characters. Other posts stay, whatever they say about AI.	Las tarjetas de Meta AI que Facebook añade al feed entre publicaciones y las publicaciones con uno de los personajes de IA de Meta. Las demás publicaciones se quedan, digan lo que digan sobre la IA.
+The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.	Las tarjetas de Meta AI que Facebook añade al feed entre publicaciones. Las publicaciones de las personas se quedan, digan lo que digan sobre la IA.
+Hide AI character posts	Ocultar publicaciones con personajes de IA
+Posts featuring one of Meta's AI characters, the chatbots people and creators make with Meta AI Studio. It's off by default because it hasn't been tested on a real feed yet.	Publicaciones con uno de los personajes de IA de Meta, los chatbots que personas y creadores hacen con Meta AI Studio. Este interruptor viene desactivado porque todavía no se probó en un feed real.
 # context: summary of that switch; the AI label is the one Facebook shows next to the poster's name on such posts
 Posts whose creator marked them as made with AI. Facebook puts its AI label next to the name on these as well as on the posts its detection found, and with this on, both kinds go. It's off by default because it hasn't been tested on a real feed yet.	Publicaciones que su autor marcó como creadas con IA. Facebook pone su etiqueta de IA junto al nombre en estas y también en las que encontró su propia detección, y con este interruptor activado se ocultan las dos. Viene desactivado porque todavía no se probó en un feed real.
 Return to regular Facebook	Volver a Facebook normal

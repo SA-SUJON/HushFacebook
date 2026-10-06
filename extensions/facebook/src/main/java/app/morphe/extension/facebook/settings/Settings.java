@@ -125,12 +125,19 @@ public class Settings extends BaseSettings {
 
     /**
      * The Meta AI cards Facebook adds to the feed between posts, known by their GraphQL type name
-     * alone, and posts whose attachment carries one of Meta's AI characters, known by the
-     * attachment style Facebook draws it with. On: the cards are Facebook's own promotion, not
-     * anyone's post, and the type can't match a post.
+     * alone. On: the cards are Facebook's own promotion, not anyone's post, and the type can't match
+     * a post.
      */
     public static final BooleanSetting HIDE_META_AI_FEED_UNITS =
             new BooleanSetting("hushfacebook_hide_meta_ai_feed_units", TRUE);
+
+    /**
+     * Feed posts whose attachment carries one of Meta's AI characters, known by the attachment
+     * style Facebook draws it with. Off: these are someone's posts, a creator's or a character's
+     * account's, and no feed here has been served one to show the rule tells them apart.
+     */
+    public static final BooleanSetting HIDE_AI_CHARACTER_POSTS =
+            new BooleanSetting("hushfacebook_hide_ai_character_posts", FALSE);
 
     /**
      * Reels and Watch videos Facebook's own detection marked as made with AI, read off the

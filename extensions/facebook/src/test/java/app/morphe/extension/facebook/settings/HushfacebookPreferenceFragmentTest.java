@@ -219,6 +219,25 @@ public class HushfacebookPreferenceFragmentTest {
         }
     }
 
+    /**
+     * The AI character switch sits right below the Meta AI cards' row, in the same family, and says
+     * it starts off.
+     */
+    @Test
+    public void theAiCharacterRowSitsRightBelowTheMetaAiCardsRow() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.AI_DETECTED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int cards = indexOfKey(rows, Settings.HIDE_META_AI_FEED_UNITS.key);
+            int characters = indexOfKey(rows, Settings.HIDE_AI_CHARACTER_POSTS.key);
+            assertTrue("the Meta AI cards row is missing", cards >= 0);
+            assertEquals("the AI character row isn't right below the Meta AI cards row", cards + 1, characters);
+            assertEquals("Hide AI character posts", String.valueOf(rows.get(characters).getTitle()));
+            assertTrue(String.valueOf(rows.get(characters).getSummary()), String.valueOf(rows.get(characters)
+                    .getSummary()).contains("It's off by default"));
+        }
+    }
+
     @Test
     public void thePausedCardSaysWhatStaysInForEveryReason() {
         for (HushfacebookPause.Reason why : HushfacebookPause.Reason.values()) {

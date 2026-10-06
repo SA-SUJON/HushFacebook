@@ -14,6 +14,7 @@ import com.facebook.graphql.model.GraphQLStoryAttachment;
 import com.facebook.graphservice.tree.TreeJNI;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,10 +35,11 @@ import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
- * Hide Meta AI in the feed's rule for posts featuring one of Meta's AI characters: with Hide
+ * Hide AI character posts' rule for posts featuring one of Meta's AI characters: with Hide
  * AI-detected posts in and the switch on, a post goes when one of its attachments has Facebook's
- * AI character style, counted by kind only, and every other post stays. Off, paused or without the
- * patch, nothing of a post is read.
+ * AI character style, counted by kind only, and every other post stays. The switch starts off and
+ * answers to itself alone, not to the Meta AI cards' switch. Off, paused or without the patch,
+ * nothing of a post is read.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -64,10 +66,17 @@ public class AiCharacterPostsTest {
         return attachment == CHARACTER && AiCharacterPosts.STYLE_TYPE.equals(type) ? new TreeJNI(type) : null;
     };
 
+    /** The rule's tests run with the switch on; the ones about it being off say so. */
+    @Before
+    public void switchOn() {
+        Settings.HIDE_AI_CHARACTER_POSTS.save(true);
+    }
+
     @After
     public void restore() {
         PauseForTests.resume();
         Settings.HIDE_META_AI_FEED_UNITS.resetToDefault();
+        Settings.HIDE_AI_CHARACTER_POSTS.resetToDefault();
         FeedFilterCounters.clear();
         HookStatus.clear();
     }
@@ -100,6 +109,28 @@ public class AiCharacterPostsTest {
     @Test
     public void theStyleIsTheOneFacebooksFinderIsHanded() {
         assertEquals("AiInteractiveEmbodimentAttachmentStyleInfo", AiCharacterPosts.STYLE_TYPE);
+    }
+
+    /** These are someone's posts and none has been seen on a real feed, so the switch starts off. */
+    @Test
+    public void theSwitchStartsOffAndBelongsToHideAiDetectedPosts() {
+        assertFalse(Settings.HIDE_AI_CHARACTER_POSTS.defaultValue);
+        Settings.HIDE_AI_CHARACTER_POSTS.resetToDefault();
+        assertFalse(guard(new GraphQLStory(null, CHARACTER), true));
+        assertEquals(0, attachmentReads.get());
+        assertTrue(app.morphe.extension.facebook.settings.PatchFamily.AI_DETECTED_POSTS.switches
+                .contains(Settings.HIDE_AI_CHARACTER_POSTS));
+    }
+
+    /** The Meta AI cards' switch neither turns the rule on nor holds it back. */
+    @Test
+    public void theCardsSwitchDoesntGovernTheRule() {
+        Settings.HIDE_META_AI_FEED_UNITS.save(false);
+        assertTrue(guard(new GraphQLStory(null, CHARACTER), true));
+        Settings.HIDE_META_AI_FEED_UNITS.save(true);
+        Settings.HIDE_AI_CHARACTER_POSTS.save(false);
+        assertFalse(guard(new GraphQLStory(null, CHARACTER), true));
+        assertEquals(1, attachmentReads.get());
     }
 
     /** On, the post goes, and the report names the style and the kind, which is all it says of it. */
@@ -172,7 +203,7 @@ public class AiCharacterPostsTest {
     /** Off, nothing of the post is read and it stays. */
     @Test
     public void offNothingIsRead() {
-        Settings.HIDE_META_AI_FEED_UNITS.save(false);
+        Settings.HIDE_AI_CHARACTER_POSTS.save(false);
         assertFalse(guard(new GraphQLStory(null, CHARACTER), true));
         assertEquals(0, attachmentReads.get());
         assertNull(line(AiCharacterPosts.ROUTE));

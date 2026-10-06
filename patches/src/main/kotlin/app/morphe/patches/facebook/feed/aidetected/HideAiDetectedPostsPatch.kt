@@ -20,6 +20,7 @@ import app.morphe.patches.facebook.feed.requireStoryFlagReaders
 import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -53,9 +54,12 @@ private const val PATCH = "Hide AI-detected posts"
  * labelled as AI. Its accessor is found and held to the plugin the same way and written into
  * `GenAiLabel.selfDisclosureInfo`, for the opt-in switch that hides those posts too.
  *
- * The Meta AI switch also takes out posts featuring one of Meta's AI characters. Facebook asks for
- * such a post's attachment style through a finder of its own, and this patch writes GraphQLStory's
+ * A fifth switch takes out posts featuring one of Meta's AI characters. Facebook asks for such a
+ * post's attachment style through a finder of its own, and this patch writes GraphQLStory's
  * attachments accessor and a call of that finder into `AiCharacterPosts` (see AiCharacterAnchors.kt).
+ * That rule is the newest and least needed here, so a build whose anchors moved only loses it: the
+ * patch log says why, the stubs stay unfilled, and Hook status names what's missing while its switch
+ * is on.
  *
  * The Reels rule runs where a fetched page enters the Reels and Watch item collection, on the same
  * three methods the sponsored reels filter runs on, each prepended with a call of its own; the two
@@ -68,17 +72,19 @@ private const val PATCH = "Hide AI-detected posts"
  * own, and for those the extension reads `ai_generated_detected_info` by its key through
  * `TreeJNI.getTree(int)`, which the patch requires too (see ReelLabel.kt).
  *
- * Every switch starts off. Nobody has yet recorded a signed-in feed with one AI-labeled post and
- * one ordinary post beside it, nor a Reels feed with an AI-labelled reel, and until someone does,
- * each rule waits to be turned on.
+ * Every switch but the Meta AI cards' starts off. Nobody has yet recorded a signed-in feed with one
+ * AI-labeled post and one ordinary post beside it, a Reels feed with an AI-labelled reel or a post
+ * featuring an AI character, and until someone does, each rule waits to be turned on. The cards are
+ * Facebook's own promotion, not anyone's post, so that switch starts on.
  */
 @Suppress("unused")
 val hideAiDetectedPostsPatch = bytecodePatch(
     name = "Hide AI-detected posts",
     description = "Removes feed posts that Facebook's own detection marked as made with AI, and the reels " +
         "and Watch videos it flagged the same way. A third switch also removes posts their creator " +
-        "labelled as AI, and a fourth takes out the Meta AI cards Facebook adds between posts and posts " +
-        "featuring Meta's AI characters. That one starts on. The others start off, so turn them on in Hushfacebook's settings.",
+        "labelled as AI, a fourth takes out the Meta AI cards Facebook adds between posts, and a fifth " +
+        "removes posts featuring Meta's AI characters. The Meta AI cards switch starts on. The others start " +
+        "off, so turn them on in Hushfacebook's settings.",
     default = true,
 ) {
     category("Feed")
@@ -122,7 +128,11 @@ val hideAiDetectedPostsPatch = bytecodePatch(
         fillStoryModelStub(GEN_AI_LABEL, DETECTED_INFO_STUB, accessor)
         fillStoryModelStub(GEN_AI_LABEL, SELF_DISCLOSURE_INFO_STUB, selfLabel)
 
-        hideAiCharacterPosts(story)
+        try {
+            hideAiCharacterPosts(story)
+        } catch (moved: PatchException) {
+            patchLog.warning("${moved.message}. The patch goes on without the AI character posts rule.")
+        }
         hideReels()
 
         enableStatus("aiDetectedPosts")
@@ -130,11 +140,11 @@ val hideAiDetectedPostsPatch = bytecodePatch(
 }
 
 /**
- * The Meta AI switch's rule for posts that carry an AI character: GraphQLStory's attachments
+ * Hide AI character posts' rule for posts that carry an AI character: GraphQLStory's attachments
  * accessor and Facebook's finder of an attachment's style, written into AiCharacterPosts' two stubs.
  * The finder is the one static method the style's literal is handed to, held to the shape and the
- * style_infos read AiCharacterAnchors.kt describes, so a finder that changed stops the patch rather
- * than the rule guessing.
+ * style_infos read AiCharacterAnchors.kt describes, so a finder that changed throws here rather than
+ * the rule guessing, and both stubs are filled only once everything has been found.
  */
 private fun BytecodePatchContext.hideAiCharacterPosts(story: ClassDef) {
     val attachmentLists = attachmentsAccessors(story)

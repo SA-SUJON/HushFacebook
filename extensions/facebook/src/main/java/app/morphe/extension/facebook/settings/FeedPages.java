@@ -178,8 +178,12 @@ final class FeedPages {
                                 + "both kinds go. It's off by default because it hasn't been tested on a real feed "
                                 + "yet.")));
                 feed.addPreference(toggle(context, Settings.HIDE_META_AI_FEED_UNITS,
-                        L10n.t("The Meta AI cards Facebook adds to the feed between posts, and posts featuring one "
-                                + "of Meta's AI characters. Other posts stay, whatever they say about AI.")));
+                        L10n.t("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, "
+                                + "whatever they say about AI.")));
+                feed.addPreference(toggle(context, Settings.HIDE_AI_CHARACTER_POSTS,
+                        L10n.t("Posts featuring one of Meta's AI characters, the chatbots people and creators make "
+                                + "with Meta AI Studio. It's off by default because it hasn't been tested on a real "
+                                + "feed yet.")));
             }
             if (build.contains(PatchFamily.POST_WORDS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_POSTS_WITH_WORDS,

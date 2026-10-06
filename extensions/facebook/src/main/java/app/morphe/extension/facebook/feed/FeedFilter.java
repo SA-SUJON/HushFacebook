@@ -103,7 +103,7 @@ public final class FeedFilter {
     /**
      * The type name of the Meta AI card Facebook adds to the feed between posts. Facebook's own feed
      * unit dispatcher compares a unit's type name with it in 581. Hide AI-detected posts takes it out
-     * under {@link Settings#HIDE_META_AI_FEED_UNITS}, with the posts {@link AiCharacterPosts} finds.
+     * under {@link Settings#HIDE_META_AI_FEED_UNITS}.
      */
     static final String META_AI_UNIT_TYPE = "XFBFBImplicitMetaAIFeedUnit";
 
@@ -404,7 +404,8 @@ public final class FeedFilter {
             if (reason == null && metaAi && META_AI_UNIT_TYPE.equals(typeName(feedUnit))) {
                 reason = META_AI_UNIT_TYPE;
             }
-            if (reason == null && metaAi && attachmentsAccessor != null && styleFinder != null) {
+            if (reason == null && aiPatched && attachmentsAccessor != null && styleFinder != null
+                    && Settings.HIDE_AI_CHARACTER_POSTS.get()) {
                 reason = aiCharacterReason(feedUnit, attachmentsAccessor, styleFinder);
             }
             boolean aiLabelled = aiPatched && Settings.HIDE_AI_LABELLED_POSTS.get();
@@ -477,7 +478,7 @@ public final class FeedFilter {
     }
 
     /**
-     * Hide Meta AI in the feed's rule for posts that carry an AI character: the style's type name
+     * Hide AI character posts' rule for posts that carry an AI character: the style's type name
      * when one of the post's attachments has it, otherwise null. Every unit it reads is counted on
      * its own route under what the read found, so a kept post always has a reason in the report.
      */

@@ -38,6 +38,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_AI_DETECTED_POSTS) return L10n.t("Hide AI-detected posts");
         if (setting == Settings.HIDE_AI_LABELLED_POSTS) return L10n.t("Also hide posts labelled as AI");
         if (setting == Settings.HIDE_META_AI_FEED_UNITS) return L10n.t("Hide Meta AI in the feed");
+        if (setting == Settings.HIDE_AI_CHARACTER_POSTS) return L10n.t("Hide AI character posts");
         if (setting == Settings.HIDE_POSTS_WITH_WORDS) return L10n.t("Hide posts with words you choose");
         if (setting == Settings.POST_WORDS_WHOLE_WORDS) return L10n.t("Match whole words");
         if (setting == Settings.HIDE_SPONSORED_STORIES) return L10n.t("Hide sponsored stories");
