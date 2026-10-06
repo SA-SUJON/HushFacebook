@@ -314,7 +314,9 @@ public class PausedHooksTest {
                     Section section = new Section(new ArrayList<>(Arrays.asList(new Reel(), ad)));
                     ReelsAdFilter.withoutAdSections(Collections.singletonList(section), AD);
                     return !section.items.contains(ad);
-                }));
+                },
+                () -> ReelsAdFilter.holdsAdPill(
+                        "com.facebook.feedback.comments.plugins.indicatorpill.reelsadsfloatingcta.ReelsAdsFloatingCtaPlugin")));
         // A search results page leaves its SEARCH_ADS module out.
         probes.put(PatchFamily.SPONSORED_SEARCH, Collections.singletonList(SearchAdFilterForTests::dropsAnAd));
         // A timeline story with sponsored data isn't drawn on a profile.

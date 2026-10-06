@@ -10,6 +10,7 @@ package app.morphe.patches.facebook.ads.sponsoredreels
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
@@ -135,6 +136,14 @@ val hideSponsoredReelsPatch = bytecodePatch(
         // returns -1, the value for a reel with no media, which stops the poller. The lookup then
         // never starts.
         stopDeferredCardPoller()
+
+        // An ad that still reaches a reel or a video opens its comments without the floating ad
+        // button: see AdPills.kt. A build that draws the button another way keeps the rest.
+        try {
+            holdAdPills()
+        } catch (moved: PatchException) {
+            patchLog.warning("${moved.message}. The patch goes on without holding the ad button on comments.")
+        }
 
         enableStatus("sponsoredReels")
     }
