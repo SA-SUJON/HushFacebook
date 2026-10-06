@@ -17,6 +17,7 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 /**
@@ -63,6 +64,12 @@ internal fun Method.futureReadyIndex(): Int {
         ?: throw PatchException("$READ_RECEIPTS_PATCH: $definingClass->$name has ${returns.size} return-object, expected one")
     val made = code.indexOfFirst { it.opcode == Opcode.MOVE_RESULT_OBJECT && (it as OneRegisterInstruction).registerA == future }
     if (made < 0) throw PatchException("$READ_RECEIPTS_PATCH: $definingClass->$name never moves its future into v$future")
+    // The first object moved into that register has to be the future itself: a call answering the
+    // method's own return type. Anything else handed back would fail Android's verifier.
+    val maker = ((code.getOrNull(made - 1) as? ReferenceInstruction)?.reference as? MethodReference)?.returnType
+    if (maker != returnType) {
+        throw PatchException("$READ_RECEIPTS_PATCH: $definingClass->$name first fills v$future from a call answering $maker, not $returnType")
+    }
     return made + 1
 }
 
