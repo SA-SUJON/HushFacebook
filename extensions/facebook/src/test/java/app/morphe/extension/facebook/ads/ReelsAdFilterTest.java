@@ -323,6 +323,26 @@ public class ReelsAdFilterTest {
         }
     }
 
+    /** Each ad-break fetch the patch fails is counted, switch on or off, since it stays held either way. */
+    @Test
+    public void eachHeldAdBreakFetchIsCounted() {
+        HookStatus.clear();
+        try {
+            ReelsAdFilter.heldAdBreakFetch();
+            Settings.HIDE_SPONSORED_REELS.save(false);
+            ReelsAdFilter.heldAdBreakFetch();
+
+            String line = null;
+            for (String candidate : HookStatus.report()) {
+                if (candidate.startsWith("Hide sponsored reels:")) line = candidate;
+            }
+            assertNotNull(String.join("\n", HookStatus.report()), line);
+            assertTrue(line, line.contains(ReelsAdFilter.AD_BREAK_FETCH_HELD + " 2"));
+        } finally {
+            HookStatus.clear();
+        }
+    }
+
     /** A page whose iteration fails, the way a list changed on another thread would. */
     private static List<Object> failingPage() {
         return new AbstractList<Object>() {

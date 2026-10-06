@@ -73,6 +73,9 @@ public final class ReelsAdFilter {
     /** What the diagnostic report counts each time the ad pool is held to no ad. */
     static final String POOL_HELD = "Reels ad pool held to no ad";
 
+    /** What the diagnostic report counts each time an ad-break fetch is answered with a failure. */
+    static final String AD_BREAK_FETCH_HELD = "Ad-break fetch held";
+
     /** Whether the first hold of this process has been logged. */
     private static volatile boolean poolHoldLogged;
 
@@ -267,6 +270,16 @@ public final class ReelsAdFilter {
                     () -> "the Reels ad pool was asked for an ad and held to none");
         }
         return true;
+    }
+
+    /**
+     * Injection point, run by each ad-break fetch the patch answers with a failed future: a banner
+     * over a reel, a video's ad break, the Reels idle query or an extended break. Those stay held
+     * while Hushfacebook is paused, so this only counts them for the diagnostic report.
+     */
+    public static void heldAdBreakFetch() {
+        HookStatus.invoked(FamilyNames.SPONSORED_REELS);
+        HookStatus.counted(FamilyNames.SPONSORED_REELS, AD_BREAK_FETCH_HELD);
     }
 
     /**
