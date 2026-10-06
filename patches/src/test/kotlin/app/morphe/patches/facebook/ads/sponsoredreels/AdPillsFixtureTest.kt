@@ -90,6 +90,35 @@ class AdPillsFixtureTest {
     }
 
     @Test
+    fun `the feed ads patch alone asks its own question, and in front of the reels patch the other way round`() = eachPill { name, owner, table, check ->
+        val before = check.implementation!!.instructions.toList()
+
+        val alone = PatchContexts.of(listOf(owner))
+        with(alone) { holdAdPills(SPONSORED_POSTS_PATCH, HOLDS_FEED_AD_PILL) }
+        val one = alone.mutableClassDefBy(owner.type).methods
+            .single { MethodUtil.methodSignaturesMatch(it, check) }.implementation!!.instructions.toList()
+        assertEquals("$name: one question in front", before.size + 7, one.size)
+        assertEquals("$name: the table first", "${table.definingClass}->${table.name}(I)Ljava/lang/String;", one[0].called())
+        assertEquals("$name: then the feed ads check", HOLDS_FEED_AD_PILL, one[2].called())
+        assertSame("$name: whose no reaches the switch", one[7], (one[4] as BuilderOffsetInstruction).target.location.instruction)
+
+        forgetTheLastMatch()
+        val both = PatchContexts.of(listOf(owner))
+        with(both) {
+            holdAdPills(SPONSORED_POSTS_PATCH, HOLDS_FEED_AD_PILL)
+            holdAdPills()
+        }
+        val two = both.mutableClassDefBy(owner.type).methods
+            .single { MethodUtil.methodSignaturesMatch(it, check) }.implementation!!.instructions.toList()
+        assertEquals("$name: two questions in front", before.size + 14, two.size)
+        assertEquals("$name: the reels check first this way round", HOLDS_AD_PILL, two[2].called())
+        assertSame("$name: its no asks the feed ads check", two[7], (two[4] as BuilderOffsetInstruction).target.location.instruction)
+        assertEquals("$name: the feed ads check next", HOLDS_FEED_AD_PILL, two[9].called())
+        assertSame("$name: whose no reaches the switch", two[14], (two[11] as BuilderOffsetInstruction).target.location.instruction)
+        assertEquals("$name: as it was", before[0].opcode, two[14].opcode)
+    }
+
+    @Test
     fun `the feed ads patch asks in front of the reels patch, and a no from either one answers`() = eachPill { name, owner, _, check ->
         val before = check.implementation!!.instructions.toList()
 

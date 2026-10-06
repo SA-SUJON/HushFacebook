@@ -887,55 +887,68 @@ public final class MediaDownload {
         java.util.function.Consumer<PostDetails> watching = detailsForTests;
         if (watching != null) watching.accept(known);
         IN_FLIGHT.incrementAndGet();
-        SaveControl.Save save = SaveControl.begin(application, video);
-        // With no notification to cancel it from, the list of saves in the settings is the only way
-        // to stop it, so the start says where that is, for long enough to read.
-        if (save.manager != null) {
-            Feedback.show(application, L10n.t(application, "Saving..."), false);
-        } else {
-            Feedback.show(application,
-                L10n.t(application, "Saving... Cancel: Downloads in Hushfacebook."), true);
-        }
+        // Until the worker runs, whatever throws here gives back the slot and the save it began, or
+        // enough such failures would block every save.
+        SaveControl.Save begun = null;
+        boolean started = false;
+        try {
+            final SaveControl.Save save = SaveControl.begin(application, video);
+            begun = save;
+            // With no notification to cancel it from, the list of saves in the settings is the only way
+            // to stop it, so the start says where that is, for long enough to read.
+            if (save.manager != null) {
+                Feedback.show(application, L10n.t(application, "Saving..."), false);
+            } else {
+                Feedback.show(application,
+                    L10n.t(application, "Saving... Cancel: Downloads in Hushfacebook."), true);
+            }
 
-        Thread worker = new Thread(() -> {
-            MediaStoreWriter writer = new MediaStoreWriter(application, video, known);
+            Thread worker = new Thread(() -> {
+                MediaStoreWriter writer = new MediaStoreWriter(application, video, known);
 
-            try {
-                // What a save in a process Android ended left behind goes before this one makes
-                // anything. It runs once per process.
-                SaveLeftovers.sweepOnce(application);
+                try {
+                    // What a save in a process Android ended left behind goes before this one makes
+                    // anything. It runs once per process.
+                    SaveLeftovers.sweepOnce(application);
 
-                Downloader.Result result = job.run(writer, save);
-                boolean cancelled = result.status == Downloader.Status.CANCELLED;
-                if (result.ok() || cancelled) info(() -> "save finished: " + result);
-                else failure(() -> "save finished: " + result, null);
-                String text = message(application, result.status, writer.savedLocation(), result.lower);
-                if (result.ok()) SaveControl.showCompleted(save, writer);
-                if (result.ok() && result.refused && !compatibleSaves()) {
-                    info(() -> "the saved file has a track WhatsApp and some editors refuse, with Save videos "
-                        + "other apps can open off");
-                    Feedback.show(application, refusedMessage(application, SaveControl.showRefused(application, text)),
-                        true);
-                } else {
-                    Feedback.show(application, text, !result.ok() && !cancelled);
+                    Downloader.Result result = job.run(writer, save);
+                    boolean cancelled = result.status == Downloader.Status.CANCELLED;
+                    if (result.ok() || cancelled) info(() -> "save finished: " + result);
+                    else failure(() -> "save finished: " + result, null);
+                    String text = message(application, result.status, writer.savedLocation(), result.lower);
+                    if (result.ok()) SaveControl.showCompleted(save, writer);
+                    if (result.ok() && result.refused && !compatibleSaves()) {
+                        info(() -> "the saved file has a track WhatsApp and some editors refuse, with Save videos "
+                            + "other apps can open off");
+                        Feedback.show(application, refusedMessage(application, SaveControl.showRefused(application, text)),
+                            true);
+                    } else {
+                        Feedback.show(application, text, !result.ok() && !cancelled);
+                    }
+                } catch (Throwable t) {
+                    // Nothing can leave this thread. Facebook installs its own handler for uncaught
+                    // exceptions and reports them as its own crashes.
+                    failure(() -> "the save failed", t);
+                    Feedback.show(application, L10n.t(application, "Download failed"), true);
+                } finally {
+                    save.end();
+                    IN_FLIGHT.decrementAndGet();
                 }
-            } catch (Throwable t) {
-                // Nothing can leave this thread. Facebook installs its own handler for uncaught
-                // exceptions and reports them as its own crashes.
-                failure(() -> "the save failed", t);
-                Feedback.show(application, L10n.t(application, "Download failed"), true);
-            } finally {
-                save.end();
+            }, "hushfacebook-save");
+
+            // A thread that ends when the copy ends leaves nothing behind in a process that is not
+            // ours. A pool parks a thread there for as long as Facebook runs.
+            worker.setDaemon(true);
+            worker.setPriority(Thread.NORM_PRIORITY - 1);
+            worker.start();
+            started = true;
+            return worker;
+        } finally {
+            if (!started) {
+                if (begun != null) begun.end();
                 IN_FLIGHT.decrementAndGet();
             }
-        }, "hushfacebook-save");
-
-        // A thread that ends when the copy ends leaves nothing behind in a process that is not
-        // ours. A pool parks a thread there for as long as Facebook runs.
-        worker.setDaemon(true);
-        worker.setPriority(Thread.NORM_PRIORITY - 1);
-        worker.start();
-        return worker;
+        }
     }
 
     /** A reason for the report, cut to 160 characters. */

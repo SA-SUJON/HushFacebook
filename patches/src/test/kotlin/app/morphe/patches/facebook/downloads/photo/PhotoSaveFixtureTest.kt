@@ -18,6 +18,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
+import com.android.tools.smali.dexlib2.util.MethodUtil
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -71,7 +72,15 @@ class PhotoSaveFixtureTest {
                         .instructions.any { it.called()?.contains("->$SAVE_PHOTO_ACTION(") == true })
                 assertEquals("$name: one Save photo action", 1, actions.size)
                 val actionOwner = actions.single()
-                val beforeAction = actionOwner.methods.single(::isSavePhotoAction).implementation!!.instructions.toList()
+                val actionMethod = actionOwner.methods.single(::isSavePhotoAction)
+                val beforeAction = actionMethod.implementation!!.instructions.toList()
+                // The wrap hands over p1 as the photo, so nothing before it may have written over p1.
+                val p1 = actionMethod.implementation!!.registerCount - MethodUtil.getParameterRegisterCount(actionMethod) + 1
+                assertTrue("$name: the action writes over the photo in p1", beforeAction.none { ins ->
+                    ins.opcode.setsRegister() && (ins as? OneRegisterInstruction)?.registerA?.let {
+                        it == p1 || (ins.opcode.setsWideRegister() && it + 1 == p1)
+                    } == true
+                })
 
                 val context = PatchContexts.of((gated + actionOwner).distinctBy { it.type })
                 with(context) { unlockPhotoSave() }

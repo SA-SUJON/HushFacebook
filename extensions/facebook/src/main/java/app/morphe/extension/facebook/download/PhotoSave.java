@@ -21,7 +21,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * is true, which the poster's settings decide, and the patch hands both of the viewer's reads of
  * that flag to {@link #offersSave}. A tap then runs the action the patch wraps with
  * {@link #saveAction}: the biggest of the photo's images goes to the folder picked for downloads.
- * When that can't start, Facebook's own save runs, so a tap always saves something.
+ * When that can't start, Facebook's own save runs instead. A save that starts and then fails says
+ * so, and Facebook's save doesn't run after it.
  *
  * <p>The photo is a GraphQL model and its images are read the way Facebook's code reads them, by
  * the hash of each field's GraphQL name, through the kept {@code getTree}, {@code getString} and
