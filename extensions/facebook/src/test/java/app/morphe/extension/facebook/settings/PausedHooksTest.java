@@ -84,6 +84,7 @@ import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.BottomTabBar;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
+import app.morphe.extension.facebook.navigation.MarketplaceSellerProfileForTests;
 import app.morphe.extension.facebook.navigation.HiddenTabsForTests;
 import app.morphe.extension.facebook.navigation.ReelsTabForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
@@ -430,6 +431,9 @@ public class PausedHooksTest {
         probes.put(PatchFamily.MARKETPLACE_ONLY, Arrays.asList(
                 MarketplaceOnlyForTests::hidesHome, MarketplaceOnlyForTests::quietsNotifications,
                 MarketplaceOnlyForTests::skipsFeedPrefetch));
+        // A seller's Marketplace page is told its View profile flag is on.
+        probes.put(PatchFamily.SELLER_VIEW_PROFILE, Collections.singletonList(
+                MarketplaceSellerProfileForTests::givesSellersViewProfile));
         // The tab bar builder is told to leave the Reels tab out.
         // Facebook's push of its Reels launcher shortcut is held back too.
         probes.put(PatchFamily.REELS_TAB, Arrays.asList(ReelsTabForTests::hidesTheTab,

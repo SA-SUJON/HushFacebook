@@ -222,6 +222,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean sellerViewProfile() {
+        return false;
+    }
+
     public static boolean reelsTab() {
         return false;
     }

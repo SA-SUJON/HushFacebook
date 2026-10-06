@@ -98,11 +98,18 @@ final class AppPages {
     /** Marketplace. */
     static void marketplace(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
+        if (!build.contains(PatchFamily.SPONSORED_MARKETPLACE) && !build.contains(PatchFamily.SELLER_VIEW_PROFILE)) return;
+        PreferenceCategory marketplace = category(screen, L10n.t("Marketplace"));
         if (build.contains(PatchFamily.SPONSORED_MARKETPLACE)) {
-            PreferenceCategory marketplace = category(screen, L10n.t("Marketplace"));
             marketplace.addPreference(toggle(context, Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS,
                     L10n.t("Ads and boosted listings in Marketplace's feed and search results. The other "
                             + "listings stay.")));
+        }
+        if (build.contains(PatchFamily.SELLER_VIEW_PROFILE)) {
+            // Read as a seller's page opens, so a change shows on the next one.
+            marketplace.addPreference(toggle(context, Settings.SHOW_SELLER_VIEW_PROFILE,
+                    L10n.t("A seller's Marketplace page always has View profile, which opens their regular Facebook "
+                            + "profile. Facebook shows it to only some accounts.")));
         }
     }
 

@@ -688,3 +688,7 @@ A playing reel keeps going in a small window when you leave Facebook. Android 12
 Turn off HDR brightness	Desativar o brilho HDR
 # context: summary of that switch
 HDR videos and photos stay at your screen's usual brightness instead of turning it up to full. They keep their resolution.	Vídeos e fotos HDR ficam no brilho de sempre da sua tela em vez de aumentá-lo ao máximo. Eles mantêm a resolução.
+# context: switch title under Marketplace; View profile is Facebook's own button on a seller's Marketplace page that opens their regular Facebook profile, so use Facebook's label for it in this language
+Show View profile on Marketplace sellers	Mostrar Ver perfil nos vendedores do Marketplace
+# context: summary of that switch
+A seller's Marketplace page always has View profile, which opens their regular Facebook profile. Facebook shows it to only some accounts.	A página do Marketplace de um vendedor sempre tem Ver perfil, que abre o perfil normal dele no Facebook. O Facebook só mostra isso para algumas contas.

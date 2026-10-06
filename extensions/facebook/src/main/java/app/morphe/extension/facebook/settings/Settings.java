@@ -226,6 +226,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_sponsored_marketplace_listings", TRUE);
 
     /**
+     * A seller's Marketplace page always offers View profile, which opens the seller's regular
+     * Facebook profile ({@link app.morphe.extension.facebook.navigation.MarketplaceSellerProfile}).
+     * Off or paused, the page asks Facebook's experiment flag again, which shows it to some accounts.
+     */
+    public static final BooleanSetting SHOW_SELLER_VIEW_PROFILE =
+            new BooleanSetting("hushfacebook_show_seller_view_profile", TRUE);
+
+    /**
      * The ads Instant Games ask Facebook for ({@link app.morphe.extension.facebook.ads.GameAds}): each
      * request is answered with no ad.
      */

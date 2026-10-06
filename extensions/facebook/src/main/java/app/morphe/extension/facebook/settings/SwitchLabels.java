@@ -88,6 +88,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_META_AI_IN_SEARCH) return L10n.t("Hide Meta AI in search");
         if (setting == Settings.HIDE_SPONSORED_SEARCH_RESULTS) return L10n.t("Hide sponsored search results");
         if (setting == Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS) return L10n.t("Hide sponsored Marketplace listings");
+        if (setting == Settings.SHOW_SELLER_VIEW_PROFILE) return L10n.t("Show View profile on Marketplace sellers");
         if (setting == Settings.BLOCK_GAME_ADS) return L10n.t("Block Instant Games ads");
         if (setting == Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS) return L10n.t("Block trending video notifications");
         if (setting == Settings.BLOCK_MEMORY_NOTIFICATIONS) return L10n.t("Block memory notifications");

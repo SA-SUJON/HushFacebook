@@ -69,6 +69,7 @@ public final class FamilyNames {
     public static final String VIDEO_DOWNLOAD = "Download any video";
     public static final String START_TAB = "Open on a chosen tab";
     public static final String MARKETPLACE_ONLY = "Marketplace only";
+    public static final String SELLER_VIEW_PROFILE = "Show View profile on Marketplace sellers";
     public static final String REELS_TAB = "Hide the Reels tab";
     public static final String REELS_TAB_DOT = "Hide the Reels tab dot";
     public static final String HIDDEN_TABS = "Hide tabs";
