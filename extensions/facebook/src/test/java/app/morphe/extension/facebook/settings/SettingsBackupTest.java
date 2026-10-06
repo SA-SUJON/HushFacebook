@@ -74,6 +74,7 @@ import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.comments.CommentOrder;
+import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.feed.PostWordsTest;
 import app.morphe.extension.facebook.feed.WordsCorpus;
@@ -179,6 +180,7 @@ public class SettingsBackupTest {
         Settings.SAVE_TO.resetToDefault();
         Settings.HIDDEN_WORDS.resetToDefault();
         Settings.KEPT_WORDS.resetToDefault();
+        Settings.HIDDEN_SOURCES.resetToDefault();
         BaseSettings.PAUSED.resetToDefault();
         BaseSettings.DEBUG.resetToDefault();
         BaseSettings.DEBUG_LOG_FILTERS.resetToDefault();
@@ -801,9 +803,70 @@ public class SettingsBackupTest {
     }
 
     /**
+     * The people, Pages and sites list goes out and comes back as its row stores it, a file can
+     * clear it, an older file leaves it alone, and a list the row would clean differently refuses
+     * the whole file without quoting it.
+     */
+    @Test
+    public void theSourcesListRoundTripsAndComesBackOnlyAsACleanList() throws Exception {
+        Settings.HIDDEN_SOURCES.save("example.com\nDaily Bugle");
+        String file = SettingsBackup.create();
+        Settings.HIDDEN_SOURCES.resetToDefault();
+
+        SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+        assertEquals("example.com\nDaily Bugle", snapshot.sourcesChange());
+        assertEquals(0, snapshot.switchChanges());
+        assertEquals(1, SettingsBackup.apply(snapshot));
+        assertEquals("example.com\nDaily Bugle", Settings.HIDDEN_SOURCES.savedValue());
+        assertEquals("a file read back is the file", file, SettingsBackup.create());
+        assertEquals("the same list again changes nothing", 0, SettingsBackup.parse(file).changes().size());
+        assertEquals("Your list of people, Pages and sites to hide will hold 2 entries.",
+                SettingsBackupPreference.sourcesSentence(snapshot.sources));
+        assertEquals("Your list of people, Pages and sites to hide will be empty.",
+                SettingsBackupPreference.sourcesSentence(""));
+
+        Map<String, ?> before = store();
+        for (Object refused : new Object[]{" example.com", "example.com\n", "example.com\nEXAMPLE.com",
+                "example.com\n\nDaily Bugle", repeat('a', PostSources.MAX_LENGTH + 1),
+                "https://www.facebook.com/DailyBugle", 5, true, JSONObject.NULL, new JSONObject()}) {
+            JSONObject hostile = new JSONObject(file);
+            hostile.getJSONObject("settings").put(SettingsBackup.SOURCES.key, refused);
+            try {
+                SettingsBackup.parse(hostile.toString());
+                fail("a file with the list " + printable(String.valueOf(refused)) + " was read");
+            } catch (SettingsBackup.Rejected rejected) {
+                assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+                assertFalse("the refusal quotes the list", rejected.getMessage().contains("example")
+                        || rejected.getMessage().contains("Bugle"));
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        JSONObject emptied = new JSONObject(file);
+        emptied.getJSONObject("settings").put(SettingsBackup.SOURCES.key, "");
+        SettingsBackup.Snapshot clearing = SettingsBackup.parse(emptied.toString());
+        assertEquals("", clearing.sourcesChange());
+        SettingsBackup.apply(clearing);
+        assertEquals("", Settings.HIDDEN_SOURCES.savedValue());
+
+        Settings.HIDDEN_SOURCES.save("example.com");
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.sources);
+        assertNull(older.sourcesChange());
+        SettingsBackup.apply(older);
+        assertEquals("example.com", Settings.HIDDEN_SOURCES.savedValue());
+
+        Bundle state = snapshot.toBundle();
+        assertEquals("example.com\nDaily Bugle", SettingsBackup.Snapshot.fromBundle(state).sources);
+        state.putString("hidden_sources", "example.com\nEXAMPLE.com");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).sources);
+    }
+
+    /**
      * #58: lists that fill the room the two share to the byte, written with emoji, a CJK
      * character, an escaped slash and plain letters, go out and come back whole, both at once, with
-     * every other value a file carries at its longest, in a file inside the size limit.
+     * every other value a file carries at its longest, in a file inside the size limit. The people,
+     * Pages and sites list at its own room, a slash in every other character, fits on top.
      */
     @Test
     public void wordListsFillingTheirRoomRoundTripWithEverythingElseAtItsLongest() throws Exception {
@@ -832,15 +895,32 @@ public class SettingsBackupTest {
         int size = file.getBytes(StandardCharsets.UTF_8).length;
         assertTrue("a file of " + size + " bytes", size <= SettingsBackup.MAX_BYTES);
         assertTrue("MAX_BYTES says 63 KB at most: " + size, size <= 63 * 1024);
+
+        StringBuilder typed = new StringBuilder();
+        for (int i = 0; i < PostSources.MAX_RULES; i++) {
+            StringBuilder line = new StringBuilder("https://s").append(i).append(".example.com");
+            while (line.length() < PostSources.MAX_LENGTH) line.append("/x");
+            typed.append(line, 0, PostSources.MAX_LENGTH).append('\n');
+        }
+        String sources = PostSources.clean(typed.toString());
+        assertTrue("the list stops within a line of its room",
+                PostWords.encodedBytes(sources) > PostSources.MAX_LIST_BYTES - 2 * PostSources.MAX_LENGTH - 2);
+        Settings.HIDDEN_SOURCES.save(sources);
+        file = SettingsBackup.create();
+        size = file.getBytes(StandardCharsets.UTF_8).length;
+        assertTrue("a file of " + size + " bytes with the sources list too", size <= SettingsBackup.MAX_BYTES);
         Settings.HIDDEN_WORDS.resetToDefault();
         Settings.KEPT_WORDS.resetToDefault();
+        Settings.HIDDEN_SOURCES.resetToDefault();
 
         SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
         assertEquals(hidden, snapshot.hiddenChange());
         assertEquals(kept, snapshot.keptChange());
-        assertEquals(2, SettingsBackup.apply(snapshot));
+        assertEquals(sources, snapshot.sourcesChange());
+        assertEquals(3, SettingsBackup.apply(snapshot));
         assertEquals(hidden, Settings.HIDDEN_WORDS.savedValue());
         assertEquals(kept, Settings.KEPT_WORDS.savedValue());
+        assertEquals(sources, Settings.HIDDEN_SOURCES.savedValue());
         assertEquals("a file read back is the file", file, SettingsBackup.create());
     }
 

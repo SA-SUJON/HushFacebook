@@ -654,7 +654,7 @@ public final class FeedFilter {
             StoryFlag.Accessor attached) {
         if (!Settings.HIDE_POSTS_FROM_SOURCES.get()) return null;
         FeedFilterCounters.sawList(SOURCES_ROUTE, 1);
-        java.util.List<PostSources.Rule> rules = PostSources.rules(Settings.HIDDEN_SOURCES.get());
+        java.util.List<PostSources.Rule> rules = PostSources.cachedRules(Settings.HIDDEN_SOURCES.get());
         if (rules.isEmpty()) {
             FeedFilterCounters.sawKind(SOURCES_ROUTE, NO_SOURCES);
             return null;

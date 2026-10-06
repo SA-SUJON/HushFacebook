@@ -7,6 +7,7 @@ package app.morphe.extension.facebook.feed;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import com.facebook.graphql.model.GraphQLStory;
@@ -155,6 +156,111 @@ public class PostSourcesTest {
         PostSources.Found empty = PostSources.read(post, s -> null, s -> null, s -> null);
         assertEquals(PostSources.Outcome.READ, empty.outcome);
         assertEquals(0, PostSources.match(PostSources.rules("example.com\nDaily Bugle"), empty));
+    }
+
+    @Test
+    public void aFacebookLinkIsTheIdItCarriesAndOneWithoutIsLeftOut() {
+        PostSources.Rule profile = PostSources.rule("https://www.facebook.com/profile.php?id=100044218155390", 1);
+        assertEquals(PostSources.Kind.ID, profile.kind);
+        assertEquals("100044218155390", profile.value);
+        assertEquals("100044218155390",
+                PostSources.rule("https://www.facebook.com/profile.php?id=100044218155390&sk=about", 2).value);
+        assertEquals("100044218155390", PostSources.rule("facebook.com/people/Daily-Bugle/100044218155390/", 3).value);
+        assertEquals("100044218155390", PostSources.rule("https://m.facebook.com/100044218155390", 4).value);
+        assertNull("a username can't be matched", PostSources.rule("https://www.facebook.com/DailyBugle", 5));
+        assertNull("a post's number isn't its author's",
+                PostSources.rule("https://www.facebook.com/DailyBugle/posts/1234567890", 6));
+        assertNull("an id with letters after it isn't one",
+                PostSources.rule("https://www.facebook.com/profile.php?id=100044218155390x", 7));
+        for (String own : new String[] {"facebook.com", "www.facebook.com", "https://web.facebook.com/", "fb.me/x",
+                "https://fb.watch/abc", "https://l.facebook.com/l.php?u=x", "scontent.xx.fbcdn.net"}) {
+            assertNull(own + " would take nearly every post", PostSources.rule(own, 8));
+        }
+        assertEquals("a site that only ends in the same letters isn't Facebook's",
+                PostSources.Kind.SITE, PostSources.rule("notfacebook.com", 9).kind);
+        assertEquals(1, PostSources.leftOut("https://www.facebook.com/DailyBugle\nexample.com"));
+        assertEquals("the id and its link are one rule",
+                1, PostSources.count("100044218155390\nhttps://www.facebook.com/profile.php?id=100044218155390"));
+
+        GraphQLStory post = story(null, Arrays.asList(author("100044218155390", "Daily Bugle")),
+                Arrays.asList(link("https://www.facebook.com/photo/?fbid=1"), link("https://www.facebook.com/DailyBugle")));
+        assertEquals(1, PostSources.match(PostSources.rules("https://www.facebook.com/profile.php?id=100044218155390"),
+                read(post)));
+        assertEquals("a Facebook link never matches as a site", 0,
+                PostSources.match(PostSources.rules("https://www.facebook.com/SomeoneElse"), read(post)));
+    }
+
+    @Test
+    public void aBareLineWithADotIsASiteAndANameAtOnce() {
+        PostSources.Rule bare = PostSources.rule("Mr.Beast", 1);
+        assertEquals(PostSources.Kind.SITE, bare.kind);
+        assertEquals("mr.beast", bare.name);
+        assertNull("a link names a site only", PostSources.rule("https://booking.com/deals", 2).name);
+
+        assertEquals(1, PostSources.match(PostSources.rules("Mr.Beast"),
+                read(story(null, Arrays.asList(author("556", "Mr.Beast")), Collections.emptyList()))));
+        GraphQLStory page = story(null, Arrays.asList(author("557", "Booking.com")),
+                Arrays.asList(link("https://example.org/x")));
+        assertEquals("the Page's own post with no link", 1, PostSources.match(PostSources.rules("Booking.com"), read(page)));
+        assertEquals(0, PostSources.match(PostSources.rules("https://booking.com"), read(page)));
+        GraphQLStory linking = story(null, Arrays.asList(author("558", "A Friend")),
+                Arrays.asList(link("https://www.booking.com/hotel")));
+        assertEquals(1, PostSources.match(PostSources.rules("Booking.com"), read(linking)));
+    }
+
+    @Test
+    public void theListFitsItsRoomAsASettingsFileWritesIt() {
+        StringBuilder typed = new StringBuilder();
+        for (int i = 0; i < PostSources.MAX_RULES; i++) {
+            StringBuilder line = new StringBuilder("https://s").append(i).append(".example.com");
+            while (line.length() < PostSources.MAX_LENGTH) line.append("/x");
+            typed.append(line, 0, PostSources.MAX_LENGTH).append('\n');
+        }
+        String clean = PostSources.clean(typed.toString());
+        int bytes = PostWords.encodedBytes(clean);
+        assertTrue(bytes + " bytes", bytes <= PostSources.MAX_LIST_BYTES);
+        assertTrue("the room ran out before the count did", PostSources.count(clean) < PostSources.MAX_RULES);
+        assertTrue(PostSources.isClean(clean));
+    }
+
+    @Test
+    public void aLinkAStrictParserRefusesStillHasItsSite() {
+        assertEquals("example.com", PostSources.host("https://example.com/a b|c{d}"));
+        assertEquals("my_site.example.com", PostSources.host("https://my_site.example.com/x"));
+        assertEquals("example.com", PostSources.host("https://user@www.example.com:8443/x"));
+        assertEquals("example.org", PostSources.host("https://lm.facebook.com/l.php?h=AT0&u=https%3A%2F%2Fexample.org%2Fa#x"));
+        assertEquals("a target that can't be decoded leaves the redirect's own host", "l.facebook.com",
+                PostSources.host("https://l.facebook.com/l.php?u=https%3A%2F%2Fexample.org%2F%ZZ&h=AT0"));
+        assertNull(PostSources.host("example.com/no-scheme"));
+        assertNull(PostSources.host("https:///nothing"));
+    }
+
+    @Test
+    public void aShareWhoseOriginalCantBeReadStillMatchesItsOwnAuthor() {
+        GraphQLStory original = story(null, Arrays.asList(author("555", "Daily Bugle")), Collections.emptyList());
+        GraphQLStory share = story(original, Arrays.asList(author("777", "A Friend")), Collections.emptyList());
+        StoryFlag.Accessor failsOnTheOriginal = story -> {
+            if (story == original) throw new IllegalStateException("renamed");
+            return authors.get(story);
+        };
+        PostSources.Found found = PostSources.read(share, failsOnTheOriginal, attachments,
+                story -> ((GraphQLStory) story).A04());
+        assertEquals(PostSources.Outcome.READ, found.outcome);
+        assertEquals(1, PostSources.match(PostSources.rules("A Friend"), found));
+        assertEquals(0, PostSources.match(PostSources.rules("Daily Bugle"), found));
+        PostSources.Found noShare = PostSources.read(share, actors, attachments, story -> {
+            throw new IllegalStateException("renamed");
+        });
+        assertEquals(1, PostSources.match(PostSources.rules("A Friend"), noShare));
+    }
+
+    @Test
+    public void theFeedReadsAListOnceUntilItChanges() {
+        List<PostSources.Rule> first = PostSources.cachedRules("example.com\nDaily Bugle");
+        assertEquals(2, first.size());
+        assertSame(first, PostSources.cachedRules("example.com\nDaily Bugle"));
+        assertEquals(1, PostSources.cachedRules("other.com").size());
+        assertTrue(PostSources.cachedRules(null).isEmpty());
     }
 
     @Test

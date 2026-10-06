@@ -7,9 +7,7 @@ package app.morphe.extension.facebook.feed;
 import androidx.annotation.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
@@ -28,7 +27,11 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *
  * <p>Each line of the list is one rule: a profile or Page id (only digits), a site (a domain such
  * as example.com, which takes its subdomains too), or a name, matched whole against the name of a
- * person or Page that wrote the post, capital letters aside. A post goes when one of its authors or
+ * person or Page that wrote the post, capital letters aside. A link to Facebook itself is the id it
+ * carries (profile.php?id=, /people/name/id, or an id as the whole path), and one without is left
+ * out: a post carries its authors' ids and names, never their usernames, and Facebook's own
+ * domains as a site would take nearly every post. A bare line with a dot and no slash, such as
+ * Booking.com or Mr.Beast, is a site and a name at once. A post goes when one of its authors or
  * one of its links matches, and so does a share of such a post: the post a share wraps is read too.
  *
  * <p>The authors are the story's {@code actors}, a list GraphQLStory reads with a Redex-renamed
@@ -45,8 +48,9 @@ public final class PostSources {
     public static final int MAX_RULES = 200;
     public static final int MAX_LENGTH = 80;
     /**
-     * The room the stored list takes in UTF-8, so it fits in a settings file beside the word lists
-     * whatever it's written in. Rules past it are left out like rules past {@link #MAX_RULES}.
+     * The room the stored list takes in a settings file, as {@link PostWords#encodedBytes} counts
+     * it, so it fits beside the word lists whatever it's written in. Rules past it are left out like
+     * rules past {@link #MAX_RULES}.
      */
     public static final int MAX_LIST_BYTES = 16 * 1024;
 
@@ -62,22 +66,48 @@ public final class PostSources {
     private static final Pattern DIGITS = Pattern.compile("[0-9]{3,20}");
     private static final Pattern HOST = Pattern.compile("[a-z0-9-]+(\\.[a-z0-9-]+)+");
     private static final Pattern SPACES = Pattern.compile("\\s+");
+    private static final Pattern FACEBOOK_ID = Pattern.compile("[?&]id=([0-9]{3,20})(?=[&#]|$)");
+
+    /** Facebook's own domains. A rule never takes them as a site. */
+    private static final String[] FACEBOOK_SITES = {"facebook.com", "fb.com", "fb.me", "fb.watch", "fbcdn.net"};
 
     /** What one line of the list is. */
     enum Kind { ID, SITE, NAME }
 
-    /** One rule: what it is, the value it matches, and its line number for the report. */
+    /**
+     * One rule: what it is, the value it matches, and its line number for the report. A site typed
+     * bare, with no scheme or path, also matches an author named the same, in [name].
+     */
     static final class Rule {
         final Kind kind;
         final String value;
         final int number;
+        @Nullable final String name;
 
         Rule(Kind kind, String value, int number) {
+            this(kind, value, number, null);
+        }
+
+        Rule(Kind kind, String value, int number, @Nullable String name) {
             this.kind = kind;
             this.value = value;
             this.number = number;
+            this.name = name;
         }
     }
+
+    /** The last stored list read and its rules, so the feed reads a list once, not once per post. */
+    private static final class Parsed {
+        final String stored;
+        final List<Rule> rules;
+
+        Parsed(String stored, List<Rule> rules) {
+            this.stored = stored;
+            this.rules = rules;
+        }
+    }
+
+    private static volatile Parsed parsed;
 
     /** What reading one feed unit found. Only {@link #READ} carries authors and links. */
     enum Outcome {
@@ -130,6 +160,16 @@ public final class PostSources {
 
     // The list.
 
+    /** {@link #rules} of [stored], read again only when the list has changed since the last post. */
+    static List<Rule> cachedRules(@Nullable String stored) {
+        String key = stored == null ? "" : stored;
+        Parsed last = parsed;
+        if (last != null && last.stored.equals(key)) return last.rules;
+        List<Rule> rules = Collections.unmodifiableList(rules(key));
+        parsed = new Parsed(key, rules);
+        return rules;
+    }
+
     /** The rules in a stored list, in order. Blank, too long and repeated lines are left out. */
     static List<Rule> rules(@Nullable String stored) {
         if (stored == null || stored.isEmpty()) return Collections.emptyList();
@@ -144,15 +184,64 @@ public final class PostSources {
         return rules;
     }
 
-    /** What one typed line is, or null when it's blank or too long. */
+    /**
+     * What one typed line is, or null when it's blank, too long, or a link to Facebook with no id
+     * in it.
+     */
     @Nullable
     static Rule rule(String line, int number) {
         String trimmed = normalize(line);
         if (trimmed.isEmpty() || trimmed.length() > MAX_LENGTH) return null;
         if (DIGITS.matcher(trimmed).matches()) return new Rule(Kind.ID, trimmed, number);
         String site = site(trimmed);
-        if (site != null) return new Rule(Kind.SITE, site, number);
+        if (site != null && isFacebook(site)) {
+            String id = facebookId(trimmed);
+            return id == null ? null : new Rule(Kind.ID, id, number);
+        }
+        if (site != null) {
+            boolean bare = trimmed.indexOf('/') < 0;
+            return new Rule(Kind.SITE, site, number, bare ? trimmed.toLowerCase(Locale.ROOT) : null);
+        }
         return new Rule(Kind.NAME, trimmed.toLowerCase(Locale.ROOT), number);
+    }
+
+    /** Whether [site] is one of Facebook's own domains or under one. */
+    static boolean isFacebook(String site) {
+        for (String own : FACEBOOK_SITES) {
+            if (site.equals(own) || site.endsWith("." + own)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * The profile or Page id a link to Facebook carries, or null: profile.php?id=, the last part of
+     * /people/name/id, or an id as the whole path.
+     */
+    @Nullable
+    static String facebookId(String typed) {
+        String value = typed.toLowerCase(Locale.ROOT);
+        int scheme = value.indexOf("://");
+        if (scheme >= 0) value = value.substring(scheme + 3);
+        int slash = value.indexOf('/');
+        if (slash < 0) return null;
+        String rest = value.substring(slash);
+        int query = rest.indexOf('?');
+        String path = query < 0 ? rest : rest.substring(0, query);
+        int fragment = path.indexOf('#');
+        if (fragment >= 0) path = path.substring(0, fragment);
+        if (query >= 0 && path.equals("/profile.php")) {
+            Matcher id = FACEBOOK_ID.matcher(rest.substring(query));
+            if (id.find()) return id.group(1);
+        }
+        List<String> parts = new ArrayList<>();
+        for (String part : path.split("/")) {
+            if (!part.isEmpty()) parts.add(part);
+        }
+        if (parts.size() == 1 && DIGITS.matcher(parts.get(0)).matches()) return parts.get(0);
+        if (parts.size() == 3 && parts.get(0).equals("people") && DIGITS.matcher(parts.get(2)).matches()) {
+            return parts.get(2);
+        }
+        return null;
     }
 
     /**
@@ -170,7 +259,8 @@ public final class PostSources {
             Rule rule = rule(line, count + 1);
             if (rule == null || seen.contains(rule.kind + ":" + rule.value)) continue;
             String text = normalize(line);
-            int size = text.getBytes(StandardCharsets.UTF_8).length + (count > 0 ? 1 : 0);
+            // A line break between rules takes two bytes in the file, as \n.
+            int size = PostWords.encodedBytes(text) + (count > 0 ? 2 : 0);
             if (bytes + size > MAX_LIST_BYTES) break;
             seen.add(rule.kind + ":" + rule.value);
             if (count > 0) kept.append('\n');
@@ -235,32 +325,48 @@ public final class PostSources {
      */
     @Nullable
     static String host(@Nullable String url) {
-        if (url == null || url.isEmpty()) return null;
-        try {
-            URI uri = new URI(url.trim());
-            String host = uri.getHost();
-            if (host == null) return null;
-            host = host.toLowerCase(Locale.ROOT);
-            if ((host.equals("l.facebook.com") || host.equals("lm.facebook.com")) && "/l.php".equals(uri.getPath())) {
-                String target = queryParameter(uri.getRawQuery(), "u");
-                if (target != null) {
-                    String inner = host(target);
-                    if (inner != null) return inner;
-                }
-            }
-            return host.startsWith("www.") ? host.substring(4) : host;
-        } catch (Exception malformed) {
-            return null;
+        if (url == null) return null;
+        String value = url.trim();
+        int scheme = value.indexOf("://");
+        if (scheme <= 0) return null;
+        String rest = value.substring(scheme + 3);
+        int end = rest.length();
+        for (char stop : new char[] {'/', '?', '#'}) {
+            int at = rest.indexOf(stop);
+            if (at >= 0 && at < end) end = at;
         }
+        String authority = rest.substring(0, end);
+        int user = authority.lastIndexOf('@');
+        if (user >= 0) authority = authority.substring(user + 1);
+        int port = authority.indexOf(':');
+        if (port >= 0) authority = authority.substring(0, port);
+        String host = authority.toLowerCase(Locale.ROOT);
+        while (host.endsWith(".")) host = host.substring(0, host.length() - 1);
+        if (host.isEmpty() || host.indexOf(' ') >= 0) return null;
+        if (host.equals("l.facebook.com") || host.equals("lm.facebook.com")) {
+            String path = rest.substring(end);
+            int query = path.indexOf('?');
+            if (query >= 0 && path.substring(0, query).equals("/l.php")) {
+                int fragment = path.indexOf('#', query);
+                String target = queryParameter(path.substring(query + 1, fragment < 0 ? path.length() : fragment), "u");
+                String inner = host(target);
+                if (inner != null) return inner;
+            }
+        }
+        return host.startsWith("www.") ? host.substring(4) : host;
     }
 
+    /** The decoded value of [name] in [query], or null when it's missing or can't be decoded. */
     @Nullable
-    private static String queryParameter(@Nullable String query, String name) throws Exception {
-        if (query == null) return null;
+    private static String queryParameter(String query, String name) {
         for (String pair : query.split("&")) {
             int equals = pair.indexOf('=');
-            String key = equals < 0 ? pair : pair.substring(0, equals);
-            if (key.equals(name) && equals >= 0) return URLDecoder.decode(pair.substring(equals + 1), "UTF-8");
+            if (equals < 0 || !pair.substring(0, equals).equals(name)) continue;
+            try {
+                return URLDecoder.decode(pair.substring(equals + 1), "UTF-8");
+            } catch (IllegalArgumentException | java.io.UnsupportedEncodingException malformed) {
+                return null;
+            }
         }
         return null;
     }
@@ -268,7 +374,7 @@ public final class PostSources {
     /**
      * The number of the first rule [found] matches, or 0: an id the same as an author's, a site the
      * same as a link's host or a domain it ends in, or a name the same as an author's, capitals and
-     * extra spaces aside.
+     * extra spaces aside. A site typed bare matches an author of that name too.
      */
     static int match(List<Rule> rules, Found found) {
         for (Rule rule : rules) {
@@ -280,6 +386,7 @@ public final class PostSources {
                     for (String host : found.hosts) {
                         if (host.equals(rule.value) || host.endsWith("." + rule.value)) return rule.number;
                     }
+                    if (rule.name != null && found.names.contains(rule.name)) return rule.number;
                     break;
                 case NAME:
                     if (found.names.contains(rule.value)) return rule.number;
@@ -293,7 +400,9 @@ public final class PostSources {
 
     /**
      * The authors and links of a feed unit and of the post it shares. Never throws. A unit that
-     * isn't a story, or a part this can't read, answers why with nothing found, and the rule keeps it.
+     * isn't a story, or a story whose own authors and links can't be read, answers why with nothing
+     * found, and the rule keeps it. When only the shared post can't be read, what the unit's own
+     * authors and links hold still counts.
      */
     static Found read(@Nullable Object feedUnit, StoryFlag.Accessor actors, StoryFlag.Accessor attachments,
             StoryFlag.Accessor attached) {
@@ -314,12 +423,16 @@ public final class PostSources {
             wrapped = attached.model(feedUnit);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.POST_WORDS, "attached story accessor", failure);
-            return new Found(Outcome.READ_FAILED);
+            return found;
         }
-        if (wrapped == StoryFlag.NOT_PATCHED) return new Found(Outcome.NO_ACCESSOR);
-        if (wrapped != null && members.story.isInstance(wrapped)) {
-            Outcome shared = readStory(wrapped, actors, attachments, members, found);
-            if (shared != Outcome.READ) return new Found(shared);
+        if (wrapped != null && wrapped != StoryFlag.NOT_PATCHED && members.story.isInstance(wrapped)) {
+            // A failure here is in the hook status already; the share's own sources still count.
+            Found shared = new Found(Outcome.READ);
+            if (readStory(wrapped, actors, attachments, members, shared) == Outcome.READ) {
+                found.ids.addAll(shared.ids);
+                found.names.addAll(shared.names);
+                found.hosts.addAll(shared.hosts);
+            }
         }
         return found;
     }

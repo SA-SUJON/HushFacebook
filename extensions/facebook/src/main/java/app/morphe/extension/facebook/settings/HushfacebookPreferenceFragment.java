@@ -1460,7 +1460,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setTitle(title);
         row.setDialogTitle(title);
         row.setDialogMessage(L10n.f("One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, "
-                + "or a site like example.com, which takes its subdomains too. Capital letters don't matter.",
+                + "or a site like example.com, which takes its subdomains too. Capital letters don't matter. "
+                + "A Facebook link works when it has the id in it.",
                 PostSources.MAX_RULES));
         row.setPositiveButtonText(L10n.t("Save"));
         row.setNegativeButtonText(L10n.t("Cancel"));
