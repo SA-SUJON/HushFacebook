@@ -3722,7 +3722,7 @@
     },
     {
       "name": "Turn off screen transitions",
-      "description": "Shows Facebook's tabs, its Menu and the screens that open over it at once, without the slide between them. Swiping and animations inside a page stay. Its switch starts on, under Appearance.",
+      "description": "Shows Facebook's tabs, the tab strips inside its screens, its Menu and the screens that open over it at once, without the slide between them. Swiping and animations inside a page stay. Its switch starts on, under Appearance.",
       "category": "Interface",
       "use": false,
       "dependencies": [
