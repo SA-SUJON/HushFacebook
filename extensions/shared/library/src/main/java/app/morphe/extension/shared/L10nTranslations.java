@@ -1062,8 +1062,8 @@ public final class L10nTranslations {
                 "Der Folgen-Button neben der Person, die das Reel gepostet hat. \u00dcber ihr Profil kannst du ihr weiterhin folgen.");
         table.put("The Messenger link test couldn't start.",
                 "Der Test der Messenger-Verbindung konnte nicht starten.");
-        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
-                "Die Meta-AI-Karten, die Facebook zwischen Beitr\u00e4gen in den Feed setzt. Beitr\u00e4ge von Menschen bleiben, egal was sie \u00fcber KI sagen.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts, and posts featuring one of Meta's AI characters. Other posts stay, whatever they say about AI.",
+                "Die Meta-AI-Karten, die Facebook zwischen Beitr\u00e4gen in den Feed setzt, und Beitr\u00e4ge mit einer der KI-Figuren von Meta. Andere Beitr\u00e4ge bleiben, egal was sie \u00fcber KI sagen.");
         table.put("The Reels tab",
                 "Der Reels-Tab");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -2315,8 +2315,8 @@ public final class L10nTranslations {
                 "El bot\u00f3n Seguir junto a quien public\u00f3 el reel. Puedes seguir a esa persona desde su perfil.");
         table.put("The Messenger link test couldn't start.",
                 "La prueba de la conexi\u00f3n con Messenger no pudo empezar.");
-        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
-                "Las tarjetas de Meta AI que Facebook a\u00f1ade al feed entre publicaciones. Las publicaciones de las personas se quedan, digan lo que digan sobre la IA.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts, and posts featuring one of Meta's AI characters. Other posts stay, whatever they say about AI.",
+                "Las tarjetas de Meta AI que Facebook a\u00f1ade al feed entre publicaciones y las publicaciones con uno de los personajes de IA de Meta. Las dem\u00e1s publicaciones se quedan, digan lo que digan sobre la IA.");
         table.put("The Reels tab",
                 "La pesta\u00f1a Reels");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -3568,8 +3568,8 @@ public final class L10nTranslations {
                 "Tombol Ikuti di samping nama pembuat reel. Anda tetap bisa mengikutinya dari profilnya.");
         table.put("The Messenger link test couldn't start.",
                 "Uji koneksi Messenger tidak dapat dimulai.");
-        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
-                "Kartu Meta AI yang ditambahkan Facebook ke feed di antara postingan. Postingan orang tetap ada, apa pun yang mereka katakan tentang AI.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts, and posts featuring one of Meta's AI characters. Other posts stay, whatever they say about AI.",
+                "Kartu Meta AI yang ditambahkan Facebook ke feed di antara postingan, dan postingan yang menampilkan salah satu karakter AI Meta. Postingan lain tetap ada, apa pun yang dikatakannya tentang AI.");
         table.put("The Reels tab",
                 "Tab Reels");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -4821,8 +4821,8 @@ public final class L10nTranslations {
                 "O bot\u00e3o Seguir ao lado de quem publicou o Reel. Voc\u00ea ainda pode seguir a pessoa pelo perfil dela.");
         table.put("The Messenger link test couldn't start.",
                 "O teste da conex\u00e3o com o Messenger n\u00e3o p\u00f4de come\u00e7ar.");
-        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
-                "Os cart\u00f5es da Meta AI que o Facebook coloca no feed entre as publica\u00e7\u00f5es. As publica\u00e7\u00f5es das pessoas ficam, n\u00e3o importa o que digam sobre IA.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts, and posts featuring one of Meta's AI characters. Other posts stay, whatever they say about AI.",
+                "Os cart\u00f5es da Meta AI que o Facebook coloca no feed entre as publica\u00e7\u00f5es e as publica\u00e7\u00f5es com um dos personagens de IA da Meta. As outras publica\u00e7\u00f5es ficam, n\u00e3o importa o que digam sobre IA.");
         table.put("The Reels tab",
                 "A aba Reels");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",
@@ -6074,8 +6074,8 @@ public final class L10nTranslations {
                 "Reels videosunu payla\u015fan ki\u015finin ad\u0131n\u0131n yan\u0131ndaki Takip Et d\u00fc\u011fmesi. Onu profilinden yine takip edebilirsin.");
         table.put("The Messenger link test couldn't start.",
                 "Messenger ba\u011flant\u0131 testi ba\u015flat\u0131lamad\u0131.");
-        table.put("The Meta AI cards Facebook adds to the feed between posts. People's posts stay, whatever they say about AI.",
-                "Facebook'un ak\u0131\u015fta g\u00f6nderilerin aras\u0131na ekledi\u011fi Meta AI kartlar\u0131. \u0130nsanlar\u0131n g\u00f6nderileri, yapay zek\u00e2 hakk\u0131nda ne derlerse desinler kal\u0131r.");
+        table.put("The Meta AI cards Facebook adds to the feed between posts, and posts featuring one of Meta's AI characters. Other posts stay, whatever they say about AI.",
+                "Facebook'un ak\u0131\u015fta g\u00f6nderilerin aras\u0131na ekledi\u011fi Meta AI kartlar\u0131 ve Meta'n\u0131n yapay zek\u00e2 karakterlerinden birini i\u00e7eren g\u00f6nderiler. Di\u011fer g\u00f6nderiler, yapay zek\u00e2 hakk\u0131nda ne derlerse desinler kal\u0131r.");
         table.put("The Reels tab",
                 "Reels sekmesi");
         table.put("The Stories tray card asking to upload your contacts. Applies when Facebook next loads the tray.",

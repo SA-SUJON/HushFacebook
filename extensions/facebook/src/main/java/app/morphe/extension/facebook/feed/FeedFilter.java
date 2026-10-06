@@ -99,18 +99,19 @@ public final class FeedFilter {
      * adapter of its own. A unit answering it as an edge would be the tray between posts.
      */
     static final String STORIES_TRAY_UNIT_TYPE = "StoriesTrayFeedUnit";
+
+    /**
+     * The type name of the Meta AI card Facebook adds to the feed between posts. Facebook's own feed
+     * unit dispatcher compares a unit's type name with it in 581. Hide AI-detected posts takes it out
+     * under {@link Settings#HIDE_META_AI_FEED_UNITS}, with the posts {@link AiCharacterPosts} finds.
+     */
+    static final String META_AI_UNIT_TYPE = "XFBFBImplicitMetaAIFeedUnit";
+
     /**
      * The other two kinds of Stories between posts the same model answers in 577 and 580, through
      * its table of type names rather than a literal: one large Stories tile, and one person's
      * Stories in a viewer of their own.
      */
-    /**
-     * The type name of the Meta AI card Facebook adds to the feed between posts. Facebook's own feed
-     * unit dispatcher compares a unit's type name with it in 581. Hide AI-detected posts takes it out
-     * under {@link Settings#HIDE_META_AI_FEED_UNITS}.
-     */
-    static final String META_AI_UNIT_TYPE = "XFBFBImplicitMetaAIFeedUnit";
-
     static final String STORIES_LARGE_TILE_UNIT_TYPE = "StoriesOneColumnOneRowLargeTileFeedUnit";
     static final String STORIES_INLINE_VIEWER_UNIT_TYPE = "StoriesSingleBucketInlineViewerFeedUnit";
     /** What Hide the Stories tray's rule adds to the type of a row of Stories it took out of the feed. */
@@ -237,7 +238,8 @@ public final class FeedFilter {
         return hideEdge(category, feedUnit, SettingsStatus.sponsoredPosts(), SettingsStatus.suggestedPosts(),
                 RecommendationLabel.PATCHED, SettingsStatus.aiDetectedPosts(), GenAiLabel.PATCHED,
                 SettingsStatus.feedReels(), ShowcaseType.PATCHED, SettingsStatus.postWords(), PostText.MESSAGE,
-                PostText.ATTACHED, GenAiLabel.SELF_LABEL_PATCHED);
+                PostText.ATTACHED, GenAiLabel.SELF_LABEL_PATCHED, AiCharacterPosts.ATTACHMENTS,
+                AiCharacterPosts.STYLES);
     }
 
     /** The guard with the sponsored and suggested patch-time flags passed in, and no GenAI rule. */
@@ -313,6 +315,22 @@ public final class FeedFilter {
             boolean reelsPatched, StoryFlag.Accessor showcaseAccessor, boolean wordsPatched,
             StoryFlag.Accessor messageAccessor, StoryFlag.Accessor attachedAccessor,
             StoryFlag.Accessor aiLabelAccessor) {
+        return hideEdge(category, feedUnit, sponsoredPatched, suggestedPatched, recommendationAccessor, aiPatched,
+                aiAccessor, reelsPatched, showcaseAccessor, wordsPatched, messageAccessor, attachedAccessor,
+                aiLabelAccessor, null, null);
+    }
+
+    /**
+     * The guard with the two readers of the AI character rule passed in too, so a test can stand in
+     * for the stubs Hide AI-detected posts fills: the story's attachments and Facebook's finder of an
+     * attachment's style. Null readers leave the rule out, as the overloads above do.
+     */
+    static boolean hideEdge(Object category, Object feedUnit, boolean sponsoredPatched, boolean suggestedPatched,
+            StoryFlag.Accessor recommendationAccessor, boolean aiPatched, StoryFlag.Accessor aiAccessor,
+            boolean reelsPatched, StoryFlag.Accessor showcaseAccessor, boolean wordsPatched,
+            StoryFlag.Accessor messageAccessor, StoryFlag.Accessor attachedAccessor,
+            StoryFlag.Accessor aiLabelAccessor, @Nullable StoryFlag.Accessor attachmentsAccessor,
+            @Nullable AiCharacterPosts.Finder styleFinder) {
         boolean trayPatched = storiesTrayInBuild();
         try {
             if (sponsoredPatched) HookStatus.invoked(FamilyNames.SPONSORED_POSTS);
@@ -382,9 +400,12 @@ public final class FeedFilter {
             if (reason == null && trayPatched && Settings.HIDE_STORIES_BETWEEN_POSTS.get()) {
                 reason = storiesRowReason(typeName(feedUnit));
             }
-            if (reason == null && aiPatched && Settings.HIDE_META_AI_FEED_UNITS.get()
-                    && META_AI_UNIT_TYPE.equals(typeName(feedUnit))) {
+            boolean metaAi = aiPatched && Settings.HIDE_META_AI_FEED_UNITS.get();
+            if (reason == null && metaAi && META_AI_UNIT_TYPE.equals(typeName(feedUnit))) {
                 reason = META_AI_UNIT_TYPE;
+            }
+            if (reason == null && metaAi && attachmentsAccessor != null && styleFinder != null) {
+                reason = aiCharacterReason(feedUnit, attachmentsAccessor, styleFinder);
             }
             boolean aiLabelled = aiPatched && Settings.HIDE_AI_LABELLED_POSTS.get();
             if (reason == null && aiPatched && (aiLabelled || Settings.HIDE_AI_DETECTED_POSTS.get())) {
@@ -453,6 +474,21 @@ public final class FeedFilter {
         if (!outcome.hides) return null;
         FeedFilterCounters.removed(route, 1, why);
         return flag.flag;
+    }
+
+    /**
+     * Hide Meta AI in the feed's rule for posts that carry an AI character: the style's type name
+     * when one of the post's attachments has it, otherwise null. Every unit it reads is counted on
+     * its own route under what the read found, so a kept post always has a reason in the report.
+     */
+    private static String aiCharacterReason(Object feedUnit, StoryFlag.Accessor attachments,
+            AiCharacterPosts.Finder styles) {
+        String kind = AiCharacterPosts.read(feedUnit, attachments, styles);
+        FeedFilterCounters.sawList(AiCharacterPosts.ROUTE, 1);
+        FeedFilterCounters.sawKind(AiCharacterPosts.ROUTE, kind);
+        if (!AiCharacterPosts.FOUND.equals(kind)) return null;
+        FeedFilterCounters.removed(AiCharacterPosts.ROUTE, 1, kind);
+        return AiCharacterPosts.STYLE_TYPE;
     }
 
     /**
@@ -713,6 +749,20 @@ public final class FeedFilter {
             return name instanceof String ? (String) name : null;
         } catch (Throwable failure) {
             return null;
+        }
+    }
+
+    /**
+     * Whether a model says its native tree is gone, through the same
+     * {@code isValidGraphServicesJNIModel()} {@link #typeName} asks. A model that has no such method
+     * can't say, and counts as still there; one whose answer can't be read counts as gone.
+     */
+    static boolean released(Object model) {
+        try {
+            TypeNameReader reader = TYPE_NAME_READERS.computeIfAbsent(model.getClass(), TypeNameReader::of);
+            return reader.valid != null && !Boolean.TRUE.equals(reader.valid.invoke(model));
+        } catch (Throwable failure) {
+            return true;
         }
     }
 
