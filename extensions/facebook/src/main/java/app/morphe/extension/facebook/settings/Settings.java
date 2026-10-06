@@ -623,6 +623,27 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_EVENTS_TAB =
             new BooleanSetting("hushfacebook_hide_events_tab", FALSE, true);
 
+    public static final BooleanSetting HIDE_DATING_TAB =
+            new BooleanSetting("hushfacebook_hide_dating_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_PROFESSIONAL_DASHBOARD_TAB =
+            new BooleanSetting("hushfacebook_hide_professional_dashboard_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_SAVED_TAB =
+            new BooleanSetting("hushfacebook_hide_saved_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_AD_CENTER_TAB =
+            new BooleanSetting("hushfacebook_hide_ad_center_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_CREATOR_TOOLS_TAB =
+            new BooleanSetting("hushfacebook_hide_creator_tools_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_DISCOVER_TAB =
+            new BooleanSetting("hushfacebook_hide_discover_tab", FALSE, true);
+
+    public static final BooleanSetting HIDE_JOBS_TAB =
+            new BooleanSetting("hushfacebook_hide_jobs_tab", FALSE, true);
+
     /**
      * The tab bar goes to the bottom of the screen on accounts Facebook gives it at the top
      * ({@link app.morphe.extension.facebook.navigation.BottomTabBar}). Facebook places the bar as

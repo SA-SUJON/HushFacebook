@@ -662,6 +662,13 @@ Hide the Marketplace tab	Marketplace-Tab ausblenden
 Hide the Groups tab	Gruppen-Tab ausblenden
 Hide the Gaming tab	Gaming-Tab ausblenden
 Hide the Events tab	Veranstaltungen-Tab ausblenden
+Hide the Dating tab	Dating-Tab ausblenden
+Hide the Professional dashboard tab	Professional-Dashboard-Tab ausblenden
+Hide the Saved tab	Gespeichert-Tab ausblenden
+Hide the Ad Center tab	Werbecenter-Tab ausblenden
+Hide the Creator tools tab	Creator-Tools-Tab ausblenden
+Hide the Discover tab	Entdecken-Tab ausblenden
+Hide the Jobs tab	Jobs-Tab ausblenden
 Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after changing it.	Nimmt den Tab aus der Tab-Leiste. Seine Seite bleibt im Menü. Starte Facebook nach der Änderung neu.
 Facebook opens on Home while Hide tabs keeps %1$s off the tab bar. Your choice stays saved.	Facebook startet mit Home, solange Tabs ausblenden %1$s aus der Tab-Leiste nimmt. Deine Auswahl bleibt gespeichert.
 # context: summary of that switch; Video is Facebook's name for the tab on some accounts

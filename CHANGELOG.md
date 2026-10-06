@@ -4,6 +4,10 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+### Added
+
+* **Facebook:** `Hide tabs` has seven more switches under Appearance, for tabs Facebook gives only some accounts: Dating, Professional dashboard, Saved, Ad Center, Creator tools, Discover and Jobs. They work like the others. Each starts off, a tab you pick leaves the tab bar once Facebook restarts, and its page stays in the Menu. The Video tab already has its own switch in `Hide the Reels tab`.
+
 ### Fixed
 
 * **Facebook:** With `AMOLED theme` on, the Data mode banner that Flex carriers show under the top bar draws on the black page now, not as a dark grey band across it. Facebook paints that strip with a card's colour, and AMOLED had turned it a card's near black. The Buy data button keeps its own step above the black (issue #86).

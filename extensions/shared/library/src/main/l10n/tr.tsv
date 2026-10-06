@@ -662,6 +662,13 @@ Hide the Marketplace tab	Marketplace sekmesini gizle
 Hide the Groups tab	Gruplar sekmesini gizle
 Hide the Gaming tab	Oyun sekmesini gizle
 Hide the Events tab	Etkinlikler sekmesini gizle
+Hide the Dating tab	Flört sekmesini gizle
+Hide the Professional dashboard tab	Profesyonel panel sekmesini gizle
+Hide the Saved tab	Kaydedilenler sekmesini gizle
+Hide the Ad Center tab	Reklam Merkezi sekmesini gizle
+Hide the Creator tools tab	İçerik üreticisi araçları sekmesini gizle
+Hide the Discover tab	Keşfet sekmesini gizle
+Hide the Jobs tab	İş İlanları sekmesini gizle
 Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after changing it.	Sekmeyi sekme çubuğundan kaldırır. Sayfası Menü'de kalır. Değiştirdikten sonra Facebook'u yeniden başlat.
 Facebook opens on Home while Hide tabs keeps %1$s off the tab bar. Your choice stays saved.	Sekmeleri gizle %1$s sekmesini çubuğun dışında tuttuğu sürece Facebook Ana Sayfa'da açılır. Seçimin kayıtlı kalır.
 # context: summary of that switch; Video is Facebook's name for the tab on some accounts
