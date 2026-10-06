@@ -69,14 +69,19 @@ public class NotificationSoundTest {
     }
 
     @Test
-    public void theChimeIsWrittenOnceAsANotificationSound() {
-        byte[] chime = mp4("the chime");
-        NotificationSound.sourceForTests = () -> new ByteArrayInputStream(chime);
+    public void theChimeIsWrittenOnceAsANotificationSoundWithoutItsTitleTag() {
+        byte[] chime = Mp4TitleTest.tagged("FB_FBPN_min7p8db");
+        NotificationSound.sourceForTests = () -> new ByteArrayInputStream(chime.clone());
 
         Result saved = NotificationSound.save(context);
         assertEquals(Outcome.SAVED, saved.outcome);
         assertEquals(NAME, saved.name);
-        assertArrayEquals(chime, written.toByteArray());
+        byte[] file = written.toByteArray();
+        assertEquals(chime.length, file.length);
+        int name = Mp4TitleTest.indexOf(chime, new byte[] { (byte) 0xA9, 'n', 'a', 'm' });
+        assertEquals("the title tag is dropped so the picker shows the file's name", "free",
+                new String(file, name, 4, java.nio.charset.StandardCharsets.US_ASCII));
+        assertArrayEquals(Mp4Title.untitled(chime.clone()), file);
         ContentValues row = store.rows.get(1L);
         assertEquals(NAME, row.getAsString(MediaStore.MediaColumns.DISPLAY_NAME));
         assertEquals("Facebook notification", row.getAsString(MediaStore.MediaColumns.TITLE));
@@ -89,6 +94,18 @@ public class NotificationSoundTest {
         assertEquals(Outcome.ALREADY_THERE, again.outcome);
         assertEquals(NAME, again.name);
         assertEquals("a second tap wrote nothing", 1, store.rows.size());
+    }
+
+    @Test
+    public void anotherContainerIsCopiedAsItIs() {
+        byte[] ogg = "OggS\0\2a vorbis chime".getBytes(StandardCharsets.US_ASCII);
+        NotificationSound.sourceForTests = () -> new ByteArrayInputStream(ogg);
+        Shadows.shadowOf(context.getContentResolver()).registerOutputStream(store.uri(1), written);
+        Result saved = NotificationSound.save(context);
+        assertEquals(Outcome.SAVED, saved.outcome);
+        assertEquals("Facebook notification.ogg", saved.name);
+        assertArrayEquals(ogg, written.toByteArray());
+        assertEquals("audio/ogg", store.rows.get(1L).getAsString(MediaStore.MediaColumns.MIME_TYPE));
     }
 
     @Test

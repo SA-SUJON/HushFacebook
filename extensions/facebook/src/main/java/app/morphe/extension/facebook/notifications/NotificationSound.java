@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 
 import androidx.annotation.Nullable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,6 +56,9 @@ public final class NotificationSound {
 
     /** No leading slash: MediaStore checks this against its own directory names. */
     static final String FOLDER = "Notifications/";
+
+    /** An MP4 up to this size is held whole so its title tag can be dropped; the stock chime is 32 KB. */
+    static final int MAX_UNTITLED = 4 * 1024 * 1024;
 
     /** What a save of the chime came to. */
     public enum Outcome {
@@ -133,10 +137,20 @@ public final class NotificationSound {
             }
             try (OutputStream out = resolver.openOutputStream(item, "w")) {
                 if (out == null) throw new IOException("MediaStore gave no way to write");
-                out.write(head, 0, got);
-                byte[] buffer = new byte[8192];
-                int n;
-                while ((n = in.read(buffer)) > 0) out.write(buffer, 0, n);
+                // An MP4's own title tag would become the row's title once the scanner reads the
+                // file, and the picker shows that; the stock chime carries one. Small enough to
+                // hold, the whole file is written without its tag, so the title is the name.
+                byte[] read = "audio/mp4".equals(mime) ? readUpTo(head, got, in, MAX_UNTITLED) : null;
+                if (read != null && read.length <= MAX_UNTITLED) {
+                    out.write(Mp4Title.untitled(read));
+                } else {
+                    // Not MP4, or too big to hold: a straight copy, starting with whatever was read.
+                    if (read != null) out.write(read);
+                    else out.write(head, 0, got);
+                    byte[] buffer = new byte[8192];
+                    int n;
+                    while ((n = in.read(buffer)) > 0) out.write(buffer, 0, n);
+                }
             } catch (IOException | RuntimeException e) {
                 remove(resolver, item);
                 Logger.diagnosticError(DiagnosticCategory.SETTINGS, SOURCE, () -> "the chime could not be copied", e);
@@ -220,6 +234,20 @@ public final class NotificationSound {
         } catch (RuntimeException e) {
             Logger.diagnosticError(DiagnosticCategory.SETTINGS, SOURCE, () -> "could not remove the unfinished sound", e);
         }
+    }
+
+    /**
+     * The head already read plus the stream, read to its end or to just past {@code cap} bytes.
+     * Longer than the cap means the file isn't held whole: the caller writes these bytes and
+     * streams the rest.
+     */
+    private static byte[] readUpTo(byte[] head, int got, InputStream in, int cap) throws IOException {
+        ByteArrayOutputStream whole = new ByteArrayOutputStream(64 * 1024);
+        whole.write(head, 0, got);
+        byte[] buffer = new byte[8192];
+        int n;
+        while (whole.size() <= cap && (n = in.read(buffer)) > 0) whole.write(buffer, 0, n);
+        return whole.toByteArray();
     }
 
     private static int readFully(InputStream in, byte[] into) throws IOException {
