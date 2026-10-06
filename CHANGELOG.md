@@ -31,6 +31,7 @@ Source preparation. The latest published bundle remains v0.7.1.
 * **Tooling:** Codec cleanup no longer fails a completed media test when closing the launcher's input retries a buffered release byte after the process has exited. Cleanup still reports errors while the launcher is alive.
 * **Facebook:** With `Hide the Reels tab` on, the Reels row in Facebook's Menu opens Reels on a screen of its own. Checked on a phone with 581.
 * **Facebook:** Messenger and Instagram rows no longer say links open here when Android's link handling is off or the relevant address states are missing. The rows refresh together from one Android answer when you return from settings.
+* **Facebook:** Hide sponsored reels now stops Facebook's Reels and Watch ad pool from handing an ad out at all. A report from a phone running 0.7.1 with 581 showed the Reels tab's loader drawing an ad from that pool one slot at a time, with the page filter catching it only after the pool had marked it used and logged its position. The pool now answers the way it does when no slot is free, so the loader goes on with the next reel. Facebook isn't serving reel ads to the test accounts here, so this change is built from that report; the diagnostic report counts each ad held back (issues #47 and #35).
 
 ### Changed
 

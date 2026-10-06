@@ -446,6 +446,15 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredreels/ReelsAdPool.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the Reels and Watch ad pool. In Facebook 577, 580 and 581 one class, which names itself VideoHomeSponsoredPool, extends the story pool base every client-side story loader draws from, and its two instance methods that hand back an ad edge log -WVCDF-NO-AD when the pool has none to give. The patch finds that class by the literal and those two methods by their shape, and puts a call of the extension first in each: while the switch is on they answer null, the same answer the pool gives when no slot is free, so the loader takes the next organic reel and the pool never marks an ad as used."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/notifications/**",
         "patches/src/main/kotlin/app/morphe/patches/facebook/notifications/**"
       ],
