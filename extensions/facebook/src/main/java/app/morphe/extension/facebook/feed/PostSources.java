@@ -7,6 +7,7 @@ package app.morphe.extension.facebook.feed;
 import androidx.annotation.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.IDN;
 import java.net.URLDecoder;
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -47,6 +48,12 @@ public final class PostSources {
     /** The most rules the list holds, and the longest one. Longer lines and extra ones are left out. */
     public static final int MAX_RULES = 200;
     public static final int MAX_LENGTH = 80;
+
+    /**
+     * The longest link to Facebook kept. Its id sits among tracking parameters that make it longer
+     * than a line otherwise holds, and the rule it makes is only the id.
+     */
+    static final int MAX_FACEBOOK_LINK_LENGTH = 512;
     /**
      * The room the stored list takes in a settings file, as {@link PostWords#encodedBytes} counts
      * it, so it fits beside the word lists whatever it's written in. Rules past it are left out like
@@ -178,22 +185,31 @@ public final class PostSources {
         for (String line : stored.split("\n", -1)) {
             if (rules.size() == MAX_RULES) break;
             Rule rule = rule(line, rules.size() + 1);
-            if (rule == null || !seen.add(rule.kind + ":" + rule.value)) continue;
+            if (rule == null || !seen.add(key(rule))) continue;
             rules.add(rule);
         }
         return rules;
     }
 
     /**
+     * What tells two rules apart: a site typed bare also names an author, so it isn't the same rule
+     * as a link to that site. Two bare spellings of one site are, and the first is kept.
+     */
+    private static String key(Rule rule) {
+        return rule.kind + ":" + rule.value + (rule.name == null ? "" : "|named");
+    }
+
+    /**
      * What one typed line is, or null when it's blank, too long, or a link to Facebook with no id
-     * in it.
+     * in it. A link to Facebook may run to {@link #MAX_FACEBOOK_LINK_LENGTH}.
      */
     @Nullable
     static Rule rule(String line, int number) {
         String trimmed = normalize(line);
-        if (trimmed.isEmpty() || trimmed.length() > MAX_LENGTH) return null;
+        if (trimmed.isEmpty() || trimmed.length() > MAX_FACEBOOK_LINK_LENGTH) return null;
         if (DIGITS.matcher(trimmed).matches()) return new Rule(Kind.ID, trimmed, number);
         String site = site(trimmed);
+        if (trimmed.length() > MAX_LENGTH && (site == null || !isFacebook(site))) return null;
         if (site != null && isFacebook(site)) {
             String id = facebookId(trimmed);
             return id == null ? null : new Rule(Kind.ID, id, number);
@@ -257,12 +273,12 @@ public final class PostSources {
         for (String line : typed.split("\n", -1)) {
             if (count == MAX_RULES) break;
             Rule rule = rule(line, count + 1);
-            if (rule == null || seen.contains(rule.kind + ":" + rule.value)) continue;
+            if (rule == null || seen.contains(key(rule))) continue;
             String text = normalize(line);
             // A line break between rules takes two bytes in the file, as \n.
             int size = PostWords.encodedBytes(text) + (count > 0 ? 2 : 0);
             if (bytes + size > MAX_LIST_BYTES) break;
-            seen.add(rule.kind + ":" + rule.value);
+            seen.add(key(rule));
             if (count > 0) kept.append('\n');
             kept.append(text);
             bytes += size;
@@ -301,6 +317,7 @@ public final class PostSources {
     /**
      * The site a typed line names, or null when it isn't one: a domain with a dot and no spaces,
      * with any scheme, path and leading www. dropped. "https://www.Example.com/news" is example.com.
+     * A domain in another script is kept in its ASCII form, the way {@link #host} reads a link's.
      */
     @Nullable
     static String site(String typed) {
@@ -316,12 +333,27 @@ public final class PostSources {
         value = value.substring(0, end);
         if (value.startsWith("www.")) value = value.substring(4);
         while (value.endsWith(".")) value = value.substring(0, value.length() - 1);
-        return HOST.matcher(value).matches() ? value : null;
+        value = ascii(value);
+        return value != null && HOST.matcher(value).matches() ? value : null;
     }
 
     /**
-     * The site a link goes to, lowercase and without www., or null when it has no host. A link
-     * through Facebook's redirect counts as the one it carries in its u parameter.
+     * [host] in the ASCII form a domain in another script takes (bücher.de is xn--bcher-kva.de),
+     * lowercase, or null when it can't be one. An ASCII host comes back as it was.
+     */
+    @Nullable
+    static String ascii(String host) {
+        try {
+            return IDN.toASCII(host, IDN.ALLOW_UNASSIGNED).toLowerCase(Locale.ROOT);
+        } catch (IllegalArgumentException notADomain) {
+            return null;
+        }
+    }
+
+    /**
+     * The site a link goes to, lowercase, in ASCII and without www., or null when it has no host. A
+     * link through Facebook's redirect counts as the one it carries in its u parameter. A backslash
+     * ends the host as a slash does, the way a browser opens the link.
      */
     @Nullable
     static String host(@Nullable String url) {
@@ -329,7 +361,7 @@ public final class PostSources {
         String value = url.trim();
         int scheme = value.indexOf("://");
         if (scheme <= 0) return null;
-        String rest = value.substring(scheme + 3);
+        String rest = value.substring(scheme + 3).replace('\\', '/');
         int end = rest.length();
         for (char stop : new char[] {'/', '?', '#'}) {
             int at = rest.indexOf(stop);
@@ -343,6 +375,8 @@ public final class PostSources {
         String host = authority.toLowerCase(Locale.ROOT);
         while (host.endsWith(".")) host = host.substring(0, host.length() - 1);
         if (host.isEmpty() || host.indexOf(' ') >= 0) return null;
+        String inAscii = ascii(host);
+        if (inAscii != null) host = inAscii;
         if (host.equals("l.facebook.com") || host.equals("lm.facebook.com")) {
             String path = rest.substring(end);
             int query = path.indexOf('?');

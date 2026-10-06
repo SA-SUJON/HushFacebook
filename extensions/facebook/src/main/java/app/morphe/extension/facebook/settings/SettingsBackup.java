@@ -77,8 +77,8 @@ import app.morphe.extension.shared.settings.StringSetting;
  */
 public final class SettingsBackup {
     /**
-     * Far more than a settings file needs: one is a few hundred bytes, or 63 KB at most with both
-     * word lists filling the room they share.
+     * Far more than a settings file needs: one is a few hundred bytes, or about 79 KB at most with
+     * both word lists filling the room they share and the sources list filling its own.
      */
     public static final int MAX_BYTES = 80 * 1024;
     public static final String FORMAT = "hushfacebook-settings";

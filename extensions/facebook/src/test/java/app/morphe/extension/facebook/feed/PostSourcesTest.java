@@ -236,6 +236,57 @@ public class PostSourcesTest {
     }
 
     @Test
+    public void aBackslashEndsALinksHostAsABrowserReadsIt() {
+        assertEquals("spam.example", PostSources.host("https://spam.example\\@news.example/x"));
+        assertEquals("spam.example", PostSources.host("https://spam.example\\path"));
+    }
+
+    @Test
+    public void aSiteInAnotherScriptMatchesItsLinksEitherWay() {
+        PostSources.Rule typed = PostSources.rule("bücher.de", 1);
+        assertEquals(PostSources.Kind.SITE, typed.kind);
+        assertEquals("xn--bcher-kva.de", typed.value);
+        assertEquals("bücher.de", typed.name);
+        assertEquals("xn--bcher-kva.de", PostSources.host("https://www.bücher.de/angebote"));
+        assertEquals("xn--bcher-kva.de", PostSources.host("https://xn--bcher-kva.de/"));
+
+        GraphQLStory unicode = story(null, Arrays.asList(author("560", "A Friend")),
+                Arrays.asList(link("https://bücher.de/x")));
+        GraphQLStory punycode = story(null, Arrays.asList(author("561", "A Friend")),
+                Arrays.asList(link("https://shop.xn--bcher-kva.de/x")));
+        assertEquals(1, PostSources.match(PostSources.rules("bücher.de"), read(unicode)));
+        assertEquals(1, PostSources.match(PostSources.rules("bücher.de"), read(punycode)));
+        assertEquals(1, PostSources.match(PostSources.rules("https://xn--bcher-kva.de"), read(unicode)));
+    }
+
+    @Test
+    public void aFacebookLinkWithTrackingStillGivesItsId() {
+        String link = "https://www.facebook.com/people/Some-Long-Page-Name/100044218155390/?mibextid=ZbWKwL"
+                + "&rdid=AbCdEfGhIjKlMnOp&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1A2b3C";
+        assertTrue(link.length() > PostSources.MAX_LENGTH);
+        assertEquals("100044218155390", PostSources.rule(link, 1).value);
+        assertEquals(0, PostSources.leftOut(link));
+
+        StringBuilder longSite = new StringBuilder("https://example.com/");
+        while (longSite.length() <= PostSources.MAX_LENGTH) longSite.append('x');
+        assertNull("only a link to Facebook may run long", PostSources.rule(longSite.toString(), 2));
+        StringBuilder tooLong = new StringBuilder("https://www.facebook.com/profile.php?id=100044218155390&x=");
+        while (tooLong.length() <= PostSources.MAX_FACEBOOK_LINK_LENGTH) tooLong.append('y');
+        assertNull(PostSources.rule(tooLong.toString(), 3));
+    }
+
+    @Test
+    public void aLinkToASiteAndTheSiteTypedBareAreTwoRules() {
+        String typed = "https://booking.com\nBooking.com";
+        assertEquals(2, PostSources.count(typed));
+        assertEquals(0, PostSources.leftOut(typed));
+        GraphQLStory page = story(null, Arrays.asList(author("557", "Booking.com")),
+                Arrays.asList(link("https://example.org/x")));
+        assertEquals("the bare line still names the Page", 2, PostSources.match(PostSources.rules(typed), read(page)));
+        assertEquals("the same bare line twice is one rule", 1, PostSources.count("Booking.com\nbooking.com"));
+    }
+
+    @Test
     public void aShareWhoseOriginalCantBeReadStillMatchesItsOwnAuthor() {
         GraphQLStory original = story(null, Arrays.asList(author("555", "Daily Bugle")), Collections.emptyList());
         GraphQLStory share = story(original, Arrays.asList(author("777", "A Friend")), Collections.emptyList());
