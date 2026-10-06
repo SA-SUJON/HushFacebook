@@ -645,11 +645,11 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_AD_CENTER_TAB =
             new BooleanSetting("hushfacebook_hide_ad_center_tab", FALSE, true);
 
-    public static final BooleanSetting HIDE_CREATOR_TOOLS_TAB =
-            new BooleanSetting("hushfacebook_hide_creator_tools_tab", FALSE, true);
+    public static final BooleanSetting HIDE_CREATE_TAB =
+            new BooleanSetting("hushfacebook_hide_create_tab", FALSE, true);
 
-    public static final BooleanSetting HIDE_DISCOVER_TAB =
-            new BooleanSetting("hushfacebook_hide_discover_tab", FALSE, true);
+    public static final BooleanSetting HIDE_EXPLORE_TAB =
+            new BooleanSetting("hushfacebook_hide_explore_tab", FALSE, true);
 
     public static final BooleanSetting HIDE_JOBS_TAB =
             new BooleanSetting("hushfacebook_hide_jobs_tab", FALSE, true);

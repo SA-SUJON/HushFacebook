@@ -26,8 +26,8 @@ internal val HIDEABLE_TABS = mapOf(
     ),
     "Saved" to listOf("Lcom/facebook/saved2/tab/SavedTab;"),
     "Ad Center" to listOf("Lcom/facebook/adinterfaces/adcenter/AdCenterTab;"),
-    "Creator tools" to listOf("Lcom/facebook/creator/tab/CreatorToolComposerTab;"),
-    "Discover" to listOf("Lcom/facebook/notifications/discoverhub/tab/DiscoverHubTab;"),
+    "Create" to listOf("Lcom/facebook/creator/tab/CreatorToolComposerTab;"),
+    "Explore" to listOf("Lcom/facebook/notifications/discoverhub/tab/DiscoverHubTab;"),
     "Jobs" to listOf("Lcom/facebook/jobsv2/tab/JobsV2Tab;"),
 )
 
@@ -46,7 +46,7 @@ internal val HIDEABLE_TABS = mapOf(
 val hideTabsPatch = bytecodePatch(
     name = "Hide tabs",
     description = "Takes the tabs you pick off the tab bar: Feeds, Friends, Marketplace, Groups, Gaming or Events, " +
-        "and Dating, Professional dashboard, Saved, Ad Center, Creator tools, Discover or Jobs where Facebook gives you one. " +
+        "and Dating, Professional dashboard, Saved, Ad Center, Create, Explore or Jobs where Facebook gives you one. " +
         "Each page stays in the Menu. Every switch starts off, and a change shows once Facebook restarts.",
     default = true,
 ) {

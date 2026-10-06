@@ -62,8 +62,8 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_PROFESSIONAL_DASHBOARD_TAB) return L10n.t("Hide the Professional dashboard tab");
         if (setting == Settings.HIDE_SAVED_TAB) return L10n.t("Hide the Saved tab");
         if (setting == Settings.HIDE_AD_CENTER_TAB) return L10n.t("Hide the Ad Center tab");
-        if (setting == Settings.HIDE_CREATOR_TOOLS_TAB) return L10n.t("Hide the Creator tools tab");
-        if (setting == Settings.HIDE_DISCOVER_TAB) return L10n.t("Hide the Discover tab");
+        if (setting == Settings.HIDE_CREATE_TAB) return L10n.t("Hide the Create tab");
+        if (setting == Settings.HIDE_EXPLORE_TAB) return L10n.t("Hide the Explore tab");
         if (setting == Settings.HIDE_JOBS_TAB) return L10n.t("Hide the Jobs tab");
         if (setting == Settings.HIDE_REEL_PROMPTS) return L10n.t("Hide reel interest prompts");
         if (setting == Settings.HIDE_SPONSORED_REELS) return L10n.t("Hide sponsored reels");

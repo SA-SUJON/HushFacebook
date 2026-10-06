@@ -541,14 +541,14 @@ public final class L10nTranslations {
                 "Vorgeschlagene Stories ausblenden");
         table.put("Hide the Ad Center tab",
                 "Werbecenter-Tab ausblenden");
-        table.put("Hide the Creator tools tab",
-                "Creator-Tools-Tab ausblenden");
+        table.put("Hide the Create tab",
+                "Erstellen-Tab ausblenden");
         table.put("Hide the Dating tab",
                 "Dating-Tab ausblenden");
-        table.put("Hide the Discover tab",
-                "Entdecken-Tab ausblenden");
         table.put("Hide the Events tab",
                 "Veranstaltungen-Tab ausblenden");
+        table.put("Hide the Explore tab",
+                "Erkunden-Tab ausblenden");
     }
 
     private static void fillDe4(Map<String, String> table) {
@@ -1820,14 +1820,14 @@ public final class L10nTranslations {
                 "Ocultar historias sugeridas");
         table.put("Hide the Ad Center tab",
                 "Ocultar la pesta\u00f1a Centro de anuncios");
-        table.put("Hide the Creator tools tab",
-                "Ocultar la pesta\u00f1a Herramientas para creadores");
+        table.put("Hide the Create tab",
+                "Ocultar la pesta\u00f1a Crear");
         table.put("Hide the Dating tab",
                 "Ocultar la pesta\u00f1a Citas");
-        table.put("Hide the Discover tab",
-                "Ocultar la pesta\u00f1a Descubrir");
         table.put("Hide the Events tab",
                 "Ocultar la pesta\u00f1a Eventos");
+        table.put("Hide the Explore tab",
+                "Ocultar la pesta\u00f1a Explorar");
     }
 
     private static void fillEs4(Map<String, String> table) {
@@ -3099,14 +3099,14 @@ public final class L10nTranslations {
                 "Sembunyikan cerita yang disarankan");
         table.put("Hide the Ad Center tab",
                 "Sembunyikan tab Pusat Iklan");
-        table.put("Hide the Creator tools tab",
-                "Sembunyikan tab Alat kreator");
+        table.put("Hide the Create tab",
+                "Sembunyikan tab Buat");
         table.put("Hide the Dating tab",
                 "Sembunyikan tab Kencan");
-        table.put("Hide the Discover tab",
-                "Sembunyikan tab Jelajahi");
         table.put("Hide the Events tab",
                 "Sembunyikan tab Acara");
+        table.put("Hide the Explore tab",
+                "Sembunyikan tab Jelajahi");
     }
 
     private static void fillIn4(Map<String, String> table) {
@@ -4378,14 +4378,14 @@ public final class L10nTranslations {
                 "Ocultar Stories sugeridos");
         table.put("Hide the Ad Center tab",
                 "Ocultar a aba Central de An\u00fancios");
-        table.put("Hide the Creator tools tab",
-                "Ocultar a aba Ferramentas de cria\u00e7\u00e3o");
+        table.put("Hide the Create tab",
+                "Ocultar a aba Criar");
         table.put("Hide the Dating tab",
                 "Ocultar a aba Namoro");
-        table.put("Hide the Discover tab",
-                "Ocultar a aba Descobrir");
         table.put("Hide the Events tab",
                 "Ocultar a aba Eventos");
+        table.put("Hide the Explore tab",
+                "Ocultar a aba Explorar");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
@@ -5657,14 +5657,14 @@ public final class L10nTranslations {
                 "\u00d6nerilen hikayeleri gizle");
         table.put("Hide the Ad Center tab",
                 "Reklam Merkezi sekmesini gizle");
-        table.put("Hide the Creator tools tab",
-                "\u0130\u00e7erik \u00fcreticisi ara\u00e7lar\u0131 sekmesini gizle");
+        table.put("Hide the Create tab",
+                "Olu\u015ftur sekmesini gizle");
         table.put("Hide the Dating tab",
                 "Fl\u00f6rt sekmesini gizle");
-        table.put("Hide the Discover tab",
-                "Ke\u015ffet sekmesini gizle");
         table.put("Hide the Events tab",
                 "Etkinlikler sekmesini gizle");
+        table.put("Hide the Explore tab",
+                "Ke\u015ffet sekmesini gizle");
     }
 
     private static void fillTr4(Map<String, String> table) {

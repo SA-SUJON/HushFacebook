@@ -76,8 +76,10 @@ public final class FacebookTabs {
             "com.facebook.professionaldashboard.tab.ProfessionalDashboardTabWithoutComponentHelper";
     public static final String SAVED_CLASS = "com.facebook.saved2.tab.SavedTab";
     public static final String AD_CENTER_CLASS = "com.facebook.adinterfaces.adcenter.AdCenterTab";
-    public static final String CREATOR_TOOLS_CLASS = "com.facebook.creator.tab.CreatorToolComposerTab";
-    public static final String DISCOVER_CLASS = "com.facebook.notifications.discoverhub.tab.DiscoverHubTab";
+    /** The Create tab, a plus in a circle that opens the composer. */
+    public static final String CREATE_CLASS = "com.facebook.creator.tab.CreatorToolComposerTab";
+    /** The Explore tab, a compass that opens fb_explore. Its class keeps an older name. */
+    public static final String EXPLORE_CLASS = "com.facebook.notifications.discoverhub.tab.DiscoverHubTab";
     public static final String JOBS_CLASS = "com.facebook.jobsv2.tab.JobsV2Tab";
 
     private FacebookTabs() {

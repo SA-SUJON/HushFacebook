@@ -58,8 +58,8 @@ public final class HiddenTabs {
                 FacebookTabs.PROFESSIONAL_DASHBOARD_PLAIN_CLASS),
         SAVED(null, FacebookTabs.SAVED_CLASS),
         AD_CENTER(null, FacebookTabs.AD_CENTER_CLASS),
-        CREATOR_TOOLS(null, FacebookTabs.CREATOR_TOOLS_CLASS),
-        DISCOVER(null, FacebookTabs.DISCOVER_CLASS),
+        CREATE(null, FacebookTabs.CREATE_CLASS),
+        EXPLORE(null, FacebookTabs.EXPLORE_CLASS),
         JOBS(null, FacebookTabs.JOBS_CLASS);
 
         /** The start this tab answers, or null when a start can't be sent to it. */
@@ -85,8 +85,8 @@ public final class HiddenTabs {
                 case PROFESSIONAL_DASHBOARD: return Settings.HIDE_PROFESSIONAL_DASHBOARD_TAB;
                 case SAVED: return Settings.HIDE_SAVED_TAB;
                 case AD_CENTER: return Settings.HIDE_AD_CENTER_TAB;
-                case CREATOR_TOOLS: return Settings.HIDE_CREATOR_TOOLS_TAB;
-                case DISCOVER: return Settings.HIDE_DISCOVER_TAB;
+                case CREATE: return Settings.HIDE_CREATE_TAB;
+                case EXPLORE: return Settings.HIDE_EXPLORE_TAB;
                 case JOBS: return Settings.HIDE_JOBS_TAB;
                 default: return Settings.HIDE_EVENTS_TAB;
             }
