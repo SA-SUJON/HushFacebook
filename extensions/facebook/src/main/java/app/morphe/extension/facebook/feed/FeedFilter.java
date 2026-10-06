@@ -82,6 +82,41 @@ public final class FeedFilter {
     static final String GROUPS_YOU_SHOULD_JOIN_TYPE = "GroupsYouShouldJoinFeedUnit";
 
     /**
+     * The GraphQL type names of Memories between posts: "On this day" and its section header, a
+     * memory shown as its own post, and friendship anniversaries. Each is only a name in Facebook's
+     * type tables on 577, 580 and 581, with no model class of its own, so a unit of one answers
+     * {@code getTypeName()} from the shared model it's built on.
+     */
+    static final String[] MEMORIES_TYPES = {
+            "ThrowbackPromotionFeedUnit", "ThrowbackSectionHeaderFeedUnit", "ThrowbackPermalinkStoryFeedUnit",
+            "GoodwillThrowbackFeedUnit",
+    };
+
+    /** The row of friend requests between posts, on the model People you may know shares. */
+    static final String FRIEND_REQUESTS_TYPE = "FriendRequestsFeedUnit";
+
+    /** The card of where your friends are, between posts. */
+    static final String FRIENDS_LOCATIONS_TYPE = "FriendsLocationsFeedUnit";
+
+    /**
+     * Facebook's own promotions and prompts between posts that have no model class on every build,
+     * found by the GraphQL type name instead of by class like {@link #SUGGESTED_UNITS}: two more
+     * kinds of Quick Promotion (the Vibes one has a class on 580 and 581 only), the social list
+     * prompt, and people to invite to a group. They go with the suggested posts switch.
+     */
+    static final String[] SUGGESTED_TYPES = {
+            "ClientTriggeredQPFeedUnit", "VibesRifuQuickPromotionFeedUnit", "SocialListPromptFeedUnit",
+            "PaginatedGroupsPeopleYouMayInviteFeedUnit",
+    };
+
+    /**
+     * A carousel of several ads in one unit. Facebook draws it from the same ad pool as every other
+     * ad (581's AdValidator.checkValidity vets it), so it goes with the sponsored posts switch by its
+     * type name, whatever category the edge carries.
+     */
+    static final String MULTI_ADS_TYPE = "FBMultiAdsFeedUnit";
+
+    /**
      * The GraphQL type of the feed's rows of Stories between posts, a literal of the shared showcase
      * model's {@code getTypeName()} in 577 and 580. Facebook draws one with its DiscoverUnitComponent,
      * which reads {@link #UNCONNECTED_STORIES_FLAG} to tell a row of Stories from people you aren't
@@ -185,10 +220,11 @@ public final class FeedFilter {
      * Units Facebook injects into the feed that are not posts from anyone you follow. Every one
      * keeps its real name through Meta's obfuscator, so the check needs no obfuscated identifier.
      *
-     * <p>Left out on purpose: {@code GraphQLFriendsLocationsFeedUnit}, a real feature. People You
-     * May Know and suggested groups aren't here either: their unit class is Redex-renamed and
-     * shared with other rows, so their own rules read the GraphQL type name the unit answers
-     * ({@link #PEOPLE_YOU_MAY_KNOW_TYPE}, {@link #GROUPS_YOU_SHOULD_JOIN_TYPE}).
+     * <p>Left out on purpose: friends' locations, a real feature, which has a switch of its own that
+     * starts off ({@link #FRIENDS_LOCATIONS_TYPE}). People You May Know and suggested groups aren't
+     * here either: their unit class is Redex-renamed and shared with other rows, so their own rules
+     * read the GraphQL type name the unit answers ({@link #PEOPLE_YOU_MAY_KNOW_TYPE},
+     * {@link #GROUPS_YOU_SHOULD_JOIN_TYPE}).
      */
     private static final String[] SUGGESTED_UNITS = {
             // "Pages you may like" and its variants.
@@ -370,6 +406,9 @@ public final class FeedFilter {
             String reason = null;
             if (sponsoredPatched && hiddenCategory(category)) {
                 reason = categoryName;
+            } else if (sponsoredPatched && Settings.HIDE_SPONSORED_POSTS.get()
+                    && MULTI_ADS_TYPE.equals(typeName(feedUnit))) {
+                reason = MULTI_ADS_TYPE;
             }
             if (reason == null && reelsPatched && Settings.HIDE_FEED_REELS.get()) {
                 reason = isReelsCategory(categoryName) ? categoryName : showcaseReason(feedUnit, showcaseAccessor);
@@ -388,8 +427,9 @@ public final class FeedFilter {
                     reason = flagReason(RecommendationLabel.FLAG, RECOMMENDATION_ROUTE, feedUnit, recommendationAccessor);
                 }
                 boolean storiesYouMightLike = Settings.HIDE_STORIES_YOU_MIGHT_LIKE.get();
-                if (reason == null && (Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get() || Settings.HIDE_SUGGESTED_GROUPS.get()
-                        || storiesYouMightLike)) {
+                if (reason == null && (Settings.HIDE_SUGGESTED_POSTS.get() || Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get()
+                        || Settings.HIDE_SUGGESTED_GROUPS.get() || storiesYouMightLike || Settings.HIDE_FEED_MEMORIES.get()
+                        || Settings.HIDE_FEED_FRIEND_REQUESTS.get() || Settings.HIDE_FRIENDS_LOCATIONS.get())) {
                     String type = typeName(feedUnit);
                     reason = suggestedTypeReason(type);
                     if (reason == null && storiesYouMightLike && DISCOVER_UNIT_TYPE.equals(type)) {
@@ -493,16 +533,32 @@ public final class FeedFilter {
     }
 
     /**
-     * The rules built on a unit's GraphQL type name: the name, when it's People you may know or
-     * suggested groups and that row's switch is on, otherwise null. A name that couldn't be read
-     * is null, so the unit stays.
+     * The rules built on a unit's GraphQL type name: the name, when it's People you may know,
+     * suggested groups, a Memory, friend requests, friends' locations or one of
+     * {@link #SUGGESTED_TYPES} and that kind's switch is on, otherwise null. A name that couldn't be
+     * read is null, so the unit stays.
      */
     private static String suggestedTypeReason(String type) {
+        if (type == null) return null;
+        if (Settings.HIDE_SUGGESTED_POSTS.get()) {
+            for (String kind : SUGGESTED_TYPES) {
+                if (kind.equals(type)) return kind;
+            }
+        }
         if (PEOPLE_YOU_MAY_KNOW_TYPE.equals(type)) {
             return Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get() ? PEOPLE_YOU_MAY_KNOW_TYPE : null;
         }
         if (GROUPS_YOU_SHOULD_JOIN_TYPE.equals(type)) {
             return Settings.HIDE_SUGGESTED_GROUPS.get() ? GROUPS_YOU_SHOULD_JOIN_TYPE : null;
+        }
+        if (FRIEND_REQUESTS_TYPE.equals(type)) {
+            return Settings.HIDE_FEED_FRIEND_REQUESTS.get() ? FRIEND_REQUESTS_TYPE : null;
+        }
+        if (FRIENDS_LOCATIONS_TYPE.equals(type)) {
+            return Settings.HIDE_FRIENDS_LOCATIONS.get() ? FRIENDS_LOCATIONS_TYPE : null;
+        }
+        for (String memory : MEMORIES_TYPES) {
+            if (memory.equals(type)) return Settings.HIDE_FEED_MEMORIES.get() ? memory : null;
         }
         return null;
     }

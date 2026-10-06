@@ -26,6 +26,9 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_PEOPLE_YOU_MAY_KNOW) return L10n.t("Hide \"People you may know\"");
         if (setting == Settings.HIDE_SUGGESTED_GROUPS) return L10n.t("Hide suggested groups");
         if (setting == Settings.HIDE_STORIES_YOU_MIGHT_LIKE) return L10n.t("Hide \"Stories you might like\"");
+        if (setting == Settings.HIDE_FEED_MEMORIES) return L10n.t("Hide Memories in the feed");
+        if (setting == Settings.HIDE_FEED_FRIEND_REQUESTS) return L10n.t("Hide friend requests in the feed");
+        if (setting == Settings.HIDE_FRIENDS_LOCATIONS) return L10n.t("Hide friends' locations");
         if (setting == Settings.HIDE_TOP_STORIES_TRAY) return L10n.t("Hide the Stories tray");
         if (setting == Settings.HIDE_STORIES_BETWEEN_POSTS) return L10n.t("Hide Stories between posts");
         if (setting == Settings.HIDE_FEED_REELS) return L10n.t("Hide Reels in the feed");

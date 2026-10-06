@@ -416,6 +416,12 @@ Hide suggested groups	Önerilen grupları gizle
 The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.	Gönderilerin arasındaki katılabileceğin gruplar satırı ve Daha fazla grup keşfet düğmesi. Üyesi olduğun grupların gönderileri kalır.
 # context: switch title under News feed; Facebook's own header of a row of Stories from people you don't know, shown between posts
 Hide "Stories you might like"	“Beğenebileceğin hikayeler” bölümünü gizle
+Hide Memories in the feed	Akıştaki anıları gizle
+Hide friend requests in the feed	Akıştaki arkadaşlık isteklerini gizle
+Hide friends' locations	Arkadaşların konumlarını gizle
+Memories between posts, like "On this day" and friendship anniversaries. Your Memories page stays.	Gönderilerin arasındaki anılar, örneğin "Geçmişte bugün" ve arkadaşlık yıl dönümleri. Anılar sayfan kalır.
+The row of friend requests between posts. Your requests stay under Friends.	Gönderilerin arasındaki arkadaşlık istekleri satırı. İsteklerin Arkadaşlar'da kalır.
+The card showing where your friends are, between posts.	Gönderilerin arasında arkadaşlarının nerede olduğunu gösteren kart.
 # context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
 The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	Facebook'un gönderilerin arasına koyduğu, bağlantın olmayan kişilerin hikayelerinden oluşan satır. Arkadaşlarının hikayeleri ve hikaye şeridi kalır.
 # context: switch title under Notifications; trending videos Facebook sends as push notifications

@@ -83,6 +83,21 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_stories_you_might_like", TRUE);
 
     /**
+     * Memories Facebook puts between posts, "On this day" and friendship anniversaries, found by
+     * their GraphQL type names. Off until picked, like the other kinds below.
+     */
+    public static final BooleanSetting HIDE_FEED_MEMORIES =
+            new BooleanSetting("hushfacebook_hide_feed_memories", FALSE);
+
+    /** The row of friend requests between posts, found by its GraphQL type name. */
+    public static final BooleanSetting HIDE_FEED_FRIEND_REQUESTS =
+            new BooleanSetting("hushfacebook_hide_feed_friend_requests", FALSE);
+
+    /** The card of where your friends are, between posts, found by its GraphQL type name. */
+    public static final BooleanSetting HIDE_FRIENDS_LOCATIONS =
+            new BooleanSetting("hushfacebook_hide_friends_locations", FALSE);
+
+    /**
      * The row of stories at the top of the feed. The feed's adapter list builds it as an adapter of
      * its own, and the patch has both tray adapters count no rows while this is on.
      */

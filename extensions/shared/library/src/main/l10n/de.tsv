@@ -416,6 +416,12 @@ Hide suggested groups	Gruppenvorschläge ausblenden
 The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.	Die Reihe mit Gruppen zum Beitreten zwischen den Beiträgen, samt ihrem Button „Weitere Gruppen entdecken“. Beiträge aus deinen Gruppen bleiben.
 # context: switch title under News feed; Facebook's own header of a row of Stories from people you don't know, shown between posts
 Hide "Stories you might like"	„Stories, die dir gefallen könnten“ ausblenden
+Hide Memories in the feed	Erinnerungen im Feed ausblenden
+Hide friend requests in the feed	Freundschaftsanfragen im Feed ausblenden
+Hide friends' locations	Standorte von Freunden ausblenden
+Memories between posts, like "On this day" and friendship anniversaries. Your Memories page stays.	Erinnerungen zwischen Beiträgen, etwa „An diesem Tag“ und Freundschaftstage. Deine Erinnerungen-Seite bleibt.
+The row of friend requests between posts. Your requests stay under Friends.	Die Reihe mit Freundschaftsanfragen zwischen Beiträgen. Deine Anfragen bleiben unter Freunde.
+The card showing where your friends are, between posts.	Die Karte, die zwischen Beiträgen zeigt, wo deine Freunde sind.
 # context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
 The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	Die Reihe mit Stories von Personen, mit denen du nicht verbunden bist, die Facebook zwischen die Beiträge setzt. Die Stories deiner Freunde und die Stories-Leiste bleiben.
 # context: switch title under Notifications; trending videos Facebook sends as push notifications

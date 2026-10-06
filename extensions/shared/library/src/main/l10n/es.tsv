@@ -416,6 +416,12 @@ Hide suggested groups	Ocultar grupos sugeridos
 The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.	La fila de grupos para unirte entre las publicaciones, con su botón Descubrir más grupos. Las publicaciones de tus grupos se quedan.
 # context: switch title under News feed; Facebook's own header of a row of Stories from people you don't know, shown between posts
 Hide "Stories you might like"	Ocultar “Historias que te pueden gustar”
+Hide Memories in the feed	Ocultar recuerdos en el feed
+Hide friend requests in the feed	Ocultar solicitudes de amistad en el feed
+Hide friends' locations	Ocultar ubicaciones de amigos
+Memories between posts, like "On this day" and friendship anniversaries. Your Memories page stays.	Los recuerdos entre las publicaciones, como «Un día como hoy» y los aniversarios de amistad. Tu página de Recuerdos se queda.
+The row of friend requests between posts. Your requests stay under Friends.	La fila de solicitudes de amistad entre las publicaciones. Tus solicitudes siguen en Amigos.
+The card showing where your friends are, between posts.	La tarjeta que muestra dónde están tus amigos, entre las publicaciones.
 # context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
 The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	La fila de historias de personas con las que no tienes conexión que Facebook pone entre las publicaciones. Las historias de tus amigos y la bandeja de historias se quedan.
 # context: switch title under Notifications; trending videos Facebook sends as push notifications

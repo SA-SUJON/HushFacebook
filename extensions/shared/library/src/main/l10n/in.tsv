@@ -416,6 +416,12 @@ Hide suggested groups	Sembunyikan grup yang disarankan
 The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.	Deretan grup untuk diikuti di antara postingan, beserta tombol Temukan grup lainnya. Postingan dari grup tempat Anda bergabung tetap ada.
 # context: switch title under News feed; Facebook's own header of a row of Stories from people you don't know, shown between posts
 Hide "Stories you might like"	Sembunyikan “Cerita yang mungkin Anda sukai”
+Hide Memories in the feed	Sembunyikan Kenangan di feed
+Hide friend requests in the feed	Sembunyikan permintaan pertemanan di feed
+Hide friends' locations	Sembunyikan lokasi teman
+Memories between posts, like "On this day" and friendship anniversaries. Your Memories page stays.	Kenangan di antara postingan, seperti "Hari ini" dan hari jadi pertemanan. Halaman Kenanganmu tetap ada.
+The row of friend requests between posts. Your requests stay under Friends.	Deretan permintaan pertemanan di antara postingan. Permintaanmu tetap ada di Teman.
+The card showing where your friends are, between posts.	Kartu yang menunjukkan lokasi temanmu, di antara postingan.
 # context: summary of that switch; the Stories tray is the row of Stories at the top of the feed
 The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.	Deretan Cerita dari orang yang tidak terhubung dengan Anda, yang diselipkan Facebook di antara postingan. Cerita teman Anda dan deretan Cerita tetap ada.
 # context: switch title under Notifications; trending videos Facebook sends as push notifications
