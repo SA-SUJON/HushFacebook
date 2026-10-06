@@ -362,6 +362,7 @@ public class SettingsL10nTest {
             addDownloadSettingsText(shown);
             addTypedNameToasts(rows, shown);
             addReleaseCheckText(shown);
+            addNotificationSoundText(shown);
 
             // What the diagnostics rows say in a toast, with nothing to export or clear. The quick
             // report is built on a worker and answers on the main thread.
@@ -546,6 +547,14 @@ public class SettingsL10nTest {
         ShadowLooper.idleMainLooper();
         app.morphe.extension.shared.Utils.awaitBackgroundTasksForTests();
         ShadowLooper.idleMainLooper();
+    }
+
+    /** What the Save Facebook's notification sound row says for each way its save can go. */
+    private static void addNotificationSoundText(Set<String> shown) {
+        for (app.morphe.extension.facebook.notifications.NotificationSound.Outcome outcome
+                : app.morphe.extension.facebook.notifications.NotificationSound.Outcome.values()) {
+            shown.add(AppPages.notificationSoundMessage(outcome, "Facebook notification.m4a"));
+        }
     }
 
     private static void addToast(Set<String> shown) {

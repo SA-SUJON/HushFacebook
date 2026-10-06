@@ -838,3 +838,10 @@ HDR videos and photos stay at your screen's usual brightness instead of turning 
 Show View profile on Marketplace sellers	Marketplace satıcılarında Profili gör'ü göster
 # context: summary of that switch
 A seller's Marketplace page always has View profile, which opens their regular Facebook profile. Facebook shows it to only some accounts.	Bir satıcının Marketplace sayfasında her zaman Profili gör bulunur ve satıcının normal Facebook profilini açar. Facebook bunu yalnızca bazı hesaplara gösterir.
+# context: the Save Facebook's notification sound row under Notifications and its toasts (#83)
+Save Facebook's notification sound	Facebook'un bildirim sesini kaydet
+Puts Facebook's chime in your phone's notification sounds, for a category that Android set to None. Then pick it under Android's notification settings for Facebook: a category, then Sound.	Facebook'un sesini telefonunun bildirim seslerine koyar, Android'in Yok olarak bıraktığı bir kategori için. Sonra Android'in Facebook bildirim ayarlarından seç: bir kategori, sonra Ses.
+Saved as %1$s in the Notifications folder. Pick it under Sound in Android's notification settings for Facebook.	Notifications klasörüne %1$s olarak kaydedildi. Android'in Facebook bildirim ayarlarında Ses altından seç.
+%1$s is already in your notification sounds.	%1$s zaten bildirim seslerinde.
+This build has no notification sound to save.	Bu derlemede kaydedilecek bir bildirim sesi yok.
+Couldn't save the sound. Try again.	Ses kaydedilemedi. Tekrar dene.

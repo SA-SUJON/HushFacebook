@@ -148,6 +148,44 @@ public class HushfacebookPreferenceFragmentTest {
         }
     }
 
+    /**
+     * Facebook's chime can be saved from the Notifications section in every build, since a
+     * category Android set to None needs no patch to fix (#83). The row acts at once and says how
+     * it went in a toast, and with Block promotional notifications in it sits under that patch's
+     * rows.
+     */
+    @Test
+    public void theNotificationSoundRowSavesTheChimeInEveryBuild() throws Exception {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.POST_WORDS);
+        app.morphe.extension.facebook.notifications.NotificationSound.sourceForTests = () -> null;
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int at = indexOfKey(rows, AppPages.SAVE_NOTIFICATION_SOUND);
+            assertTrue("no sound row without the notifications patch", at >= 0);
+            Preference sound = rows.get(at);
+            assertEquals("Save Facebook's notification sound", String.valueOf(sound.getTitle()));
+            assertTrue("the row's tap acts at once, so it goes without a chevron", ((SettingsRows.Row) sound).actsOnTap());
+            assertTrue(String.valueOf(sound.getSummary()).contains("for a category that Android set to None"));
+            assertEquals(-1, indexOfKey(rows, Settings.BLOCK_ACCOUNT_SETUP_NOTIFICATIONS.key));
+
+            ShadowToast.reset();
+            sound.getOnPreferenceClickListener().onPreferenceClick(sound);
+            app.morphe.extension.shared.Utils.awaitBackgroundTasksForTests();
+            ShadowLooper.idleMainLooper();
+            assertEquals("This build has no notification sound to save.", ShadowToast.getTextOfLatestToast());
+        } finally {
+            app.morphe.extension.facebook.notifications.NotificationSound.sourceForTests = null;
+        }
+
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.PROMO_NOTIFICATIONS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int sound = indexOfKey(rows, AppPages.SAVE_NOTIFICATION_SOUND);
+            int reminders = indexOfKey(rows, Settings.BLOCK_ACCOUNT_SETUP_NOTIFICATIONS.key);
+            assertTrue("the sound row sits under the notification switches", reminders >= 0 && sound > reminders);
+        }
+    }
+
     private static int indexOfKey(List<Preference> rows, String key) {
         for (int i = 0; i < rows.size(); i++) {
             if (key.equals(rows.get(i).getKey())) return i;

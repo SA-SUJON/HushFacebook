@@ -17,6 +17,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Hide sponsored reels` also keeps the floating ad button off the comments of a reel or video ad that still gets through. Facebook's own comment buttons, like Message, stay.
 * **Facebook:** `Hide sponsored posts` keeps the floating ad button off a feed ad's comments too, on the post's own page and in the comment sheet. The Message, shop and visual search buttons stay. It works with or without `Hide sponsored reels`, and pausing Hushfacebook brings the button back.
 * **Facebook:** `Download any photo` has its own **Photo file name** under Downloads, next to the video's. It takes the same tokens, with `{photo_id}` for the photo's number on Facebook, and starts as `FB_IMG_{date}`, the name Facebook's own photo saves get. Export settings carries it.
+* **Facebook:** A **Save Facebook's notification sound** row under Notifications, in every build. It copies Facebook's own chime into the phone's Notifications folder so Android's sound picker lists it, for a notification category that came up as None after a fresh install, which no app can set back on its own (issue #83).
 * **Facebook:** `Turn off screen transitions` also covers tab strips inside a screen. A tap on one of Facebook's in-page tab rows, or on Feelings and Activities in the composer, shows that page at once. Stories, photo viewers and carousels move as before.
 
 ### Fixed

@@ -838,3 +838,10 @@ HDR videos and photos stay at your screen's usual brightness instead of turning 
 Show View profile on Marketplace sellers	Mostrar Ver perfil en los vendedores de Marketplace
 # context: summary of that switch
 A seller's Marketplace page always has View profile, which opens their regular Facebook profile. Facebook shows it to only some accounts.	La página de Marketplace de un vendedor siempre tiene Ver perfil, que abre su perfil normal de Facebook. Facebook solo lo muestra a algunas cuentas.
+# context: the Save Facebook's notification sound row under Notifications and its toasts (#83)
+Save Facebook's notification sound	Guardar el sonido de notificación de Facebook
+Puts Facebook's chime in your phone's notification sounds, for a category that Android set to None. Then pick it under Android's notification settings for Facebook: a category, then Sound.	Pone el tono de Facebook en los sonidos de notificación de tu teléfono, para una categoría que Android dejó en Ninguno. Luego elígelo en los ajustes de notificaciones de Android para Facebook: una categoría y después Sonido.
+Saved as %1$s in the Notifications folder. Pick it under Sound in Android's notification settings for Facebook.	Guardado como %1$s en la carpeta Notifications. Elígelo en Sonido, en los ajustes de notificaciones de Android para Facebook.
+%1$s is already in your notification sounds.	%1$s ya está en tus sonidos de notificación.
+This build has no notification sound to save.	Esta compilación no tiene ningún sonido de notificación que guardar.
+Couldn't save the sound. Try again.	No se pudo guardar el sonido. Inténtalo de nuevo.

@@ -16,9 +16,13 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 
+import androidx.annotation.Nullable;
+
 import java.util.Set;
 
+import app.morphe.extension.facebook.notifications.NotificationSound;
 import app.morphe.extension.shared.L10n;
+import app.morphe.extension.shared.Utils;
 
 /**
  * The category pages for the rest of Facebook: Chats, Menu, Search, Marketplace, Notifications
@@ -113,11 +117,18 @@ final class AppPages {
         }
     }
 
-    /** Notifications: the kinds of notification that can be blocked, and what always comes through. */
+    /** The row that puts Facebook's chime in the phone's notification sounds. */
+    static final String SAVE_NOTIFICATION_SOUND = "action_save_notification_sound";
+
+    /**
+     * Notifications: the kinds of notification that can be blocked, what always comes through, and
+     * Facebook's chime for a category Android set to None. The section is in every build, since the
+     * chime needs no patch.
+     */
     static void notifications(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
+        PreferenceCategory notifications = category(screen, L10n.t("Notifications"));
         if (build.contains(PatchFamily.PROMO_NOTIFICATIONS)) {
-            PreferenceCategory notifications = category(screen, L10n.t("Notifications"));
             notifications.addPreference(toggle(context, Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS,
                     L10n.t("Trending videos and the reels Facebook picked for you stop showing up in your "
                             + "notifications.")));
@@ -142,6 +153,49 @@ final class AppPages {
                             + "categories work too, since Facebook drops a notification whose category you turned "
                             + "off. Facebook's server decides which categories you get, though, so they may not "
                             + "split these kinds out.")));
+        }
+        notifications.addPreference(notificationSoundRow(context));
+    }
+
+    /**
+     * A tap copies Facebook's chime into the phone's notification sounds, off the main thread, and
+     * a toast says how it went. Android's picker then lists it for a category that came up as
+     * None, which no app can set back (#83).
+     */
+    static Preference notificationSoundRow(Context context) {
+        SettingsRows.Row row = new SettingsRows.Row(context);
+        row.setKey(SAVE_NOTIFICATION_SOUND);
+        row.setPersistent(false);
+        row.actsAtOnce = true;
+        row.setTitle(L10n.t("Save Facebook's notification sound"));
+        row.setSummary(L10n.t("Puts Facebook's chime in your phone's notification sounds, for a category that Android set "
+                + "to None. Then pick it under Android's notification settings for Facebook: a category, then Sound."));
+        Context app = context.getApplicationContext();
+        row.setOnPreferenceClickListener(p -> {
+            boolean accepted = Utils.runOnBackgroundThread(() ->
+                    Utils.showToastLong(notificationSoundMessage(NotificationSound.save(app))));
+            if (!accepted) Utils.showToastLong(notificationSoundMessage(NotificationSound.Outcome.FAILED, null));
+            return true;
+        });
+        return row;
+    }
+
+    static String notificationSoundMessage(NotificationSound.Result result) {
+        return notificationSoundMessage(result.outcome, result.name);
+    }
+
+    /** What the row's toast says for each way a save can go; the name is the file's, for the two that have one. */
+    static String notificationSoundMessage(NotificationSound.Outcome outcome, @Nullable String name) {
+        switch (outcome) {
+            case SAVED:
+                return L10n.f("Saved as %1$s in the Notifications folder. Pick it under Sound in Android's notification "
+                        + "settings for Facebook.", L10n.isolate(name));
+            case ALREADY_THERE:
+                return L10n.f("%1$s is already in your notification sounds.", L10n.isolate(name));
+            case NO_SOUND:
+                return L10n.t("This build has no notification sound to save.");
+            default:
+                return L10n.t("Couldn't save the sound. Try again.");
         }
     }
 
