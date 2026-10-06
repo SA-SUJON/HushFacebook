@@ -394,6 +394,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_picture_in_picture", TRUE);
 
     /**
+     * HDR videos and photos stay in the screen's usual range instead of turning it up to full
+     * brightness ({@link app.morphe.extension.facebook.media.HdrBrightness}). On once the patch is
+     * picked, since picking it is the choice. Off or paused, Facebook asks for its HDR window again.
+     */
+    public static final BooleanSetting TURN_OFF_HDR_BRIGHTNESS =
+            new BooleanSetting("hushfacebook_turn_off_hdr_brightness", TRUE);
+
+    /**
      * Facebook's own text, React Native screens' included, drawn in the font {@link #FONT_SOURCE}
      * names instead of Meta's Optimistic, at the same weight and slant. A typeface already on
      * screen keeps its font until Facebook restarts.

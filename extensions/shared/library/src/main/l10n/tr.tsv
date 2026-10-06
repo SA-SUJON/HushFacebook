@@ -790,3 +790,7 @@ Tabs, the Menu and screens that open over Facebook show at once, without the sli
 Picture-in-picture	Pencere içinde pencere
 # context: summary of that switch
 A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.	Oynatılan bir reel, Facebook'tan çıktığında küçük bir pencerede devam eder. Android 12 veya üstü.
+# context: switch title under Playback; HDR is the high-contrast video and photo format some screens show brighter than everything else
+Turn off HDR brightness	HDR parlaklığını kapat
+# context: summary of that switch
+HDR videos and photos stay at your screen's usual brightness instead of turning it up to full. They keep their resolution.	HDR videolar ve fotoğraflar, ekranı tam parlaklığa çıkarmak yerine ekranın her zamanki parlaklığında kalır. Çözünürlükleri değişmez.

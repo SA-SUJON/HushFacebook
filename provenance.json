@@ -650,6 +650,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/HdrBrightness.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/hdr/TurnOffHdrBrightnessPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook from Facebook 577, 580 and 581, for issue #66: every call of Window.setColorMode and Window.setDesiredHdrHeadroom outside the extension goes through the extension, which asks for the default colour mode and no headroom in place of Facebook's HDR window while the switch is on, and each SurfaceView Facebook builds asks Android 15 for no headroom. No Facebook patch source in the ledger has an HDR switch."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ScreenTransitions.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/Fingerprints.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/TransitionAnchors.kt",

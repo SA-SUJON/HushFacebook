@@ -53,6 +53,7 @@ import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
+import app.morphe.extension.facebook.media.HdrBrightnessForTests;
 import app.morphe.extension.facebook.media.PictureInPictureForTests;
 import app.morphe.extension.facebook.media.QualityChoiceForTests;
 import app.morphe.extension.facebook.media.ReelSpeedForTests;
@@ -208,6 +209,9 @@ public class ColdStartHooksTest {
         assertTrue("a tab before the context lost its slide", ScreenTransitionsForTests.slides());
         assertFalse("a picture-in-picture check before the context said yes", PictureInPictureForTests.allowsWithTheFeature());
         assertFalse("the Reels viewer's gate before the context said yes", PictureInPictureForTests.surfaceAllows());
+        assertFalse("an HDR window kept in the usual range before the context said yes",
+                HdrBrightnessForTests.keepsAnHdrWindowInTheUsualRange());
+        assertFalse("a headroom held before the context said yes", HdrBrightnessForTests.holdsTheHeadroom());
         assertTrue("a haptic before the context was held back", Haptics.performHapticFeedback(new android.view.View(app) {
             @Override
             public boolean performHapticFeedback(int feedbackConstant) {

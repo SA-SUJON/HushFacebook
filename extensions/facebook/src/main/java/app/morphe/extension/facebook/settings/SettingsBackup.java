@@ -146,6 +146,7 @@ public final class SettingsBackup {
             Settings.RESUME_LONG_VIDEOS,
             Settings.DEFAULT_PLAYBACK_QUALITY,
             Settings.PICTURE_IN_PICTURE,
+            Settings.TURN_OFF_HDR_BRIGHTNESS,
             Settings.USE_SYSTEM_FONT,
             Settings.USE_SYSTEM_EMOJI,
             Settings.OPEN_LINKS_EXTERNALLY,

@@ -790,3 +790,7 @@ Tabs, the Menu and screens that open over Facebook show at once, without the sli
 Picture-in-picture	Bild im Bild
 # context: summary of that switch
 A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.	Ein laufendes Reel spielt in einem kleinen Fenster weiter, wenn du Facebook verlässt. Ab Android 12.
+# context: switch title under Playback; HDR is the high-contrast video and photo format some screens show brighter than everything else
+Turn off HDR brightness	HDR-Helligkeit ausschalten
+# context: summary of that switch
+HDR videos and photos stay at your screen's usual brightness instead of turning it up to full. They keep their resolution.	HDR-Videos und -Fotos bleiben bei der üblichen Helligkeit deines Bildschirms, statt ihn ganz hochzudrehen. Ihre Auflösung bleibt gleich.

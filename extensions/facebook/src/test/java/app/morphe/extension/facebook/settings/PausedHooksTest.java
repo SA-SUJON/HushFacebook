@@ -67,6 +67,7 @@ import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
 import app.morphe.extension.facebook.composer.TagSuggestionsForTests;
+import app.morphe.extension.facebook.media.HdrBrightnessForTests;
 import app.morphe.extension.facebook.media.PictureInPictureForTests;
 import app.morphe.extension.facebook.media.QualityChoiceForTests;
 import app.morphe.extension.facebook.media.ReelSpeedForTests;
@@ -482,6 +483,9 @@ public class PausedHooksTest {
         // ReelsPipUtil's check and the Reels viewer's gate say yes on Android 12 with the phone's feature.
         probes.put(PatchFamily.PICTURE_IN_PICTURE, Arrays.asList(
                 PictureInPictureForTests::allowsWithTheFeature, PictureInPictureForTests::surfaceAllows));
+        // An HDR window comes out in the default colour mode, and a headroom as none.
+        probes.put(PatchFamily.HDR_BRIGHTNESS, Arrays.asList(
+                HdrBrightnessForTests::keepsAnHdrWindowInTheUsualRange, HdrBrightnessForTests::holdsTheHeadroom));
         // A tab asked for shows without its slide.
         probes.put(PatchFamily.SCREEN_TRANSITIONS, Collections.singletonList(() -> !ScreenTransitionsForTests.slides()));
         // A window's secure flag comes out.

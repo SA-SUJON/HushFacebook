@@ -126,6 +126,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean turnOffHdrBrightness() {
+        return false;
+    }
+
     public static boolean systemFont() {
         return false;
     }
