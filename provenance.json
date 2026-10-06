@@ -724,13 +724,14 @@
       "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ScreenTransitions.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/Fingerprints.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/PagerTabs.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/TransitionAnchors.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/TurnOffScreenTransitionsPatch.kt"
       ],
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: Turn off screen transitions, an idea from De-Vanced's Facebook clean-up patch, written here from Facebook 577, 580 and 581. The activity callbacks the settings patch registers ask Android for no transition as a screen comes to the front and as it closes, and the tab bar's pager controller and the sliding panel ask the extension before they decide to slide."
+      "changes": "Written for Hushfacebook: Turn off screen transitions, an idea from De-Vanced's Facebook clean-up patch, written here from Facebook 577, 580 and 581. The activity callbacks the settings patch registers ask Android for no transition as a screen comes to the front and as it closes, and the tab bar's pager controller and the sliding panel ask the extension before they decide to slide. Tab strips inside a screen ask too: the listener Facebook's TabbedViewPagerIndicator puts on each tab, found from the Redex name of the strip's onPageSelected runnable, hands its slide flag to the extension first, and the composer's kept MinutiaeTabbedPickerActivity.setTab calls the pager's two-argument setCurrentItem with no slide while the switch is on."
     },
     {
       "paths": [
@@ -752,6 +753,15 @@
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
       "changes": "Written for Hushfacebook: Hide tabs, an idea Loukious has for the Marketplace and Games tabs, written here as another rule of the tab bar filter. Each hideable tab is known by the class Facebook keeps for it (FeedsTab and MostRecentFeedTab, FriendRequestsTab, MarketplaceTab, GroupsTargetedTab, GamesTab and GamesTabWithSNESControllerIcon, EventsTab), and a start meant for a hidden tab opens Home."
+    },
+    {
+      "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/ads/FeedAdPills.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the floating ad button on a feed ad's comments. Hide sponsored posts puts its own question in front of the comment pill's check that AdPills.kt hooks for Hide sponsored reels, and this answers no for the permalink and flyout ad plugins while the sponsored posts switch is on. Each patch finds the check whether or not the other asked first."
     }
   ]
 }
