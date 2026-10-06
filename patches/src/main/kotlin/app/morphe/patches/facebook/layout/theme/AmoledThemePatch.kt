@@ -10,6 +10,7 @@ package app.morphe.patches.facebook.layout.theme
 import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patches.facebook.misc.extension.parameterRegisterNumber
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.facebook.misc.extension.requireParameterIntact
@@ -345,8 +346,13 @@ val amoledThemePatch = bytecodePatch(
         fillBackgroundColour(background())
 
         // Data mode's banner on Flex carriers asks for a card's colour, so route one left it near
-        // black across the black page (issue #86). The page's own colour goes there instead.
-        hookFlexBanner()
+        // black across the black page (issue #86). The page's own colour goes there instead. A build
+        // without the banner, or one that draws it another way, keeps the rest of the theme.
+        try {
+            hookFlexBanner()
+        } catch (moved: PatchException) {
+            patchLog.warning("${moved.message}. The theme goes on without the Data mode banner.")
+        }
 
         // The system bars. A tab's bar colour can come from a resolver route one doesn't reach, or
         // be written in code for both themes, so the methods that paint the bars ask the extension
@@ -392,7 +398,8 @@ private const val CARD_BACKGROUND = "CARD_BACKGROUND"
  * token is found by the constant's name in the enum's static initializer, and the call by its shape.
  */
 internal fun BytecodePatchContext.hookFlexBanner() {
-    val method = FlexBannerFingerprint.method
+    val method = FlexBannerFingerprint.methodOrNull
+        ?: throw PatchException("Facebook Flex's Data mode banner isn't in this build")
     val code = method.implementation!!.instructions.toList()
     val read = code.indexOfFirst { instruction ->
         val field = (instruction as? ReferenceInstruction)?.reference as? FieldReference
