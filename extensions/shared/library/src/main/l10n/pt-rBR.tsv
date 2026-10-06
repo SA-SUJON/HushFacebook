@@ -680,3 +680,7 @@ Turn off haptics	Desativar a vibração tátil
 No short vibrations on Facebook's own taps and gestures. The keyboard and your phone's own haptics stay.	Sem vibrações curtas nos toques e gestos do próprio Facebook. O teclado e a vibração tátil do seu celular continuam.
 Turn off screen transitions	Desativar as transições de tela
 Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.	As abas, o Menu e as telas que abrem sobre o Facebook aparecem na hora, sem o deslize entre elas. Deslizar entre as abas continua.
+# context: switch title under Playback; Android's own name for the floating video window
+Picture-in-picture	Picture-in-picture
+# context: summary of that switch
+A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.	Um reel em reprodução continua em uma janela pequena quando você sai do Facebook. Android 12 ou mais recente.

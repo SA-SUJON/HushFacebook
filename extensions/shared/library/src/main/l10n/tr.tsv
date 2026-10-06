@@ -786,3 +786,7 @@ Turn off haptics	Dokunsal titreşimi kapat
 No short vibrations on Facebook's own taps and gestures. The keyboard and your phone's own haptics stay.	Facebook'un kendi dokunuşlarında ve hareketlerinde kısa titreşim olmaz. Klavye ve telefonunun kendi dokunsal titreşimi kalır.
 Turn off screen transitions	Ekran geçişlerini kapat
 Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.	Sekmeler, Menü ve Facebook'un üzerinde açılan ekranlar, aralarındaki kayma olmadan hemen görünür. Sekmeler arasında kaydırma kalır.
+# context: switch title under Playback; Android's own name for the floating video window
+Picture-in-picture	Pencere içinde pencere
+# context: summary of that switch
+A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.	Oynatılan bir reel, Facebook'tan çıktığında küçük bir pencerede devam eder. Android 12 veya üstü.

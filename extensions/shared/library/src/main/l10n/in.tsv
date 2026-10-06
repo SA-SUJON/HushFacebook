@@ -786,3 +786,7 @@ Turn off haptics	Matikan haptik
 No short vibrations on Facebook's own taps and gestures. The keyboard and your phone's own haptics stay.	Tanpa getaran singkat pada ketukan dan gestur Facebook sendiri. Keyboard dan haptik ponselmu tetap ada.
 Turn off screen transitions	Matikan transisi layar
 Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.	Tab, Menu, dan layar yang terbuka di atas Facebook langsung muncul, tanpa geseran di antaranya. Mengusap antar tab tetap ada.
+# context: switch title under Playback; Android's own name for the floating video window
+Picture-in-picture	Gambar dalam gambar
+# context: summary of that switch
+A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.	Reel yang sedang diputar terus berjalan di jendela kecil saat kamu keluar dari Facebook. Android 12 atau yang lebih baru.

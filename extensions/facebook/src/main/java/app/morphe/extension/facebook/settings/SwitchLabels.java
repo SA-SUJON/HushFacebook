@@ -76,6 +76,7 @@ final class SwitchLabels {
         if (setting == Settings.TAP_TO_PLAY) return L10n.t("Tap to play");
         if (setting == Settings.RESUME_LONG_VIDEOS) return L10n.t("Resume long videos");
         if (setting == Settings.DEFAULT_PLAYBACK_QUALITY) return L10n.t("Default playback quality");
+        if (setting == Settings.PICTURE_IN_PICTURE) return L10n.t("Picture-in-picture");
         if (setting == Settings.DOWNLOAD_VIDEOS) return L10n.t("Download feed and Watch videos");
         if (setting == Settings.DOWNLOAD_COMPATIBLE) return L10n.t("Save videos other apps can open");
         if (setting == Settings.HIDE_GET_MESSENGER_CARD) return L10n.t("Hide the Get Messenger card");

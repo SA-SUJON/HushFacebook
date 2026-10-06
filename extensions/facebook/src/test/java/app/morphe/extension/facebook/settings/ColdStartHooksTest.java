@@ -53,6 +53,7 @@ import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
+import app.morphe.extension.facebook.media.PictureInPictureForTests;
 import app.morphe.extension.facebook.media.QualityChoiceForTests;
 import app.morphe.extension.facebook.media.ReelSpeedForTests;
 import app.morphe.extension.facebook.media.ResumePlaybackForTests;
@@ -205,6 +206,8 @@ public class ColdStartHooksTest {
         assertTrue("a Papaya job before the context was held back", AnalyticsUploads.papayaOn(true));
         assertEquals("a window's secure flag before the context was taken out", 0x2000, Screenshots.layoutFlags(0x2000));
         assertTrue("a tab before the context lost its slide", ScreenTransitionsForTests.slides());
+        assertFalse("a picture-in-picture check before the context said yes", PictureInPictureForTests.allowsWithTheFeature());
+        assertFalse("the Reels viewer's gate before the context said yes", PictureInPictureForTests.surfaceAllows());
         assertTrue("a haptic before the context was held back", Haptics.performHapticFeedback(new android.view.View(app) {
             @Override
             public boolean performHapticFeedback(int feedbackConstant) {

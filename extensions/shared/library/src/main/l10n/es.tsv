@@ -786,3 +786,7 @@ Turn off haptics	Desactivar la vibración háptica
 No short vibrations on Facebook's own taps and gestures. The keyboard and your phone's own haptics stay.	Sin vibraciones cortas en los toques y gestos propios de Facebook. El teclado y la vibración háptica de tu teléfono se mantienen.
 Turn off screen transitions	Desactivar las transiciones de pantalla
 Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.	Las pestañas, el menú y las pantallas que se abren sobre Facebook aparecen al instante, sin el deslizamiento entre ellas. Deslizar entre pestañas se mantiene.
+# context: switch title under Playback; Android's own name for the floating video window
+Picture-in-picture	Imagen en imagen
+# context: summary of that switch
+A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.	Un reel en reproducción sigue en una ventana pequeña cuando sales de Facebook. Android 12 o posterior.

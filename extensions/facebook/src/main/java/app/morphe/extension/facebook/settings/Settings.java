@@ -385,6 +385,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_default_playback_quality", TRUE);
 
     /**
+     * A playing reel shrinks into a window when you leave Facebook, through the picture-in-picture
+     * Facebook ships for its Reels viewer behind server flags
+     * ({@link app.morphe.extension.facebook.media.PictureInPicture}). On once the patch is picked,
+     * since picking it is the choice. Off or paused, Facebook decides as before.
+     */
+    public static final BooleanSetting PICTURE_IN_PICTURE =
+            new BooleanSetting("hushfacebook_picture_in_picture", TRUE);
+
+    /**
      * Facebook's own text, React Native screens' included, drawn in the font {@link #FONT_SOURCE}
      * names instead of Meta's Optimistic, at the same weight and slant. A typeface already on
      * screen keeps its font until Facebook restarts.

@@ -631,6 +631,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/PictureInPicture.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/pip/PictureInPicturePatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: picture-in-picture for reels through the picture-in-picture Facebook ships for its Reels viewer behind server flags, an idea from De-Vanced's Facebook picture-in-picture patch, written here from Facebook 577, 580 and 581. The patch finds ReelsPipUtil by the surface name only it loads and its one activity check by the system feature it asks for, and the Reels viewer's arming step by two player origins it names, with the surface gate it asks first. The extension answers yes first in both on Android 12 or later where the phone has the feature. It also hears ReelsPipUtil arm and disarm and FbGrootPlayer play and pause, arms the window again for the reel a swipe starts through a helper the patch adds to ReelsPipUtil, holds auto-enter off while the reel on screen is paused, and gives Facebook's window viewer a view id nothing on screen holds. No code came from De-Vanced."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ScreenTransitions.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/Fingerprints.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/transitions/TransitionAnchors.kt",

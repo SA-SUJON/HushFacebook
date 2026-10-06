@@ -55,6 +55,7 @@ public final class FamilyNames {
     public static final String TAP_TO_PLAY = "Tap to play";
     public static final String RESUME_LONG_VIDEOS = "Resume long videos";
     public static final String PLAYBACK_QUALITY = "Default playback quality";
+    public static final String PICTURE_IN_PICTURE = "Picture-in-picture";
     public static final String SYSTEM_FONT = "Use the system font";
     public static final String SYSTEM_EMOJI = "Use the phone's emoji";
     public static final String HAPTICS = "Turn off haptics";

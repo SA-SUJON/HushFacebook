@@ -122,6 +122,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean pictureInPicture() {
+        return false;
+    }
+
     public static boolean systemFont() {
         return false;
     }

@@ -136,7 +136,7 @@ final class VideoPages {
     static void playback(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
         if (build.contains(PatchFamily.TAP_TO_PLAY) || build.contains(PatchFamily.RESUME_LONG_VIDEOS)
-                || build.contains(PatchFamily.PLAYBACK_QUALITY)) {
+                || build.contains(PatchFamily.PLAYBACK_QUALITY) || build.contains(PatchFamily.PICTURE_IN_PICTURE)) {
             PreferenceCategory playback = category(screen, L10n.t("Playback"));
             if (build.contains(PatchFamily.TAP_TO_PLAY)) {
                 playback.addPreference(toggle(context, Settings.TAP_TO_PLAY,
@@ -150,6 +150,10 @@ final class VideoPages {
                 playback.addPreference(toggle(context, Settings.DEFAULT_PLAYBACK_QUALITY,
                         L10n.t("Play videos, reels and stories at the quality below. A quality picked in a video's own menu still wins.")));
                 playback.addPreference(playbackQualityRow(context));
+            }
+            if (build.contains(PatchFamily.PICTURE_IN_PICTURE)) {
+                playback.addPreference(toggle(context, Settings.PICTURE_IN_PICTURE,
+                        L10n.t("A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.")));
             }
         }
     }

@@ -465,6 +465,7 @@ public final class SettingsEntry {
             resumed = new WeakReference<>(activity);
             SavedFileActions.onResumed(activity);
             ScreenTransitions.activityResumed(activity);
+            TapToPlay.activityResumed(activity);
             if (openPending) openWhenSettled(activity);
             relabelIfStale(activity);
             SavedShortcut.refresh(activity);

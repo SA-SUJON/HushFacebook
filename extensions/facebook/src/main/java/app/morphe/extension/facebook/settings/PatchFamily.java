@@ -104,6 +104,8 @@ public enum PatchFamily {
             Settings.RESUME_LONG_VIDEOS),
     PLAYBACK_QUALITY(FamilyNames.PLAYBACK_QUALITY, "defaultPlaybackQuality", null,
             Settings.DEFAULT_PLAYBACK_QUALITY),
+    PICTURE_IN_PICTURE(FamilyNames.PICTURE_IN_PICTURE, "pictureInPicture", null,
+            Settings.PICTURE_IN_PICTURE),
     SYSTEM_FONT(FamilyNames.SYSTEM_FONT, "systemFont", null,
             Settings.USE_SYSTEM_FONT),
     SYSTEM_EMOJI(FamilyNames.SYSTEM_EMOJI, "systemEmoji", null,
