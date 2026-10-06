@@ -98,7 +98,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `Hide Meta AI questions under posts` | Removes the row of Meta AI questions Facebook adds under some posts. The post, its link card and its buttons stay. |
 | `Hide the Feeds header` | Takes the title row and the All, Favorites, Friends, Groups and Pages filters off the top of the Feeds tab, so it opens on its posts. Its switch starts off, so turn it on under News feed and restart Facebook. |
 | `Keep post dates` | Keeps the date under the poster's name. Facebook's newer post header can swap that line for rotating details a moment after a post shows, and on some phones the line goes blank. With this on, the line stays put. |
-| `Hide sponsored posts` | Removes sponsored and promoted posts from the news feed, with no gap left behind. |
+| `Hide sponsored posts` | Removes sponsored and promoted posts from the news feed, with no gap left behind, and keeps the floating ad button off an ad's comments. |
 | `Hide sponsored profile posts` | Removes the ads between the posts on someone's profile or a Page. The profile's own posts stay. |
 | `Hide sponsored reels` | Removes ads from Reels and Watch, including product banners over a reel and ads inside a video. |
 | `Hide sponsored search results` | Removes the ads from Facebook's search results, the sponsored posts and ad cards between the people, pages and posts you searched for. |
@@ -268,7 +268,7 @@ Reels turn up in four places, and no one switch covers them all. The Reels and W
 
 | Patch | While paused |
 |---|---|
-| Hide sponsored posts | Off. Sponsored and promoted posts come back. |
+| Hide sponsored posts | Off. Sponsored and promoted posts come back, and so does the ad button on their comments. |
 | Hide suggested and promoted posts | Off. |
 | Hide Stories tray | Off. The row of stories at the top and the rows of stories between posts come back. |
 | Hide Reels in the feed | Off. The rows of reels come back. |

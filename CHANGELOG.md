@@ -15,6 +15,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Hide suggested and promoted posts` has three more switches under News feed, for things Facebook puts between posts that aren't suggestions: Memories, like "On this day" and friendship anniversaries, the row of friend requests, and the card showing where your friends are. Each starts off. Your Memories page and the requests under Friends stay either way.
 * **Facebook:** `Hide suggested and promoted posts` also takes two more kinds of Facebook's own promotions, its social list prompt and the row of people to invite to a group. It goes by the type name each one carries, since some builds send them without a model class of their own. `Hide sponsored posts` also takes a carousel of several ads, whatever category Facebook files it under.
 * **Facebook:** `Hide sponsored reels` also keeps the floating ad button off the comments of a reel or video ad that still gets through. Facebook's own comment buttons, like Message, stay.
+* **Facebook:** `Hide sponsored posts` keeps the floating ad button off a feed ad's comments too, on the post's own page and in the comment sheet. The Message, shop and visual search buttons stay. It works with or without `Hide sponsored reels`, and pausing Hushfacebook brings the button back.
 
 ### Fixed
 

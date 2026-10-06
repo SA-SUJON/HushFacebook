@@ -1627,7 +1627,7 @@
     },
     {
       "name": "Hide sponsored posts",
-      "description": "Removes sponsored and promoted posts from the news feed, with no gap left behind.",
+      "description": "Removes sponsored and promoted posts from the news feed, with no gap left behind, and keeps the floating ad button off an ad's comments.",
       "category": "Ads",
       "use": true,
       "dependencies": [

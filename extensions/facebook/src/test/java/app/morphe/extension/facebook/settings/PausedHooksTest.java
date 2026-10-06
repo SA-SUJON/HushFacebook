@@ -45,6 +45,7 @@ import app.morphe.extension.facebook.ads.AffiliateLinks;
 import app.morphe.extension.facebook.ads.GameAds;
 import app.morphe.extension.facebook.ads.MarketplaceAdFilterForTests;
 import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
+import app.morphe.extension.facebook.ads.FeedAdPills;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
@@ -223,7 +224,10 @@ public class PausedHooksTest {
         probes.put(PatchFamily.SPONSORED_POSTS, Arrays.asList(
                 () -> FeedGuardForTests.hides(Category.SPONSORED, new Object()),
                 () -> FeedGuardForTests.hides(Category.PROMOTION, new Object()),
-                () -> FeedGuardForTests.swapHides(Category.SPONSORED, new Object())));
+                () -> FeedGuardForTests.swapHides(Category.SPONSORED, new Object()),
+                // A feed ad's comments open without the floating ad button.
+                () -> FeedAdPills.holdsAdPill(
+                        "com.facebook.feedback.comments.plugins.indicatorpill.permalinkadsfloatingcta.PermalinkAdsFloatingCtaPlugin")));
         probes.put(PatchFamily.SUGGESTED_POSTS, Arrays.asList(
                 () -> FeedGuardForTests.hides(Category.ORGANIC, new GraphQLPagesYouMayLikeFeedUnit()),
                 // A story Facebook's own recommendation flag marks as suggested for you.
