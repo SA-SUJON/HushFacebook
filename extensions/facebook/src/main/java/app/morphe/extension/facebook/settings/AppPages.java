@@ -168,11 +168,11 @@ final class AppPages {
                         + "and your other link settings stay as they are.")));
     }
 
-    /** Privacy: what Facebook sends home in the background. */
+    /** Privacy: what Facebook sends home in the background, and what it shows others while you write. */
     static void privacy(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
         if (!build.contains(PatchFamily.ANALYTICS_UPLOADS) && !build.contains(PatchFamily.SCREENSHOTS)
-                && !build.contains(PatchFamily.SCREENSHOT_DETECTION)) {
+                && !build.contains(PatchFamily.SCREENSHOT_DETECTION) && !build.contains(PatchFamily.TYPING_INDICATOR)) {
             return;
         }
         PreferenceCategory privacy = category(screen, L10n.t("Privacy"));
@@ -191,6 +191,13 @@ final class AppPages {
             privacy.addPreference(toggle(context, Settings.ALLOW_SCREENSHOTS,
                     L10n.t("Screenshots and screen recordings show the pages Facebook blocks them on. A page that's "
                             + "already open changes when you open it again.")));
+        }
+        if (build.contains(PatchFamily.TYPING_INDICATOR)) {
+            privacy.addPreference(toggle(context, Settings.HIDE_CHAT_TYPING,
+                    L10n.t("People you chat with in a chat that opens inside Facebook don't see that you're typing. "
+                            + "Your messages send as usual.")));
+            privacy.addPreference(toggle(context, Settings.HIDE_COMMENT_TYPING,
+                    L10n.t("People looking at a post don't see that you're writing a comment.")));
         }
     }
 }

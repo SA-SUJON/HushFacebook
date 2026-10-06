@@ -166,6 +166,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean typingIndicator() {
+        return false;
+    }
+
     public static boolean audienceNetwork() {
         return false;
     }

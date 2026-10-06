@@ -641,6 +641,17 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/TypingIndicator.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/chats/HideTypingIndicatorPatch.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/chats/TypingAnchors.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Hide typing indicator, an idea shared with HushMessenger's Hide typing indicator and the ConversationTypingContext runnable De-Vanced and ReVanced find, written here from Facebook 577, 580 and 581. Mailbox's typing setter hands its flag to the extension first, and the chat and comment typing runnables, found by the names Redex keeps, ask the extension before they send."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/PictureInPicture.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/media/pip/PictureInPicturePatch.kt"
       ],

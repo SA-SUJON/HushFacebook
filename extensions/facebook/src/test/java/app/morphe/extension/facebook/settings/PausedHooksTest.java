@@ -49,6 +49,7 @@ import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
 import app.morphe.extension.facebook.chats.MessengerIconForTests;
+import app.morphe.extension.facebook.chats.TypingIndicator;
 import app.morphe.extension.facebook.download.MediaDownload;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
 import app.morphe.extension.facebook.download.ReelDownload;
@@ -498,6 +499,10 @@ public class PausedHooksTest {
         // A new picture in the photo library isn't looked at.
         probes.put(PatchFamily.SCREENSHOT_DETECTION, Collections.singletonList(
                 ScreenshotDetection::ignoresChange));
+        // "Typing" goes out as "not typing", and the chat and comment runnables skip their send.
+        probes.put(PatchFamily.TYPING_INDICATOR, Arrays.asList(
+                () -> !TypingIndicator.chatTyping(true), TypingIndicator::holdsChatTyping,
+                TypingIndicator::holdsCommentTyping));
         // A push of each kind a notification switch blocks isn't posted.
         probes.put(PatchFamily.PROMO_NOTIFICATIONS, Arrays.asList(
                 NotificationKindsForTests::blocksTrendingVideo,

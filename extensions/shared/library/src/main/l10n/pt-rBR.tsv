@@ -298,6 +298,10 @@ Facebook stops uploading its app analytics in the background and skips its on-de
 Allow screenshots	Permitir capturas de tela
 Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.	Capturas e gravações de tela mostram as páginas em que o Facebook as bloqueia. Uma página que já está aberta muda quando você a abre de novo.
 Block screenshot detection	Bloquear a detecção de capturas
+Hide typing in chats	Ocultar que você está digitando nos chats
+Hide typing in comments	Ocultar que você está digitando um comentário
+People you chat with in a chat that opens inside Facebook don't see that you're typing. Your messages send as usual.	As pessoas com quem você conversa em um chat que abre dentro do Facebook não veem que você está digitando. Suas mensagens são enviadas normalmente.
+People looking at a post don't see that you're writing a comment.	As pessoas que veem uma publicação não veem que você está escrevendo um comentário.
 Facebook doesn't notice when you take a screenshot or record the screen, so nothing it does in response happens.	O Facebook não percebe quando você tira uma captura ou grava a tela, então nada do que ele faria em resposta acontece.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Deixa de enviar ao Facebook as listas de Reels assistidos. Ele as usa para classificar seu feed, então Reels já assistidos podem voltar a aparecer.
 the rename of the shared permissions	a renomeação das permissões compartilhadas

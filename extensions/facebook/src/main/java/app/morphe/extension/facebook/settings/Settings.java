@@ -326,6 +326,16 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_block_screenshot_detection", TRUE);
 
     /**
+     * Others see that you're typing, in a chat that opens inside Facebook and in a comment box
+     * ({@link app.morphe.extension.facebook.chats.TypingIndicator}). Both on once the patch is picked.
+     */
+    public static final BooleanSetting HIDE_CHAT_TYPING =
+            new BooleanSetting("hushfacebook_hide_chat_typing", TRUE);
+
+    public static final BooleanSetting HIDE_COMMENT_TYPING =
+            new BooleanSetting("hushfacebook_hide_comment_typing", TRUE);
+
+    /**
      * A double tap on a reel or a video left without Facebook's like: no heart, no like sent. A
      * single tap and the Like button do what they always did. On once the patch is picked, since
      * picking it is the choice.

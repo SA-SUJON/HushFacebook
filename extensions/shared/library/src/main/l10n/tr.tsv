@@ -305,6 +305,10 @@ Facebook stops uploading its app analytics in the background and skips its on-de
 Allow screenshots	Ekran görüntülerine izin ver
 Screenshots and screen recordings show the pages Facebook blocks them on. A page that's already open changes when you open it again.	Ekran görüntüleri ve ekran kayıtları, Facebook'un bunları engellediği sayfaları da gösterir. Zaten açık olan bir sayfa, onu yeniden açtığında değişir.
 Block screenshot detection	Ekran görüntüsü algılamayı engelle
+Hide typing in chats	Sohbetlerde yazıyor bilgisini gizle
+Hide typing in comments	Yorum yazıyor bilgisini gizle
+People you chat with in a chat that opens inside Facebook don't see that you're typing. Your messages send as usual.	Facebook içinde açılan bir sohbette konuştuğun kişiler yazdığını görmez. Mesajların her zamanki gibi gönderilir.
+People looking at a post don't see that you're writing a comment.	Bir gönderiye bakanlar yorum yazdığını görmez.
 Facebook doesn't notice when you take a screenshot or record the screen, so nothing it does in response happens.	Facebook ekran görüntüsü aldığını veya ekranı kaydettiğini fark etmez, bu yüzden buna karşılık yapacağı hiçbir şey olmaz.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	İzlenen Reels listelerini Facebook'a göndermeyi durdurur. Listeler akışı sıraladığından izlenen Reels tekrar görünebilir.
 the rename of the shared permissions	paylaşılan izinlerin yeniden adlandırılması

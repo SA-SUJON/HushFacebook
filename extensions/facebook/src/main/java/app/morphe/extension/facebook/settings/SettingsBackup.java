@@ -139,6 +139,8 @@ public final class SettingsBackup {
             Settings.TURN_OFF_HAPTICS,
             Settings.TURN_OFF_SCREEN_TRANSITIONS,
             Settings.BLOCK_SCREENSHOT_DETECTION,
+            Settings.HIDE_CHAT_TYPING,
+            Settings.HIDE_COMMENT_TYPING,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE,
             Settings.KEEP_REEL_SPEED,
             Settings.HOLD_REEL_FOR_2X,

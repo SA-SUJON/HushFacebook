@@ -6,6 +6,7 @@ Every Hushfacebook release, newest first.
 
 ### Added
 
+* **Facebook:** New patch, `Hide typing indicator`, with two switches under Privacy. In a chat that opens inside Facebook, the person you're writing to doesn't see that you're typing, and people looking at a post don't see that you're writing a comment. Your messages and comments send as usual. It's off in Manager's default selection, and both switches start on once it's picked. The idea comes from HushMessenger's patch of the same name.
 * **Facebook:** `Hide tabs` has seven more switches under Appearance, for tabs Facebook gives only some accounts: Dating, Professional dashboard, Saved, Ad Center, Creator tools, Discover and Jobs. They work like the others. Each starts off, a tab you pick leaves the tab bar once Facebook restarts, and its page stays in the Menu. The Video tab already has its own switch in `Hide the Reels tab`.
 * **Facebook:** `Hide sponsored reels` also stops the query for extended ad breaks, the longer breaks a video can line up. It ran on its own path, outside the ad-break requests the patch already answers with no ad. The diagnostic report now counts every ad-break request the patch holds back, banners and video ad breaks included.
 

@@ -161,6 +161,8 @@ public enum PatchFamily {
             Settings.ALLOW_SCREENSHOTS),
     SCREENSHOT_DETECTION(FamilyNames.SCREENSHOT_DETECTION, "screenshotDetection", null,
             Settings.BLOCK_SCREENSHOT_DETECTION),
+    TYPING_INDICATOR(FamilyNames.TYPING_INDICATOR, "typingIndicator", null,
+            Settings.HIDE_CHAT_TYPING, Settings.HIDE_COMMENT_TYPING),
     PROMO_NOTIFICATIONS(FamilyNames.PROMO_NOTIFICATIONS, "promoNotifications", null,
             Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS, Settings.BLOCK_MEMORY_NOTIFICATIONS,
             Settings.BLOCK_BIRTHDAY_NOTIFICATIONS, Settings.BLOCK_HIGHLIGHT_NOTIFICATIONS,
