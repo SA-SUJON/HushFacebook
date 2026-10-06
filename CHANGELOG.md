@@ -2,9 +2,9 @@
 
 Every Hushfacebook release, newest first.
 
-## 0.7.2 (2026-10-04)
+## 0.7.2 (2026-10-06)
 
-Source preparation. The latest published bundle remains v0.7.1.
+* **Facebook:** This release gathers everything since v0.7.1 and brings 70 patches for Facebook 581.0.0.45.58, up from 60. 580.0.0.51.74 and 577.0.0.50.72 still work, and phones with a 32-bit processor on Android 11 or newer can patch 581 now too. The ten new ones are `Show View profile on Marketplace sellers`, `Turn off HDR brightness`, `Picture-in-picture`, `Turn off screen transitions`, `Turn off haptics`, `Block Instant Games ads`, `Hide tabs`, `Block screenshot detection`, `Allow screenshots` and `Hold back analytics uploads`. Morphe Manager 1.34.0 or newer is required.
 
 ### Added
 
