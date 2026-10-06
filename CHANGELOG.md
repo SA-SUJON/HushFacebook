@@ -16,6 +16,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Hide suggested and promoted posts` also takes two more kinds of Facebook's own promotions, its social list prompt and the row of people to invite to a group. It goes by the type name each one carries, since some builds send them without a model class of their own. `Hide sponsored posts` also takes a carousel of several ads, whatever category Facebook files it under.
 * **Facebook:** `Hide sponsored reels` also keeps the floating ad button off the comments of a reel or video ad that still gets through. Facebook's own comment buttons, like Message, stay.
 * **Facebook:** `Hide sponsored posts` keeps the floating ad button off a feed ad's comments too, on the post's own page and in the comment sheet. The Message, shop and visual search buttons stay. It works with or without `Hide sponsored reels`, and pausing Hushfacebook brings the button back.
+* **Facebook:** `Download any photo` has its own **Photo file name** under Downloads, next to the video's. It takes the same tokens, with `{photo_id}` for the photo's number on Facebook, and starts as `FB_IMG_{date}`, the name Facebook's own photo saves get. Export settings carries it.
 * **Facebook:** `Turn off screen transitions` also covers tab strips inside a screen. A tap on one of Facebook's in-page tab rows, or on Feelings and Activities in the composer, shows that page at once. Stories, photo viewers and carousels move as before.
 
 ### Fixed

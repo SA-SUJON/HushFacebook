@@ -798,12 +798,20 @@ public class Settings extends BaseSettings {
     /**
      * The name a saved video gets: {date}, {video_id}, {owner}, {owner_id} and {posted} fill in per
      * save, the last four only when the save knows them, and the default is Facebook's own FB_VID_
-     * name, so nothing changes for anyone who leaves it. Photos keep their FB_IMG_ names. Cleaned
-     * like the folder wherever it's read ({@link FileNameTemplate#sanitize}), and like the folder,
-     * it isn't a switch.
+     * name, so nothing changes for anyone who leaves it. Photos have {@link #PHOTO_FILENAME_TEMPLATE}.
+     * Cleaned like the folder wherever it's read ({@link FileNameTemplate#sanitize}), and like the
+     * folder, it isn't a switch.
      */
     public static final StringSetting FILENAME_TEMPLATE =
             new StringSetting("hushfacebook_filename_template", FileNameTemplate.DEFAULT);
+
+    /**
+     * The name a saved photo gets, the same way: {date}, {photo_id}, {owner}, {owner_id} and
+     * {posted}, and Facebook's own FB_IMG_ name by default. Cleaned wherever it's read
+     * ({@link FileNameTemplate#sanitizePhoto}).
+     */
+    public static final StringSetting PHOTO_FILENAME_TEMPLATE =
+            new StringSetting("hushfacebook_photo_filename_template", FileNameTemplate.PHOTO_DEFAULT);
 
     /**
      * What a tap on Download does for a reel or a feed or Watch video: save it here, the default,

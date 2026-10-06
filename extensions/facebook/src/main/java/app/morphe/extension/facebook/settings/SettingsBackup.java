@@ -249,6 +249,12 @@ public final class SettingsBackup {
     static final StringSetting FILE_NAME = Settings.FILENAME_TEMPLATE;
 
     /**
+     * The name saved photos get, held in a file the same way and taken back only as a clean photo
+     * template ({@link FileNameTemplate#isImportablePhoto}).
+     */
+    static final StringSetting PHOTO_NAME = Settings.PHOTO_FILENAME_TEMPLATE;
+
+    /**
      * What a tap on Download does, held in a file as its {@link SendLink.Action#fileValue}.
      * Anything else refuses the whole file, as a quality does.
      */
@@ -287,8 +293,8 @@ public final class SettingsBackup {
 
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, TO, FOLDER, QUALITY, FILE_NAME, ACTION, APP, START,
-                    SUBTAB, ORDER, PLAYBACK));
+            Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, TO, FOLDER, QUALITY, FILE_NAME, PHOTO_NAME, ACTION, APP,
+                    START, SUBTAB, ORDER, PLAYBACK));
 
     /** The longest name or value a file holds that isn't a word list, far past a package name. */
     private static final int MAX_OTHER_CHARS = 1024;
@@ -379,6 +385,7 @@ public final class SettingsBackup {
         private static final String APP_NAME = "send_to_app";
         private static final String TO_NAME = "save_to";
         private static final String SUBTAB_NAME = "feeds_subtab";
+        private static final String PHOTO_NAME_NAME = "photo_name";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -421,6 +428,9 @@ public final class SettingsBackup {
         /** The clean people, Pages and sites list the file holds, or null when it names none. */
         @Nullable
         final String sources;
+        /** The clean photo file name template the file holds, or null when it names none. */
+        @Nullable
+        final String photoName;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -470,6 +480,15 @@ public final class SettingsBackup {
                  @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
                  @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
                  @Nullable FeedsSubtab subtab, @Nullable String sources, int unknown) {
+            this(values, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to, subtab,
+                    sources, null, unknown);
+        }
+
+        Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                 @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                 @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
+                 @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
@@ -484,6 +503,7 @@ public final class SettingsBackup {
             this.to = to;
             this.subtab = subtab;
             this.sources = sources;
+            this.photoName = photoName;
             this.unknown = unknown;
         }
 
@@ -506,6 +526,8 @@ public final class SettingsBackup {
             if (qualityChange != null) changes.put(QUALITY, qualityChange);
             String fileNameChange = fileNameChange();
             if (fileNameChange != null) changes.put(FILE_NAME, fileNameChange);
+            String photoNameChange = photoNameChange();
+            if (photoNameChange != null) changes.put(PHOTO_NAME, photoNameChange);
             StartTab startChange = startChange();
             if (startChange != null) changes.put(START, startChange);
             FeedsSubtab subtabChange = subtabChange();
@@ -557,6 +579,13 @@ public final class SettingsBackup {
         String fileNameChange() {
             if (fileName == null) return null;
             return fileName.equals(FileNameTemplate.sanitize(FILE_NAME.savedValue())) ? null : fileName;
+        }
+
+        /** The photo template this file sets, or null when it names none or the one photo saves already use. */
+        @Nullable
+        String photoNameChange() {
+            if (photoName == null) return null;
+            return photoName.equals(FileNameTemplate.sanitizePhoto(PHOTO_NAME.savedValue())) ? null : photoName;
         }
 
         /** The start tab this file sets, or null when it names none or the one already set. */
@@ -641,6 +670,7 @@ public final class SettingsBackup {
             if (folder != null) state.putString(FOLDER_NAME, folder);
             if (quality != null) state.putString(QUALITY_NAME, quality.fileValue);
             if (fileName != null) state.putString(FILE_NAME_NAME, fileName);
+            if (photoName != null) state.putString(PHOTO_NAME_NAME, photoName);
             if (start != null) state.putString(START_NAME, start.fileValue);
             if (order != null) state.putString(ORDER_NAME, order.fileValue);
             if (hidden != null) state.putString(HIDDEN_NAME, hidden);
@@ -677,6 +707,7 @@ public final class SettingsBackup {
             Object kept = state.get(KEPT_NAME);
             Object sources = state.get(SOURCES_NAME);
             Object app = state.get(APP_NAME);
+            Object photoName = state.get(PHOTO_NAME_NAME);
             return new Snapshot(values, folder instanceof String && SaveFolder.isClean((String) folder)
                     ? (String) folder : null, DownloadQuality.fromFile(state.get(QUALITY_NAME)),
                     fileName instanceof String && FileNameTemplate.isClean((String) fileName) ? (String) fileName : null,
@@ -686,7 +717,9 @@ public final class SettingsBackup {
                     PlaybackQuality.fromFile(state.get(PLAYBACK_NAME)), SendLink.Action.fromFile(state.get(ACTION_NAME)),
                     SendLink.isFileApp(app) ? (String) app : null, SaveTo.fromFile(state.get(TO_NAME)),
                     FeedsSubtab.fromFile(state.get(SUBTAB_NAME)),
-                    sources instanceof String && PostSources.isClean((String) sources) ? (String) sources : null, unknown);
+                    sources instanceof String && PostSources.isClean((String) sources) ? (String) sources : null,
+                    photoName instanceof String && FileNameTemplate.isCleanPhoto((String) photoName) ? (String) photoName : null,
+                    unknown);
         }
     }
 
@@ -704,6 +737,7 @@ public final class SettingsBackup {
         switches.put(FOLDER.key, SaveFolder.sanitize(FOLDER.savedValue()));
         switches.put(QUALITY.key, QUALITY.savedValue().fileValue);
         switches.put(FILE_NAME.key, FileNameTemplate.sanitize(FILE_NAME.savedValue()));
+        switches.put(PHOTO_NAME.key, FileNameTemplate.sanitizePhoto(PHOTO_NAME.savedValue()));
         switches.put(START.key, START.savedValue().fileValue);
         switches.put(SUBTAB.key, SUBTAB.savedValue().fileValue);
         switches.put(ORDER.key, ORDER.savedValue().fileValue);
@@ -803,6 +837,7 @@ public final class SettingsBackup {
         String folder = null;
         DownloadQuality quality = null;
         String fileName = null;
+        String photoName = null;
         StartTab start = null;
         CommentOrder order = null;
         String hidden = null;
@@ -845,6 +880,14 @@ public final class SettingsBackup {
                     throw new Rejected(Reason.VALUE, "Not one clean file name: " + name);
                 }
                 fileName = FileNameTemplate.sanitize((String) value);
+                continue;
+            }
+            if (PHOTO_NAME.key.equals(name)) {
+                Object value = values.opt(name);
+                if (!(value instanceof String) || !FileNameTemplate.isImportablePhoto((String) value)) {
+                    throw new Rejected(Reason.VALUE, "Not one clean photo file name: " + name);
+                }
+                photoName = FileNameTemplate.sanitizePhoto((String) value);
                 continue;
             }
             if (START.key.equals(name)) {
@@ -934,7 +977,7 @@ public final class SettingsBackup {
             if (value != null) ordered.put(setting, value);
         }
         return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
-                subtab, sources, unknown);
+                subtab, sources, photoName, unknown);
     }
 
     /**

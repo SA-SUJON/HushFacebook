@@ -90,6 +90,7 @@ public class HushfacebookPreferenceFragmentTest {
         Settings.SAVE_TO.resetToDefault();
         Settings.DOWNLOAD_QUALITY.resetToDefault();
         Settings.FILENAME_TEMPLATE.resetToDefault();
+        Settings.PHOTO_FILENAME_TEMPLATE.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
         Settings.SEND_TO_APP.resetToDefault();
         Settings.HIDDEN_WORDS.resetToDefault();
@@ -1139,8 +1140,8 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals("the file name row isn't next to the folder", folderAt + 1, nameAt);
             assertEquals(Settings.FILENAME_TEMPLATE.key, name.getKey());
             assertEquals("Video file name", String.valueOf(name.getTitle()));
-            assertEquals("Videos are named " + L10n.isolate("FB_VID_{date}") + ". Photos keep Facebook's own "
-                    + L10n.isolate("FB_IMG_") + " names.", String.valueOf(name.getSummary()));
+            assertFalse("the video's row names photos", name.photo);
+            assertEquals("Videos are named " + L10n.isolate("FB_VID_{date}") + ".", String.valueOf(name.getSummary()));
             String message = String.valueOf(name.getDialogMessage());
             assertTrue(message, message.contains(L10n.isolate("{date}")) && message.contains(L10n.isolate("{video_id}"))
                     && message.contains(L10n.isolate("{owner}")) && message.contains(L10n.isolate("{posted}"))
@@ -1182,6 +1183,68 @@ public class HushfacebookPreferenceFragmentTest {
             for (Preference row : rowsOf(controller)) {
                 assertFalse("a file name row with no download in the build",
                         row instanceof ValueRows.FileNameRow);
+            }
+        }
+    }
+
+    /**
+     * With Download any photo in the build, the photo file name row sits under the video's, keeps
+     * its own clean template, and says what photos are named; without it there's no such row.
+     */
+    @Test
+    public void thePhotoNameRowKeepsItsOwnCleanTemplateUnderTheVideos() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.PHOTO_DOWNLOAD);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            List<Integer> at = new ArrayList<>();
+            for (int i = 0; i < rows.size(); i++) {
+                if (rows.get(i) instanceof ValueRows.FileNameRow) at.add(i);
+            }
+            assertEquals("a video and a photo name row", 2, at.size());
+            assertEquals("the photo's row isn't under the video's", at.get(0) + 1, (int) at.get(1));
+            ValueRows.FileNameRow video = (ValueRows.FileNameRow) rows.get(at.get(0));
+            ValueRows.FileNameRow photo = (ValueRows.FileNameRow) rows.get(at.get(1));
+            assertFalse(video.photo);
+            assertTrue(photo.photo);
+            assertEquals(Settings.PHOTO_FILENAME_TEMPLATE.key, photo.getKey());
+            assertEquals("Photo file name", String.valueOf(photo.getTitle()));
+            assertEquals("Photos are named " + L10n.isolate("FB_IMG_{date}") + ".", String.valueOf(photo.getSummary()));
+            String message = String.valueOf(photo.getDialogMessage());
+            assertTrue(message, message.contains(L10n.isolate("{photo_id}")) && message.contains(L10n.isolate("{owner}"))
+                    && message.contains(L10n.isolate("FB_IMG_{date}")) && !message.contains("{video_id}"));
+            assertEquals("Save", String.valueOf(photo.getPositiveButtonText()));
+            assertEquals("File name", String.valueOf(photo.getEditText().getHint()));
+
+            Preference.OnPreferenceChangeListener ok = photo.getOnPreferenceChangeListener();
+            assertFalse("a video's name was kept", ok.onPreferenceChange(photo, "FB_VID_{photo_id}"));
+            ShadowLooper.idleMainLooper();
+            assertEquals("FB_IMG_{photo_id}", photo.getText());
+            assertEquals("FB_IMG_{photo_id}", Settings.PHOTO_FILENAME_TEMPLATE.savedValue());
+            assertEquals(HushfacebookPreferenceFragment.photoNameSummary("FB_IMG_{photo_id}"), String.valueOf(photo.getSummary()));
+            assertEquals("File name set to " + L10n.isolate("FB_IMG_{photo_id}") + ".", ShadowToast.getTextOfLatestToast());
+            assertEquals("the video's template moved", "FB_VID_{date}", Settings.FILENAME_TEMPLATE.savedValue());
+
+            assertFalse("a name with no token was kept", ok.onPreferenceChange(photo, "Shot"));
+            ShadowLooper.idleMainLooper();
+            assertEquals("Shot_{date}", Settings.PHOTO_FILENAME_TEMPLATE.savedValue());
+
+            ShadowToast.reset();
+            assertTrue("a clean template was changed", ok.onPreferenceChange(photo, "{date} {photo_id}"));
+            assertNull("a clean template raised a toast", ShadowToast.getLatestToast());
+
+            assertFalse("an empty template was kept", ok.onPreferenceChange(photo, " . "));
+            ShadowLooper.idleMainLooper();
+            assertEquals("FB_IMG_{date}", Settings.PHOTO_FILENAME_TEMPLATE.savedValue());
+
+            String preview = ValueRows.FileNameRow.previewName("Shot {photo_id}", new java.util.Date(0), true);
+            assertEquals("Shot 123456.jpg", preview);
+        }
+
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.VIDEO_DOWNLOAD);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            for (Preference row : rowsOf(controller)) {
+                assertFalse("a photo name row with no photo download in the build",
+                        row instanceof ValueRows.FileNameRow && ((ValueRows.FileNameRow) row).photo);
             }
         }
     }

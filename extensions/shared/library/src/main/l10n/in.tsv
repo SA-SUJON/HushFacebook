@@ -289,8 +289,12 @@ Videos will save at %1$s or the closest quality below it. A video with nothing t
 Settings imported.	Pengaturan diimpor.
 Video file name	Nama file video
 %1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it, %4$s their profile's number on Facebook and %5$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %6$s.	%1$s diganti dengan tanggal dan waktu penyimpanan, %2$s dengan nomor video di Facebook, %3$s dengan nama pengunggahnya, %4$s dengan nomor profilnya di Facebook, dan %5$s dengan tanggal unggahnya. Yang tidak diketahui saat menyimpan akan dihilangkan, dan nama tanpa satu pun di antaranya akan ditambahi tanggal. Jika nama itu sudah ada di folder, waktu penyimpanan ditambahkan di akhir. Karakter yang tidak valid menjadi garis bawah. Kosongkan untuk memakai nama bawaan, %6$s.
-Videos are named %1$s. Photos keep Facebook's own %2$s names.	Video diberi nama %1$s. Foto tetap memakai nama %2$s bawaan Facebook.
+Photo file name	Nama file foto
+%1$s becomes the date and time of the save, %2$s the photo's number on Facebook, %3$s who posted it, %4$s their profile's number on Facebook and %5$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %6$s.	%1$s diganti dengan tanggal dan waktu penyimpanan, %2$s dengan nomor foto di Facebook, %3$s dengan nama pengunggahnya, %4$s dengan nomor profilnya di Facebook, dan %5$s dengan tanggal unggahnya. Yang tidak diketahui saat menyimpan akan dihilangkan, dan nama tanpa satu pun di antaranya akan ditambahi tanggal. Jika nama itu sudah ada di folder, waktu penyimpanan ditambahkan di akhir. Karakter yang tidak valid menjadi garis bawah. Kosongkan untuk memakai nama bawaan, %6$s.
+Videos are named %1$s.	Video diberi nama %1$s.
+Photos are named %1$s.	Foto diberi nama %1$s.
 Saved videos will be named %1$s.	Video yang disimpan akan diberi nama %1$s.
+Saved photos will be named %1$s.	Foto yang disimpan akan diberi nama %1$s.
 File name	Nama file
 File name set to %1$s.	Nama file diatur menjadi %1$s.
 Hide AI-detected reels and videos	Sembunyikan reel dan video yang terdeteksi dibuat dengan AI

@@ -480,6 +480,8 @@ public class SettingsL10nTest {
         shown.add(HushfacebookPreferenceFragment.fileNameSummary("Reel {video_id}"));
         shown.add(SettingsBackupPreference.fileNameSentence("Reel {video_id}"));
         shown.add(SettingsBackupPreference.importedMessage(0, null, null, "Reel {video_id}"));
+        shown.add(HushfacebookPreferenceFragment.photoNameSummary("Shot {photo_id}"));
+        shown.add(SettingsBackupPreference.photoNameSentence("Shot {photo_id}"));
     }
 
     /**

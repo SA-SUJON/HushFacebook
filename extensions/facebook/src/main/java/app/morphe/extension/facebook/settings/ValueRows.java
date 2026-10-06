@@ -12,6 +12,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.fileNameSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.fitAboveKeyboard;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.folderSummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.photoNameSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.playbackQualitySummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.qualitySummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.saveToSummary;
@@ -43,6 +44,7 @@ import java.util.function.Consumer;
 import app.morphe.extension.facebook.comments.CommentOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
+import app.morphe.extension.facebook.download.PostDetails;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
@@ -262,25 +264,31 @@ final class ValueRows {
     }
 
     /**
-     * The video file name's row. Its summary follows its text, whoever sets it: the person, the
-     * shared page syncing it from the setting, or an import.
+     * The video or the photo file name's row. Its summary follows its text, whoever sets it: the
+     * person, the shared page syncing it from the setting, or an import.
      */
     static final class FileNameRow extends EditTextPreference {
+        /** Whether it names saved photos rather than videos. */
+        final boolean photo;
         @Nullable private TextView preview;
         private java.util.Date previewDate;
 
-        FileNameRow(Context context) {
+        FileNameRow(Context context, boolean photo) {
             super(context);
+            this.photo = photo;
             getEditText().addTextChangedListener(new android.text.TextWatcher() {
                 @Override public void beforeTextChanged(CharSequence text, int start, int count, int after) { }
                 @Override public void onTextChanged(CharSequence text, int start, int before, int count) {
-                    if (preview != null) preview.setText(previewName(text.toString(), previewDate));
+                    if (preview != null) preview.setText(previewName(text.toString(), previewDate, FileNameRow.this.photo));
                 }
                 @Override public void afterTextChanged(android.text.Editable text) { }
             });
         }
 
-        static String previewName(String text, java.util.Date when) {
+        static String previewName(String text, java.util.Date when, boolean photo) {
+            if (photo) {
+                return FileNameTemplate.photoName(FileNameTemplate.sanitizePhoto(text), when, PostDetails.of("123456")) + ".jpg";
+            }
             return FileNameTemplate.videoName(FileNameTemplate.sanitize(text), when, "123456") + ".mp4";
         }
 
@@ -297,7 +305,7 @@ final class ValueRows {
             preview = new TextView(context);
             preview.setTextSize(14);
             preview.setTextColor(colors.title);
-            preview.setText(previewName(getText(), previewDate));
+            preview.setText(previewName(getText(), previewDate, photo));
             TextView help = new TextView(context);
             help.setId(android.R.id.message);
             help.setText(getDialogMessage());
@@ -320,7 +328,8 @@ final class ValueRows {
         @Override
         public void setText(String text) {
             super.setText(text);
-            setSummary(fileNameSummary(FileNameTemplate.sanitize(text)));
+            setSummary(photo ? photoNameSummary(FileNameTemplate.sanitizePhoto(text))
+                    : fileNameSummary(FileNameTemplate.sanitize(text)));
         }
 
         @Override

@@ -289,8 +289,12 @@ Videos will save at %1$s or the closest quality below it. A video with nothing t
 Settings imported.	Einstellungen importiert.
 Video file name	Dateiname für Videos
 %1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it, %4$s their profile's number on Facebook and %5$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %6$s.	%1$s wird zu Datum und Uhrzeit des Speicherns, %2$s zur Nummer des Videos auf Facebook, %3$s zum Namen dessen, der es gepostet hat, %4$s zur Nummer seines Profils auf Facebook und %5$s zum Tag der Veröffentlichung. Was beim Speichern nicht bekannt ist, wird weggelassen, und ein Name ohne eines davon bekommt das Datum angehängt. Gibt es den Namen im Ordner schon, wird die Uhrzeit des Speicherns angehängt. Ungültige Zeichen werden zu Unterstrichen. Lass das Feld leer, um den Standardnamen %6$s zu verwenden.
-Videos are named %1$s. Photos keep Facebook's own %2$s names.	Videos heißen %1$s. Fotos behalten Facebooks eigene Namen mit %2$s.
+Photo file name	Dateiname für Fotos
+%1$s becomes the date and time of the save, %2$s the photo's number on Facebook, %3$s who posted it, %4$s their profile's number on Facebook and %5$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %6$s.	%1$s wird zu Datum und Uhrzeit des Speicherns, %2$s zur Nummer des Fotos auf Facebook, %3$s zum Namen dessen, der es gepostet hat, %4$s zur Nummer seines Profils auf Facebook und %5$s zum Tag der Veröffentlichung. Was beim Speichern nicht bekannt ist, wird weggelassen, und ein Name ohne eines davon bekommt das Datum angehängt. Gibt es den Namen im Ordner schon, wird die Uhrzeit des Speicherns angehängt. Ungültige Zeichen werden zu Unterstrichen. Lass das Feld leer, um den Standardnamen %6$s zu verwenden.
+Videos are named %1$s.	Videos heißen %1$s.
+Photos are named %1$s.	Fotos heißen %1$s.
 Saved videos will be named %1$s.	Gespeicherte Videos heißen dann %1$s.
+Saved photos will be named %1$s.	Gespeicherte Fotos heißen dann %1$s.
 File name	Dateiname
 File name set to %1$s.	Dateiname auf %1$s gesetzt.
 Hide AI-detected reels and videos	Als KI erkannte Reels und Videos ausblenden

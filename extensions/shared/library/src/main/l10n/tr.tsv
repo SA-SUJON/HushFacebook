@@ -289,8 +289,12 @@ Videos will save at %1$s or the closest quality below it. A video with nothing t
 Settings imported.	Ayarlar içe aktarıldı.
 Video file name	Video dosya adı
 %1$s becomes the date and time of the save, %2$s the video's number on Facebook, %3$s who posted it, %4$s their profile's number on Facebook and %5$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %6$s.	%1$s kaydetme tarihine ve saatine, %2$s videonun Facebook'taki numarasına, %3$s paylaşan kişinin adına, %4$s paylaşanın Facebook'taki profil numarasına, %5$s ise paylaşıldığı güne dönüşür. Kaydederken bilinmeyenler dışarıda bırakılır ve bunların hiçbirini içermeyen bir ada tarih eklenir. Ad klasörde zaten varsa sonuna kaydetme saati eklenir. Geçersiz karakterler alt çizgiye dönüşür. Varsayılan %6$s adını kullanmak için boş bırak.
-Videos are named %1$s. Photos keep Facebook's own %2$s names.	Videoların adı %1$s olur. Fotoğraflar Facebook'un kendi %2$s adlarını korur.
+Photo file name	Fotoğraf dosya adı
+%1$s becomes the date and time of the save, %2$s the photo's number on Facebook, %3$s who posted it, %4$s their profile's number on Facebook and %5$s the day it was posted. What a save doesn't know is left out, and a name with none of these gets the date added. When the name is already in the folder, the time of the save goes on the end. Invalid characters become underscores. Leave it blank to use the default, %6$s.	%1$s kaydetme tarihine ve saatine, %2$s fotoğrafın Facebook'taki numarasına, %3$s paylaşan kişinin adına, %4$s paylaşanın Facebook'taki profil numarasına, %5$s ise paylaşıldığı güne dönüşür. Kaydederken bilinmeyenler dışarıda bırakılır ve bunların hiçbirini içermeyen bir ada tarih eklenir. Ad klasörde zaten varsa sonuna kaydetme saati eklenir. Geçersiz karakterler alt çizgiye dönüşür. Varsayılan %6$s adını kullanmak için boş bırak.
+Videos are named %1$s.	Videoların adı %1$s olur.
+Photos are named %1$s.	Fotoğrafların adı %1$s olur.
 Saved videos will be named %1$s.	Kaydedilen videoların adı %1$s olacak.
+Saved photos will be named %1$s.	Kaydedilen fotoğrafların adı %1$s olacak.
 File name	Dosya adı
 File name set to %1$s.	Dosya adı %1$s olarak ayarlandı.
 Hide AI-detected reels and videos	Yapay zekâ ile üretildiği tespit edilen reels ve videoları gizle

@@ -114,7 +114,8 @@ public final class PhotoSave {
                 return false;
             }
             Logger.diagnosticInfo(DiagnosticCategory.DOWNLOADS, SOURCE, () -> "Save photo tapped");
-            return MediaDownload.savePhoto(context, url, PostDetails.read(null, photo));
+            // The photo's own id, for a template that asks for it. A name uses it only when it's digits.
+            return MediaDownload.savePhoto(context, url, PostDetails.read(PostDetails.string(photo, PostDetails.ID), photo));
         } catch (Throwable t) {
             // It runs inside Facebook's click dispatch, on the thread that draws the app.
             HookStatus.threw(FamilyNames.PHOTO_DOWNLOAD, "save photo tap", t);

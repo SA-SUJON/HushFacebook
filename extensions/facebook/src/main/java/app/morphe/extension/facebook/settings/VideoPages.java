@@ -11,6 +11,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.fileNameRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.folderRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.info;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.photoNameRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.playbackQualityRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.qualityRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.saveToRow;
@@ -191,6 +192,7 @@ final class VideoPages {
             downloads.addPreference(saveToRow(context));
             downloads.addPreference(folderRow(context));
             downloads.addPreference(fileNameRow(context));
+            if (build.contains(PatchFamily.PHOTO_DOWNLOAD)) downloads.addPreference(photoNameRow(context));
             // Reels and feed and Watch videos can go to another app as a link (#41). A story can't:
             // its link opens only for someone signed in, so no downloader could fetch it.
             if (build.contains(PatchFamily.REEL_DOWNLOAD) || build.contains(PatchFamily.VIDEO_DOWNLOAD)) {
