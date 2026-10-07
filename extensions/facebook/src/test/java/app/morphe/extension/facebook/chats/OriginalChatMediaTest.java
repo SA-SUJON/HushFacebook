@@ -277,6 +277,72 @@ public class OriginalChatMediaTest {
                 OriginalChatMedia.videoPassthrough(9, 4_000_000L, video(join(fileType(), media(), plainMovie))));
     }
 
+    /**
+     * What Samsung, Pixel and iPhone cameras write into udta and meta beyond a place: Samsung's smta
+     * and SDLN boxes beside the make and model, QuickTime's four-byte zero end of a udta, and an ISO
+     * meta (version and flags first) listing Android's keys. All of them go out as they are.
+     */
+    @Test
+    public void theTagsOrdinaryPhoneVideosCarryGoOutAsTheyAre() throws IOException {
+        Settings.ORIGINAL_CHAT_MEDIA.save(true);
+        byte[] mdta = box("hdlr", new byte[8], bytes("mdta"), new byte[13]);
+        Map<String, byte[]> phones = new LinkedHashMap<>();
+        phones.put("a Samsung's smta and SDLN", movie(track("vide"), track("soun"),
+                box("udta", box("smta", box("saut", new byte[8]), box("smrd", new byte[24])), box("SDLN", new byte[8]),
+                        box("©mak", new byte[4], bytes("samsung")), box("©mod", new byte[4], bytes("SM-S901U")))));
+        phones.put("a udta ended by four zero bytes", movie(track("vide"),
+                join(box("udta", box("©swr", new byte[4], bytes("14.1")), box("auth", new byte[8], bytes("me"))),
+                        new byte[0]), box("udta", box("©day", new byte[4], bytes("2026")), new byte[4])));
+        phones.put("an ISO meta with version and flags", movie(track("vide"), box("meta", new byte[4], mdta,
+                box("keys", new byte[8], box("mdta", bytes("com.android.version"))),
+                box("ilst", box("\u0000\u0000\u0000\u0001", box("data", new byte[8], bytes("15")))))));
+        phones.put("a track's udta with a meta in it", movie(track("vide", box("udta", box("meta", new byte[4], mdta))),
+                track("soun")));
+        for (Map.Entry<String, byte[]> phone : phones.entrySet()) {
+            assertEquals(phone.getKey(), -1, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                    video(join(fileType(), phone.getValue(), media()))));
+        }
+    }
+
+    /**
+     * Binary Exif that carries a place and none of the words the scan looks for: Nikon's NCDT with
+     * its NCTG, Pentax, Panasonic and Canon maker boxes, an ISO meta whose iloc points at an Exif
+     * item, a UTF-16 XMP packet and an iTunes-style item. Each is a box the udta or meta isn't on the
+     * list to hold, or text in a wider encoding, so the video keeps the re-encode.
+     */
+    @Test
+    public void binaryExifAndOtherTagsInUdtaAndMetaKeepTheReEncode() throws IOException {
+        Settings.ORIGINAL_CHAT_MEDIA.save(true);
+        byte[] mdta = box("hdlr", new byte[8], bytes("mdta"), new byte[13]);
+        byte[] binary = new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        Map<String, byte[]> refused = new LinkedHashMap<>();
+        refused.put("Nikon NCDT and NCTG", movie(track("vide"), box("udta", box("NCDT", box("NCTG", binary)))));
+        refused.put("Pentax PENT", movie(track("vide"), box("udta", box("PENT", binary))));
+        refused.put("Panasonic PANA", movie(track("vide"), box("udta", box("PANA", binary))));
+        refused.put("Canon CNTH", movie(track("vide"), box("udta", box("CNTH", binary))));
+        refused.put("a maker box in a track's udta", movie(track("vide", box("udta", box("PENT", binary))), track("soun")));
+        refused.put("an unknown box beside the make", movie(track("vide"),
+                box("udta", box("©mak", new byte[4], bytes("Nikon")), box("abcd", binary))));
+        refused.put("an ISO meta with an Exif item in iloc and idat", movie(track("vide"), box("meta", new byte[4], mdta,
+                box("iinf", new byte[8]), box("iloc", new byte[16]), box("idat", binary))));
+        refused.put("an iloc alone in a QuickTime meta", movie(track("vide"), box("meta", mdta, box("iloc", new byte[16]))));
+        refused.put("an iloc in a meta inside a udta", movie(track("vide"),
+                box("udta", box("meta", new byte[4], mdta, box("iloc", new byte[16])))));
+        refused.put("UTF-16 little-endian XMP in Samsung's smta", movie(track("vide"), box("udta",
+                box("smta", "<exif:GPSLatitude>".getBytes(java.nio.charset.StandardCharsets.UTF_16LE)))));
+        refused.put("UTF-16 big-endian XMP in a vendor box", movie(track("vide"), box("udta",
+                box("SDLN", "<exif:GPSLatitude>".getBytes(java.nio.charset.StandardCharsets.UTF_16BE)))));
+        refused.put("an iTunes-style freeform item in a list", movie(track("vide"),
+                box("meta", mdta, box("ilst", box("----", binary)))));
+        refused.put("a udta box cut short", movie(track("vide"), box("udta", box("©mak", new byte[4]), new byte[3])));
+        for (Map.Entry<String, byte[]> movie : refused.entrySet()) {
+            assertEquals(movie.getKey(), 9, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                    video(join(fileType(), movie.getValue(), media()))));
+        }
+        assertEquals("the control: a plain make and model", -1, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                video(join(fileType(), movie(track("vide"), box("udta", box("©mak", new byte[4], bytes("Nikon")))), media()))));
+    }
+
     /** A media box of [size] zero bytes with [marker] written at [at]. */
     private static byte[] mediaWith(int size, int at, String marker) {
         byte[] payload = new byte[size];

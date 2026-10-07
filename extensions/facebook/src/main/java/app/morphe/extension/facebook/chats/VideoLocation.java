@@ -33,17 +33,18 @@ import java.util.Set;
  * top-level {@code free} box. This reads the file's top-level box headers, the movie box, the
  * contents of every top-level {@code free}, {@code skip} and {@code wide} box, and the media data
  * ({@code mdat}) in chunks, looking in the media data only for the long markers a dashcam writes
- * (see {@link #LOG_MARKERS}), and looks through every {@code udta}, {@code meta} and padding box
- * of the movie, its tracks and their media.
+ * (see {@link #LOG_MARKERS}). It walks every {@code udta}, {@code meta} and padding box of the
+ * movie, its tracks and their media box by box.
  *
- * <p>It answers "clear" only when it read the whole layout, knew every box in it, and found
- * nothing. Each container this walks has a list of the boxes it may hold, taken from ISO/IEC
- * 14496-12, Apple's QuickTime file format and what Android's and iOS's cameras write; a box off
- * that list (a dashcam's {@code gps } index, an XMP {@code uuid}, a fragment's {@code mvex}) means
- * the file isn't clear. So does a file that isn't local, can't be read, is cut short, has its movie
- * box twice, holds more than {@link #MAX_MOVIE_BYTES} in its movie and padding boxes together, has
- * a top-level box this doesn't know, or a track with no media or no handler, or with a handler that
- * isn't video or sound (a timed metadata track, such as GoPro's {@code gpmd} or Google's
+ * <p>It answers "clear" only when it read the whole layout, found every box on its container's
+ * list, and found nothing. Each container this walks has a list of the boxes it may hold, taken
+ * from ISO/IEC 14496-12, Apple's QuickTime file format and what Android's, Samsung's and iOS's
+ * cameras write; a box off that list (a dashcam's {@code gps } index, an XMP {@code uuid}, a
+ * fragment's {@code mvex}, a Nikon {@code NCDT}, an ISO {@code iloc} that points at an Exif item)
+ * means the file isn't clear. So does a file that isn't local, can't be read, is cut short, has its
+ * movie box twice, holds more than {@link #MAX_MOVIE_BYTES} in its movie and padding boxes
+ * together, has a top-level box this doesn't know, a track with no media or no handler, or a
+ * handler that isn't video or sound (a timed metadata track, such as GoPro's {@code gpmd} or Google's
  * {@code camm}, can carry a GPS trace). Video frames aren't decoded, so GPS written into the video
  * stream as binary SEI, with none of the markers above, isn't seen. The date and the camera's make and model aren't looked at: a
  * video that passes keeps them.
@@ -59,8 +60,8 @@ final class VideoLocation {
     static final long MAX_MDAT_BYTES = 64L << 20;
     static final int MDAT_CHUNK = 64 << 10;
 
-    /** How deep the movie box's containers may nest: track, media, media information. */
-    private static final int MAX_DEPTH = 4;
+    /** How deep the movie box's containers may nest: track, media, media information, a udta and its meta. */
+    private static final int MAX_DEPTH = 6;
 
     /**
      * The boxes each container this walks may hold, and nothing else. Padding ({@code free},
@@ -77,6 +78,15 @@ final class VideoLocation {
         CHILDREN.put("mdia", set("mdhd", "hdlr", "minf", "elng", "udta", "meta", "free", "skip", "wide"));
         // A video or a sound header, QuickTime's data handler, data references and sample tables.
         CHILDREN.put("minf", set("vmhd", "smhd", "hdlr", "dinf", "stbl", "udta", "meta", "free", "skip", "wide"));
+        // Text atoms a phone writes that name no place (make, model, software, date, tool, encoder),
+        // a meta, Samsung's smta and SDLN, 3GPP's author string and padding. A place's box (the
+        // \u00A9xyz atom, loci) and every maker's binary Exif box (Nikon NCDT, Pentax PENT, Panasonic
+        // PANA, Canon CNTH) are off the list.
+        CHILDREN.put("udta", set("\u00A9mak", "\u00A9mod", "\u00A9swr", "\u00A9day", "\u00A9too", "\u00A9enc",
+                "meta", "smta", "SDLN", "auth", "free", "skip", "wide"));
+        // A handler, the keys and their values, and padding. An ISO meta's iinf, iloc and idat can
+        // hold an Exif item, so they're off the list.
+        CHILDREN.put("meta", set("hdlr", "keys", "ilst", "free", "skip", "wide"));
     }
 
     /** Box types and key text that name a place, matched as bytes in a udta, a meta or padding. */
@@ -261,6 +271,8 @@ final class VideoLocation {
         boolean handler = false;
         int at = from;
         while (at < to) {
+            // QuickTime ends a udta with four zero bytes.
+            if ("udta".equals(parent) && to - at == 4 && u32(data, at) == 0) break;
             if (to - at < 8) return false;
             long size = u32(data, at);
             int headerSize = 8;
@@ -279,6 +291,13 @@ final class VideoLocation {
             switch (type) {
                 case "udta":
                 case "meta":
+                    if (namesAPlace(data, start, end)) return false;
+                    int inner = "meta".equals(type) ? metaChildren(data, start, end) : start;
+                    if (!clearBoxes(data, inner, end, type, depth + 1)) return false;
+                    break;
+                case "ilst":
+                    if (!numberedItems(data, start, end)) return false;
+                    break;
                 case "free":
                 case "skip":
                 case "wide":
@@ -311,6 +330,30 @@ final class VideoLocation {
         return !"mdia".equals(parent) || handler;
     }
 
+    /**
+     * Where a meta box's children start: an ISO meta begins with four bytes of version and flags,
+     * a QuickTime meta with its first child. A zero first word is the version and flags.
+     */
+    private static int metaChildren(byte[] data, int start, int end) {
+        return end - start >= 4 && u32(data, start) == 0 ? start + 4 : start;
+    }
+
+    /**
+     * Whether every item of an {@code ilst} has a number for its type, as the items of a QuickTime
+     * key list do. An iTunes-style item (a {@code ©xyz}, a freeform {@code ----}) isn't one a phone writes.
+     */
+    private static boolean numberedItems(byte[] data, int from, int to) {
+        int at = from;
+        while (at < to) {
+            if (to - at < 8) return false;
+            long size = u32(data, at);
+            if (size < 8 || size > to - at) return false;
+            if (data[at + 4] != 0 || data[at + 5] != 0 || data[at + 6] != 0) return false;
+            at += (int) size;
+        }
+        return true;
+    }
+
     private static boolean videoOrSound(byte[] data, int start, int end) {
         if (end - start < 12) return false;
         String handler = type(data, start + 8);
@@ -324,7 +367,10 @@ final class VideoLocation {
                 if (matches(data, i, to, box, false)) return true;
             }
             for (byte[] word : PLACE_WORDS) {
-                if (matches(data, i, to, word, true)) return true;
+                if (matches(data, i, to, word, true) || matchesWide(data, i, to, word, false)
+                        || matchesWide(data, i, to, word, true)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -335,6 +381,18 @@ final class VideoLocation {
         for (int j = 0; j < part.length; j++) {
             int b = data[at + j];
             if (anyCase && b >= 'A' && b <= 'Z') b += 'a' - 'A';
+            if (b != part[j]) return false;
+        }
+        return true;
+    }
+
+    /** [part] as UTF-16 text without case, as an XMP packet may be written: big-endian or little-endian. */
+    private static boolean matchesWide(byte[] data, int at, int to, byte[] part, boolean littleEndian) {
+        if (to - at < part.length * 2) return false;
+        for (int j = 0; j < part.length; j++) {
+            if (data[at + 2 * j + (littleEndian ? 1 : 0)] != 0) return false;
+            int b = data[at + 2 * j + (littleEndian ? 0 : 1)];
+            if (b >= 'A' && b <= 'Z') b += 'a' - 'A';
             if (b != part[j]) return false;
         }
         return true;
