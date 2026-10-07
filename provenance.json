@@ -243,6 +243,15 @@
     },
     {
       "paths": [
+        "extensions/shared/library/src/main/java/app/morphe/extension/shared/settings/preference/JavaCrashReport.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: keeps the Java crash that ends Facebook, with its stack trace and the events before it, so the diagnostic report can show it after the restart."
+    },
+    {
+      "paths": [
         "extensions/shared/library/src/main/java/app/morphe/extension/shared/L10nTranslations.java"
       ],
       "origin": "original",
