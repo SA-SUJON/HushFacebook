@@ -141,6 +141,10 @@ final class FeedPages {
                 feed.addPreference(toggle(context, Settings.HIDE_STORIES_BETWEEN_POSTS,
                         L10n.t("Rows, large tiles and viewers of Stories between posts, starting with the next "
                                 + "feed Facebook loads. The top Stories tray has its own switch.")));
+                feed.addPreference(toggle(context, Settings.HIDE_HOME_COMPOSER,
+                        L10n.t("The \"What's on your mind?\" row at the top of Home. The create button in the "
+                                + "top bar still starts a post.") + " "
+                                + L10n.t("A change shows the next time you pull down to refresh.")));
             }
             if (build.contains(PatchFamily.FEED_REELS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_FEED_REELS,

@@ -739,3 +739,7 @@ Saved as %1$s in the Notifications folder. Pick it under Sound in Android's noti
 %1$s is already in your notification sounds.	%1$s já está nos seus sons de notificação.
 This build has no notification sound to save.	Esta versão não tem som de notificação para salvar.
 Couldn't save the sound. Try again.	Não foi possível salvar o som. Tente de novo.
+# context: switch title on the Feed page; the composer row is the "What's on your mind?" box at the top of Home where a post starts
+Hide the composer row	Ocultar a linha de publicar
+# context: summary of that switch; use the wording Facebook itself uses in this language for "What's on your mind?" and Home
+The "What's on your mind?" row at the top of Home. The create button in the top bar still starts a post.	A linha "No que você está pensando?" no topo da Página inicial. O botão de criar na barra superior continua iniciando uma publicação.

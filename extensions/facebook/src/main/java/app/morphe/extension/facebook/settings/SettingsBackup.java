@@ -107,6 +107,7 @@ public final class SettingsBackup {
             Settings.HIDE_FRIENDS_LOCATIONS,
             Settings.HIDE_TOP_STORIES_TRAY,
             Settings.HIDE_STORIES_BETWEEN_POSTS,
+            Settings.HIDE_HOME_COMPOSER,
             Settings.HIDE_FEED_REELS,
             Settings.BLOCK_RETURN_REFRESH,
             Settings.RETURN_REFRESH_NO_LIMIT,

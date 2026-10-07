@@ -845,3 +845,7 @@ Saved as %1$s in the Notifications folder. Pick it under Sound in Android's noti
 %1$s is already in your notification sounds.	%1$s sudah ada di suara notifikasimu.
 This build has no notification sound to save.	Build ini tidak punya suara notifikasi untuk disimpan.
 Couldn't save the sound. Try again.	Suara tidak bisa disimpan. Coba lagi.
+# context: switch title on the Feed page; the composer row is the "What's on your mind?" box at the top of Home where a post starts
+Hide the composer row	Sembunyikan baris pembuat postingan
+# context: summary of that switch; use the wording Facebook itself uses in this language for "What's on your mind?" and Home
+The "What's on your mind?" row at the top of Home. The create button in the top bar still starts a post.	Baris "Apa yang Anda pikirkan?" di bagian atas Beranda. Tombol buat di bilah atas tetap bisa memulai postingan.

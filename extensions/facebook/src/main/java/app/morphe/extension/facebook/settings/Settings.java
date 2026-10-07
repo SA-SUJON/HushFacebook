@@ -109,6 +109,14 @@ public class Settings extends BaseSettings {
             new StoriesSetting(StoriesSetting.BETWEEN_KEY);
 
     /**
+     * The "What's on your mind?" composer row at the top of Home. Like the tray, it's an adapter of
+     * the feed's own, and the patch has it count no rows while this is on. Off until picked: the
+     * row is how most people start a post.
+     */
+    public static final BooleanSetting HIDE_HOME_COMPOSER =
+            new BooleanSetting("hushfacebook_hide_home_composer", FALSE);
+
+    /**
      * The feed's rows of reels: the "Reels" carousels between posts and the reels Facebook adds where
      * the feed you follow ends. Each is an edge of its own, filed under a reels story category.
      */

@@ -206,6 +206,9 @@ public final class FeedFilter {
      */
     static final String TRAY_ROUTE = "Stories tray adapters";
 
+    /** The composer row's adapter, counted the same way as the tray's under a route of its own. */
+    static final String COMPOSER_ROUTE = "Composer row adapter";
+
     /**
      * The story categories Facebook files the feed's rows of reels under: the "Reels" carousels
      * between posts, their fallback, and the reels it adds where the feed you follow ends. On a
@@ -223,9 +226,13 @@ public final class FeedFilter {
     /** The kind and the removal reason a pre-EOF injector call counts under. */
     static final String PRE_EOF_UNIT = "pre-EOF unit";
 
-    /** The adapter the patch passes: the classic tray, or the unified one a server gate turns on. */
+    /**
+     * The adapter the patch passes: the classic tray, the unified one a server gate turns on, or the
+     * "What's on your mind?" composer row above them.
+     */
     public static final int LEGACY_TRAY = 0;
     public static final int UNIFIED_TRAY = 1;
+    public static final int HOME_COMPOSER = 2;
 
     /**
      * Units Facebook injects into the feed that are not posts from anyone you follow. Every one
@@ -892,7 +899,7 @@ public final class FeedFilter {
      * Injection point, the item count of a Stories tray adapter: the patch gives the classic and
      * the unified tray adapter a getItemCount() that asks here with Facebook's own count. It answers
      * 0 while the tray is hidden, which leaves the tray built but out of the feed, and
-     * {@code count} otherwise.
+     * {@code count} otherwise. The composer row's adapter asks here too, under its own switch.
      *
      * <p>Facebook's feed adapter reads its children's counts again whenever one of them changes,
      * and tells the list only what that child said changed. So an adapter's answer changes only
@@ -904,7 +911,8 @@ public final class FeedFilter {
      *
      * <p>Until the settings are ready, and while Hushfacebook is paused, the tray is shown.
      *
-     * @param kind {@link #LEGACY_TRAY} or {@link #UNIFIED_TRAY}, the adapter the patch hooked.
+     * @param kind {@link #LEGACY_TRAY}, {@link #UNIFIED_TRAY} or {@link #HOME_COMPOSER}, the adapter
+     *             the patch hooked.
      */
     public static int storiesTrayCount(Object adapter, int kind, int count) {
         try {
@@ -912,7 +920,7 @@ public final class FeedFilter {
             if (hidden == null) {
                 hidden = hideStoriesTray(kind);
                 TRAY_HIDDEN.put(adapter, hidden);
-            } else if (hidden != trayHidden() && !TRAY_STUCK.containsKey(adapter)
+            } else if (hidden != trayHidden(kind) && !TRAY_STUCK.containsKey(adapter)
                     && TRAY_PENDING.put(adapter, Boolean.TRUE) == null) {
                 Utils.runOnMainThread(() -> flipTray(adapter, kind));
             }
@@ -933,8 +941,9 @@ public final class FeedFilter {
     /** Tray adapters whose notifyDataSetChanged failed: they keep their answer until Facebook restarts. */
     private static final Map<Object, Boolean> TRAY_STUCK = Collections.synchronizedMap(new WeakHashMap<>());
 
-    private static boolean trayHidden() {
-        return Utils.settingsReady() && Settings.HIDE_TOP_STORIES_TRAY.get();
+    private static boolean trayHidden(int kind) {
+        if (!Utils.settingsReady()) return false;
+        return (kind == HOME_COMPOSER ? Settings.HIDE_HOME_COMPOSER : Settings.HIDE_TOP_STORIES_TRAY).get();
     }
 
     /**
@@ -946,7 +955,7 @@ public final class FeedFilter {
     static void flipTray(Object adapter, int kind) {
         TRAY_PENDING.remove(adapter);
         Boolean was = TRAY_HIDDEN.get(adapter);
-        if (was == null || was == trayHidden()) return;
+        if (was == null || was == trayHidden(kind)) return;
         boolean hide = hideStoriesTray(kind);
         TRAY_HIDDEN.put(adapter, hide);
         try {
@@ -971,16 +980,17 @@ public final class FeedFilter {
      * count, and each time its answer changes. The report counts each as a list of one, under the
      * adapter's kind, and a hidden one as removed.
      *
-     * @param adapter {@link #LEGACY_TRAY} or {@link #UNIFIED_TRAY}.
+     * @param adapter {@link #LEGACY_TRAY}, {@link #UNIFIED_TRAY} or {@link #HOME_COMPOSER}.
      */
     static boolean hideStoriesTray(int adapter) {
         try {
             HookStatus.invoked(FamilyNames.STORIES_TRAY);
-            String kind = adapter == UNIFIED_TRAY ? "unified" : "legacy";
-            FeedFilterCounters.sawList(TRAY_ROUTE, 1);
-            FeedFilterCounters.sawKind(TRAY_ROUTE, kind);
-            boolean hide = trayHidden();
-            if (hide) FeedFilterCounters.removed(TRAY_ROUTE, 1, kind + " adapter hidden");
+            String kind = adapter == HOME_COMPOSER ? "composer" : adapter == UNIFIED_TRAY ? "unified" : "legacy";
+            String route = adapter == HOME_COMPOSER ? COMPOSER_ROUTE : TRAY_ROUTE;
+            FeedFilterCounters.sawList(route, 1);
+            FeedFilterCounters.sawKind(route, kind);
+            boolean hide = trayHidden(adapter);
+            if (hide) FeedFilterCounters.removed(route, 1, kind + " adapter hidden");
             logTrayOnce(adapter, kind, hide);
             return hide;
         } catch (Throwable failure) {
@@ -1000,9 +1010,10 @@ public final class FeedFilter {
      */
     private static void logTrayOnce(int adapter, String kind, boolean hide) {
         if (!Utils.settingsReady() || !BaseSettings.DEBUG.get()) return;
-        int bit = 1 << ((adapter == UNIFIED_TRAY ? 2 : 0) + (hide ? 1 : 0));
+        int bit = 1 << (adapter * 2 + (hide ? 1 : 0));
         if ((TRAY_LOGGED.getAndUpdate(logged -> logged | bit) & bit) != 0) return;
-        Logger.printDebug(() -> "Stories tray: " + (hide ? "hid" : "kept") + " the " + kind + " adapter");
+        String what = adapter == HOME_COMPOSER ? "Composer row" : "Stories tray";
+        Logger.printDebug(() -> what + ": " + (hide ? "hid" : "kept") + " the " + kind + " adapter");
     }
 
     /**
