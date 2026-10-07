@@ -106,6 +106,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_CHAT_TYPING) return L10n.t("Hide typing in chats");
         if (setting == Settings.HIDE_COMMENT_TYPING) return L10n.t("Hide typing in comments");
         if (setting == Settings.HIDE_READ_RECEIPTS) return L10n.t("Hide read receipts");
+        if (setting == Settings.ORIGINAL_CHAT_MEDIA) return L10n.t("Send photos and videos at original quality");
         if (setting == Settings.TURN_OFF_DOUBLE_TAP_LIKE) return L10n.t("Turn off double tap to like");
         if (setting == Settings.KEEP_REEL_SPEED) return L10n.t("Keep the reel speed");
         if (setting == Settings.KEEP_VIDEO_SPEED) return L10n.t("Keep the video speed");

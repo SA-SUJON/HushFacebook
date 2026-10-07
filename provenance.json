@@ -743,6 +743,20 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/OriginalChatMedia.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/OriginalPhoto.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/chats/OriginalChatMediaAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/chats/OriginalChatMediaPatch.kt"
+      ],
+      "origin": "ported",
+      "upstream": "https://github.com/SysAdminDoc/HushMessenger",
+      "commit": "e1e90d839e142ca225dcf345b6b35116475e6e64",
+      "via": [],
+      "license": "GPL-3.0-only",
+      "changes": "Rewritten for Facebook from HushMessenger's original photo and original video controls. Facebook's in-app chats use the same DefaultMediaTranscoder, so the photo hooks (transcodeImage and transcodeImageAsync, handed their arguments in one range call) and OriginalPhoto's JPEG copy are the same idea and nearly the same code. The video hook moved: Facebook asks extractMimeTypeAndCheckCanSkipVideoTranscoding, in a build with two trailing ints, whether a file may skip the re-encode, and the size check sits there (bitrate times duration over 8000, plus slack times 1000) instead of in the transcoder's private worker. The anchors are found by names Facebook keeps and by the shape of that check, before anything changes, on 577, 580 and 581. A settings switch in front of every hook, Pause and cold start answered with Facebook's own behavior, the diagnostic report counting what goes out, a send with Facebook's standard size treated like an HD one because the switch asks for originals, and failures recorded in the report instead of Messenger's private log."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/TypingIndicator.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/chats/HideTypingIndicatorPatch.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/chats/TypingAnchors.kt"

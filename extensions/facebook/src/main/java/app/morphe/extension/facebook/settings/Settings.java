@@ -446,6 +446,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_read_receipts", TRUE);
 
     /**
+     * Photos and videos sent from a chat that opens inside Facebook go out as the originals
+     * ({@link app.morphe.extension.facebook.chats.OriginalChatMedia}). Starts off.
+     */
+    public static final BooleanSetting ORIGINAL_CHAT_MEDIA =
+            new BooleanSetting("hushfacebook_original_chat_media", FALSE);
+
+    /**
      * A double tap on a reel or a video left without Facebook's like: no heart, no like sent. A
      * single tap and the Like button do what they always did. On once the patch is picked, since
      * picking it is the choice.

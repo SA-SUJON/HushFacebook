@@ -51,6 +51,7 @@ import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
 import app.morphe.extension.facebook.chats.MessengerIconForTests;
+import app.morphe.extension.facebook.chats.OriginalChatMediaForTests;
 import app.morphe.extension.facebook.chats.ReadReceipts;
 import app.morphe.extension.facebook.chats.TypingIndicator;
 import app.morphe.extension.facebook.download.ClipboardLinkForTests;
@@ -616,6 +617,10 @@ public class PausedHooksTest {
                 TypingIndicator::holdsCommentTyping));
         // Mailbox's mark-read hands back its future without sending the read.
         probes.put(PatchFamily.READ_RECEIPTS, Collections.singletonList(ReadReceipts::holdsChatRead));
+        // A standard JPEG goes out as its own bytes from both photo hooks, and a small video's size
+        // check says it can skip the re-encode.
+        probes.put(PatchFamily.ORIGINAL_CHAT_MEDIA, Arrays.asList(OriginalChatMediaForTests::sendsAPhotoAsIs,
+                OriginalChatMediaForTests::sendsAPhotoAsyncAsIs, OriginalChatMediaForTests::passesAVideo));
         // A push of each kind a notification switch blocks isn't posted, asked at 11 PM, inside
         // the quiet hours every switch on turns on.
         probes.put(PatchFamily.PROMO_NOTIFICATIONS, Arrays.asList(

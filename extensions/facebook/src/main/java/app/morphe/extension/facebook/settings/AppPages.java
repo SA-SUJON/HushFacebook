@@ -41,7 +41,8 @@ final class AppPages {
     /** Chats: the Get Messenger card and the Messenger icon. */
     static void chats(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
-        if (build.contains(PatchFamily.MESSENGER_CARD) || build.contains(PatchFamily.MESSENGER_ICON)) {
+        if (build.contains(PatchFamily.MESSENGER_CARD) || build.contains(PatchFamily.MESSENGER_ICON)
+                || build.contains(PatchFamily.ORIGINAL_CHAT_MEDIA)) {
             PreferenceCategory chats = category(screen, L10n.t("Chats"));
             if (build.contains(PatchFamily.MESSENGER_CARD)) {
                 chats.addPreference(toggle(context, Settings.HIDE_GET_MESSENGER_CARD,
@@ -52,6 +53,12 @@ final class AppPages {
                 chats.addPreference(toggle(context, Settings.OPEN_MESSENGER_APP,
                         L10n.t("A tap on the Messenger icon at the top of Facebook opens the Messenger app instead "
                                 + "of Chats. Without Messenger installed, Chats opens as before.")));
+            }
+            if (build.contains(PatchFamily.ORIGINAL_CHAT_MEDIA)) {
+                chats.addPreference(toggle(context, Settings.ORIGINAL_CHAT_MEDIA,
+                        L10n.t("Photos and videos you send from a chat that opens inside Facebook go out as the "
+                                + "originals. Photos lose their location and camera details. Files over 20 MB for photos "
+                                + "and 25 MB for videos are still shrunk.")));
             }
         }
     }

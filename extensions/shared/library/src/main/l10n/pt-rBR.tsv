@@ -1047,3 +1047,7 @@ Links, buttons, switches and the selected tab are %1$s where Facebook uses its b
 Facebook will keep its own blue.	O Facebook vai manter o próprio azul.
 # context: what a settings import changes; %1$s is a color name such as Teal
 With Accent color in the build, Facebook's blue will be %1$s.	Com Cor de destaque na versão, o azul do Facebook será %1$s.
+# context: switch title under Chats; photos and videos sent from a chat inside Facebook go out as the originals
+Send photos and videos at original quality	Enviar fotos e vídeos em qualidade original
+# context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again
+Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.	As fotos e os vídeos que você envia de um chat dentro do Facebook saem como originais. As fotos perdem a localização e os dados da câmera. Fotos acima de 20 MB e vídeos acima de 25 MB continuam sendo reduzidos.

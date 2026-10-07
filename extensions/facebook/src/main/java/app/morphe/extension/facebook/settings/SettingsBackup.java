@@ -166,6 +166,7 @@ public final class SettingsBackup {
             Settings.HIDE_CHAT_TYPING,
             Settings.HIDE_COMMENT_TYPING,
             Settings.HIDE_READ_RECEIPTS,
+            Settings.ORIGINAL_CHAT_MEDIA,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE,
             Settings.KEEP_REEL_SPEED,
             Settings.KEEP_VIDEO_SPEED,

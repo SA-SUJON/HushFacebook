@@ -186,6 +186,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean originalChatMedia() {
+        return false;
+    }
+
     public static boolean audienceNetwork() {
         return false;
     }
