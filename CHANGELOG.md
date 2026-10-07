@@ -22,6 +22,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+* **Facebook:** `Hide affiliate product links` takes the other Shop now cards off reels too, like the one above the creator's name for a product of their own. Facebook sends products tagged on a reel, a creator's storefront and Shop similar as card kinds of their own, and the patch only caught the affiliate one. The diagnostic report counts each card it keeps out by its kind (issue #89).
 * **Facebook:** With `AMOLED theme` on, the Data mode banner that Flex carriers show under the top bar draws on the black page now, not as a dark grey band across it. Facebook paints that strip with a card's colour, and AMOLED had turned it a card's near black. The Buy data button keeps its own step above the black (issue #86).
 
 ## 0.7.2 (2026-10-06)

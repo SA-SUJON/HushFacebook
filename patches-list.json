@@ -1306,7 +1306,7 @@
     },
     {
       "name": "Hide affiliate product links",
-      "description": "Removes the product cards of affiliate shop links from reels, feed posts and the comment sheet. The \"Commission eligible\" label stays.",
+      "description": "Removes the product cards of affiliate shop links from reels, feed posts and the comment sheet, plus the Shop now cards reels get for tagged products, a creator's storefront and Shop similar. The \"Commission eligible\" label stays.",
       "category": "Ads",
       "use": true,
       "dependencies": [

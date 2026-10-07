@@ -84,7 +84,7 @@
       "commit": "a934b40608e5645cf119dd4101ded7767a9cdc73",
       "via": [],
       "license": "GPL-3.0",
-      "changes": "Rewritten from the patch at that commit. The anchors are the same: the static Z predicate the reel overlay asks before adding its AFFILIATE_EYEBROW constant, the one string lookup the feed video plugin's isFooterHidden method makes, and the one static card reader of OrganicAffiliateFloatingCtaPlugin. Instead of returning false or null from the first instruction, each answer goes through an extension hook with a switch, so pausing Hushfacebook or turning the switch off brings the cards back, and the diagnostic report counts the cards kept out in each place. Checked on 580 as well as 577. On 580 the overlay's list builder is inlined into its render, and the same shape still matches once."
+      "changes": "Rewritten from the patch at that commit. The anchors are the same: the static Z predicate the reel overlay asks before adding its AFFILIATE_EYEBROW constant, the one string lookup the feed video plugin's isFooterHidden method makes, and the one static card reader of OrganicAffiliateFloatingCtaPlugin. Instead of returning false or null from the first instruction, each answer goes through an extension hook with a switch, so pausing Hushfacebook or turning the switch off brings the cards back, and the diagnostic report counts the cards kept out in each place. Checked on 580 as well as 577. On 580 the overlay's list builder is inlined into its render, and the same shape still matches once. Added for Hushfacebook (issue #89): a fourth anchor, the reel overlay's filterCtasForCategorySuppression, whose every answer goes to the extension beside the full list of call-to-action kinds, so the other shop cards on reels go too."
     },
     {
       "paths": [
@@ -93,7 +93,7 @@
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: the switch behind Hide affiliate product links. The patch hands it each answer of the three places that ask whether a post has a product card (the reel overlay's predicate, the feed's footer id lookup and the comment sheet's card reader), and while the switch is on and Hushfacebook isn't paused it answers no or null, the answer for a post without a shop link. Any other time, and on any throw, Facebook's own answer stands."
+      "changes": "Written for Hushfacebook: the switch behind Hide affiliate product links. The patch hands it each answer of the three places that ask whether a post has a product card (the reel overlay's predicate, the feed's footer id lookup and the comment sheet's card reader), and while the switch is on and Hushfacebook isn't paused it answers no or null, the answer for a post without a shop link. Any other time, and on any throw, Facebook's own answer stands. The reel overlay's list of call-to-action kinds comes through as well, and while the switch is on it loses the shop kinds (tagged products, storefront, Shop similar and the affiliate cards)."
     },
     {
       "paths": [

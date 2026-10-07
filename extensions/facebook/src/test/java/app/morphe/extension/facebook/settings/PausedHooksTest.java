@@ -173,6 +173,9 @@ public class PausedHooksTest {
 
     private static final String AD = AdBase.class.getName();
 
+    /** A reel overlay call-to-action kind named like Facebook's storefront card. */
+    private enum ReelCta { STOREFRONT }
+
     @After
     public void restore() {
         PauseForTests.resume();
@@ -337,12 +340,13 @@ public class PausedHooksTest {
         // A game's ad load is answered with no ad.
         probes.put(PatchFamily.GAME_ADS, Collections.singletonList(
                 () -> GameAds.heldPromise("{\"type\":\"loadadasync\",\"content\":{\"promiseID\":\"1\"}}") != null));
-        // A reel's product card is answered away, and so are a feed post's product footer and the
-        // comment sheet's floating card.
+        // A reel's product card is answered away, and so are a feed post's product footer, the
+        // comment sheet's floating card and a reel's storefront card.
         probes.put(PatchFamily.AFFILIATE_LINKS, Arrays.asList(
                 () -> !AffiliateLinks.keepReelCard(true),
                 () -> AffiliateLinks.keepFooter("footer") == null,
-                () -> AffiliateLinks.keepCommentCard(new Object()) == null));
+                () -> AffiliateLinks.keepCommentCard(new Object()) == null,
+                () -> AffiliateLinks.keepReelCtas(null, Collections.singletonList(ReelCta.STOREFRONT)) != null));
         // A Remix chip under a reel, the Follow and Following buttons beside its author, and both
         // footer queries.
         probes.put(PatchFamily.REEL_DECLUTTER, Arrays.asList(
