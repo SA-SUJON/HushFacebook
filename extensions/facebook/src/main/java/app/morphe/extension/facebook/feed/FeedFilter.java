@@ -102,12 +102,25 @@ public final class FeedFilter {
      * Facebook's own promotions and prompts between posts that have no model class on every build,
      * found by the GraphQL type name instead of by class like {@link #SUGGESTED_UNITS}: two more
      * kinds of Quick Promotion (the Vibes one has a class on 580 and 581 only), the social list
-     * prompt, and people to invite to a group. They go with the suggested posts switch.
+     * prompt, people to invite to a group, and a row of suggested shows. They go with the suggested
+     * posts switch. The shows row is only a name in the type tables of 577, 580 and 581, and no feed
+     * has served one yet, so it's an extra until a diagnostic report shows one.
      */
     static final String[] SUGGESTED_TYPES = {
             "ClientTriggeredQPFeedUnit", "VibesRifuQuickPromotionFeedUnit", "SocialListPromptFeedUnit",
-            "PaginatedGroupsPeopleYouMayInviteFeedUnit",
+            "PaginatedGroupsPeopleYouMayInviteFeedUnit", "SuggestedShowsFeedUnit",
     };
+
+    /**
+     * Story categories Facebook can file a post it picked for you under: one it adds to the feed
+     * from outside what you follow, and a trending one. They go with the "Suggested for you" switch,
+     * whatever the post's recommendation flag reads. Neither has reached the feed guard on the
+     * accounts this was tested with, where recommended posts came as ENGAGEMENT, so they're extras
+     * until a diagnostic report shows one. Every build since 577 builds both constants, and no app
+     * code names either (577 keeps a field for each that nothing reads, 580 and 581 keep none), so
+     * an edge under one only comes from Facebook's servers. The feed edge log names each category.
+     */
+    static final String[] SUGGESTED_CATEGORIES = {"INJECTED_STORY", "TRENDING"};
 
     /**
      * A carousel of several ads in one unit. Facebook draws it from the same ad pool as every other
@@ -450,7 +463,10 @@ public final class FeedFilter {
                     }
                 }
                 if (reason == null && Settings.HIDE_SUGGESTED_FOR_YOU.get()) {
-                    reason = flagReason(RecommendationLabel.FLAG, RECOMMENDATION_ROUTE, feedUnit, recommendationAccessor);
+                    reason = suggestedCategory(categoryName);
+                    if (reason == null) {
+                        reason = flagReason(RecommendationLabel.FLAG, RECOMMENDATION_ROUTE, feedUnit, recommendationAccessor);
+                    }
                 }
                 boolean storiesYouMightLike = Settings.HIDE_STORIES_YOU_MIGHT_LIKE.get();
                 if (reason == null && (Settings.HIDE_SUGGESTED_POSTS.get() || Settings.HIDE_PEOPLE_YOU_MAY_KNOW.get()
@@ -797,6 +813,15 @@ public final class FeedFilter {
             if (reels.equals(categoryName)) return true;
         }
         return false;
+    }
+
+    /** The category's name when it's one of {@link #SUGGESTED_CATEGORIES}, otherwise null. */
+    static String suggestedCategory(String categoryName) {
+        if (categoryName == null) return null;
+        for (String suggested : SUGGESTED_CATEGORIES) {
+            if (suggested.equals(categoryName)) return suggested;
+        }
+        return null;
     }
 
     /** Whether the feed unit is one of the injected suggestion or upsell units. */
