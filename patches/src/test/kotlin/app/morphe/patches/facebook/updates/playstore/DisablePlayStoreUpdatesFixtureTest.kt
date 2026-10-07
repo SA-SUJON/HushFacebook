@@ -18,14 +18,18 @@ import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstructio
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
+import com.reandroid.apk.ApkModule
+import com.reandroid.apk.ApkModuleXmlDecoder
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import java.nio.ByteBuffer
+import java.nio.file.Files
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import javax.xml.parsers.DocumentBuilderFactory
+import org.w3c.dom.Document
 
 /**
  * Disable Play Store updates on every Facebook build the bundle declares: the resource half reads
@@ -75,6 +79,32 @@ class DisablePlayStoreUpdatesFixtureTest {
         throw AssertionError("${bundle.name}: the base manifest declares no version code")
     }
 
+    /**
+     * The base APK's manifest as Morphe hands it to a resource patch: decoded to XML by ARSCLib's
+     * ApkModuleXmlDecoder, the decoder its resource coder extends, and parsed as a plain document.
+     */
+    private fun decodedManifest(bundle: File): Document {
+        val work = Files.createTempDirectory("hushfacebook-manifest").toFile()
+        try {
+            val apk = File(work, "base.apk")
+            ZipFile(bundle).use { zip ->
+                val base = checkNotNull(zip.getEntry("base.apk")) { "${bundle.name} holds no base.apk" }
+                zip.getInputStream(base).use { input -> apk.outputStream().use { input.copyTo(it) } }
+            }
+            val decoded = File(work, "decoded")
+            val module = ApkModule.loadApkFile(apk)
+            try {
+                ApkModuleXmlDecoder(module).decodeAndroidManifest(decoded)
+            } finally {
+                module.close()
+            }
+            val manifest = decoded.walk().single { it.name == "AndroidManifest.xml" }
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(manifest)
+        } finally {
+            work.deleteRecursively()
+        }
+    }
+
     private fun ClassDef.code(): List<Instruction> = methods.flatMap { it.implementation?.instructions?.toList().orEmpty() }
 
     private fun Instruction.names(reference: String) = (this as? ReferenceInstruction)?.reference?.toString() == reference
@@ -97,8 +127,7 @@ class DisablePlayStoreUpdatesFixtureTest {
         assertTrue("$name: the manifest's version code $code is already raised", code in 1 until Int.MAX_VALUE)
 
         // The resource half, on the manifest as Morphe decodes it.
-        val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-        document.appendChild(document.createElement("manifest").apply { setAttribute("android:versionCode", "$code") })
+        val document = decodedManifest(bundle)
         assertEquals("$name: the version code read", code, document.versionCode())
         document.raiseVersionCode()
         assertEquals("$name: the version code written", Int.MAX_VALUE, document.versionCode())
