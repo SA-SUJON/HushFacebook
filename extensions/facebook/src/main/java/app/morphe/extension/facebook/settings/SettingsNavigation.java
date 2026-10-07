@@ -92,6 +92,7 @@ final class SettingsNavigation extends BaseAdapter {
         section("Writing", L10n.t("Writing"), null, SettingsIcons.WRITING, false);
         section("Chats", L10n.t("Chats"), null, SettingsIcons.CHATS, false);
         section("Menu", L10n.t("Menu"), null, SettingsIcons.MENU, false);
+        section("Meta's other products", L10n.t("Meta's other products"), null, SettingsIcons.BLOCK, false);
         section("Search", L10n.t("Search"), null, SettingsIcons.SEARCH, false);
         section("Marketplace", L10n.t("Marketplace"), null, SettingsIcons.MARKETPLACE, false);
         section("Notifications", L10n.t("Notifications"), null, SettingsIcons.NOTIFICATIONS, false);
