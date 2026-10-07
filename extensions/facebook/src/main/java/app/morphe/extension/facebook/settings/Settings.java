@@ -570,6 +570,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_tap_to_play", TRUE);
 
     /**
+     * With {@link #TAP_TO_PLAY} on, once a tap plays a reel that was waiting, the reels swiped to
+     * after it start on their own, until a start is held again (#91). Off by default, so every reel
+     * waits. The feed, Watch and stories wait either way.
+     */
+    public static final BooleanSetting TAP_TO_PLAY_REELS_AFTER_FIRST =
+            new BooleanSetting("hushfacebook_tap_to_play_reels_after_first", FALSE);
+
+    /**
      * A video longer than two minutes that was left partway picks up where it was left, once, the
      * next time a player starts it ({@link app.morphe.extension.facebook.media.ResumePlayback}).
      * Starts off. Off or paused, nothing is saved or looked up and videos start as Facebook starts

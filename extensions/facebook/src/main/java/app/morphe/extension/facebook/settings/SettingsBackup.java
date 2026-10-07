@@ -182,6 +182,7 @@ public final class SettingsBackup {
             Settings.OPEN_REPLY_THREADS,
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
             Settings.TAP_TO_PLAY,
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST,
             Settings.RESUME_LONG_VIDEOS,
             Settings.DEFAULT_PLAYBACK_QUALITY,
             Settings.PICTURE_IN_PICTURE,

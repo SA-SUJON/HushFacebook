@@ -621,6 +621,119 @@ public class TapToPlayTest {
         assertEquals(report, 2, occurrences(report, "Tap to play: 50 more starts, 0 allowed, 50 held"));
     }
 
+    /** Plays the reel that was waiting with a tap on its play button, starting a run (#91). */
+    private static Object playAWaitingReel() {
+        Object reel = new Object();
+        assertFalse("the reel waits", TapToPlay.allowStart(reel, Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+        TapToPlayForTests.tapEnded(30);
+        assertTrue("its play button's tap", TapToPlay.allowStart(reel, Trigger.BY_USER));
+        TapClock.forget();
+        return reel;
+    }
+
+    /** #91: once a tap plays a waiting reel, the reels swiped to after it play on their own. */
+    @Test
+    public void withOnlyTheFirstReelWaitingTheReelsAfterAPlayedOnePlay() {
+        Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.save(true);
+        try {
+            playAWaitingReel();
+            Object next = new Object();
+            assertTrue("the reel swiped to next", TapToPlay.allowStart(next, Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+            assertTrue("it plays through Facebook's own restarts", TapToPlay.armed(next));
+            TapToPlay.paused(next);
+            assertTrue("a paused reel doesn't stop the next one",
+                    TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+            for (Trigger trigger : Trigger.values()) {
+                if (trigger == Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE || TapToPlay.CONTROLS.contains(trigger.name())) continue;
+                assertFalse("only a reel coming into view rides the run: " + trigger,
+                        TapToPlay.allowStart(new Object(), trigger));
+                playAWaitingReel();
+            }
+        } finally {
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.resetToDefault();
+        }
+    }
+
+    /** A held start ends the run, so the first reel waits on the next visit to Reels. */
+    @Test
+    public void anythingHeldMakesTheNextReelWaitAgain() {
+        Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.save(true);
+        try {
+            Object reel = playAWaitingReel();
+            assertFalse("the feed trying a video", TapToPlay.allowStart(new Object(), Trigger.BY_AUTOPLAY));
+            assertFalse("ends the run", TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+
+            reel = playAWaitingReel();
+            TapToPlay.paused(reel);
+            assertFalse("the reel coming back from another tab waits",
+                    TapToPlay.allowStart(reel, Trigger.BY_SHORT_FORM_VIDEO_ONRESUME));
+            TapToPlayForTests.tapEnded(30);
+            assertTrue(TapToPlay.allowStart(reel, Trigger.BY_USER));
+            TapClock.forget();
+            assertTrue("a tap on the reel that came back starts a new run",
+                    TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+
+            reel = new Object();
+            assertFalse(TapToPlay.allowStart(reel, Trigger.BY_SHORT_FORM_VIDEO_ONRESUME));
+            Object swipedTo = new Object();
+            assertFalse("a reel swiped to from one that came back waits",
+                    TapToPlay.allowStart(swipedTo, Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+            TapToPlayForTests.tapEnded(30);
+            assertTrue(TapToPlay.allowStart(swipedTo, Trigger.BY_USER));
+            TapClock.forget();
+            assertTrue("and a tap on it starts the run",
+                    TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+        } finally {
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.resetToDefault();
+        }
+    }
+
+    /** Only a tap that plays a reel Facebook held starts a run: not a feed video's, not a link's. */
+    @Test
+    public void onlyATapOnAWaitingReelStartsARun() {
+        Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.save(true);
+        try {
+            Object video = new Object();
+            assertFalse(TapToPlay.allowStart(video, Trigger.BY_AUTOPLAY));
+            TapToPlayForTests.tapEnded(30);
+            assertTrue("a feed video's tap", TapToPlay.allowStart(video, Trigger.BY_USER));
+            TapClock.forget();
+            assertFalse("starts no run", TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+
+            Object reel = new Object();
+            assertFalse(TapToPlay.allowStart(reel, Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+            TapToPlay.linkOpened(SystemClock.uptimeMillis());
+            assertTrue("a link's start", TapToPlay.allowStart(reel, Trigger.BY_USER));
+            assertFalse("starts no run either", TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+        } finally {
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.resetToDefault();
+        }
+    }
+
+    /** The control: off, its default, every reel waits after a played one, as before #91. */
+    @Test
+    public void withTheSwitchOffEveryReelWaits() {
+        assertFalse(Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.get());
+        playAWaitingReel();
+        assertFalse(TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+    }
+
+    @Test
+    public void debugLoggingSaysWhenAReelPlaysForTheRun() {
+        BaseSettings.DEBUG.save(true);
+        LogBufferManager.clearLogBuffer();
+        Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.save(true);
+        try {
+            playAWaitingReel();
+            TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE);
+            String report = LogBufferManager.buildExportText();
+            assertTrue(report, report.contains(
+                    "Tap to play: allowed BY_SHORT_FORM_VIDEO_FULLY_VISIBLE no tap armed no (a reel after one you played)"));
+        } finally {
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.resetToDefault();
+        }
+    }
+
     @Test
     public void withoutDebugLoggingNothingIsLogged() {
         LogBufferManager.clearLogBuffer();

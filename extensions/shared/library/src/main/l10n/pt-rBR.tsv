@@ -1144,3 +1144,5 @@ Facebook's own screen for security research, where it can trust certificates you
 Facebook hasn't downloaded this screen to this phone, so a tap opens the Whitehat page on the web instead.	O Facebook não baixou esta tela neste celular, então um toque abre a página do Whitehat na web.
 # context: toast when the Facebook version has no such screen
 This Facebook build has no Whitehat settings screen.	Esta versão do Facebook não tem a tela de configurações do Whitehat.
+Only the first reel waits	Só o primeiro reel espera
+With the switch above on, once you play a reel, the reels you swipe to after it play on their own. Back in Reels later, the first reel waits again. The feed, Watch and stories always wait.	Com a opção acima ativada, depois que você reproduz um reel, os reels para os quais você desliza em seguida tocam sozinhos. Ao voltar para o Reels depois, o primeiro reel espera de novo. O feed, o Watch e os Stories sempre esperam.

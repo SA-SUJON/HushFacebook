@@ -114,7 +114,7 @@ public enum PatchFamily {
     TAG_SUGGESTIONS(FamilyNames.TAG_SUGGESTIONS, "tagSuggestions", null,
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT),
     TAP_TO_PLAY(FamilyNames.TAP_TO_PLAY, "tapToPlay", null,
-            Settings.TAP_TO_PLAY),
+            Settings.TAP_TO_PLAY, Settings.TAP_TO_PLAY_REELS_AFTER_FIRST),
     RESUME_LONG_VIDEOS(FamilyNames.RESUME_LONG_VIDEOS, "resumeLongVideos", null,
             Settings.RESUME_LONG_VIDEOS),
     PLAYBACK_QUALITY(FamilyNames.PLAYBACK_QUALITY, "defaultPlaybackQuality", null,

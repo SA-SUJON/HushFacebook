@@ -1250,3 +1250,5 @@ Facebook's own screen for security research, where it can trust certificates you
 Facebook hasn't downloaded this screen to this phone, so a tap opens the Whitehat page on the web instead.	Facebook bu ekranı bu telefona indirmedi, bu yüzden dokunduğunda web'deki Whitehat sayfası açılır.
 # context: toast when the Facebook version has no such screen
 This Facebook build has no Whitehat settings screen.	Bu Facebook sürümünde Whitehat ayarları ekranı yok.
+Only the first reel waits	Yalnızca ilk reel bekler
+With the switch above on, once you play a reel, the reels you swipe to after it play on their own. Back in Reels later, the first reel waits again. The feed, Watch and stories always wait.	Yukarıdaki anahtar açıkken bir reel oynattığında, sonra kaydırdığın reels kendiliğinden oynar. Daha sonra Reels'e döndüğünde ilk reel yine bekler. Akış, Watch ve hikayeler her zaman bekler.

@@ -57,6 +57,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *       ({@link #inPictureInPicture}). Android keeps every tap on that window for its own buttons,
  *       and Facebook pauses the player on its way in and starts it again in the window, so a start
  *       held there could never be tapped into playing.</li>
+ *   <li>With {@link Settings#TAP_TO_PLAY_REELS_AFTER_FIRST} on, the start is a reel coming into
+ *       view while a run of reels is going ({@link #noteReelRun}): a tap or a control played the
+ *       reel that was waiting, and nothing has been held since.</li>
  * </ul>
  *
  * <p>Every other start is held, and the player stays where it was, showing its first frame or its
@@ -89,6 +92,12 @@ public final class TapToPlay {
     /** No link waiting: none came, or a BY_USER start took it. */
     private static final long NO_LINK = Long.MIN_VALUE;
 
+    /** The trigger Facebook starts each reel you land on with. */
+    private static final String REEL_IN_VIEW = "BY_SHORT_FORM_VIDEO_FULLY_VISIBLE";
+
+    /** What the triggers of a reel's own starts begin with: coming into view, and coming back. */
+    private static final String REEL_TRIGGERS = "BY_SHORT_FORM_VIDEO_";
+
     /**
      * Triggers that go ahead with no tap, because only something you did sends them: the media
      * controls in the notification and on the lock screen, the seek bar, whose drag moves too far to
@@ -112,6 +121,10 @@ public final class TapToPlay {
     private static final AtomicLong LINK_OPENED_AT = new AtomicLong(NO_LINK);
     /** The Facebook screen last brought to the front. */
     private static volatile WeakReference<Activity> front = new WeakReference<>(null);
+    /** The player whose last held start was a reel's own, weakly. A tap that plays it starts a run. */
+    private static volatile WeakReference<Object> heldReel = new WeakReference<>(null);
+    /** Whether a run of reels is going: a tap played a waiting reel, and nothing was held since. */
+    private static volatile boolean reelRun;
     private static final Object LOG_LOCK = new Object();
     private static int decisions;
     private static int allowedSinceSummary;
@@ -318,11 +331,30 @@ public final class TapToPlay {
         if (tapped || control) dropLink();
         boolean window = !armed && !control && !tapped && inPictureInPicture();
         boolean linked = !armed && !control && !tapped && !window && BY_USER.equals(trigger) && takeLink(now);
-        boolean allowed = armed || control || linked || tapped || window;
+        boolean run = !armed && !control && !tapped && !window && !linked && reelRun
+                && REEL_IN_VIEW.equals(trigger) && Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.get();
+        boolean allowed = armed || control || linked || tapped || window || run;
         if (allowed && (!armed || control)) ARMED.arm(player, now);
-        logDecision(allowed, trigger, sinceTap, armed,
-                linked ? path + " (a link asked for it)" : window ? path + " (in picture-in-picture)" : path);
+        noteReelRun(player, trigger, allowed, tapped || control);
+        logDecision(allowed, trigger, sinceTap, armed, linked ? path + " (a link asked for it)"
+                : window ? path + " (in picture-in-picture)" : run ? path + " (a reel after one you played)" : path);
         return allowed;
+    }
+
+    /**
+     * Keeps track of the run of reels {@link Settings#TAP_TO_PLAY_REELS_AFTER_FIRST} lets play. A
+     * held reel start remembers its player, and a tap or a control that plays that player starts a
+     * run (#91). Any held start ends it: a reel coming back from a sheet or another tab, or the feed
+     * trying to start a video, means the person isn't swiping through Reels anymore, so the next
+     * reel waits again. Tracked whatever the switch says; only the decision reads it.
+     */
+    private static void noteReelRun(Object player, @Nullable String trigger, boolean allowed, boolean yours) {
+        if (!allowed) {
+            reelRun = false;
+            heldReel = new WeakReference<>(trigger != null && trigger.startsWith(REEL_TRIGGERS) ? player : null);
+        } else if (yours && player != null && player == heldReel.get()) {
+            reelRun = true;
+        }
     }
 
     /**
@@ -398,6 +430,8 @@ public final class TapToPlay {
     static void forget() {
         ARMED.clear();
         front = new WeakReference<>(null);
+        heldReel = new WeakReference<>(null);
+        reelRun = false;
         LINK_OPENED_AT.set(NO_LINK);
         synchronized (LOG_LOCK) {
             decisions = 0;

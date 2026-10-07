@@ -159,6 +159,9 @@ final class VideoPages {
             if (build.contains(PatchFamily.TAP_TO_PLAY)) {
                 playback.addPreference(toggle(context, Settings.TAP_TO_PLAY,
                         L10n.t("Videos, reels, stories and music wait for your tap. Facebook's Autoplay setting temporarily reads Off.")));
+                playback.addPreference(toggle(context, Settings.TAP_TO_PLAY_REELS_AFTER_FIRST,
+                        L10n.t("With the switch above on, once you play a reel, the reels you swipe to after it play on their own. "
+                                + "Back in Reels later, the first reel waits again. The feed, Watch and stories always wait.")));
             }
             if (build.contains(PatchFamily.RESUME_LONG_VIDEOS)) {
                 playback.addPreference(toggle(context, Settings.RESUME_LONG_VIDEOS,

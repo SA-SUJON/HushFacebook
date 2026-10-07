@@ -1250,3 +1250,5 @@ Facebook's own screen for security research, where it can trust certificates you
 Facebook hasn't downloaded this screen to this phone, so a tap opens the Whitehat page on the web instead.	Facebook hat diesen Bildschirm nicht auf dieses Handy geladen. Ein Tippen öffnet deshalb die Whitehat-Seite im Web.
 # context: toast when the Facebook version has no such screen
 This Facebook build has no Whitehat settings screen.	Diese Facebook-Version hat keinen Bildschirm für Whitehat-Einstellungen.
+Only the first reel waits	Nur das erste Reel wartet
+With the switch above on, once you play a reel, the reels you swipe to after it play on their own. Back in Reels later, the first reel waits again. The feed, Watch and stories always wait.	Wenn der Schalter oben an ist und du ein Reel abspielst, laufen die Reels, zu denen du danach wischst, von selbst. Kommst du später zu Reels zurück, wartet das erste Reel wieder. Feed, Watch und Storys warten immer.
