@@ -25,6 +25,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** **Hide Meta AI in the feed** also takes out the cards promoting Vibes, Meta AI's app of AI-made videos, that Facebook can put between posts. They go by the card's own type, like the Meta AI cards, and the report counts them under it.
 * **Facebook:** `Clean up Reels` can take out the Threads cards Facebook puts between reels. Turn on **Hide Threads cards between reels**, which starts off, and the next reel follows right after the last. The diagnostic report counts every kind of card it finds between reels, so a new kind shows up there (issue #85).
 * **Facebook:** `Tab bar at the bottom` has a second switch under Appearance, **Hide the tab bar while scrolling**. With the bar at the bottom, it slides away as you scroll the feed down and comes back when you scroll up. It turns on the version Facebook already gives some accounts, so the feed keeps its room for the bar. It starts off and needs a restart (issue #84).
+* **Facebook:** New patch, `Keep the progress bar`, with a switch under Playback. A reel's progress bar stays full size, so you can drag it without tapping the reel first, and a full-screen video's controls stay up until you tap (issue #73).
+* **Facebook:** New patch, `Hide Meta AI comment summaries`, with a switch under Comments. Comment sheets open without Meta AI's summary at the top, and posts lose the summary under their buttons.
 
 ### Fixed
 
