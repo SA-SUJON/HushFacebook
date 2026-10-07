@@ -71,6 +71,7 @@ Every Hushfacebook release, newest first.
 ### Changed
 
 * **Facebook:** `Show View profile on Marketplace sellers` also answers the seller page's flag when it's read by its number instead of its name. Facebook's React Native pages can ask for a flag either way, so a page that switches over keeps the button.
+* **Facebook:** `Picture-in-picture` now also covers a video playing in Facebook's full-screen Watch viewer, using the window Facebook already has there, behind the same **Picture-in-picture** switch. A paused video doesn't open one.
 * The README's list of patches that are off by default names all 32 again, `Hide Meta upsells`, `Hide read receipts` and `Hide typing indicator` included, and its notes on switches that start off no longer repeat themselves.
 
 ## 0.7.2 (2026-10-06)
