@@ -147,20 +147,56 @@ public class ReturnRefreshTest {
         assertFalse("paused", ReturnRefresh.askInAppAt(later, ReturnRefresh.HOT_START, false));
     }
 
-    /** The three in-app entries keep the feed and say so in the report, one count each. */
+    /**
+     * The three in-app entries keep the feed and say so in the report, one count each. The hot-start
+     * check keeps it through the warm-start check it asks next, so both of its calls are invoked.
+     */
     @Test public void theInAppEntriesKeepTheFeedAndSaySo() {
         HookStatus.clear();
         try {
-            assertTrue(ReturnRefresh.holdHotStart());
+            ReturnRefresh.hotStart();
+            assertTrue(ReturnRefresh.holdWarmStart());
             assertTrue(ReturnRefresh.holdStalePost());
             assertTrue(ReturnRefresh.holdTabAutoRefresh());
             String report = String.join("\n", HookStatus.report());
-            assertTrue(report, report.contains(FamilyNames.RETURN_REFRESH + ": invoked 3"));
+            assertTrue(report, report.contains(FamilyNames.RETURN_REFRESH + ": invoked 4"));
             assertTrue(report, report.contains("kept the feed at hot start 1, kept the feed from a stale-post refresh 1, "
                     + "kept the feed from the tab's auto refresh 1"));
         } finally {
             HookStatus.clear();
         }
+    }
+
+    /**
+     * The hot-start check holds nothing itself, so an empty feed, which never reaches the warm-start
+     * check's question, still loads. The warm-start check it asks next gets the in-app answer once,
+     * and only straight after it, and only with no return from the background pending.
+     */
+    @Test public void onlyTheWarmStartCheckTheHotStartAsksGetsTheInAppAnswer() {
+        ReturnRefresh.hotStartAt(1_000);
+        assertTrue(ReturnRefresh.askedByHotStartInApp(1_000 + ReturnRefresh.HOT_START_ASKS_MS));
+        assertFalse("taken", ReturnRefresh.askedByHotStartInApp(1_001 + ReturnRefresh.HOT_START_ASKS_MS));
+        assertFalse("no hot start", ReturnRefresh.askedByHotStartInApp(5_000));
+
+        ReturnRefresh.hotStartAt(10_000);
+        assertFalse("too late", ReturnRefresh.askedByHotStartInApp(10_001 + ReturnRefresh.HOT_START_ASKS_MS));
+        ReturnRefresh.hotStartAt(20_000);
+        assertFalse("clock moved back", ReturnRefresh.askedByHotStartInApp(19_999));
+
+        ReturnRefresh.uiHidden(30_000);
+        ReturnRefresh.hotStartAt(40_000);
+        assertFalse("a return decides itself", ReturnRefresh.askedByHotStartInApp(40_001));
+    }
+
+    /** Outside the app's hot start, the warm-start check with no return pending is Facebook's own. */
+    @Test public void aWarmStartCheckOutsideAHotStartIsFacebooksOwn() {
+        assertFalse(ReturnRefresh.holdWarmStart());
+        ReturnRefresh.hotStart();
+        assertTrue(ReturnRefresh.holdWarmStart());
+        assertFalse("answered once", ReturnRefresh.holdWarmStart());
+        Settings.BLOCK_RETURN_REFRESH.save(false);
+        ReturnRefresh.hotStart();
+        assertFalse("switch off", ReturnRefresh.holdWarmStart());
     }
 
     /**

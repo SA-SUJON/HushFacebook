@@ -30,7 +30,8 @@ import app.morphe.extension.shared.settings.Setting;
  * <p>Inside the app, a tab switch back to Home or the feed back from another screen reaches three
  * more: the feed's hot-start check, its stale-post executor (from the visibility change, and from
  * the worker it posts on pause) and NewsFeedTabDataFetch's AUTO_REFRESH. Those keep the feed while
- * the switch is on, and never use a return up ({@link #decideInApp}).
+ * the switch is on, and never use a return up ({@link #decideInApp}). The hot-start check keeps it
+ * through the warm-start check it asks, past that check's empty-feed load, so an empty feed loads.
  *
  * <p>While Facebook is away it also tears the feed's stories down once it has been gone as long as
  * the warm-start threshold, and a torn-down feed loads new posts on the return whatever the checks
@@ -40,6 +41,11 @@ public final class ReturnRefresh {
     private static final long HOLD_MS = 10 * 60 * 1000L;
     /** How long after the first check of a return a later check still belongs to it. */
     static final long SAME_RETURN_MS = 10_000L;
+    /**
+     * How long after the hot-start check starts a warm-start check still counts as the one it asks.
+     * It asks straight away, on the same call, so this only has to outlast a pause in that call.
+     */
+    static final long HOT_START_ASKS_MS = 1_000L;
     static final String FEED_RESUME = "feed resume";
     static final String WARM_START = "warm start";
     static final String AUTO_SCROLL = "foreground auto-scroll";
@@ -60,6 +66,8 @@ public final class ReturnRefresh {
     /** Why the first check of the current return let Facebook refresh, or null while it's holding. */
     private static String decidedBecause;
     private static boolean registered;
+    /** When the hot-start check last started, until the warm-start check it asks takes it. */
+    private static long hotStartAt = -1;
 
     private ReturnRefresh() { }
 
@@ -100,9 +108,18 @@ public final class ReturnRefresh {
     /**
      * Called from the feed's warm-start check once it knows the feed has stories, before it looks
      * at how long the feed sat idle. True skips the check the way Facebook's own skip does, so an
-     * empty feed still loads.
+     * empty feed still loads. Asked by the hot-start check inside the app, with no return pending,
+     * it gets the in-app answer instead.
      */
     public static boolean holdWarmStart() {
+        try {
+            if (askedByHotStartInApp(SystemClock.elapsedRealtime())) {
+                return askInApp(HOT_START, KEPT_ON_HOT_START, false);
+            }
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.RETURN_REFRESH, WARM_START, failure);
+            return false;
+        }
         return ask(WARM_START, KEPT_ON_WARM_START);
     }
 
@@ -139,11 +156,32 @@ public final class ReturnRefresh {
     /**
      * Called first thing in the feed's hot-start check, which NewsFeedFragment's onSetUserVisibleHint
      * reaches as the Home tab comes back into view and its refreshForRevisit as the feed comes back
-     * from another screen. True skips the check, Facebook's own answer when it does nothing. In a
-     * return from the background it goes on, to the warm-start check that return's answer comes from.
+     * from another screen. It holds nothing itself: the check asks the warm-start check next, past
+     * that check's empty-feed load, and {@link #holdWarmStart()} answers it for the app.
      */
-    public static boolean holdHotStart() {
-        return askInApp(HOT_START, KEPT_ON_HOT_START, false);
+    public static void hotStart() {
+        try {
+            HookStatus.invoked(FamilyNames.RETURN_REFRESH);
+            hotStartAt(SystemClock.elapsedRealtime());
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.RETURN_REFRESH, HOT_START, failure);
+        }
+    }
+
+    static synchronized void hotStartAt(long now) {
+        hotStartAt = now;
+    }
+
+    /**
+     * Whether the warm-start check asking at [now] is the one the hot-start check just asked, with no
+     * return from the background pending. Takes the hot start either way, so it answers once.
+     */
+    static synchronized boolean askedByHotStartInApp(long now) {
+        boolean asked = hotStartAt >= 0 && now >= hotStartAt && now - hotStartAt <= HOT_START_ASKS_MS;
+        hotStartAt = -1;
+        if (!asked) return false;
+        boolean returning = hiddenAt >= 0 || (decidedAt >= 0 && now >= decidedAt && now - decidedAt <= SAME_RETURN_MS);
+        return !returning;
     }
 
     /**

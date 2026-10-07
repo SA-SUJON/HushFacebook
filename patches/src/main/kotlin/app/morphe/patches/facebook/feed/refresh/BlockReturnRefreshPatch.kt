@@ -27,6 +27,7 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
@@ -76,7 +77,8 @@ private const val HOLD_STALE_POST = "$EXTENSION_PACKAGE/feed/ReturnRefresh;->hol
  * which no other method loads. onSetUserVisibleHint and the feed's refreshForRevisit call it.
  */
 internal const val HOT_START_CHECK = "-maybeRefreshForHotStart"
-private const val HOLD_HOT_START = "$EXTENSION_PACKAGE/feed/ReturnRefresh;->holdHotStart()Z"
+private const val PATCH = "Block background-return feed refresh"
+private const val NOTE_HOT_START = "$EXTENSION_PACKAGE/feed/ReturnRefresh;->hotStart()V"
 
 /** The source NewsFeedTabDataFetch hands the forced refresh it runs once the tab's data is stale. */
 internal const val TAB_DATA_FETCH = "NewsFeedTabDataFetchSpec"
@@ -95,7 +97,13 @@ private const val HOLD_TAB_AUTO_REFRESH = "$EXTENSION_PACKAGE/feed/ReturnRefresh
  * Inside the app, switching back to Home reaches three more: the feed's hot-start check, its
  * stale-post executor (a re-rank or a refresh that clears the feed, from the tab's visibility
  * change and from the worker the feed posts on pause) and NewsFeedTabDataFetch's AUTO_REFRESH once
- * the tab's data is stale. Each asks the extension and does nothing while it holds.
+ * the tab's data is stale. The executor and the data fetch ask the extension and do nothing while
+ * it holds. The hot-start check only tells the extension it's running: it asks the warm-start
+ * check next, and that check's own question, past its empty-feed load, gets the in-app answer, so
+ * a feed that came back empty still loads.
+ *
+ * Every anchor is found and checked before anything changes, so a build that moved one refuses
+ * the whole patch rather than keeping some hooks with its switch row hidden.
  */
 @Suppress("unused")
 val blockReturnRefreshPatch = bytecodePatch(
@@ -112,19 +120,18 @@ val blockReturnRefreshPatch = bytecodePatch(
     execute {
         val callbacks = classDefByStrings(CONTROLLER, StringComparisonType.EQUALS)
             .flatMap { it.methods.filter(::isReturnRefreshCallback) }
-        val callback = callbacks.singleOrNull() ?: throw PatchException(
+        val callbackFound = callbacks.singleOrNull() ?: throw PatchException(
             "Expected one FeedRefreshTriggerController resume callback holding $ON_REFRESH, found ${callbacks.size}",
         )
-        mutableClassDefBy(callback.definingClass).methods.first {
-            it.name == callback.name && it.parameterTypes == callback.parameterTypes
-        }.skipBriefReturnRefresh()
+        val callback = mutableClassDefBy(callbackFound.definingClass).methods.first {
+            it.name == callbackFound.name && it.parameterTypes == callbackFound.parameterTypes
+        }
 
         val checks = classDefByStrings(WARM_START_CHECK, StringComparisonType.EQUALS)
             .flatMap { it.methods.filter(::isWarmStartCheck) }
         val check = checks.singleOrNull() ?: throw PatchException(
             "Expected one feed warm-start check holding $WARM_START_CHECK and $EMPTY_FEED_LOAD, found ${checks.size}",
         )
-        mutableClassDefBy(check.definingClass).findMutableMethodOf(check).holdWarmStartOfAFeedWithStories()
 
         val logs = classDefByStrings(RESET_TO_FEED_OUTCOME, StringComparisonType.EQUALS)
             .flatMap { it.methods.filter(::isResetToFeedLog) }
@@ -132,22 +139,18 @@ val blockReturnRefreshPatch = bytecodePatch(
             "Expected one static (Context, String, String) reset-to-feed log holding $RESET_TO_FEED_OUTCOME " +
                 "and $RESET_TO_FEED_DESTINATION, found ${logs.size}",
         )
-        mutableClassDefBy(log.definingClass).findMutableMethodOf(log).logResetToFeedFirst()
 
         val teardowns = classDefByStrings(LEFT_APP_TEARDOWN, StringComparisonType.EQUALS)
             .flatMap { it.methods.filter(::isLeftAppTeardown) }
         val teardown = teardowns.singleOrNull() ?: throw PatchException(
             "Expected one feed teardown runnable holding \"$LEFT_APP_TEARDOWN\", found ${teardowns.size}",
         )
-        mutableClassDefBy(teardown.definingClass).findMutableMethodOf(teardown).keepFeedWhileAwayFirst()
 
         val decisions = mutableListOf<Method>()
         classDefForEach { classDef -> decisions += classDef.methods.filter(::isAutoScrollDecision) }
         val decision = decisions.singleOrNull() ?: throw PatchException(
             "Expected one $AUTO_SCROLL_DECISION(long, boolean, long, long), found ${decisions.size}",
         )
-        mutableClassDefBy(decision.definingClass).findMutableMethodOf(decision)
-            .holdAutoScrollFirst(mutableClassDefBy(decision.returnType))
 
         // Inside the app: the Home tab coming back into view and the feed coming back from another
         // screen, which reach the stale-post executor, the hot-start check and the tab's data fetch.
@@ -156,21 +159,43 @@ val blockReturnRefreshPatch = bytecodePatch(
         val executor = executors.singleOrNull() ?: throw PatchException(
             "Expected one static (owner, int, boolean) stale-post executor holding $STALE_POST_RE_RANK, found ${executors.size}",
         )
-        mutableClassDefBy(executor.definingClass).findMutableMethodOf(executor).holdFirst(HOLD_STALE_POST)
 
         val hotStarts = classDefByStrings(HOT_START_CHECK, StringComparisonType.EQUALS)
             .flatMap { it.methods.filter(::isHotStartCheck) }
         val hotStart = hotStarts.singleOrNull() ?: throw PatchException(
             "Expected one static (owner, String...) hot-start check holding $HOT_START_CHECK, found ${hotStarts.size}",
         )
-        mutableClassDefBy(hotStart.definingClass).findMutableMethodOf(hotStart).holdFirst(HOLD_HOT_START)
+        if (hotStart.implementation!!.instructions.none { callsMethod(it, check) }) {
+            throw PatchException("The hot-start check ${hotStart.definingClass}->${hotStart.name} doesn't ask the warm-start check")
+        }
 
         val fetches = classDefByStrings(TAB_DATA_FETCH, StringComparisonType.EQUALS)
             .flatMap { it.methods.filter(::isTabDataFetch) }
         val fetch = fetches.singleOrNull() ?: throw PatchException(
             "Expected one static NewsFeedTabDataFetch dispatch holding $TAB_DATA_FETCH, found ${fetches.size}",
         )
-        mutableClassDefBy(fetch.definingClass).findMutableMethodOf(fetch).holdTabAutoRefreshBeforeIt()
+
+        val warmStartCheck = mutableClassDefBy(check.definingClass).findMutableMethodOf(check)
+        val resetLog = mutableClassDefBy(log.definingClass).findMutableMethodOf(log)
+        val teardownRun = mutableClassDefBy(teardown.definingClass).findMutableMethodOf(teardown)
+        val autoScroll = mutableClassDefBy(decision.definingClass).findMutableMethodOf(decision)
+        val noScroll = mutableClassDefBy(decision.returnType)
+        val stalePost = mutableClassDefBy(executor.definingClass).findMutableMethodOf(executor)
+        val hotStartCheck = mutableClassDefBy(hotStart.definingClass).findMutableMethodOf(hotStart)
+        val tabFetch = mutableClassDefBy(fetch.definingClass).findMutableMethodOf(fetch)
+        for (method in listOf(callback, teardownRun, autoScroll, stalePost)) method.requireLocals(PATCH, 1)
+        emptyFeedAnswer(warmStartCheck)
+        noAutoScrollAnswer(autoScroll, noScroll)
+        tabAutoRefreshCause(tabFetch)
+
+        callback.skipBriefReturnRefresh()
+        warmStartCheck.holdWarmStartOfAFeedWithStories()
+        resetLog.logResetToFeedFirst()
+        teardownRun.keepFeedWhileAwayFirst()
+        autoScroll.holdAutoScrollFirst(noScroll)
+        stalePost.holdFirst(HOLD_STALE_POST)
+        hotStartCheck.noteHotStartFirst()
+        tabFetch.holdTabAutoRefreshBeforeIt()
         enableStatus("returnRefresh")
     }
 }
@@ -237,7 +262,7 @@ internal fun emptyFeedAnswer(method: Method): Int {
 }
 
 private fun MutableMethod.skipBriefReturnRefresh() {
-    requireLocals("Block background-return feed refresh", 1)
+    requireLocals(PATCH, 1)
     addInstructionsWithLabels(
         0,
         """
@@ -327,7 +352,7 @@ internal fun noAutoScrollAnswer(decision: Method, enum: ClassDef): String {
  * down while the switch is on. The answer goes through v0: at index 0 no local holds anything yet.
  */
 internal fun MutableMethod.keepFeedWhileAwayFirst() {
-    requireLocals("Block background-return feed refresh", 1)
+    requireLocals(PATCH, 1)
     addInstructionsWithLabels(
         0,
         """
@@ -347,7 +372,7 @@ internal fun MutableMethod.keepFeedWhileAwayFirst() {
  */
 internal fun MutableMethod.holdAutoScrollFirst(enum: ClassDef) {
     val none = noAutoScrollAnswer(this, enum)
-    requireLocals("Block background-return feed refresh", 1)
+    requireLocals(PATCH, 1)
     val at = implementation!!.instructions.indexOfFirst {
         it.opcode == Opcode.SGET_OBJECT && (it as ReferenceInstruction).reference.toString() == none
     }
@@ -385,13 +410,30 @@ internal fun isTabDataFetch(method: Method): Boolean =
     AccessFlags.STATIC.isSet(method.accessFlags) && method.returnType == "V" && method.implementation != null &&
         method.parameterTypes.lastOrNull()?.toString() == "Z" && holdsString(method, TAB_DATA_FETCH)
 
+/** Whether [instruction] calls [method]. */
+private fun callsMethod(instruction: Instruction, method: Method): Boolean {
+    val target = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: return false
+    return target.definingClass == method.definingClass && target.name == method.name &&
+        target.returnType == method.returnType &&
+        target.parameterTypes.map { it.toString() } == method.parameterTypes.map { it.toString() }
+}
+
+/**
+ * Tells the extension first thing that the hot-start check is running, so the warm-start check it
+ * asks next gets the in-app answer. It holds nothing itself: an empty feed still reaches Facebook's
+ * load. The call takes no register.
+ */
+internal fun MutableMethod.noteHotStartFirst() {
+    addInstructions(0, "invoke-static { }, $NOTE_HOT_START")
+}
+
 /**
  * Asks [extension] first thing and, while it holds, answers what Facebook's own method answers when
- * it does nothing: it returns, or answers false for the hot-start check that says whether it
- * refreshed. The answer goes through v0: at index 0 no local holds anything yet.
+ * it does nothing: it returns, or answers false for a method that says whether it refreshed. The
+ * answer goes through v0: at index 0 no local holds anything yet.
  */
 internal fun MutableMethod.holdFirst(extension: String) {
-    requireLocals("Block background-return feed refresh", 1)
+    requireLocals(PATCH, 1)
     val nothing = if (returnType == "Z") "const/4 v0, 0x0\nreturn v0" else "return-void"
     addInstructionsWithLabels(
         0,

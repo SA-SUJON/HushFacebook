@@ -285,7 +285,8 @@ public class PausedHooksTest {
                 () -> {
                     // Past the return the probes above started, so these are a tab switch inside the app.
                     SystemClock.sleep(60_000);
-                    return ReturnRefresh.holdHotStart();
+                    ReturnRefresh.hotStart();
+                    return ReturnRefresh.holdWarmStart();
                 },
                 ReturnRefresh::holdStalePost,
                 ReturnRefresh::holdTabAutoRefresh));

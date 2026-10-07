@@ -40,7 +40,7 @@ class ReturnRefreshFixtureTest {
     private val resetToFeed = "$extension->resetToFeed(Ljava/lang/String;Ljava/lang/String;)V"
     private val keepFeedWhileAway = "$extension->keepFeedWhileAway()Z"
     private val holdAutoScroll = "$extension->holdAutoScroll()Z"
-    private val holdHotStart = "$extension->holdHotStart()Z"
+    private val noteHotStart = "$extension->hotStart()V"
     private val holdStalePost = "$extension->holdStalePost()Z"
     private val holdTabAutoRefresh = "$extension->holdTabAutoRefresh()Z"
 
@@ -63,7 +63,7 @@ class ReturnRefreshFixtureTest {
     @Test
     fun `the extension has the entries the patch calls, public and static`() {
         val methods = ExtensionDex.classDef(extension).methods.associateBy(::signature)
-        for (entry in listOf(skip, holdWarmStart, resetToFeed, keepFeedWhileAway, holdAutoScroll, holdHotStart,
+        for (entry in listOf(skip, holdWarmStart, resetToFeed, keepFeedWhileAway, holdAutoScroll, noteHotStart,
             holdStalePost, holdTabAutoRefresh)) {
             val method = methods[entry]
             assertTrue("the extension has no $entry", method != null)
@@ -219,17 +219,22 @@ class ReturnRefreshFixtureTest {
         assertEquals("$name: the rest of the decision", decision.body().map { it.opcode },
             decisionBody.drop(3).map { it.opcode })
 
-        // The executor and the hot-start check ask first and, on a yes, do nothing, as Facebook's
-        // own answer does: the hot-start check of 577 answers false.
-        for ((method, entry) in listOf(executor to holdStalePost, hotStart to holdHotStart)) {
-            val body = patched(method).body()
-            val nothing = if (method.returnType == "Z") listOf(Opcode.CONST_4, Opcode.RETURN) else listOf(Opcode.RETURN_VOID)
-            val hook = listOf(Opcode.INVOKE_STATIC, Opcode.MOVE_RESULT, Opcode.IF_EQZ) + nothing
-            assertEquals("$name: ${method.name}'s first call", entry, body[0].call())
-            assertEquals("$name: ${method.name}'s hook", hook, body.take(hook.size).map { it.opcode })
-            assertEquals("$name: the rest of ${method.name}", method.body().map { it.opcode },
-                body.drop(hook.size).map { it.opcode })
-        }
+        // The executor asks first and, on a yes, does nothing, as Facebook's own answer does.
+        val executorBody = patched(executor).body()
+        val hook = listOf(Opcode.INVOKE_STATIC, Opcode.MOVE_RESULT, Opcode.IF_EQZ, Opcode.RETURN_VOID)
+        assertEquals("$name: the executor's first call", holdStalePost, executorBody[0].call())
+        assertEquals("$name: the executor's hook", hook, executorBody.take(hook.size).map { it.opcode })
+        assertEquals("$name: the rest of the executor", executor.body().map { it.opcode },
+            executorBody.drop(hook.size).map { it.opcode })
+
+        // The hot-start check only says it's running, then asks the warm-start check, whose own
+        // question past its empty-feed load holds it: nothing in the hot-start check is skipped.
+        val hotBody = patched(hotStart).body()
+        assertEquals("$name: the hot-start check's first call", noteHotStart, hotBody[0].call())
+        assertEquals("$name: the rest of the hot-start check", hotStart.body().map { it.opcode },
+            hotBody.drop(1).map { it.opcode })
+        assertTrue("$name: the hot-start check doesn't ask the warm-start check",
+            hotBody.any { it.call() == signature(warmStart) })
 
         // The dispatch asks where it loaded the refresh's cause, in that register, and a yes lands
         // right after the refresh, on the data fetch's own callback.
