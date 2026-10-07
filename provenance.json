@@ -465,6 +465,15 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/ads/sponsoredreels/ProfileReelAds.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the profile Reels tab's ad query. In Facebook 577, 580 and 581 a profile or Page's Reels tab asks for its ads with ProfileReelsAsyncAdsQuery, from one non-static void method holding that name, outside the Reels ad pool. The patch finds that method by the literal and its shape and puts a call of the extension first in it: while Hide sponsored reels is on, the method returns before it sends the query, so the tab shows only that profile's own reels."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/notifications/**",
         "patches/src/main/kotlin/app/morphe/patches/facebook/notifications/**"
       ],
