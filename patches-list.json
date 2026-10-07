@@ -3402,7 +3402,7 @@
     },
     {
       "name": "Tab bar at the bottom",
-      "description": "Moves Facebook's tab bar to the bottom of the screen on accounts that have it at the top. Its switch starts off, so turn it on under Appearance and restart Facebook.",
+      "description": "Moves Facebook's tab bar to the bottom of the screen on accounts that have it at the top. Its switch starts off, so turn it on under Appearance and restart Facebook. A second switch there lets the bar at the bottom slide away while you scroll down.",
       "category": "Interface",
       "use": true,
       "dependencies": [

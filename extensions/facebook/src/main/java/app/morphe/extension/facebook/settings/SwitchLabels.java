@@ -122,6 +122,7 @@ final class SwitchLabels {
         if (setting == Settings.USE_SYSTEM_FONT) return L10n.t("Use the system font");
         if (setting == Settings.USE_SYSTEM_EMOJI) return L10n.t("Use the phone's emoji");
         if (setting == Settings.BOTTOM_TAB_BAR) return L10n.t("Tab bar at the bottom");
+        if (setting == Settings.TAB_BAR_SCROLL_AWAY) return L10n.t("Hide the tab bar while scrolling");
         if (setting == Settings.FORCE_DARK_MODE) return L10n.t("Force dark mode");
         throw new IllegalArgumentException("No individual switch label: " + setting.key);
     }

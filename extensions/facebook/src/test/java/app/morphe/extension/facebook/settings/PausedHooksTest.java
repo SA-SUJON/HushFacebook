@@ -87,6 +87,7 @@ import app.morphe.extension.facebook.misc.Screenshots;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
 import app.morphe.extension.facebook.navigation.BottomTabBar;
+import app.morphe.extension.facebook.navigation.TabBarScrollAway;
 import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.MarketplaceSellerProfileForTests;
 import app.morphe.extension.facebook.navigation.HiddenTabsForTests;
@@ -465,8 +466,10 @@ public class PausedHooksTest {
         // The Friends tab comes off the bar.
         probes.put(PatchFamily.HIDDEN_TABS, Collections.singletonList(HiddenTabsForTests::hidesTheTab));
         // Facebook's own override of where the tab bar goes reads YES, for the bottom, where it read NO.
-        probes.put(PatchFamily.BOTTOM_TAB_BAR, Collections.singletonList(
-                () -> BottomTabBar.override(TriState.NO.ordinal()) == TriState.YES.ordinal()));
+        // With the bar at the bottom, Facebook's check of whether it slides away answers yes.
+        probes.put(PatchFamily.BOTTOM_TAB_BAR, Arrays.asList(
+                () -> BottomTabBar.override(TriState.NO.ordinal()) == TriState.YES.ordinal(),
+                TabBarScrollAway::slidesAway));
         // Facebook's dark mode controller answers dark where it answered light.
         probes.put(PatchFamily.FORCE_DARK_MODE, Collections.singletonList(ForceDarkModeForTests::forcesDark));
         // A request for a post's comments that names no order asks for the chosen one.

@@ -104,6 +104,10 @@ final class HushfacebookPages {
                 appearance.addPreference(toggle(context, Settings.BOTTOM_TAB_BAR,
                         L10n.t("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. "
                                 + "Restart Facebook after changing it.")));
+                // Facebook adds the bar to the views that scroll away as its main screen starts.
+                appearance.addPreference(toggle(context, Settings.TAB_BAR_SCROLL_AWAY,
+                        L10n.t("When the tab bar is at the bottom, it slides away as you scroll down and comes back "
+                                + "when you scroll up. Restart Facebook after changing it.")));
             }
             if (build.contains(PatchFamily.HIDDEN_TABS)) {
                 // Facebook builds the tab bar once, so a change waits for a restart.

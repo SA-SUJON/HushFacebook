@@ -724,6 +724,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_bottom_tab_bar", FALSE, true);
 
     /**
+     * The tab bar at the bottom slides away while the feed scrolls down and comes back scrolling
+     * up, through Facebook's own scroll-away
+     * ({@link app.morphe.extension.facebook.navigation.TabBarScrollAway}). Facebook adds the bar to
+     * the views that scroll away as its main screen starts, so a change waits for a restart.
+     */
+    public static final BooleanSetting TAB_BAR_SCROLL_AWAY =
+            new BooleanSetting("hushfacebook_tab_bar_scroll_away", FALSE, true);
+
+    /**
      * Facebook's dark mode controller answers dark whatever its own setting says
      * ({@link app.morphe.extension.facebook.theme.ForceDarkMode}), for tablets whose Facebook
      * settings have no Dark mode row. Facebook asks as each screen applies its theme, so a change
