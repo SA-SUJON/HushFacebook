@@ -53,7 +53,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * Facebook makes a card the active one. The button speaks for that card only: moving to a card the
  * helper hasn't named hides the eye, a card counted after the viewer moved on never gets it, and a
  * tap on an eye that no longer matches the active card marks nothing. A card is sent at once only
- * while it's still the active card; otherwise the mark waits for the next batch that holds it.
+ * while it's still the active card; otherwise the mark waits for the next batch that holds it. A
+ * viewer that only goes behind another screen, like the share sheet, keeps its card and comes
+ * back with the eye on it; one that closes forgets it.
  *
  * <p>The button shows only while views are anonymous and its own switch is on, and only over
  * StoryViewerActivity while it's in front. Either switch off, Hushfacebook paused or the settings
@@ -93,7 +95,7 @@ public final class StorySeenButton {
 
     @Nullable
     private static volatile Shown shown;
-    /** The id of the card Facebook made active last, or null before any, or once the viewer left. */
+    /** The id of the card Facebook made active last, or null before any, or once the viewer closed. */
     @Nullable
     private static volatile String active;
     /** The account each recently counted card was viewed on, so a card returned to can show the eye again. */
@@ -197,20 +199,30 @@ public final class StorySeenButton {
         }
     }
 
-    /** From the activity callbacks: [activity] left the front. Hides the eye if it was over it. Never throws. */
+    /**
+     * From the activity callbacks: [activity] left the front. Hides the eye if it was over it. A
+     * viewer that's closing forgets its cards. One that only went behind another screen, like the
+     * share sheet, is still on the card it showed when it comes back, so it keeps them, and a tap
+     * then still sends a held card at once. Never throws.
+     */
     public static void activityPaused(Activity activity) {
         try {
             if (viewer.get() != activity) return;
             viewer = new WeakReference<>(null);
-            shown = null;
-            active = null;
-            synchronized (known) {
-                known.clear();
-            }
+            if (activity.isFinishing()) forget();
             ImageView eye = button.get();
             if (eye != null) hide(eye);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
+    /** Forgets the card on screen, the active one and the accounts of the cards counted. */
+    private static void forget() {
+        shown = null;
+        active = null;
+        synchronized (known) {
+            known.clear();
         }
     }
 
@@ -282,11 +294,7 @@ public final class StorySeenButton {
     static void resetForTests() {
         cardIds = StorySeenButton::cardId;
         sendNow = StorySeen::sendHeld;
-        shown = null;
-        active = null;
-        synchronized (known) {
-            known.clear();
-        }
+        forget();
         viewer = new WeakReference<>(null);
         button = new WeakReference<>(null);
     }

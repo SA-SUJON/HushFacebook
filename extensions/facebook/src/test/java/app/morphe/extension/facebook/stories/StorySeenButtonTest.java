@@ -227,6 +227,45 @@ public class StorySeenButtonTest {
         controller.pause().stop().destroy();
     }
 
+    /**
+     * The share sheet, or another screen, over the viewer and gone again: the viewer is still on
+     * its card, so the eye comes back on it and a tap sends a held card at once. A viewer that
+     * closes forgets its cards.
+     */
+    @Test
+    public void aViewerThatComesBackKeepsItsCardAndOneThatClosesForgetsIt() {
+        Settings.MARK_STORIES_SEEN.save(true);
+        List<String> sent = new ArrayList<>();
+        StorySeenButton.sendNow = (account, card) -> sent.add(account + "/" + card);
+        ActivityController<StoryViewerActivity> controller = Robolectric.buildActivity(StoryViewerActivity.class).setup();
+        StoryViewerActivity viewer = controller.get();
+        StorySeenButton.activityResumed(viewer);
+        StorySeenButton.onActive("c1");
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c1");
+        ShadowLooper.idleMainLooper();
+        ImageView eye = eyeIn(viewer);
+        assertNotNull(eye);
+
+        StorySeenButton.activityPaused(viewer);
+        assertEquals("the eye stayed while the share sheet was up", View.GONE, eye.getVisibility());
+        StorySeenButton.activityResumed(viewer);
+        ShadowLooper.idleMainLooper();
+        assertEquals("the eye didn't come back with the viewer", View.VISIBLE, eye.getVisibility());
+        assertTrue(eye.performClick());
+        assertEquals(StoryMarks.State.MARKED, StorySeen.MARKS.state("100", "c1"));
+        assertEquals("a held card waited after the viewer came back", Collections.singletonList("100/c1"), sent);
+        // Facebook naming the same card again on the return finds its account still known.
+        StorySeenButton.onActive("c1");
+        assertEquals("c1", StorySeenButton.shown().card);
+
+        viewer.finish();
+        StorySeenButton.activityPaused(viewer);
+        assertNull("a closed viewer kept its card", StorySeenButton.shown());
+        StorySeenButton.onActive("c1");
+        assertNull("a closed viewer's card kept its account", StorySeenButton.shown());
+        controller.pause().stop().destroy();
+    }
+
     @Test
     public void marksLapseAfterADay() {
         AtomicLong now = new AtomicLong(1_000);
