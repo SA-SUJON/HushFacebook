@@ -61,7 +61,8 @@ Download to phone	Aufs Handy herunterladen
 Downloading	Wird heruntergeladen
 Downloads	Downloads
 Empties the log and the filter counts a report would include.	Leert das Protokoll und die Filterzähler, die ein Bericht enthalten würde.
-Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.	Jeder Schalter außer der Debug-Protokollierung verhält sich, als wäre er aus, und was beim Patchen festgelegt wurde, bleibt aktiv. Deine Einstellungen bleiben, wie sie sind.
+# context: second sentence of the paused card on the settings overview, after the reason it's paused; Lock Facebook keeps working while paused
+Every switch but Debug logging and Lock Facebook acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.	Jeder Schalter außer der Debug-Protokollierung und „Facebook sperren“ verhält sich, als wäre er aus, und was beim Patchen festgelegt wurde, bleibt aktiv. Deine Einstellungen bleiben, wie sie sind.
 Export diagnostic report	Diagnosebericht exportieren
 Export settings	Einstellungen exportieren
 Facebook crashed or froze within a minute of starting three times in a row, so Hushfacebook paused itself.	Facebook ist dreimal hintereinander innerhalb einer Minute nach dem Start abgestürzt oder hängen geblieben, deshalb hat sich Hushfacebook selbst pausiert.
@@ -70,7 +71,8 @@ Facebook doesn't serve ads to other apps on this phone.	Facebook liefert keine W
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebooks Dunkelmodus und diese Seite nutzen die Farben deines Hintergrundbilds. Android 11 nutzt stattdessen Blau. Aktiviere Facebooks Dunkelmodus, um es zu sehen.
 Hide Stories between posts	Stories zwischen Beiträgen ausblenden
 Joining the picture and sound	Bild und Ton werden zusammengefügt
-From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Ab dem nächsten Start verhält sich jeder Schalter außer der Debug-Protokollierung, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv, und deine Auswahl bleibt gespeichert.
+# context: summary of the Pause Hushfacebook switch; Debug logging and Lock Facebook are the two switches a pause leaves working
+From the next start, every switch but Debug logging and Lock Facebook acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Ab dem nächsten Start verhält sich jeder Schalter außer der Debug-Protokollierung und „Facebook sperren“, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv, und deine Auswahl bleibt gespeichert.
 Rows, large tiles and viewers of Stories between posts, starting with the next feed Facebook loads. The top Stories tray has its own switch.	Story-Reihen, große Kacheln und Story-Viewer zwischen Beiträgen, ab dem nächsten von Facebook geladenen Feed. Die Story-Leiste oben hat einen eigenen Schalter.
 Open	Öffnen
 Photo saved	Foto gespeichert
@@ -83,7 +85,8 @@ The app holding the settings file is taking too long, so Hushfacebook stopped wa
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	Die Datei %1$s ließ sich nicht entfernen. Lösche sie aus %2$s und tippe dann noch einmal auf Fortsetzen.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zurück, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.
 There's no app here that can open or share this saved file.	Keine App kann diese gespeicherte Datei öffnen oder teilen.
-Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Bis zum Fortsetzen verhält sich jeder Schalter außer der Debug-Protokollierung, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv.
+# context: line at the top of a settings page while paused; Lock Facebook keeps working while paused
+Until you resume, every switch but Debug logging and Lock Facebook acts as if it were off. Changes made when you patched stay in.	Bis zum Fortsetzen verhält sich jeder Schalter außer der Debug-Protokollierung und „Facebook sperren“, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Nutzt die Emoji deines Telefons. Reaktionen und Sticker bleiben gleich. Starte Facebook nach der Änderung neu.
 # context: switch title under Appearance; the tab bar is Facebook's row of tabs, Home, Video, Marketplace and the rest
 Tab bar at the bottom	Tab-Leiste unten

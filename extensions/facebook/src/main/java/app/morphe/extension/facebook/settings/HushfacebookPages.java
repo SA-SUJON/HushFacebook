@@ -203,8 +203,9 @@ final class HushfacebookPages {
         // Named for its rows: the screen's own title already says Hushfacebook.
         PreferenceCategory hushfacebook = category(screen, L10n.t("Pause, backup and diagnostics"));
         hushfacebook.addPreference(mark(toggle(context, BaseSettings.PAUSED, L10n.t("Pause Hushfacebook"),
-                L10n.t("From the next start, every switch but Debug logging acts as if it were off. "
-                        + "Changes made when you patched stay in, and your choices stay saved.")), SettingsIcons.PATCHED));
+                L10n.t("From the next start, every switch but Debug logging and Lock Facebook acts as if it "
+                        + "were off. Changes made when you patched stay in, and your choices stay saved.")),
+                SettingsIcons.PATCHED));
         String stays = PatchFamily.staysWhilePausedSummary(build);
         // Morphe Manager can export the patch choices and the signing key, not these switches.
         hushfacebook.addPreference(mark(new BackupRow(page, context, SettingsBackupPreference.EXPORT,

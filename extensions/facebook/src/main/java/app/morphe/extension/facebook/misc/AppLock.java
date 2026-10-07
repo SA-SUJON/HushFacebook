@@ -58,8 +58,11 @@ import app.morphe.extension.shared.Utils;
  * configuration, isn't a leave. While the switch is on, Android 13 and later keep Facebook's
  * screens out of the recent apps view, as Facebook's own lock does.
  *
- * <p>Off, paused, settings that aren't ready yet, or a phone without a screen lock, and nothing is
- * covered or asked. Turning the switch on doesn't lock the screen in front.
+ * <p>Off, settings that aren't ready yet, or a phone without a screen lock, and nothing is covered
+ * or asked. Turning the switch on doesn't lock the screen in front. A pause doesn't turn it off,
+ * whatever paused Hushfacebook: the Pause switch, the marker file, or safe mode after crashed
+ * starts. Each of those is in reach of someone holding the phone, and the switch, which sits
+ * behind the lock, is the way off ({@link Settings#APP_LOCK} keeps its value while paused).
  */
 public final class AppLock {
     /** How long Facebook may be away before a return asks again. */
@@ -135,7 +138,7 @@ public final class AppLock {
     private AppLock() {
     }
 
-    /** Whether the lock reads on. Never with the settings not ready yet or Hushfacebook paused. */
+    /** Whether the lock is on: its switch, which reads the same paused or not, once the settings are ready. */
     private static boolean switchedOn() {
         return Utils.settingsReady() && Settings.APP_LOCK.get();
     }

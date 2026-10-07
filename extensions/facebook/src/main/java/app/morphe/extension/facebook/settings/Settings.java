@@ -26,6 +26,7 @@ import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.EnumSetting;
+import app.morphe.extension.shared.settings.Setting;
 import app.morphe.extension.shared.settings.StringSetting;
 
 /**
@@ -796,6 +797,7 @@ public class Settings extends BaseSettings {
      * A cold start, and a return after {@link #APP_LOCK_AFTER}, ask for the phone's screen lock
      * before Facebook shows ({@link app.morphe.extension.facebook.misc.AppLock}). The settings
      * entry's own switch, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off by default.
+     * It keeps its value while Hushfacebook is paused, see the block after {@link #APP_LOCK_AFTER}.
      */
     public static final BooleanSetting APP_LOCK =
             new BooleanSetting("hushfacebook_app_lock", FALSE);
@@ -1185,10 +1187,18 @@ public class Settings extends BaseSettings {
 
     /**
      * How long Facebook may be away before a return asks for the screen lock while {@link #APP_LOCK}
-     * is on. It isn't a switch, and a paused Facebook never locks.
+     * is on. It isn't a switch.
      */
     public static final EnumSetting<AppLock.After> APP_LOCK_AFTER =
             new EnumSetting<>("hushfacebook_app_lock_after", AppLock.After.ONE_MINUTE);
+
+    static {
+        // The lock guards the phone's owner rather than changing Facebook, so no pause opens it: not
+        // the Pause switch, not the marker file someone could leave over USB, and not the safe mode
+        // a few quick crashes can turn on. Its own switch, behind the lock, is the only way off.
+        // Here, after both fields, since a static block runs in the order it's written.
+        Setting.keepWhenPaused(APP_LOCK, APP_LOCK_AFTER);
+    }
 
     /**
      * How large Facebook's text is, as a share of the phone's font size ({@link TextSize}). It

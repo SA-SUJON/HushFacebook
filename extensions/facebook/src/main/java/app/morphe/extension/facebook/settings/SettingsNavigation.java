@@ -323,10 +323,10 @@ final class SettingsNavigation extends BaseAdapter {
         pageAction = (paused || nextPaused) && showsPausable();
         if (pageAction) {
             pageStatus.setTitle(paused ? L10n.t("Hushfacebook is paused") : L10n.t("Hushfacebook is on"));
-            // Worded like the Pause switch: Debug logging and what was set when patching stay in.
+            // Worded like the Pause switch: Debug logging, Lock Facebook and what was set when patching stay in.
             pageStatus.setSummary(paused == nextPaused
-                    ? L10n.t("Until you resume, every switch but Debug logging acts as if it were off. "
-                    + "Changes made when you patched stay in.")
+                    ? L10n.t("Until you resume, every switch but Debug logging and Lock Facebook acts as if it "
+                    + "were off. Changes made when you patched stay in.")
                     : paused ? L10n.t("Hushfacebook turns back on when Facebook restarts.")
                     : L10n.t("Hushfacebook pauses when Facebook restarts."));
             pageStatus.setIcon(SettingsIcons.icon(context, paused ? SettingsIcons.PAUSE : SettingsIcons.PATCHED,

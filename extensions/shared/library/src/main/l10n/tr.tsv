@@ -61,7 +61,8 @@ Download to phone	Telefona indir
 Downloading	İndiriliyor
 Downloads	İndirmeler
 Empties the log and the filter counts a report would include.	Bir raporun içereceği günlüğü ve filtre sayaçlarını boşaltır.
-Every switch but Debug logging acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.	Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır, yamaladığında ayarlananlar ise devrede kalır. Ayarların olduğu gibi kalır.
+# context: second sentence of the paused card on the settings overview, after the reason it's paused; Lock Facebook keeps working while paused
+Every switch but Debug logging and Lock Facebook acts as if it were off, and what was set when you patched stays in. Your settings stay as they are.	Hata ayıklama günlüğü ve “Facebook'u kilitle” dışındaki her anahtar kapalıymış gibi davranır, yamaladığında ayarlananlar ise devrede kalır. Ayarların olduğu gibi kalır.
 Export diagnostic report	Tanılama raporunu dışa aktar
 Export settings	Ayarları dışa aktar
 Facebook crashed or froze within a minute of starting three times in a row, so Hushfacebook paused itself.	Facebook açıldıktan sonraki bir dakika içinde üst üste üç kez çöktü veya dondu, bu yüzden Hushfacebook kendini duraklattı.
@@ -70,7 +71,8 @@ Facebook doesn't serve ads to other apps on this phone.	Facebook bu telefondaki 
 Facebook dark mode and this screen use your wallpaper colours. Android 11 uses blue instead. Turn on Facebook dark mode to see it.	Facebook karanlık modu ve bu ekran duvar kâğıdının renklerini kullanır. Android 11 bunun yerine mavi kullanır. Görmek için Facebook karanlık modunu aç.
 Hide Stories between posts	Gönderiler arasındaki Hikayeleri gizle
 Joining the picture and sound	Görüntü ve ses birleştiriliyor
-From the next start, every switch but Debug logging acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Sonraki açılıştan itibaren Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır ve tercihlerin kayıtlı kalır.
+# context: summary of the Pause Hushfacebook switch; Debug logging and Lock Facebook are the two switches a pause leaves working
+From the next start, every switch but Debug logging and Lock Facebook acts as if it were off. Changes made when you patched stay in, and your choices stay saved.	Sonraki açılıştan itibaren Hata ayıklama günlüğü ve “Facebook'u kilitle” dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır ve tercihlerin kayıtlı kalır.
 Rows, large tiles and viewers of Stories between posts, starting with the next feed Facebook loads. The top Stories tray has its own switch.	Gönderiler arasındaki Hikaye sıraları, büyük kutucuklar ve görüntüleyiciler. Facebook'un yükleyeceği sonraki akıştan itibaren geçerlidir. Üstteki Hikaye tepsisinin ayrı bir anahtarı vardır.
 Open	Aç
 Photo saved	Fotoğraf kaydedildi
@@ -83,7 +85,8 @@ The app holding the settings file is taking too long, so Hushfacebook stopped wa
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	%1$s dosyası kaldırılamadı. Onu %2$s içinden sil, sonra yeniden Devam et'e dokun.
 The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Ayar dosyası kaydedildi, ancak geri okunduğunda yazılanla aynı değil. Yeni bir dosya olarak tekrar kaydet.
 There's no app here that can open or share this saved file.	Bu kaydedilen dosyayı açabilecek veya paylaşabilecek bir uygulama yok.
-Until you resume, every switch but Debug logging acts as if it were off. Changes made when you patched stay in.	Devam ettirene kadar Hata ayıklama günlüğü dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır.
+# context: line at the top of a settings page while paused; Lock Facebook keeps working while paused
+Until you resume, every switch but Debug logging and Lock Facebook acts as if it were off. Changes made when you patched stay in.	Devam ettirene kadar Hata ayıklama günlüğü ve “Facebook'u kilitle” dışındaki her anahtar kapalıymış gibi davranır. Yamaladığında ayarlananlar devrede kalır.
 Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.	Telefonunuzun emojilerini kullanır. İfadeler ve çıkartmalar aynı kalır. Değiştirdikten sonra Facebook'u yeniden başlatın.
 # context: switch title under Appearance; the tab bar is Facebook's row of tabs, Home, Video, Marketplace and the rest
 Tab bar at the bottom	Sekme çubuğu altta

@@ -833,8 +833,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 why = L10n.t("You paused Hushfacebook.");
                 break;
         }
-        return why + " " + L10n.t("Every switch but Debug logging acts as if it were off, and what was set when you "
-                + "patched stays in. Your settings stay as they are.");
+        return why + " " + L10n.t("Every switch but Debug logging and Lock Facebook acts as if it were off, and "
+                + "what was set when you patched stays in. Your settings stay as they are.");
     }
 
     /**

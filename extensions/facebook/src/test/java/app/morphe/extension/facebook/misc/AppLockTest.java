@@ -48,8 +48,9 @@ import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
  * Lock Facebook: a cold start and a return after the chosen time cover Facebook and ask for the
- * screen lock, only a passed check takes the cover away, and picture-in-picture, a rotation, the
- * switch off, a pause and a phone without a screen lock never lock. Android's prompt is stood in for.
+ * screen lock, only a passed check takes the cover away, picture-in-picture, a rotation, the switch
+ * off and a phone without a screen lock never lock, and no pause opens it. Android's prompt is
+ * stood in for.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -309,20 +310,42 @@ public class AppLockTest {
     }
 
     @Test
-    public void noScreenLockOrPausedNeverLocks() {
+    public void noScreenLockNeverLocks() {
         Settings.APP_LOCK.save(true);
         secure(false);
         Activity activity = screen();
         front(activity);
         assertFalse("a phone without a screen lock got a lock it can't open", AppLock.covered(activity));
-
-        AppLock.forgetForTests();
-        AppLock.prompter = (shown, answer) -> asked.add(new Asked(shown, answer));
-        secure(true);
-        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
-        front(activity);
-        assertFalse(AppLock.covered(activity));
         assertTrue(asked.isEmpty());
+    }
+
+    /**
+     * Each way to pause Hushfacebook is in reach of someone holding the phone, so none of them
+     * opens Facebook: a start still covers it and asks, and Lock after keeps the time chosen.
+     */
+    @Test
+    public void everyPauseStillLocks() {
+        Settings.APP_LOCK.save(true);
+        Settings.APP_LOCK_AFTER.save(AppLock.After.FIVE_MINUTES);
+        for (HushfacebookPause.Reason why : HushfacebookPause.Reason.values()) {
+            if (why == HushfacebookPause.Reason.NONE) continue;
+            AppLock.forgetForTests();
+            asked.clear();
+            AppLock.prompter = (shown, answer) -> asked.add(new Asked(shown, answer));
+            PauseForTests.pause(why);
+            Activity activity = screen();
+            front(activity);
+            assertTrue("a start paused by " + why + " wasn't covered", AppLock.covered(activity));
+            assertEquals("a start paused by " + why + " didn't ask", 1, asked.size());
+            asked.get(0).answer.unlocked();
+            assertFalse(AppLock.covered(activity));
+
+            awayAndBack(activity, Duration.ofMinutes(2));
+            assertFalse("paused by " + why + ", two minutes away locked a five minute lock", AppLock.covered(activity));
+            awayAndBack(activity, Duration.ofMinutes(6));
+            assertTrue("paused by " + why + ", a return after the time wasn't covered", AppLock.covered(activity));
+            assertEquals(2, asked.size());
+        }
     }
 
     @Test

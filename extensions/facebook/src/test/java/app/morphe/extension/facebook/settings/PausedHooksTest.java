@@ -129,7 +129,7 @@ import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
  * What Pause and safe mode promise: every hook a switch runs takes Facebook's own path, and every
- * saved value stays as it is.
+ * saved value stays as it is. Lock Facebook is the one switch that keeps working ({@link #kept}).
  *
  * <p>Each probe is one hook with its switch on. It must change Facebook's behaviour while
  * Hushfacebook runs, which is the control, and leave it alone while paused. A family that gains a
@@ -232,6 +232,25 @@ public class PausedHooksTest {
         // A save takes the H.264 picture over the sharper AV1 one.
         probes.put(Settings.DOWNLOAD_COMPATIBLE, SaveRulesForTests::picksAFileOtherAppsOpen);
         return probes;
+    }
+
+    /**
+     * The switches that keep working while paused. Lock Facebook guards the phone's owner rather
+     * than changing Facebook, and every way to pause is in reach of someone holding the phone: the
+     * Pause switch, a marker file left over USB, safe mode after a few quick crashes. A method, not
+     * a field, so the class doesn't load Settings before the rule hands it a context.
+     */
+    private static Set<BooleanSetting> kept() {
+        return Collections.singleton(Settings.APP_LOCK);
+    }
+
+    /** The probes whose switch is in [kept] when [keep], and the others otherwise. */
+    private static Map<BooleanSetting, Probe> keptOrNot(Map<BooleanSetting, Probe> probes, boolean keep) {
+        Map<BooleanSetting, Probe> picked = new LinkedHashMap<>();
+        for (Map.Entry<BooleanSetting, Probe> entry : probes.entrySet()) {
+            if (kept().contains(entry.getKey()) == keep) picked.put(entry.getKey(), entry.getValue());
+        }
+        return picked;
     }
 
     /** Adds a line to [wrong] for every entry probe that didn't answer [changes]. */
@@ -706,7 +725,9 @@ public class PausedHooksTest {
                 HushfacebookPause.Reason.MARKER_FILE}) {
             PauseForTests.pause(why);
             everyProbe(probes, false, "paused by " + why, wrong);
-            everyEntryProbe(entry, false, "paused by " + why, wrong);
+            everyEntryProbe(keptOrNot(entry, false), false, "paused by " + why, wrong);
+            // The lock still covers Facebook and asks, whatever paused it.
+            everyEntryProbe(keptOrNot(entry, true), true, "paused by " + why, wrong);
             everyEntryProbe(downloads, false, "paused by " + why, wrong);
         }
 
@@ -760,11 +781,19 @@ public class PausedHooksTest {
     public void pausedEverySwitchAnswersOffAndKeepsWhatWasSaved() {
         List<BooleanSetting> switches = settingsSwitches();
         assertFalse("found no switches to check", switches.isEmpty());
-        for (BooleanSetting setting : switches) setting.save(true);
+        for (BooleanSetting setting : switches) {
+            // A switch that keeps working through a pause is one kept() names, with its reason.
+            assertEquals(setting.key + " keeps its value while paused", kept().contains(setting), setting.isKeptWhenPaused());
+            setting.save(true);
+        }
 
         PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
         for (BooleanSetting setting : switches) {
-            assertFalse(setting.key + " answered on while paused", setting.get());
+            if (kept().contains(setting)) {
+                assertTrue(setting.key + " answered off while paused", setting.get());
+            } else {
+                assertFalse(setting.key + " answered on while paused", setting.get());
+            }
             assertTrue(setting.key + " lost what was saved", setting.savedValue());
         }
 
