@@ -4320,6 +4320,7 @@
       "category": "Privacy",
       "use": false,
       "dependencies": [
+        "BytecodePatch",
         "Hushfacebook settings"
       ],
       "compatiblePackages": {
