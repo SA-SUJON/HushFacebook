@@ -371,7 +371,7 @@ The card at the top of Chats that asks you to get the Messenger app goes while M
 # context: switch title under Chats; the notes and active now row is the row of friends' notes and who's active above the chat list in Chats inside Facebook
 Hide the notes and active now row	Sembunyikan baris catatan dan yang aktif
 # context: summary of that switch
-The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.	Baris catatan teman dan siapa yang aktif di atas obrolanmu di Obrolan dalam Facebook disembunyikan. Obrolan, pencarian, dan pesan baru tetap ada.
+Empties the list behind the row above your chats in Chats inside Facebook, so friends' notes and who's active go, and your own note tile may go too. Your chats, search and new messages stay.	Mengosongkan daftar di balik baris di atas obrolanmu di Obrolan dalam Facebook, jadi catatan teman dan siapa yang aktif hilang, dan catatanmu sendiri mungkin ikut hilang. Obrolan, pencarian, dan pesan baru tetap ada.
 # context: switch title under Chats; promotions are the banners Facebook puts at the top of the chat list
 Hide chat list promotions	Sembunyikan promosi di daftar obrolan
 # context: summary of that switch

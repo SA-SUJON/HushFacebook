@@ -26,8 +26,11 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
  * parameter name `activeNowTiles` (kept in all three builds, because the check carries it as a
  * literal) and stores the list. The component that draws the row and the section builder both read
  * that field, so the patch hands the constructor an empty list while the switch is on and nothing
- * downstream has a tile to draw. Whether the row then leaves with no gap is a phone check. The state class and its builder are Redex names (`E7k` and `E7j` on 581, `EBq` and `EBp`
- * on 580, `E4x` and `E4w` on 577); only the literal and the constructor's shape find them.
+ * downstream has a tile to draw. That empties the list the row is built from: friends' notes, who's
+ * active now and, if it sits in the same list, your own "Your note" tile. Whether the row then
+ * leaves with no gap is a phone check. The state class and its builder are Redex names (`E7k` and
+ * `E7j` on 581, `EBq` and `EBp` on 580, `E4x` and `E4w` on 577); only the literal and the
+ * constructor's shape find them.
  *
  * Chats also builds a group of top banners, each its own plugin answering a show question. Two of
  * them are promotions: the one asking you to turn on notifications (its builder tags the banner

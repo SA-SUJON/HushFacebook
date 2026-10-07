@@ -371,7 +371,7 @@ The card at the top of Chats that asks you to get the Messenger app goes while M
 # context: switch title under Chats; the notes and active now row is the row of friends' notes and who's active above the chat list in Chats inside Facebook
 Hide the notes and active now row	Reihe mit Notizen und Aktiven ausblenden
 # context: summary of that switch
-The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.	Die Reihe mit den Notizen deiner Freunde und mit denen, die gerade aktiv sind, über deinen Chats in den Chats innerhalb von Facebook verschwindet. Deine Chats, die Suche und neue Nachrichten bleiben.
+Empties the list behind the row above your chats in Chats inside Facebook, so friends' notes and who's active go, and your own note tile may go too. Your chats, search and new messages stay.	Leert die Liste hinter der Reihe über deinen Chats in den Chats innerhalb von Facebook, sodass die Notizen deiner Freunde und die aktiven Kontakte verschwinden, vielleicht auch deine eigene Notiz. Deine Chats, die Suche und neue Nachrichten bleiben.
 # context: switch title under Chats; promotions are the banners Facebook puts at the top of the chat list
 Hide chat list promotions	Hinweisbanner in der Chatliste ausblenden
 # context: summary of that switch

@@ -371,7 +371,7 @@ The card at the top of Chats that asks you to get the Messenger app goes while M
 # context: switch title under Chats; the notes and active now row is the row of friends' notes and who's active above the chat list in Chats inside Facebook
 Hide the notes and active now row	Not ve etkin satırını gizle
 # context: summary of that switch
-The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.	Facebook içindeki Sohbetlerde, sohbetlerinin üstündeki arkadaş notları ve etkin kişiler satırı kalkar. Sohbetlerin, arama ve yeni mesajlar yerinde kalır.
+Empties the list behind the row above your chats in Chats inside Facebook, so friends' notes and who's active go, and your own note tile may go too. Your chats, search and new messages stay.	Facebook içindeki Sohbetlerde, sohbetlerinin üstündeki satırın arkasındaki listeyi boşaltır. Böylece arkadaş notları ve etkin kişiler kalkar, kendi notun da kalkabilir. Sohbetlerin, arama ve yeni mesajlar yerinde kalır.
 # context: switch title under Chats; promotions are the banners Facebook puts at the top of the chat list
 Hide chat list promotions	Sohbet listesindeki tanıtımları gizle
 # context: summary of that switch

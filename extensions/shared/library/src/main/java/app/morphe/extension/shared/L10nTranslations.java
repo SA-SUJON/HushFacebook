@@ -477,6 +477,8 @@ public final class L10nTranslations {
                 "Jedes Video wird in der besten Qualit\u00e4t gespeichert, die der Player streamt.");
         table.put("Elections",
                 "Wahlen");
+        table.put("Empties the list behind the row above your chats in Chats inside Facebook, so friends' notes and who's active go, and your own note tile may go too. Your chats, search and new messages stay.",
+                "Leert die Liste hinter der Reihe \u00fcber deinen Chats in den Chats innerhalb von Facebook, sodass die Notizen deiner Freunde und die aktiven Kontakte verschwinden, vielleicht auch deine eigene Notiz. Deine Chats, die Suche und neue Nachrichten bleiben.");
         table.put("Empties the list of posts you've seen, so they can show up again.",
                 "Leert die Liste der gesehenen Beitr\u00e4ge, damit sie wieder erscheinen k\u00f6nnen.");
         table.put("Empties the log and the filter counts a report would include.",
@@ -551,11 +553,11 @@ public final class L10nTranslations {
                 "Der Text in Facebook wird %1$s so gro\u00df, wie es die Schriftgr\u00f6\u00dfeneinstellung deines Handys vorgibt.");
         table.put("Facebook's text will be the size your phone's font size setting gives it.",
                 "Der Text in Facebook hat dann die Gr\u00f6\u00dfe, die die Schriftgr\u00f6\u00dfeneinstellung deines Handys vorgibt.");
-        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
-                "Die Webadressen von Facebook sind in den Android-Einstellungen f\u00fcr diese App ausgew\u00e4hlt, deshalb \u00f6ffnen sich ihre Links hier.");
     }
 
     private static void fillDe4(Map<String, String> table) {
+        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
+                "Die Webadressen von Facebook sind in den Android-Einstellungen f\u00fcr diese App ausgew\u00e4hlt, deshalb \u00f6ffnen sich ihre Links hier.");
         table.put("Facebook's web addresses open here now.",
                 "Die Webadressen von Facebook \u00f6ffnen sich jetzt hier.");
         table.put("Favorites",
@@ -674,11 +676,11 @@ public final class L10nTranslations {
                 "Standorte von Freunden ausblenden");
         table.put("Hide link posts",
                 "Beitr\u00e4ge mit Links ausblenden");
-        table.put("Hide other Meta AI buttons under posts",
-                "Andere Meta-AI-Schaltfl\u00e4chen unter Beitr\u00e4gen ausblenden");
     }
 
     private static void fillDe5(Map<String, String> table) {
+        table.put("Hide other Meta AI buttons under posts",
+                "Andere Meta-AI-Schaltfl\u00e4chen unter Beitr\u00e4gen ausblenden");
         table.put("Hide other tabs' badges",
                 "Z\u00e4hler an anderen Tabs ausblenden");
         table.put("Hide page suggestions and Facebook's own promos",
@@ -797,11 +799,11 @@ public final class L10nTranslations {
                 "Reel f\u00fcr 2x gedr\u00fcckt halten");
         table.put("Hold back analytics uploads",
                 "Analyse-Uploads zur\u00fcckhalten");
-        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
-                "Wenn du ein Reel gedr\u00fcckt h\u00e4ltst, l\u00e4uft es mit doppelter Geschwindigkeit, bis du losl\u00e4sst, statt Facebooks Men\u00fc f\u00fcr langes Dr\u00fccken zu \u00f6ffnen. Die Mehr-Schaltfl\u00e4che des Reels \u00f6ffnet das Men\u00fc weiterhin.");
     }
 
     private static void fillDe6(Map<String, String> table) {
+        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
+                "Wenn du ein Reel gedr\u00fcckt h\u00e4ltst, l\u00e4uft es mit doppelter Geschwindigkeit, bis du losl\u00e4sst, statt Facebooks Men\u00fc f\u00fcr langes Dr\u00fccken zu \u00f6ffnen. Die Mehr-Schaltfl\u00e4che des Reels \u00f6ffnet das Men\u00fc weiterhin.");
         table.put("Home",
                 "Startseite");
         table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
@@ -920,11 +922,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
                 "Marketplace ist in Facebooks Tab-Einstellungen ausgeblendet. Blende es unter Einstellungen, Tab-Leiste, Leiste anpassen ein. Deine normalen Tabs bleiben verf\u00fcgbar.");
-        table.put("Marketplace mode and your start tab",
-                "Marketplace-Modus und Starttab");
     }
 
     private static void fillDe7(Map<String, String> table) {
+        table.put("Marketplace mode and your start tab",
+                "Marketplace-Modus und Starttab");
         table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
                 "Der Marketplace-Modus bestimmt den Start-Tab. Deine bisherige Auswahl bleibt gespeichert.");
         table.put("Marketplace mode is off.",
@@ -1043,11 +1045,11 @@ public final class L10nTranslations {
                 "Ein Wort oder eine Wortfolge pro Zeile");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Ein Wort oder eine Wortfolge pro Zeile, bis zu %1$d, jeweils %2$d bis %3$d Zeichen lang, oder nur eins bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe. Gro\u00df- und Kleinschreibung spielt keine Rolle, und eine Wortfolge passt \u00fcberall im Text eines Beitrags, auch mitten in l\u00e4ngeren W\u00f6rtern.");
-        table.put("Only on the right edge",
-                "Nur am rechten Rand");
     }
 
     private static void fillDe8(Map<String, String> table) {
+        table.put("Only on the right edge",
+                "Nur am rechten Rand");
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "Nur einige Webadressen von Facebook sind f\u00fcr diese App ausgew\u00e4hlt, und Links zu den \u00fcbrigen \u00f6ffnen sich woanders. Tippe, um sie in den Android-Einstellungen auszuw\u00e4hlen.");
         table.put("Open",
@@ -1166,11 +1168,11 @@ public final class L10nTranslations {
                 "Profile und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
         table.put("Profiles and some Settings pages won't open",
                 "Profile und einige Einstellungsseiten \u00f6ffnen sich nicht");
-        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
-                "Werbung f\u00fcr Avatar-Sticker verschwindet aus Kommentaren und Facebooks Werbepl\u00e4tzen, ebenso die Aufforderung, einen Avatar zu erstellen. Sticker lassen sich weiterhin senden.");
     }
 
     private static void fillDe9(Map<String, String> table) {
+        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
+                "Werbung f\u00fcr Avatar-Sticker verschwindet aus Kommentaren und Facebooks Werbepl\u00e4tzen, ebenso die Aufforderung, einen Avatar zu erstellen. Sticker lassen sich weiterhin senden.");
         table.put("Purple",
                 "Violett");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
@@ -1289,11 +1291,11 @@ public final class L10nTranslations {
                 "Videos speichern, die andere Apps \u00f6ffnen k\u00f6nnen");
         table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
                 "Speichert deine Schalter und die Download-Einstellungen in einer Datei. Pause und Debug-Protokollierung sind nicht enthalten, die Suche nach neuen Versionen auch nicht.");
-        table.put("Saved",
-                "Gespeichert");
     }
 
     private static void fillDe10(Map<String, String> table) {
+        table.put("Saved",
+                "Gespeichert");
         table.put("Saved as %1$s in the Notifications folder. Pick it under Sound in Android's notification settings for Facebook.",
                 "Als %1$s im Ordner Notifications gespeichert. W\u00e4hle ihn unter Ton in Androids Benachrichtigungseinstellungen f\u00fcr Facebook.");
         table.put("Saved isn't available in this build.",
@@ -1412,11 +1414,11 @@ public final class L10nTranslations {
                 "Unterst\u00fctzte Links");
         table.put("Tab bar at the bottom",
                 "Tab-Leiste unten");
-        table.put("Tab to open on",
-                "Tab beim Start");
     }
 
     private static void fillDe11(Map<String, String> table) {
+        table.put("Tab to open on",
+                "Tab beim Start");
         table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
                 "Tabs, das Men\u00fc und Bildschirme, die sich \u00fcber Facebook \u00f6ffnen, erscheinen sofort, ohne das Gleiten dazwischen. Das Wischen zwischen Tabs bleibt.");
         table.put("Tag suggestions only after @",
@@ -1535,11 +1537,11 @@ public final class L10nTranslations {
                 "Die Produktkarten der Shop-Links, die Creator zu Beitr\u00e4gen hinzuf\u00fcgen, bei Reels, unter Beitr\u00e4gen im Feed und in den Kommentaren. Das Label \u201eProvisionsberechtigt\u201c bleibt.");
         table.put("The promotional banners at the top of Chats inside Facebook go, like the one asking you to turn on notifications.",
                 "Die Werbebanner oben in den Chats innerhalb von Facebook verschwinden, zum Beispiel der, der dich bittet, Benachrichtigungen einzuschalten.");
-        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
-                "Die Reihe mit Meta-AI-Fragen unter manchen Beitr\u00e4gen. Der Beitrag, seine Linkvorschau und seine Schaltfl\u00e4chen bleiben.");
     }
 
     private static void fillDe12(Map<String, String> table) {
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "Die Reihe mit Meta-AI-Fragen unter manchen Beitr\u00e4gen. Der Beitrag, seine Linkvorschau und seine Schaltfl\u00e4chen bleiben.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Die Reihe mit Stories von Personen, mit denen du nicht verbunden bist, die Facebook zwischen die Beitr\u00e4ge setzt. Die Stories deiner Freunde und die Stories-Leiste bleiben.");
         table.put("The row of friend requests between posts. Your requests stay under Friends.",
@@ -1548,8 +1550,6 @@ public final class L10nTranslations {
                 "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen und die auf deinem eigenen Profil.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen, die auf deinem eigenen Profil und die Karten mit der Schaltfl\u00e4che \u201eHinzuf\u00fcgen\u201c in der Story-Leiste.");
-        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "Die Reihe mit den Notizen deiner Freunde und mit denen, die gerade aktiv sind, \u00fcber deinen Chats in den Chats innerhalb von Facebook verschwindet. Deine Chats, die Suche und neue Nachrichten bleiben.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Die Reihe mit Gruppen zum Beitreten zwischen den Beitr\u00e4gen, samt ihrem Button \u201eWeitere Gruppen entdecken\u201c. Beitr\u00e4ge aus deinen Gruppen bleiben.");
         table.put("The row of stories at the top of the feed, Create story included.",
@@ -2228,6 +2228,8 @@ public final class L10nTranslations {
                 "Cada video se guarda con la mejor calidad que ofrece el reproductor.");
         table.put("Elections",
                 "Elecciones");
+        table.put("Empties the list behind the row above your chats in Chats inside Facebook, so friends' notes and who's active go, and your own note tile may go too. Your chats, search and new messages stay.",
+                "Vac\u00eda la lista que hay detr\u00e1s de la fila sobre tus chats, en los chats dentro de Facebook, as\u00ed que desaparecen las notas de tus amigos y qui\u00e9n est\u00e1 activo, y puede que tambi\u00e9n tu propia nota. Tus chats, la b\u00fasqueda y los mensajes nuevos se quedan.");
         table.put("Empties the list of posts you've seen, so they can show up again.",
                 "Vac\u00eda la lista de publicaciones vistas para que puedan volver a aparecer.");
         table.put("Empties the log and the filter counts a report would include.",
@@ -2302,11 +2304,11 @@ public final class L10nTranslations {
                 "El texto de Facebook medir\u00e1 el %1$s del tama\u00f1o que le da el ajuste de tama\u00f1o de fuente de tu tel\u00e9fono.");
         table.put("Facebook's text will be the size your phone's font size setting gives it.",
                 "El texto de Facebook tendr\u00e1 el tama\u00f1o que le da el ajuste de tama\u00f1o de fuente de tu tel\u00e9fono.");
-        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
-                "Las direcciones web de Facebook est\u00e1n seleccionadas para esta app en los ajustes de Android, as\u00ed que sus enlaces se abren aqu\u00ed.");
     }
 
     private static void fillEs4(Map<String, String> table) {
+        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
+                "Las direcciones web de Facebook est\u00e1n seleccionadas para esta app en los ajustes de Android, as\u00ed que sus enlaces se abren aqu\u00ed.");
         table.put("Facebook's web addresses open here now.",
                 "Las direcciones web de Facebook ahora se abren aqu\u00ed.");
         table.put("Favorites",
@@ -2425,11 +2427,11 @@ public final class L10nTranslations {
                 "Ocultar ubicaciones de amigos");
         table.put("Hide link posts",
                 "Ocultar publicaciones con enlaces");
-        table.put("Hide other Meta AI buttons under posts",
-                "Ocultar otros botones de Meta AI en las publicaciones");
     }
 
     private static void fillEs5(Map<String, String> table) {
+        table.put("Hide other Meta AI buttons under posts",
+                "Ocultar otros botones de Meta AI en las publicaciones");
         table.put("Hide other tabs' badges",
                 "Ocultar los indicadores de otras pesta\u00f1as");
         table.put("Hide page suggestions and Facebook's own promos",
@@ -2548,11 +2550,11 @@ public final class L10nTranslations {
                 "Mantener pulsado un reel para 2x");
         table.put("Hold back analytics uploads",
                 "Retener las subidas de anal\u00edticas");
-        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
-                "Mantener pulsado un reel lo reproduce al doble de velocidad hasta que lo sueltes, en lugar de abrir el men\u00fa de pulsaci\u00f3n larga de Facebook. El bot\u00f3n M\u00e1s del reel sigue abriendo ese men\u00fa.");
     }
 
     private static void fillEs6(Map<String, String> table) {
+        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
+                "Mantener pulsado un reel lo reproduce al doble de velocidad hasta que lo sueltes, en lugar de abrir el men\u00fa de pulsaci\u00f3n larga de Facebook. El bot\u00f3n M\u00e1s del reel sigue abriendo ese men\u00fa.");
         table.put("Home",
                 "Inicio");
         table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
@@ -2671,11 +2673,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
                 "Marketplace est\u00e1 oculto en los ajustes de pesta\u00f1as de Facebook. Mu\u00e9stralo en Configuraci\u00f3n, Barra de pesta\u00f1as, Personalizar la barra. Tus pesta\u00f1as normales siguen disponibles.");
-        table.put("Marketplace mode and your start tab",
-                "Modo Marketplace y pesta\u00f1a de inicio");
     }
 
     private static void fillEs7(Map<String, String> table) {
+        table.put("Marketplace mode and your start tab",
+                "Modo Marketplace y pesta\u00f1a de inicio");
         table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
                 "El modo Marketplace elige la pesta\u00f1a de inicio. Tu selecci\u00f3n anterior se conserva.");
         table.put("Marketplace mode is off.",
@@ -2794,11 +2796,11 @@ public final class L10nTranslations {
                 "Una palabra o frase por l\u00ednea");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Una palabra o frase por l\u00ednea, hasta %1$d, cada una de %2$d a %3$d caracteres, o solo uno si es un emoji, un car\u00e1cter chino, un kana o una s\u00edlaba hangul. Las may\u00fasculas no importan, y una frase coincide en cualquier parte del texto de una publicaci\u00f3n, tambi\u00e9n dentro de palabras m\u00e1s largas.");
-        table.put("Only on the right edge",
-                "Solo en el borde derecho");
     }
 
     private static void fillEs8(Map<String, String> table) {
+        table.put("Only on the right edge",
+                "Solo en el borde derecho");
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "Solo algunas direcciones web de Facebook est\u00e1n seleccionadas para esta app, y los enlaces a las dem\u00e1s se abren en otro sitio. Toca para seleccionarlas en los ajustes de Android.");
         table.put("Open",
@@ -2917,11 +2919,11 @@ public final class L10nTranslations {
                 "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
         table.put("Profiles and some Settings pages won't open",
                 "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n no se abrir\u00e1n");
-        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
-                "Las promociones de stickers de avatar desaparecen de los comentarios y de los espacios promocionales de Facebook, junto con la invitaci\u00f3n a crear un avatar. Los stickers se siguen enviando.");
     }
 
     private static void fillEs9(Map<String, String> table) {
+        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
+                "Las promociones de stickers de avatar desaparecen de los comentarios y de los espacios promocionales de Facebook, junto con la invitaci\u00f3n a crear un avatar. Los stickers se siguen enviando.");
         table.put("Purple",
                 "Morado");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
@@ -3040,11 +3042,11 @@ public final class L10nTranslations {
                 "Guardar videos que otras apps puedan abrir");
         table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
                 "Guarda tus interruptores y los ajustes de descarga en un archivo. La pausa y el Registro de depuraci\u00f3n no se incluyen, y la b\u00fasqueda de nuevas versiones tampoco.");
-        table.put("Saved",
-                "Guardado");
     }
 
     private static void fillEs10(Map<String, String> table) {
+        table.put("Saved",
+                "Guardado");
         table.put("Saved as %1$s in the Notifications folder. Pick it under Sound in Android's notification settings for Facebook.",
                 "Guardado como %1$s en la carpeta Notifications. El\u00edgelo en Sonido, en los ajustes de notificaciones de Android para Facebook.");
         table.put("Saved isn't available in this build.",
@@ -3163,11 +3165,11 @@ public final class L10nTranslations {
                 "Enlaces compatibles");
         table.put("Tab bar at the bottom",
                 "Barra de pesta\u00f1as abajo");
-        table.put("Tab to open on",
-                "Pesta\u00f1a al abrir");
     }
 
     private static void fillEs11(Map<String, String> table) {
+        table.put("Tab to open on",
+                "Pesta\u00f1a al abrir");
         table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
                 "Las pesta\u00f1as, el men\u00fa y las pantallas que se abren sobre Facebook aparecen al instante, sin el deslizamiento entre ellas. Deslizar entre pesta\u00f1as se mantiene.");
         table.put("Tag suggestions only after @",
@@ -3286,11 +3288,11 @@ public final class L10nTranslations {
                 "Las tarjetas de producto de los enlaces de tienda que los creadores a\u00f1aden a sus publicaciones, en los reels, bajo las publicaciones del feed y en los comentarios. La etiqueta \u201cApto para comisi\u00f3n\u201d se queda.");
         table.put("The promotional banners at the top of Chats inside Facebook go, like the one asking you to turn on notifications.",
                 "Los banners promocionales en la parte superior de los chats dentro de Facebook desaparecen, como el que te pide activar las notificaciones.");
-        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
-                "La fila de preguntas de Meta AI bajo algunas publicaciones. La publicaci\u00f3n, la tarjeta de su enlace y sus botones se quedan.");
     }
 
     private static void fillEs12(Map<String, String> table) {
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "La fila de preguntas de Meta AI bajo algunas publicaciones. La publicaci\u00f3n, la tarjeta de su enlace y sus botones se quedan.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "La fila de historias de personas con las que no tienes conexi\u00f3n que Facebook pone entre las publicaciones. Las historias de tus amigos y la bandeja de historias se quedan.");
         table.put("The row of friend requests between posts. Your requests stay under Friends.",
@@ -3299,8 +3301,6 @@ public final class L10nTranslations {
                 "La fila de sugerencias de amistad entre las publicaciones y la de tu propio perfil.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "La fila de sugerencias de amistad entre las publicaciones, la de tu propio perfil y las tarjetas con el bot\u00f3n Agregar en la bandeja de historias.");
-        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "La fila de notas de tus amigos y de qui\u00e9n est\u00e1 activo sobre tus chats, en los chats dentro de Facebook, desaparece. Tus chats, la b\u00fasqueda y los mensajes nuevos se quedan.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "La fila de grupos para unirte entre las publicaciones, con su bot\u00f3n Descubrir m\u00e1s grupos. Las publicaciones de tus grupos se quedan.");
         table.put("The row of stories at the top of the feed, Create story included.",
@@ -3979,6 +3979,8 @@ public final class L10nTranslations {
                 "Setiap video disimpan dengan kualitas streaming terbaik dari pemutar.");
         table.put("Elections",
                 "Pemilu");
+        table.put("Empties the list behind the row above your chats in Chats inside Facebook, so friends' notes and who's active go, and your own note tile may go too. Your chats, search and new messages stay.",
+                "Mengosongkan daftar di balik baris di atas obrolanmu di Obrolan dalam Facebook, jadi catatan teman dan siapa yang aktif hilang, dan catatanmu sendiri mungkin ikut hilang. Obrolan, pencarian, dan pesan baru tetap ada.");
         table.put("Empties the list of posts you've seen, so they can show up again.",
                 "Mengosongkan daftar kiriman yang sudah dilihat, supaya bisa muncul lagi.");
         table.put("Empties the log and the filter counts a report would include.",
@@ -4053,11 +4055,11 @@ public final class L10nTranslations {
                 "Teks Facebook akan berukuran %1$s dari ukuran yang diberikan pengaturan ukuran font di ponselmu.");
         table.put("Facebook's text will be the size your phone's font size setting gives it.",
                 "Teks Facebook akan berukuran sesuai pengaturan ukuran font di ponselmu.");
-        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
-                "Alamat web Facebook dipilih untuk aplikasi ini di pengaturan Android, jadi tautannya terbuka di sini.");
     }
 
     private static void fillIn4(Map<String, String> table) {
+        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
+                "Alamat web Facebook dipilih untuk aplikasi ini di pengaturan Android, jadi tautannya terbuka di sini.");
         table.put("Facebook's web addresses open here now.",
                 "Alamat web Facebook kini terbuka di sini.");
         table.put("Favorites",
@@ -4176,11 +4178,11 @@ public final class L10nTranslations {
                 "Sembunyikan lokasi teman");
         table.put("Hide link posts",
                 "Sembunyikan postingan tautan");
-        table.put("Hide other Meta AI buttons under posts",
-                "Sembunyikan tombol Meta AI lain di bawah postingan");
     }
 
     private static void fillIn5(Map<String, String> table) {
+        table.put("Hide other Meta AI buttons under posts",
+                "Sembunyikan tombol Meta AI lain di bawah postingan");
         table.put("Hide other tabs' badges",
                 "Sembunyikan lencana tab lainnya");
         table.put("Hide page suggestions and Facebook's own promos",
@@ -4299,11 +4301,11 @@ public final class L10nTranslations {
                 "Tahan reel untuk 2x");
         table.put("Hold back analytics uploads",
                 "Tahan unggahan analitik");
-        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
-                "Menahan reel memutarnya dengan kecepatan dua kali lipat sampai kamu melepaskannya, sebagai ganti menu tekan lama Facebook. Tombol lainnya pada reel tetap membuka menu itu.");
     }
 
     private static void fillIn6(Map<String, String> table) {
+        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
+                "Menahan reel memutarnya dengan kecepatan dua kali lipat sampai kamu melepaskannya, sebagai ganti menu tekan lama Facebook. Tombol lainnya pada reel tetap membuka menu itu.");
         table.put("Home",
                 "Beranda");
         table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
@@ -4422,11 +4424,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
                 "Marketplace disembunyikan di pengaturan tab Facebook. Tampilkan melalui Pengaturan, Bilah tab, Sesuaikan bilah. Tab biasa tetap tersedia.");
-        table.put("Marketplace mode and your start tab",
-                "Mode Marketplace dan tab awal");
     }
 
     private static void fillIn7(Map<String, String> table) {
+        table.put("Marketplace mode and your start tab",
+                "Mode Marketplace dan tab awal");
         table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
                 "Mode Marketplace menentukan tab awal. Pilihan sebelumnya tetap tersimpan.");
         table.put("Marketplace mode is off.",
@@ -4545,11 +4547,11 @@ public final class L10nTranslations {
                 "Satu kata atau frasa per baris");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Satu kata atau frasa per baris, hingga %1$d, masing-masing %2$d sampai %3$d karakter, atau cukup satu untuk emoji, aksara Tionghoa, kana, atau suku kata Hangul. Huruf besar dan kecil tidak berpengaruh, dan frasa cocok di mana saja dalam teks postingan, termasuk di dalam kata yang lebih panjang.");
-        table.put("Only on the right edge",
-                "Hanya di tepi kanan");
     }
 
     private static void fillIn8(Map<String, String> table) {
+        table.put("Only on the right edge",
+                "Hanya di tepi kanan");
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "Hanya sebagian alamat web Facebook yang dipilih untuk aplikasi ini, dan tautan ke alamat lainnya terbuka di tempat lain. Ketuk untuk memilihnya di pengaturan Android.");
         table.put("Open",
@@ -4668,11 +4670,11 @@ public final class L10nTranslations {
                 "Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
         table.put("Profiles and some Settings pages won't open",
                 "Profil dan beberapa halaman Pengaturan tidak akan terbuka");
-        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
-                "Promosi stiker avatar hilang dari komentar dan slot promosi Facebook, begitu juga ajakan membuat avatar. Stiker tetap bisa dikirim.");
     }
 
     private static void fillIn9(Map<String, String> table) {
+        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
+                "Promosi stiker avatar hilang dari komentar dan slot promosi Facebook, begitu juga ajakan membuat avatar. Stiker tetap bisa dikirim.");
         table.put("Purple",
                 "Ungu");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
@@ -4791,11 +4793,11 @@ public final class L10nTranslations {
                 "Simpan video yang bisa dibuka aplikasi lain");
         table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
                 "Simpan sakelar dan pengaturan unduhan Anda ke sebuah file. Jeda dan Pencatatan debug tidak disertakan, begitu pula pemeriksaan rilis.");
-        table.put("Saved",
-                "Tersimpan");
     }
 
     private static void fillIn10(Map<String, String> table) {
+        table.put("Saved",
+                "Tersimpan");
         table.put("Saved as %1$s in the Notifications folder. Pick it under Sound in Android's notification settings for Facebook.",
                 "Disimpan sebagai %1$s di folder Notifications. Pilih di Suara pada pengaturan notifikasi Android untuk Facebook.");
         table.put("Saved isn't available in this build.",
@@ -4914,11 +4916,11 @@ public final class L10nTranslations {
                 "Tautan yang didukung");
         table.put("Tab bar at the bottom",
                 "Bilah tab di bawah");
-        table.put("Tab to open on",
-                "Tab saat dibuka");
     }
 
     private static void fillIn11(Map<String, String> table) {
+        table.put("Tab to open on",
+                "Tab saat dibuka");
         table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
                 "Tab, Menu, dan layar yang terbuka di atas Facebook langsung muncul, tanpa geseran di antaranya. Mengusap antar tab tetap ada.");
         table.put("Tag suggestions only after @",
@@ -5037,11 +5039,11 @@ public final class L10nTranslations {
                 "Kartu produk dari tautan toko yang ditambahkan kreator ke postingan, di reel, di bawah postingan feed, dan di komentar. Label \u201cMemenuhi syarat komisi\u201d tetap ada.");
         table.put("The promotional banners at the top of Chats inside Facebook go, like the one asking you to turn on notifications.",
                 "Banner promosi di bagian atas Obrolan dalam Facebook disembunyikan, seperti yang meminta kamu mengaktifkan notifikasi.");
-        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
-                "Baris pertanyaan Meta AI di bawah beberapa postingan. Postingan, kartu tautannya, dan tombolnya tetap ada.");
     }
 
     private static void fillIn12(Map<String, String> table) {
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "Baris pertanyaan Meta AI di bawah beberapa postingan. Postingan, kartu tautannya, dan tombolnya tetap ada.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Deretan Cerita dari orang yang tidak terhubung dengan Anda, yang diselipkan Facebook di antara postingan. Cerita teman Anda dan deretan Cerita tetap ada.");
         table.put("The row of friend requests between posts. Your requests stay under Friends.",
@@ -5050,8 +5052,6 @@ public final class L10nTranslations {
                 "Deretan saran pertemanan di antara postingan, dan deretan di profilmu sendiri.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "Deretan saran pertemanan di antara postingan, deretan di profilmu sendiri, dan kartu dengan tombol Tambah di baki cerita.");
-        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "Baris catatan teman dan siapa yang aktif di atas obrolanmu di Obrolan dalam Facebook disembunyikan. Obrolan, pencarian, dan pesan baru tetap ada.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Deretan grup untuk diikuti di antara postingan, beserta tombol Temukan grup lainnya. Postingan dari grup tempat Anda bergabung tetap ada.");
         table.put("The row of stories at the top of the feed, Create story included.",
@@ -5730,6 +5730,8 @@ public final class L10nTranslations {
                 "Cada v\u00eddeo \u00e9 salvo na melhor qualidade que o player reproduz.");
         table.put("Elections",
                 "Elei\u00e7\u00f5es");
+        table.put("Empties the list behind the row above your chats in Chats inside Facebook, so friends' notes and who's active go, and your own note tile may go too. Your chats, search and new messages stay.",
+                "Esvazia a lista por tr\u00e1s da linha acima das suas conversas, nas conversas dentro do Facebook, ent\u00e3o as notas dos seus amigos e quem est\u00e1 ativo somem, e talvez a sua pr\u00f3pria nota tamb\u00e9m. Suas conversas, a busca e as mensagens novas continuam.");
         table.put("Empties the list of posts you've seen, so they can show up again.",
                 "Esvazia a lista de publica\u00e7\u00f5es vistas, para que elas possam aparecer de novo.");
         table.put("Empties the log and the filter counts a report would include.",
@@ -5804,11 +5806,11 @@ public final class L10nTranslations {
                 "O texto do Facebook ficar\u00e1 com %1$s do tamanho que a configura\u00e7\u00e3o de tamanho da fonte do seu celular define.");
         table.put("Facebook's text will be the size your phone's font size setting gives it.",
                 "O texto do Facebook ter\u00e1 o tamanho que a configura\u00e7\u00e3o de tamanho da fonte do seu celular define.");
-        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
-                "Os endere\u00e7os web do Facebook est\u00e3o selecionados para este app nas configura\u00e7\u00f5es do Android, ent\u00e3o os links deles abrem aqui.");
     }
 
     private static void fillPt_rBR4(Map<String, String> table) {
+        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
+                "Os endere\u00e7os web do Facebook est\u00e3o selecionados para este app nas configura\u00e7\u00f5es do Android, ent\u00e3o os links deles abrem aqui.");
         table.put("Facebook's web addresses open here now.",
                 "Os endere\u00e7os web do Facebook agora abrem aqui.");
         table.put("Favorites",
@@ -5927,11 +5929,11 @@ public final class L10nTranslations {
                 "Ocultar localiza\u00e7\u00e3o de amigos");
         table.put("Hide link posts",
                 "Ocultar publica\u00e7\u00f5es com links");
-        table.put("Hide other Meta AI buttons under posts",
-                "Ocultar outros bot\u00f5es da Meta AI nas publica\u00e7\u00f5es");
     }
 
     private static void fillPt_rBR5(Map<String, String> table) {
+        table.put("Hide other Meta AI buttons under posts",
+                "Ocultar outros bot\u00f5es da Meta AI nas publica\u00e7\u00f5es");
         table.put("Hide other tabs' badges",
                 "Ocultar os indicadores das outras abas");
         table.put("Hide page suggestions and Facebook's own promos",
@@ -6050,11 +6052,11 @@ public final class L10nTranslations {
                 "Segurar um reel para 2x");
         table.put("Hold back analytics uploads",
                 "Segurar envios de an\u00e1lises");
-        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
-                "Segurar um reel faz ele tocar no dobro da velocidade at\u00e9 voc\u00ea soltar, no lugar do menu de toque longo do Facebook. O bot\u00e3o Mais do reel ainda abre esse menu.");
     }
 
     private static void fillPt_rBR6(Map<String, String> table) {
+        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
+                "Segurar um reel faz ele tocar no dobro da velocidade at\u00e9 voc\u00ea soltar, no lugar do menu de toque longo do Facebook. O bot\u00e3o Mais do reel ainda abre esse menu.");
         table.put("Home",
                 "P\u00e1gina inicial");
         table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
@@ -6173,11 +6175,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
                 "O Marketplace est\u00e1 oculto nas configura\u00e7\u00f5es de abas do Facebook. Exiba em Configura\u00e7\u00f5es, Barra de abas, Personalizar a barra. Suas abas normais continuam dispon\u00edveis.");
-        table.put("Marketplace mode and your start tab",
-                "Modo Marketplace e aba inicial");
     }
 
     private static void fillPt_rBR7(Map<String, String> table) {
+        table.put("Marketplace mode and your start tab",
+                "Modo Marketplace e aba inicial");
         table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
                 "O modo Marketplace define a aba inicial. Sua escolha anterior \u00e9 mantida.");
         table.put("Marketplace mode is off.",
@@ -6296,11 +6298,11 @@ public final class L10nTranslations {
                 "Uma palavra ou frase por linha");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Uma palavra ou frase por linha, at\u00e9 %1$d no total, com %2$d a %3$d caracteres cada, ou s\u00f3 um se for um emoji, um caractere chin\u00eas, um kana ou uma s\u00edlaba hangul. Mai\u00fasculas e min\u00fasculas n\u00e3o fazem diferen\u00e7a, e uma frase corresponde a qualquer trecho do texto de uma publica\u00e7\u00e3o, inclusive dentro de palavras maiores.");
-        table.put("Only on the right edge",
-                "S\u00f3 na borda direita");
     }
 
     private static void fillPt_rBR8(Map<String, String> table) {
+        table.put("Only on the right edge",
+                "S\u00f3 na borda direita");
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "S\u00f3 alguns endere\u00e7os web do Facebook est\u00e3o selecionados para este app, e os links para os outros abrem em outro lugar. Toque para selecion\u00e1-los nas configura\u00e7\u00f5es do Android.");
         table.put("Open",
@@ -6419,11 +6421,11 @@ public final class L10nTranslations {
                 "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o com nova assinatura.");
         table.put("Profiles and some Settings pages won't open",
                 "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es n\u00e3o v\u00e3o abrir");
-        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
-                "As promo\u00e7\u00f5es de figurinhas de avatar saem dos coment\u00e1rios e dos espa\u00e7os de promo\u00e7\u00e3o do Facebook, junto com o convite para criar um avatar. As figurinhas continuam sendo enviadas.");
     }
 
     private static void fillPt_rBR9(Map<String, String> table) {
+        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
+                "As promo\u00e7\u00f5es de figurinhas de avatar saem dos coment\u00e1rios e dos espa\u00e7os de promo\u00e7\u00e3o do Facebook, junto com o convite para criar um avatar. As figurinhas continuam sendo enviadas.");
         table.put("Purple",
                 "Roxo");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
@@ -6542,11 +6544,11 @@ public final class L10nTranslations {
                 "Salvar v\u00eddeos que outros apps conseguem abrir");
         table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
                 "Salve suas op\u00e7\u00f5es e configura\u00e7\u00f5es de download em um arquivo. Pausa e Registro de depura\u00e7\u00e3o n\u00e3o s\u00e3o inclu\u00eddos, nem a verifica\u00e7\u00e3o de novas vers\u00f5es.");
-        table.put("Saved",
-                "Salvos");
     }
 
     private static void fillPt_rBR10(Map<String, String> table) {
+        table.put("Saved",
+                "Salvos");
         table.put("Saved as %1$s in the Notifications folder. Pick it under Sound in Android's notification settings for Facebook.",
                 "Salvo como %1$s na pasta Notifications. Escolha em Som, nas configura\u00e7\u00f5es de notifica\u00e7\u00e3o do Android para o Facebook.");
         table.put("Saved isn't available in this build.",
@@ -6665,11 +6667,11 @@ public final class L10nTranslations {
                 "Links compat\u00edveis");
         table.put("Tab bar at the bottom",
                 "Barra de abas embaixo");
-        table.put("Tab to open on",
-                "Aba ao abrir");
     }
 
     private static void fillPt_rBR11(Map<String, String> table) {
+        table.put("Tab to open on",
+                "Aba ao abrir");
         table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
                 "As abas, o Menu e as telas que abrem sobre o Facebook aparecem na hora, sem o deslize entre elas. Deslizar entre as abas continua.");
         table.put("Tag suggestions only after @",
@@ -6788,11 +6790,11 @@ public final class L10nTranslations {
                 "Os cart\u00f5es de produto dos links de loja que os criadores adicionam \u00e0s publica\u00e7\u00f5es, nos reels, abaixo das publica\u00e7\u00f5es do feed e nos coment\u00e1rios. O r\u00f3tulo \u201cQualificado para comiss\u00e3o\u201d fica.");
         table.put("The promotional banners at the top of Chats inside Facebook go, like the one asking you to turn on notifications.",
                 "Os banners promocionais no topo das conversas dentro do Facebook somem, como o que pede para voc\u00ea ativar as notifica\u00e7\u00f5es.");
-        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
-                "A fileira de perguntas da Meta AI abaixo de algumas publica\u00e7\u00f5es. A publica\u00e7\u00e3o, o cart\u00e3o do link e os bot\u00f5es continuam.");
     }
 
     private static void fillPt_rBR12(Map<String, String> table) {
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "A fileira de perguntas da Meta AI abaixo de algumas publica\u00e7\u00f5es. A publica\u00e7\u00e3o, o cart\u00e3o do link e os bot\u00f5es continuam.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "A linha de Stories de pessoas com quem voc\u00ea n\u00e3o tem conex\u00e3o, que o Facebook insere entre as publica\u00e7\u00f5es. Os Stories dos seus amigos e a bandeja de Stories permanecem.");
         table.put("The row of friend requests between posts. Your requests stay under Friends.",
@@ -6801,8 +6803,6 @@ public final class L10nTranslations {
                 "A linha de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es e a linha no seu pr\u00f3prio perfil.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "A linha de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es, a linha no seu pr\u00f3prio perfil e os cart\u00f5es com o bot\u00e3o Adicionar na bandeja de Stories.");
-        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "A linha de notas dos seus amigos e de quem est\u00e1 ativo acima das suas conversas, nas conversas dentro do Facebook, some. Suas conversas, a busca e as mensagens novas continuam.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "A linha de grupos sugeridos para participa\u00e7\u00e3o entre as publica\u00e7\u00f5es, com o bot\u00e3o \u201cDescobrir mais grupos\u201d. As publica\u00e7\u00f5es dos grupos dos quais voc\u00ea participa permanecem.");
         table.put("The row of stories at the top of the feed, Create story included.",
@@ -7481,6 +7481,8 @@ public final class L10nTranslations {
                 "Her video, oynat\u0131c\u0131n\u0131n sundu\u011fu en iyi kalitede kaydedilir.");
         table.put("Elections",
                 "Se\u00e7imler");
+        table.put("Empties the list behind the row above your chats in Chats inside Facebook, so friends' notes and who's active go, and your own note tile may go too. Your chats, search and new messages stay.",
+                "Facebook i\u00e7indeki Sohbetlerde, sohbetlerinin \u00fcst\u00fcndeki sat\u0131r\u0131n arkas\u0131ndaki listeyi bo\u015falt\u0131r. B\u00f6ylece arkada\u015f notlar\u0131 ve etkin ki\u015filer kalkar, kendi notun da kalkabilir. Sohbetlerin, arama ve yeni mesajlar yerinde kal\u0131r.");
         table.put("Empties the list of posts you've seen, so they can show up again.",
                 "G\u00f6r\u00fclen g\u00f6nderilerin listesini bo\u015falt\u0131r, b\u00f6ylece g\u00f6nderiler yeniden g\u00f6r\u00fcnebilir.");
         table.put("Empties the log and the filter counts a report would include.",
@@ -7555,11 +7557,11 @@ public final class L10nTranslations {
                 "Facebook'taki metin, telefonunun yaz\u0131 tipi boyutu ayar\u0131n\u0131n verdi\u011fi boyutun %1$s kadar\u0131 olacak.");
         table.put("Facebook's text will be the size your phone's font size setting gives it.",
                 "Facebook'taki metin, telefonunun yaz\u0131 tipi boyutu ayar\u0131n\u0131n verdi\u011fi boyutta olacak.");
-        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
-                "Facebook'un web adresleri Android ayarlar\u0131nda bu uygulama i\u00e7in se\u00e7ili, bu y\u00fczden ba\u011flant\u0131lar\u0131 burada a\u00e7\u0131l\u0131r.");
     }
 
     private static void fillTr4(Map<String, String> table) {
+        table.put("Facebook's web addresses are selected for this app in Android's settings, so their links open here.",
+                "Facebook'un web adresleri Android ayarlar\u0131nda bu uygulama i\u00e7in se\u00e7ili, bu y\u00fczden ba\u011flant\u0131lar\u0131 burada a\u00e7\u0131l\u0131r.");
         table.put("Facebook's web addresses open here now.",
                 "Facebook'un web adresleri art\u0131k burada a\u00e7\u0131l\u0131yor.");
         table.put("Favorites",
@@ -7678,11 +7680,11 @@ public final class L10nTranslations {
                 "Arkada\u015flar\u0131n konumlar\u0131n\u0131 gizle");
         table.put("Hide link posts",
                 "Ba\u011flant\u0131 g\u00f6nderilerini gizle");
-        table.put("Hide other Meta AI buttons under posts",
-                "G\u00f6nderilerin alt\u0131ndaki di\u011fer Meta AI d\u00fc\u011fmelerini gizle");
     }
 
     private static void fillTr5(Map<String, String> table) {
+        table.put("Hide other Meta AI buttons under posts",
+                "G\u00f6nderilerin alt\u0131ndaki di\u011fer Meta AI d\u00fc\u011fmelerini gizle");
         table.put("Hide other tabs' badges",
                 "Di\u011fer sekmelerdeki rozetleri gizle");
         table.put("Hide page suggestions and Facebook's own promos",
@@ -7801,11 +7803,11 @@ public final class L10nTranslations {
                 "2x i\u00e7in reel'e bas\u0131l\u0131 tut");
         table.put("Hold back analytics uploads",
                 "Analiz y\u00fcklemelerini beklet");
-        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
-                "Bir reel'e bas\u0131l\u0131 tutmak, b\u0131rakana kadar onu iki kat h\u0131zda oynat\u0131r ve Facebook'un uzun basma men\u00fcs\u00fcn\u00fcn yerini al\u0131r. Reel'in daha fazla d\u00fc\u011fmesi bu men\u00fcy\u00fc a\u00e7maya devam eder.");
     }
 
     private static void fillTr6(Map<String, String> table) {
+        table.put("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press menu. The reel's more button still opens that menu.",
+                "Bir reel'e bas\u0131l\u0131 tutmak, b\u0131rakana kadar onu iki kat h\u0131zda oynat\u0131r ve Facebook'un uzun basma men\u00fcs\u00fcn\u00fcn yerini al\u0131r. Reel'in daha fazla d\u00fc\u011fmesi bu men\u00fcy\u00fc a\u00e7maya devam eder.");
         table.put("Home",
                 "Ana Sayfa");
         table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
@@ -7924,11 +7926,11 @@ public final class L10nTranslations {
                 "Marketplace");
         table.put("Marketplace is hidden in Facebook's tab settings. Show it under Settings, Tab bar, Customize the bar. Your normal tabs stay available.",
                 "Marketplace, Facebook'un sekme ayarlar\u0131nda gizli. Ayarlar, Sekme \u00e7ubu\u011fu, \u00c7ubu\u011fu \u00f6zelle\u015ftir b\u00f6l\u00fcm\u00fcnden g\u00f6sterin. Normal sekmeleriniz kullan\u0131labilir.");
-        table.put("Marketplace mode and your start tab",
-                "Marketplace modu ve ba\u015flang\u0131\u00e7 sekmesi");
     }
 
     private static void fillTr7(Map<String, String> table) {
+        table.put("Marketplace mode and your start tab",
+                "Marketplace modu ve ba\u015flang\u0131\u00e7 sekmesi");
         table.put("Marketplace mode chooses the opening tab. Your previous choice stays saved.",
                 "A\u00e7\u0131l\u0131\u015f sekmesini Marketplace modu belirler. \u00d6nceki se\u00e7iminiz kay\u0131tl\u0131 kal\u0131r.");
         table.put("Marketplace mode is off.",
@@ -8047,11 +8049,11 @@ public final class L10nTranslations {
                 "Her sat\u0131ra bir kelime veya ifade");
         table.put("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
                 "Her sat\u0131ra bir kelime veya ifade, en fazla %1$d tane, her biri %2$d ile %3$d karakter aras\u0131. Emoji, \u00c7ince karakter, kana veya Hangul hecesi i\u00e7in tek karakter yeter. B\u00fcy\u00fck k\u00fc\u00e7\u00fck harf fark etmez ve bir ifade, g\u00f6nderi metninin herhangi bir yerinde, daha uzun kelimelerin i\u00e7inde bile e\u015fle\u015fir.");
-        table.put("Only on the right edge",
-                "Yaln\u0131zca sa\u011f kenarda");
     }
 
     private static void fillTr8(Map<String, String> table) {
+        table.put("Only on the right edge",
+                "Yaln\u0131zca sa\u011f kenarda");
         table.put("Only some of Facebook's web addresses are selected for this app, and links to the rest open elsewhere. Tap to select them in Android's settings.",
                 "Facebook'un web adreslerinden yaln\u0131zca baz\u0131lar\u0131 bu uygulama i\u00e7in se\u00e7ili ve di\u011ferlerinin ba\u011flant\u0131lar\u0131 ba\u015fka yerde a\u00e7\u0131l\u0131r. Android ayarlar\u0131nda se\u00e7mek i\u00e7in dokunun.");
         table.put("Open",
@@ -8170,11 +8172,11 @@ public final class L10nTranslations {
                 "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
         table.put("Profiles and some Settings pages won't open",
                 "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 a\u00e7\u0131lmayacak");
-        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
-                "Avatar \u00e7\u0131kartmas\u0131 tan\u0131t\u0131mlar\u0131 yorumlardan ve Facebook'un tan\u0131t\u0131m alanlar\u0131ndan kalkar, avatar olu\u015fturma daveti de kalkar. \u00c7\u0131kartmalar yine g\u00f6nderilebilir.");
     }
 
     private static void fillTr9(Map<String, String> table) {
+        table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
+                "Avatar \u00e7\u0131kartmas\u0131 tan\u0131t\u0131mlar\u0131 yorumlardan ve Facebook'un tan\u0131t\u0131m alanlar\u0131ndan kalkar, avatar olu\u015fturma daveti de kalkar. \u00c7\u0131kartmalar yine g\u00f6nderilebilir.");
         table.put("Purple",
                 "Mor");
         table.put("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. Restart Facebook after changing it.",
@@ -8293,11 +8295,11 @@ public final class L10nTranslations {
                 "Videolar\u0131 di\u011fer uygulamalar\u0131n a\u00e7abilece\u011fi bi\u00e7imde kaydet");
         table.put("Save your switches and download settings to a file. Pause and Debug logging aren't included, and neither is the release check.",
                 "Anahtarlar\u0131n\u0131 ve indirme ayarlar\u0131n\u0131 bir dosyaya kaydet. Duraklatma ve Hata ay\u0131klama g\u00fcnl\u00fc\u011f\u00fc dahil edilmez, s\u00fcr\u00fcm denetimi de edilmez.");
-        table.put("Saved",
-                "Kaydedilenler");
     }
 
     private static void fillTr10(Map<String, String> table) {
+        table.put("Saved",
+                "Kaydedilenler");
         table.put("Saved as %1$s in the Notifications folder. Pick it under Sound in Android's notification settings for Facebook.",
                 "Notifications klas\u00f6r\u00fcne %1$s olarak kaydedildi. Android'in Facebook bildirim ayarlar\u0131nda Ses alt\u0131ndan se\u00e7.");
         table.put("Saved isn't available in this build.",
@@ -8416,11 +8418,11 @@ public final class L10nTranslations {
                 "Desteklenen ba\u011flant\u0131lar");
         table.put("Tab bar at the bottom",
                 "Sekme \u00e7ubu\u011fu altta");
-        table.put("Tab to open on",
-                "A\u00e7\u0131l\u0131\u015fta g\u00f6sterilecek sekme");
     }
 
     private static void fillTr11(Map<String, String> table) {
+        table.put("Tab to open on",
+                "A\u00e7\u0131l\u0131\u015fta g\u00f6sterilecek sekme");
         table.put("Tabs, the Menu and screens that open over Facebook show at once, without the slide between them. Swiping between tabs stays.",
                 "Sekmeler, Men\u00fc ve Facebook'un \u00fczerinde a\u00e7\u0131lan ekranlar, aralar\u0131ndaki kayma olmadan hemen g\u00f6r\u00fcn\u00fcr. Sekmeler aras\u0131nda kayd\u0131rma kal\u0131r.");
         table.put("Tag suggestions only after @",
@@ -8539,11 +8541,11 @@ public final class L10nTranslations {
                 "\u0130\u00e7erik \u00fcreticilerinin g\u00f6nderilere ekledi\u011fi ma\u011faza ba\u011flant\u0131lar\u0131n\u0131n \u00fcr\u00fcn kartlar\u0131, reels'te, ak\u0131\u015ftaki g\u00f6nderilerin alt\u0131nda ve yorumlarda. \u201cKomisyona uygun\u201d etiketi kal\u0131r.");
         table.put("The promotional banners at the top of Chats inside Facebook go, like the one asking you to turn on notifications.",
                 "Facebook i\u00e7indeki Sohbetlerin \u00fcst\u00fcndeki tan\u0131t\u0131m afi\u015fleri kalkar, bildirimleri a\u00e7man\u0131 isteyen afi\u015f gibi.");
-        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
-                "Baz\u0131 g\u00f6nderilerin alt\u0131ndaki Meta AI sorular\u0131 sat\u0131r\u0131. G\u00f6nderi, ba\u011flant\u0131 kart\u0131 ve d\u00fc\u011fmeleri kal\u0131r.");
     }
 
     private static void fillTr12(Map<String, String> table) {
+        table.put("The row of Meta AI questions under some posts. The post, its link card and its buttons stay.",
+                "Baz\u0131 g\u00f6nderilerin alt\u0131ndaki Meta AI sorular\u0131 sat\u0131r\u0131. G\u00f6nderi, ba\u011flant\u0131 kart\u0131 ve d\u00fc\u011fmeleri kal\u0131r.");
         table.put("The row of Stories from people you aren't connected to that Facebook puts between posts. Your friends' Stories and the Stories tray stay.",
                 "Facebook'un g\u00f6nderilerin aras\u0131na koydu\u011fu, ba\u011flant\u0131n olmayan ki\u015filerin hikayelerinden olu\u015fan sat\u0131r. Arkada\u015flar\u0131n\u0131n hikayeleri ve hikaye \u015feridi kal\u0131r.");
         table.put("The row of friend requests between posts. Your requests stay under Friends.",
@@ -8552,8 +8554,6 @@ public final class L10nTranslations {
                 "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131 ve kendi profilindeki sat\u0131r.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131, kendi profilindeki sat\u0131r ve hikaye tepsisindeki Ekle d\u00fc\u011fmeli kartlar.");
-        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "Facebook i\u00e7indeki Sohbetlerde, sohbetlerinin \u00fcst\u00fcndeki arkada\u015f notlar\u0131 ve etkin ki\u015filer sat\u0131r\u0131 kalkar. Sohbetlerin, arama ve yeni mesajlar yerinde kal\u0131r.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "G\u00f6nderilerin aras\u0131ndaki kat\u0131labilece\u011fin gruplar sat\u0131r\u0131 ve Daha fazla grup ke\u015ffet d\u00fc\u011fmesi. \u00dcyesi oldu\u011fun gruplar\u0131n g\u00f6nderileri kal\u0131r.");
         table.put("The row of stories at the top of the feed, Create story included.",
