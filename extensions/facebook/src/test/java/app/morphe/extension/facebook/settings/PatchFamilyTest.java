@@ -60,6 +60,8 @@ public class PatchFamilyTest {
         Settings.HIDE_SPONSORED_POSTS.resetToDefault();
         Settings.HIDE_REEL_FOLLOW_BUTTON.resetToDefault();
         Settings.HIDE_MENU_ALSO_FROM_META.resetToDefault();
+        Settings.DOWNLOAD_VIDEOS.resetToDefault();
+        Settings.CLIPBOARD_DOWNLOAD.resetToDefault();
         HookStatus.clear();
     }
 
@@ -358,10 +360,19 @@ public class PatchFamilyTest {
         assertEquals("Download any reel: on (hushfacebook_download_reels=on)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.REEL_DOWNLOAD), false).get(0));
         // So has the video menu's item, and a pause takes it out whole.
-        assertEquals("Download any video: on (hushfacebook_download_videos=on)",
+        // Its copied-link offer is an option of that item: on alone, it doesn't turn the patch on.
+        assertEquals("Download any video: on (hushfacebook_download_videos=on, hushfacebook_clipboard_download=off)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.VIDEO_DOWNLOAD), false).get(0));
-        assertEquals("Download any video: disabled while paused (saved hushfacebook_download_videos=on)",
+        assertEquals("Download any video: disabled while paused (saved hushfacebook_download_videos=on, "
+                        + "hushfacebook_clipboard_download=off)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.VIDEO_DOWNLOAD), true).get(0));
+        Settings.DOWNLOAD_VIDEOS.save(false);
+        Settings.CLIPBOARD_DOWNLOAD.save(true);
+        assertEquals("Download any video: disabled by its switch (hushfacebook_download_videos=off, "
+                        + "hushfacebook_clipboard_download=on)",
+                PatchFamily.reportLines(EnumSet.of(PatchFamily.VIDEO_DOWNLOAD), false).get(0));
+        Settings.DOWNLOAD_VIDEOS.resetToDefault();
+        Settings.CLIPBOARD_DOWNLOAD.resetToDefault();
         // The Menu's two groups have a switch each, and the report names both.
         Settings.HIDE_MENU_ALSO_FROM_META.save(false);
         assertEquals("Hide Menu promotions: on (hushfacebook_hide_menu_upgrades=on, "

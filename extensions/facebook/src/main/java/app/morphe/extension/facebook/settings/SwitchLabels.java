@@ -113,6 +113,7 @@ final class SwitchLabels {
         if (setting == Settings.TURN_OFF_HDR_BRIGHTNESS) return L10n.t("Turn off HDR brightness");
         if (setting == Settings.KEEP_PROGRESS_BAR) return L10n.t("Keep the progress bar");
         if (setting == Settings.DOWNLOAD_VIDEOS) return L10n.t("Download feed and Watch videos");
+        if (setting == Settings.CLIPBOARD_DOWNLOAD) return L10n.t("Offer to download copied links");
         if (setting == Settings.DOWNLOAD_PHOTOS) return L10n.t("Save any photo");
         if (setting == Settings.POST_MENU_PHOTO_SAVE) return L10n.t("Save photo in post menus");
         if (setting == Settings.DOWNLOAD_COMPATIBLE) return L10n.t("Save videos other apps can open");

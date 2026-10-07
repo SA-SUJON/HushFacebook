@@ -180,6 +180,7 @@ public final class SettingsBackup {
             Settings.DOWNLOAD_STORIES,
             Settings.DOWNLOAD_REELS,
             Settings.DOWNLOAD_VIDEOS,
+            Settings.CLIPBOARD_DOWNLOAD,
             Settings.DOWNLOAD_PHOTOS,
             Settings.POST_MENU_PHOTO_SAVE,
             Settings.DOWNLOAD_COMPATIBLE,

@@ -893,3 +893,15 @@ Posts and reel captions stay in the language they were written in. Facebook's Se
 Keep the video speed	Manter a velocidade dos vídeos
 # context: description of that switch; the gear menu is the settings button on a video's player, where Playback speed is picked
 A playback speed you pick in a feed or Watch video's gear menu stays for the next videos until you pick another or Facebook restarts. Reels keep their own speed. It's off by default because it hasn't been tested on a real account yet.	A velocidade de reprodução que você escolhe no menu de engrenagem de um vídeo do feed ou do Watch continua nos próximos vídeos até você escolher outra ou o Facebook reiniciar. Os reels mantêm a própria velocidade. Esta opção vem desativada por padrão porque ainda não foi testada com uma conta real.
+# context: switch title under Downloads, below Download feed and Watch videos; it offers to download a reel or video whose link the user copied
+Offer to download copied links	Oferecer download de links copiados
+# context: description of that switch; Download feed and Watch videos is the name of the switch above it
+With Download feed and Watch videos on, coming back to Facebook with a reel or video link copied offers to download it, once per link. Off, Facebook doesn't look at what you copied.	Com Baixar vídeos do feed e do Watch ativado, voltar ao Facebook com um link de reel ou vídeo copiado oferece baixá-lo, uma vez por link. Desativado, o Facebook não olha o que você copiou.
+# context: title of the dialog that offers to download the video whose link is on the clipboard; the link shows under it
+Download the video you copied?	Baixar o vídeo que você copiou?
+# context: button of that dialog that declines; the same link is never offered again
+No thanks	Não, obrigado
+# context: toast when a copied share link couldn't be followed to a video, so Facebook opened the link itself
+Couldn't find the video in that link, so it opened in Facebook instead.	Não foi possível encontrar o vídeo nesse link, então ele foi aberto no Facebook.
+# context: toast when Download on a copied link opens the video first, so Facebook loads it and the save can start
+Opening the video to save it	Abrindo o vídeo para salvá-lo

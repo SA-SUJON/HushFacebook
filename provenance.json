@@ -726,6 +726,15 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/ClipboardLink.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook, an idea from Loukious's module (behavior only, no code): behind a second switch of Download any video, a facebook.com or fb.watch reel or video link on the clipboard is offered for download once per link when a Facebook screen comes to the front and gains focus, read only with the switch on; a share or fb.watch link is followed over Facebook's own https redirects to its video id, and the save reuses the player source Facebook records for that id, opening the video through Facebook's kept IntentUriHandler first when no player was built yet."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/ReadReceipts.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/chats/HideReadReceiptsPatch.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/chats/ReadReceiptAnchors.kt"

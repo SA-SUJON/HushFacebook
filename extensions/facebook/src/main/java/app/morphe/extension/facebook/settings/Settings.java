@@ -728,6 +728,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_download_videos", TRUE);
 
     /**
+     * Download any video's second switch: coming back to Facebook with a reel or video link
+     * copied offers to download it, once per link. Off until you turn it on, and it needs
+     * {@link #DOWNLOAD_VIDEOS} on too. Off, the clipboard is never read.
+     */
+    public static final BooleanSetting CLIPBOARD_DOWNLOAD =
+            new BooleanSetting("hushfacebook_clipboard_download", FALSE);
+
+    /**
      * Save photo in the photo viewer's menu for every photo, saved at its biggest size where
      * downloads go. Off, the item shows only where the poster allows it and saves through Facebook.
      */

@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.facebook.download.ClipboardLink;
 import app.morphe.extension.facebook.download.SaveLeftovers;
 import app.morphe.extension.facebook.download.SavedFileActions;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
@@ -471,6 +472,8 @@ public final class SettingsEntry {
             SavedFileActions.onResumed(activity);
             ScreenTransitions.activityResumed(activity);
             TapToPlay.activityResumed(activity);
+            // Only with Download any video in the build, whose switch it is an option of.
+            if (SettingsStatus.videoDownload()) ClipboardLink.onResumed(activity);
             if (openPending) openWhenSettled(activity);
             relabelIfStale(activity);
             SavedShortcut.refresh(activity);
@@ -479,6 +482,7 @@ public final class SettingsEntry {
         @Override
         public void onActivityPaused(Activity activity) {
             SavedFileActions.onPaused(activity);
+            ClipboardLink.onPaused(activity);
             ScreenTransitions.activityPaused(activity);
             if (resumed != null && resumed.get() == activity) resumed = null;
             LastScreen.read(activity);

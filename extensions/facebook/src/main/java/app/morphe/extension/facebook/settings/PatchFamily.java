@@ -137,7 +137,7 @@ public enum PatchFamily {
     REEL_DOWNLOAD(FamilyNames.REEL_DOWNLOAD, "reelDownload", null,
             Settings.DOWNLOAD_REELS),
     VIDEO_DOWNLOAD(FamilyNames.VIDEO_DOWNLOAD, "videoDownload", null,
-            Settings.DOWNLOAD_VIDEOS),
+            Settings.DOWNLOAD_VIDEOS, Settings.CLIPBOARD_DOWNLOAD),
     PHOTO_DOWNLOAD(FamilyNames.PHOTO_DOWNLOAD, "photoDownload", null,
             Settings.DOWNLOAD_PHOTOS, Settings.POST_MENU_PHOTO_SAVE),
     START_TAB(FamilyNames.START_TAB, "startTab", null,
@@ -384,6 +384,7 @@ public enum PatchFamily {
         for (BooleanSetting setting : switches) anyOn |= setting.savedValue();
         // Options cannot enable these families without their main switch.
         if (this == MARKETPLACE_ONLY) anyOn = Settings.MARKETPLACE_ONLY.savedValue();
+        if (this == VIDEO_DOWNLOAD) anyOn = Settings.DOWNLOAD_VIDEOS.savedValue();
         if (this == POST_WORDS) {
             anyOn = Settings.HIDE_POSTS_WITH_WORDS.savedValue() || Settings.HIDE_POSTS_FROM_SOURCES.savedValue();
         }
