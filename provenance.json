@@ -821,6 +821,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/navigation/TabBadges.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/navigation/tabbadges/HideTabBadgesPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Hide tab badges, the per-tab version of the shortcut-bar dot controls Meta gives the web. It shares the tab bar's one count hook with Hide the Reels tab dot, the jewel controller's static count for each TabTag, which now sits in a hook patch both depend on, and answers 0 for each tab whose switch is on, known by the class Facebook keeps for it. For the app icon, Facebook 577, 580 and 581 write their own launcher count through one writer per launcher family, each naming itself with a kept *LauncherBadgesInterface literal and all sharing one (FbUserSession, int) -> TriState interface found from the generic writer. The extension goes first in every writer and swaps the count for 0 while the switch is on."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/ads/FeedAdPills.java"
       ],
       "origin": "original",

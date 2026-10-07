@@ -97,6 +97,7 @@ import app.morphe.extension.facebook.navigation.MarketplaceOnlyForTests;
 import app.morphe.extension.facebook.navigation.MarketplaceSellerProfileForTests;
 import app.morphe.extension.facebook.navigation.HiddenTabsForTests;
 import app.morphe.extension.facebook.navigation.ReelsTabForTests;
+import app.morphe.extension.facebook.navigation.TabBadgesForTests;
 import app.morphe.extension.facebook.navigation.StartTabRouteForTests;
 import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
 import app.morphe.extension.facebook.reels.DoubleTapLike;
@@ -476,6 +477,9 @@ public class PausedHooksTest {
                 ReelsTabForTests::dropsTheShortcut));
         // The tab bar's count for the Reels tab reads none.
         probes.put(PatchFamily.REELS_TAB_DOT, Collections.singletonList(ReelsTabForTests::clearsTheDot));
+        // The tab bar's count for the Friends tab reads none, and a launcher writer puts 0 on the icon.
+        probes.put(PatchFamily.TAB_BADGES, Arrays.asList(TabBadgesForTests::clearsTheFriendsTab,
+                TabBadgesForTests::clearsTheIcon));
         // The Friends tab comes off the bar.
         probes.put(PatchFamily.HIDDEN_TABS, Collections.singletonList(HiddenTabsForTests::hidesTheTab));
         // Facebook's own override of where the tab bar goes reads YES, for the bottom, where it read NO.

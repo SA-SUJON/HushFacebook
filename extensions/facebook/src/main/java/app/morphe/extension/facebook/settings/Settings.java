@@ -754,6 +754,40 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reels_tab_dot", TRUE);
 
     /*
+     * The tabs Hide tab badges takes the dot and count off
+     * ({@link app.morphe.extension.facebook.navigation.TabBadges}), each off until you pick it. The
+     * tab bar asks for each count as it changes, so a change shows the next time it asks.
+     */
+    public static final BooleanSetting HIDE_HOME_TAB_BADGE =
+            new BooleanSetting("hushfacebook_hide_home_tab_badge", FALSE);
+
+    public static final BooleanSetting HIDE_FRIENDS_TAB_BADGE =
+            new BooleanSetting("hushfacebook_hide_friends_tab_badge", FALSE);
+
+    public static final BooleanSetting HIDE_MARKETPLACE_TAB_BADGE =
+            new BooleanSetting("hushfacebook_hide_marketplace_tab_badge", FALSE);
+
+    public static final BooleanSetting HIDE_NOTIFICATIONS_TAB_BADGE =
+            new BooleanSetting("hushfacebook_hide_notifications_tab_badge", FALSE);
+
+    public static final BooleanSetting HIDE_MENU_TAB_BADGE =
+            new BooleanSetting("hushfacebook_hide_menu_tab_badge", FALSE);
+
+    public static final BooleanSetting HIDE_GROUPS_TAB_BADGE =
+            new BooleanSetting("hushfacebook_hide_groups_tab_badge", FALSE);
+
+    /** Every tab but Reels and the six above: Feeds, Gaming, Events, Dating and the rest. */
+    public static final BooleanSetting HIDE_OTHER_TAB_BADGES =
+            new BooleanSetting("hushfacebook_hide_other_tab_badges", FALSE);
+
+    /**
+     * Facebook's own launcher badge writers put 0 on the app icon. Notifications still arrive. A
+     * change shows the next time Facebook updates the badge.
+     */
+    public static final BooleanSetting HIDE_APP_ICON_COUNT =
+            new BooleanSetting("hushfacebook_hide_app_icon_count", FALSE);
+
+    /*
      * The tabs Hide tabs takes off the tab bar ({@link app.morphe.extension.facebook.navigation.HiddenTabs}),
      * each off until it's picked. Facebook builds the bar once, so a change shows when it restarts.
      */

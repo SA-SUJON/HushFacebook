@@ -2221,6 +2221,60 @@
       "options": []
     },
     {
+      "name": "Hide tab badges",
+      "description": "Takes the dot and count off the tabs you pick, and Facebook's count off its app icon. Notifications still come in, and the Notifications tab still lists them. Every switch starts off.",
+      "category": "Interface",
+      "use": true,
+      "dependencies": [
+        "BytecodePatch",
+        "Hushfacebook settings"
+      ],
+      "compatiblePackages": {
+        "com.facebook.katana": [
+          "581.0.0.45.58",
+          "580.0.0.51.74",
+          "577.0.0.50.72"
+        ]
+      },
+      "compatibility": [
+        {
+          "name": "Facebook",
+          "packageName": "com.facebook.katana",
+          "description": null,
+          "appIconColor": 550655,
+          "signatures": [
+            "911d604446084ca7f4760b775bfc160fa8702441240a7258645d7a72c4312d27",
+            "e3f9e1e0cf99d0e56a055ba65e241b3399f7cea524326b0cdd6ec1327ed0fdc1"
+          ],
+          "targets": [
+            {
+              "version": "581.0.0.45.58",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 475215365,
+                "ARMEABI_V7A": 475215364
+              }
+            },
+            {
+              "version": "580.0.0.51.74",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 475019344
+              }
+            },
+            {
+              "version": "577.0.0.50.72",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 474426275
+              }
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Hide tabs",
       "description": "Takes the tabs you pick off the tab bar: Feeds, Friends, Marketplace, Groups, Gaming or Events, and Dating, Professional dashboard, Saved, Ad Center, Create, Explore or Jobs where Facebook gives you one. Each page stays in the Menu. Every switch starts off, and a change shows once Facebook restarts.",
       "category": "Interface",
@@ -2440,6 +2494,7 @@
       "category": "Interface",
       "use": true,
       "dependencies": [
+        "BytecodePatch",
         "Hushfacebook settings"
       ],
       "compatiblePackages": {

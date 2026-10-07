@@ -262,6 +262,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean tabBadges() {
+        return false;
+    }
+
     public static boolean hiddenTabs() {
         return false;
     }

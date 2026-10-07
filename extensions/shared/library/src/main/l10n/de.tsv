@@ -931,3 +931,25 @@ Choose a folder for photos inside the save folder. Invalid characters become und
 Videos go to %1$s.	Videos landen in %1$s.
 # context: summary of the Photo subfolder row; %1$s is a folder path such as Pictures/Facebook/Photos
 Photos go to %1$s.	Fotos landen in %1$s.
+# context: switch that takes the new-item dot and count off the Home tab
+Hide the Home tab badge	Zähler am Startseiten-Tab ausblenden
+# context: switch that takes the new-item dot and count off the Friends tab
+Hide the Friends tab badge	Zähler am Freunde-Tab ausblenden
+# context: switch that takes the new-item dot and count off the Marketplace tab
+Hide the Marketplace tab badge	Zähler am Marketplace-Tab ausblenden
+# context: switch that takes the new-item dot and count off the Notifications tab
+Hide the Notifications tab badge	Zähler am Benachrichtigungen-Tab ausblenden
+# context: switch that takes the new-item dot and count off the Menu tab
+Hide the Menu tab badge	Zähler am Menü-Tab ausblenden
+# context: switch that takes the new-item dot and count off the Groups tab
+Hide the Groups tab badge	Zähler am Gruppen-Tab ausblenden
+# context: switch that takes the new-item dot and count off every tab without a switch of its own
+Hide other tabs' badges	Zähler an anderen Tabs ausblenden
+# context: switch that keeps Facebook from putting its count on the launcher icon
+Hide the app icon count	Zähler am App-Symbol ausblenden
+# context: summary of the switch for the badges on every tab without a switch of its own
+No dot or count on Feeds, Gaming, Events and the other tabs not listed here. The Reels tab has its own switch.	Kein Punkt und keine Zahl an Feeds, Gaming, Veranstaltungen und den anderen Tabs, die hier nicht stehen. Der Reels-Tab hat einen eigenen Schalter.
+# context: summary of each tab's badge switch
+No dot or count on this tab. Its page still shows what's new when you open it.	Kein Punkt und keine Zahl an diesem Tab. Die Seite zeigt Neues weiterhin, wenn du sie öffnest.
+# context: summary of the app icon count switch
+No count on Facebook's app icon. Notifications still come in. A launcher that counts notifications on its own may still show them.	Keine Zahl am App-Symbol von Facebook. Benachrichtigungen kommen weiterhin an. Ein Launcher, der Benachrichtigungen selbst zählt, kann sie trotzdem anzeigen.

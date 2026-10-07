@@ -931,3 +931,25 @@ Choose a folder for photos inside the save folder. Invalid characters become und
 Videos go to %1$s.	Video disimpan ke %1$s.
 # context: summary of the Photo subfolder row; %1$s is a folder path such as Pictures/Facebook/Photos
 Photos go to %1$s.	Foto disimpan ke %1$s.
+# context: switch that takes the new-item dot and count off the Home tab
+Hide the Home tab badge	Sembunyikan lencana tab Beranda
+# context: switch that takes the new-item dot and count off the Friends tab
+Hide the Friends tab badge	Sembunyikan lencana tab Teman
+# context: switch that takes the new-item dot and count off the Marketplace tab
+Hide the Marketplace tab badge	Sembunyikan lencana tab Marketplace
+# context: switch that takes the new-item dot and count off the Notifications tab
+Hide the Notifications tab badge	Sembunyikan lencana tab Notifikasi
+# context: switch that takes the new-item dot and count off the Menu tab
+Hide the Menu tab badge	Sembunyikan lencana tab Menu
+# context: switch that takes the new-item dot and count off the Groups tab
+Hide the Groups tab badge	Sembunyikan lencana tab Grup
+# context: switch that takes the new-item dot and count off every tab without a switch of its own
+Hide other tabs' badges	Sembunyikan lencana tab lainnya
+# context: switch that keeps Facebook from putting its count on the launcher icon
+Hide the app icon count	Sembunyikan angka di ikon aplikasi
+# context: summary of the switch for the badges on every tab without a switch of its own
+No dot or count on Feeds, Gaming, Events and the other tabs not listed here. The Reels tab has its own switch.	Tanpa titik atau angka di Feed, Gaming, Acara, dan tab lain yang tidak tercantum di sini. Tab Reels punya tombolnya sendiri.
+# context: summary of each tab's badge switch
+No dot or count on this tab. Its page still shows what's new when you open it.	Tanpa titik atau angka di tab ini. Halamannya tetap menampilkan yang baru saat kamu membukanya.
+# context: summary of the app icon count switch
+No count on Facebook's app icon. Notifications still come in. A launcher that counts notifications on its own may still show them.	Tanpa angka di ikon aplikasi Facebook. Notifikasi tetap masuk. Launcher yang menghitung notifikasi sendiri mungkin tetap menampilkannya.

@@ -32,6 +32,7 @@ import android.widget.TextView;
 import java.util.Set;
 
 import app.morphe.extension.facebook.navigation.HiddenTabs;
+import app.morphe.extension.facebook.navigation.TabBadges;
 import app.morphe.extension.facebook.coexist.MessengerLinkCheck;
 import app.morphe.extension.facebook.settings.SettingsRows.BackupRow;
 import app.morphe.extension.facebook.settings.SettingsRows.ClearRow;
@@ -80,7 +81,7 @@ final class HushfacebookPages {
         if (build.contains(PatchFamily.SYSTEM_FONT) || build.contains(PatchFamily.SYSTEM_EMOJI)
                 || build.contains(PatchFamily.BOTTOM_TAB_BAR) || build.contains(PatchFamily.FORCE_DARK_MODE)
                 || build.contains(PatchFamily.HIDDEN_TABS) || build.contains(PatchFamily.HAPTICS)
-                || build.contains(PatchFamily.SCREEN_TRANSITIONS)) {
+                || build.contains(PatchFamily.SCREEN_TRANSITIONS) || build.contains(PatchFamily.TAB_BADGES)) {
             PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
             if (build.contains(PatchFamily.SYSTEM_FONT)) {
                 appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT,
@@ -116,6 +117,18 @@ final class HushfacebookPages {
                             L10n.t("Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after "
                                     + "changing it.")));
                 }
+            }
+            if (build.contains(PatchFamily.TAB_BADGES)) {
+                // The tab bar asks for each tab's count as it changes, so a change shows the next time it asks.
+                for (TabBadges.Tab tab : TabBadges.Tab.values()) {
+                    appearance.addPreference(toggle(context, tab.setting(), tab == TabBadges.Tab.OTHER
+                            ? L10n.t("No dot or count on Feeds, Gaming, Events and the other tabs not listed here. "
+                                    + "The Reels tab has its own switch.")
+                            : L10n.t("No dot or count on this tab. Its page still shows what's new when you open it.")));
+                }
+                appearance.addPreference(toggle(context, Settings.HIDE_APP_ICON_COUNT,
+                        L10n.t("No count on Facebook's app icon. Notifications still come in. A launcher that counts "
+                                + "notifications on its own may still show them.")));
             }
             if (build.contains(PatchFamily.FORCE_DARK_MODE)) {
                 // Facebook asks for dark mode as each screen applies its theme, so a change shows fully after a restart.

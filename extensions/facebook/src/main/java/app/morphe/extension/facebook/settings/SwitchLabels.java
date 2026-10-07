@@ -60,6 +60,14 @@ final class SwitchLabels {
         if (setting == Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT) return L10n.t("Tag suggestions only after @");
         if (setting == Settings.HIDE_REELS_TAB) return L10n.t("Hide the Reels tab");
         if (setting == Settings.HIDE_REELS_TAB_DOT) return L10n.t("Hide the Reels tab dot");
+        if (setting == Settings.HIDE_HOME_TAB_BADGE) return L10n.t("Hide the Home tab badge");
+        if (setting == Settings.HIDE_FRIENDS_TAB_BADGE) return L10n.t("Hide the Friends tab badge");
+        if (setting == Settings.HIDE_MARKETPLACE_TAB_BADGE) return L10n.t("Hide the Marketplace tab badge");
+        if (setting == Settings.HIDE_NOTIFICATIONS_TAB_BADGE) return L10n.t("Hide the Notifications tab badge");
+        if (setting == Settings.HIDE_MENU_TAB_BADGE) return L10n.t("Hide the Menu tab badge");
+        if (setting == Settings.HIDE_GROUPS_TAB_BADGE) return L10n.t("Hide the Groups tab badge");
+        if (setting == Settings.HIDE_OTHER_TAB_BADGES) return L10n.t("Hide other tabs' badges");
+        if (setting == Settings.HIDE_APP_ICON_COUNT) return L10n.t("Hide the app icon count");
         if (setting == Settings.HIDE_FEEDS_TAB) return L10n.t("Hide the Feeds tab");
         if (setting == Settings.HIDE_FRIENDS_TAB) return L10n.t("Hide the Friends tab");
         if (setting == Settings.HIDE_MARKETPLACE_TAB) return L10n.t("Hide the Marketplace tab");

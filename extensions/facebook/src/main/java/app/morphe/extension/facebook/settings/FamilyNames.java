@@ -76,6 +76,7 @@ public final class FamilyNames {
     public static final String SELLER_VIEW_PROFILE = "Show View profile on Marketplace sellers";
     public static final String REELS_TAB = "Hide the Reels tab";
     public static final String REELS_TAB_DOT = "Hide the Reels tab dot";
+    public static final String TAB_BADGES = "Hide tab badges";
     public static final String HIDDEN_TABS = "Hide tabs";
     public static final String BOTTOM_TAB_BAR = "Tab bar at the bottom";
     public static final String FORCE_DARK_MODE = "Force dark mode";
