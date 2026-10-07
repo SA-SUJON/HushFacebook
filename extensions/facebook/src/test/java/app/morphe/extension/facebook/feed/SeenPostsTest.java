@@ -214,11 +214,12 @@ public class SeenPostsTest {
     public void theStoreKeepsTheNewestAndDropsTheOldest() {
         for (int i = 0; i < SeenPosts.CAP + 5; i++) SeenPosts.remember("id" + i, now.get() + i);
         assertEquals(SeenPosts.CAP, SeenPosts.size());
-        assertFalse("the oldest post was kept", SeenPosts.isRemembered("id0", now.get() + SeenPosts.CAP, DAY));
-        assertFalse(SeenPosts.isRemembered("id4", now.get() + SeenPosts.CAP, DAY));
-        assertTrue("the first post past the cut was dropped", SeenPosts.isRemembered("id5", now.get() + SeenPosts.CAP, DAY));
-        assertTrue("the newest post was dropped",
-                SeenPosts.isRemembered("id" + (SeenPosts.CAP + 4), now.get() + SeenPosts.CAP, DAY));
+        // Looked up after the newest was seen: a lookup before it would find a time ahead of the clock.
+        long later = now.get() + SeenPosts.CAP + 5;
+        assertFalse("the oldest post was kept", SeenPosts.isRemembered("id0", later, DAY));
+        assertFalse(SeenPosts.isRemembered("id4", later, DAY));
+        assertTrue("the first post past the cut was dropped", SeenPosts.isRemembered("id5", later, DAY));
+        assertTrue("the newest post was dropped", SeenPosts.isRemembered("id" + (SeenPosts.CAP + 4), later, DAY));
     }
 
     @Test
