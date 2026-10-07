@@ -175,6 +175,7 @@ public final class SettingsBackup {
             Settings.POST_MENU_PHOTO_SAVE,
             Settings.DOWNLOAD_COMPATIBLE,
             Settings.OPEN_ON_CHOSEN_TAB,
+            Settings.FOLLOWING_FEED_HOME,
             Settings.SAVED_SHORTCUT,
             Settings.MARKETPLACE_ONLY,
             Settings.MARKETPLACE_QUIET_NOTIFICATIONS,

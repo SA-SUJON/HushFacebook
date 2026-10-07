@@ -33,10 +33,11 @@ final class FeedPages {
     private FeedPages() {
     }
 
-    /** Opening Facebook: Marketplace only, and the tab Facebook opens on. */
+    /** Opening Facebook: Marketplace only, the tab Facebook opens on, and the feed Home loads. */
     static void opening(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
-        if (build.contains(PatchFamily.START_TAB) || build.contains(PatchFamily.MARKETPLACE_ONLY)) {
+        if (build.contains(PatchFamily.START_TAB) || build.contains(PatchFamily.MARKETPLACE_ONLY)
+                || build.contains(PatchFamily.FOLLOWING_HOME)) {
             // First: it's what happens before anything the other rows change comes on screen.
             PreferenceCategory opening = category(screen, L10n.t("Opening Facebook"));
             if (build.contains(PatchFamily.MARKETPLACE_ONLY)) {
@@ -69,6 +70,11 @@ final class FeedPages {
                         L10n.t("Choose where Facebook opens from its icon. Notifications and links still open their destination.")));
                 opening.addPreference(startTabRow(context));
                 opening.addPreference(feedsSubtabRow(context));
+            }
+            if (build.contains(PatchFamily.FOLLOWING_HOME)) {
+                // Home asks for its feed each time it loads one, so no restart is needed.
+                opening.addPreference(toggle(context, Settings.FOLLOWING_FEED_HOME,
+                        L10n.t("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.")));
             }
         }
     }

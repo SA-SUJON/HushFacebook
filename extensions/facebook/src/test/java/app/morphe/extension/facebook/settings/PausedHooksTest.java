@@ -62,6 +62,7 @@ import app.morphe.extension.facebook.download.VideoMenuItemForTests;
 import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.FeedsHeader;
+import app.morphe.extension.facebook.feed.FollowingHome;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.MetaAiQuestions;
@@ -457,6 +458,10 @@ public class PausedHooksTest {
                 PhotoMenuItemForTests::addsAnItem));
         // A start from the launcher icon asks Facebook for the chosen tab.
         probes.put(PatchFamily.START_TAB, Collections.singletonList(StartTabRouteForTests::routes));
+        // Home's request for its feed goes out for the Following feed.
+        probes.put(PatchFamily.FOLLOWING_HOME, Collections.singletonList(
+                () -> FollowingHome.feedType(com.facebook.api.feedtype.FeedType.TOP_STORIES)
+                        != com.facebook.api.feedtype.FeedType.TOP_STORIES));
         // The tab bar builder is told to leave Home out.
         probes.put(PatchFamily.MARKETPLACE_ONLY, Arrays.asList(
                 MarketplaceOnlyForTests::hidesHome, MarketplaceOnlyForTests::quietsNotifications,

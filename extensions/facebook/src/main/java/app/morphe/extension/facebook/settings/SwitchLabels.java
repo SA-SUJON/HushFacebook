@@ -17,6 +17,7 @@ final class SwitchLabels {
         if (setting == Settings.MARKETPLACE_QUIET_NOTIFICATIONS) return L10n.t("Quiet social notifications");
         if (setting == Settings.MARKETPLACE_SKIP_FEED_PREFETCH) return L10n.t("Skip feed preloading");
         if (setting == Settings.OPEN_ON_CHOSEN_TAB) return L10n.t("Open on a chosen tab");
+        if (setting == Settings.FOLLOWING_FEED_HOME) return L10n.t("Following feed on Home");
         if (setting == Settings.HIDE_SPONSORED_POSTS) return L10n.t("Hide sponsored posts");
         if (setting == Settings.HIDE_PROMOTED_POSTS) return L10n.t("Hide promoted posts");
         if (setting == Settings.HIDE_SPONSORED_PROFILE_POSTS) return L10n.t("Hide sponsored profile posts");

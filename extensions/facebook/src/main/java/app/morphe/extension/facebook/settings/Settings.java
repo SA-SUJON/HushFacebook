@@ -704,6 +704,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_open_on_chosen_tab", FALSE);
 
     /**
+     * Home asks Facebook for its Following feed where it would ask for the ranked one
+     * ({@link app.morphe.extension.facebook.feed.FollowingHome}). Off by default. The Feeds tab's
+     * filters keep their own feeds, and a change shows the next time Home loads its feed.
+     */
+    public static final BooleanSetting FOLLOWING_FEED_HOME =
+            new BooleanSetting("hushfacebook_following_feed_home", FALSE);
+
+    /**
      * The tab bar keeps Marketplace, Notifications and the profile or Menu tab, and a start from
      * the launcher icon opens Marketplace whatever {@link #START_TAB} says. Home with the news feed,
      * Video, Friends, Feeds, Groups, Gaming and Events go. Facebook builds the bar once, so a change

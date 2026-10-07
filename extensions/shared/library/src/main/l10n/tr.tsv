@@ -347,6 +347,10 @@ Menu	Menü
 Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.	Facebook %1$s sekmesinde açılır. Sekme çubuğunda bu sekme yoksa Facebook Ana Sayfa'da açılır.
 # context: a sentence in the settings import preview and its toast; %1$s is a tab name
 Facebook will open on %1$s.	Facebook %1$s sekmesinde açılacak.
+# context: switch title under Opening Facebook; Following is Facebook's feed of the friends, Pages and groups you follow, and Home is the tab
+Following feed on Home	Ana Sayfa'da Takip Edilenler akışı
+# context: summary of that switch; the ranked feed is the one Facebook orders for you, and the Feeds tab has its own filters
+Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.	Ana Sayfa, sıralanmış akış yerine Facebook'un Takip Edilenler akışını yükler. Akışlar sekmesinin filtreleri olduğu gibi kalır.
 Jump to a section	Bir bölüme git
 Go straight to one group of settings. Back returns to where you were.	Doğrudan bir ayar grubuna git. Geri, bulunduğun yere döndürür.
 # context: switch title under Downloads; on, every video save keeps to formats other apps accept

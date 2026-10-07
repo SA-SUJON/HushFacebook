@@ -238,6 +238,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean followingHome() {
+        return false;
+    }
+
     public static boolean marketplaceOnly() {
         return false;
     }
