@@ -102,6 +102,9 @@ final class AppPages {
             upsells.addPreference(toggle(context, Settings.HIDE_META_AI_IMAGINE,
                     L10n.t("Posts lose the Imagine me button, and Imagine leaves the post composer and the top of "
                             + "Create story. Everything else there works as before.")));
+            upsells.addPreference(toggle(context, Settings.HIDE_META_AI_POST_BUTTONS,
+                    L10n.t("Posts lose the other Meta AI buttons Facebook puts under them. The post's next button "
+                            + "shows instead, if it has one.")));
         }
     }
 

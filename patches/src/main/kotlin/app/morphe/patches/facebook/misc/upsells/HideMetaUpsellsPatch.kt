@@ -17,8 +17,8 @@ import app.morphe.patches.shared.compat.AppCompatibilities
  * cross-posting onboarding in the composer, the Threads button in the share sheet, the Meta
  * Verified offer sheet after you post and the label under some posts' headers, the avatar sticker
  * promotions in comments and Facebook's own promotion slots, and Meta AI's Imagine: the Imagine me
- * button under posts, the post composer's Imagine and Create story's Imagine tile. Posting, the
- * other ways to share and ordinary stickers are untouched.
+ * button under posts, the post composer's Imagine and Create story's Imagine tile, plus the other
+ * Meta AI buttons under posts. Posting, the other ways to share and ordinary stickers are untouched.
  *
  * Every anchor is a kept class name, an enum constant's name or a literal (see
  * MetaUpsellAnchors.kt, ImagineAnchors.kt and ShareSheetAnchors.kt), and every one is required.

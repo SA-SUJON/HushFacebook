@@ -128,6 +128,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_META_VERIFIED_UPSELLS) return L10n.t("Hide Meta Verified offers");
         if (setting == Settings.HIDE_AVATAR_UPSELLS) return L10n.t("Hide avatar sticker promotions");
         if (setting == Settings.HIDE_META_AI_IMAGINE) return L10n.t("Hide Meta AI's Imagine");
+        if (setting == Settings.HIDE_META_AI_POST_BUTTONS) return L10n.t("Hide other Meta AI buttons under posts");
         if (setting == Settings.HIDE_META_AI_IN_SEARCH) return L10n.t("Hide Meta AI in search");
         if (setting == Settings.HIDE_SPONSORED_SEARCH_RESULTS) return L10n.t("Hide sponsored search results");
         if (setting == Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS) return L10n.t("Hide sponsored Marketplace listings");

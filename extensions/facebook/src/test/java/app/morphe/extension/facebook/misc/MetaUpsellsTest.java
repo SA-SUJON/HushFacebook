@@ -32,7 +32,7 @@ import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
- * Hide Meta upsells: each of the six switches starts off, and on it answers away only its own
+ * Hide Meta upsells: each of the seven switches starts off, and on it answers away only its own
  * promotions, counted. A no stays a no, Kotlin's suspend marker passes the Meta Verified hook
  * untouched, other post buttons, story tools and share targets stay in order, and off or paused every
  * answer is Facebook's.
@@ -43,7 +43,7 @@ public class MetaUpsellsTest {
     @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
 
     /**
-     * The six switches, filled in once the rule has set the context: naming Settings in a static
+     * The seven switches, filled in once the rule has set the context: naming Settings in a static
      * field loads it at class init, before any context, and leaves BaseSettings broken for every
      * test that runs after it in this sandbox.
      */
@@ -68,7 +68,8 @@ public class MetaUpsellsTest {
     @Before
     public void start() {
         switches = new BooleanSetting[] {Settings.HIDE_EDITS_UPSELLS, Settings.HIDE_THREADS_CROSS_POSTING,
-                Settings.HIDE_THREADS_SHARE_BUTTON, Settings.HIDE_META_VERIFIED_UPSELLS, Settings.HIDE_AVATAR_UPSELLS, Settings.HIDE_META_AI_IMAGINE};
+                Settings.HIDE_THREADS_SHARE_BUTTON, Settings.HIDE_META_VERIFIED_UPSELLS, Settings.HIDE_AVATAR_UPSELLS, Settings.HIDE_META_AI_IMAGINE,
+                Settings.HIDE_META_AI_POST_BUTTONS};
         HookStatus.clear();
     }
 
@@ -88,7 +89,7 @@ public class MetaUpsellsTest {
 
     /**
      * Whether each part hides, in the switches' order: Edits, Threads cross-posting, Threads in the
-     * share sheet, Meta Verified, avatar stickers, Imagine.
+     * share sheet, Meta Verified, avatar stickers, Imagine, the other Meta AI post buttons.
      */
     private static boolean[] hiding() {
         boolean edits = !MetaUpsells.editsHeader(true) && !MetaUpsells.fetchEditsPill(true)
@@ -100,13 +101,15 @@ public class MetaUpsellsTest {
         boolean avatar = MetaUpsells.hidesAvatarUpsell();
         boolean imagine = MetaUpsells.hidesImagineCta(MetaUpsells.IMAGINE_ME_PLUGIN) && !MetaUpsells.imagineCapability(true)
                 && !MetaUpsells.storyTools(TOOLS).contains(StoryTool.IMAGINE);
-        return new boolean[] {edits, threads, threadsShare, verified, avatar, imagine};
+        boolean metaAiButtons = true;
+        for (String plugin : MetaUpsells.META_AI_POST_PLUGINS) metaAiButtons &= MetaUpsells.hidesImagineCta(plugin);
+        return new boolean[] {edits, threads, threadsShare, verified, avatar, imagine, metaAiButtons};
     }
 
     @Test
     public void everySwitchStartsOffAndFacebookDecides() {
         for (BooleanSetting setting : switches) assertFalse(setting.key + " starts on", setting.get());
-        assertTrue(Arrays.toString(hiding()), Arrays.equals(new boolean[6], hiding()));
+        assertTrue(Arrays.toString(hiding()), Arrays.equals(new boolean[7], hiding()));
         assertSame("Create story's tools were copied with the switch off", TOOLS, MetaUpsells.storyTools(TOOLS));
         assertSame("the share sheet's items were copied with the switch off", SHARE_ITEMS, MetaUpsells.shareTargets(SHARE_ITEMS));
         assertEquals("Meta Verified", MetaUpsells.metaVerifiedLabel("Meta Verified"));
@@ -117,7 +120,7 @@ public class MetaUpsellsTest {
     public void eachSwitchHidesOnlyItsOwnAndIsCounted() {
         for (int on = 0; on < switches.length; on++) {
             for (BooleanSetting setting : switches) setting.save(setting == switches[on]);
-            boolean[] expected = new boolean[6];
+            boolean[] expected = new boolean[7];
             expected[on] = true;
             // Asked once per switch: each ask counts, so the counts below are one round of asks.
             boolean[] hid = hiding();
@@ -130,6 +133,7 @@ public class MetaUpsellsTest {
         assertTrue(line, line.contains(MetaUpsells.AVATAR_HIDDEN + " 1"));
         assertTrue(line, line.contains(MetaUpsells.IMAGINE_HIDDEN + " 3"));
         assertTrue(line, line.contains(MetaUpsells.THREADS_SHARE_HIDDEN + " 1"));
+        assertTrue(line, line.contains(MetaUpsells.META_AI_BUTTON_HIDDEN + " 3"));
     }
 
     @Test
@@ -159,6 +163,21 @@ public class MetaUpsellsTest {
     }
 
     @Test
+    public void theOtherMetaAiButtonsLeaveImagineMeAndEveryOtherButton() {
+        Settings.HIDE_META_AI_POST_BUTTONS.save(true);
+        for (String plugin : MetaUpsells.META_AI_POST_PLUGINS) assertTrue(plugin + " kept its yes", MetaUpsells.hidesImagineCta(plugin));
+        assertFalse("Imagine me got a no from the other switch", MetaUpsells.hidesImagineCta(MetaUpsells.IMAGINE_ME_PLUGIN));
+        assertFalse("a business's AI button got a no",
+                MetaUpsells.hidesImagineCta("com.facebook.feed.plugins.calltoaction.impl.bizaiagent.BizAiAgentCtaPlugin"));
+        assertFalse("another post button got a no",
+                MetaUpsells.hidesImagineCta("com.facebook.feed.plugins.calltoaction.impl.telluswhy.FeedTellUsWhyCtaPlugin"));
+        assertFalse("a missing plugin name got a no", MetaUpsells.hidesImagineCta(null));
+        String line = statusLine();
+        assertTrue(line, line.contains(MetaUpsells.META_AI_BUTTON_HIDDEN + " 3"));
+        assertFalse(line, line.contains(MetaUpsells.IMAGINE_HIDDEN));
+    }
+
+    @Test
     public void aNoStaysANoAndTheSuspendMarkerPasses() {
         for (BooleanSetting setting : switches) setting.save(true);
         assertFalse(MetaUpsells.editsHeader(false));
@@ -180,7 +199,7 @@ public class MetaUpsellsTest {
                 HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP}) {
             PauseForTests.pause(reason);
             assertTrue("a Hushfacebook paused by " + reason + " hid " + Arrays.toString(hiding()),
-                    Arrays.equals(new boolean[6], hiding()));
+                    Arrays.equals(new boolean[7], hiding()));
             PauseForTests.resume();
         }
     }

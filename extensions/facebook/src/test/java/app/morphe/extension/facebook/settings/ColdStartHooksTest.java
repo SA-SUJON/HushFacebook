@@ -295,6 +295,8 @@ public class ColdStartHooksTest {
         assertFalse("an avatar upsell drawn before the context drew nothing", MetaUpsells.hidesAvatarUpsell());
         assertFalse("a post button checked before the context lost Imagine me",
                 MetaUpsells.hidesImagineCta(MetaUpsells.IMAGINE_ME_PLUGIN));
+        assertFalse("a post button checked before the context lost its Meta AI button",
+                MetaUpsells.hidesImagineCta(MetaUpsells.META_AI_POST_PLUGINS.get(0)));
         assertTrue("a composer opened before the context lost Imagine", MetaUpsells.imagineCapability(true));
         List<Thread.State> tools = Arrays.asList(Thread.State.values());
         assertSame("Create story's tools listed before the context changed", tools, MetaUpsells.storyTools(tools));

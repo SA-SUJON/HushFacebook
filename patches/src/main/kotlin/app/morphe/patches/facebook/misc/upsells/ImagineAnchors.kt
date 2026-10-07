@@ -39,6 +39,13 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
  * extension goes first in it, the way Hide Meta AI comment summaries does it, and the Imagine me
  * plugin gets a no, so the socket goes on to the next button.
  *
+ * The other Meta AI buttons under posts come from the same socket and the same check: the name
+ * table also names AIStylesPlugin, GenAiDeepDiveCtaPlugin and GenAiDeepDiveUgcChatIcebreakerCtaPlugin
+ * on all three builds (581 LX/2du;->A0K, 580 LX/2Yo;->A04, 577 LX/2Wo;->A04). The hook
+ * already hands the extension every plugin's name, so those get a no under their own switch with
+ * nothing more to find. The patch doesn't require them: a build that drops one just has nothing to
+ * hide there.
+ *
  * The post composer's Imagine. The composer asks its capabilities, an enum whose constants include
  * AI_GEN_IMAGINE, CHECKIN and FEED_COMPOSER_REDESIGN (581 LX/Byc, 580 LX/Bye, 577 LX/C1o), whether
  * Imagine is on, each time loading AI_GEN_IMAGINE right before an (enum)Z call: the Imagine
@@ -55,6 +62,13 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 internal const val IMAGINE_CTA_SOCKET = "FeedStoryCtaSelectorSocket"
 internal const val IMAGINE_ME_PLUGIN = "com.facebook.feed.plugins.calltoaction.impl.imagineme.ImagineMePlugin"
+
+/** The other Meta AI post buttons the CTA table names, which the extension's hook also answers. */
+internal val META_AI_POST_PLUGINS = listOf(
+    "com.facebook.feed.plugins.calltoaction.impl.aistyles.AIStylesPlugin",
+    "com.facebook.feed.plugins.calltoaction.impl.genaideepdive.GenAiDeepDiveCtaPlugin",
+    "com.facebook.feed.plugins.calltoaction.impl.genaideedpdiveugcchaticebreakercta.GenAiDeepDiveUgcChatIcebreakerCtaPlugin",
+)
 
 internal const val COMPOSER_IMAGINE = "AI_GEN_IMAGINE"
 internal val COMPOSER_CAPABILITIES = listOf(COMPOSER_IMAGINE, "CHECKIN", "FEED_COMPOSER_REDESIGN")

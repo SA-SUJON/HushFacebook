@@ -647,6 +647,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_meta_ai_imagine", FALSE);
 
     /**
+     * The other Meta AI buttons the post call-to-action selector can put under a post: AI styles
+     * and Meta AI's deep dive and chat starter. Off until it's turned on.
+     */
+    public static final BooleanSetting HIDE_META_AI_POST_BUTTONS =
+            new BooleanSetting("hushfacebook_hide_meta_ai_post_buttons", FALSE);
+
+    /**
      * Meta AI in Facebook's search: the answer a results page adds on top, the Meta AI modules and
      * "Ask Meta AI" prompts among the results, and the suggestions Facebook's server sets to open in
      * Meta AI. People, groups, pages and posts stay, and so do the Meta AI button and the results

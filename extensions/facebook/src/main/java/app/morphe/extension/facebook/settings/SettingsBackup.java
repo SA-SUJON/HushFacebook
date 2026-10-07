@@ -227,6 +227,7 @@ public final class SettingsBackup {
             Settings.HIDE_META_VERIFIED_UPSELLS,
             Settings.HIDE_AVATAR_UPSELLS,
             Settings.HIDE_META_AI_IMAGINE,
+            Settings.HIDE_META_AI_POST_BUTTONS,
             Settings.HIDE_META_AI_IN_SEARCH,
             Settings.BLOCK_TRENDING_VIDEO_NOTIFICATIONS,
             Settings.BLOCK_MEMORY_NOTIFICATIONS,

@@ -547,7 +547,8 @@ public class PausedHooksTest {
                 MenuSectionsForTests::hidesServerAlsoFromMeta));
         // Edits' header flag and both shapes of its pill request, the Threads cross-posting
         // onboarding and the share sheet's Threads item, the Meta Verified sheet and label, an avatar
-        // sticker upsell, and Imagine's post button, composer capability and Create story tile.
+        // sticker upsell, Imagine's post button, composer capability and Create story tile, and the
+        // other Meta AI post buttons.
         probes.put(PatchFamily.META_UPSELLS, Arrays.asList(
                 () -> !MetaUpsells.editsHeader(true),
                 () -> !MetaUpsells.fetchEditsPill(true),
@@ -559,7 +560,8 @@ public class PausedHooksTest {
                 MetaUpsells::hidesAvatarUpsell,
                 () -> MetaUpsells.hidesImagineCta(MetaUpsells.IMAGINE_ME_PLUGIN),
                 () -> !MetaUpsells.imagineCapability(true),
-                () -> MetaUpsells.storyTools(Arrays.asList(StoryTool.values())).size() == 1));
+                () -> MetaUpsells.storyTools(Arrays.asList(StoryTool.values())).size() == 1,
+                () -> MetaUpsells.hidesImagineCta(MetaUpsells.META_AI_POST_PLUGINS.get(0))));
         // Search leaves out its Meta AI answer and its prompt modules, and a suggestion set to open
         // Meta AI opens the results.
         probes.put(PatchFamily.META_AI_SEARCH, Arrays.asList(
