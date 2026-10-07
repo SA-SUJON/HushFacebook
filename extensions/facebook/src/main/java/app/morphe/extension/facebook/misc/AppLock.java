@@ -17,12 +17,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.SystemClock;
+import android.provider.Settings.Global;
 import android.util.TypedValue;
 import android.util.Xml;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,12 +38,18 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -90,6 +99,14 @@ import app.morphe.extension.shared.settings.Setting;
  * change reaches a game that was already running. They read the XML themselves rather than through
  * SharedPreferences ({@link #readSettingsFile}), whose reload can delete a file the main process is
  * writing.
+ *
+ * <p>The main process also leaves a private note in the app's no-backup folder with the boot and
+ * the last moment Facebook was unlocked and in use ({@link #shareUnlock}). A side process starting
+ * within Lock after of it, on the same boot, doesn't ask again; locking Facebook takes the note away,
+ * and a side process only reads it.
+ *
+ * <p>While locked, the screen's windows are read from the framework's list ({@link #sweep}). One
+ * that lands above the cover, focusable or not, stops taking touches and the cover goes back on top.
  */
 public final class AppLock {
     /** How long Facebook may be away before a return asks again. */
@@ -170,6 +187,21 @@ public final class AppLock {
     @Nullable
     private static CharSequence refusal;
     private static final Map<Activity, Cover> covers = new WeakHashMap<>();
+    /** How often a locked screen looks for a window that landed above its cover. */
+    static final long WATCH_MS = 100;
+
+    /** The window lists of this process: a test's stand-in, or the framework's own list. */
+    interface Roots {
+        /** Every window's root view, oldest first, or null when this phone won't say. */
+        @Nullable
+        List<View> list();
+    }
+
+    static Roots roots = AppLock::frameworkRoots;
+    private static boolean rootsFailureLogged;
+    private static boolean watchingWindows;
+    /** Windows made untouchable while locked, with the window manager that holds each. */
+    private static final Map<View, WindowManager> untouchable = new IdentityHashMap<>();
     private static final Set<Activity> keptFromRecents = Collections.newSetFromMap(new WeakHashMap<>());
 
     /** The application this process's callbacks went on, so a second start of the hook adds none. */
@@ -395,8 +427,13 @@ public final class AppLock {
                 leftAt = NEVER;
                 return;
             }
+            if (!everUnlocked && !Utils.isMainProcess() && sharedUnlockFresh(SystemClock.elapsedRealtime())) {
+                // The main process was unlocked a moment ago, so a side process doesn't ask again for it.
+                everUnlocked = true;
+            }
             if (!locked && due(SystemClock.elapsedRealtime())) {
                 locked = true;
+                shareUnlock(NEVER);
                 Logger.printInfo(() -> "App lock: locked on " + (everUnlocked ? "a return" : "a cold start"));
             }
             declined = false;
@@ -421,6 +458,8 @@ public final class AppLock {
     public static void paused(Activity activity) {
         try {
             if (front.get() == activity) front = new WeakReference<>(null);
+            // Facebook was unlocked right up to this pause, which a game's start in another process reads.
+            if (!locked && everUnlocked && switchedOn()) shareUnlock(SystemClock.elapsedRealtime());
             if (!inPictureInPicture(activity) || floating.contains(activity) || !inFront()) return;
             floating.add(activity);
             if (!inFront()) leftAt = SystemClock.elapsedRealtime();
@@ -439,6 +478,7 @@ public final class AppLock {
         floating.remove(activity);
         if (wasInFront && !inFront() && !activity.isChangingConfigurations()) {
             leftAt = SystemClock.elapsedRealtime();
+            if (!locked && everUnlocked && switchedOn()) shareUnlock(leftAt);
         }
     }
 
@@ -537,6 +577,7 @@ public final class AppLock {
         }
         cover.showReason();
         if (!cover.isShowing()) cover.show();
+        watchWindows();
     }
 
     /**
@@ -632,6 +673,8 @@ public final class AppLock {
         refusal = null;
         for (Cover cover : new ArrayList<>(covers.values())) cover.close();
         covers.clear();
+        restoreTouch();
+        shareUnlock(SystemClock.elapsedRealtime());
         Activity shown = unlockedOn != null ? unlockedOn : front.get();
         if (shown != null && !shown.isFinishing()) {
             // A saved file Facebook was asked to open while it was locked is opened now.
@@ -657,6 +700,223 @@ public final class AppLock {
         refusal = null;
         prompter = AppLock::askAndroid;
         lastRead = null;
+        roots = AppLock::frameworkRoots;
+        rootsFailureLogged = false;
+        watchingWindows = false;
+        restoreTouch();
+        shareUnlock(NEVER);
+    }
+
+    /** Starts the look for windows above the cover, which runs while Facebook is locked. */
+    private static void watchWindows() {
+        if (watchingWindows || !locked) return;
+        watchingWindows = true;
+        Utils.runOnMainThreadDelayed(AppLock::watchTick, WATCH_MS);
+    }
+
+    private static void watchTick() {
+        watchingWindows = false;
+        if (!locked) return;
+        Activity shown = front.get();
+        if (shown != null) sweep(shown);
+        watchWindows();
+    }
+
+    /**
+     * A window of [activity]'s above its cover takes taps whether or not it can take the focus: a
+     * popup, a tooltip bubble, anything added to the window manager with FLAG_NOT_FOCUSABLE. The
+     * cover only learns of windows that take the focus, so while locked the screen's windows are
+     * read in the order Android layers them. Whatever sits above the cover stops taking touches, so
+     * a tap goes through to the cover, and the cover goes back on top of it. Fails safe: when this
+     * phone won't give its window list, nothing changes and the cover stays as it was.
+     */
+    static void sweep(Activity activity) {
+        try {
+            if (!locked || activity.isFinishing() || activity.isDestroyed()) return;
+            Cover cover = covers.get(activity);
+            if (cover == null || !cover.isShowing()) return;
+            List<View> all = roots.list();
+            if (all == null) return;
+            Window window = cover.getWindow();
+            View mine = window == null ? null : window.getDecorView();
+            int at = mine == null ? -1 : all.lastIndexOf(mine);
+            if (at < 0) return;
+            boolean foreign = false;
+            for (View root : all.subList(at + 1, all.size())) {
+                if (isCover(root) || !belongsTo(root, activity)) continue;
+                foreign = true;
+                stopTouches(activity, root);
+            }
+            if (foreign) {
+                Logger.printInfo(() -> "App lock: a window opened above the cover, so the cover went back on top of it");
+                raise(activity);
+            }
+        } catch (Throwable failure) {
+            Logger.printException(() -> "App lock: could not look for windows above the cover", failure);
+        }
+    }
+
+    private static boolean isCover(View root) {
+        for (Cover cover : covers.values()) {
+            Window window = cover.getWindow();
+            if (window != null && window.getDecorView() == root) return true;
+        }
+        return false;
+    }
+
+    /** Whether [root] is one of [activity]'s windows: made with it, or sharing its window token. */
+    private static boolean belongsTo(View root, Activity activity) {
+        Context context = root.getContext();
+        while (context instanceof android.content.ContextWrapper) {
+            if (context == activity) return true;
+            context = ((android.content.ContextWrapper) context).getBaseContext();
+        }
+        android.os.IBinder token = root.getApplicationWindowToken();
+        return token != null && token == activity.getWindow().getDecorView().getApplicationWindowToken();
+    }
+
+    private static void stopTouches(Activity activity, View root) {
+        if (untouchable.containsKey(root) || !(root.getLayoutParams() instanceof WindowManager.LayoutParams)) return;
+        WindowManager.LayoutParams params = (WindowManager.LayoutParams) root.getLayoutParams();
+        if ((params.flags & WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE) != 0) return;
+        WindowManager manager = activity.getWindowManager();
+        params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        try {
+            manager.updateViewLayout(root, params);
+            untouchable.put(root, manager);
+        } catch (RuntimeException gone) {
+            params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        }
+    }
+
+    /** Gives back the touches taken from other windows while locked. */
+    private static void restoreTouch() {
+        for (Map.Entry<View, WindowManager> entry : new ArrayList<>(untouchable.entrySet())) {
+            try {
+                View root = entry.getKey();
+                if (root.getLayoutParams() instanceof WindowManager.LayoutParams) {
+                    WindowManager.LayoutParams params = (WindowManager.LayoutParams) root.getLayoutParams();
+                    params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+                    entry.getValue().updateViewLayout(root, params);
+                }
+            } catch (RuntimeException gone) {
+                // The window went while locked.
+            }
+        }
+        untouchable.clear();
+    }
+
+    /**
+     * This process's windows from the framework's own list, oldest first. Reads WindowManagerGlobal's
+     * list of views, and when a phone won't give that, its root names. Null when neither is reachable.
+     */
+    @Nullable
+    @SuppressWarnings("unchecked")
+    private static List<View> frameworkRoots() {
+        try {
+            Class<?> global = Class.forName("android.view.WindowManagerGlobal");
+            Object instance = global.getMethod("getInstance").invoke(null);
+            try {
+                Field views = global.getDeclaredField("mViews");
+                views.setAccessible(true);
+                Object list = views.get(instance);
+                if (list instanceof List) {
+                    return new ArrayList<>((List<View>) list);
+                }
+            } catch (ReflectiveOperationException | RuntimeException blocked) {
+                // Fall back to the names below.
+            }
+            String[] names = (String[]) global.getMethod("getViewRootNames").invoke(instance);
+            Method rootView = global.getMethod("getRootView", String.class);
+            List<View> found = new ArrayList<>();
+            for (String name : names) {
+                Object view = rootView.invoke(instance, name);
+                if (view instanceof View) found.add((View) view);
+            }
+            return found;
+        } catch (Throwable unavailable) {
+            if (!rootsFailureLogged) {
+                rootsFailureLogged = true;
+                Logger.printInfo(() -> "App lock: this phone doesn't give its window list, so only windows that take the focus are noticed");
+            }
+            return null;
+        }
+    }
+
+    /** The file the main process leaves for a side process: the boot and when Facebook was last unlocked. */
+    private static File shareFile(Context context) {
+        return new File(context.getNoBackupFilesDir(), "applock-unlocked");
+    }
+
+    private static int bootCount(Context context) {
+        try {
+            return Global.getInt(context.getContentResolver(), Global.BOOT_COUNT, -1);
+        } catch (RuntimeException unavailable) {
+            return -1;
+        }
+    }
+
+    /**
+     * The main process's note of when Facebook was last unlocked and in use, for a game or ad screen
+     * in a process of its own to read. A private file in the app's own no-backup folder, which only
+     * this app's processes reach, written whole and renamed into place; no one else can read or
+     * write it. [at] is {@link #NEVER} to take the note away, as when Facebook locks.
+     */
+    private static void shareUnlock(long at) {
+        if (!Utils.isMainProcess()) return;
+        try {
+            Context context = Utils.getContext();
+            if (context == null) return;
+            File file = shareFile(context);
+            if (at == NEVER) {
+                //noinspection ResultOfMethodCallIgnored
+                file.delete();
+                return;
+            }
+            int boot = bootCount(context);
+            if (boot < 0) return;
+            File part = new File(file.getPath() + ".part");
+            try (FileOutputStream out = new FileOutputStream(part)) {
+                out.write((boot + " " + at).getBytes(StandardCharsets.US_ASCII));
+            }
+            if (!part.renameTo(file)) {
+                //noinspection ResultOfMethodCallIgnored
+                part.delete();
+            }
+        } catch (Throwable failure) {
+            Logger.printException(() -> "App lock: could not leave the unlock for a side process", failure);
+        }
+    }
+
+    /**
+     * Whether the main process was unlocked and in use within Lock after of [now], on this boot. A
+     * missing, unreadable, odd or old note, or one from before a restart, is no. Read only.
+     */
+    static boolean sharedUnlockFresh(long now) {
+        try {
+            Context context = Utils.getContext();
+            if (context == null) return false;
+            File file = shareFile(context);
+            if (!file.isFile() || file.length() > 64) return false;
+            byte[] bytes;
+            try (InputStream in = new FileInputStream(file)) {
+                bytes = new byte[(int) file.length()];
+                int read = 0;
+                while (read < bytes.length) {
+                    int more = in.read(bytes, read, bytes.length - read);
+                    if (more < 0) return false;
+                    read += more;
+                }
+            }
+            String[] parts = new String(bytes, StandardCharsets.US_ASCII).split(" ");
+            if (parts.length != 2) return false;
+            int boot = bootCount(context);
+            if (boot < 0 || Integer.parseInt(parts[0]) != boot) return false;
+            long at = Long.parseLong(parts[1]);
+            return at >= 0 && now >= at && now - at < lockAfter().millis;
+        } catch (Throwable unreadable) {
+            return false;
+        }
     }
 
     /** Android's own prompt: a biometric the phone counts as at least weak, or its PIN, pattern or password. */
@@ -762,7 +1022,10 @@ public final class AppLock {
             super.onWindowFocusChanged(hasFocus);
             focused = hasFocus;
             // Judged once the change has settled, when the screen's own pause has been heard.
-            if (!hasFocus && !retired) Utils.runOnMainThread(() -> keepOnTop(activity, this));
+            if (!hasFocus && !retired) Utils.runOnMainThread(() -> {
+                sweep(activity);
+                keepOnTop(activity, this);
+            });
         }
 
         /** Android's reason the last check ended, or what unlocks Facebook. */
