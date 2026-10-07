@@ -51,8 +51,8 @@ final class AppPages {
             }
             if (build.contains(PatchFamily.CHAT_LIST)) {
                 chats.addPreference(toggle(context, Settings.HIDE_CHAT_NOTES_TRAY,
-                        L10n.t("The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, "
-                                + "search and new messages stay.")));
+                        L10n.t("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. "
+                                + "Your chats, search and new messages stay.")));
                 chats.addPreference(toggle(context, Settings.HIDE_CHAT_PROMOTIONS,
                         L10n.t("The promotional banners at the top of Chats inside Facebook go, like the one asking "
                                 + "you to turn on notifications.")));

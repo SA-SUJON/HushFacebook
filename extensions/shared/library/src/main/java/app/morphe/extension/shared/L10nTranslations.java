@@ -779,8 +779,8 @@ public final class L10nTranslations {
                 "Z\u00e4hler am App-Symbol ausblenden");
         table.put("Hide the composer row",
                 "Zeile zum Posten ausblenden");
-        table.put("Hide the notes tray",
-                "Notizenleiste ausblenden");
+        table.put("Hide the notes and active now row",
+                "Reihe mit Notizen und Aktiven ausblenden");
         table.put("Hide the tab bar while scrolling",
                 "Tab-Leiste beim Scrollen ausblenden");
         table.put("Hide typing in chats",
@@ -1548,8 +1548,8 @@ public final class L10nTranslations {
                 "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen und die auf deinem eigenen Profil.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "Die Reihe mit Freundschaftsvorschl\u00e4gen zwischen den Beitr\u00e4gen, die auf deinem eigenen Profil und die Karten mit der Schaltfl\u00e4che \u201eHinzuf\u00fcgen\u201c in der Story-Leiste.");
-        table.put("The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "Die Reihe mit den Notizen deiner Freunde \u00fcber deinen Chats in den Chats innerhalb von Facebook verschwindet. Deine Chats, die Suche und neue Nachrichten bleiben.");
+        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
+                "Die Reihe mit den Notizen deiner Freunde und mit denen, die gerade aktiv sind, \u00fcber deinen Chats in den Chats innerhalb von Facebook verschwindet. Deine Chats, die Suche und neue Nachrichten bleiben.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Die Reihe mit Gruppen zum Beitreten zwischen den Beitr\u00e4gen, samt ihrem Button \u201eWeitere Gruppen entdecken\u201c. Beitr\u00e4ge aus deinen Gruppen bleiben.");
         table.put("The row of stories at the top of the feed, Create story included.",
@@ -2530,8 +2530,8 @@ public final class L10nTranslations {
                 "Ocultar el contador del \u00edcono de la app");
         table.put("Hide the composer row",
                 "Ocultar la fila para publicar");
-        table.put("Hide the notes tray",
-                "Ocultar la bandeja de notas");
+        table.put("Hide the notes and active now row",
+                "Ocultar la fila de notas y activos");
         table.put("Hide the tab bar while scrolling",
                 "Ocultar la barra de pesta\u00f1as al desplazarte");
         table.put("Hide typing in chats",
@@ -3299,8 +3299,8 @@ public final class L10nTranslations {
                 "La fila de sugerencias de amistad entre las publicaciones y la de tu propio perfil.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "La fila de sugerencias de amistad entre las publicaciones, la de tu propio perfil y las tarjetas con el bot\u00f3n Agregar en la bandeja de historias.");
-        table.put("The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "La fila de notas de tus amigos sobre tus chats, en los chats dentro de Facebook, desaparece. Tus chats, la b\u00fasqueda y los mensajes nuevos se quedan.");
+        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
+                "La fila de notas de tus amigos y de qui\u00e9n est\u00e1 activo sobre tus chats, en los chats dentro de Facebook, desaparece. Tus chats, la b\u00fasqueda y los mensajes nuevos se quedan.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "La fila de grupos para unirte entre las publicaciones, con su bot\u00f3n Descubrir m\u00e1s grupos. Las publicaciones de tus grupos se quedan.");
         table.put("The row of stories at the top of the feed, Create story included.",
@@ -4281,8 +4281,8 @@ public final class L10nTranslations {
                 "Sembunyikan angka di ikon aplikasi");
         table.put("Hide the composer row",
                 "Sembunyikan baris pembuat postingan");
-        table.put("Hide the notes tray",
-                "Sembunyikan baris catatan");
+        table.put("Hide the notes and active now row",
+                "Sembunyikan baris catatan dan yang aktif");
         table.put("Hide the tab bar while scrolling",
                 "Sembunyikan bilah tab saat menggulir");
         table.put("Hide typing in chats",
@@ -5050,8 +5050,8 @@ public final class L10nTranslations {
                 "Deretan saran pertemanan di antara postingan, dan deretan di profilmu sendiri.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "Deretan saran pertemanan di antara postingan, deretan di profilmu sendiri, dan kartu dengan tombol Tambah di baki cerita.");
-        table.put("The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "Baris catatan teman di atas obrolanmu di Obrolan dalam Facebook disembunyikan. Obrolan, pencarian, dan pesan baru tetap ada.");
+        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
+                "Baris catatan teman dan siapa yang aktif di atas obrolanmu di Obrolan dalam Facebook disembunyikan. Obrolan, pencarian, dan pesan baru tetap ada.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "Deretan grup untuk diikuti di antara postingan, beserta tombol Temukan grup lainnya. Postingan dari grup tempat Anda bergabung tetap ada.");
         table.put("The row of stories at the top of the feed, Create story included.",
@@ -6032,8 +6032,8 @@ public final class L10nTranslations {
                 "Ocultar o contador do \u00edcone do app");
         table.put("Hide the composer row",
                 "Ocultar a linha de publicar");
-        table.put("Hide the notes tray",
-                "Ocultar a bandeja de notas");
+        table.put("Hide the notes and active now row",
+                "Ocultar a linha de notas e ativos");
         table.put("Hide the tab bar while scrolling",
                 "Ocultar a barra de abas ao rolar");
         table.put("Hide typing in chats",
@@ -6801,8 +6801,8 @@ public final class L10nTranslations {
                 "A linha de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es e a linha no seu pr\u00f3prio perfil.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "A linha de sugest\u00f5es de amizade entre as publica\u00e7\u00f5es, a linha no seu pr\u00f3prio perfil e os cart\u00f5es com o bot\u00e3o Adicionar na bandeja de Stories.");
-        table.put("The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "A linha de notas dos seus amigos acima das suas conversas, nas conversas dentro do Facebook, some. Suas conversas, a busca e as mensagens novas continuam.");
+        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
+                "A linha de notas dos seus amigos e de quem est\u00e1 ativo acima das suas conversas, nas conversas dentro do Facebook, some. Suas conversas, a busca e as mensagens novas continuam.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "A linha de grupos sugeridos para participa\u00e7\u00e3o entre as publica\u00e7\u00f5es, com o bot\u00e3o \u201cDescobrir mais grupos\u201d. As publica\u00e7\u00f5es dos grupos dos quais voc\u00ea participa permanecem.");
         table.put("The row of stories at the top of the feed, Create story included.",
@@ -7783,8 +7783,8 @@ public final class L10nTranslations {
                 "Uygulama simgesindeki say\u0131y\u0131 gizle");
         table.put("Hide the composer row",
                 "G\u00f6nderi olu\u015fturma sat\u0131r\u0131n\u0131 gizle");
-        table.put("Hide the notes tray",
-                "Not sat\u0131r\u0131n\u0131 gizle");
+        table.put("Hide the notes and active now row",
+                "Not ve etkin sat\u0131r\u0131n\u0131 gizle");
         table.put("Hide the tab bar while scrolling",
                 "Kayd\u0131r\u0131rken sekme \u00e7ubu\u011funu gizle");
         table.put("Hide typing in chats",
@@ -8552,8 +8552,8 @@ public final class L10nTranslations {
                 "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131 ve kendi profilindeki sat\u0131r.");
         table.put("The row of friend suggestions between posts, the one on your own profile, and the cards with an Add button in the Stories tray.",
                 "G\u00f6nderilerin aras\u0131ndaki arkada\u015f \u00f6nerileri sat\u0131r\u0131, kendi profilindeki sat\u0131r ve hikaye tepsisindeki Ekle d\u00fc\u011fmeli kartlar.");
-        table.put("The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
-                "Facebook i\u00e7indeki Sohbetlerde, sohbetlerinin \u00fcst\u00fcndeki arkada\u015f notlar\u0131 sat\u0131r\u0131 kalkar. Sohbetlerin, arama ve yeni mesajlar yerinde kal\u0131r.");
+        table.put("The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.",
+                "Facebook i\u00e7indeki Sohbetlerde, sohbetlerinin \u00fcst\u00fcndeki arkada\u015f notlar\u0131 ve etkin ki\u015filer sat\u0131r\u0131 kalkar. Sohbetlerin, arama ve yeni mesajlar yerinde kal\u0131r.");
         table.put("The row of groups to join between posts, with its Discover more groups button. Posts from groups you're in stay.",
                 "G\u00f6nderilerin aras\u0131ndaki kat\u0131labilece\u011fin gruplar sat\u0131r\u0131 ve Daha fazla grup ke\u015ffet d\u00fc\u011fmesi. \u00dcyesi oldu\u011fun gruplar\u0131n g\u00f6nderileri kal\u0131r.");
         table.put("The row of stories at the top of the feed, Create story included.",

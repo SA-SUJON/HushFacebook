@@ -19,7 +19,7 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * What the Clean up Facebook's chat list patch asks while Facebook's own Chats builds its list.
  *
  * <p>Two hooks, one per switch. {@link #notesTiles} sits where the state behind the row of notes and
- * active friends above the chats stores its tiles, and hands back no tiles while Hide the notes tray
+ * active friends above the chats stores its tiles, and hands back no tiles while Hide the notes and active now row
  * is on. {@link #hidesPromotion} sits first in the show question of each promotion banner at the
  * top of Chats, and answers yes while Hide chat list promotions is on, which the patch turns into
  * a no for Facebook. Both fail open: with the switch off, a pause, settings that aren't ready or
@@ -31,7 +31,7 @@ public final class ChatList {
     static final String PROMOTIONS_ROUTE = "Chat list promotions";
 
     /** What a hidden piece is counted under. */
-    static final String NOTES_HIDDEN = "Hide the notes tray";
+    static final String NOTES_HIDDEN = "Hide the notes and active now row";
     static final String PROMOTIONS_HIDDEN = "Hide chat list promotions";
 
     private ChatList() {

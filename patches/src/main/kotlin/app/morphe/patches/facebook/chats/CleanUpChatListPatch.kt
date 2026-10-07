@@ -14,9 +14,11 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
+import app.morphe.util.cloneMutableAndPreserveParameters
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private const val CHAT_LIST = "$EXTENSION_PACKAGE/chats/ChatList;"
@@ -34,9 +36,10 @@ internal const val IMMUTABLE_COPY_OF = "$IMMUTABLE_LIST_TYPE->copyOf(Ljava/util/
  */
 @Suppress("unused")
 val cleanUpChatListPatch = bytecodePatch(
-    name = CHAT_LIST_PATCH,
+    // The README table check reads this literal; CHAT_LIST_PATCH carries the same text for the messages.
+    name = "Clean up Facebook's chat list",
     description = "Two switches for Chats inside Facebook, both off until you turn them on. One takes out the row of " +
-        "friends' notes above your chats, and one takes out the promotional banners at the top of Chats, like the one " +
+        "friends' notes and who's active above your chats, and one takes out the promotional banners at the top of Chats, like the one " +
         "asking you to turn on notifications. Your chats, search and new messages stay.",
     default = true,
 ) {
@@ -64,10 +67,16 @@ val cleanUpChatListPatch = bytecodePatch(
         val asks = questions.map { question ->
             mutableClassDefBy(question.definingClass).methods.single {
                 it.name == question.name && it.parameterTypes.map(Any::toString) == question.parameterTypes.map(Any::toString)
-            }.also { it.requireLocals(CHAT_LIST_PATCH, 1) }
+            }
         }
         tray.emptyTilesWhileHidden(store.store, store.list)
-        asks.forEach { it.answerNoWhileHidingPromotions() }
+        // 577's diode question has no local at all (it works in its parameter registers), so a
+        // question without one is replaced by a copy with its parameters moved down, freeing v0.
+        asks.forEach { ask ->
+            val target = if (ask.localRegisterCount() >= 1) ask
+            else ask.cloneMutableAndPreserveParameters(mutableClassDefBy(ask.definingClass))
+            target.answerNoWhileHidingPromotions()
+        }
         enableStatus("chatListCleanup")
     }
 }

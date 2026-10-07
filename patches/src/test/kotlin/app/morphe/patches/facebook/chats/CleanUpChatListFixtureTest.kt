@@ -80,8 +80,7 @@ class CleanUpChatListFixtureTest {
                     plugins += owners.single()
                     val question = bannerQuestion(owners.single(), tag)
                     assertTrue("$name: no show question for \"$tag\"", question != null)
-                    assertTrue("$name: the question for \"$tag\" has no local register", locals(question!!) >= 1)
-                    question
+                    question!!
                 }
                 assertEquals("$name: two plugins", 2, plugins.map { it.type }.toSet().size)
 
@@ -117,7 +116,12 @@ class CleanUpChatListFixtureTest {
                     val stock = question.body()
                     val hooked = patched(context, question).body()
                     val here = "$name ${question.definingClass}->${question.name}"
-                    assertEquals("$here: five instructions in", stock.size + 5, hooked.size)
+                    // A question with no local is copied with its parameters moved down; the hook still goes
+                    // first, before those moves, where v0 is free.
+                    val moves = hooked.size - stock.size - 5
+                    assertTrue("$here: $moves preserved parameters", moves >= 0)
+                    assertEquals("$here: moves only when it has no local", locals(question) < 1, moves > 0)
+                    assertTrue("$here: a local register for the answer", locals(patched(context, question)) >= 1)
                     assertEquals("$here: the hook call", Opcode.INVOKE_STATIC, hooked[0].opcode)
                     assertEquals("$here: the hook", HIDES_PROMOTION, hooked[0].target())
                     assertEquals("$here: no arguments", 0, (hooked[0] as FiveRegisterInstruction).registerCount)
@@ -126,7 +130,7 @@ class CleanUpChatListFixtureTest {
                     assertEquals("$here: tested", Opcode.IF_EQZ, hooked[2].opcode)
                     assertEquals("$here: answers no", Opcode.CONST_4, hooked[3].opcode)
                     assertEquals("$here: returns it", Opcode.RETURN, hooked[4].opcode)
-                    assertEquals("$here: stock code follows", stock[0].opcode, hooked[5].opcode)
+                    assertEquals("$here: stock code follows the moves", stock[0].opcode, hooked[5 + moves].opcode)
                 }
                 checked += version
             }

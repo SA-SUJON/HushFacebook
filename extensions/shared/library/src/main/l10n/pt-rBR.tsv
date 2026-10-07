@@ -350,10 +350,10 @@ For WhatsApp, video editors such as CapCut and InShot, or a gallery or player th
 Chats	Conversas
 Hide the Get Messenger card	Ocultar o cartão Baixar o Messenger
 The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	O cartão no topo de Conversas que pede para você baixar o aplicativo Messenger desaparece enquanto o Messenger estiver instalado. Sem o Messenger, ele permanece para que você possa instalá-lo por ali.
-# context: switch title under Chats; the notes tray is the row of friends' notes above the chat list in Chats inside Facebook
-Hide the notes tray	Ocultar a bandeja de notas
+# context: switch title under Chats; the notes and active now row is the row of friends' notes and who's active above the chat list in Chats inside Facebook
+Hide the notes and active now row	Ocultar a linha de notas e ativos
 # context: summary of that switch
-The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.	A linha de notas dos seus amigos acima das suas conversas, nas conversas dentro do Facebook, some. Suas conversas, a busca e as mensagens novas continuam.
+The row of friends' notes and who's active above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.	A linha de notas dos seus amigos e de quem está ativo acima das suas conversas, nas conversas dentro do Facebook, some. Suas conversas, a busca e as mensagens novas continuam.
 # context: switch title under Chats; promotions are the banners Facebook puts at the top of the chat list
 Hide chat list promotions	Ocultar promoções da lista de conversas
 # context: summary of that switch
