@@ -209,8 +209,6 @@ final class VideoPages {
             downloads.addPreference(qualityRow(context));
             downloads.addPreference(saveToRow(context));
             downloads.addPreference(folderRow(context));
-            downloads.addPreference(subfolderRow(context, true));
-            downloads.addPreference(subfolderRow(context, false));
             downloads.addPreference(fileNameRow(context));
             if (build.contains(PatchFamily.PHOTO_DOWNLOAD)) downloads.addPreference(photoNameRow(context));
             // Reels and feed and Watch videos can go to another app as a link (#41). A story can't:
@@ -219,6 +217,9 @@ final class VideoPages {
                 downloads.addPreference(downloadActionRow(context));
                 downloads.addPreference(sendAppRow(context));
             }
+            // Last, so the names stay next to the folder and what Download does stays under them.
+            downloads.addPreference(subfolderRow(context, true));
+            if (build.contains(PatchFamily.PHOTO_DOWNLOAD)) downloads.addPreference(subfolderRow(context, false));
             return downloads;
         }
         return null;

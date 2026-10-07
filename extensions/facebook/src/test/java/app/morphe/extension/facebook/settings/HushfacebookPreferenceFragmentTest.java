@@ -385,19 +385,22 @@ public class HushfacebookPreferenceFragmentTest {
     }
 
     /**
-     * Right below the folder, videos and photos each get a subfolder row. Blank, the default, saves
-     * stay in the folder itself; a name is cleaned as the folder's is, and both rows and the folder
-     * row say where each kind goes.
+     * Below the file names, which stay next to the folder, videos and photos each get a subfolder
+     * row, the photo one with Download any photo in the build. Blank, the default, saves stay in the
+     * folder itself; a name is cleaned as the folder's is, and both rows and the folder row say
+     * where each kind goes.
      */
     @Test
     public void theSubfolderRowsKeepOneCleanNameEachAndSayWhereSavesGo() {
-        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.STORY_DOWNLOAD);
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.STORY_DOWNLOAD, PatchFamily.PHOTO_DOWNLOAD);
         try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
             List<Preference> rows = rowsOf(controller);
             int folderAt = indexOfKey(rows, Settings.SAVE_FOLDER.key);
             ValueRows.FolderRow folder = (ValueRows.FolderRow) rows.get(folderAt);
-            ValueRows.SubfolderRow videos = (ValueRows.SubfolderRow) rows.get(folderAt + 1);
-            ValueRows.SubfolderRow photos = (ValueRows.SubfolderRow) rows.get(folderAt + 2);
+            int namesEnd = indexOfKey(rows, Settings.PHOTO_FILENAME_TEMPLATE.key);
+            assertEquals("the file names sit right below the folder", folderAt + 2, namesEnd);
+            ValueRows.SubfolderRow videos = (ValueRows.SubfolderRow) rows.get(namesEnd + 1);
+            ValueRows.SubfolderRow photos = (ValueRows.SubfolderRow) rows.get(namesEnd + 2);
             assertEquals(Settings.VIDEO_SUBFOLDER.key, videos.getKey());
             assertEquals("Video subfolder", String.valueOf(videos.getTitle()));
             assertEquals(Settings.PHOTO_SUBFOLDER.key, photos.getKey());
