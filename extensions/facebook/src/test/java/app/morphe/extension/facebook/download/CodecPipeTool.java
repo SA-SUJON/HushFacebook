@@ -83,11 +83,12 @@ public final class CodecPipeTool {
     }
 
     /**
-     * How long a held tool stays up by itself. It has to outlast Mp4JoinTest's deadline and the close
-     * after it, or a tool can exit on its own before the deadline it's there to test. At eight seconds
-     * it did, once that deadline grew to ten for loaded machines (2026-10-06).
+     * How long a held tool stays up by itself. It has to outlast Mp4JoinTest's longest deadline (25
+     * seconds for the three-JVM tree) and the close after it, or a tool can exit on its own before the
+     * deadline it's there to test. At eight seconds it did, once the deadline grew to ten for loaded
+     * machines (2026-10-06).
      */
-    static final long LIFETIME_MS = 30_000;
+    static final long LIFETIME_MS = 60_000;
 
     private static String[] windowsArguments(int expectedCount) throws IOException {
         // java.exe converts its native UTF-16 command line to CP_ACP before building main's args.

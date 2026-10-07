@@ -822,6 +822,14 @@ public class Mp4JoinTest {
     private static final long TOOL_DEADLINE = 10_000;
     /** Each helper-tool test's own limit: its deadline, the cleanup after it, and a slow start. */
     private static final long TEST_TIMEOUT = 30_000;
+    /**
+     * The deadline for the tree and orphan tools, which start three JVMs one after another before the
+     * last prints child-ready. Ten seconds didn't cover three cold starts beside other builds
+     * (2026-10-07), and the run read as a timeout with no child-ready in its output.
+     */
+    private static final long CHAIN_DEADLINE = 25_000;
+    /** The tree and orphan tests' own limit: the longer deadline, its cleanup, and the starts. */
+    private static final long CHAIN_TEST_TIMEOUT = 60_000;
 
     @Test(timeout = TEST_TIMEOUT)
     public void aToolHoldingStdoutOpenStopsAtItsDeadlineAndKeepsDiagnostics() throws Exception {
@@ -835,10 +843,10 @@ public class Mp4JoinTest {
         dead(marker);
     }
 
-    @Test(timeout = TEST_TIMEOUT)
+    @Test(timeout = CHAIN_TEST_TIMEOUT)
     public void aToolAndItsInheritedOutputChildStopAtTheDeadline() throws Exception {
         File marker = temp.newFile("tree-pids.txt");
-        AssertionError failure = assertThrows(AssertionError.class, () -> run(TOOL_DEADLINE, tool("tree", marker)));
+        AssertionError failure = assertThrows(AssertionError.class, () -> run(CHAIN_DEADLINE, tool("tree", marker)));
         assertTrue(failure.getMessage(), failure.getMessage().startsWith("timed out:"));
         assertTrue(failure.getMessage(), failure.getMessage().contains("parent-ready"));
         assertTrue(failure.getMessage(), failure.getMessage().contains("child-ready"));
@@ -846,10 +854,10 @@ public class Mp4JoinTest {
         dead(marker);
     }
 
-    @Test(timeout = TEST_TIMEOUT)
+    @Test(timeout = CHAIN_TEST_TIMEOUT)
     public void anExitedToolCannotLeaveItsOutputChildRunning() throws Exception {
         File marker = temp.newFile("orphan-pids.txt");
-        AssertionError failure = assertThrows(AssertionError.class, () -> run(TOOL_DEADLINE, tool("orphan", marker)));
+        AssertionError failure = assertThrows(AssertionError.class, () -> run(CHAIN_DEADLINE, tool("orphan", marker)));
         assertTrue(failure.getMessage(), failure.getMessage().startsWith("timed out:"));
         assertTrue(failure.getMessage(), failure.getMessage().contains("child-ready"));
         assertEquals(3, Files.readAllLines(marker.toPath(), StandardCharsets.UTF_8).size());
