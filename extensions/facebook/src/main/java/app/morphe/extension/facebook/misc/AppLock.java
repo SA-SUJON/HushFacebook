@@ -51,12 +51,15 @@ import app.morphe.extension.shared.Utils;
  * only keep the screen out of the recent apps view, log, or filter a promotion. There's no lock
  * screen behind it to turn on, so this is the extension's own.
  *
- * <p>The settings entry's activity callbacks drive it. "Away" starts when the last Facebook screen
- * stops, so a video in picture-in-picture, which keeps its screen started, is never away, and a
- * screen in picture-in-picture is never covered. A reply typed into a notification runs without
- * any screen, so it starts nothing either. A rotation, or a screen Facebook rebuilds for a new
- * configuration, isn't a leave. While the switch is on, Android 13 and later keep Facebook's
- * screens out of the recent apps view, as Facebook's own lock does.
+ * <p>The settings entry's activity callbacks drive it. Facebook is in front while one of its
+ * screens is started and isn't a picture-in-picture window. "Away" starts when the last of those
+ * stops, or shrinks into a picture-in-picture window, which Android reports as a pause with the
+ * screen already in that mode. The floating window keeps playing and is never covered, but the
+ * first full-screen Facebook screen after the chosen time asks, the video brought back to full
+ * screen included. A reply typed into a notification runs without any screen, so it starts nothing.
+ * A rotation, or a screen Facebook rebuilds for a new configuration, isn't a leave. While the
+ * switch is on, Android 13 and later keep Facebook's screens out of the recent apps view, as
+ * Facebook's own lock does.
  *
  * <p>Off, settings that aren't ready yet, or a phone without a screen lock, and nothing is covered
  * or asked. Turning the switch on doesn't lock the screen in front. A pause doesn't turn it off,
@@ -116,7 +119,12 @@ public final class AppLock {
 
     /** Facebook screens between their start and their stop. */
     private static int started;
-    /** When the last of them stopped, or {@link #NEVER} while one is started or the lock is off. */
+    /** The started screens that are picture-in-picture windows, as their last pause found them. */
+    private static final Set<Activity> floating = Collections.newSetFromMap(new WeakHashMap<>());
+    /**
+     * When the last full-screen Facebook screen left, or {@link #NEVER} while one is in front or the
+     * lock is off.
+     */
     private static long leftAt = NEVER;
     /** A check passed in this process, or it ran with the lock off, so a start alone doesn't lock. */
     private static boolean everUnlocked;
@@ -143,14 +151,31 @@ public final class AppLock {
         return Utils.settingsReady() && Settings.APP_LOCK.get();
     }
 
+    /** Whether a Facebook screen is in front: started, and not a picture-in-picture window. */
+    private static boolean inFront() {
+        return started > floating.size();
+    }
+
+    /** Whether [activity] is a picture-in-picture window. Android 7 brought the mode. */
+    private static boolean inPictureInPicture(Activity activity) {
+        return Build.VERSION.SDK_INT >= 24 && activity.isInPictureInPictureMode();
+    }
+
     /**
-     * From the settings entry's callbacks, as a Facebook screen starts. The first start after every
-     * screen stopped is a return, and it locks when the lock is due.
+     * From the settings entry's callbacks, as a Facebook screen starts. The first start with no
+     * Facebook screen in front is a return, and it locks when the lock is due.
      */
     public static void started(Activity activity) {
-        boolean returning = started == 0;
+        boolean returning = !inFront();
         started++;
-        if (!returning) return;
+        if (returning) returned(activity);
+    }
+
+    /**
+     * A Facebook screen came to the front with none there before it: a start, or a
+     * picture-in-picture window brought back to full screen. Locks when the lock is due.
+     */
+    private static void returned(Activity activity) {
         try {
             if (!Utils.settingsReady()) return;
             if (!Settings.APP_LOCK.get() || !canLock(activity)) {
@@ -180,19 +205,46 @@ public final class AppLock {
         return leftAt != NEVER && now - leftAt >= Settings.APP_LOCK_AFTER.get().millis;
     }
 
-    /** From the settings entry's callbacks, as a Facebook screen stops. The last one to stop starts the time away. */
+    /**
+     * From the settings entry's callbacks, as a Facebook screen leaves the front. A screen that
+     * pauses as a picture-in-picture window no longer counts as Facebook in front, and when it was
+     * the last one that did, the time away starts.
+     */
+    public static void paused(Activity activity) {
+        try {
+            if (!inPictureInPicture(activity) || floating.contains(activity) || !inFront()) return;
+            floating.add(activity);
+            if (!inFront()) leftAt = SystemClock.elapsedRealtime();
+        } catch (Throwable failure) {
+            Logger.printException(() -> "App lock: could not judge a pause", failure);
+        }
+    }
+
+    /**
+     * From the settings entry's callbacks, as a Facebook screen stops. The last full-screen one to
+     * stop starts the time away.
+     */
     public static void stopped(Activity activity) {
+        boolean wasInFront = inFront();
         if (started > 0) started--;
-        if (started == 0 && !activity.isChangingConfigurations()) leftAt = SystemClock.elapsedRealtime();
+        floating.remove(activity);
+        if (wasInFront && !inFront() && !activity.isChangingConfigurations()) {
+            leftAt = SystemClock.elapsedRealtime();
+        }
     }
 
     /**
      * From the settings entry's callbacks, as a Facebook screen comes to the front: covered while
-     * locked, and the check asked for unless the person just called one off. A screen in
-     * picture-in-picture is left as it is.
+     * locked, and the check asked for unless the person just called one off. A picture-in-picture
+     * window is left as it is, and one brought back to full screen is a return.
      */
     public static void resumed(Activity activity) {
         try {
+            if (floating.contains(activity) && !inPictureInPicture(activity)) {
+                boolean returning = !inFront();
+                floating.remove(activity);
+                if (returning) returned(activity);
+            }
             if (!switchedOn()) {
                 showInRecents(activity);
                 if (locked) release(null);
@@ -204,7 +256,7 @@ public final class AppLock {
                 Logger.printInfo(() -> "App lock: the phone has no screen lock now, so Facebook opens");
                 release(null);
             }
-            if (!locked || activity.isInPictureInPictureMode()) return;
+            if (!locked || inPictureInPicture(activity)) return;
             cover(activity);
             if (!asking && !declined) ask(activity);
         } catch (Throwable failure) {
@@ -217,6 +269,7 @@ public final class AppLock {
         Cover cover = covers.remove(activity);
         if (cover != null) cover.close();
         keptFromRecents.remove(activity);
+        floating.remove(activity);
         // Android ends a check whose screen goes, and an answer that never comes mustn't stop the next one.
         WeakReference<Activity> asked = askedOn;
         if (asked != null && asked.get() == activity) {
@@ -326,6 +379,7 @@ public final class AppLock {
         for (Cover cover : new ArrayList<>(covers.values())) cover.close();
         covers.clear();
         keptFromRecents.clear();
+        floating.clear();
         started = 0;
         leftAt = NEVER;
         everUnlocked = false;

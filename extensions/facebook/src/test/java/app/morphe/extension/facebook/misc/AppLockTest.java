@@ -13,7 +13,6 @@ import static org.robolectric.Shadows.shadowOf;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.KeyguardManager;
-import android.app.PictureInPictureParams;
 import android.hardware.biometrics.BiometricPrompt;
 import android.view.KeyEvent;
 import android.view.View;
@@ -62,6 +61,16 @@ public class AppLockTest {
         @Override
         public boolean isChangingConfigurations() {
             return true;
+        }
+    }
+
+    /** A screen whose picture-in-picture mode the test sets, as Android reports it to a pause. */
+    public static final class Video extends Activity {
+        boolean floating;
+
+        @Override
+        public boolean isInPictureInPictureMode() {
+            return floating;
         }
     }
 
@@ -268,30 +277,73 @@ public class AppLockTest {
         assertEquals(1, asked.size());
     }
 
+    /** A full-screen video shrinking into its floating window: Android pauses it in that mode. */
+    private static void shrink(Video video) {
+        video.floating = true;
+        AppLock.paused(video);
+    }
+
+    /** The floating window brought back to full screen: Android resumes it out of that mode. */
+    private static void expand(Video video) {
+        video.floating = false;
+        AppLock.resumed(video);
+        ShadowLooper.idleMainLooper();
+    }
+
     @Test
-    public void pictureInPictureNeverAsks() {
+    public void aPictureInPictureWindowIsNeverCovered() {
         Settings.APP_LOCK.save(true);
-        Activity activity = screen();
-        front(activity);
+        Video video = screen(Video.class);
+        front(video);
         asked.get(0).answer.unlocked();
 
-        // A video in picture-in-picture keeps its screen started: no time away, however long it plays.
-        activity.enterPictureInPictureMode(new PictureInPictureParams.Builder().build());
+        // However long it plays, the floating window itself is left alone and asks nothing.
+        shrink(video);
         ShadowSystemClock.advanceBy(Duration.ofHours(2));
-        AppLock.resumed(activity);
+        AppLock.resumed(video);
         ShadowLooper.idleMainLooper();
-        assertFalse(AppLock.covered(activity));
-        assertEquals(1, asked.size());
-
-        // A screen in picture-in-picture while Facebook is locked stays as it is, and asks nothing.
-        Activity video = screen();
-        video.enterPictureInPictureMode(new PictureInPictureParams.Builder().build());
-        AppLock.stopped(activity);
-        ShadowSystemClock.advanceBy(Duration.ofMinutes(2));
-        front(video);
-        assertTrue(AppLock.covering());
         assertFalse(AppLock.covered(video));
         assertEquals(1, asked.size());
+
+        // Locked by another screen while it floats, it still stays as it is.
+        Activity other = screen();
+        front(other);
+        assertTrue(AppLock.covered(other));
+        AppLock.resumed(video);
+        ShadowLooper.idleMainLooper();
+        assertFalse(AppLock.covered(video));
+    }
+
+    @Test
+    public void aReturnFromPictureInPictureAfterTheTimeAsks() {
+        Settings.APP_LOCK.save(true);
+        Video video = screen(Video.class);
+        front(video);
+        asked.get(0).answer.unlocked();
+
+        // Brought back within the minute: Facebook was never away long enough.
+        shrink(video);
+        ShadowSystemClock.advanceBy(Duration.ofSeconds(30));
+        expand(video);
+        assertFalse("half a minute floating locked a one minute lock", AppLock.covered(video));
+        assertEquals(1, asked.size());
+
+        // Floating past the minute, then back to full screen: covered, and the check asked for.
+        shrink(video);
+        ShadowSystemClock.advanceBy(Duration.ofMinutes(2));
+        expand(video);
+        assertTrue("the video brought back after the time wasn't covered", AppLock.covered(video));
+        assertEquals(2, asked.size());
+        asked.get(1).answer.unlocked();
+
+        // Floating past the minute, then Facebook opened from its icon onto another screen.
+        shrink(video);
+        ShadowSystemClock.advanceBy(Duration.ofMinutes(2));
+        Activity other = screen();
+        front(other);
+        assertTrue("a screen opened while the video floated wasn't covered", AppLock.covered(other));
+        assertFalse(AppLock.covered(video));
+        assertEquals(3, asked.size());
     }
 
     @Test

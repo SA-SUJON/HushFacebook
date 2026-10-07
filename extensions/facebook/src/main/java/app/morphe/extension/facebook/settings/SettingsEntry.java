@@ -489,6 +489,7 @@ public final class SettingsEntry {
 
         @Override
         public void onActivityPaused(Activity activity) {
+            AppLock.paused(activity);
             SavedFileActions.onPaused(activity);
             ClipboardLink.onPaused(activity);
             StorySeenButton.activityPaused(activity);
