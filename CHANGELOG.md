@@ -50,6 +50,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Download any video` has a new switch, **Offer to download copied links**, off to start. Come back to Facebook with a reel or video link copied and it asks once whether to download it. With the switch off, your clipboard is never read.
 * **Facebook:** `Hide Meta upsells` has a new **Hide other Meta AI buttons under posts** switch next to Hide Meta AI's Imagine. It takes the rest of Meta AI's buttons off posts, and the post's next button shows instead if it has one. It starts off.
 * **Facebook:** `Block promotional notifications` has new switches for group activity, event invites, live videos and reactions to your posts and comments. **Quiet hours**, a separate switch, blocks the kinds you picked only between two times you choose (10 PM to 7 AM to start). Everything starts off, and messages and calls always come through.
+* **Facebook:** `Block background-return feed refresh` also keeps your place when Facebook would reload Home as you switch back to it after a while on another tab. The **Keep feed position on return** switch covers it, and pull to refresh and a fresh start still load new posts.
+* **Facebook:** `Hold a reel for 2x` has a new switch, **Only on the right edge**, off to start. With it on, only a hold on the right third of a reel plays it at 2x, and a hold anywhere else does what Facebook does, usually its long-press menu.
 
 ### Fixed
 
