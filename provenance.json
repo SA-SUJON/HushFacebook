@@ -234,6 +234,15 @@
     },
     {
       "paths": [
+        "extensions/shared/library/src/main/java/app/morphe/extension/shared/settings/preference/ReadOnlyPreferences.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: a read-only view of the settings file for Facebook's side processes, so none of them opens it as SharedPreferences, whose first load can delete a file the main process is part way through saving."
+    },
+    {
+      "paths": [
         "extensions/shared/library/src/main/java/app/morphe/extension/shared/L10nTranslations.java"
       ],
       "origin": "original",
