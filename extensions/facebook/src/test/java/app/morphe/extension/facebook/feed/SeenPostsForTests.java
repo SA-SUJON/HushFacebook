@@ -18,7 +18,7 @@ public final class SeenPostsForTests {
     }
 
     /** A post with a cache id, the way Facebook's own story answers {@code getCacheId()}. */
-    public static final class Story extends GraphQLStory {
+    public static class Story extends GraphQLStory {
         private final String id;
 
         public Story(String id) {

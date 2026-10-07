@@ -269,8 +269,15 @@ final class FeedPages {
         });
         mark(forget, SettingsIcons.DELETE);
         // The two rows follow the switch: they're greyed out until it's on.
-        keep.setDependency(Settings.HIDE_SEEN_POSTS.key);
-        forget.setDependency(Settings.HIDE_SEEN_POSTS.key);
+        boolean on = Settings.HIDE_SEEN_POSTS.savedValue();
+        keep.setEnabled(on);
+        forget.setEnabled(on);
+        seen.setOnPreferenceChangeListener((preference, value) -> {
+            boolean now = Boolean.TRUE.equals(value);
+            keep.setEnabled(now);
+            forget.setEnabled(now);
+            return true;
+        });
         feed.addPreference(seen);
         feed.addPreference(keep);
         feed.addPreference(forget);
