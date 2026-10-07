@@ -85,7 +85,7 @@ final class HushfacebookPages {
         appearance.addPreference(textSizeRow(context));
         if (build.contains(PatchFamily.ACCENT_COLOR)) {
             // Colours Facebook asks for as each screen builds, so a change shows fully after a restart.
-            appearance.addPreference(accentRow(context));
+            appearance.addPreference(accentRow(context, build.contains(PatchFamily.MATERIAL_YOU_THEME)));
         }
         if (build.contains(PatchFamily.SYSTEM_FONT)) {
             appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT,

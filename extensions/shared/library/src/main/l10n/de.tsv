@@ -1156,6 +1156,8 @@ Red	Rot
 Indigo	Indigo
 # context: Accent color choice, a yellow-orange
 Amber	Bernstein
+# context: summary of the Accent color row, greyed out because the Material You theme patch is in the build
+Material You theme is in this build and picks Facebook's colors, so this has no effect.	Das Material-You-Design ist in diesem Build und bestimmt die Farben von Facebook, daher hat das hier keine Wirkung.
 # context: summary of the Accent color row at its default
 Links, buttons, switches and the selected tab keep Facebook's blue.	Links, Schaltflächen, Schalter und der gewählte Tab behalten das Blau von Facebook.
 # context: summary of the Accent color row; %1$s is a color name such as Teal

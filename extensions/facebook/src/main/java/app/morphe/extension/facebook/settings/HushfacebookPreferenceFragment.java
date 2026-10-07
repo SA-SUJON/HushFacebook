@@ -1287,8 +1287,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * The accent color, with the Accent color patch in the build. Like the text size row, its values
      * are the setting's own names and its summary says what the choice does.
      */
-    static AccentRow accentRow(Context context) {
-        AccentRow row = new AccentRow(context);
+    static AccentRow accentRow(Context context, boolean materialYou) {
+        AccentRow row = new AccentRow(context, materialYou);
         row.setKey(Settings.ACCENT_COLOR.key);
         row.setTitle(L10n.t("Accent color"));
         row.setDialogTitle(L10n.t("Accent color"));

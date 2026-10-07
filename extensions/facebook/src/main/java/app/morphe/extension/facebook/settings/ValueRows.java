@@ -888,8 +888,13 @@ final class ValueRows {
      * page syncing it from the setting, or an import.
      */
     static final class AccentRow extends PlainSummaryList {
-        AccentRow(Context context) {
+        /** Whether the Material You theme is in the build, so it picks the colors and this row does nothing. */
+        private final boolean materialYou;
+
+        AccentRow(Context context, boolean materialYou) {
             super(context);
+            this.materialYou = materialYou;
+            setEnabled(!materialYou);
         }
 
         @Override
@@ -899,6 +904,10 @@ final class ValueRows {
         }
 
         void showSummary() {
+            if (materialYou) {
+                setSummary(L10n.t("Material You theme is in this build and picks Facebook's colors, so this has no effect."));
+                return;
+            }
             AccentColor.Preset accent = AccentColor.Preset.FACEBOOK;
             for (AccentColor.Preset candidate : AccentColor.Preset.values()) {
                 if (candidate.name().equals(getValue())) accent = candidate;

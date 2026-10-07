@@ -36,6 +36,7 @@ public class ListRowSummaryTest {
     @After
     public void restore() {
         Settings.TEXT_SIZE.resetToDefault();
+        Settings.ACCENT_COLOR.resetToDefault();
     }
 
     private static Context context() {
@@ -59,6 +60,24 @@ public class ListRowSummaryTest {
             ValueRows.TextSizeRow row = HushfacebookPreferenceFragment.textSizeRow(context());
             assertEquals(scale.name(), HushfacebookPreferenceFragment.textSizeSummary(scale), String.valueOf(row.getSummary()));
         }
+    }
+
+    @Test
+    public void theAccentRowGreysOutAndSaysWhoPicksTheColorsWhenMaterialYouIsInTheBuild() {
+        Settings.ACCENT_COLOR.save(app.morphe.extension.facebook.theme.AccentColor.Preset.TEAL);
+        ValueRows.AccentRow taken = HushfacebookPreferenceFragment.accentRow(context(), true);
+        assertEquals(false, taken.isEnabled());
+        assertEquals("Material You theme is in this build and picks Facebook's colors, so this has no effect.",
+                String.valueOf(taken.getSummary()));
+        taken.setValue("TEAL");
+        assertEquals(false, taken.isEnabled());
+        assertEquals("Material You theme is in this build and picks Facebook's colors, so this has no effect.",
+                String.valueOf(taken.getSummary()));
+
+        ValueRows.AccentRow free = HushfacebookPreferenceFragment.accentRow(context(), false);
+        assertEquals(true, free.isEnabled());
+        assertEquals(HushfacebookPreferenceFragment.accentSummary(app.morphe.extension.facebook.theme.AccentColor.Preset.TEAL),
+                String.valueOf(free.getSummary()));
     }
 
     @Test
