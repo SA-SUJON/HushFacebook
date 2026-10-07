@@ -477,6 +477,7 @@ public final class AppLock {
         if (cover != null) cover.close();
         keptFromRecents.remove(activity);
         floating.remove(activity);
+        forgetTouches(activity);
         if (front.get() == activity) front = new WeakReference<>(null);
         // Android ends a check whose screen goes, and an answer that never comes mustn't stop the next one.
         WeakReference<Activity> asked = askedOn;
@@ -780,7 +781,23 @@ public final class AppLock {
         }
     }
 
-    /** Gives back the touches taken from other windows while locked. */
+    /**
+     * Lets go of the windows of a screen that's gone, as a rotation while locked destroys one. They
+     * go with it, so there are no touches to give back, and holding them would keep the screen alive.
+     */
+    private static void forgetTouches(Activity activity) {
+        WindowManager own = activity.getWindowManager();
+        for (Map.Entry<View, WindowManager> entry : new ArrayList<>(untouchable.entrySet())) {
+            if (entry.getValue() == own || belongsTo(entry.getKey(), activity)) untouchable.remove(entry.getKey());
+        }
+    }
+
+    /** Whether the lock holds a window it made untouchable, for a test. */
+    static int untouchableCount() {
+        return untouchable.size();
+    }
+
+    /** Gives back the touches taken from other windows while locked, only the ones the lock took. */
     private static void restoreTouch() {
         for (Map.Entry<View, WindowManager> entry : new ArrayList<>(untouchable.entrySet())) {
             try {

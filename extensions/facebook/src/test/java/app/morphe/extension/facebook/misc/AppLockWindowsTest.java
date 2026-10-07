@@ -272,6 +272,46 @@ public class AppLockWindowsTest {
     }
 
     @Test
+    public void aScreenThatIsDestroyedWhileLockedIsLetGoOfAndFacebooksOwnFlagIsLeftAlone() {
+        Activity screen = lockedScreen();
+        AppLock.roots.list();
+        View ours = notFocusableWindow(screen);
+        // Facebook made this one untouchable itself, above the cover, before the lock looked.
+        View facebooks = new View(screen);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                PixelFormat.TRANSLUCENT);
+        screen.getWindowManager().addView(facebooks, params);
+        windows.add(facebooks);
+        AppLock.sweep(screen);
+        assertTrue(takesNoTouch(ours));
+        assertEquals("the lock holds a window it didn't flag", 1, AppLock.untouchableCount());
+
+        answers.get(0).unlocked();
+        assertFalse("the unlock gave back touches the lock took", takesNoTouch(ours));
+        assertTrue("the unlock cleared Facebook's own flag", takesNoTouch(facebooks));
+        assertEquals(0, AppLock.untouchableCount());
+
+        // A second locked screen, rotated away: its windows aren't kept.
+        AppLock.forgetForTests();
+        AppLock.prompter = (shown, answer) -> {
+            asked.add(shown);
+            answers.add(answer);
+        };
+        AppLock.roots = freshRoots;
+        windows.clear();
+        Activity rotated = lockedScreen();
+        AppLock.roots.list();
+        notFocusableWindow(rotated);
+        AppLock.sweep(rotated);
+        assertEquals(1, AppLock.untouchableCount());
+        AppLock.destroyed(rotated);
+        assertEquals("a destroyed screen's window was still held", 0, AppLock.untouchableCount());
+    }
+
+    @Test
     public void aPhoneThatWontGiveItsWindowListLeavesTheCoverAsItWas() {
         Activity screen = lockedScreen();
         Dialog cover = ShadowDialog.getLatestDialog();
