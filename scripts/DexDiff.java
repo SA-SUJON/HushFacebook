@@ -88,7 +88,8 @@ import java.util.TreeSet;
  * addNewEdgeToCollection, because two guards stacked on that method is what broke Froggo's
  * builds; and each extension stub a patch fills in with one of Facebook's renamed accessors calls
  * it before it returns, so a patch that stopped filling one fails here instead of shipping a stub
- * that answers its marker forever; and each of the two Stories tray adapter classes gets one
+ * that answers its marker forever; and each of the two Stories tray adapter classes and Home's
+ * composer row gets one
  * count of its own asking the extension, and the reels hook comes first in the pre-EOF injector;
  * and the settings patch's
  * stand-in for the Facebook logo's touch listener comes right after the logo gets its tap, on the

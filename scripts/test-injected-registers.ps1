@@ -598,11 +598,11 @@ try {
             'Lcom/facebook/graphql/model/GraphQLStory;->A0X()Lfixture/Model; before its first return'))) `
             "The good build's $stub was not reported calling the story's accessor.`n$($good.Output -join "`n")"
     }
-    # The tray count rule finds one call in each tray class's count.
+    # The tray count rule finds one call in each counted class's count.
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
-        'storiesTrayCount(Ljava/lang/Object;II)I in getItemCount 2: 2 call sites, in ' +
-        'Lfixture/ClassicTray;->getItemCount()I, Lfixture/UnifiedTray;->getItemCount()I')) `
-        "The good build's tray counts were not reported, one in each tray class.`n$($good.Output -join "`n")"
+        'storiesTrayCount(Ljava/lang/Object;II)I in getItemCount 3: 3 call sites, in ' +
+        'Lfixture/ClassicTray;->getItemCount()I, Lfixture/ComposerRow;->getItemCount()I, Lfixture/UnifiedTray;->getItemCount()I')) `
+        "The good build's tray counts were not reported, one in each counted class.`n$($good.Output -join "`n")"
     # Each start-call rule finds its one method among others holding part of what it names (the
     # refresh controller's onPause, two other methods naming both surfaces), and the hook first there.
     Assert-True (($good.Output -join "`n") -match [regex]::Escape(
@@ -1062,9 +1062,9 @@ try {
     # reaches and the count, in the method it sits in. Each FAIL line has to be one of these.
     $wrongPlace = [ordered]@{
         'bad-tray-hook-missing' = @(('*contract: Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I ' +
-            'has 1 call sites, and must have exactly 2, each in getItemCount of a class of its own: Lfixture/ClassicTray;->getItemCount()I'))
+            'has 2 call sites, and must have exactly 3, each in getItemCount of a class of its own: Lfixture/ClassicTray;->getItemCount()I, Lfixture/ComposerRow;->getItemCount()I'))
         'bad-tray-count-twice' = @(('*contract: Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I ' +
-            'is called more than once in one class''s getItemCount: Lfixture/ClassicTray;->getItemCount()I, Lfixture/ClassicTray;->getItemCount()I'))
+            'is called more than once in one class''s getItemCount: Lfixture/ClassicTray;->getItemCount()I, Lfixture/ClassicTray;->getItemCount()I, Lfixture/ComposerRow;->getItemCount()I'))
         'bad-tray-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I ' +
             'is called from Lfixture/UnifiedTray;->countRows()I, not from getItemCount'))
         'bad-return-refresh-hook-wrong-method' = @(('*contract: Lapp/morphe/extension/facebook/feed/ReturnRefresh;->skip()Z is not ' +

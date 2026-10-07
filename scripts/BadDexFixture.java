@@ -57,8 +57,8 @@ import java.util.Set;
  * the one feed guard goes, and the bundle's {@code FeedFilter.hideEdge} is the guard, under the
  * same names the contract file holds the real APK to. The bundle's two story-flag stubs are there
  * under their real names too, filled the way the patches fill them: a call to GraphQLStory's
- * accessor before anything returns. And two classes stand in for the feed's two Stories tray
- * adapters, each given a getItemCount() of its own in the patched builds, which calls
+ * accessor before anything returns. And three classes stand in for the feed's two Stories tray
+ * adapters and Home's composer row, each given a getItemCount() of its own in the patched builds, which calls
  * {@code FeedFilter.storiesTrayCount}. The reels patch's two
  * changes are there as well: a renamed feed unit class answering ShowcaseFeedUnit, whose accessor
  * the {@code ShowcaseType} stub calls, and a pre-EOF injector holding its adapter's name, with the
@@ -121,6 +121,7 @@ public class BadDexFixture {
 
     private static final String CLASSIC_TRAY = "Lfixture/ClassicTray;";
     private static final String UNIFIED_TRAY = "Lfixture/UnifiedTray;";
+    private static final String COMPOSER_ROW = "Lfixture/ComposerRow;";
     private static final ImmutableMethodReference STORIES_TRAY_COUNT =
             method(FILTER, "storiesTrayCount", "I", OBJECT, "I", "I");
     /** An extension class of the bundle's own, for an added method that writes past its registers. */
@@ -539,8 +540,8 @@ public class BadDexFixture {
     }
 
     /**
-     * One of the feed's two Stories tray adapter classes, which inherit their count as Facebook
-     * ships them. The tray patch gives each a getItemCount() of its own, [count] in it; [other]
+     * One of the feed's two Stories tray adapter classes or Home's composer row, which inherit their
+     * count as Facebook ships them. The tray patch gives each a getItemCount() of its own, [count] in it; [other]
      * stands in for another method of the class. Null leaves the method out.
      */
     private static ClassDef tray(String type, List<Instruction> count, List<Instruction> other) {
@@ -568,9 +569,10 @@ public class BadDexFixture {
                 op(Opcode.MOVE_RESULT, 0));
     }
 
-    /** Both tray classes, each given a count holding [classic] or [unified]; null leaves it out. */
-    private static List<ClassDef> trays(List<Instruction> classic, List<Instruction> unified) {
-        return Arrays.asList(tray(CLASSIC_TRAY, classic, null), tray(UNIFIED_TRAY, unified, null));
+    /** The three counted classes, each given a count holding [classic], [unified] or [composer]; null leaves it out. */
+    private static List<ClassDef> trays(List<Instruction> classic, List<Instruction> unified, List<Instruction> composer) {
+        return Arrays.asList(tray(CLASSIC_TRAY, classic, null), tray(UNIFIED_TRAY, unified, null),
+                tray(COMPOSER_ROW, composer, null));
     }
 
     /**
@@ -659,7 +661,7 @@ public class BadDexFixture {
     }
 
     private static List<ClassDef> hookedTrays() {
-        return trays(trayCount(0), trayCount(1));
+        return trays(trayCount(0), trayCount(1), trayCount(2));
     }
 
     private static ClassDef followCheck(List<Instruction> prefix) {
@@ -1645,7 +1647,7 @@ public class BadDexFixture {
 
     /** The clean host, Facebook's classes as they ship, with the batcher's flush making [handOver]. */
     private static List<ClassDef> clean(List<Instruction> handOver) {
-        List<ClassDef> classes = new ArrayList<>(trays(null, null));
+        List<ClassDef> classes = new ArrayList<>(trays(null, null, null));
         classes.addAll(Arrays.asList(cleanHost(),
                 showcaseUnit(), preEof(Collections.<Instruction>emptyList()), returnController(Collections.<Instruction>emptyList()),
                 shortcuts(allShortcutCalls()), followCheck(Collections.<Instruction>emptyList()),
@@ -2084,12 +2086,12 @@ public class BadDexFixture {
         // contract: the unified tray's count left without the tray patch's call.
         ClassDef filledGenAi = genAiLabel(FILLED_STUB);
         dexes.put("bad-tray-hook-missing", bundle(goodHost, filledGenAi, filledRecommendation,
-                trays(trayCount(0), Collections.<Instruction>emptyList())));
-        // contract: both calls in the classic tray's count and the unified tray given none.
+                trays(trayCount(0), Collections.<Instruction>emptyList(), trayCount(2))));
+        // contract: both tray calls in the classic tray's count and the unified tray given none.
         List<Instruction> countTwice = new ArrayList<>(trayCount(0));
         countTwice.addAll(trayCount(1));
         dexes.put("bad-tray-count-twice", bundle(goodHost, filledGenAi, filledRecommendation,
-                trays(countTwice, null)));
+                trays(countTwice, null, trayCount(2))));
         // contract: the unified tray's call in another of its methods, not its count.
         dexes.put("bad-tray-hook-wrong-method", replaced(good(), tray(CLASSIC_TRAY, trayCount(0), null),
                 tray(UNIFIED_TRAY, null, trayCount(1))));

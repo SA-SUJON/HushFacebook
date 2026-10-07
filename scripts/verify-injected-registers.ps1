@@ -21,7 +21,7 @@
     scripts/injected-mutation-contracts.txt: one feed guard, in addNewEdgeToCollection, each
     story-flag stub calling GraphQLStory's accessor before it returns, the showcase stub calling
     the accessor of the one class answering ShowcaseFeedUnit, one Stories tray count in each of the
-    two tray adapter classes, the reels hook first in the pre-EOF injector, the swap guard once in
+    two tray adapter classes and Home's composer row, the reels hook first in the pre-EOF injector, the swap guard once in
     the runnable that swaps an edge into the feed, and one tab link call in each of the three places
     Facebook looks a link's tab up in its configured tabs, each in the one method its rule's strings
     and shape pick out.

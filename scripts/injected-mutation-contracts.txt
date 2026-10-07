@@ -35,10 +35,10 @@ first-call Lapp/morphe/extension/facebook/feed/PostSources;->attachments(Ljava/l
 # first call leaves the extension. Left unfilled it answers its marker, and the Reels rule keeps
 # every reel with nothing but a Hook status line to say why.
 first-call Lapp/morphe/extension/facebook/feed/GenAiReelFilter;->transparencyAttribution(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object; outside Lapp/morphe/extension/
-# The Stories tray patch gives each of the feed's two tray adapter classes, the classic and the
-# unified one, a getItemCount() of its own that asks the extension with Facebook's count. No other
-# method calls it, and neither class gets two.
-count-call Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I in getItemCount 2
+# The Stories tray patch gives three of the feed's adapter classes, the classic tray, the unified
+# tray and Home's composer row, a getItemCount() of its own that asks the extension with Facebook's
+# count. No other method calls it, and no class gets two.
+count-call Lapp/morphe/extension/facebook/feed/FeedFilter;->storiesTrayCount(Ljava/lang/Object;II)I in getItemCount 3
 # The reels patch fills the showcase stub with the story type accessor of the one class whose
 # getTypeName() answers ShowcaseFeedUnit, a class Redex renames, so the rule names it by that type.
 first-call Lapp/morphe/extension/facebook/feed/ShowcaseType;->storyType(Ljava/lang/Object;)Ljava/lang/Object; on-type-named ShowcaseFeedUnit
