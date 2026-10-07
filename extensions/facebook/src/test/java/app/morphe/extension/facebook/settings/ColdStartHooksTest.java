@@ -86,6 +86,7 @@ import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.ReelMidCardsForTests;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
+import app.morphe.extension.facebook.stories.StoryAdvance;
 import app.morphe.extension.facebook.stories.StorySeen;
 import app.morphe.extension.facebook.stories.SuggestedStoriesForTests;
 import app.morphe.extension.shared.Utils;
@@ -248,6 +249,7 @@ public class ColdStartHooksTest {
         });
         assertFalse("a lift's speed before the context was changed", ReelHoldForTests.putsBackTheSpeedBeforeAHold());
         assertFalse("stories viewed before the context were kept off their viewer lists", StorySeen.holdBack());
+        assertFalse("a story that finished before the context played again", StoryAdvance.loop());
         assertFalse(PlayerSourcesForTests.recordsAPlayer());
         assertFalse("a post menu built before the context got the video item", VideoMenuItemForTests.addsAnItem());
         assertFalse(PlayerSourcesForTests.recordsAVideoPlayer());
