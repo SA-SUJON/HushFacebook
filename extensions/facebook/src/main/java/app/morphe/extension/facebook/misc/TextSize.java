@@ -10,12 +10,16 @@ import android.content.ComponentCallbacks;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.Logger;
@@ -31,7 +35,10 @@ import app.morphe.extension.shared.Utils;
  * comments and Menu). Here the scale those resources report is the phone's times the choice, set
  * on each Facebook activity as it's created and again as it resumes, and on the application's
  * resources once Facebook starts. A configuration change puts the phone's scale back in the
- * resources, so the next resume and the application's configuration callback set it again.
+ * resources, so the next resume and the application's configuration callback set it again. On
+ * Android 12 and later a screen that handles its own configuration changes gets its resources
+ * rebuilt after the application's callback ran, so each scaled activity has a callback of its own
+ * too, taken off when it's destroyed.
  *
  * <p>Since the phone's own large sizes are what Facebook's layouts were checked against, a choice
  * above 100% never takes the total past 2.0, Android's largest font scale (or past the phone's
@@ -94,6 +101,8 @@ public final class TextSize {
     private static WeakReference<Application> watched;
     @Nullable
     private static WeakReference<Activity> latest;
+    /** The configuration callback on each activity that has one, so its destroy can take it off. */
+    private static final Map<Activity, ComponentCallbacks> ownChanges = Collections.synchronizedMap(new WeakHashMap<>());
 
     private TextSize() {
     }
@@ -132,6 +141,7 @@ public final class TextSize {
         scaledSomething = false;
         latest = null;
         watched = null;
+        ownChanges.clear();
     }
 
     /** The phone's own font scale: the system resources follow its font size setting. */
@@ -154,8 +164,32 @@ public final class TextSize {
             Scale scale = chosen();
             latest = new WeakReference<>(activity);
             apply(activity.getResources(), phoneScale(), scale);
+            if (scaledSomething) watch(activity);
         } catch (RuntimeException failure) {
             Logger.printException(() -> "Text size: could not set the activity's font scale", failure);
+        }
+    }
+
+    /**
+     * Gives [activity] its own configuration callback, once. Android 12 and later send an activity's
+     * own configuration changes to the callbacks registered on it.
+     */
+    private static void watch(Activity activity) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || ownChanges.containsKey(activity)) return;
+        ComponentCallbacks callbacks = new ActivityChanges(activity);
+        activity.registerComponentCallbacks(callbacks);
+        ownChanges.put(activity, callbacks);
+    }
+
+    /** From the settings entry's callbacks as a Facebook activity is destroyed: takes its configuration callback off. Never throws. */
+    public static void destroyed(Activity activity) {
+        try {
+            ComponentCallbacks callbacks = ownChanges.remove(activity);
+            if (callbacks != null) activity.unregisterComponentCallbacks(callbacks);
+            WeakReference<Activity> newest = latest;
+            if (newest != null && newest.get() == activity) latest = null;
+        } catch (RuntimeException failure) {
+            Logger.printException(() -> "Text size: could not take a screen's configuration callback off", failure);
         }
     }
 
@@ -194,6 +228,29 @@ public final class TextSize {
                 if (activity != null) apply(activity.getResources(), phone, scale);
             } catch (RuntimeException failure) {
                 Logger.printException(() -> "Text size: could not set the font scale after a configuration change", failure);
+            }
+        }
+
+        @Override
+        public void onLowMemory() {
+        }
+    }
+
+    /** Sets the scale again after one activity's own configuration change. It holds the activity weakly. */
+    private static final class ActivityChanges implements ComponentCallbacks {
+        private final WeakReference<Activity> activity;
+
+        ActivityChanges(Activity activity) {
+            this.activity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void onConfigurationChanged(@NonNull Configuration newConfig) {
+            try {
+                Activity changed = activity.get();
+                if (changed != null) apply(changed.getResources(), phoneScale(), chosen());
+            } catch (RuntimeException failure) {
+                Logger.printException(() -> "Text size: could not set a screen's font scale after its configuration change", failure);
             }
         }
 

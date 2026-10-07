@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
 import app.morphe.extension.facebook.settings.Settings;
@@ -146,6 +147,36 @@ public class TextSizeTest {
         app.getResources().updateConfiguration(reset, app.getResources().getDisplayMetrics());
         app.onConfigurationChanged(reset);
         assertEquals(phone * 1.15f, scaleOf(app.getResources()), 0.0001f);
+    }
+
+    /**
+     * A screen that handles its own configuration change gets its resources rebuilt at the phone's
+     * scale on Android 12 and later, after the application's callback ran. Its own callback sets the
+     * choice again, and its destroy takes that callback off.
+     */
+    @Test
+    @Config(sdk = 34)
+    public void aScreensOwnConfigurationChangeKeepsTheChosenSizeUntilItsDestroyed() {
+        Settings.TEXT_SIZE.save(TextSize.Scale.P120);
+        float phone = Resources.getSystem().getConfiguration().fontScale;
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).create()) {
+            Activity activity = controller.get();
+            Resources resources = activity.getResources();
+            TextSize.activity(activity);
+            TextSize.activity(activity);
+            assertEquals(phone * 1.2f, scaleOf(resources), 0.0001f);
+
+            Configuration rebuilt = new Configuration(resources.getConfiguration());
+            rebuilt.fontScale = phone;
+            resources.updateConfiguration(rebuilt, resources.getDisplayMetrics());
+            activity.onConfigurationChanged(rebuilt);
+            assertEquals("the screen's own change keeps the choice", phone * 1.2f, scaleOf(resources), 0.0001f);
+
+            TextSize.destroyed(activity);
+            resources.updateConfiguration(rebuilt, resources.getDisplayMetrics());
+            activity.onConfigurationChanged(rebuilt);
+            assertEquals("a destroyed screen's callback is off", phone, scaleOf(resources), 0.0001f);
+        }
     }
 
     @Test

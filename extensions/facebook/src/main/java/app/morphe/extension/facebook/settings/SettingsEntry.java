@@ -525,6 +525,7 @@ public final class SettingsEntry {
         @Override public void onActivitySaveInstanceState(Activity activity, Bundle state) { }
         @Override
         public void onActivityDestroyed(Activity activity) {
+            TextSize.destroyed(activity);
             SavedFileActions.onPaused(activity);
             if (SettingsStatus.storySeen()) StorySeenButton.activityDestroyed(activity);
             // The screen can land on an activity just before it clears itself for the next one.
