@@ -285,6 +285,9 @@ internal fun BytecodePatchContext.hideMetaUpsells() {
     val ctaCheck = ctaCheck(ctaTable, ctaSockets) { classDefByOrNull(it) }
     val captionPlugin = classDefByOrNull(CAPTION_DEEP_DIVE_PLUGIN) ?: refuse("this Facebook build has no $CAPTION_DEEP_DIVE_PLUGIN")
     val captionGetter = captionDeepDiveGetter(captionPlugin)
+    // Both take a local register; checked here, before the Edits, Threads and Meta Verified hooks go in.
+    if (ctaCheck.localRegisterCount() < 1) refuse("${ctaCheck.definingClass}->${ctaCheck.name} has no local register")
+    if (captionGetter.localRegisterCount() < 1) refuse("${captionGetter.definingClass}->${captionGetter.name} has no local register")
     val composerImagine = enumConstant(enumNaming(COMPOSER_CAPABILITIES), COMPOSER_IMAGINE)
     val storyImagine = enumConstant(enumNaming(STORY_TOOLS_NAMES), STORY_IMAGINE)
 
