@@ -226,11 +226,21 @@ public final class AppLock {
 
     /**
      * From the lock's callbacks, as a Facebook screen starts. The first start with no
-     * Facebook screen in front is a return, and it locks when the lock is due.
+     * Facebook screen in front is a return, and it locks when the lock is due. A picture-in-picture
+     * window that starts again, as it does when the phone is unlocked, isn't one: it floats, so the
+     * time away keeps running until a full-screen Facebook screen comes back.
      */
     public static void started(Activity activity) {
         boolean returning = !inFront();
         started++;
+        try {
+            if (inPictureInPicture(activity)) {
+                floating.add(activity);
+                return;
+            }
+        } catch (Throwable failure) {
+            Logger.printException(() -> "App lock: could not judge a floating start", failure);
+        }
         if (returning) returned(activity);
     }
 

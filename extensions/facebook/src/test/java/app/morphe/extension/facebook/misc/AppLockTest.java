@@ -411,6 +411,48 @@ public class AppLockTest {
         assertEquals(3, asked.size());
     }
 
+    /**
+     * A reel floating while the phone locks and unlocks: Android stops its window and starts it
+     * again, which isn't a return to Facebook, so the time away keeps running. Lock after 15
+     * minutes, the reel floated at t0, the phone locked and unlocked at t0+14m, and Facebook opened
+     * or the reel brought back at t0+25m: both ask.
+     */
+    @Test
+    public void aFloatingReelThatStartsAgainKeepsTheTimeAwayRunning() {
+        Settings.APP_LOCK.save(true);
+        Settings.APP_LOCK_AFTER.save(AppLock.After.FIFTEEN_MINUTES);
+        for (boolean bringBack : new boolean[] {false, true}) {
+            AppLock.forgetForTests();
+            asked.clear();
+            AppLock.prompter = (shown, answer) -> asked.add(new Asked(shown, answer));
+            Video video = screen(Video.class);
+            front(video);
+            asked.get(0).answer.unlocked();
+
+            shrink(video);
+            ShadowSystemClock.advanceBy(Duration.ofMinutes(14));
+            // The phone locks and unlocks: the floating window stops, then starts and pauses again.
+            AppLock.stopped(video);
+            AppLock.started(video);
+            AppLock.resumed(video);
+            AppLock.paused(video);
+            ShadowLooper.idleMainLooper();
+            assertFalse("the floating window was covered", AppLock.covered(video));
+            assertEquals("the floating window's restart asked", 1, asked.size());
+
+            ShadowSystemClock.advanceBy(Duration.ofMinutes(11));
+            if (bringBack) {
+                expand(video);
+                assertTrue("the reel brought back 25 minutes after it floated wasn't covered", AppLock.covered(video));
+            } else {
+                Activity other = screen();
+                front(other);
+                assertTrue("Facebook opened 25 minutes after the reel floated wasn't covered", AppLock.covered(other));
+            }
+            assertEquals(2, asked.size());
+        }
+    }
+
     @Test
     public void aScreenThatGoesWhileAskingDoesntStopTheNextCheck() {
         Settings.APP_LOCK.save(true);
