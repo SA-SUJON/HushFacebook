@@ -202,6 +202,7 @@ public class PausedHooksTest {
         PauseForTests.resume();
         for (BooleanSetting setting : settingsSwitches()) setting.resetToDefault();
         Settings.HIDDEN_WORDS.resetToDefault();
+        Settings.HIDE_POSTS_OVER_REACTIONS.resetToDefault();
         FeedFilterCounters.clear();
         ReleaseCheckForTests.forget();
     }
@@ -341,10 +342,12 @@ public class PausedHooksTest {
         // the kinds of post switches read without any list. Paused, the list reads empty too.
         // Saved here, with the context, so a probe run without one reads it rather than loading it.
         Settings.HIDDEN_WORDS.save("spoiler");
+        Settings.HIDE_POSTS_OVER_REACTIONS.save(app.morphe.extension.facebook.feed.ReactionCeiling.K1);
         probes.put(PatchFamily.POST_WORDS, Arrays.asList(
                 () -> FeedGuardForTests.hidesByWords(Category.ORGANIC, new GraphQLStory(),
                         FeedGuardForTests.postText("Big SPOILER inside")),
-                () -> FeedGuardForTests.hidesPhotoPost(Category.ORGANIC)));
+                () -> FeedGuardForTests.hidesPhotoPost(Category.ORGANIC),
+                () -> FeedGuardForTests.hidesPopularPost(Category.ORGANIC)));
         // A story with a bumper is answered as one without, so no strip is drawn and no room kept.
         probes.put(PatchFamily.POST_PROMPTS, Collections.singletonList(() -> !PostPrompts.keep(true)));
         // The pill socket's yes for Meta AI's questions is answered as a no, so it draws no row for

@@ -55,6 +55,7 @@ import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.TextSize;
+import app.morphe.extension.facebook.feed.ReactionCeiling;
 import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -386,6 +387,7 @@ public class SettingsBackupPreference extends Preference {
                     snapshot.videoSubfolderChange(), snapshot.photoSubfolderChange(), snapshot.reelsQualityChange(),
                     snapshot.storiesQualityChange(), snapshot.quietFromChange(), snapshot.quietUntilChange(),
                     snapshot.lockAfterChange(), snapshot.textSizeChange(), snapshot.accentChange()));
+            if (snapshot.ceilingChange() != null) parts.add(ceilingSentence(snapshot.ceilingChange()));
             message = String.join("\n\n", parts);
         }
         if (snapshot.unknown > 0) {
@@ -547,6 +549,13 @@ public class SettingsBackupPreference extends Preference {
         if (after == AppLock.After.IMMEDIATELY) return L10n.t("With Lock Facebook on, it will lock as soon as you leave it.");
         return L10n.f("With Lock Facebook on, it will lock once you've been away for %1$s.",
                 HushfacebookPreferenceFragment.lockAfterLabel(after));
+    }
+
+    /** The sentence that says what the feed will do about a post's reaction count after an import. */
+    static String ceilingSentence(ReactionCeiling ceiling) {
+        if (ceiling == ReactionCeiling.OFF) return L10n.t("The feed won't hide posts for how many reactions they have.");
+        return L10n.f("The feed will hide posts with more than %1$s reactions.",
+                HushfacebookPreferenceFragment.ceilingNumber(ceiling));
     }
 
     /** The sentence that says which accent color Facebook will have after an import. */
@@ -839,7 +848,8 @@ public class SettingsBackupPreference extends Preference {
                     snapshot.toChange(), snapshot.subtabChange(), snapshot.sourcesChange(), snapshot.photoNameChange(),
                     snapshot.videoSubfolderChange(), snapshot.photoSubfolderChange(), snapshot.reelsQualityChange(),
                     snapshot.storiesQualityChange(), snapshot.quietFromChange(), snapshot.quietUntilChange(),
-                    snapshot.lockAfterChange(), snapshot.textSizeChange(), snapshot.accentChange());
+                    snapshot.lockAfterChange(), snapshot.textSizeChange(), snapshot.accentChange())
+                    + (snapshot.ceilingChange() == null ? "" : " " + ceilingSentence(snapshot.ceilingChange()));
             accepted = Utils.runOnBackgroundThread(() -> {
                 try {
                     SettingsBackup.apply(snapshot);

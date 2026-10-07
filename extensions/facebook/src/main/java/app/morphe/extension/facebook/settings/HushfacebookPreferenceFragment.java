@@ -49,6 +49,7 @@ import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
+import app.morphe.extension.facebook.feed.ReactionCeiling;
 import app.morphe.extension.facebook.feed.TopicPacks;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
@@ -67,6 +68,7 @@ import app.morphe.extension.facebook.settings.SettingsRows.Toggle;
 import app.morphe.extension.facebook.settings.ValueRows.CommentOrderRow;
 import app.morphe.extension.facebook.settings.ValueRows.LockAfterRow;
 import app.morphe.extension.facebook.settings.ValueRows.AccentRow;
+import app.morphe.extension.facebook.settings.ValueRows.ReactionCeilingRow;
 import app.morphe.extension.facebook.settings.ValueRows.TextSizeRow;
 import app.morphe.extension.facebook.settings.ValueRows.DownloadActionRow;
 import app.morphe.extension.facebook.settings.ValueRows.FeedsSubtabRow;
@@ -1195,6 +1197,48 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * The reaction ceiling, with Hide posts by words in the build. Like the accent row, its values
+     * are the setting's own names and its summary says what the choice does.
+     */
+    static ReactionCeilingRow reactionCeilingRow(Context context) {
+        ReactionCeilingRow row = new ReactionCeilingRow(context);
+        row.setKey(Settings.HIDE_POSTS_OVER_REACTIONS.key);
+        row.setTitle(L10n.t("Hide posts with more reactions than"));
+        row.setDialogTitle(L10n.t("Hide posts with more reactions than"));
+        // Android's own Cancel follows the activity's language, as the other lists' did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        ReactionCeiling[] choices = ReactionCeiling.values();
+        CharSequence[] entries = new CharSequence[choices.length];
+        CharSequence[] values = new CharSequence[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            entries[i] = ceilingLabel(choices[i]);
+            values[i] = choices[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.HIDE_POSTS_OVER_REACTIONS.savedValue().name());
+        return row;
+    }
+
+    /** A ceiling as a number with its thousands separator, for the sentences about it. */
+    static String ceilingNumber(ReactionCeiling ceiling) {
+        return java.text.NumberFormat.getIntegerInstance().format(ceiling.limit);
+    }
+
+    /** What the list calls [ceiling]. */
+    static String ceilingLabel(ReactionCeiling ceiling) {
+        if (ceiling == ReactionCeiling.OFF) return L10n.t("Off");
+        return L10n.f("%1$s reactions", ceilingNumber(ceiling));
+    }
+
+    /** What a choice does, for the row's summary. */
+    static String ceilingSummary(ReactionCeiling ceiling) {
+        if (ceiling == ReactionCeiling.OFF) return L10n.t("Posts stay however many reactions they have.");
+        return L10n.f("Hides posts with more than %1$s reactions, read from the count Facebook shows under a post.",
+                ceilingNumber(ceiling));
+    }
+
+    /**
      * The accent color, with the Accent color patch in the build. Like the text size row, its values
      * are the setting's own names and its summary says what the choice does.
      */
@@ -1401,6 +1445,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((TextSizeRow) listPreference).showSummary();
         } else if (listPreference instanceof AccentRow) {
             ((AccentRow) listPreference).showSummary();
+        } else if (listPreference instanceof ReactionCeilingRow) {
+            ((ReactionCeilingRow) listPreference).showSummary();
         } else if (listPreference instanceof PlaybackQualityRow) {
             ((PlaybackQualityRow) listPreference).showSummary();
         } else if (listPreference instanceof SurfaceQualityRow) {

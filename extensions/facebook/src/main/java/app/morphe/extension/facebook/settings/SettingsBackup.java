@@ -43,6 +43,7 @@ import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.TextSize;
+import app.morphe.extension.facebook.feed.ReactionCeiling;
 import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -383,11 +384,17 @@ public final class SettingsBackup {
      */
     static final EnumSetting<AccentColor.Preset> ACCENT = Settings.ACCENT_COLOR;
 
+    /**
+     * The reaction count above which the feed hides a post, held in a file as its
+     * {@link ReactionCeiling#fileValue}. Anything else refuses the whole file, as an accent color does.
+     */
+    static final EnumSetting<ReactionCeiling> CEILING = Settings.HIDE_POSTS_OVER_REACTIONS;
+
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
             Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, TO, FOLDER, VIDEO_SUBFOLDER, PHOTO_SUBFOLDER, QUALITY,
                     FILE_NAME, PHOTO_NAME, ACTION, APP, START, SUBTAB, ORDER, PLAYBACK, REELS_QUALITY, STORIES_QUALITY,
-                    QUIET_FROM, QUIET_UNTIL, LOCK_AFTER, TEXT_SIZE, ACCENT));
+                    QUIET_FROM, QUIET_UNTIL, LOCK_AFTER, TEXT_SIZE, ACCENT, CEILING));
 
     /** The longest name or value a file holds that isn't a word list, far past a package name. */
     private static final int MAX_OTHER_CHARS = 1024;
@@ -489,6 +496,7 @@ public final class SettingsBackup {
         private static final String LOCK_AFTER_NAME = "app_lock_after";
         private static final String TEXT_SIZE_NAME = "text_size";
         private static final String ACCENT_NAME = "accent_color";
+        private static final String CEILING_NAME = "hide_posts_over_reactions";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -561,6 +569,9 @@ public final class SettingsBackup {
         /** The accent the file says to use, or null when it names none. */
         @Nullable
         final AccentColor.Preset accent;
+        /** The reaction ceiling the file says to use, or null when it names none. */
+        @Nullable
+        final ReactionCeiling ceiling;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -672,6 +683,21 @@ public final class SettingsBackup {
                  @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
                  @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil, @Nullable AppLock.After lockAfter,
                  @Nullable TextSize.Scale textSize, @Nullable AccentColor.Preset accent, int unknown) {
+            this(values, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to, subtab,
+                    sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom,
+                    quietUntil, lockAfter, textSize, accent, null, unknown);
+        }
+
+        Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                 @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                 @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
+                 @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName,
+                 @Nullable String videoSubfolder, @Nullable String photoSubfolder,
+                 @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
+                 @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil, @Nullable AppLock.After lockAfter,
+                 @Nullable TextSize.Scale textSize, @Nullable AccentColor.Preset accent,
+                 @Nullable ReactionCeiling ceiling, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
@@ -696,6 +722,7 @@ public final class SettingsBackup {
             this.lockAfter = lockAfter;
             this.textSize = textSize;
             this.accent = accent;
+            this.ceiling = ceiling;
             this.unknown = unknown;
         }
 
@@ -752,6 +779,8 @@ public final class SettingsBackup {
             if (textSizeChange != null) changes.put(TEXT_SIZE, textSizeChange);
             AccentColor.Preset accentChange = accentChange();
             if (accentChange != null) changes.put(ACCENT, accentChange);
+            ReactionCeiling ceilingChange = ceilingChange();
+            if (ceilingChange != null) changes.put(CEILING, ceilingChange);
             SendLink.Action actionChange = actionChange();
             if (actionChange != null) changes.put(ACTION, actionChange);
             String appChange = appChange();
@@ -885,6 +914,12 @@ public final class SettingsBackup {
             return accent == null || accent == ACCENT.savedValue() ? null : accent;
         }
 
+        /** The reaction ceiling after this file, or null when it names none or the one already set. */
+        @Nullable
+        ReactionCeiling ceilingChange() {
+            return ceiling == null || ceiling == CEILING.savedValue() ? null : ceiling;
+        }
+
         /** The top folder this file sends saves to, or null when it names none or the one already set. */
         @Nullable
         SaveTo toChange() {
@@ -963,6 +998,7 @@ public final class SettingsBackup {
             if (lockAfter != null) state.putString(LOCK_AFTER_NAME, lockAfter.fileValue);
             if (textSize != null) state.putString(TEXT_SIZE_NAME, textSize.fileValue);
             if (accent != null) state.putString(ACCENT_NAME, accent.fileValue);
+            if (ceiling != null) state.putString(CEILING_NAME, ceiling.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -1013,6 +1049,7 @@ public final class SettingsBackup {
                     AppLock.After.fromFile(state.get(LOCK_AFTER_NAME)),
                     TextSize.Scale.fromFile(state.get(TEXT_SIZE_NAME)),
                     AccentColor.Preset.fromFile(state.get(ACCENT_NAME)),
+                    ReactionCeiling.fromFile(state.get(CEILING_NAME)),
                     unknown);
         }
     }
@@ -1045,6 +1082,7 @@ public final class SettingsBackup {
         switches.put(LOCK_AFTER.key, LOCK_AFTER.savedValue().fileValue);
         switches.put(TEXT_SIZE.key, TEXT_SIZE.savedValue().fileValue);
         switches.put(ACCENT.key, ACCENT.savedValue().fileValue);
+        switches.put(CEILING.key, CEILING.savedValue().fileValue);
         switches.put(ACTION.key, ACTION.savedValue().fileValue);
         // The app links really go to, so a file never carries a name an import would refuse.
         switches.put(APP.key, SendLink.fileApp(APP.savedValue()));
@@ -1160,6 +1198,7 @@ public final class SettingsBackup {
         AppLock.After lockAfter = null;
         TextSize.Scale textSize = null;
         AccentColor.Preset accent = null;
+        ReactionCeiling ceiling = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -1263,6 +1302,11 @@ public final class SettingsBackup {
                 if (accent == null) throw new Rejected(Reason.VALUE, "Not an accent color: " + name);
                 continue;
             }
+            if (CEILING.key.equals(name)) {
+                ceiling = ReactionCeiling.fromFile(values.opt(name));
+                if (ceiling == null) throw new Rejected(Reason.VALUE, "Not a reaction ceiling: " + name);
+                continue;
+            }
             if (TO.key.equals(name)) {
                 to = SaveTo.fromFile(values.opt(name));
                 if (to == null) throw new Rejected(Reason.VALUE, "Not a save location: " + name);
@@ -1331,7 +1375,7 @@ public final class SettingsBackup {
         }
         return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
                 subtab, sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom,
-                quietUntil, lockAfter, textSize, accent, unknown);
+                quietUntil, lockAfter, textSize, accent, ceiling, unknown);
     }
 
     /**

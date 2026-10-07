@@ -20,6 +20,7 @@ import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
+import app.morphe.extension.facebook.feed.ReactionCeiling;
 import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
@@ -237,6 +238,14 @@ public class Settings extends BaseSettings {
     /** Feed posts written on a colored background, which Facebook draws as large formatted text. */
     public static final BooleanSetting HIDE_BACKGROUND_POSTS =
             new BooleanSetting("hushfacebook_hide_background_posts", FALSE);
+
+    /**
+     * The reaction count above which feed posts are hidden, read from the feed unit's own feedback
+     * ({@link app.morphe.extension.facebook.feed.PostReactions}). Off hides nothing. Not a switch:
+     * a list picks the count, and a paused Facebook reads Off.
+     */
+    public static final EnumSetting<ReactionCeiling> HIDE_POSTS_OVER_REACTIONS =
+            new EnumSetting<>("hushfacebook_hide_posts_over_reactions", ReactionCeiling.OFF);
 
     /** The four story bucket sources that splice ad cards into the story viewer. */
     public static final BooleanSetting HIDE_SPONSORED_STORIES =

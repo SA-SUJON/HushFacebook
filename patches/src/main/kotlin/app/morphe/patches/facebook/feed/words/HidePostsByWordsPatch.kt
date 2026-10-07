@@ -46,7 +46,9 @@ internal const val PATCH = "Hide posts by words"
  * PostSourceAnchors.kt), and a build where they can't be found keeps the words and leaves that list
  * reading nothing. Its four switches for kinds of post (photo, video, link and colored background
  * posts) read an attachment's styles and the story's text format through PostTypes' two stubs (see
- * PostTypeAnchors.kt), which a build without them leaves unfilled in the same way.
+ * PostTypeAnchors.kt), which a build without them leaves unfilled in the same way. Its reaction
+ * ceiling reads a story's feedback and the feedback's reactors through PostReactions' two stubs (see
+ * ReactionAnchors.kt), and counts them with the kept `getCachedInt(int)`.
  *
  * The lists live in Hushfacebook's settings on the phone. Nothing here reads a post until a
  * switch is on and its list has something in it, and nothing of the text, the names or the lists
@@ -82,6 +84,14 @@ val hidePostsByWordsPatch = bytecodePatch(
             null
         }
 
+        // The reaction ceiling is optional in the same way: a build without it keeps everything else.
+        val reactions = try {
+            findReactionAccessors(story)
+        } catch (moved: PatchException) {
+            patchLog.warning("${moved.message}. The patch goes on without the reaction ceiling.")
+            null
+        }
+
         // The extension reads the text and the model's type tag through these, by reflection.
         if (!hasPublicStringReader(classDefBy(BASE_MODEL_WITH_TREE))) {
             throw PatchException("$PATCH: BaseModelWithTree has no public getCachedString(int)")
@@ -98,6 +108,7 @@ val hidePostsByWordsPatch = bytecodePatch(
             patchLog.warning("${moved.message}. The patch goes on without the people, Pages and sites list.")
         }
         if (types != null) fillPostTypeStubs(types)
+        if (reactions != null) fillReactionStubs(reactions)
         enableStatus("postWords")
     }
 }

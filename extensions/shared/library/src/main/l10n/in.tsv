@@ -1192,3 +1192,15 @@ The list is full, so nothing was added.	Daftar penuh, jadi tidak ada yang ditamb
 Every word from %1$s is already in the list.	Semua kata dari %1$s sudah ada di daftar.
 # context: last sentence of the topic pack toast: the words are only typed into the editor until Save
 Tap Save to keep the list.	Ketuk Simpan untuk menyimpan daftar.
+# context: row title and dialog title under News feed: posts with more reactions than the chosen count are hidden
+Hide posts with more reactions than	Sembunyikan postingan dengan reaksi lebih dari
+# context: a choice in the reaction ceiling list; %1$s is a number such as 5,000
+%1$s reactions	%1$s reaksi
+# context: summary of the reaction ceiling row while it is off
+Posts stay however many reactions they have.	Postingan tetap tampil berapa pun jumlah reaksinya.
+# context: summary of the reaction ceiling row while a count is chosen; %1$s is a number such as 5,000
+Hides posts with more than %1$s reactions, read from the count Facebook shows under a post.	Menyembunyikan postingan dengan lebih dari %1$s reaksi, dibaca dari jumlah yang ditampilkan Facebook di bawah postingan.
+# context: settings import preview and result: the file turns the reaction ceiling off
+The feed won't hide posts for how many reactions they have.	Feed tidak akan menyembunyikan postingan berdasarkan jumlah reaksinya.
+# context: settings import preview and result: the file sets a reaction ceiling; %1$s is a number such as 5,000
+The feed will hide posts with more than %1$s reactions.	Feed akan menyembunyikan postingan dengan lebih dari %1$s reaksi.

@@ -137,6 +137,21 @@ public final class FeedGuardForTests {
                 ShowcaseType.PATCHED, true, unit -> null, unit -> null, unit -> null, null, null, readers);
     }
 
+    /**
+     * The guard for a story whose feedback says 5,000 reactions, through stand-ins for the stubs the
+     * reaction ceiling reads it with.
+     */
+    public static boolean hidesPopularPost(Object category) {
+        BaseModelWithTree reactors = new BaseModelWithTree(0);
+        reactors.number("count", 5_000);
+        GraphQLStory story = new GraphQLStory();
+        com.facebook.graphql.model.GraphQLFeedback feedback = new com.facebook.graphql.model.GraphQLFeedback();
+        PostTypes.Readers readers = new PostTypes.Readers(unit -> null, unit -> null, unit -> null,
+                unit -> feedback, unit -> reactors);
+        return FeedFilter.hideEdge(category, story, true, true, unit -> null, false, GenAiLabel.PATCHED, false,
+                ShowcaseType.PATCHED, true, unit -> null, unit -> null, unit -> null, null, null, readers);
+    }
+
     /** A story's message, of the type Facebook's posts carry, holding [text]. */
     public static BaseModelWithTree postText(String text) {
         return new BaseModelWithTree(PostText.TEXT_TYPE_TAG).with(PostText.TEXT_FIELD, text);

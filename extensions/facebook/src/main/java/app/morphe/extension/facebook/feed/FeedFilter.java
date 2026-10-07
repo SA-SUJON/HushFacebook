@@ -524,6 +524,9 @@ public final class FeedFilter {
             if (reason == null && wordsPatched && typeReaders != null) {
                 reason = typesReason(feedUnit, typeReaders, attachedAccessor);
             }
+            if (reason == null && wordsPatched && typeReaders != null) {
+                reason = reactionsReason(feedUnit, typeReaders);
+            }
             if (reason == null) return false;
 
             FeedFilterCounters.removed(FEED_ROUTE, 1, reason);
@@ -753,6 +756,24 @@ public final class FeedFilter {
         FeedFilterCounters.removed(WORDS_ROUTE, 1, verdict.reason);
         PostWords.HIDDEN.incrementAndGet();
         return WORDS_REASON;
+    }
+
+    /**
+     * The reaction ceiling: {@link PostReactions#ABOVE} when the post has more reactions than the
+     * ceiling the person set, otherwise null. Nothing is read while the ceiling is off, and a post
+     * whose count can't be read stays. Each post it reads is counted on its route by what the read
+     * found.
+     */
+    static String reactionsReason(Object feedUnit, PostTypes.Readers readers) {
+        ReactionCeiling ceiling = Settings.HIDE_POSTS_OVER_REACTIONS.get();
+        if (ceiling == ReactionCeiling.OFF) return null;
+        FeedFilterCounters.sawList(PostReactions.ROUTE, 1);
+        PostReactions.Read read = PostReactions.read(feedUnit, readers.feedback, readers.reactors);
+        boolean above = ceiling.exceeds(read.count);
+        FeedFilterCounters.sawKind(PostReactions.ROUTE, above ? PostReactions.ABOVE : read.reason);
+        if (!above) return null;
+        FeedFilterCounters.removed(PostReactions.ROUTE, 1, PostReactions.ABOVE);
+        return PostReactions.ABOVE;
     }
 
     /**

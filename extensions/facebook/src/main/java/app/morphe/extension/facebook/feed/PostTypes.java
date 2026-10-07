@@ -63,20 +63,33 @@ public final class PostTypes {
 
     private static final String FAMILY = FamilyNames.POST_WORDS;
 
-    /** The three reads a post's kind takes, the patch's stubs or stand-ins in a test. */
+    /**
+     * The three reads a post's kind takes, and the two its reaction count takes, the patch's stubs
+     * or stand-ins in a test. A reader that isn't given reads as not patched.
+     */
     static final class Readers {
         final StoryFlag.Accessor attachments;
         final StoryFlag.Accessor styles;
         final StoryFlag.Accessor format;
+        final StoryFlag.Accessor feedback;
+        final StoryFlag.Accessor reactors;
 
         Readers(StoryFlag.Accessor attachments, StoryFlag.Accessor styles, StoryFlag.Accessor format) {
+            this(attachments, styles, format, unit -> StoryFlag.NOT_PATCHED, unit -> StoryFlag.NOT_PATCHED);
+        }
+
+        Readers(StoryFlag.Accessor attachments, StoryFlag.Accessor styles, StoryFlag.Accessor format,
+                StoryFlag.Accessor feedback, StoryFlag.Accessor reactors) {
             this.attachments = attachments;
             this.styles = styles;
             this.format = format;
+            this.feedback = feedback;
+            this.reactors = reactors;
         }
     }
 
-    static final Readers READERS = new Readers(PostSources.ATTACHMENTS, PostTypes::styleList, PostTypes::textFormat);
+    static final Readers READERS = new Readers(PostSources.ATTACHMENTS, PostTypes::styleList, PostTypes::textFormat,
+            PostReactions::feedback, PostReactions::reactors);
 
     /** Which kinds the switches ask to hide. */
     static final class Wanted {
