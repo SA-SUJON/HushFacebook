@@ -518,7 +518,8 @@ public final class ClipboardLink {
      */
     @Nullable
     static Found resolve(Found shortLink) {
-        String at = shortLink.link.matches("(?i)^https?://.*") ? shortLink.link : "https://" + shortLink.link;
+        // Every hop is https, the first one too, even when the copied link said http.
+        String at = "https://" + shortLink.link.replaceFirst("(?i)^https?://", "");
         try {
             for (int hop = 0; hop < MAX_HOPS; hop++) {
                 String location = redirects.next(at);

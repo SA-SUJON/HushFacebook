@@ -175,6 +175,8 @@ public class ClipboardLinkTest {
         assertNull("a redirect off Facebook is never followed",
                 ClipboardLink.resolve(ClipboardLink.find("https://www.facebook.com/share/v/3XyZ/")));
         assertNull("no redirect, no video", ClipboardLink.resolve(ClipboardLink.find("https://fb.watch/zzz/")));
+        assertEquals("an http short link is asked over https", "11223344",
+                ClipboardLink.resolve(ClipboardLink.find("http://fb.watch/aBcD12/")).videoId);
     }
 
     @Test
