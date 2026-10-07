@@ -61,7 +61,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *   <li>With {@link Settings#TAP_TO_PLAY_REELS_AFTER_FIRST} on, the start is a reel coming into
  *       view (BY_SHORT_FORM_VIDEO_FULLY_VISIBLE, or BY_AUTOPLAY on a reel's player) while a run of
  *       reels is going ({@link #noteReelRun}): a tap or a control played the reel that was waiting,
- *       and nothing has been held since.</li>
+ *       and nothing has been held since. A reel that starts right after a tap, with no swipe in
+ *       between, came from that tap, like the Reels tab's, and waits.</li>
  * </ul>
  *
  * <p>Every other start is held, and the player stays where it was, showing its first frame or its
@@ -364,13 +365,16 @@ public final class TapToPlay {
         boolean armed = ARMED.armed(player);
         long sinceTap = TapClock.msSinceTap(now);
         boolean control = trigger != null && CONTROLS.contains(trigger);
-        boolean tapped = sinceTap >= 0 && sinceTap <= TAP_WINDOW_MS && !visibilityDriven(trigger) && !autoplayedReel;
+        boolean recentTap = sinceTap >= 0 && sinceTap <= TAP_WINDOW_MS;
+        boolean tapped = recentTap && !visibilityDriven(trigger) && !autoplayedReel;
         // A tap or a control is the person at work, so a link waiting is no longer what started
         // this. An armed player's own restart leaves it for the player the link opened.
         if (tapped || control) dropLink();
         boolean window = !armed && !control && !tapped && inPictureInPicture();
         boolean linked = !armed && !control && !tapped && !window && BY_USER.equals(trigger) && takeLink(now);
-        boolean run = !armed && !control && !tapped && !window && !linked && reelRun
+        // A swipe forgets the last tap, so a reel that starts right after one came from that tap, on
+        // the Reels tab say, not from swiping through Reels, and it waits.
+        boolean run = !armed && !control && !tapped && !window && !linked && reelRun && !recentTap
                 && (REEL_IN_VIEW.equals(trigger) || autoplayedReel) && Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.get();
         boolean allowed = armed || control || linked || tapped || window || run;
         if (allowed && (!armed || control)) ARMED.arm(player, now);

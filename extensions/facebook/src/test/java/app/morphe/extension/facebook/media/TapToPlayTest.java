@@ -768,6 +768,38 @@ public class TapToPlayTest {
         }
     }
 
+    /**
+     * Seen on a phone: back on the Reels tab from Home, 581 starts the reel with BY_AUTOPLAY 45 ms
+     * after the tab's tap. A swipe forgets the last tap, so a reel that starts right after one came
+     * from that tap, not from swiping through Reels: it waits, and the run is over.
+     */
+    @Test
+    public void aReelStartedRightAfterATapDoesntRideTheRun() {
+        Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.save(true);
+        try {
+            playAWaitingReel();
+            TapToPlayForTests.tapEnded(45);
+            assertFalse("the reel the Reels tab comes back to", autoplayedReel(new Object()));
+            TapClock.forget();
+            assertFalse("and the run is over", autoplayedReel(new Object()));
+
+            playAWaitingReel();
+            TapToPlayForTests.tapEnded(45);
+            assertFalse("a reel coming into view right after a tap",
+                    TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+
+            playAWaitingReel();
+            TapToPlayForTests.tapEnded(300);
+            long at = SystemClock.uptimeMillis() - 200;
+            TapClock.record(MotionEvent.ACTION_DOWN, 500, 1500, at, 8);
+            TapClock.record(MotionEvent.ACTION_MOVE, 500, 900, at + 60, 8);
+            TapClock.record(MotionEvent.ACTION_UP, 500, 500, at + 120, 8);
+            assertTrue("a swipe after a tap forgets it, and the reel swiped to plays", autoplayedReel(new Object()));
+        } finally {
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.resetToDefault();
+        }
+    }
+
     /** The control: with Only the first reel waits off, every reel's BY_AUTOPLAY start waits. */
     @Test
     public void withTheSwitchOffEveryAutoplayedReelWaits() {
