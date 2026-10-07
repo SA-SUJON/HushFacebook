@@ -486,6 +486,30 @@ Block nearby and weather notifications	Yakındaki yerler ve hava durumu bildirim
 Alerts about places near you and about the weather stop.	Yakınındaki yerler ve hava durumuyla ilgili uyarılar gelmez.
 Block account setup reminders	Hesap kurulumu hatırlatıcılarını engelle
 Reminders to finish setting up a Facebook account stop. Login and security alerts still come through.	Bir Facebook hesabının kurulumunu tamamlama hatırlatıcıları gelmez. Giriş ve güvenlik uyarıları gelmeye devam eder.
+# context: switch title under Notifications; group activity is the notifications about new posts and activity in groups you're in
+Block group activity notifications	Grup etkinliği bildirimlerini engelle
+# context: summary of the group activity switch
+Notifications about new activity in your groups stop. Comments, replies and mentions in groups still come through.	Gruplarındaki yeni etkinliklerle ilgili bildirimler gelmez. Gruplardaki yorumlar, yanıtlar ve bahsetmeler gelmeye devam eder.
+# context: switch title under Notifications; an event invite is someone inviting you to a Facebook event
+Block event invites	Etkinlik davetlerini engelle
+# context: summary of the event invites switch
+Invites to events stop showing up in your notifications.	Etkinlik davetleri artık bildirimlerinde görünmez.
+# context: switch title under Notifications; a live video is a broadcast someone is streaming right now
+Block live video notifications	Canlı video bildirimlerini engelle
+# context: summary of the live video switch; the ones you asked Facebook for are live notifications you turned on for a person or Page
+Notifications that someone is live stop, including the ones you asked Facebook for.	Birinin canlı yayında olduğuna dair bildirimler gelmez, Facebook'tan istediklerin de dahil.
+# context: switch title under Notifications; reactions are likes and the other reaction buttons on posts and comments
+Block reaction notifications	Tepki bildirimlerini engelle
+# context: summary of the reactions switch
+Likes and reactions to your posts and comments stop showing up in your notifications. Comments still come through.	Gönderilerine ve yorumlarına gelen beğeniler ve tepkiler artık bildirimlerinde görünmez. Yorumlar gelmeye devam eder.
+# context: switch title under Notifications; quiet hours is a stretch of the day when the picked notification kinds are blocked
+Quiet hours	Sessiz saatler
+# context: summary of the quiet hours switch; the switches above are the notification switches, the two times below are the start and end rows
+The switches above block their kinds only between the two times below. The rest of the day those kinds come through.	Yukarıdaki anahtarlar türlerini yalnızca aşağıdaki iki saat arasında engeller. Günün geri kalanında bu türler gelmeye devam eder.
+# context: row title and list title; the time quiet hours begin
+Quiet hours start	Sessiz saatlerin başlangıcı
+# context: row title and list title; the time quiet hours finish
+Quiet hours end	Sessiz saatlerin bitişi
 # context: title of a note under Notifications, below the switches; what no switch there blocks
 What always comes through	Her zaman gelenler
 # context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines
@@ -692,6 +716,10 @@ Reels quality will be set to %1$s.	Reels kalitesi %1$s olarak ayarlanacak.
 Video stories will play at the same quality as other videos.	Video hikayeler, diğer videolarla aynı kalitede oynatılacak.
 # context: import preview and toast sentence; %1$s is a Stories quality choice such as Up to 720p
 Stories quality will be set to %1$s.	Hikaye kalitesi %1$s olarak ayarlanacak.
+# context: after a settings import; %1$s is a time of day such as 10:00 PM
+Quiet hours will start at %1$s.	Sessiz saatler %1$s itibarıyla başlayacak.
+# context: after a settings import; %1$s is a time of day such as 7:00 AM
+Quiet hours will end at %1$s.	Sessiz saatler %1$s itibarıyla bitecek.
 # context: import preview and toast sentence; %1$s is the folder inside the save folder that videos will go in
 Videos will go in a subfolder named %1$s.	Videolar %1$s adlı bir alt klasöre kaydedilecek.
 # context: import preview and toast sentence when a settings file clears the Video subfolder

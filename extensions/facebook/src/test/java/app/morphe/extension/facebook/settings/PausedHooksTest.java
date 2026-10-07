@@ -602,14 +602,19 @@ public class PausedHooksTest {
                 TypingIndicator::holdsCommentTyping));
         // Mailbox's mark-read hands back its future without sending the read.
         probes.put(PatchFamily.READ_RECEIPTS, Collections.singletonList(ReadReceipts::holdsChatRead));
-        // A push of each kind a notification switch blocks isn't posted.
+        // A push of each kind a notification switch blocks isn't posted, asked at 11 PM, inside
+        // the quiet hours every switch on turns on.
         probes.put(PatchFamily.PROMO_NOTIFICATIONS, Arrays.asList(
                 NotificationKindsForTests::blocksTrendingVideo,
                 NotificationKindsForTests::blocksMemory,
                 NotificationKindsForTests::blocksBirthday,
                 NotificationKindsForTests::blocksHighlights,
                 NotificationKindsForTests::blocksPeopleYouMayKnow,
-                NotificationKindsForTests::blocksNearby));
+                NotificationKindsForTests::blocksNearby,
+                NotificationKindsForTests::blocksGroupActivity,
+                NotificationKindsForTests::blocksEventInvite,
+                NotificationKindsForTests::blocksLiveVideo,
+                NotificationKindsForTests::blocksReaction));
         // A shared link loses what the app added to it.
         probes.put(PatchFamily.SANITIZE_SHARING_LINKS, Collections.singletonList(() -> {
             String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";

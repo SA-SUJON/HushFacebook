@@ -8,6 +8,7 @@ package app.morphe.extension.facebook.settings;
 
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.category;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.info;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.quietHourRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.toggle;
 
 import android.content.Context;
@@ -174,6 +175,21 @@ final class AppPages {
             notifications.addPreference(toggle(context, Settings.BLOCK_ACCOUNT_SETUP_NOTIFICATIONS,
                     L10n.t("Reminders to finish setting up a Facebook account stop. Login and security alerts "
                             + "still come through.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_GROUP_ACTIVITY_NOTIFICATIONS,
+                    L10n.t("Notifications about new activity in your groups stop. Comments, replies and mentions in "
+                            + "groups still come through.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_EVENT_NOTIFICATIONS,
+                    L10n.t("Invites to events stop showing up in your notifications.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_LIVE_VIDEO_NOTIFICATIONS,
+                    L10n.t("Notifications that someone is live stop, including the ones you asked Facebook for.")));
+            notifications.addPreference(toggle(context, Settings.BLOCK_REACTION_NOTIFICATIONS,
+                    L10n.t("Likes and reactions to your posts and comments stop showing up in your notifications. "
+                            + "Comments still come through.")));
+            notifications.addPreference(toggle(context, Settings.NOTIFICATION_QUIET_HOURS,
+                    L10n.t("The switches above block their kinds only between the two times below. The rest of the "
+                            + "day those kinds come through.")));
+            notifications.addPreference(quietHourRow(context, true));
+            notifications.addPreference(quietHourRow(context, false));
             notifications.addPreference(info(context, L10n.t("What always comes through"),
                     L10n.t("Messages, friend requests, comments, mentions, calls and login alerts, and any kind "
                             + "Hushfacebook doesn't know. Android's own settings for Facebook's notification "

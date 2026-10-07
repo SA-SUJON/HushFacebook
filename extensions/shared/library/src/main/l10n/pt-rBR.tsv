@@ -420,6 +420,30 @@ Block nearby and weather notifications	Bloquear notificações de lugares próxi
 Alerts about places near you and about the weather stop.	Alertas sobre lugares próximos e sobre o clima deixam de aparecer.
 Block account setup reminders	Bloquear lembretes de configuração da conta
 Reminders to finish setting up a Facebook account stop. Login and security alerts still come through.	Os lembretes para terminar de configurar uma conta do Facebook deixam de aparecer. Alertas de login e de segurança continuam chegando.
+# context: switch title under Notifications; group activity is the notifications about new posts and activity in groups you're in
+Block group activity notifications	Bloquear notificações de atividade em grupos
+# context: summary of the group activity switch
+Notifications about new activity in your groups stop. Comments, replies and mentions in groups still come through.	As notificações de atividade nova nos seus grupos deixam de aparecer. Comentários, respostas e menções em grupos continuam chegando.
+# context: switch title under Notifications; an event invite is someone inviting you to a Facebook event
+Block event invites	Bloquear convites para eventos
+# context: summary of the event invites switch
+Invites to events stop showing up in your notifications.	Os convites para eventos deixam de aparecer nas notificações.
+# context: switch title under Notifications; a live video is a broadcast someone is streaming right now
+Block live video notifications	Bloquear notificações de vídeos ao vivo
+# context: summary of the live video switch; the ones you asked Facebook for are live notifications you turned on for a person or Page
+Notifications that someone is live stop, including the ones you asked Facebook for.	As notificações de que alguém está ao vivo deixam de aparecer, inclusive as que você pediu ao Facebook.
+# context: switch title under Notifications; reactions are likes and the other reaction buttons on posts and comments
+Block reaction notifications	Bloquear notificações de reações
+# context: summary of the reactions switch
+Likes and reactions to your posts and comments stop showing up in your notifications. Comments still come through.	As curtidas e reações às suas publicações e comentários deixam de aparecer nas notificações. Os comentários continuam chegando.
+# context: switch title under Notifications; quiet hours is a stretch of the day when the picked notification kinds are blocked
+Quiet hours	Horário de silêncio
+# context: summary of the quiet hours switch; the switches above are the notification switches, the two times below are the start and end rows
+The switches above block their kinds only between the two times below. The rest of the day those kinds come through.	As chaves acima bloqueiam os tipos delas só entre os dois horários abaixo. No resto do dia esses tipos continuam chegando.
+# context: row title and list title; the time quiet hours begin
+Quiet hours start	Início do horário de silêncio
+# context: row title and list title; the time quiet hours finish
+Quiet hours end	Fim do horário de silêncio
 What always comes through	O que sempre chega
 Messages, friend requests, comments, mentions, calls and login alerts, and any kind Hushfacebook doesn't know. Android's own settings for Facebook's notification categories work too, since Facebook drops a notification whose category you turned off. Facebook's server decides which categories you get, though, so they may not split these kinds out.	Mensagens, solicitações de amizade, comentários, menções, chamadas e alertas de login, além de qualquer tipo de notificação que o Hushfacebook não conheça. As configurações do Android para as categorias de notificação do Facebook também funcionam, pois o Facebook descarta uma notificação cuja categoria você desativou. No entanto, o servidor do Facebook decide quais categorias você recebe, então esses tipos podem não aparecer separados.
 Hide suggested stories	Ocultar Stories sugeridos
@@ -586,6 +610,10 @@ Reels quality will be set to %1$s.	A qualidade dos reels será %1$s.
 Video stories will play at the same quality as other videos.	Os stories em vídeo vão usar a mesma qualidade dos outros vídeos.
 # context: import preview and toast sentence; %1$s is a Stories quality choice such as Up to 720p
 Stories quality will be set to %1$s.	A qualidade dos stories será %1$s.
+# context: after a settings import; %1$s is a time of day such as 10:00 PM
+Quiet hours will start at %1$s.	O horário de silêncio vai começar às %1$s.
+# context: after a settings import; %1$s is a time of day such as 7:00 AM
+Quiet hours will end at %1$s.	O horário de silêncio vai terminar às %1$s.
 # context: import preview and toast sentence; %1$s is the folder inside the save folder that videos will go in
 Videos will go in a subfolder named %1$s.	Os vídeos vão para uma subpasta chamada %1$s.
 # context: import preview and toast sentence when a settings file clears the Video subfolder

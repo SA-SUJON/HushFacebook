@@ -69,6 +69,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 import app.morphe.extension.facebook.download.DownloadQuality;
+import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
@@ -179,6 +180,8 @@ public class SettingsBackupTest {
         Settings.PLAYBACK_QUALITY.resetToDefault();
         Settings.REELS_PLAYBACK_QUALITY.resetToDefault();
         Settings.STORIES_PLAYBACK_QUALITY.resetToDefault();
+        Settings.QUIET_HOURS_FROM.resetToDefault();
+        Settings.QUIET_HOURS_UNTIL.resetToDefault();
         Settings.VIDEO_SUBFOLDER.resetToDefault();
         Settings.PHOTO_SUBFOLDER.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
@@ -233,7 +236,8 @@ public class SettingsBackupTest {
                 Settings.SAVE_FOLDER, Settings.VIDEO_SUBFOLDER, Settings.PHOTO_SUBFOLDER, Settings.DOWNLOAD_QUALITY,
                 Settings.FILENAME_TEMPLATE, Settings.PHOTO_FILENAME_TEMPLATE, Settings.DOWNLOAD_ACTION, Settings.SEND_TO_APP,
                 Settings.START_TAB, Settings.FEEDS_SUBTAB, Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY,
-                Settings.REELS_PLAYBACK_QUALITY, Settings.STORIES_PLAYBACK_QUALITY), SettingsBackup.VALUES);
+                Settings.REELS_PLAYBACK_QUALITY, Settings.STORIES_PLAYBACK_QUALITY, Settings.QUIET_HOURS_FROM,
+                Settings.QUIET_HOURS_UNTIL), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_TO, SettingsBackup.TO);
         assertEquals(Settings.HIDDEN_WORDS, SettingsBackup.HIDDEN);
         assertEquals(Settings.KEPT_WORDS, SettingsBackup.KEPT);
@@ -248,6 +252,8 @@ public class SettingsBackupTest {
         assertEquals(Settings.PLAYBACK_QUALITY, SettingsBackup.PLAYBACK);
         assertEquals(Settings.REELS_PLAYBACK_QUALITY, SettingsBackup.REELS_QUALITY);
         assertEquals(Settings.STORIES_PLAYBACK_QUALITY, SettingsBackup.STORIES_QUALITY);
+        assertEquals(Settings.QUIET_HOURS_FROM, SettingsBackup.QUIET_FROM);
+        assertEquals(Settings.QUIET_HOURS_UNTIL, SettingsBackup.QUIET_UNTIL);
         assertEquals(Settings.VIDEO_SUBFOLDER, SettingsBackup.VIDEO_SUBFOLDER);
         assertEquals(Settings.PHOTO_SUBFOLDER, SettingsBackup.PHOTO_SUBFOLDER);
         assertEquals(Settings.DOWNLOAD_ACTION, SettingsBackup.ACTION);
@@ -1706,6 +1712,75 @@ public class SettingsBackupTest {
         state.putInt("stories_quality", 3);
         assertNull(SettingsBackup.Snapshot.fromBundle(state).reelsQuality);
         assertNull(SettingsBackup.Snapshot.fromBundle(state).storiesQuality);
+    }
+
+    /**
+     * The hours notification quiet hours start and end go out as 24-hour times on the hour and come
+     * back only as one of those, each on its own: any other value, or one that isn't text, refuses
+     * the whole file. The preview and the toast say each one that changes.
+     */
+    @Test
+    public void theQuietHoursRoundTripAndComeBackOnlyAsWholeHours() throws Exception {
+        Settings.QUIET_HOURS_FROM.save(QuietHour.H23);
+        Settings.QUIET_HOURS_UNTIL.save(QuietHour.H6);
+        String file = SettingsBackup.create();
+        JSONObject written = new JSONObject(file).getJSONObject("settings");
+        assertEquals("23:00", written.get(SettingsBackup.QUIET_FROM.key));
+        assertEquals("06:00", written.get(SettingsBackup.QUIET_UNTIL.key));
+        Settings.QUIET_HOURS_FROM.resetToDefault();
+        Settings.QUIET_HOURS_UNTIL.resetToDefault();
+
+        SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+        assertEquals(QuietHour.H23, snapshot.quietFromChange());
+        assertEquals(QuietHour.H6, snapshot.quietUntilChange());
+        assertEquals(0, snapshot.switchChanges());
+        Map<Setting<?>, Object> expected = new LinkedHashMap<>();
+        expected.put(SettingsBackup.QUIET_FROM, QuietHour.H23);
+        expected.put(SettingsBackup.QUIET_UNTIL, QuietHour.H6);
+        assertEquals(expected, snapshot.changes());
+        String from = HushfacebookPreferenceFragment.quietHourLabel(QuietHour.H23);
+        String until = HushfacebookPreferenceFragment.quietHourLabel(QuietHour.H6);
+        assertEquals(Arrays.asList("Quiet hours will start at " + from + ".", "Quiet hours will end at " + until + "."),
+                SettingsBackupPreference.valueSentences(null, null, null, null, null, null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, snapshot.quietFromChange(), snapshot.quietUntilChange()));
+        assertEquals(2, SettingsBackup.apply(snapshot));
+        assertEquals(QuietHour.H23, Settings.QUIET_HOURS_FROM.savedValue());
+        assertEquals(QuietHour.H6, Settings.QUIET_HOURS_UNTIL.savedValue());
+        assertEquals("a file read back is the file", file, SettingsBackup.create());
+        assertEquals("the same hours again change nothing", 0, SettingsBackup.parse(file).changes().size());
+
+        Map<String, ?> before = store();
+        for (String key : new String[]{SettingsBackup.QUIET_FROM.key, SettingsBackup.QUIET_UNTIL.key}) {
+            for (Object refused : new Object[]{"H23", "23", "11 PM", "7:00", "24:00", "23:30", "", 23, true,
+                    JSONObject.NULL, new JSONObject(), new org.json.JSONArray()}) {
+                JSONObject hostile = new JSONObject(file);
+                hostile.getJSONObject("settings").put(key, refused);
+                try {
+                    SettingsBackup.parse(hostile.toString());
+                    fail("a file with " + key + " " + printable(String.valueOf(refused)) + " was read");
+                } catch (SettingsBackup.Rejected rejected) {
+                    assertEquals(key + " " + printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+                }
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the hours were carried leaves them alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.quietFrom);
+        assertNull(older.quietUntil);
+        SettingsBackup.apply(older);
+        assertEquals(QuietHour.H23, Settings.QUIET_HOURS_FROM.savedValue());
+
+        // A preview kept across a rebuild keeps both, and only whole hours come back.
+        Settings.QUIET_HOURS_FROM.resetToDefault();
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(QuietHour.H23, SettingsBackup.Snapshot.fromBundle(state).quietFrom);
+        assertEquals(QuietHour.H6, SettingsBackup.Snapshot.fromBundle(state).quietUntil);
+        state.putString("quiet_hours_from", "H23");
+        state.putInt("quiet_hours_until", 6);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).quietFrom);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).quietUntil);
     }
 
     /**

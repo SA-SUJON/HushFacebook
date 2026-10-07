@@ -19,6 +19,7 @@ import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
+import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.EnumSetting;
@@ -703,6 +704,36 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_block_account_setup_notifications", FALSE);
 
     /**
+     * Push notifications Facebook types GROUP_ACTIVITY: new activity in your groups. Comments,
+     * replies and mentions in groups are other kinds and still come through.
+     */
+    public static final BooleanSetting BLOCK_GROUP_ACTIVITY_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_group_activity_notifications", FALSE);
+
+    /** Push notifications Facebook types EVENT_INVITE: invites to events. */
+    public static final BooleanSetting BLOCK_EVENT_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_event_notifications", FALSE);
+
+    /** Push notifications Facebook types LIVE_VIDEO or LIVE_VIDEO_EXPLICIT: someone is live. */
+    public static final BooleanSetting BLOCK_LIVE_VIDEO_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_live_video_notifications", FALSE);
+
+    /**
+     * Push notifications Facebook types LIKE or FEEDBACK_REACTION_GENERIC: likes and reactions to
+     * your posts and comments. Comments themselves are other kinds and still come through.
+     */
+    public static final BooleanSetting BLOCK_REACTION_NOTIFICATIONS =
+            new BooleanSetting("hushfacebook_block_reaction_notifications", FALSE);
+
+    /**
+     * The notification switches above block their kinds only between {@link #QUIET_HOURS_FROM}
+     * and {@link #QUIET_HOURS_UNTIL}, and the rest of the day those kinds come through. Off by
+     * default, when a switch blocks its kinds all day.
+     */
+    public static final BooleanSetting NOTIFICATION_QUIET_HOURS =
+            new BooleanSetting("hushfacebook_notification_quiet_hours", FALSE);
+
+    /**
      * Once a day, when Facebook starts, ask api.github.com whether a newer Hushfacebook release is
      * out, and say so on the settings screen ({@link ReleaseCheck}). It's the settings entry's own
      * switch rather than a patch's, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off
@@ -1087,6 +1118,17 @@ public class Settings extends BaseSettings {
     /** The quality video stories start at, the way {@link #REELS_PLAYBACK_QUALITY} is the reels'. */
     public static final EnumSetting<SurfaceQuality> STORIES_PLAYBACK_QUALITY =
             new EnumSetting<>("hushfacebook_stories_playback_quality", SurfaceQuality.SAME);
+
+    /**
+     * The hour quiet hours start while {@link #NOTIFICATION_QUIET_HOURS} is on, 10 PM until someone
+     * picks another. It isn't a switch.
+     */
+    public static final EnumSetting<QuietHour> QUIET_HOURS_FROM =
+            new EnumSetting<>("hushfacebook_quiet_hours_from", QuietHour.H22);
+
+    /** The hour quiet hours end, 7 AM until someone picks another, the way {@link #QUIET_HOURS_FROM} starts them. */
+    public static final EnumSetting<QuietHour> QUIET_HOURS_UNTIL =
+            new EnumSetting<>("hushfacebook_quiet_hours_until", QuietHour.H7);
 
     /**
      * Where {@link #USE_SYSTEM_FONT} takes its font from: empty for the phone's own, or the name of

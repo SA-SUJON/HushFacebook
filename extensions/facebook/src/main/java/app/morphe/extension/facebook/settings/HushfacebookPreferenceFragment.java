@@ -55,6 +55,7 @@ import app.morphe.extension.facebook.navigation.HiddenTabs;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.navigation.MarketplaceOnly;
+import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.facebook.settings.SettingsRows.Heading;
 import app.morphe.extension.facebook.settings.SettingsRows.Row;
 import app.morphe.extension.facebook.settings.SettingsRows.SaveRow;
@@ -65,6 +66,7 @@ import app.morphe.extension.facebook.settings.ValueRows.FeedsSubtabRow;
 import app.morphe.extension.facebook.settings.ValueRows.FileNameRow;
 import app.morphe.extension.facebook.settings.ValueRows.FolderRow;
 import app.morphe.extension.facebook.settings.ValueRows.PlaybackQualityRow;
+import app.morphe.extension.facebook.settings.ValueRows.QuietHourRow;
 import app.morphe.extension.facebook.settings.ValueRows.QualityRow;
 import app.morphe.extension.facebook.settings.ValueRows.SaveToRow;
 import app.morphe.extension.facebook.settings.ValueRows.SendAppRow;
@@ -1194,6 +1196,39 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * The hour quiet hours start ([from]) or end. Its values are the setting's own names, as the
+     * comment order's are, and each hour reads the way the phone's language writes a time.
+     */
+    static QuietHourRow quietHourRow(Context context, boolean from) {
+        EnumSetting<QuietHour> setting = from ? Settings.QUIET_HOURS_FROM : Settings.QUIET_HOURS_UNTIL;
+        QuietHourRow row = new QuietHourRow(context);
+        row.setKey(setting.key);
+        String title = from ? L10n.t("Quiet hours start") : L10n.t("Quiet hours end");
+        row.setTitle(title);
+        row.setDialogTitle(title);
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        QuietHour[] hours = QuietHour.values();
+        CharSequence[] entries = new CharSequence[hours.length];
+        CharSequence[] values = new CharSequence[hours.length];
+        for (int i = 0; i < hours.length; i++) {
+            entries[i] = quietHourLabel(hours[i]);
+            values[i] = hours[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(setting.savedValue().name());
+        return row;
+    }
+
+    /**
+     * What the list, its summary and an import call [hour]: the time as the phone's language writes
+     * it. It comes from the platform, not the catalog, so it's isolated like a folder name.
+     */
+    static String quietHourLabel(QuietHour hour) {
+        return L10n.isolate(hour.label(L10n.locale()));
+    }
+
+    /**
      * The quality, download action, start tab, Feeds filter, comment order and playback quality
      * rows' summaries are sentences of their own rather than the chosen entry.
      */
@@ -1215,6 +1250,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((PlaybackQualityRow) listPreference).showSummary();
         } else if (listPreference instanceof SurfaceQualityRow) {
             ((SurfaceQualityRow) listPreference).showSummary();
+        } else if (listPreference instanceof QuietHourRow) {
+            ((QuietHourRow) listPreference).showSummary();
         } else {
             super.updateListPreferenceSummary(listPreference, setting);
         }

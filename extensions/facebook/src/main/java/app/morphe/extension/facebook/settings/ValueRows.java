@@ -15,6 +15,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.photoNameSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.playbackQualitySummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.qualitySummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.quietHourLabel;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.saveToSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.sendAppSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.showAllText;
@@ -55,6 +56,7 @@ import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
+import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.facebook.settings.SettingsRows.RowSemantics;
 import app.morphe.extension.shared.L10n;
 
@@ -718,6 +720,43 @@ final class ValueRows {
                 if (candidate.name().equals(getValue())) choice = candidate;
             }
             setSummary(surfaceQualitySummary(choice, reels));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The row for the hour quiet hours start or end. Its summary follows its value, whoever sets it,
+     * as the playback quality's does.
+     */
+    static final class QuietHourRow extends ListPreference {
+        QuietHourRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            for (QuietHour candidate : QuietHour.values()) {
+                if (candidate.name().equals(getValue())) setSummary(quietHourLabel(candidate));
+            }
         }
 
         @Override

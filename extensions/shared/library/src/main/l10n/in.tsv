@@ -486,6 +486,30 @@ Block nearby and weather notifications	Blokir notifikasi tempat terdekat dan cua
 Alerts about places near you and about the weather stop.	Peringatan tentang tempat di dekat Anda dan tentang cuaca berhenti.
 Block account setup reminders	Blokir pengingat penyiapan akun
 Reminders to finish setting up a Facebook account stop. Login and security alerts still come through.	Pengingat untuk menyelesaikan penyiapan akun Facebook berhenti. Peringatan login dan keamanan tetap masuk.
+# context: switch title under Notifications; group activity is the notifications about new posts and activity in groups you're in
+Block group activity notifications	Blokir notifikasi aktivitas grup
+# context: summary of the group activity switch
+Notifications about new activity in your groups stop. Comments, replies and mentions in groups still come through.	Notifikasi tentang aktivitas baru di grup Anda berhenti. Komentar, balasan, dan sebutan di grup tetap masuk.
+# context: switch title under Notifications; an event invite is someone inviting you to a Facebook event
+Block event invites	Blokir undangan acara
+# context: summary of the event invites switch
+Invites to events stop showing up in your notifications.	Undangan acara tidak lagi muncul di notifikasi Anda.
+# context: switch title under Notifications; a live video is a broadcast someone is streaming right now
+Block live video notifications	Blokir notifikasi video siaran langsung
+# context: summary of the live video switch; the ones you asked Facebook for are live notifications you turned on for a person or Page
+Notifications that someone is live stop, including the ones you asked Facebook for.	Notifikasi bahwa seseorang sedang siaran langsung berhenti, termasuk yang Anda minta dari Facebook.
+# context: switch title under Notifications; reactions are likes and the other reaction buttons on posts and comments
+Block reaction notifications	Blokir notifikasi reaksi
+# context: summary of the reactions switch
+Likes and reactions to your posts and comments stop showing up in your notifications. Comments still come through.	Suka dan reaksi pada postingan dan komentar Anda tidak lagi muncul di notifikasi Anda. Komentar tetap masuk.
+# context: switch title under Notifications; quiet hours is a stretch of the day when the picked notification kinds are blocked
+Quiet hours	Jam tenang
+# context: summary of the quiet hours switch; the switches above are the notification switches, the two times below are the start and end rows
+The switches above block their kinds only between the two times below. The rest of the day those kinds come through.	Sakelar di atas hanya memblokir jenisnya di antara dua waktu di bawah. Di luar itu, jenis tersebut tetap masuk.
+# context: row title and list title; the time quiet hours begin
+Quiet hours start	Jam tenang mulai
+# context: row title and list title; the time quiet hours finish
+Quiet hours end	Jam tenang selesai
 # context: title of a note under Notifications, below the switches; what no switch there blocks
 What always comes through	Yang selalu masuk
 # context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines
@@ -692,6 +716,10 @@ Reels quality will be set to %1$s.	Kualitas reel akan diatur ke %1$s.
 Video stories will play at the same quality as other videos.	Cerita video akan diputar dengan kualitas yang sama seperti video lainnya.
 # context: import preview and toast sentence; %1$s is a Stories quality choice such as Up to 720p
 Stories quality will be set to %1$s.	Kualitas cerita akan diatur ke %1$s.
+# context: after a settings import; %1$s is a time of day such as 10:00 PM
+Quiet hours will start at %1$s.	Jam tenang akan dimulai pukul %1$s.
+# context: after a settings import; %1$s is a time of day such as 7:00 AM
+Quiet hours will end at %1$s.	Jam tenang akan berakhir pukul %1$s.
 # context: import preview and toast sentence; %1$s is the folder inside the save folder that videos will go in
 Videos will go in a subfolder named %1$s.	Video akan disimpan ke subfolder bernama %1$s.
 # context: import preview and toast sentence when a settings file clears the Video subfolder

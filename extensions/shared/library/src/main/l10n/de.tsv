@@ -486,6 +486,30 @@ Block nearby and weather notifications	Benachrichtigungen zu Orten in der Nähe 
 Alerts about places near you and about the weather stop.	Hinweise auf Orte in deiner Nähe und zum Wetter bleiben aus.
 Block account setup reminders	Erinnerungen zur Kontoeinrichtung blockieren
 Reminders to finish setting up a Facebook account stop. Login and security alerts still come through.	Erinnerungen, die Einrichtung eines Facebook-Kontos abzuschließen, bleiben aus. Anmelde- und Sicherheitswarnungen kommen weiterhin an.
+# context: switch title under Notifications; group activity is the notifications about new posts and activity in groups you're in
+Block group activity notifications	Benachrichtigungen zu Gruppenaktivitäten blockieren
+# context: summary of the group activity switch
+Notifications about new activity in your groups stop. Comments, replies and mentions in groups still come through.	Benachrichtigungen über neue Aktivitäten in deinen Gruppen bleiben aus. Kommentare, Antworten und Erwähnungen in Gruppen kommen weiterhin an.
+# context: switch title under Notifications; an event invite is someone inviting you to a Facebook event
+Block event invites	Veranstaltungseinladungen blockieren
+# context: summary of the event invites switch
+Invites to events stop showing up in your notifications.	Einladungen zu Veranstaltungen tauchen nicht mehr in deinen Benachrichtigungen auf.
+# context: switch title under Notifications; a live video is a broadcast someone is streaming right now
+Block live video notifications	Benachrichtigungen zu Live-Videos blockieren
+# context: summary of the live video switch; the ones you asked Facebook for are live notifications you turned on for a person or Page
+Notifications that someone is live stop, including the ones you asked Facebook for.	Benachrichtigungen, dass jemand live ist, bleiben aus, auch die, die du bei Facebook angefordert hast.
+# context: switch title under Notifications; reactions are likes and the other reaction buttons on posts and comments
+Block reaction notifications	Benachrichtigungen zu Reaktionen blockieren
+# context: summary of the reactions switch
+Likes and reactions to your posts and comments stop showing up in your notifications. Comments still come through.	„Gefällt mir“-Angaben und Reaktionen auf deine Beiträge und Kommentare tauchen nicht mehr in deinen Benachrichtigungen auf. Kommentare kommen weiterhin an.
+# context: switch title under Notifications; quiet hours is a stretch of the day when the picked notification kinds are blocked
+Quiet hours	Ruhezeiten
+# context: summary of the quiet hours switch; the switches above are the notification switches, the two times below are the start and end rows
+The switches above block their kinds only between the two times below. The rest of the day those kinds come through.	Die Schalter oben blockieren ihre Arten nur zwischen den beiden Uhrzeiten unten. Den Rest des Tages kommen diese Arten an.
+# context: row title and list title; the time quiet hours begin
+Quiet hours start	Beginn der Ruhezeiten
+# context: row title and list title; the time quiet hours finish
+Quiet hours end	Ende der Ruhezeiten
 # context: title of a note under Notifications, below the switches; what no switch there blocks
 What always comes through	Was immer ankommt
 # context: text of that note; Android's own settings are the phone's per-app notification categories, which Facebook's server defines
@@ -692,6 +716,10 @@ Reels quality will be set to %1$s.	Die Qualität für Reels wird auf %1$s gesetz
 Video stories will play at the same quality as other videos.	Video-Stories laufen dann in derselben Qualität wie andere Videos.
 # context: import preview and toast sentence; %1$s is a Stories quality choice such as Up to 720p
 Stories quality will be set to %1$s.	Die Qualität für Stories wird auf %1$s gesetzt.
+# context: after a settings import; %1$s is a time of day such as 10:00 PM
+Quiet hours will start at %1$s.	Die Ruhezeiten beginnen um %1$s.
+# context: after a settings import; %1$s is a time of day such as 7:00 AM
+Quiet hours will end at %1$s.	Die Ruhezeiten enden um %1$s.
 # context: import preview and toast sentence; %1$s is the folder inside the save folder that videos will go in
 Videos will go in a subfolder named %1$s.	Videos landen dann in einem Unterordner namens %1$s.
 # context: import preview and toast sentence when a settings file clears the Video subfolder

@@ -142,6 +142,11 @@ final class SwitchLabels {
         if (setting == Settings.BLOCK_PEOPLE_YOU_MAY_KNOW_NOTIFICATIONS) return L10n.t("Block \"People you may know\"");
         if (setting == Settings.BLOCK_NEARBY_NOTIFICATIONS) return L10n.t("Block nearby and weather notifications");
         if (setting == Settings.BLOCK_ACCOUNT_SETUP_NOTIFICATIONS) return L10n.t("Block account setup reminders");
+        if (setting == Settings.BLOCK_GROUP_ACTIVITY_NOTIFICATIONS) return L10n.t("Block group activity notifications");
+        if (setting == Settings.BLOCK_EVENT_NOTIFICATIONS) return L10n.t("Block event invites");
+        if (setting == Settings.BLOCK_LIVE_VIDEO_NOTIFICATIONS) return L10n.t("Block live video notifications");
+        if (setting == Settings.BLOCK_REACTION_NOTIFICATIONS) return L10n.t("Block reaction notifications");
+        if (setting == Settings.NOTIFICATION_QUIET_HOURS) return L10n.t("Quiet hours");
         if (setting == Settings.OPEN_LINKS_EXTERNALLY) return L10n.t("Open links in your browser");
         if (setting == Settings.SANITIZE_SHARING_LINKS) return L10n.t("Remove tracking from shared links");
         if (setting == Settings.STOP_UPDATE_PROMPTS) return L10n.t("Stop update prompts");

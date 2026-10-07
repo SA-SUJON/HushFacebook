@@ -73,6 +73,7 @@ public class RowChevronTest {
             "Tab to open on", "Feeds opens on", "Words to hide", "Words that keep a post", "People, Pages and sites to hide", "Comment order", "Hide reaction counts", "Playback quality", "Reels quality", "Stories quality", "Font file", "Download quality", "Save to", "Save folder",
             "Video subfolder", "Photo subfolder",
             "Video file name", "Photo file name", "When you tap Download", "App to send to", "Supported links", "Meta App Manager", "Messenger", "Instagram",
+            "Quiet hours start", "Quiet hours end",
             "Export settings", "Import settings",
             "Export diagnostic report", "Source code and issues", "Licenses"));
 

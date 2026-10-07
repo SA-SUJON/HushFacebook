@@ -308,6 +308,7 @@ public class ColdStartHooksTest {
         // A push can start Facebook, so the notification hook can run this early.
         assertFalse("a trending video push before the context was blocked", NotificationKindsForTests.blocksTrendingVideo());
         assertFalse("a birthday push before the context was blocked", NotificationKindsForTests.blocksBirthday());
+        assertFalse("a live video push before the context was blocked", NotificationKindsForTests.blocksLiveVideo());
         assertTrue("a player start before the context was held",
                 TapToPlay.allowStart(new Object(), TapToPlayForTests.Trigger.BY_AUTOPLAY));
         assertTrue("an older player start before the context was held",
