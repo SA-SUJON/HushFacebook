@@ -74,6 +74,7 @@ import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
+import app.morphe.extension.facebook.comments.CommentSheetOptions;
 import app.morphe.extension.facebook.comments.MetaAiSummaries;
 import app.morphe.extension.facebook.composer.TagSuggestionsForTests;
 import app.morphe.extension.facebook.media.HdrBrightnessForTests;
@@ -513,6 +514,12 @@ public class PausedHooksTest {
         probes.put(PatchFamily.META_AI_SUMMARIES, Arrays.asList(
                 () -> MetaAiSummaries.holds(MetaAiSummaries.SHEET_SUMMARY),
                 () -> MetaAiSummaries.holds(MetaAiSummaries.POST_SUMMARY)));
+        // The comment box's check answers no for its GIF and sticker buttons, and a long press on
+        // Like returns before the reaction picker opens.
+        probes.put(PatchFamily.COMMENT_SHEET_OPTIONS, Arrays.asList(
+                () -> CommentSheetOptions.holdsButton(CommentSheetOptions.GIF_BUTTON),
+                () -> CommentSheetOptions.holdsButton(CommentSheetOptions.STICKER_BUTTON),
+                CommentSheetOptions::skipReactionPicker));
         // A word without @ in a post or comment box looks nobody up, and a list of people left open
         // by an earlier @ is closed.
         probes.put(PatchFamily.TAG_SUGGESTIONS, Arrays.asList(

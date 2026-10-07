@@ -367,6 +367,20 @@ Use the order below. A choice made on a post lasts until restart. Links to comme
 Hide Meta AI comment summaries	Ocultar os resumos de comentários da Meta AI
 # context: summary of that switch; the buttons are a post's Like, Comment and Share row
 Comments open without Meta AI's summary at the top, and posts lose the summary of their comments under the buttons. The comments themselves stay.	Os comentários abrem sem o resumo da Meta AI no topo, e as publicações perdem o resumo dos comentários abaixo dos botões. Os comentários em si continuam.
+# context: switch title under Comments; Like is the button under a post or a comment
+Like only	Só Curtir
+# context: summary of that switch; the reactions are the row of Love, Haha, Wow and the rest that a long press on Like opens
+A long press on Like doesn't open the reactions. A tap still likes.	Tocar e segurar em Curtir não abre mais as reações. Um toque continua curtindo.
+# context: switch title under Comments; GIF and sticker are two buttons in the box where you type a comment
+Hide GIF and sticker buttons	Ocultar os botões de GIF e figurinhas
+# context: summary of that switch; the comment box is where you type a comment
+The comment box loses its GIF and sticker buttons. Typing, photos and posting work as before.	A caixa de comentário perde os botões de GIF e figurinhas. Digitar, enviar fotos e publicar continuam como antes.
+# context: row title under Comments that opens Facebook's own settings; reaction counts are the numbers next to the reactions on a post
+Hide reaction counts	Ocultar o número de reações
+# context: summary of that row; Preferences and Reaction preferences are the names Facebook's own settings use
+Facebook has its own setting for this. Open Facebook's settings, then Preferences and Reaction preferences.	O Facebook tem uma configuração própria para isso. Abra as configurações do Facebook, depois Preferências e Preferências de reações.
+# context: message shown when Facebook's own settings could not be opened from that row
+Facebook's settings didn't open. You'll find Reaction preferences in its Settings, under Preferences.	As configurações do Facebook não abriram. Você encontra Preferências de reações nas Configurações, em Preferências.
 Comment order	Ordem dos comentários
 Facebook's choice	Escolha do Facebook
 Most relevant	Mais relevantes

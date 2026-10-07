@@ -402,6 +402,20 @@ Use the order below. A choice made on a post lasts until restart. Links to comme
 Hide Meta AI comment summaries	Meta AI yorum özetlerini gizle
 # context: summary of that switch; the buttons are a post's Like, Comment and Share row
 Comments open without Meta AI's summary at the top, and posts lose the summary of their comments under the buttons. The comments themselves stay.	Yorumlar üstte Meta AI özeti olmadan açılır ve gönderilerin düğmelerinin altındaki yorum özeti kalkar. Yorumların kendisi kalır.
+# context: switch title under Comments; Like is the button under a post or a comment
+Like only	Yalnızca Beğen
+# context: summary of that switch; the reactions are the row of Love, Haha, Wow and the rest that a long press on Like opens
+A long press on Like doesn't open the reactions. A tap still likes.	Beğen'e uzun basmak artık tepkileri açmaz. Bir dokunuş yine beğenir.
+# context: switch title under Comments; GIF and sticker are two buttons in the box where you type a comment
+Hide GIF and sticker buttons	GIF ve çıkartma düğmelerini gizle
+# context: summary of that switch; the comment box is where you type a comment
+The comment box loses its GIF and sticker buttons. Typing, photos and posting work as before.	Yorum kutusu GIF ve çıkartma düğmelerini kaybeder. Yazmak, fotoğraf eklemek ve paylaşmak eskisi gibi çalışır.
+# context: row title under Comments that opens Facebook's own settings; reaction counts are the numbers next to the reactions on a post
+Hide reaction counts	Tepki sayılarını gizle
+# context: summary of that row; Preferences and Reaction preferences are the names Facebook's own settings use
+Facebook has its own setting for this. Open Facebook's settings, then Preferences and Reaction preferences.	Facebook'un bunun için kendi ayarı var. Facebook ayarlarını aç, ardından Tercihler ve Tepki tercihleri'ne git.
+# context: message shown when Facebook's own settings could not be opened from that row
+Facebook's settings didn't open. You'll find Reaction preferences in its Settings, under Preferences.	Facebook ayarları açılmadı. Tepki tercihleri, Facebook Ayarları'nda Tercihler altında.
 # context: title of the list of comment orders, and of its dialog
 Comment order	Yorum sırası
 # context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook

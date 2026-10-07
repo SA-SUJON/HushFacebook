@@ -470,6 +470,22 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_meta_ai_summaries", FALSE);
 
     /**
+     * A long press on Like doesn't open the reaction picker, so a tap that likes is all Like does
+     * ({@link app.morphe.extension.facebook.comments.CommentSheetOptions}). Off by default. A change
+     * shows on the next long press.
+     */
+    public static final BooleanSetting LIKE_ONLY =
+            new BooleanSetting("hushfacebook_like_only", FALSE);
+
+    /**
+     * The comment box comes without its GIF and sticker buttons
+     * ({@link app.morphe.extension.facebook.comments.CommentSheetOptions}). Typing, photos and
+     * posting stay. Off by default. A change shows on the next comment box drawn.
+     */
+    public static final BooleanSetting HIDE_COMMENT_GIF_STICKER_BUTTONS =
+            new BooleanSetting("hushfacebook_hide_comment_gif_sticker_buttons", FALSE);
+
+    /**
      * Facebook's text boxes (posts, comments, captions, a story's text) look people up to tag only
      * for a word that starts with @. Off, they also look them up for a plain word Facebook takes for
      * a name, what its code calls an implicit mention

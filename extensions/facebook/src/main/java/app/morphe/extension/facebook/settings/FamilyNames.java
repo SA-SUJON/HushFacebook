@@ -53,6 +53,7 @@ public final class FamilyNames {
     public static final String HOLD_REEL_FOR_2X = "Hold a reel for 2x";
     public static final String DEFAULT_COMMENT_ORDER = "Default comment order";
     public static final String META_AI_SUMMARIES = "Hide Meta AI comment summaries";
+    public static final String COMMENT_SHEET_OPTIONS = "Comment sheet options";
     public static final String TAG_SUGGESTIONS = "Tag suggestions only after @";
     public static final String TAP_TO_PLAY = "Tap to play";
     public static final String RESUME_LONG_VIDEOS = "Resume long videos";

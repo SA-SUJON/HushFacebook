@@ -402,6 +402,20 @@ Use the order below. A choice made on a post lasts until restart. Links to comme
 Hide Meta AI comment summaries	Meta-AI-Zusammenfassungen von Kommentaren ausblenden
 # context: summary of that switch; the buttons are a post's Like, Comment and Share row
 Comments open without Meta AI's summary at the top, and posts lose the summary of their comments under the buttons. The comments themselves stay.	Kommentare öffnen sich ohne die Zusammenfassung von Meta AI oben, und unter den Schaltflächen eines Beitrags fehlt die Zusammenfassung seiner Kommentare. Die Kommentare selbst bleiben.
+# context: switch title under Comments; Like is the button under a post or a comment
+Like only	Nur „Gefällt mir“
+# context: summary of that switch; the reactions are the row of Love, Haha, Wow and the rest that a long press on Like opens
+A long press on Like doesn't open the reactions. A tap still likes.	Langes Drücken auf „Gefällt mir“ öffnet keine Reaktionen mehr. Ein Tippen gibt weiterhin ein „Gefällt mir“.
+# context: switch title under Comments; GIF and sticker are two buttons in the box where you type a comment
+Hide GIF and sticker buttons	GIF- und Sticker-Schaltflächen ausblenden
+# context: summary of that switch; the comment box is where you type a comment
+The comment box loses its GIF and sticker buttons. Typing, photos and posting work as before.	Das Kommentarfeld verliert seine GIF- und Sticker-Schaltflächen. Schreiben, Fotos und Posten funktionieren wie bisher.
+# context: row title under Comments that opens Facebook's own settings; reaction counts are the numbers next to the reactions on a post
+Hide reaction counts	Anzahl der Reaktionen ausblenden
+# context: summary of that row; Preferences and Reaction preferences are the names Facebook's own settings use
+Facebook has its own setting for this. Open Facebook's settings, then Preferences and Reaction preferences.	Facebook hat dafür eine eigene Einstellung. Öffne die Einstellungen von Facebook, dann Präferenzen und Reaktionspräferenzen.
+# context: message shown when Facebook's own settings could not be opened from that row
+Facebook's settings didn't open. You'll find Reaction preferences in its Settings, under Preferences.	Die Einstellungen von Facebook haben sich nicht geöffnet. Reaktionspräferenzen findest du in den Einstellungen unter Präferenzen.
 # context: title of the list of comment orders, and of its dialog
 Comment order	Reihenfolge der Kommentare
 # context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook

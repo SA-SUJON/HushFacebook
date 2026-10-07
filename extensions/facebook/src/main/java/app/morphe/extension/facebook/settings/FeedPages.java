@@ -9,15 +9,18 @@ package app.morphe.extension.facebook.settings;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.category;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.commentOrderRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.feedsSubtabRow;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.mark;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.startTabRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.toggle;
 
 import android.content.Context;
+import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 
 import java.util.Set;
 
+import app.morphe.extension.facebook.comments.CommentSheetOptions;
 import app.morphe.extension.facebook.navigation.MarketplaceOnly;
 import app.morphe.extension.facebook.settings.SettingsRows.Row;
 import app.morphe.extension.shared.L10n;
@@ -269,12 +272,16 @@ final class FeedPages {
         }
     }
 
-    /** Comments: the order they open in, and Meta AI's summaries of them. */
+    /**
+     * Comments: the order they open in, Meta AI's summaries of them, and what the comment box and
+     * the Like button offer.
+     */
     static void comments(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
         boolean order = build.contains(PatchFamily.DEFAULT_COMMENT_ORDER);
         boolean summaries = build.contains(PatchFamily.META_AI_SUMMARIES);
-        if (!order && !summaries) return;
+        boolean options = build.contains(PatchFamily.COMMENT_SHEET_OPTIONS);
+        if (!order && !summaries && !options) return;
         PreferenceCategory comments = category(screen, L10n.t("Comments"));
         if (order) {
             comments.addPreference(toggle(context, Settings.DEFAULT_COMMENT_ORDER,
@@ -286,6 +293,34 @@ final class FeedPages {
                     L10n.t("Comments open without Meta AI's summary at the top, and posts lose the summary of their comments "
                             + "under the buttons. The comments themselves stay.")));
         }
+        if (options) {
+            comments.addPreference(toggle(context, Settings.LIKE_ONLY,
+                    L10n.t("A long press on Like doesn't open the reactions. A tap still likes.")));
+            comments.addPreference(toggle(context, Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS,
+                    L10n.t("The comment box loses its GIF and sticker buttons. Typing, photos and posting work as before.")));
+            comments.addPreference(reactionCountsRow(context));
+        }
+    }
+
+    /**
+     * Opens Facebook's own settings, where Preferences has Reaction preferences and its switches
+     * for hiding reaction counts. Facebook keeps those on its servers, so Hushfacebook doesn't
+     * rebuild them.
+     */
+    static Preference reactionCountsRow(Context context) {
+        Preference row = new Row(context);
+        row.setTitle(L10n.t("Hide reaction counts"));
+        row.setSummary(L10n.t("Facebook has its own setting for this. Open Facebook's settings, then Preferences "
+                + "and Reaction preferences."));
+        row.setPersistent(false);
+        row.setOnPreferenceClickListener(p -> {
+            if (!CommentSheetOptions.openReactionSettings(p.getContext())) {
+                Utils.showToastLong(L10n.t("Facebook's settings didn't open. You'll find Reaction preferences in its Settings, "
+                        + "under Preferences."));
+            }
+            return true;
+        });
+        return mark(row, SettingsIcons.OPENING);
     }
 
     /** Writing: when Facebook suggests someone to tag. */
