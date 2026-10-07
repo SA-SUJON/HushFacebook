@@ -571,6 +571,29 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_menu_also_from_meta", TRUE);
 
     /**
+     * Edits outside the Menu: the button and badge in the Reels composer's header, and the Edits
+     * pill under feed videos, which the feed's requests stop asking the server for
+     * ({@link app.morphe.extension.facebook.misc.MetaUpsells}). Off until it's turned on.
+     */
+    public static final BooleanSetting HIDE_EDITS_UPSELLS =
+            new BooleanSetting("hushfacebook_hide_edits_upsells", FALSE);
+
+    /** The composer's onboarding for cross-posting to Threads. Off until it's turned on. */
+    public static final BooleanSetting HIDE_THREADS_CROSS_POSTING =
+            new BooleanSetting("hushfacebook_hide_threads_cross_posting", FALSE);
+
+    /**
+     * The Meta Verified offer sheet after you post, and the Meta Verified label under some posts'
+     * headers. Off until it's turned on.
+     */
+    public static final BooleanSetting HIDE_META_VERIFIED_UPSELLS =
+            new BooleanSetting("hushfacebook_hide_meta_verified_upsells", FALSE);
+
+    /** The avatar sticker upsells in comments and Facebook's promotion slots. Off until it's turned on. */
+    public static final BooleanSetting HIDE_AVATAR_UPSELLS =
+            new BooleanSetting("hushfacebook_hide_avatar_upsells", FALSE);
+
+    /**
      * Meta AI in Facebook's search: the answer a results page adds on top, the Meta AI modules and
      * "Ask Meta AI" prompts among the results, and the suggestions Facebook's server sets to open in
      * Meta AI. People, groups, pages and posts stay, and so do the Meta AI button and the results

@@ -79,6 +79,21 @@ final class AppPages {
                     L10n.t("Games you play in Facebook get no ads. A game asking for one hears there's none to show, "
                             + "so rewarded ads give no reward.")));
         }
+        if (build.contains(PatchFamily.META_UPSELLS)) {
+            PreferenceCategory upsells = category(screen, L10n.t("Meta's other products"));
+            upsells.addPreference(toggle(context, Settings.HIDE_EDITS_UPSELLS,
+                    L10n.t("The Edits button and its badge leave the Reels composer, and the feed stops asking for the "
+                            + "Edits pill under videos. You can still make reels in Facebook.")));
+            upsells.addPreference(toggle(context, Settings.HIDE_THREADS_CROSS_POSTING,
+                    L10n.t("The composer stops prompting you to share your posts to Threads too. Your posts go to "
+                            + "Facebook as before.")));
+            upsells.addPreference(toggle(context, Settings.HIDE_META_VERIFIED_UPSELLS,
+                    L10n.t("No Meta Verified offer after you post, and no Meta Verified label under the names on "
+                            + "posts. Posting works as usual.")));
+            upsells.addPreference(toggle(context, Settings.HIDE_AVATAR_UPSELLS,
+                    L10n.t("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with "
+                            + "the prompt to make an avatar. Stickers still send.")));
+        }
     }
 
     /** Search. */

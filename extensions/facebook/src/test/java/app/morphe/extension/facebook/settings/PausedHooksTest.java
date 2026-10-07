@@ -81,6 +81,7 @@ import app.morphe.extension.facebook.media.ResumePlaybackForTests;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
+import app.morphe.extension.facebook.misc.MetaUpsells;
 import app.morphe.extension.facebook.misc.AnalyticsUploads;
 import app.morphe.extension.facebook.misc.Haptics;
 import app.morphe.extension.facebook.misc.ScreenshotDetection;
@@ -499,6 +500,16 @@ public class PausedHooksTest {
                 MenuSectionsForTests::hidesAlsoFromMeta,
                 MenuSectionsForTests::hidesServerUpgrades,
                 MenuSectionsForTests::hidesServerAlsoFromMeta));
+        // Edits' header flag and both shapes of its pill request, the Threads cross-posting
+        // onboarding, the Meta Verified sheet and label, and an avatar sticker upsell.
+        probes.put(PatchFamily.META_UPSELLS, Arrays.asList(
+                () -> !MetaUpsells.editsHeader(true),
+                () -> !MetaUpsells.fetchEditsPill(true),
+                () -> Boolean.FALSE.equals(MetaUpsells.fetchEditsPill(Boolean.TRUE)),
+                () -> !MetaUpsells.threadsOnboarding(1),
+                () -> Boolean.FALSE.equals(MetaUpsells.metaVerifiedSheet(Boolean.TRUE)),
+                () -> MetaUpsells.metaVerifiedLabel("Meta Verified") == null,
+                MetaUpsells::hidesAvatarUpsell));
         // Search leaves out its Meta AI answer and its prompt modules, and a suggestion set to open
         // Meta AI opens the results.
         probes.put(PatchFamily.META_AI_SEARCH, Arrays.asList(

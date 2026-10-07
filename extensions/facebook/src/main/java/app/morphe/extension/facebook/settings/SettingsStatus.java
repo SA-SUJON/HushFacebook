@@ -298,6 +298,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean metaUpsells() {
+        return false;
+    }
+
     public static boolean metaAiSearch() {
         return false;
     }

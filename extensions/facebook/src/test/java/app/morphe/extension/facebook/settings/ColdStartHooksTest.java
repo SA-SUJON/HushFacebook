@@ -63,6 +63,7 @@ import app.morphe.extension.facebook.media.ResumePlaybackForTests;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
+import app.morphe.extension.facebook.misc.MetaUpsells;
 import app.morphe.extension.facebook.menu.MenuSettingsRow;
 import app.morphe.extension.facebook.misc.AnalyticsUploads;
 import app.morphe.extension.facebook.misc.ScreenshotDetection;
@@ -273,6 +274,14 @@ public class ColdStartHooksTest {
                 ProfileSuggestionsForTests.hidesTheCarousel());
         assertFalse("a Menu built before the context lost Also from Meta", MenuSectionsForTests.hidesServerAlsoFromMeta());
         assertTrue("a Menu list built before the context changed", MenuSettingsRow.withRow(Collections.emptyList()).isEmpty());
+        assertTrue("an Edits flag read before the context lost its yes", MetaUpsells.editsHeader(true));
+        assertTrue("a feed request made before the context stopped asking for the Edits pill", MetaUpsells.fetchEditsPill(true));
+        assertTrue("a composer opened before the context lost its Threads prompt", MetaUpsells.threadsOnboarding(1));
+        assertEquals("a post made before the context lost its Meta Verified sheet", Boolean.TRUE,
+                MetaUpsells.metaVerifiedSheet(Boolean.TRUE));
+        assertEquals("a header built before the context lost its Meta Verified label", "Meta Verified",
+                MetaUpsells.metaVerifiedLabel("Meta Verified"));
+        assertFalse("an avatar upsell drawn before the context drew nothing", MetaUpsells.hidesAvatarUpsell());
         assertFalse("a results page built before the context lost its Meta AI answer", MetaAiSearchForTests.hidesAnswer());
         assertFalse("a results page built before the context lost its Meta AI prompts", MetaAiSearchForTests.dropsPrompts());
         assertFalse("a suggestion parsed before the context lost its Meta AI route",

@@ -867,3 +867,21 @@ The "What's on your mind?" row at the top of Home. The create button in the top 
 Always use Clean mode	Her zaman temiz modu kullan
 # context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
 Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. You can still leave Clean mode on a video the usual way. It's off by default because it hasn't been tested on a real account yet.	Reels videoları ve videolar, yandaki düğmeler gizli olarak Facebook'un temiz modunda açılır. Bir videoda temiz moddan yine her zamanki gibi çıkabilirsin. Bu anahtar henüz gerçek bir hesapla test edilmediği için varsayılan olarak kapalıdır.
+# context: settings section title on the App page, above the four switches of Hide Meta upsells; Meta is the company
+Meta's other products	Meta'nın diğer ürünleri
+# context: switch title; Edits is Meta's video editing app, keep its name
+Hide Edits promotions	Edits tanıtımlarını gizle
+# context: switch title; Threads is Meta's app, keep its name; cross-posting means sharing a Facebook post to Threads as well
+Hide Threads cross-posting prompts	Threads'de paylaşma önerilerini gizle
+# context: switch title; Meta Verified is Meta's paid subscription, keep its name
+Hide Meta Verified offers	Meta Verified tekliflerini gizle
+# context: switch title; avatar stickers are stickers made from your Facebook avatar
+Hide avatar sticker promotions	Avatar çıkartması tanıtımlarını gizle
+# context: summary of the Edits switch; the pill is a small button under a video in the feed that opens Edits
+The Edits button and its badge leave the Reels composer, and the feed stops asking for the Edits pill under videos. You can still make reels in Facebook.	Edits düğmesi ve rozeti Reels oluşturucusundan kalkar, akış da videoların altındaki Edits etiketini istemeyi bırakır. Facebook'ta reels oluşturmaya devam edebilirsin.
+# context: summary of the Threads switch; the composer is where you write a new post
+The composer stops prompting you to share your posts to Threads too. Your posts go to Facebook as before.	Gönderi oluşturucu, gönderilerini Threads'de de paylaşman için seni yönlendirmeyi bırakır. Gönderilerin eskisi gibi Facebook'a gider.
+# context: summary of the Meta Verified switch; the label is a line Facebook adds under the poster's name on some posts
+No Meta Verified offer after you post, and no Meta Verified label under the names on posts. Posting works as usual.	Paylaşım yaptıktan sonra Meta Verified teklifi çıkmaz, gönderilerdeki isimlerin altında Meta Verified etiketi de görünmez. Paylaşım her zamanki gibi çalışır.
+# context: summary of the avatar sticker switch; promotion slots are the cards Facebook uses to suggest its own features
+Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.	Avatar çıkartması tanıtımları yorumlardan ve Facebook'un tanıtım alanlarından kalkar, avatar oluşturma daveti de kalkar. Çıkartmalar yine gönderilebilir.

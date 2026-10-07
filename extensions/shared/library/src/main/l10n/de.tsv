@@ -867,3 +867,21 @@ The "What's on your mind?" row at the top of Home. The create button in the top 
 Always use Clean mode	Immer den Clean-Modus verwenden
 # context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
 Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. You can still leave Clean mode on a video the usual way. It's off by default because it hasn't been tested on a real account yet.	Reels und Videos öffnen sich in Facebooks Clean-Modus, ohne die Buttons an der Seite. Du kannst den Clean-Modus bei einem Video weiterhin wie gewohnt verlassen. Der Schalter ist standardmäßig aus, weil er noch nicht mit einem echten Konto getestet wurde.
+# context: settings section title on the App page, above the four switches of Hide Meta upsells; Meta is the company
+Meta's other products	Andere Produkte von Meta
+# context: switch title; Edits is Meta's video editing app, keep its name
+Hide Edits promotions	Edits-Werbung ausblenden
+# context: switch title; Threads is Meta's app, keep its name; cross-posting means sharing a Facebook post to Threads as well
+Hide Threads cross-posting prompts	Hinweise zum Teilen auf Threads ausblenden
+# context: switch title; Meta Verified is Meta's paid subscription, keep its name
+Hide Meta Verified offers	Meta-Verified-Angebote ausblenden
+# context: switch title; avatar stickers are stickers made from your Facebook avatar
+Hide avatar sticker promotions	Werbung für Avatar-Sticker ausblenden
+# context: summary of the Edits switch; the pill is a small button under a video in the feed that opens Edits
+The Edits button and its badge leave the Reels composer, and the feed stops asking for the Edits pill under videos. You can still make reels in Facebook.	Der Edits-Button und sein Badge verschwinden aus dem Reels-Editor, und der Feed fragt nicht mehr nach dem Edits-Hinweis unter Videos. Reels kannst du weiterhin in Facebook erstellen.
+# context: summary of the Threads switch; the composer is where you write a new post
+The composer stops prompting you to share your posts to Threads too. Your posts go to Facebook as before.	Beim Erstellen eines Beitrags wirst du nicht mehr aufgefordert, deine Beiträge auch auf Threads zu teilen. Deine Beiträge erscheinen wie gewohnt auf Facebook.
+# context: summary of the Meta Verified switch; the label is a line Facebook adds under the poster's name on some posts
+No Meta Verified offer after you post, and no Meta Verified label under the names on posts. Posting works as usual.	Kein Meta-Verified-Angebot nach dem Posten und kein Meta-Verified-Label unter den Namen bei Beiträgen. Posten funktioniert wie gewohnt.
+# context: summary of the avatar sticker switch; promotion slots are the cards Facebook uses to suggest its own features
+Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.	Werbung für Avatar-Sticker verschwindet aus Kommentaren und Facebooks Werbeplätzen, ebenso die Aufforderung, einen Avatar zu erstellen. Sticker lassen sich weiterhin senden.

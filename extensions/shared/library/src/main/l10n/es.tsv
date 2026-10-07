@@ -867,3 +867,21 @@ The "What's on your mind?" row at the top of Home. The create button in the top 
 Always use Clean mode	Usar siempre el modo limpio
 # context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
 Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. You can still leave Clean mode on a video the usual way. It's off by default because it hasn't been tested on a real account yet.	Los reels y videos se abren en el modo limpio de Facebook, sin los botones del costado. Puedes salir del modo limpio en un video como siempre. Este interruptor viene desactivado porque todavía no se probó con una cuenta real.
+# context: settings section title on the App page, above the four switches of Hide Meta upsells; Meta is the company
+Meta's other products	Otros productos de Meta
+# context: switch title; Edits is Meta's video editing app, keep its name
+Hide Edits promotions	Ocultar promociones de Edits
+# context: switch title; Threads is Meta's app, keep its name; cross-posting means sharing a Facebook post to Threads as well
+Hide Threads cross-posting prompts	Ocultar avisos para publicar también en Threads
+# context: switch title; Meta Verified is Meta's paid subscription, keep its name
+Hide Meta Verified offers	Ocultar ofertas de Meta Verified
+# context: switch title; avatar stickers are stickers made from your Facebook avatar
+Hide avatar sticker promotions	Ocultar promociones de stickers de avatar
+# context: summary of the Edits switch; the pill is a small button under a video in the feed that opens Edits
+The Edits button and its badge leave the Reels composer, and the feed stops asking for the Edits pill under videos. You can still make reels in Facebook.	El botón de Edits y su insignia desaparecen del editor de reels, y el feed deja de pedir la etiqueta de Edits debajo de los videos. Puedes seguir creando reels en Facebook.
+# context: summary of the Threads switch; the composer is where you write a new post
+The composer stops prompting you to share your posts to Threads too. Your posts go to Facebook as before.	El editor de publicaciones deja de pedirte que compartas tus publicaciones también en Threads. Tus publicaciones van a Facebook como siempre.
+# context: summary of the Meta Verified switch; the label is a line Facebook adds under the poster's name on some posts
+No Meta Verified offer after you post, and no Meta Verified label under the names on posts. Posting works as usual.	Sin la oferta de Meta Verified después de publicar y sin la etiqueta de Meta Verified debajo de los nombres en las publicaciones. Publicar funciona como siempre.
+# context: summary of the avatar sticker switch; promotion slots are the cards Facebook uses to suggest its own features
+Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.	Las promociones de stickers de avatar desaparecen de los comentarios y de los espacios promocionales de Facebook, junto con la invitación a crear un avatar. Los stickers se siguen enviando.
