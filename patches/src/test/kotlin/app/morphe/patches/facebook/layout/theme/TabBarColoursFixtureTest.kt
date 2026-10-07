@@ -80,7 +80,12 @@ class TabBarColoursFixtureTest {
                     it.toString() == "Landroid/graphics/drawable/Drawable;->setColorFilter(Landroid/graphics/ColorFilter;)V"
                 })
 
-                val owners = FixtureDex.classes(bundle, readers.map { it.definingClass }.toSet())
+                // The hook also needs the inflater that first fills the line's Paint, or it refuses.
+                val paint = lineColourPaint(layout)
+                val inflaters = FixtureDex.methodsWhere(bundle, { dex -> dex.fieldSection.any { it.toString() == paint.toString() } }) {
+                    it.definingClass != TAB_BAR_CONTAINER && lineColourReads(it, paint).isNotEmpty()
+                }
+                val owners = FixtureDex.classes(bundle, (readers + inflaters).map { it.definingClass }.toSet())
                 val pool: Collection<ClassDef> = (owners.values + provider + layout).associateBy { it.type }.values
                 val context = PatchContexts.of(pool)
                 with(context) { selectedTabColourHook()() }
