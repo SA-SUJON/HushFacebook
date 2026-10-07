@@ -143,6 +143,14 @@ public final class FeedFilter {
     static final String META_AI_UNIT_TYPE = "XFBFBImplicitMetaAIFeedUnit";
 
     /**
+     * The type name of the card promoting Vibes, Meta AI's app of AI-made videos, that Facebook can
+     * put between posts. Its model, GraphQLVibesRifuQuickPromotionFeedUnit, answers it from
+     * getTypeName() in 580 and 581; 577 has no such unit. It goes under the same switch as the Meta
+     * AI card.
+     */
+    static final String VIBES_PROMOTION_UNIT_TYPE = "VibesRifuQuickPromotionFeedUnit";
+
+    /**
      * The other two kinds of Stories between posts the same model answers in 577 and 580, through
      * its table of type names rather than a literal: one large Stories tile, and one person's
      * Stories in a viewer of their own.
@@ -459,8 +467,9 @@ public final class FeedFilter {
                 reason = storiesRowReason(typeName(feedUnit));
             }
             boolean metaAi = aiPatched && Settings.HIDE_META_AI_FEED_UNITS.get();
-            if (reason == null && metaAi && META_AI_UNIT_TYPE.equals(typeName(feedUnit))) {
-                reason = META_AI_UNIT_TYPE;
+            if (reason == null && metaAi) {
+                String type = typeName(feedUnit);
+                if (META_AI_UNIT_TYPE.equals(type) || VIBES_PROMOTION_UNIT_TYPE.equals(type)) reason = type;
             }
             if (reason == null && aiPatched && attachmentsAccessor != null && styleFinder != null
                     && Settings.HIDE_AI_CHARACTER_POSTS.get()) {

@@ -22,6 +22,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** With Debug logging on, the diagnostic report lists the last 50 Facebook screens that came to the front, by class, action and the link's host and path (never its query). When a tap opens the wrong screen, the report says which one it was.
 * **Facebook:** `Hide Stories tray` has a third switch, **Hide the composer row** under News feed, which starts off. It takes the "What's on your mind?" row off the top of Home, so the feed starts with the Stories tray (or your first post, with the tray hidden too). The create button in the top bar still starts a post, and a change shows the next time you pull down to refresh.
 * **Facebook:** `Hide sponsored reels` also covers the Reels tab on a profile or Page. That tab asks for its ads with a query of its own, outside the Reels ad pool the patch already holds, and now it doesn't send it, so the tab shows that profile's own reels. The diagnostic report counts each held query.
+* **Facebook:** **Hide Meta AI in the feed** also takes out the cards promoting Vibes, Meta AI's app of AI-made videos, that Facebook can put between posts. They go by the card's own type, like the Meta AI cards, and the report counts them under it.
 
 ### Fixed
 
