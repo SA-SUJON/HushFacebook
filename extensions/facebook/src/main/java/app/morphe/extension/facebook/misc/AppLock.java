@@ -55,6 +55,7 @@ import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.Setting;
+import app.morphe.extension.shared.settings.preference.LogBufferManager;
 import app.morphe.extension.shared.settings.preference.ReadOnlyPreferences;
 
 /**
@@ -203,6 +204,31 @@ public final class AppLock {
     static final int WINDOW_CHECK_UNAVAILABLE = -1;
     /** Whether the last read of the framework's window list worked, for the diagnostics report. */
     private static int windowCheck = WINDOW_CHECK_UNKNOWN;
+
+    /**
+     * The [LOCK FACEBOOK] section of the diagnostic report: whether the lock can read the window
+     * list, which a hidden-API block on a newer Android would take away without any sign, leaving
+     * the lock noticing only windows that take the focus. Nothing while the lock is off.
+     */
+    public static final LogBufferManager.ReportSection REPORT = new LogBufferManager.ReportSection() {
+        @Override public String title() { return "LOCK FACEBOOK"; }
+        @Override public List<String> lines() { return windowCheckLines(); }
+        @Override public boolean isAppState() { return true; }
+    };
+
+    /** The report's line for the window check, or nothing when the lock is off. */
+    static List<String> windowCheckLines() {
+        if (!switchedOn()) return Collections.emptyList();
+        switch (windowCheck) {
+            case WINDOW_CHECK_WORKS:
+                return Collections.singletonList("Window check: works, windows above the cover are found");
+            case WINDOW_CHECK_UNAVAILABLE:
+                return Collections.singletonList("Window check: unavailable on this phone, so only windows that "
+                        + "take the focus are noticed");
+            default:
+                return Collections.singletonList("Window check: not run yet, it starts the first time Facebook is covered");
+        }
+    }
     private static boolean watchingWindows;
     /** Windows made untouchable while locked, with the window manager that holds each. */
     private static final Map<View, WindowManager> untouchable = new IdentityHashMap<>();
@@ -664,6 +690,7 @@ public final class AppLock {
         rootsFailureLogged = false;
         windowCheck = WINDOW_CHECK_UNKNOWN;
         readersFound = false;
+        windowGlobalName = "android.view.WindowManagerGlobal";
         watchingWindows = false;
         restoreTouch();
         shareUnlock(NEVER);
@@ -820,10 +847,12 @@ public final class AppLock {
     @Nullable private static Method rootNames;
     @Nullable private static Method rootView;
     private static boolean readersFound;
+    /** The framework class that holds the window list. A test names another to see the lock without it. */
+    static String windowGlobalName = "android.view.WindowManagerGlobal";
 
     private static void findReaders() throws ReflectiveOperationException {
         if (readersFound) return;
-        Class<?> global = Class.forName("android.view.WindowManagerGlobal");
+        Class<?> global = Class.forName(windowGlobalName);
         windowGlobal = global.getMethod("getInstance").invoke(null);
         try {
             Field views = global.getDeclaredField("mViews");

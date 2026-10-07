@@ -6,7 +6,9 @@ package app.morphe.extension.facebook.misc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
@@ -349,6 +351,37 @@ public class AppLockWindowsTest {
         AppLock.sweep(activity);
         assertFalse(takesNoTouch(overlay));
         assertTrue(answers.isEmpty());
+    }
+
+    /** A fresh process that reads the phone's own window list, as a phone does. */
+    private void realReader() {
+        AppLock.forgetForTests();
+        AppLock.prompter = (screen, answer) -> {
+            asked.add(screen);
+            answers.add(answer);
+        };
+    }
+
+    @Test
+    public void theReportSaysWhetherTheWindowCheckCanSeeEveryWindow() {
+        assertEquals("LOCK FACEBOOK", AppLock.REPORT.title());
+        Settings.APP_LOCK.save(false);
+        assertTrue("the lock is off and the report still spoke", AppLock.REPORT.lines().isEmpty());
+
+        Settings.APP_LOCK.save(true);
+        assertEquals(1, AppLock.REPORT.lines().size());
+        assertTrue(AppLock.REPORT.lines().get(0), AppLock.REPORT.lines().get(0).contains("not run yet"));
+
+        realReader();
+        assertNotNull(AppLock.roots.list());
+        assertTrue(AppLock.REPORT.lines().get(0), AppLock.REPORT.lines().get(0).contains("works"));
+
+        // A phone that hides the class: the lock says so instead of quietly noticing less.
+        realReader();
+        AppLock.windowGlobalName = "android.view.NoSuchWindowGlobal";
+        assertNull(AppLock.roots.list());
+        assertEquals(1, AppLock.REPORT.lines().size());
+        assertTrue(AppLock.REPORT.lines().get(0), AppLock.REPORT.lines().get(0).contains("unavailable"));
     }
 
     // The unlock shared with a game or ad screen in a process of its own.
