@@ -63,7 +63,10 @@ public final class OriginalChatMediaForTests {
         try (FileOutputStream out = new FileOutputStream(file)) {
             out.write(content);
         }
-        return Uri.fromFile(file).toString();
+        // Uri.fromFile leaves a Windows path's drive letter where the authority goes, so build the
+        // address with a path that starts at the root, as a phone's always does.
+        String path = file.getAbsolutePath().replace(File.separatorChar, '/');
+        return new Uri.Builder().scheme("file").authority("").path(path).build().toString();
     }
 
     /** [text] as bytes, one per character, so a box type like ©xyz is its four bytes. */
