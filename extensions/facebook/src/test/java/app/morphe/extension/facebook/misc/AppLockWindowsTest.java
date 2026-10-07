@@ -363,6 +363,38 @@ public class AppLockWindowsTest {
     }
 
     @Test
+    public void theRealWindowReaderFindsAShownDialogsWindow() {
+        realReader();
+        Activity screen = screen();
+        Dialog dialog = new Dialog(screen);
+        dialog.show();
+
+        List<View> all = AppLock.roots.list();
+
+        assertNotNull("the framework's window list couldn't be read under Robolectric", all);
+        assertTrue("a shown dialog's window wasn't in the list", all.contains(dialog.getWindow().getDecorView()));
+        assertTrue("the screen's own window wasn't in the list", all.contains(decorOf(screen)));
+    }
+
+    @Test
+    public void aWindowAboveTheCoverIsFoundThroughTheRealReaderToo() {
+        realReader();
+        activity = screen();
+        front(activity);
+        Dialog cover = ShadowDialog.getLatestDialog();
+        View overlay = new View(activity);
+        activity.getWindowManager().addView(overlay, new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT));
+
+        AppLock.sweep(activity);
+
+        assertTrue("the real reader didn't find a window above the cover", takesNoTouch(overlay));
+        assertNotSame(cover, ShadowDialog.getLatestDialog());
+    }
+
+    @Test
     public void theReportSaysWhetherTheWindowCheckCanSeeEveryWindow() {
         assertEquals("LOCK FACEBOOK", AppLock.REPORT.title());
         Settings.APP_LOCK.save(false);
