@@ -76,12 +76,63 @@ final class PostPattern {
     private final int[] x;
     private final int[] y;
     private final CharClass[] classes;
+    /**
+     * Which ASCII characters can be the first of a match, or null when the pattern can match
+     * nothing at all (so every position starts one) and the check is no use. A position whose
+     * character isn't in it starts no match, so the matcher doesn't spend steps adding the start
+     * there. A character past ASCII always counts.
+     */
+    private final boolean[] firstAscii;
 
     private PostPattern(int[] op, int[] x, int[] y, CharClass[] classes) {
         this.op = op;
         this.x = x;
         this.y = y;
         this.classes = classes;
+        this.firstAscii = firstAscii();
+    }
+
+    /** The characters the instructions the start reaches without reading anything take, or null when it reaches a match. */
+    private boolean[] firstAscii() {
+        boolean[] first = new boolean[128];
+        boolean[] visited = new boolean[op.length];
+        int[] stack = new int[op.length * 2 + 2];
+        int top = 0;
+        stack[top++] = 0;
+        while (top > 0) {
+            int pc = stack[--top];
+            if (visited[pc]) continue;
+            visited[pc] = true;
+            switch (op[pc]) {
+                case MATCH:
+                    return null;
+                case JUMP:
+                    stack[top++] = x[pc];
+                    break;
+                case SPLIT:
+                    stack[top++] = y[pc];
+                    stack[top++] = x[pc];
+                    break;
+                case LINE_START:
+                case LINE_END:
+                case WORD_EDGE:
+                case NOT_WORD_EDGE:
+                    // Taken as passing: more positions are tried than needed, never fewer.
+                    stack[top++] = pc + 1;
+                    break;
+                default:
+                    for (int point = 0; point < first.length; point++) {
+                        boolean takes;
+                        switch (op[pc]) {
+                            case CHAR: takes = x[pc] == fold(point); break;
+                            case ANY: takes = point != '\n'; break;
+                            default: takes = classes[x[pc]].matches(point);
+                        }
+                        if (takes) first[point] = true;
+                    }
+            }
+        }
+        return first;
     }
 
     /** A pattern that can't be read, and why, for a test. */
@@ -131,11 +182,14 @@ final class PostPattern {
         int generation = 1;
         int length = text.length();
         for (int pos = 0; ; ) {
-            // A match may start here, as well as go on from any earlier start.
-            int added = add(0, pos, text, current, currentSeen, currentSize, generation, stack, budget);
-            if (added == FOUND) return Result.MATCH;
-            if (added == OUT) return Result.TOO_SLOW;
-            currentSize = added;
+            // A match may start here, as well as go on from any earlier start, unless the
+            // character here can't be the first of one.
+            if (pos < length ? mayStart(text.charAt(pos)) : firstAscii == null) {
+                int added = add(0, pos, text, current, currentSeen, currentSize, generation, stack, budget);
+                if (added == FOUND) return Result.MATCH;
+                if (added == OUT) return Result.TOO_SLOW;
+                currentSize = added;
+            }
             if (pos >= length) return Result.NO_MATCH;
 
             int point = Character.codePointAt(text, pos);
@@ -168,6 +222,11 @@ final class PostPattern {
             currentSize = nextSize;
             pos = after;
         }
+    }
+
+    /** Whether a match can start at a position holding [c]: any character past ASCII can. */
+    private boolean mayStart(char c) {
+        return firstAscii == null || c >= firstAscii.length || firstAscii[c];
     }
 
     private static final int FOUND = -1;

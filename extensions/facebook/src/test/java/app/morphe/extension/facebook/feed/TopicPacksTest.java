@@ -237,4 +237,100 @@ public class TopicPacksTest {
         assertEquals("a plural", PostWords.Verdict.HIDE_PATTERN, PostWords.rules(everyPack(), "")
                 .judge(Collections.singletonList("Three more NFTs dropped today")));
     }
+
+    /** [word] in Mathematical Sans-Serif Bold letters, the way styled posts spell a word. */
+    private static String styled(String word) {
+        StringBuilder out = new StringBuilder();
+        for (char c : word.toCharArray()) {
+            out.appendCodePoint(c >= 'a' && c <= 'z' ? 0x1D5EE + (c - 'a') : c);
+        }
+        return out.toString();
+    }
+
+    /** [word] in full-width letters, with a full-width space for each space. */
+    private static String fullWidth(String word) {
+        StringBuilder out = new StringBuilder();
+        for (char c : word.toCharArray()) {
+            out.append(c == ' ' ? '　' : c >= 'a' && c <= 'z' ? (char) (0xFF41 + (c - 'a')) : c);
+        }
+        return out.toString();
+    }
+
+    /**
+     * The folded phrases catch styled, full-width and invisibly padded text, so the packs' patterns
+     * have to as well: they read the folded text, not only the raw one. Each case would slip past
+     * a pattern run on the raw text alone.
+     */
+    @Test
+    public void aPackCatchesStyledFullWidthAndPaddedText() {
+        Map<TopicPacks.Pack, String> topics = new LinkedHashMap<>();
+        topics.put(TopicPacks.Pack.POLITICS, "The " + styled("senators") + " passed it");
+        topics.put(TopicPacks.Pack.ELECTIONS, fullWidth("election day") + " is here");
+        topics.put(TopicPacks.Pack.CRYPTO, styled("bitcoin") + " just hit a new high");
+        topics.put(TopicPacks.Pack.SPORTS, "What a super bowl that was");
+        topics.put(TopicPacks.Pack.CELEBRITY_GOSSIP, "The " + styled("paparazzi") + " caught them");
+        topics.put(TopicPacks.Pack.WEIGHT_LOSS_ADS, fullWidth("lose weight") + " fast");
+        topics.put(TopicPacks.Pack.GIVEAWAYS_AND_BAIT, styled("giveaway") + " time");
+        assertEquals(TopicPacks.Pack.values().length, topics.size());
+        for (Map.Entry<TopicPacks.Pack, String> topic : topics.entrySet()) {
+            String alone = TopicPacks.add("", topic.getKey(), 0).text;
+            assertEquals(topic.getKey() + " kept \"" + topic.getValue() + "\"", PostWords.Verdict.HIDE_PATTERN,
+                    PostWords.rules(alone, "").judge(Collections.singletonList(topic.getValue())));
+            assertEquals(topic.getKey() + " kept it among every pack", PostWords.Verdict.HIDE_PATTERN,
+                    PostWords.rules(everyPack(), "").judge(Collections.singletonList(topic.getValue())));
+        }
+        assertEquals("a soft hyphen inside the word", PostWords.Verdict.HIDE_PATTERN, PostWords.rules(everyPack(), "")
+                .judge(Collections.singletonList("All about cryp­to today")));
+        assertEquals("a zero-width space inside the word", PostWords.Verdict.HIDE_PATTERN,
+                PostWords.rules(everyPack(), "").judge(Collections.singletonList("All about bit​coin today")));
+        assertEquals("styled text that's no topic stays", PostWords.Verdict.NO_MATCH, PostWords.rules(everyPack(), "")
+                .judge(Collections.singletonList(styled("lovely") + " weather, " + fullWidth("see you soon"))));
+    }
+
+    /**
+     * A person's own pattern is read against the text as typed and folded, and either hides. One
+     * written with a full-width letter needs the raw text, one in plain letters needs the folded.
+     */
+    @Test
+    public void aPatternReadsTheTextAsItIsAndFolded() {
+        PostWords.Rules plain = PostWords.rules("/\\bsuper bowl\\b/", "");
+        assertEquals(PostWords.Verdict.HIDE_PATTERN, plain.judge(Collections.singletonList("super bowl")));
+        assertEquals(PostWords.Verdict.HIDE_PATTERN, plain.judge(Collections.singletonList("Super Bowl")));
+        assertEquals(PostWords.Verdict.NO_MATCH, plain.judge(Collections.singletonList("superbowls")));
+        PostWords.Rules wide = PostWords.rules("/" + fullWidth("bit") + "/", "");
+        assertEquals("a pattern written in full-width letters still sees them", PostWords.Verdict.HIDE_PATTERN,
+                wide.judge(Collections.singletonList("a " + fullWidth("bit") + " of news")));
+        PostWords.Rules keep = PostWords.rules("/\\bbitcoin\\b/", "/\\bbitcoin pizza\\b/");
+        assertEquals("a keep pattern reads the folded text too", PostWords.Verdict.KEEP_PATTERN,
+                keep.judge(Collections.singletonList(styled("bitcoin") + " pizza day")));
+    }
+
+    /** A prose post with no topic word in it, [length] characters long. */
+    private static String prose(int length, String sentence) {
+        StringBuilder text = new StringBuilder();
+        while (text.length() < length) text.append(sentence);
+        return text.substring(0, length);
+    }
+
+    /**
+     * All seven packs on one post's step budget, with a 10,000-character post that matches none of
+     * them. Every pack's patterns used to take about 2.4 million steps on one, past the 2 million
+     * budget, so the last pack's lines were never read and the post was left alone as too slow. The
+     * check is the last pack still hiding a post that ends with its word.
+     */
+    @Test
+    public void everyPackStillRunsOnALongPostWithinTheBudget() {
+        PostWords.Rules rules = PostWords.rules(everyPack(), "");
+        for (String sentence : new String[] {"the quick brown fox jumps over a lazy dog ",
+                "The Quick Brown Fox Jumps Over A Lazy Dog "}) {
+            String post = prose(10_000, sentence);
+            assertEquals("a long post with no topic word was " + rules.judge(Collections.singletonList(post)),
+                    PostWords.Verdict.NO_MATCH, rules.judge(Collections.singletonList(post)));
+            for (String ending : new String[] {" giveaway", " comment done", " Super Bowl", " " + styled("bitcoin")}) {
+                String ended = prose(10_000, sentence) + ending;
+                assertEquals(ending + " at the end of a long post", PostWords.Verdict.HIDE_PATTERN,
+                        rules.judge(Collections.singletonList(ended)));
+            }
+        }
+    }
 }

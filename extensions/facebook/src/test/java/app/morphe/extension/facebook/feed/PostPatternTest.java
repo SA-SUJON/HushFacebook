@@ -165,6 +165,26 @@ public class PostPatternTest {
         assertEquals(PostPattern.Result.NO_MATCH, pattern.find("ababababababab", new PostPattern.Budget(10_000)));
     }
 
+    /**
+     * A position whose character can't begin a match costs no step, so a long post with no first
+     * letter of the pattern in it fits a small budget, while a pattern that can match nothing at
+     * all, and a character past ASCII, are still tried everywhere.
+     */
+    @Test
+    public void aPositionThatCantStartAMatchCostsNothing() throws Exception {
+        StringBuilder xs = new StringBuilder();
+        for (int i = 0; i < 5_000; i++) xs.append('x');
+        assertEquals(PostPattern.Result.NO_MATCH, PostPattern.compile("\b(abc|abd)\b").find(xs, new PostPattern.Budget(10)));
+        assertEquals(PostPattern.Result.MATCH,
+                PostPattern.compile("\b(abc|abd)\b").find(xs + " abd", new PostPattern.Budget(1_000)));
+        assertEquals("a pattern that can match nothing", PostPattern.Result.MATCH,
+                PostPattern.compile("x*").find("", new PostPattern.Budget(10)));
+        assertEquals(PostPattern.Result.MATCH, PostPattern.compile("x*$").find(xs, new PostPattern.Budget(1_000_000)));
+        assertEquals("a letter past ASCII", PostPattern.Result.MATCH,
+                PostPattern.compile("été").find("un ÉTÉ doux", new PostPattern.Budget(1_000)));
+        assertEquals("a class", PostPattern.Result.MATCH, PostPattern.compile("[0-9]+ ok").find(xs + " 42 ok", new PostPattern.Budget(1_000)));
+    }
+
     @Test
     public void randomPatternsAgreeWithJava() throws Exception {
         Random random = new Random(7);

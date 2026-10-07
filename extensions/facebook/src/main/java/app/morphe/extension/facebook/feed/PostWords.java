@@ -333,26 +333,34 @@ public final class PostWords {
         /**
          * What the lists make of a post's words: a keep phrase anywhere in them wins, then a hide
          * phrase or pattern anywhere hides unless a keep pattern matches too. No words match
-         * nothing. A phrase or pattern matches inside one text, never across two. Patterns run only
+         * nothing. A phrase or pattern matches inside one text, never across two. Patterns read each
+         * text as it is and folded, and either one can match. Patterns run only
          * where they can change the verdict, all on one {@link PostPattern.Budget}, and a post whose
          * patterns run out of steps is {@link Verdict#TOO_SLOW} and stays.
          */
         Verdict judge(List<String> texts) {
             if (hidesNothing() || texts.isEmpty()) return Verdict.NO_MATCH;
             int found = 0;
+            // What the patterns read: each text as it is, so a pattern written with a styled or
+            // full-width letter still sees it, and folded, so a plain pattern sees through styled
+            // letters, full-width forms, no-break spaces and soft hyphens as the phrases do.
+            List<String> patternTexts = new ArrayList<>(texts.size() * 2);
             for (String text : texts) {
-                found |= matcher.find(fold(text));
+                String folded = fold(text);
+                found |= matcher.find(folded);
                 if ((found & Matcher.KEEPS) != 0) return Verdict.KEEP;
+                patternTexts.add(text);
+                if (!folded.equals(text)) patternTexts.add(folded);
             }
             PostPattern.Budget budget = new PostPattern.Budget(STEPS_PER_POST);
             Verdict hide = (found & Matcher.HIDES) != 0 ? Verdict.HIDE : null;
             if (hide == null) {
-                PostPattern.Result result = any(hidePatterns, texts, budget);
+                PostPattern.Result result = any(hidePatterns, patternTexts, budget);
                 if (result == PostPattern.Result.TOO_SLOW) return Verdict.TOO_SLOW;
                 if (result == PostPattern.Result.MATCH) hide = Verdict.HIDE_PATTERN;
             }
             if (hide == null) return Verdict.NO_MATCH;
-            PostPattern.Result kept = any(keepPatterns, texts, budget);
+            PostPattern.Result kept = any(keepPatterns, patternTexts, budget);
             if (kept == PostPattern.Result.TOO_SLOW) return Verdict.TOO_SLOW;
             return kept == PostPattern.Result.MATCH ? Verdict.KEEP_PATTERN : hide;
         }
