@@ -23,6 +23,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Hide Stories tray` has a third switch, **Hide the composer row** under News feed, which starts off. It takes the "What's on your mind?" row off the top of Home, so the feed starts with the Stories tray (or your first post, with the tray hidden too). The create button in the top bar still starts a post, and a change shows the next time you pull down to refresh.
 * **Facebook:** `Hide sponsored reels` also covers the Reels tab on a profile or Page. That tab asks for its ads with a query of its own, outside the Reels ad pool the patch already holds, and now it doesn't send it, so the tab shows that profile's own reels. The diagnostic report counts each held query.
 * **Facebook:** **Hide Meta AI in the feed** also takes out the cards promoting Vibes, Meta AI's app of AI-made videos, that Facebook can put between posts. They go by the card's own type, like the Meta AI cards, and the report counts them under it.
+* **Facebook:** `Clean up Reels` can take out the Threads cards Facebook puts between reels. Turn on **Hide Threads cards between reels**, which starts off, and the next reel follows right after the last. The diagnostic report counts every kind of card it finds between reels, so a new kind shows up there (issue #85).
+* **Facebook:** `Tab bar at the bottom` has a second switch under Appearance, **Hide the tab bar while scrolling**. With the bar at the bottom, it slides away as you scroll the feed down and comes back when you scroll up. It turns on the version Facebook already gives some accounts, so the feed keeps its room for the bar. It starts off and needs a restart (issue #84).
 
 ### Fixed
 
