@@ -41,6 +41,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `AMOLED black theme`'s **Background colour** takes lighter colours like #5B513F now, with cards and menus stepped to match and secondary text and links lifted so they stay easy to read. (#34)
 * **Facebook:** With `Material You theme` in dark mode, the page under your last post takes the palette too instead of staying Facebook's grey.
 * **Facebook:** `Block background-return feed refresh` now keeps your place when you switch back to Home too, so the feed doesn't re-rank or reload behind your back. The **Keep feed position on return** switch covers it, and pull to refresh still works.
+* **Facebook:** New `Turn off auto-translation` shows posts and reel captions in the language they were written in. Turn on **Turn off auto-translation** under News feed, and posts Facebook would translate by itself keep their own text with its See translation link under them, while reels stop asking for a caption translation. It's in the default selection with its switch off, and turning it off or pausing Hushfacebook brings Facebook's translations back.
+* **Facebook:** `Keep the reel speed` has a second switch, **Keep the video speed**, under Reels and Watch. Turn it on and a playback speed you pick in a feed or Watch video's gear menu carries to the next videos you play, until you pick another or Facebook restarts. Reels keep their own speed, and ads, live videos, stories and videos in chats start at Facebook's speed. It starts off.
 
 ### Fixed
 
