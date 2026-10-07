@@ -907,7 +907,8 @@ public class SettingsBackupTest {
         assertTrue("a file of " + size + " bytes", size <= SettingsBackup.MAX_BYTES);
         // Both word lists and every other value at their longest, the two file names among them, leave
         // the sources list the rest of MAX_BYTES.
-        assertTrue("without the sources list, 64 KB at most: " + size, size <= 64 * 1024);
+        assertTrue("without the sources list, MAX_BYTES less its room at most: " + size,
+                size <= SettingsBackup.MAX_BYTES - PostSources.MAX_LIST_BYTES);
 
         StringBuilder typed = new StringBuilder();
         for (int i = 0; i < PostSources.MAX_RULES; i++) {
