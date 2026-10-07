@@ -288,6 +288,17 @@ public final class PostWords {
         return Normalizer2.getNFKCCasefoldInstance().normalize(text);
     }
 
+    /** [text] with only the case a pattern ignores folded, so a fold that adds nothing more can be told. */
+    static String caseFolded(String text) {
+        StringBuilder out = new StringBuilder(text.length());
+        for (int at = 0; at < text.length(); ) {
+            int point = text.codePointAt(at);
+            out.appendCodePoint(PostPattern.fold(point));
+            at += Character.charCount(point);
+        }
+        return out.toString();
+    }
+
     /**
      * Both lists folded into one {@link Matcher}, and their patterns compiled, ready to judge
      * posts. Built again only when either list changes, never for a post.
@@ -350,7 +361,8 @@ public final class PostWords {
                 found |= matcher.find(folded);
                 if ((found & Matcher.KEEPS) != 0) return Verdict.KEEP;
                 patternTexts.add(text);
-                if (!folded.equals(text)) patternTexts.add(folded);
+                // Patterns already ignore case, so a copy that differs only by case is the same read twice.
+                if (!folded.equals(text) && !folded.equals(caseFolded(text))) patternTexts.add(folded);
             }
             PostPattern.Budget budget = new PostPattern.Budget(STEPS_PER_POST);
             Verdict hide = (found & Matcher.HIDES) != 0 ? Verdict.HIDE : null;
