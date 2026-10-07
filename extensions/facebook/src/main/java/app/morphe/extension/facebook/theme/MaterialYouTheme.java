@@ -494,7 +494,9 @@ public final class MaterialYouTheme {
 
     /**
      * Facebook's tab bar asks one method for the selected tab's colour, which tints the selected
-     * tab's icon and paints the line over it (#65). The patch hands each answer here. In Facebook's
+     * tab's icon and repaints the line over it when the theme is set (#65). The line's Paint first
+     * gets its colour from a colour token as the bar inflates, before that method runs, so the patch
+     * hands that colour here too. The patch hands each answer here. In Facebook's
      * dark mode a light answer becomes the palette's accent at {@link #SELECTED_TAB_TONE}, so the
      * selected tab stands out in the wallpaper's colour as HushMessenger's does, while the other tabs,
      * the bar and the badges keep the colours route one gives them. A selected tab Facebook already

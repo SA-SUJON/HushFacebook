@@ -107,4 +107,58 @@ class TabBarColoursFixtureTest {
         }
         assertEquals("a declared build has no fixture", declaredBundles().keys, checked)
     }
+
+    @Test
+    fun `each declared build fills the line's paint from a token as the bar inflates, and the hook reaches it`() {
+        val checked = mutableSetOf<String>()
+        for ((version, bundles) in declaredBundles()) {
+            for (bundle in bundles) {
+                val name = bundle.name
+                val layout = FixtureDex.classes(bundle, setOf(TAB_BAR_CONTAINER)).getValue(TAB_BAR_CONTAINER)
+                val paint = lineColourPaint(layout)
+                val inflaters = FixtureDex.methodsWhere(bundle, { dex -> dex.fieldSection.any { it.toString() == paint.toString() } }) {
+                    lineColourReads(it, paint).isNotEmpty()
+                }
+                // The provider's setter reads the Paint too, with the provider's own colour.
+                val setters = inflaters.filter { it.definingClass == TAB_BAR_CONTAINER }
+                val inflater = inflaters.filter { it.definingClass != TAB_BAR_CONTAINER }.single()
+                assertEquals("$name: the layout's own setter", 1, setters.size)
+                val sites = lineColourReads(inflater, paint)
+                assertEquals("$name: one colour goes on the line's Paint when it's made", 1, sites.size)
+                val original = inflater.code()
+                val at = sites.single() + 1
+                val register = (original[at - 1] as OneRegisterInstruction).registerA
+                val colourCall = original.take(at - 1).last { it.called() != null }.called()!!
+                assertEquals("$name: the colour comes from a token resolver", "Lcom/facebook/fds/core/theme/component/FDSColors;", colourCall.definingClass)
+                assertEquals("$name: the colour comes from a token resolver", "I", colourCall.returnType)
+
+                val colour = selectedTabColour(layout) { type ->
+                    FixtureDex.classes(bundle, setOf(type))[type]?.let { AccessFlags.ABSTRACT.isSet(it.accessFlags) && !AccessFlags.INTERFACE.isSet(it.accessFlags) } == true
+                }
+                val readers = FixtureDex.methodsWhere(bundle, { dex -> dex.methodSection.any { it.toString() == colour.toString() } }) {
+                    selectedTabColourReads(it, colour).isNotEmpty()
+                }
+                val owners = FixtureDex.classes(bundle, (readers + inflater).map { it.definingClass }.toSet() + colour.definingClass)
+                val context = PatchContexts.of((owners.values + layout).associateBy { it.type }.values)
+                with(context) { selectedTabColourHook()() }
+                val patched = context.mutableClassDefBy(inflater.definingClass).methods.single { it.sameAs(inflater) }.code()
+                val where = "$name: ${inflater.definingClass}->${inflater.name}"
+                assertEquals("$where gains two instructions", original.size + 2, patched.size)
+                assertEquals("$where: the extension is asked", Opcode.INVOKE_STATIC_RANGE, patched[at].opcode)
+                assertEquals("$where: the extension is asked", TAB_BAR_SELECTED, patched[at].called().toString())
+                assertEquals("$where: with the colour", register, (patched[at] as RegisterRangeInstruction).startRegister)
+                assertEquals("$where: with the colour", 1, (patched[at] as RegisterRangeInstruction).registerCount)
+                assertEquals("$where: its answer goes back in the same register", Opcode.MOVE_RESULT, patched[at + 1].opcode)
+                assertEquals("$where: its answer goes back in the same register", register, (patched[at + 1] as OneRegisterInstruction).registerA)
+                assertEquals("$where: the Paint is read next", paint.toString(), (patched[at + 2] as ReferenceInstruction).reference.toString())
+                assertEquals("$where: Facebook's code after the hook stays", original.drop(at).map { it.opcode }, patched.drop(at + 2).map { it.opcode })
+                // The setter's colour is handed over once, not twice.
+                val setter = setters.single()
+                val patchedSetter = context.mutableClassDefBy(TAB_BAR_CONTAINER).methods.single { it.sameAs(setter) }.code()
+                assertEquals("$name: the setter's Paint isn't hooked a second time", setter.code().size + 2, patchedSetter.size)
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", declaredBundles().keys, checked)
+    }
 }
