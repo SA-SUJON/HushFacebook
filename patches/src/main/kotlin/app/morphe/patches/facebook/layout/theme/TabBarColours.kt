@@ -100,9 +100,11 @@ internal fun selectedTabColourReads(method: Method, colour: MethodReference): Li
 /**
  * Every place that asks for the selected tab's colour hands the answer to the extension, which
  * gives back the palette's accent in the dark theme. Refuses unless the setter's own read and at
- * least one other, the tab icon's tint, are found.
+ * least one other, the tab icon's tint, are found. It only finds them: the step it returns makes
+ * the change, so the theme can find this before its other hooks go in and a build without it
+ * fails before anything is half done.
  */
-internal fun BytecodePatchContext.hookSelectedTabColour() {
+internal fun BytecodePatchContext.selectedTabColourHook(): () -> Unit {
     val layout = classDefByOrNull(TAB_BAR_CONTAINER)
         ?: throw PatchException("$PATCH: this Facebook build has no $TAB_BAR_CONTAINER")
     val colour = selectedTabColour(layout) { type ->
@@ -119,8 +121,10 @@ internal fun BytecodePatchContext.hookSelectedTabColour() {
             "$PATCH: expected $colour read by $TAB_BAR_CONTAINER and by the tab icons, found ${readers.map { it.first }}",
         )
     }
-    readers.forEach { (type, method) ->
-        mutableClassDefBy(type).findMutableMethodOf(method).recolourSelectedTab(colour)
+    return {
+        readers.forEach { (type, method) ->
+            mutableClassDefBy(type).findMutableMethodOf(method).recolourSelectedTab(colour)
+        }
     }
 }
 

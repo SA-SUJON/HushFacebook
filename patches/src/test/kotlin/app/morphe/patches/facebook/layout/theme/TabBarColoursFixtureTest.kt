@@ -83,7 +83,7 @@ class TabBarColoursFixtureTest {
                 val owners = FixtureDex.classes(bundle, readers.map { it.definingClass }.toSet())
                 val pool: Collection<ClassDef> = (owners.values + provider + layout).associateBy { it.type }.values
                 val context = PatchContexts.of(pool)
-                with(context) { hookSelectedTabColour() }
+                with(context) { selectedTabColourHook()() }
                 for (reader in readers) {
                     val where = "$name: ${reader.definingClass}->${reader.name}"
                     val original = reader.code()

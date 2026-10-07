@@ -319,6 +319,10 @@ val materialYouThemePatch = bytecodePatch(
     // there: each hook here goes after AMOLED's and gets AMOLED's colour, and AMOLED's black is no
     // dark-theme colour this recolours.
     finalize {
+        // The selected tab's reads are found first: a build without them fails before any hook
+        // below goes in.
+        val recolourSelectedTab = selectedTabColourHook()
+
         // Facebook's own answer for whether its dark mode is on, unless AMOLED has hooked it already.
         hookDarkModeAnswer()
 
@@ -333,7 +337,7 @@ val materialYouThemePatch = bytecodePatch(
 
         // The selected tab in Facebook's tab bar, its icon and the line over it, which Facebook's
         // dark theme draws near white: the palette's accent, as HushMessenger's selected tab (#65).
-        hookSelectedTabColour()
+        recolourSelectedTab()
 
         // Route four, and the reads of a colour resource, where Facebook's dark palette reaches the
         // Video tab's bottom bar. AMOLED, when it went first, has sent every call to its own
