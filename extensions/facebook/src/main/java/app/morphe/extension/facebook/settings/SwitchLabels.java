@@ -123,6 +123,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_MENU_ALSO_FROM_META) return L10n.t("Hide Also from Meta");
         if (setting == Settings.HIDE_EDITS_UPSELLS) return L10n.t("Hide Edits promotions");
         if (setting == Settings.HIDE_THREADS_CROSS_POSTING) return L10n.t("Hide Threads cross-posting prompts");
+        if (setting == Settings.HIDE_THREADS_SHARE_BUTTON) return L10n.t("Hide Threads in the share sheet");
         if (setting == Settings.HIDE_META_VERIFIED_UPSELLS) return L10n.t("Hide Meta Verified offers");
         if (setting == Settings.HIDE_AVATAR_UPSELLS) return L10n.t("Hide avatar sticker promotions");
         if (setting == Settings.HIDE_META_AI_IMAGINE) return L10n.t("Hide Meta AI's Imagine");

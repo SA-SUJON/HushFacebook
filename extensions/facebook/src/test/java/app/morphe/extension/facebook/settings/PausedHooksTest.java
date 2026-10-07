@@ -191,6 +191,9 @@ public class PausedHooksTest {
     /** Stands in for Facebook's enum of Create story tools: the hook goes by the constant's name. */
     private enum StoryTool { TEXT_BASE, IMAGINE }
 
+    /** Stands in for Facebook's enum of share sheet items, named the same way. */
+    private enum ShareItem { SHARE_NOW, SHARE_TO_THREADS }
+
     @After
     public void restore() {
         PauseForTests.resume();
@@ -540,13 +543,14 @@ public class PausedHooksTest {
                 MenuSectionsForTests::hidesServerUpgrades,
                 MenuSectionsForTests::hidesServerAlsoFromMeta));
         // Edits' header flag and both shapes of its pill request, the Threads cross-posting
-        // onboarding, the Meta Verified sheet and label, an avatar sticker upsell, and Imagine's
-        // post button, composer capability and Create story tile.
+        // onboarding and the share sheet's Threads item, the Meta Verified sheet and label, an avatar
+        // sticker upsell, and Imagine's post button, composer capability and Create story tile.
         probes.put(PatchFamily.META_UPSELLS, Arrays.asList(
                 () -> !MetaUpsells.editsHeader(true),
                 () -> !MetaUpsells.fetchEditsPill(true),
                 () -> Boolean.FALSE.equals(MetaUpsells.fetchEditsPill(Boolean.TRUE)),
                 () -> !MetaUpsells.threadsOnboarding(1),
+                () -> MetaUpsells.shareTargets(Arrays.asList(ShareItem.values())).size() == 1,
                 () -> Boolean.FALSE.equals(MetaUpsells.metaVerifiedSheet(Boolean.TRUE)),
                 () -> MetaUpsells.metaVerifiedLabel("Meta Verified") == null,
                 MetaUpsells::hidesAvatarUpsell,

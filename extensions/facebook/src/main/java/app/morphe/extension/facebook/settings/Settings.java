@@ -624,6 +624,10 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_THREADS_CROSS_POSTING =
             new BooleanSetting("hushfacebook_hide_threads_cross_posting", FALSE);
 
+    /** The share sheet's button for sharing to Threads. Off until it's turned on. */
+    public static final BooleanSetting HIDE_THREADS_SHARE_BUTTON =
+            new BooleanSetting("hushfacebook_hide_threads_share_button", FALSE);
+
     /**
      * The Meta Verified offer sheet after you post, and the Meta Verified label under some posts'
      * headers. Off until it's turned on.

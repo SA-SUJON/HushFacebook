@@ -31,8 +31,9 @@ import java.io.File
  * landing configuration's serializer writes and every read of them, the gates that set the Edits
  * pill's request parameter, the Threads cross-posting capability's one answer, the Meta Verified
  * sheet's eligibility check and the one place that asks for the label, the three avatar sticker
- * upsell components, and Imagine's three: the post call-to-action selector's check, every question
- * the composer asks about its Imagine capability and Create story's tile builder. Then the whole
+ * upsell components, Imagine's three (the post call-to-action selector's check, every question the
+ * composer asks about its Imagine capability and Create story's tile builder) and the method that
+ * picks the share sheet's items, with Guava's ImmutableList.copyOf beside it. Then the whole
  * patch on those classes: each hook where it belongs, on the anchor's own register, and nothing
  * else moved. Reads the fixture bundles from
  * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
@@ -160,11 +161,23 @@ class HideMetaUpsellsFixtureTest {
                 }
                 assertEquals("$name: Create story tile builders", 1, storyBuilders.size)
 
+                // Threads in the share sheet: the item enum, the one list of items, and Guava's copy.
+                val shareEnums = FixtureDex.classesHolding(bundle, SHARE_TO_THREADS).filter { isEnumNaming(it, SHARE_ITEM_TYPES) }
+                assertEquals("$name: share sheet item enums", 1, shareEnums.size)
+                val shareThreads = enumConstant(shareEnums.single(), SHARE_TO_THREADS)
+                val shareLists = FixtureDex.methodsWhere(bundle, { dex -> dex.fieldSection.any { it.toString() == shareThreads.toString() } }) {
+                    isShareItemList(it, shareThreads)
+                }
+                assertEquals("$name: share sheet item lists", 1, shareLists.size)
+                val immutableList = FixtureDex.classes(bundle, setOf(IMMUTABLE_LIST)).values.single()
+                assertTrue("$name: $IMMUTABLE_LIST has no copyOf(Collection)", definesImmutableCopy(immutableList))
+
                 val readerClasses = FixtureDex.classes(bundle,
-                    (flagReaders + labelAskers + imagineAskers + storyBuilders).map { it.definingClass }.toSet())
+                    (flagReaders + labelAskers + imagineAskers + storyBuilders + shareLists).map { it.definingClass }.toSet())
                 val pool = (kept.values + readerClasses.values + pillClasses + capabilities + components +
                     ctaTableHolders + ctaSocketHolders + listOfNotNull(calledClasses[ctaCheck.definingClass]) +
-                    composerEnums + storyEnums + ExtensionDex.classDef(SETTINGS_STATUS)).associateBy { it.type }.values
+                    composerEnums + storyEnums + shareEnums + immutableList +
+                    ExtensionDex.classDef(SETTINGS_STATUS)).associateBy { it.type }.values
                 val context = PatchContexts.of(pool)
                 hideMetaUpsellsPatch.execute(context)
                 fun patched(method: Method) = context.mutableClassDefBy(method.definingClass).method(method).code()
@@ -231,6 +244,29 @@ class HideMetaUpsellsFixtureTest {
                 }
                 assertEquals("$name: the rest of Create story's builder stays", builder.code().map { it.opcode },
                     built.take(list + 1).map { it.opcode } + built.drop(list + 5).map { it.opcode })
+
+                // The share sheet's items: in front of every return, the extension and the copy back.
+                val shareList = shareLists.single()
+                val picked = shareList.code()
+                val shared = patched(shareList)
+                val returns = picked.count { it.opcode == Opcode.RETURN_OBJECT }
+                assertEquals("$name: four instructions in front of each of the item list's returns", picked.size + 4 * returns, shared.size)
+                shared.withIndex().filter { it.value.opcode == Opcode.RETURN_OBJECT }.forEach { (at, ret) ->
+                    val answer = (ret as OneRegisterInstruction).registerA
+                    listOf(SHARE_TARGETS, IMMUTABLE_COPY).forEachIndexed { step, hook ->
+                        val call = shared[at - 4 + 2 * step]
+                        assertEquals("$name: $hook before return v$answer", listOf(Opcode.INVOKE_STATIC_RANGE, hook),
+                            listOf(call.opcode, call.called()))
+                        assertEquals("$name: $hook handed v$answer", listOf(answer, 1),
+                            listOf((call as RegisterRangeInstruction).startRegister, call.registerCount))
+                        val result = shared[at - 3 + 2 * step]
+                        assertEquals("$name: $hook's answer in v$answer", listOf(Opcode.MOVE_RESULT_OBJECT, answer),
+                            listOf(result.opcode, (result as OneRegisterInstruction).registerA))
+                    }
+                }
+                val inserted = shared.indices.filter { shared[it].opcode == Opcode.RETURN_OBJECT }.flatMap { (it - 4) until it }.toSet()
+                val untouched = shared.filterIndexed { at, _ -> at !in inserted }
+                assertEquals("$name: the rest of the item list stays", picked.map { it.opcode }, untouched.map { it.opcode })
 
                 val status = context.mutableClassDefBy(SETTINGS_STATUS).methods.single { it.name == "metaUpsells" }
                 assertEquals("$name: SettingsStatus.metaUpsells() isn't switched on", 1,

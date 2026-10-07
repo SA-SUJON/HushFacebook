@@ -296,6 +296,7 @@ public class ColdStartHooksTest {
         assertTrue("a composer opened before the context lost Imagine", MetaUpsells.imagineCapability(true));
         List<Thread.State> tools = Arrays.asList(Thread.State.values());
         assertSame("Create story's tools listed before the context changed", tools, MetaUpsells.storyTools(tools));
+        assertSame("a share sheet built before the context changed", tools, MetaUpsells.shareTargets(tools));
         assertFalse("a results page built before the context lost its Meta AI answer", MetaAiSearchForTests.hidesAnswer());
         assertFalse("a results page built before the context lost its Meta AI prompts", MetaAiSearchForTests.dropsPrompts());
         assertFalse("a suggestion parsed before the context lost its Meta AI route",

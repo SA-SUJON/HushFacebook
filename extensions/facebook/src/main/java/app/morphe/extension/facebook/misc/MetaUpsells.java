@@ -17,9 +17,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
 
 /**
  * What the Hide Meta upsells patch asks wherever Facebook pushes Meta's other products outside the
- * Menu. Five switches, all off by default: Edits (the Reels composer header's button and badge, and
+ * Menu. Six switches, all off by default: Edits (the Reels composer header's button and badge, and
  * the server's Edits pill under feed videos, which the feed's requests stop asking for), Threads
- * cross-posting (the composer's onboarding), Meta Verified (the offer sheet after you post and the
+ * cross-posting (the composer's onboarding), Threads in the share sheet, Meta Verified (the offer sheet after you post and the
  * label under some posts' headers), avatar stickers (the upsell components in comments and
  * Facebook's promotion slots) and Meta AI's Imagine (the Imagine me button under posts, the post
  * composer's Imagine and Create story's Imagine tile).
@@ -28,12 +28,13 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * Facebook's own.
  */
 public final class MetaUpsells {
-    /** Counted under the patch's name each time one of the five is answered away. */
+    /** Counted under the patch's name each time one of the six is answered away. */
     static final String EDITS_HIDDEN = "Edits promotion kept out";
     static final String THREADS_HIDDEN = "Threads cross-posting prompt kept out";
     static final String VERIFIED_HIDDEN = "Meta Verified offer kept out";
     static final String AVATAR_HIDDEN = "Avatar sticker promotion kept out";
     static final String IMAGINE_HIDDEN = "Imagine entry kept out";
+    static final String THREADS_SHARE_HIDDEN = "Threads share button kept out";
 
     /** The post call-to-action plugin for Imagine me, as the CTA selector's name table gives it. */
     public static final String IMAGINE_ME_PLUGIN =
@@ -41,6 +42,9 @@ public final class MetaUpsells {
 
     /** The name of Create story's Imagine tool, a constant of Facebook's enum of story tools. */
     static final String STORY_IMAGINE = "IMAGINE";
+
+    /** The share sheet's Threads item, a constant of Facebook's enum of share sheet items. */
+    static final String SHARE_TO_THREADS = "SHARE_TO_THREADS";
 
     private static final String FAMILY = FamilyNames.META_UPSELLS;
 
@@ -223,21 +227,47 @@ public final class MetaUpsells {
             HookStatus.invoked(FAMILY);
             if (tools == null || tools.isEmpty()) return tools;
             if (!Utils.settingsReady() || !Settings.HIDE_META_AI_IMAGINE.get()) return tools;
-            List<Object> kept = null;
-            for (int index = 0; index < tools.size(); index++) {
-                Object tool = tools.get(index);
-                if (tool instanceof Enum && STORY_IMAGINE.equals(((Enum<?>) tool).name())) {
-                    if (kept == null) kept = new ArrayList<>(tools.subList(0, index));
-                } else if (kept != null) {
-                    kept.add(tool);
-                }
-            }
-            if (kept == null) return tools;
-            hid("Create story Imagine tile", IMAGINE_HIDDEN);
+            List<?> kept = without(tools, STORY_IMAGINE);
+            if (kept != tools) hid("Create story Imagine tile", IMAGINE_HIDDEN);
             return kept;
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "Create story tools", failure);
             return tools;
         }
+    }
+
+    /**
+     * The hook in front of each return of the method that picks the share sheet's items, handed
+     * the list of item types, constants of Facebook's enum. Answers the same items in the same order
+     * without Threads while its switch is on, and the list it was handed otherwise. The patch copies
+     * the answer back into an ImmutableList.
+     */
+    @Nullable
+    public static List<?> shareTargets(@Nullable List<?> targets) {
+        try {
+            HookStatus.invoked(FAMILY);
+            if (targets == null || targets.isEmpty()) return targets;
+            if (!Utils.settingsReady() || !Settings.HIDE_THREADS_SHARE_BUTTON.get()) return targets;
+            List<?> kept = without(targets, SHARE_TO_THREADS);
+            if (kept != targets) hid("share sheet Threads button", THREADS_SHARE_HIDDEN);
+            return kept;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "share sheet items", failure);
+            return targets;
+        }
+    }
+
+    /** [list] without the enum constants named [name], in the same order, or [list] itself when it has none. */
+    private static List<?> without(List<?> list, String name) {
+        List<Object> kept = null;
+        for (int index = 0; index < list.size(); index++) {
+            Object item = list.get(index);
+            if (item instanceof Enum && name.equals(((Enum<?>) item).name())) {
+                if (kept == null) kept = new ArrayList<>(list.subList(0, index));
+            } else if (kept != null) {
+                kept.add(item);
+            }
+        }
+        return kept == null ? list : kept;
     }
 }

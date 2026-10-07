@@ -909,6 +909,8 @@ Meta's other products	Otros productos de Meta
 Hide Edits promotions	Ocultar promociones de Edits
 # context: switch title; Threads is Meta's app, keep its name; cross-posting means sharing a Facebook post to Threads as well
 Hide Threads cross-posting prompts	Ocultar avisos para publicar también en Threads
+# context: switch title under Meta's other products; Threads is Meta's app, keep its name; the share sheet is the panel that opens when you tap Share on a post, use Facebook's own word for it in this language
+Hide Threads in the share sheet	Ocultar Threads al compartir
 # context: switch title; Meta Verified is Meta's paid subscription, keep its name
 Hide Meta Verified offers	Ocultar ofertas de Meta Verified
 # context: switch title; avatar stickers are stickers made from your Facebook avatar
@@ -917,6 +919,8 @@ Hide avatar sticker promotions	Ocultar promociones de stickers de avatar
 The Edits button and its badge leave the Reels composer, and the feed stops asking for the Edits pill under videos. You can still make reels in Facebook.	El botón de Edits y su insignia desaparecen del editor de reels, y el feed deja de pedir la etiqueta de Edits debajo de los videos. Puedes seguir creando reels en Facebook.
 # context: summary of the Threads switch; the composer is where you write a new post
 The composer stops prompting you to share your posts to Threads too. Your posts go to Facebook as before.	El editor de publicaciones deja de pedirte que compartas tus publicaciones también en Threads. Tus publicaciones van a Facebook como siempre.
+# context: summary of the Threads share sheet switch; the share sheet is the panel that opens when you tap Share on a post
+The share sheet loses its Threads button. Every other way to share stays, in the same order.	El menú para compartir pierde su botón de Threads. Las demás formas de compartir se quedan, en el mismo orden.
 # context: summary of the Meta Verified switch; the label is a line Facebook adds under the poster's name on some posts
 No Meta Verified offer after you post, and no Meta Verified label under the names on posts. Posting works as usual.	Sin la oferta de Meta Verified después de publicar y sin la etiqueta de Meta Verified debajo de los nombres en las publicaciones. Publicar funciona como siempre.
 # context: summary of the avatar sticker switch; promotion slots are the cards Facebook uses to suggest its own features

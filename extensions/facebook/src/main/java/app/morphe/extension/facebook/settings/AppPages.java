@@ -90,6 +90,9 @@ final class AppPages {
             upsells.addPreference(toggle(context, Settings.HIDE_THREADS_CROSS_POSTING,
                     L10n.t("The composer stops prompting you to share your posts to Threads too. Your posts go to "
                             + "Facebook as before.")));
+            upsells.addPreference(toggle(context, Settings.HIDE_THREADS_SHARE_BUTTON,
+                    L10n.t("The share sheet loses its Threads button. Every other way to share stays, in the same "
+                            + "order.")));
             upsells.addPreference(toggle(context, Settings.HIDE_META_VERIFIED_UPSELLS,
                     L10n.t("No Meta Verified offer after you post, and no Meta Verified label under the names on "
                             + "posts. Posting works as usual.")));

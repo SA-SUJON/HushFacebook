@@ -909,6 +909,8 @@ Meta's other products	Meta'nın diğer ürünleri
 Hide Edits promotions	Edits tanıtımlarını gizle
 # context: switch title; Threads is Meta's app, keep its name; cross-posting means sharing a Facebook post to Threads as well
 Hide Threads cross-posting prompts	Threads'de paylaşma önerilerini gizle
+# context: switch title under Meta's other products; Threads is Meta's app, keep its name; the share sheet is the panel that opens when you tap Share on a post, use Facebook's own word for it in this language
+Hide Threads in the share sheet	Paylaşım menüsünde Threads'i gizle
 # context: switch title; Meta Verified is Meta's paid subscription, keep its name
 Hide Meta Verified offers	Meta Verified tekliflerini gizle
 # context: switch title; avatar stickers are stickers made from your Facebook avatar
@@ -917,6 +919,8 @@ Hide avatar sticker promotions	Avatar çıkartması tanıtımlarını gizle
 The Edits button and its badge leave the Reels composer, and the feed stops asking for the Edits pill under videos. You can still make reels in Facebook.	Edits düğmesi ve rozeti Reels oluşturucusundan kalkar, akış da videoların altındaki Edits etiketini istemeyi bırakır. Facebook'ta reels oluşturmaya devam edebilirsin.
 # context: summary of the Threads switch; the composer is where you write a new post
 The composer stops prompting you to share your posts to Threads too. Your posts go to Facebook as before.	Gönderi oluşturucu, gönderilerini Threads'de de paylaşman için seni yönlendirmeyi bırakır. Gönderilerin eskisi gibi Facebook'a gider.
+# context: summary of the Threads share sheet switch; the share sheet is the panel that opens when you tap Share on a post
+The share sheet loses its Threads button. Every other way to share stays, in the same order.	Paylaşım menüsünden Threads düğmesi kalkar. Diğer paylaşma yolları aynı sırada kalır.
 # context: summary of the Meta Verified switch; the label is a line Facebook adds under the poster's name on some posts
 No Meta Verified offer after you post, and no Meta Verified label under the names on posts. Posting works as usual.	Paylaşım yaptıktan sonra Meta Verified teklifi çıkmaz, gönderilerdeki isimlerin altında Meta Verified etiketi de görünmez. Paylaşım her zamanki gibi çalışır.
 # context: summary of the avatar sticker switch; promotion slots are the cards Facebook uses to suggest its own features

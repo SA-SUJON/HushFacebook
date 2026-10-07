@@ -32,9 +32,10 @@ import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
- * Hide Meta upsells: each of the five switches starts off, and on it answers away only its own
+ * Hide Meta upsells: each of the six switches starts off, and on it answers away only its own
  * promotions, counted. A no stays a no, Kotlin's suspend marker passes the Meta Verified hook
- * untouched, other post buttons and story tools stay, and off or paused every answer is Facebook's.
+ * untouched, other post buttons, story tools and share targets stay in order, and off or paused every
+ * answer is Facebook's.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -42,7 +43,7 @@ public class MetaUpsellsTest {
     @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
 
     /**
-     * The five switches, filled in once the rule has set the context: naming Settings in a static
+     * The six switches, filled in once the rule has set the context: naming Settings in a static
      * field loads it at class init, before any context, and leaves BaseSettings broken for every
      * test that runs after it in this sandbox.
      */
@@ -56,13 +57,18 @@ public class MetaUpsellsTest {
 
     private static final List<StoryTool> TOOLS = Arrays.asList(StoryTool.values());
 
+    /** Stands in for Facebook's enum of share sheet items, which names its constants the same way. */
+    private enum ShareItem { SHARE_NOW, SHARE_TO_THREADS, OFF_PLATFORM_WHATSAPP, COPY_LINK }
+
+    private static final List<ShareItem> SHARE_ITEMS = Arrays.asList(ShareItem.values());
+
     /** Another post button the call-to-action selector can show. */
     private static final String OTHER_CTA = "com.facebook.feed.plugins.calltoaction.impl.aistyles.AIStylesPlugin";
 
     @Before
     public void start() {
         switches = new BooleanSetting[] {Settings.HIDE_EDITS_UPSELLS, Settings.HIDE_THREADS_CROSS_POSTING,
-                Settings.HIDE_META_VERIFIED_UPSELLS, Settings.HIDE_AVATAR_UPSELLS, Settings.HIDE_META_AI_IMAGINE};
+                Settings.HIDE_THREADS_SHARE_BUTTON, Settings.HIDE_META_VERIFIED_UPSELLS, Settings.HIDE_AVATAR_UPSELLS, Settings.HIDE_META_AI_IMAGINE};
         HookStatus.clear();
     }
 
@@ -80,24 +86,29 @@ public class MetaUpsellsTest {
         return "";
     }
 
-    /** Whether each part hides, in the order Edits, Threads, Meta Verified, avatar stickers, Imagine. */
+    /**
+     * Whether each part hides, in the switches' order: Edits, Threads cross-posting, Threads in the
+     * share sheet, Meta Verified, avatar stickers, Imagine.
+     */
     private static boolean[] hiding() {
         boolean edits = !MetaUpsells.editsHeader(true) && !MetaUpsells.fetchEditsPill(true)
                 && Boolean.FALSE.equals(MetaUpsells.fetchEditsPill(Boolean.TRUE));
         boolean threads = !MetaUpsells.threadsOnboarding(1);
+        boolean threadsShare = !MetaUpsells.shareTargets(SHARE_ITEMS).contains(ShareItem.SHARE_TO_THREADS);
         boolean verified = Boolean.FALSE.equals(MetaUpsells.metaVerifiedSheet(Boolean.TRUE))
                 && MetaUpsells.metaVerifiedLabel("Meta Verified") == null;
         boolean avatar = MetaUpsells.hidesAvatarUpsell();
         boolean imagine = MetaUpsells.hidesImagineCta(MetaUpsells.IMAGINE_ME_PLUGIN) && !MetaUpsells.imagineCapability(true)
                 && !MetaUpsells.storyTools(TOOLS).contains(StoryTool.IMAGINE);
-        return new boolean[] {edits, threads, verified, avatar, imagine};
+        return new boolean[] {edits, threads, threadsShare, verified, avatar, imagine};
     }
 
     @Test
     public void everySwitchStartsOffAndFacebookDecides() {
         for (BooleanSetting setting : switches) assertFalse(setting.key + " starts on", setting.get());
-        assertTrue(Arrays.toString(hiding()), Arrays.equals(new boolean[5], hiding()));
+        assertTrue(Arrays.toString(hiding()), Arrays.equals(new boolean[6], hiding()));
         assertSame("Create story's tools were copied with the switch off", TOOLS, MetaUpsells.storyTools(TOOLS));
+        assertSame("the share sheet's items were copied with the switch off", SHARE_ITEMS, MetaUpsells.shareTargets(SHARE_ITEMS));
         assertEquals("Meta Verified", MetaUpsells.metaVerifiedLabel("Meta Verified"));
         assertEquals(Boolean.TRUE, MetaUpsells.fetchEditsPill(Boolean.TRUE));
     }
@@ -106,7 +117,7 @@ public class MetaUpsellsTest {
     public void eachSwitchHidesOnlyItsOwnAndIsCounted() {
         for (int on = 0; on < switches.length; on++) {
             for (BooleanSetting setting : switches) setting.save(setting == switches[on]);
-            boolean[] expected = new boolean[5];
+            boolean[] expected = new boolean[6];
             expected[on] = true;
             // Asked once per switch: each ask counts, so the counts below are one round of asks.
             boolean[] hid = hiding();
@@ -118,6 +129,20 @@ public class MetaUpsellsTest {
         assertTrue(line, line.contains(MetaUpsells.VERIFIED_HIDDEN + " 2"));
         assertTrue(line, line.contains(MetaUpsells.AVATAR_HIDDEN + " 1"));
         assertTrue(line, line.contains(MetaUpsells.IMAGINE_HIDDEN + " 3"));
+        assertTrue(line, line.contains(MetaUpsells.THREADS_SHARE_HIDDEN + " 1"));
+    }
+
+    @Test
+    public void theShareSheetKeepsItsOtherItemsInOrder() {
+        Settings.HIDE_THREADS_SHARE_BUTTON.save(true);
+        assertEquals("the share sheet's other items moved",
+                Arrays.asList(ShareItem.SHARE_NOW, ShareItem.OFF_PLATFORM_WHATSAPP, ShareItem.COPY_LINK),
+                MetaUpsells.shareTargets(SHARE_ITEMS));
+        List<ShareItem> without = Arrays.asList(ShareItem.SHARE_NOW, ShareItem.COPY_LINK);
+        assertSame("a sheet with no Threads item was copied", without, MetaUpsells.shareTargets(without));
+        assertSame(Collections.emptyList(), MetaUpsells.shareTargets(Collections.emptyList()));
+        assertNull(MetaUpsells.shareTargets(null));
+        assertFalse("a sheet with no Threads item was counted", statusLine().contains(MetaUpsells.THREADS_SHARE_HIDDEN + " 2"));
     }
 
     @Test
@@ -155,7 +180,7 @@ public class MetaUpsellsTest {
                 HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP}) {
             PauseForTests.pause(reason);
             assertTrue("a Hushfacebook paused by " + reason + " hid " + Arrays.toString(hiding()),
-                    Arrays.equals(new boolean[5], hiding()));
+                    Arrays.equals(new boolean[6], hiding()));
             PauseForTests.resume();
         }
     }
