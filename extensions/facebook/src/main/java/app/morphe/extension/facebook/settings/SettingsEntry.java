@@ -44,6 +44,7 @@ import app.morphe.extension.facebook.download.SaveLeftovers;
 import app.morphe.extension.facebook.download.SavedFileActions;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.media.ResumePlayback;
+import app.morphe.extension.facebook.menu.MenuLayoutDump;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.ScreenTransitions;
@@ -318,6 +319,7 @@ public final class SettingsEntry {
         try {
             SavedFileActions.receive(activity.getIntent());
             noteIntent(activity.getIntent());
+            MenuLayoutDump.screenCreated(activity);
         } catch (Exception ex) {
             Logger.printException(() -> "Settings entry: onActivityCreate failure", ex);
         }
