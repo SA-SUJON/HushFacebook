@@ -400,7 +400,7 @@ public class OriginalChatMediaTest {
         movies.put("media with no handler", movie(box("trak", header, box("mdia", box("mdhd", new byte[24]),
                 box("minf", box("vmhd", new byte[12]))))));
         movies.put("a track with two media", movie(box("trak", header, box("mdia", box("mdhd", new byte[24]), handler("vide")),
-                box("mdia", box("mdhd", new byte[24]), handler("meta")))));
+                box("mdia", box("mdhd", new byte[24]), handler("vide")))));
         movies.put("GoPro's gpmd metadata track", movie(track("vide"), track("soun"), track("meta")));
         movies.put("Google's camm motion track", movie(track("vide"), track("camm")));
         movies.put("a text track", movie(track("vide"), track("text")));

@@ -13,6 +13,7 @@ import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.builder.BuilderOffsetInstruction
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
@@ -72,6 +73,16 @@ class CleanUpChatListFixtureTest {
                 assertTrue("$name: the builder is the constructor's parameter",
                     store.method.parameterTypes.single().toString() == builder.type)
 
+                // The hook hands the list back through ImmutableList.copyOf(Collection), so every build has to carry it.
+                val guava = FixtureDex.classes(bundle, setOf(IMMUTABLE_LIST_TYPE))[IMMUTABLE_LIST_TYPE]
+                assertTrue("$name: Guava's ImmutableList is in the dex", guava != null)
+                assertTrue("$name: ImmutableList.copyOf(Collection) is public static and returns an ImmutableList",
+                    guava!!.methods.any {
+                        it.name == "copyOf" && it.returnType == IMMUTABLE_LIST_TYPE &&
+                            AccessFlags.STATIC.isSet(it.accessFlags) &&
+                            it.parameterTypes.map(CharSequence::toString) == listOf("Ljava/util/Collection;")
+                    })
+
                 // The promotions: one plugin per tag, distinct, each with one show question.
                 val plugins = mutableListOf<ClassDef>()
                 val questions = PROMOTION_TAGS.map { tag ->
@@ -128,6 +139,10 @@ class CleanUpChatListFixtureTest {
                     assertEquals("$here: the answer", Opcode.MOVE_RESULT, hooked[1].opcode)
                     assertEquals("$here: lands in v0", 0, (hooked[1] as OneRegisterInstruction).registerA)
                     assertEquals("$here: tested", Opcode.IF_EQZ, hooked[2].opcode)
+                    // A "no" returns; a "yes" must land on the first of the stock code, which is the first
+                    // preserved parameter move on a cloned method, never past it or back into the hook.
+                    assertEquals("$here: a yes continues at the first stock instruction", 5,
+                        (hooked[2] as BuilderOffsetInstruction).target.location.index)
                     assertEquals("$here: answers no", Opcode.CONST_4, hooked[3].opcode)
                     assertEquals("$here: returns it", Opcode.RETURN, hooked[4].opcode)
                     assertEquals("$here: stock code follows the moves", stock[0].opcode, hooked[5 + moves].opcode)
