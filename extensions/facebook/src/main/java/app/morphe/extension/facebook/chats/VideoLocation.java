@@ -69,6 +69,31 @@ final class VideoLocation {
      */
     private static final Map<String, Set<String>> CHILDREN = new HashMap<>();
 
+    /**
+     * Text atoms editors and phones write, in a udta or a meta's item list, that carry no place:
+     * make, model, software, date, tool (ffmpeg's and Lavf's), encoder, title, comment,
+     * description, artist, album, genre, writer, grouping, lyrics and copyright. The place's
+     * \u00A9xyz is not here.
+     */
+    private static final Set<String> TEXT_ATOMS = set("\u00A9mak", "\u00A9mod", "\u00A9swr", "\u00A9day",
+            "\u00A9too", "\u00A9enc", "\u00A9nam", "\u00A9cmt", "\u00A9des", "\u00A9ART", "\u00A9alb",
+            "\u00A9gen", "\u00A9wrt", "\u00A9grp", "\u00A9lyr", "\u00A9cpy");
+
+    /**
+     * The iTunes-style items of an {@code ilst} that carry no place: the text atoms above and the
+     * plain tags an editor or a tagger writes. Cover art ({@code covr}) can hold an Exif block and a
+     * freeform {@code ----} item can hold anything, so both are off.
+     */
+    private static final Set<String> ILST_ITEMS = ilstItems();
+
+    private static Set<String> ilstItems() {
+        Set<String> items = new HashSet<>(TEXT_ATOMS);
+        items.addAll(Arrays.asList("aART", "desc", "ldes", "cprt", "tvsh", "tven", "tvnn", "tves", "tvsn",
+                "keyw", "catg", "purl", "egid", "purd", "trkn", "disk", "cpil", "pgap", "tmpo", "sonm", "soal",
+                "soar", "soaa", "soco", "sosn", "stik", "rtng", "gnre", "hdvd"));
+        return Collections.unmodifiableSet(items);
+    }
+
     static {
         // The movie's header, tracks, tags, MPEG-4's object descriptor and padding. No mvex: a
         // fragmented movie keeps its samples, and so any timed metadata, in fragments not read here.
@@ -78,12 +103,21 @@ final class VideoLocation {
         CHILDREN.put("mdia", set("mdhd", "hdlr", "minf", "elng", "udta", "meta", "free", "skip", "wide"));
         // A video or a sound header, QuickTime's data handler, data references and sample tables.
         CHILDREN.put("minf", set("vmhd", "smhd", "hdlr", "dinf", "stbl", "udta", "meta", "free", "skip", "wide"));
-        // Text atoms a phone writes that name no place (make, model, software, date, tool, encoder),
-        // a meta, Samsung's smta and SDLN, 3GPP's author string and padding. A place's box (the
-        // \u00A9xyz atom, loci) and every maker's binary Exif box (Nikon NCDT, Pentax PENT, Panasonic
-        // PANA, Canon CNTH) are off the list.
-        CHILDREN.put("udta", set("\u00A9mak", "\u00A9mod", "\u00A9swr", "\u00A9day", "\u00A9too", "\u00A9enc",
-                "meta", "smta", "SDLN", "auth", "free", "skip", "wide"));
+        // Text atoms a phone or an editor writes that name no place (make, model, software, date,
+        // tool, encoder, title, comment, artist), a meta, Samsung's boxes, 3GPP's asset strings,
+        // QuickTime's name and hint info, and padding. A place's box (the \u00A9xyz atom, loci) and
+        // every maker's binary Exif box (Nikon NCDT, Pentax PENT, Panasonic PANA, Canon CNTH) are
+        // off the list.
+        Set<String> udta = new HashSet<>(Arrays.asList("meta", "free", "skip", "wide",
+                // Samsung: the smta block, a play mode, and the strings a Galaxy may write straight
+                // under udta. From memory of ExifTool's Samsung QuickTime tables, so a best guess.
+                "smta", "SDLN", "smrd", "cver", "cmnm",
+                // 3GPP asset boxes (TS 26.244) except loci, which is a place.
+                "titl", "dscp", "cprt", "perf", "auth", "albm", "yrrc", "kywd", "gnre", "rtng", "clsf",
+                // QuickTime's name and hint info.
+                "name", "hnti", "hinf"));
+        udta.addAll(TEXT_ATOMS);
+        CHILDREN.put("udta", Collections.unmodifiableSet(udta));
         // A handler, the keys and their values, and padding. An ISO meta's iinf, iloc and idat can
         // hold an Exif item, so they're off the list.
         CHILDREN.put("meta", set("hdlr", "keys", "ilst", "free", "skip", "wide"));
@@ -178,6 +212,8 @@ final class VideoLocation {
         File file = localFile(source);
         if (file == null) return false;
         try (RandomAccessFile in = new RandomAccessFile(file, "r")) {
+            // Facebook's reported size is what the cap was checked on; the file's own length is the truth.
+            if (in.length() > OriginalChatMedia.VIDEO_MAX_BYTES) return false;
             byte[] movie = movieBox(in);
             return movie != null && clearBoxes(movie, 0, movie.length, "moov", 0);
         } catch (IOException | RuntimeException unreadable) {
@@ -340,7 +376,8 @@ final class VideoLocation {
 
     /**
      * Whether every item of an {@code ilst} has a number for its type, as the items of a QuickTime
-     * key list do. An iTunes-style item (a {@code ©xyz}, a freeform {@code ----}) isn't one a phone writes.
+     * key list do, or is an iTunes-style text or tag atom that names no place (ffmpeg writes a
+     * {@code \u00A9too} this way). A {@code \u00A9xyz}, a freeform {@code ----} item and cover art aren't.
      */
     private static boolean numberedItems(byte[] data, int from, int to) {
         int at = from;
@@ -348,7 +385,8 @@ final class VideoLocation {
             if (to - at < 8) return false;
             long size = u32(data, at);
             if (size < 8 || size > to - at) return false;
-            if (data[at + 4] != 0 || data[at + 5] != 0 || data[at + 6] != 0) return false;
+            boolean numbered = data[at + 4] == 0 && data[at + 5] == 0 && data[at + 6] == 0;
+            if (!numbered && !ILST_ITEMS.contains(type(data, at + 4))) return false;
             at += (int) size;
         }
         return true;

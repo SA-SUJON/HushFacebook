@@ -305,6 +305,93 @@ public class OriginalChatMediaTest {
     }
 
     /**
+     * What editors and Galaxy phones write that names no place: ffmpeg's and Lavf's
+     * udta/meta(hdlr mdir)/ilst/©too (CapCut, InShot and most editors), other iTunes-style text
+     * items, 3GPP asset boxes, QuickTime's name, and Samsung's boxes straight under udta. All go out as
+     * they are, and a place's box in the same shapes (loci, ©xyz) still keeps the re-encode.
+     */
+    @Test
+    public void editedAndGalaxyVideosGoOutAsTheyAreWhileAPlaceStillDoesNot() throws IOException {
+        Settings.ORIGINAL_CHAT_MEDIA.save(true);
+        byte[] mdir = box("hdlr", new byte[8], bytes("mdir"), bytes("appl"), new byte[9]);
+        byte[] place = bytes("+37.4220-122.0841/");
+        Map<String, byte[]> ordinary = new LinkedHashMap<>();
+        ordinary.put("an ffmpeg file's udta meta ilst tool", movie(track("vide"), track("soun"),
+                box("udta", box("meta", new byte[4], mdir,
+                        box("ilst", box("©too", box("data", new byte[8], bytes("Lavf58.76.100"))))))));
+        ordinary.put("an editor's title, comment, artist and description items", movie(track("vide"),
+                box("udta", box("meta", new byte[4], mdir, box("ilst",
+                        box("©nam", box("data", new byte[8], bytes("Holiday"))),
+                        box("©cmt", box("data", new byte[8], bytes("clip"))),
+                        box("©des", box("data", new byte[8], bytes("a day out"))),
+                        box("©day", box("data", new byte[8], bytes("2026"))),
+                        box("©ART", box("data", new byte[8], bytes("me"))),
+                        box("©alb", box("data", new byte[8], bytes("trip"))),
+                        box("©gen", box("data", new byte[8], bytes("vlog"))),
+                        box("desc", box("data", new byte[8], bytes("short"))),
+                        box("ldes", box("data", new byte[8], bytes("long"))))))));
+        ordinary.put("3GPP asset boxes", movie(track("vide"), box("udta",
+                box("titl", new byte[6], bytes("title")), box("dscp", new byte[6], bytes("about")),
+                box("cprt", new byte[6], bytes("mine")), box("perf", new byte[6], bytes("me")),
+                box("auth", new byte[6], bytes("me")), box("albm", new byte[6], bytes("trip")),
+                box("yrrc", new byte[6], bytes("20")), box("kywd", new byte[6], bytes("k")),
+                box("gnre", new byte[6], bytes("g")), box("rtng", new byte[6], bytes("r")),
+                box("clsf", new byte[6], bytes("c")))));
+        ordinary.put("QuickTime's name and hint info", movie(track("vide"), box("udta",
+                box("name", bytes("clip")), box("hnti", new byte[8]), box("hinf", new byte[8]))));
+        ordinary.put("a Galaxy's smrd and friends straight under udta", movie(track("vide"), track("soun"),
+                box("udta", box("smrd", new byte[24]), box("SDLN", new byte[8]), box("cver", new byte[8]),
+                        box("cmnm", bytes("SM-S901U")), box("©mak", new byte[4], bytes("samsung")))));
+        for (Map.Entry<String, byte[]> file : ordinary.entrySet()) {
+            assertEquals(file.getKey(), -1, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                    video(join(fileType(), file.getValue(), media()))));
+        }
+
+        Map<String, byte[]> placed = new LinkedHashMap<>();
+        placed.put("loci beside an editor's tags", movie(track("vide"), box("udta", box("titl", new byte[6], bytes("a")),
+                box("loci", new byte[24]))));
+        placed.put("a ©xyz item beside ffmpeg's tool", movie(track("vide"), box("udta", box("meta", new byte[4], mdir,
+                box("ilst", box("©too", box("data", new byte[8], bytes("Lavf58"))),
+                        box("©xyz", box("data", new byte[8], place)))))));
+        placed.put("a ©xyz directly under a Galaxy's udta", movie(track("vide"),
+                box("udta", box("smrd", new byte[24]), box("©xyz", new byte[4], place))));
+        placed.put("cover art in the item list", movie(track("vide"), box("udta", box("meta", new byte[4], mdir,
+                box("ilst", box("covr", box("data", new byte[8], new byte[12])))))));
+        for (Map.Entry<String, byte[]> file : placed.entrySet()) {
+            assertEquals(file.getKey(), 9, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                    video(join(fileType(), file.getValue(), media()))));
+        }
+    }
+
+    /**
+     * The 25 MB cap was checked on the size Facebook reported. A file whose own length is over it
+     * keeps the re-encode whatever size was reported, and one at the ceiling still goes out.
+     */
+    @Test
+    public void theFilesOwnLengthIsHeldToTheCapToo() throws IOException {
+        Settings.ORIGINAL_CHAT_MEDIA.save(true);
+        for (long extra : new long[] {0, 1}) {
+            long total = OriginalChatMedia.VIDEO_MAX_BYTES + extra;
+            byte[] front = join(fileType(), movie(track("vide"), track("soun")));
+            long mdatSize = total - front.length;
+            byte[] header = new byte[8];
+            header[0] = (byte) (mdatSize >>> 24);
+            header[1] = (byte) (mdatSize >>> 16);
+            header[2] = (byte) (mdatSize >>> 8);
+            header[3] = (byte) mdatSize;
+            System.arraycopy(bytes("mdat"), 0, header, 4, 4);
+            String address = video(join(front, header));
+            try (java.io.RandomAccessFile file = new java.io.RandomAccessFile(
+                    android.net.Uri.parse(address).getPath(), "rw")) {
+                file.setLength(total);
+            }
+            // Facebook says it is small; the file itself says otherwise by one byte.
+            assertEquals("a file of " + total + " bytes", extra == 0 ? -1 : 9,
+                    OriginalChatMedia.videoPassthrough(9, 4_000_000L, address));
+        }
+    }
+
+    /**
      * Binary Exif that carries a place and none of the words the scan looks for: Nikon's NCDT with
      * its NCTG, Pentax, Panasonic and Canon maker boxes, an ISO meta whose iloc points at an Exif
      * item, a UTF-16 XMP packet and an iTunes-style item. Each is a box the udta or meta isn't on the
