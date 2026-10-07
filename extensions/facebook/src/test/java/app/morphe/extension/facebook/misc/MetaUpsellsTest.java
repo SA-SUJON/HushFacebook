@@ -103,6 +103,7 @@ public class MetaUpsellsTest {
                 && !MetaUpsells.storyTools(TOOLS).contains(StoryTool.IMAGINE);
         boolean metaAiButtons = true;
         for (String plugin : MetaUpsells.META_AI_POST_PLUGINS) metaAiButtons &= MetaUpsells.hidesImagineCta(plugin);
+        metaAiButtons &= MetaUpsells.hidesDeepDiveBelowCaption();
         return new boolean[] {edits, threads, threadsShare, verified, avatar, imagine, metaAiButtons};
     }
 
@@ -133,7 +134,8 @@ public class MetaUpsellsTest {
         assertTrue(line, line.contains(MetaUpsells.AVATAR_HIDDEN + " 1"));
         assertTrue(line, line.contains(MetaUpsells.IMAGINE_HIDDEN + " 3"));
         assertTrue(line, line.contains(MetaUpsells.THREADS_SHARE_HIDDEN + " 1"));
-        assertTrue(line, line.contains(MetaUpsells.META_AI_BUTTON_HIDDEN + " 3"));
+        assertTrue(line, line.contains(MetaUpsells.META_AI_BUTTON_HIDDEN + " 5"));
+        assertTrue(line, line.contains(MetaUpsells.CAPTION_DEEP_DIVE_HIDDEN + " 1"));
     }
 
     @Test
@@ -167,13 +169,17 @@ public class MetaUpsellsTest {
         Settings.HIDE_META_AI_POST_BUTTONS.save(true);
         for (String plugin : MetaUpsells.META_AI_POST_PLUGINS) assertTrue(plugin + " kept its yes", MetaUpsells.hidesImagineCta(plugin));
         assertFalse("Imagine me got a no from the other switch", MetaUpsells.hidesImagineCta(MetaUpsells.IMAGINE_ME_PLUGIN));
-        assertFalse("a business's AI button got a no",
+        assertTrue("a business's AI agent button kept its yes",
                 MetaUpsells.hidesImagineCta("com.facebook.feed.plugins.calltoaction.impl.bizaiagent.BizAiAgentCtaPlugin"));
+        assertTrue("Meta AI's deep dive under a caption kept its model", MetaUpsells.hidesDeepDiveBelowCaption());
+        assertFalse("a group invite button got a no",
+                MetaUpsells.hidesImagineCta("com.facebook.feed.rows.sections.calltoaction.GroupsInviteFeedStoryCtaPlugin"));
         assertFalse("another post button got a no",
                 MetaUpsells.hidesImagineCta("com.facebook.feed.plugins.calltoaction.impl.telluswhy.FeedTellUsWhyCtaPlugin"));
         assertFalse("a missing plugin name got a no", MetaUpsells.hidesImagineCta(null));
         String line = statusLine();
-        assertTrue(line, line.contains(MetaUpsells.META_AI_BUTTON_HIDDEN + " 3"));
+        assertTrue(line, line.contains(MetaUpsells.META_AI_BUTTON_HIDDEN + " 6"));
+        assertTrue(line, line.contains(MetaUpsells.CAPTION_DEEP_DIVE_HIDDEN + " 1"));
         assertFalse(line, line.contains(MetaUpsells.IMAGINE_HIDDEN));
     }
 

@@ -5,14 +5,17 @@
 package app.morphe.patches.facebook.misc.upsells
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
+import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.comments.summaries.descriptor
 import app.morphe.patches.facebook.comments.summaries.isNameTable
 import app.morphe.patches.facebook.comments.summaries.switchKeys
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.feed.methodsHolding
+import app.morphe.patches.facebook.misc.extension.requireLocals
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -40,11 +43,19 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
  * plugin gets a no, so the socket goes on to the next button.
  *
  * The other Meta AI buttons under posts come from the same socket and the same check: the name
- * table also names AIStylesPlugin, GenAiDeepDiveCtaPlugin and GenAiDeepDiveUgcChatIcebreakerCtaPlugin
- * on all three builds (581 LX/2du;->A0K, 580 LX/2Yo;->A04, 577 LX/2Wo;->A04). The hook
- * already hands the extension every plugin's name, so those get a no under their own switch with
- * nothing more to find. The patch doesn't require them: a build that drops one just has nothing to
- * hide there.
+ * table also names AIStylesPlugin, GenAiDeepDiveCtaPlugin, GenAiDeepDiveUgcChatIcebreakerCtaPlugin,
+ * BizAiAgentCtaPlugin and FindsVisualSearchCtaPlugin on all three builds (581 LX/2du;->A0K, 580
+ * LX/2Yo;->A04, 577 LX/2Wo;->A04). The hook already hands the extension every plugin's name, so
+ * those get a no under their own switch with nothing more to find. The patch doesn't require them:
+ * a build that drops one just has nothing to hide there.
+ *
+ * Meta AI's deep dive under a post's caption comes from another socket, the one that names itself
+ * FeedStoryContentCollectorSocket, whose name table (581 LX/2kX;->A0K, 580 LX/2dL;->A07, 577
+ * LX/2lC;->A07) names GenAiDeepDiveBelowCaptionPlugin. Only 581 gives that socket a check method
+ * of its own (LX/2kX;->A0M); 577 and 580 inline the check into the collector (LX/2lC;->A1N, LX/2dL;->A1F).
+ * Every build's check, and the plugin's own row builder on 581, read the deep dive through the
+ * plugin's one static (GraphQLStory) getter, a kept class, and treat a null as nothing to show.
+ * So the extension goes first in that getter and answers null while the switch is on.
  *
  * The post composer's Imagine. The composer asks its capabilities, an enum whose constants include
  * AI_GEN_IMAGINE, CHECKIN and FEED_COMPOSER_REDESIGN (581 LX/Byc, 580 LX/Bye, 577 LX/C1o), whether
@@ -68,7 +79,14 @@ internal val META_AI_POST_PLUGINS = listOf(
     "com.facebook.feed.plugins.calltoaction.impl.aistyles.AIStylesPlugin",
     "com.facebook.feed.plugins.calltoaction.impl.genaideepdive.GenAiDeepDiveCtaPlugin",
     "com.facebook.feed.plugins.calltoaction.impl.genaideedpdiveugcchaticebreakercta.GenAiDeepDiveUgcChatIcebreakerCtaPlugin",
+    "com.facebook.feed.plugins.calltoaction.impl.bizaiagent.BizAiAgentCtaPlugin",
+    "com.facebook.feed.plugins.calltoaction.impl.findsvisualsearch.FindsVisualSearchCtaPlugin",
 )
+
+/** The plugin for Meta AI's deep dive under a post's caption, a kept class. */
+internal const val CAPTION_DEEP_DIVE_PLUGIN =
+    "Lcom/facebook/feed/plugins/calltoaction/impl/genaideepdivebelowcaption/GenAiDeepDiveBelowCaptionPlugin;"
+internal const val GRAPHQL_STORY = "Lcom/facebook/graphql/model/GraphQLStory;"
 
 internal const val COMPOSER_IMAGINE = "AI_GEN_IMAGINE"
 internal val COMPOSER_CAPABILITIES = listOf(COMPOSER_IMAGINE, "CHECKIN", "FEED_COMPOSER_REDESIGN")
@@ -80,6 +98,7 @@ internal const val IMMUTABLE_LIST = "Lcom/google/common/collect/ImmutableList;"
 internal const val IMMUTABLE_COPY = "$IMMUTABLE_LIST->copyOf(Ljava/util/Collection;)$IMMUTABLE_LIST"
 
 internal const val HIDES_IMAGINE_CTA = "$META_UPSELLS->hidesImagineCta(Ljava/lang/String;)Z"
+internal const val HIDES_CAPTION_DEEP_DIVE = "$META_UPSELLS->hidesDeepDiveBelowCaption()Z"
 internal const val IMAGINE_CAPABILITY = "$META_UPSELLS->imagineCapability(Z)Z"
 internal const val STORY_TOOLS = "$META_UPSELLS->storyTools(Ljava/util/List;)Ljava/util/List;"
 
@@ -124,6 +143,34 @@ internal fun ctaCheck(table: Method, sockets: List<Method>, classDefOf: (String)
     }.filter { AccessFlags.STATIC.isSet(it.accessFlags) && numbers in switchKeys(it) }
     return checks.singleOrNull() ?: refuse(
         "expected one check of $tableCall's plugins, found ${checks.size}: ${checks.joinToString { it.descriptor() }}",
+    )
+}
+
+/**
+ * The getter the caption deep dive's check and row read the deep dive through: [plugin]'s one
+ * static method taking a GraphQLStory and answering an object. Refuses unless there's exactly one.
+ */
+internal fun captionDeepDiveGetter(plugin: ClassDef): Method {
+    val getters = plugin.methods.filter {
+        AccessFlags.STATIC.isSet(it.accessFlags) && it.implementation != null && it.returnType.startsWith("L") &&
+            it.parameterTypes.map(CharSequence::toString) == listOf(GRAPHQL_STORY)
+    }
+    return getters.singleOrNull() ?: refuse("expected one static (GraphQLStory) getter in ${plugin.type}, found ${getters.size}")
+}
+
+/** First thing in the getter: ask the extension, and answer null on a yes. Otherwise the getter runs as before. */
+internal fun MutableMethod.dropCaptionDeepDive() {
+    requireLocals(PATCH, 1)
+    addInstructionsWithLabels(
+        0,
+        """
+            invoke-static { }, $HIDES_CAPTION_DEEP_DIVE
+            move-result v0
+            if-eqz v0, :read
+            const/4 v0, 0x0
+            return-object v0
+        """,
+        ExternalLabel("read", getInstruction(0)),
     )
 }
 

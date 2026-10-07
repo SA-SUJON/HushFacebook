@@ -283,6 +283,8 @@ internal fun BytecodePatchContext.hideMetaUpsells() {
     val ctaTable = ctaTable(holders(IMAGINE_ME_PLUGIN))
     val ctaSockets = holders(IMAGINE_CTA_SOCKET).flatMap { methodsHolding(it, IMAGINE_CTA_SOCKET) }
     val ctaCheck = ctaCheck(ctaTable, ctaSockets) { classDefByOrNull(it) }
+    val captionPlugin = classDefByOrNull(CAPTION_DEEP_DIVE_PLUGIN) ?: refuse("this Facebook build has no $CAPTION_DEEP_DIVE_PLUGIN")
+    val captionGetter = captionDeepDiveGetter(captionPlugin)
     val composerImagine = enumConstant(enumNaming(COMPOSER_CAPABILITIES), COMPOSER_IMAGINE)
     val storyImagine = enumConstant(enumNaming(STORY_TOOLS_NAMES), STORY_IMAGINE)
 
@@ -360,6 +362,7 @@ internal fun BytecodePatchContext.hideMetaUpsells() {
     // Imagine: the Imagine me button's check, every capability question, and Create story's tools.
     mutableClassDefBy(ctaCheck.definingClass).methods.single { it.descriptor() == ctaCheck.descriptor() }
         .holdSummaries(ctaTable, HIDES_IMAGINE_CTA, PATCH)
+    mutableClassDefBy(captionPlugin.type).methods.single { it.descriptor() == captionGetter.descriptor() }.dropCaptionDeepDive()
     imagineAskers.forEach { (type, method) ->
         val mutable = mutableClassDefBy(type).findMutableMethodOf(method)
         capabilityAsks(mutable, composerImagine).asReversed().forEach { mutable.answerAfter(it, IMAGINE_CAPABILITY) }

@@ -25,8 +25,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * label under some posts' headers), avatar stickers (the upsell components in comments and
  * Facebook's promotion slots) and Meta AI's Imagine (the Imagine me button under posts, the post
  * composer's Imagine and Create story's Imagine tile), and the other Meta AI buttons under posts
- * (AI styles and Meta AI's deep dive and chat starter, from the same post button selector as
- * Imagine me).
+ * (AI styles, Meta AI's deep dive and chat starter, a business's AI agent and visual search, from
+ * the same post button selector as Imagine me, plus the deep dive Facebook puts under a caption).
  *
  * <p>Off, paused, before the settings are ready, or when anything here fails, every answer is
  * Facebook's own.
@@ -40,6 +40,7 @@ public final class MetaUpsells {
     static final String IMAGINE_HIDDEN = "Imagine entry kept out";
     static final String THREADS_SHARE_HIDDEN = "Threads share button kept out";
     static final String META_AI_BUTTON_HIDDEN = "Meta AI post button kept out";
+    static final String CAPTION_DEEP_DIVE_HIDDEN = "Meta AI deep dive under a caption kept out";
 
     /** The post call-to-action plugin for Imagine me, as the CTA selector's name table gives it. */
     public static final String IMAGINE_ME_PLUGIN =
@@ -47,13 +48,16 @@ public final class MetaUpsells {
 
     /**
      * The other Meta AI post buttons, as the same name table gives them: AI styles, Meta AI's deep
-     * dive and its chat starter. All three are in the table on 577, 580 and 581.
+     * dive and its chat starter, a business's AI agent and visual search. All five are in the table
+     * on 577, 580 and 581.
      */
     public static final List<String> META_AI_POST_PLUGINS = Collections.unmodifiableList(Arrays.asList(
             "com.facebook.feed.plugins.calltoaction.impl.aistyles.AIStylesPlugin",
             "com.facebook.feed.plugins.calltoaction.impl.genaideepdive.GenAiDeepDiveCtaPlugin",
             "com.facebook.feed.plugins.calltoaction.impl.genaideedpdiveugcchaticebreakercta."
-                    + "GenAiDeepDiveUgcChatIcebreakerCtaPlugin"));
+                    + "GenAiDeepDiveUgcChatIcebreakerCtaPlugin",
+            "com.facebook.feed.plugins.calltoaction.impl.bizaiagent.BizAiAgentCtaPlugin",
+            "com.facebook.feed.plugins.calltoaction.impl.findsvisualsearch.FindsVisualSearchCtaPlugin"));
 
     /** The name of Create story's Imagine tool, a constant of Facebook's enum of story tools. */
     static final String STORY_IMAGINE = "IMAGINE";
@@ -217,6 +221,24 @@ public final class MetaUpsells {
             return true;
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "post button check", failure);
+            return false;
+        }
+    }
+
+    /**
+     * The hook, first thing in the getter Facebook's deep dive under a post's caption reads its
+     * model through. The socket that collects what goes under a caption asks it whether the plugin
+     * applies and the plugin asks it again to build the row, and both stop at a null. True answers
+     * null while the other Meta AI buttons' switch is on; false leaves the getter to Facebook.
+     */
+    public static boolean hidesDeepDiveBelowCaption() {
+        try {
+            HookStatus.invoked(FAMILY);
+            if (!Utils.settingsReady() || !Settings.HIDE_META_AI_POST_BUTTONS.get()) return false;
+            hid("Meta AI deep dive under a caption", CAPTION_DEEP_DIVE_HIDDEN);
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "deep dive under a caption", failure);
             return false;
         }
     }
