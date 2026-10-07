@@ -153,6 +153,7 @@ public final class SettingsBackup {
             Settings.KEEP_REEL_SPEED,
             Settings.HOLD_REEL_FOR_2X,
             Settings.DEFAULT_COMMENT_ORDER,
+            Settings.HIDE_META_AI_SUMMARIES,
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
             Settings.TAP_TO_PLAY,
             Settings.RESUME_LONG_VIDEOS,

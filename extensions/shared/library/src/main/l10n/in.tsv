@@ -392,6 +392,10 @@ Comments	Komentar
 Default comment order	Urutan komentar bawaan
 # context: summary of that switch; a link to a comment is one from a notification, say
 Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.	Gunakan urutan di bawah. Pilihan pada postingan berlaku hingga mulai ulang. Tautan komentar mempertahankan urutan Facebook.
+# context: switch title under Comments; Meta AI writes a short summary of what a post's comments say
+Hide Meta AI comment summaries	Sembunyikan ringkasan komentar Meta AI
+# context: summary of that switch; the buttons are a post's Like, Comment and Share row
+Comments open without Meta AI's summary at the top, and posts lose the summary of their comments under the buttons. The comments themselves stay.	Komentar terbuka tanpa ringkasan Meta AI di bagian atas, dan postingan tidak lagi menampilkan ringkasan komentarnya di bawah tombol. Komentarnya sendiri tetap ada.
 # context: title of the list of comment orders, and of its dialog
 Comment order	Urutan komentar
 # context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook

@@ -357,6 +357,10 @@ Search results lose the Meta AI answer and the Ask Meta AI prompts, and a sugges
 Comments	Comentários
 Default comment order	Ordem padrão dos comentários
 Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.	Usa a ordem abaixo. A ordem escolhida em uma publicação vale até o Facebook ser reiniciado. Links para comentários mantêm a ordem do Facebook.
+# context: switch title under Comments; Meta AI writes a short summary of what a post's comments say
+Hide Meta AI comment summaries	Ocultar os resumos de comentários da Meta AI
+# context: summary of that switch; the buttons are a post's Like, Comment and Share row
+Comments open without Meta AI's summary at the top, and posts lose the summary of their comments under the buttons. The comments themselves stay.	Os comentários abrem sem o resumo da Meta AI no topo, e as publicações perdem o resumo dos comentários abaixo dos botões. Os comentários em si continuam.
 Comment order	Ordem dos comentários
 Facebook's choice	Escolha do Facebook
 Most relevant	Mais relevantes

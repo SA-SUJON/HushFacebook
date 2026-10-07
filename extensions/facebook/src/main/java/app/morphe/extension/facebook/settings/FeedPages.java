@@ -252,14 +252,22 @@ final class FeedPages {
         }
     }
 
-    /** Comments: the order they open in. */
+    /** Comments: the order they open in, and Meta AI's summaries of them. */
     static void comments(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
-        if (build.contains(PatchFamily.DEFAULT_COMMENT_ORDER)) {
-            PreferenceCategory comments = category(screen, L10n.t("Comments"));
+        boolean order = build.contains(PatchFamily.DEFAULT_COMMENT_ORDER);
+        boolean summaries = build.contains(PatchFamily.META_AI_SUMMARIES);
+        if (!order && !summaries) return;
+        PreferenceCategory comments = category(screen, L10n.t("Comments"));
+        if (order) {
             comments.addPreference(toggle(context, Settings.DEFAULT_COMMENT_ORDER,
                     L10n.t("Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.")));
             comments.addPreference(commentOrderRow(context));
+        }
+        if (summaries) {
+            comments.addPreference(toggle(context, Settings.HIDE_META_AI_SUMMARIES,
+                    L10n.t("Comments open without Meta AI's summary at the top, and posts lose the summary of their comments "
+                            + "under the buttons. The comments themselves stay.")));
         }
     }
 

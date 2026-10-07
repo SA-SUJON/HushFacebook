@@ -392,6 +392,10 @@ Comments	Comentarios
 Default comment order	Orden predeterminado de los comentarios
 # context: summary of that switch; a link to a comment is one from a notification, say
 Use the order below. A choice made on a post lasts until restart. Links to comments keep Facebook's order.	Usa el orden de abajo. El elegido en una publicación dura hasta reiniciar. Los enlaces a comentarios conservan el orden de Facebook.
+# context: switch title under Comments; Meta AI writes a short summary of what a post's comments say
+Hide Meta AI comment summaries	Ocultar los resúmenes de comentarios de Meta AI
+# context: summary of that switch; the buttons are a post's Like, Comment and Share row
+Comments open without Meta AI's summary at the top, and posts lose the summary of their comments under the buttons. The comments themselves stay.	Los comentarios se abren sin el resumen de Meta AI arriba, y las publicaciones pierden el resumen de sus comentarios bajo los botones. Los comentarios en sí se quedan.
 # context: title of the list of comment orders, and of its dialog
 Comment order	Orden de los comentarios
 # context: entry of that list: the order Facebook's servers pick, which is what happens without Hushfacebook

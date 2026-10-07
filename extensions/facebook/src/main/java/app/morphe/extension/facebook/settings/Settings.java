@@ -426,6 +426,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_default_comment_order", TRUE);
 
     /**
+     * Comment sheets open without Meta AI's summary of the comments at the top, and posts come
+     * without the summary Facebook adds under their buttons
+     * ({@link app.morphe.extension.facebook.comments.MetaAiSummaries}). Off by default. A change
+     * shows on the next comment sheet or post drawn.
+     */
+    public static final BooleanSetting HIDE_META_AI_SUMMARIES =
+            new BooleanSetting("hushfacebook_hide_meta_ai_summaries", FALSE);
+
+    /**
      * Facebook's text boxes (posts, comments, captions, a story's text) look people up to tag only
      * for a word that starts with @. Off, they also look them up for a plain word Facebook takes for
      * a name, what its code calls an implicit mention

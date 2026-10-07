@@ -70,6 +70,7 @@ import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
+import app.morphe.extension.facebook.comments.MetaAiSummaries;
 import app.morphe.extension.facebook.composer.TagSuggestionsForTests;
 import app.morphe.extension.facebook.media.HdrBrightnessForTests;
 import app.morphe.extension.facebook.media.PictureInPictureForTests;
@@ -476,6 +477,10 @@ public class PausedHooksTest {
         // A request for a post's comments that names no order asks for the chosen one.
         probes.put(PatchFamily.DEFAULT_COMMENT_ORDER,
                 Collections.singletonList(DefaultCommentOrderForTests::asksForTheChosenOrder));
+        // A comment sheet's summary and the one under a post get a no from their sockets' checks.
+        probes.put(PatchFamily.META_AI_SUMMARIES, Arrays.asList(
+                () -> MetaAiSummaries.holds(MetaAiSummaries.SHEET_SUMMARY),
+                () -> MetaAiSummaries.holds(MetaAiSummaries.POST_SUMMARY)));
         // A word without @ in a post or comment box looks nobody up, and a list of people left open
         // by an earlier @ is closed.
         probes.put(PatchFamily.TAG_SUGGESTIONS, Arrays.asList(

@@ -110,6 +110,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean metaAiSummaries() {
+        return false;
+    }
+
     public static boolean tapToPlay() {
         return false;
     }

@@ -722,6 +722,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/comments/MetaAiSummaries.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/comments/summaries/HideMetaAiCommentSummariesPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook from Facebook 577, 580 and 581: the comment sheet's top content socket and the socket under a post's buttons are found by the names they give themselves, each socket's name table by the Meta AI summary plugins it names, and its per-plugin check by the plugin numbers it shares with the table. The extension answers no for the summary plugins in each check while the switch is on. No Facebook patch source in the ledger describes Meta AI's comment summaries."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/navigation/MarketplaceSellerProfile.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/navigation/sellerprofile/ShowSellerViewProfilePatch.kt"
       ],
