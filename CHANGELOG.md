@@ -55,6 +55,9 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Block promotional notifications` has new switches for group activity, event invites, live videos and reactions to your posts and comments. **Quiet hours**, a separate switch, blocks the kinds you picked only between two hours you choose (10 PM to 7 AM to start). Everything starts off, and messages and calls always come through.
 * **Facebook:** `Block background-return feed refresh` also keeps your place when Facebook would reload Home as you switch back to it after a while on another tab. The **Keep feed position on return** switch covers it, and pull to refresh and a fresh start still load new posts.
 * **Facebook:** `Hold a reel for 2x` has a new switch, **Only on the right edge**, off to start. With it on, only a hold on the right third of a reel plays it at 2x, and a hold anywhere else does what Facebook does, usually its long-press menu.
+* **Facebook:** **Text size** under Appearance makes Facebook's text 85% to 130% of what your phone's font size setting gives it. It starts at 100%, which is Facebook as it ships, and Pause puts it back. Restart Facebook after changing it.
+* **Facebook:** New patch, `Accent color`, left out of Manager's default selection. Pick Teal, Green, Purple, Pink, Orange, Red, Indigo or Amber under Appearance and the blue Facebook draws links, buttons, switches and the selected tab in takes that color, with link text kept at 4.5 to 1 contrast. It starts on Facebook's blue. `Material You theme` wins when both are in.
+* **Facebook:** New patch, `Send chat photos and videos at original quality`, with a switch under Chats that starts off. Photos and videos you send from a chat that opens inside Facebook go out as the originals instead of shrunken copies. Photos lose their location and camera details (the rotation stays), and photos over 20 MB and videos over 25 MB are still shrunk.
 
 ### Fixed
 
