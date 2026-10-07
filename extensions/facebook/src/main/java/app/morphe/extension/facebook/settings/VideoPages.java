@@ -173,7 +173,7 @@ final class VideoPages {
             }
             if (build.contains(PatchFamily.PICTURE_IN_PICTURE)) {
                 playback.addPreference(toggle(context, Settings.PICTURE_IN_PICTURE,
-                        L10n.t("A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.")));
+                        L10n.t("A playing reel or full-screen video keeps going in a small window when you leave Facebook. Android 12 or later.")));
             }
             if (build.contains(PatchFamily.HDR_BRIGHTNESS)) {
                 // Asked as each screen comes to the front, so a change shows from the next one.

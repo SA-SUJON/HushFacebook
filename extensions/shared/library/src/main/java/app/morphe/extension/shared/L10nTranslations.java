@@ -160,8 +160,8 @@ public final class L10nTranslations {
                 "Eine Wiedergabegeschwindigkeit, die du im Zahnradmen\u00fc eines Feed- oder Watch-Videos w\u00e4hlst, bleibt f\u00fcr die n\u00e4chsten Videos, bis du eine andere w\u00e4hlst oder Facebook neu startet. Reels behalten ihre eigene Geschwindigkeit. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht mit einem echten Konto getestet wurde.");
         table.put("A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. Off, every reel starts at normal speed.",
                 "Eine Wiedergabegeschwindigkeit, die du im Men\u00fc eines Reels w\u00e4hlst, bleibt f\u00fcr die n\u00e4chsten Reels, bis du eine andere w\u00e4hlst oder Facebook neu startet. Aus startet jedes Reel mit normaler Geschwindigkeit.");
-        table.put("A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.",
-                "Ein laufendes Reel spielt in einem kleinen Fenster weiter, wenn du Facebook verl\u00e4sst. Ab Android 12.");
+        table.put("A playing reel or full-screen video keeps going in a small window when you leave Facebook. Android 12 or later.",
+                "Ein laufendes Reel oder Vollbildvideo spielt in einem kleinen Fenster weiter, wenn du Facebook verl\u00e4sst. Ab Android 12.");
         table.put("A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable.",
                 "Ein Beitrag mit einem dieser W\u00f6rter bleibt, auch wenn er ein Wort zum Ausblenden enth\u00e4lt. Eins pro Zeile, bis zu %1$d, jeweils %2$d bis %3$d Zeichen lang, oder nur eins bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe.");
         table.put("A post you've scrolled past stays out of the feed for %1$s.",
@@ -1911,8 +1911,8 @@ public final class L10nTranslations {
                 "La velocidad de reproducci\u00f3n que elijas en el men\u00fa del engranaje de un video del feed o de Watch se mantiene en los siguientes videos hasta que elijas otra o Facebook se reinicie. Los reels mantienen su propia velocidad. Este interruptor viene desactivado porque todav\u00eda no se prob\u00f3 con una cuenta real.");
         table.put("A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. Off, every reel starts at normal speed.",
                 "La velocidad de reproducci\u00f3n que elijas en el men\u00fa de un reel se mantiene en los siguientes reels hasta que elijas otra o Facebook se reinicie. Desactivado, cada reel empieza a velocidad normal.");
-        table.put("A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.",
-                "Un reel en reproducci\u00f3n sigue en una ventana peque\u00f1a cuando sales de Facebook. Android 12 o posterior.");
+        table.put("A playing reel or full-screen video keeps going in a small window when you leave Facebook. Android 12 or later.",
+                "Un reel o un video a pantalla completa en reproducci\u00f3n sigue en una ventana peque\u00f1a cuando sales de Facebook. Android 12 o posterior.");
         table.put("A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable.",
                 "Una publicaci\u00f3n con cualquiera de estas se mantiene, aunque tambi\u00e9n tenga una palabra para ocultar. Una por l\u00ednea, hasta %1$d, cada una de %2$d a %3$d caracteres, o solo uno si es un emoji, un car\u00e1cter chino, un kana o una s\u00edlaba hangul.");
         table.put("A post you've scrolled past stays out of the feed for %1$s.",
@@ -3662,8 +3662,8 @@ public final class L10nTranslations {
                 "Kecepatan pemutaran yang kamu pilih di menu roda gigi video feed atau Watch tetap dipakai untuk video berikutnya sampai kamu memilih yang lain atau Facebook dimulai ulang. Reel tetap memakai kecepatannya sendiri. Sakelar ini nonaktif secara default karena belum diuji dengan akun sungguhan.");
         table.put("A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. Off, every reel starts at normal speed.",
                 "Kecepatan pemutaran yang kamu pilih di menu reel tetap dipakai untuk reel berikutnya sampai kamu memilih yang lain atau Facebook dimulai ulang. Jika mati, setiap reel dimulai dengan kecepatan normal.");
-        table.put("A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.",
-                "Reel yang sedang diputar terus berjalan di jendela kecil saat kamu keluar dari Facebook. Android 12 atau yang lebih baru.");
+        table.put("A playing reel or full-screen video keeps going in a small window when you leave Facebook. Android 12 or later.",
+                "Reel atau video layar penuh yang sedang diputar terus berjalan di jendela kecil saat kamu keluar dari Facebook. Android 12 atau yang lebih baru.");
         table.put("A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable.",
                 "Postingan dengan salah satu kata ini tetap ada, meskipun juga berisi kata untuk disembunyikan. Satu per baris, hingga %1$d, masing-masing %2$d sampai %3$d karakter, atau cukup satu untuk emoji, aksara Tionghoa, kana, atau suku kata Hangul.");
         table.put("A post you've scrolled past stays out of the feed for %1$s.",
@@ -5413,8 +5413,8 @@ public final class L10nTranslations {
                 "A velocidade de reprodu\u00e7\u00e3o que voc\u00ea escolhe no menu de engrenagem de um v\u00eddeo do feed ou do Watch continua nos pr\u00f3ximos v\u00eddeos at\u00e9 voc\u00ea escolher outra ou o Facebook reiniciar. Os reels mant\u00eam a pr\u00f3pria velocidade. Esta op\u00e7\u00e3o vem desativada por padr\u00e3o porque ainda n\u00e3o foi testada com uma conta real.");
         table.put("A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. Off, every reel starts at normal speed.",
                 "A velocidade de reprodu\u00e7\u00e3o que voc\u00ea escolhe no menu de um reel continua nos pr\u00f3ximos reels at\u00e9 voc\u00ea escolher outra ou o Facebook reiniciar. Desativado, cada reel come\u00e7a na velocidade normal.");
-        table.put("A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.",
-                "Um reel em reprodu\u00e7\u00e3o continua em uma janela pequena quando voc\u00ea sai do Facebook. Android 12 ou mais recente.");
+        table.put("A playing reel or full-screen video keeps going in a small window when you leave Facebook. Android 12 or later.",
+                "Um reel ou v\u00eddeo em tela cheia em reprodu\u00e7\u00e3o continua em uma janela pequena quando voc\u00ea sai do Facebook. Android 12 ou mais recente.");
         table.put("A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable.",
                 "Uma publica\u00e7\u00e3o que contenha qualquer uma destas palavras ou frases permanece, mesmo que tamb\u00e9m contenha uma palavra a ocultar. Uma por linha, at\u00e9 %1$d no total, com %2$d a %3$d caracteres cada, ou s\u00f3 um se for um emoji, um caractere chin\u00eas, um kana ou uma s\u00edlaba hangul.");
         table.put("A post you've scrolled past stays out of the feed for %1$s.",
@@ -7164,8 +7164,8 @@ public final class L10nTranslations {
                 "Bir ak\u0131\u015f veya Watch videosunun di\u015fli men\u00fcs\u00fcnde se\u00e7ti\u011fin oynatma h\u0131z\u0131, ba\u015fka bir h\u0131z se\u00e7ene veya Facebook yeniden ba\u015flayana kadar sonraki videolarda kal\u0131r. Reels kendi h\u0131z\u0131n\u0131 korur. Bu anahtar hen\u00fcz ger\u00e7ek bir hesapla test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. Off, every reel starts at normal speed.",
                 "Bir reel'in men\u00fcs\u00fcnde se\u00e7ti\u011fin oynatma h\u0131z\u0131, ba\u015fka bir h\u0131z se\u00e7ene veya Facebook yeniden ba\u015flayana kadar sonraki reel'lerde kal\u0131r. Kapal\u0131yken her reel normal h\u0131zda ba\u015flar.");
-        table.put("A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.",
-                "Oynat\u0131lan bir reel, Facebook'tan \u00e7\u0131kt\u0131\u011f\u0131nda k\u00fc\u00e7\u00fck bir pencerede devam eder. Android 12 veya \u00fcst\u00fc.");
+        table.put("A playing reel or full-screen video keeps going in a small window when you leave Facebook. Android 12 or later.",
+                "Oynat\u0131lan bir reel ya da tam ekran video, Facebook'tan \u00e7\u0131kt\u0131\u011f\u0131nda k\u00fc\u00e7\u00fck bir pencerede devam eder. Android 12 veya \u00fcst\u00fc.");
         table.put("A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable.",
                 "Bunlardan birini i\u00e7eren g\u00f6nderi, gizlenecek bir kelime de i\u00e7erse kal\u0131r. Her sat\u0131ra bir tane, en fazla %1$d tane, her biri %2$d ile %3$d karakter aras\u0131. Emoji, \u00c7ince karakter, kana veya Hangul hecesi i\u00e7in tek karakter yeter.");
         table.put("A post you've scrolled past stays out of the feed for %1$s.",

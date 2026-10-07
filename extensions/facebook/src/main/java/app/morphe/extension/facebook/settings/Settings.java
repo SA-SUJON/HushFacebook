@@ -582,7 +582,7 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_default_playback_quality", TRUE);
 
     /**
-     * A playing reel shrinks into a window when you leave Facebook, through the picture-in-picture
+     * A playing reel or full-screen video shrinks into a window when you leave Facebook, through the picture-in-picture
      * Facebook ships for its Reels viewer behind server flags
      * ({@link app.morphe.extension.facebook.media.PictureInPicture}). On once the patch is picked,
      * since picking it is the choice. Off or paused, Facebook decides as before.

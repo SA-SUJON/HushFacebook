@@ -918,7 +918,7 @@ Tabs, the Menu and screens that open over Facebook show at once, without the sli
 # context: switch title under Playback; Android's own name for the floating video window
 Picture-in-picture	Gambar dalam gambar
 # context: summary of that switch
-A playing reel keeps going in a small window when you leave Facebook. Android 12 or later.	Reel yang sedang diputar terus berjalan di jendela kecil saat kamu keluar dari Facebook. Android 12 atau yang lebih baru.
+A playing reel or full-screen video keeps going in a small window when you leave Facebook. Android 12 or later.	Reel atau video layar penuh yang sedang diputar terus berjalan di jendela kecil saat kamu keluar dari Facebook. Android 12 atau yang lebih baru.
 # context: switch title under Playback; HDR is the high-contrast video and photo format some screens show brighter than everything else
 Turn off HDR brightness	Matikan kecerahan HDR
 # context: summary of that switch
