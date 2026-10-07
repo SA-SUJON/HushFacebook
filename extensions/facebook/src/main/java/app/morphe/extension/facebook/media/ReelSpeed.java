@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,8 +56,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * and the composer's previews keep Facebook's speed, so a pick there isn't kept either. With that
  * switch off, a gear pick on a video that isn't a reel stays with that video, as Facebook has it.
  *
- * <p>Slower speeds in the Reels menu, the third switch, adds 0.1x and 0.25x to the speeds the Reels
- * menu's two pickers offer ({@link #speedChoices}). The gear menu's sheet keeps Facebook's list.
+ * <p>Slower speeds, the third switch, adds 0.1x and 0.25x to the speeds the Reels menu's two pickers
+ * offer ({@link #speedChoices}) and to the gear menu's speed sheet ({@link #gearValues},
+ * {@link #gearSpeeds} and {@link #gearLabels}).
  */
 public final class ReelSpeed {
     static final float NORMAL = 1f;
@@ -73,11 +75,17 @@ public final class ReelSpeed {
     /** Counted under the patch's name for each feed or Watch video started at the kept video speed. */
     static final String VIDEO_APPLIED = "video started at the kept speed";
 
-    /** The speeds Slower speeds in the Reels menu offers, slowest first. ExoPlayer plays down to 0.1x. */
+    /** The speeds Slower speeds offers, slowest first. ExoPlayer plays down to 0.1x. */
     static final float[] SLOWER = {0.1f, 0.25f};
 
     /** Counted under the patch's name each time a Reels speed picker offers the slower speeds. */
     static final String SLOWER_OFFERED = "Reels speed menu offered slower speeds";
+
+    /** Counted under the patch's name each time the gear menu's speed sheet offers the slower speeds. */
+    static final String GEAR_SLOWER_OFFERED = "gear speed sheet offered slower speeds";
+
+    /** The speeds {@link #gearSpeeds} just put ahead of the sheet's own, for {@link #gearLabels} to label. */
+    private static final ThreadLocal<float[]> GEAR_ADDED = new ThreadLocal<>();
 
     /**
      * What a player's origin holds when it plays somewhere a kept video speed doesn't belong: chats,
@@ -271,6 +279,82 @@ public final class ReelSpeed {
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "speed menu", failure);
             return speeds;
+        }
+    }
+
+    /**
+     * The hook first in the gear menu's speed sheet builder, on its flag for reading each speed from
+     * a float rather than parsing it back out of its label with the locale's NumberFormat (#95). With
+     * {@link Settings#SLOWER_REEL_SPEEDS} on it answers true, so {@link #gearSpeeds} gets the sheet's
+     * real speeds and a pick plays the speed it shows whatever the locale. Facebook's own builders
+     * pass true on some paths, and the pick reads the float whenever the flag is set. Off, paused or
+     * failing, Facebook's flag stands.
+     */
+    public static boolean gearValues(boolean values) {
+        try {
+            if (values || !Utils.settingsReady() || !Settings.SLOWER_REEL_SPEEDS.get()) return values;
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "gear speed sheet", failure);
+            return values;
+        }
+    }
+
+    /**
+     * The hook where the gear menu's speed sheet has its speeds and their labels and is about to
+     * make one item from each pair: the speeds come here first. With the switch on, the array that
+     * comes back starts with the {@link #SLOWER} speeds slower than any the sheet offers, and
+     * {@link #gearLabels}, called straight after, puts a label in front of the labels for each.
+     * Speeds of zero mean the sheet still reads its labels, so nothing is added. Off, paused or
+     * failing, Facebook's array comes back and so do its labels.
+     */
+    public static float[] gearSpeeds(float[] speeds) {
+        GEAR_ADDED.remove();
+        try {
+            HookStatus.invoked(FAMILY);
+            if (speeds == null || speeds.length == 0 || !Utils.settingsReady() || !Settings.SLOWER_REEL_SPEEDS.get()) {
+                return speeds;
+            }
+            float slowest = Float.MAX_VALUE;
+            for (float speed : speeds) slowest = Math.min(slowest, speed);
+            if (slowest <= 0) return speeds;
+            HookStatus.bound(FAMILY, "gear speed sheet");
+            int added = 0;
+            // SLOWER runs slowest first, so the speeds below the sheet's slowest are its first ones.
+            for (float speed : SLOWER) {
+                if (speed < slowest - SAME) added++;
+            }
+            if (added == 0) return speeds;
+            float[] choices = new float[added + speeds.length];
+            System.arraycopy(SLOWER, 0, choices, 0, added);
+            System.arraycopy(speeds, 0, choices, added, speeds.length);
+            GEAR_ADDED.set(Arrays.copyOf(SLOWER, added));
+            HookStatus.counted(FAMILY, GEAR_SLOWER_OFFERED);
+            return choices;
+        } catch (Throwable failure) {
+            GEAR_ADDED.remove();
+            HookStatus.threw(FAMILY, "gear speed sheet", failure);
+            return speeds;
+        }
+    }
+
+    /**
+     * The labels for the speeds {@link #gearSpeeds} just added on this thread, written the way
+     * Facebook labels a speed from its server list, ahead of the sheet's own labels. Facebook's
+     * labels come back unchanged when nothing was added.
+     */
+    public static String[] gearLabels(String[] labels) {
+        float[] added = GEAR_ADDED.get();
+        GEAR_ADDED.remove();
+        if (added == null || labels == null) return labels;
+        try {
+            String[] choices = new String[added.length + labels.length];
+            for (int i = 0; i < added.length; i++) choices[i] = String.valueOf(added[i]);
+            System.arraycopy(labels, 0, choices, added.length, labels.length);
+            return choices;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "gear speed sheet", failure);
+            return labels;
         }
     }
 

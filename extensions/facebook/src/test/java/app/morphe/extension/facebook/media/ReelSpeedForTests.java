@@ -117,4 +117,13 @@ public final class ReelSpeedForTests {
         List<Float> facebooks = Arrays.asList(0.5f, 1f, 2f);
         return ReelSpeed.speedChoices(facebooks).size() > facebooks.size();
     }
+
+    /** True when the gear menu's speed sheet reads its floats or gets slower speeds ahead of Facebook's. */
+    public static boolean gearOffersSlowerSpeeds() {
+        float[] facebooks = {0.5f, 1f, 2f};
+        boolean values = ReelSpeed.gearValues(false);
+        boolean longer = ReelSpeed.gearSpeeds(facebooks).length > facebooks.length;
+        boolean labelled = ReelSpeed.gearLabels(new String[] {"0.5", "1", "2"}).length > facebooks.length;
+        return values || longer || labelled;
+    }
 }

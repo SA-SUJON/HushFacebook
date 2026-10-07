@@ -26,6 +26,7 @@ import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.facebook.reels.hold.reelLiftGuardPatch
 import app.morphe.patches.facebook.reels.hold.SPEED_SET as GUARD_SPEED_SET
 import app.morphe.patches.shared.compat.AppCompatibilities
+import app.morphe.util.addInstructionsAtControlFlowLabel
 import app.morphe.util.findMutableMethodOf
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
@@ -50,9 +51,10 @@ internal const val PATCH = "Keep the reel speed"
  * hooks fire for every FbGrootPlayer, so a gear pick on a feed or Watch video and each later video's
  * start already reach the extension, which tells reels from other videos by isFbShorts.
  *
- * Slower speeds in the Reels menu, the third switch, hands the extension the list of speeds each
- * of the Reels menu's pickers offers ([addSlowerSpeeds]), and a pick of one of the added speeds goes
- * through the same toast and setter, so Keep the reel speed keeps it like any other.
+ * Slower speeds, the third switch, hands the extension the list of speeds each of the Reels menu's
+ * pickers offers ([addSlowerSpeeds]), and a pick of one of the added speeds goes through the same
+ * toast and setter, so Keep the reel speed keeps it like any other. The gear menu's speed sheet
+ * gets them too ([addSlowerGearSpeeds]), and its pick goes through the setter the gear hook follows.
  */
 @Suppress("unused")
 val keepReelSpeedPatch = bytecodePatch(
@@ -75,6 +77,11 @@ val keepReelSpeedPatch = bytecodePatch(
             addSlowerSpeeds(anchors.toast)
         } catch (moved: PatchException) {
             patchLog.warning("${moved.message}. The patch goes on without the slower speeds in that picker.")
+        }
+        try {
+            addSlowerGearSpeeds(anchors.gearPick)
+        } catch (moved: PatchException) {
+            patchLog.warning("${moved.message}. The patch goes on without the slower speeds in the gear menu.")
         }
         enableStatus("keepReelSpeed")
     }
@@ -209,6 +216,43 @@ internal fun BytecodePatchContext.addSlowerSpeeds(toast: Method) {
     }
     if (selectors.isEmpty()) refuse("no speed selector answering $ATTRIBUTE_SELECTOR in ${toast.definingClass} fills a Float[]")
     if (dropdowns.isEmpty()) refuse("no speed dropdown holding \"$SPEED_DROPDOWN\" fills a Float[]")
+}
+
+/**
+ * The gear menu's speed sheet (#95). Its builder, the one method of a class holding
+ * "PlayerControlsPlaybackSpeedBottomSheet" that makes [gearPick]'s class, hands the extension its
+ * last parameter first thing, the flag for reading each speed from its float, and takes the answer
+ * back in the same register, ahead of the copy the pick gets. Where its paths have met and it's about to walk the
+ * labels, it hands over the speeds and then the labels, each through the range form, and takes
+ * each back in its own register. That hook goes in under the walk's label, so a branch landing
+ * there runs it too. Refuses before anything changes.
+ */
+internal fun BytecodePatchContext.addSlowerGearSpeeds(gearPick: Method) {
+    val sheets = classDefByStrings(GEAR_SHEET, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        .flatMap { holder -> holder.methods.filter { isGearSheet(it, gearPick.definingClass) } }
+    val sheet = sheets.singleOrNull()
+        ?: refuse("expected one gear speed sheet builder making ${gearPick.definingClass}, found ${sheets.size}")
+    val meets = gearMeets(sheet)
+    val meet = meets.singleOrNull()
+        ?: refuse("expected one place ${sheet.definingClass}->${sheet.name} reads a speed for each label, found ${meets.size}")
+    val method = mutableClassDefBy(sheet.definingClass).findMutableMethodOf(sheet)
+    method.addInstructionsAtControlFlowLabel(
+        meet.index,
+        """
+            invoke-static/range { v${meet.speeds} .. v${meet.speeds} }, $GEAR_SPEEDS
+            move-result-object v${meet.speeds}
+            invoke-static/range { v${meet.labels} .. v${meet.labels} }, $GEAR_LABELS
+            move-result-object v${meet.labels}
+        """,
+    )
+    method.addInstructions(
+        0,
+        """
+            invoke-static/range { v${meet.values} .. v${meet.values} }, $GEAR_VALUES
+            move-result v${meet.values}
+        """,
+    )
 }
 
 /** 2 when [setter] starts with the release guard's hook and its move-result, else 0. */

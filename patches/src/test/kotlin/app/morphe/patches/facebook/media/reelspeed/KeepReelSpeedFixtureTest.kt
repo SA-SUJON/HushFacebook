@@ -48,7 +48,8 @@ import java.io.File
  * and the Reels menu's speed toast, the only method
  * holding its selector's name, which only FbShortsInlinePlaybackSpeedUtil's two pickers call. The
  * gear menu's speed sheet sets its pick with the same setter. The Reels menu's two speed pickers each
- * list their Float[] of speeds in one place, where the slower speeds go in. Then the patch itself, run on those
+ * list their Float[] of speeds in one place, where the slower speeds go in, and the gear menu's speed
+ * sheet builder reads a speed for each label in one place, where they go in too. Then the patch itself, run on those
  * classes: each hook first in its method, reading the method's own arguments, and each stub calling
  * the method or reading the field it stands for. Reads the fixture bundles from
  * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
@@ -161,7 +162,18 @@ class KeepReelSpeedFixtureTest {
                 }
                 val dropdownClass = dropdownHolders.single { it.type == dropdowns.single().definingClass }
 
-                fun classes() = listOf(owner, toastClass, gearClass, paramsClass, dropdownClass,
+                // The gear menu's speed sheet builder makes the gear pick's class, takes its flag for
+                // reading speeds from floats last, and reads a speed for each label in one place (#95).
+                val sheetHolders = FixtureDex.classesHolding(bundle, GEAR_SHEET).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+                val sheets = sheetHolders.flatMap { it.methods }.filter { isGearSheet(it, gearPick.definingClass) }
+                assertEquals("$name: gear speed sheet builders making ${gearPick.definingClass}", 1, sheets.size)
+                val sheet = sheets.single()
+                val meets = gearMeets(sheet)
+                assertEquals("$name: places ${sheet.definingClass}->${sheet.name} reads a speed for each label", 1, meets.size)
+                val meet = meets.single()
+                val sheetClass = sheetHolders.single { it.type == sheet.definingClass }
+
+                fun classes() = listOf(owner, toastClass, gearClass, paramsClass, dropdownClass, sheetClass,
                     ExtensionDex.classDef(REEL_SPEED), ExtensionDex.classDef(SETTINGS_STATUS)).distinctBy { it.type }
                 val context = PatchContexts.of(classes())
                 keepReelSpeedPatch.execute(context)
@@ -204,6 +216,22 @@ class KeepReelSpeedFixtureTest {
                     assertEquals("$name: $what doesn't take the list back", Opcode.MOVE_RESULT_OBJECT, code[result + 2].opcode)
                     assertEquals("$name: the register $what takes it back in", list, (code[result + 2] as OneRegisterInstruction).registerA)
                 }
+
+                // The sheet hands its flag over first and takes it back in the same register. Where it walks
+                // its labels it hands over the speeds and then the labels, taking each back in its own register.
+                val sheetCode = patched(sheet.definingClass, sheet)
+                fun assertHook(at: Int, what: String, hook: String, register: Int, result: Opcode) {
+                    assertEquals("$name: the sheet's $what hook", hook, sheetCode[at].call.toString())
+                    assertEquals("$name: the register the sheet hands over as its $what", listOf(register), sheetCode[at].registers())
+                    assertEquals("$name: the sheet doesn't take its $what back", result, sheetCode[at + 1].opcode)
+                    assertEquals("$name: the register the sheet takes its $what back in", register,
+                        (sheetCode[at + 1] as OneRegisterInstruction).registerA)
+                }
+                assertHook(0, "flag", GEAR_VALUES, meet.values, Opcode.MOVE_RESULT)
+                val walk = meet.index + 2
+                assertHook(walk, "speeds", GEAR_SPEEDS, meet.speeds, Opcode.MOVE_RESULT_OBJECT)
+                assertHook(walk + 2, "labels", GEAR_LABELS, meet.labels, Opcode.MOVE_RESULT_OBJECT)
+                assertEquals("$name: the walk doesn't follow the hooks", Opcode.ARRAY_LENGTH, sheetCode[walk + 4].opcode)
 
                 val stubs = context.mutableClassDefBy(REEL_SPEED)
                 val setStub = stubs.methods.single { it.name == SET_SPEED_STUB }.code()

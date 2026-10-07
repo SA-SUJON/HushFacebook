@@ -14,6 +14,8 @@ import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.ThreeRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
@@ -59,9 +61,18 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  *   is the toast class's static method answering FDSAttributeSelectorHScroll, a kept class (581
  *   LX/JsV;->A00); the dropdown is the method holding "fds_control_playback_speed" (581
  *   LX/TmY;->A08, 580 LX/U1V;->A08, 577 LX/UFS;->A09). Nothing branches to the instruction after
- *   either asList's move-result. The gear menu's speed sheet builds its list elsewhere, from a
- *   server list or two resource arrays, and parses its labels back with the locale's NumberFormat
- *   on some paths, so it isn't touched here.
+ *   either asList's move-result.
+ * - The gear menu's speed sheet (read from 577, 580 and 581, 2026-10-07): its class holds
+ *   "PlayerControlsPlaybackSpeedBottomSheet" (581 LX/TkP;, 580 LX/TzE;, 577 LX/UCw;), and its
+ *   builder, A01 on all three, takes two booleans last and makes the gear pick's class. It gets
+ *   its labels from a server list or a resource array, and its speeds from the same server list,
+ *   from a resource array of floats, or, with the last boolean false, as zeros. Its paths meet,
+ *   and it then walks the labels: array-length of the labels, then per label aget-object, if-eqz
+ *   on the last boolean and aget of the speed. With the boolean false it parses each label with
+ *   the locale's NumberFormat, which needn't read "0.5" as a half where a comma marks decimals,
+ *   and makes items without a speed, which the pick parses the same way. With it true each item
+ *   carries its float and the pick reads that. Every caller passes false but one, which passes a
+ *   field.
  */
 
 internal const val REEL_SPEED = "$EXTENSION_PACKAGE/media/ReelSpeed;"
@@ -93,6 +104,54 @@ internal const val SPEED_DROPDOWN = "fds_control_playback_speed"
 internal const val ATTRIBUTE_SELECTOR = "Lcom/facebook/fds/attributeselector/FDSAttributeSelectorHScroll;"
 private const val AS_LIST = "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;"
 private const val FLOATS = "[Ljava/lang/Float;"
+
+/** Kept literal. The gear menu's speed sheet's class holds it, and its pick logs under it. */
+internal const val GEAR_SHEET = "PlayerControlsPlaybackSpeedBottomSheet"
+internal const val GEAR_VALUES = "$REEL_SPEED->gearValues(Z)Z"
+internal const val GEAR_SPEEDS = "$REEL_SPEED->gearSpeeds([F)[F"
+internal const val GEAR_LABELS = "$REEL_SPEED->gearLabels([Ljava/lang/String;)[Ljava/lang/String;"
+private const val LOCALE_NUMBERS = "Ljava/text/NumberFormat;->getInstance(Ljava/util/Locale;)Ljava/text/NumberFormat;"
+
+/**
+ * Where the gear menu's speed sheet builder walks its labels: [index] is the array-length of
+ * [labels], the walk reads each speed from [speeds], and [values] is the last parameter, the flag
+ * for reading speeds from floats.
+ */
+internal class GearMeet(val index: Int, val labels: Int, val speeds: Int, val values: Int)
+
+/**
+ * Whether [method] is the gear menu's speed sheet builder: it answers nothing, takes a boolean
+ * last, makes [pick], the sheet's pick class, and parses with the locale's NumberFormat.
+ */
+internal fun isGearSheet(method: Method, pick: String): Boolean {
+    if (method.returnType != "V" || method.parameters().lastOrNull() != "Z") return false
+    val code = method.implementation?.instructions ?: return false
+    return code.any { it.opcode == Opcode.NEW_INSTANCE && (it as ReferenceInstruction).reference.toString() == pick } &&
+        code.any { (it as? ReferenceInstruction)?.reference?.toString() == LOCALE_NUMBERS }
+}
+
+/**
+ * Where [method] walks its labels and reads each one's speed: an array-length of the labels, then
+ * within a few instructions an aget-object from them, an if-eqz on the last parameter and an aget
+ * of the speed. The last parameter is one register wide, a boolean, so it's the method's last.
+ */
+internal fun gearMeets(method: Method): List<GearMeet> {
+    val implementation = method.implementation ?: return emptyList()
+    val code = implementation.instructions.toList()
+    val values = implementation.registerCount - 1
+    return code.withIndex().mapNotNull { (index, instruction) ->
+        if (instruction.opcode != Opcode.ARRAY_LENGTH) return@mapNotNull null
+        val labels = (instruction as TwoRegisterInstruction).registerB
+        val ahead = code.subList(index + 1, minOf(code.size, index + 8))
+        val label = ahead.indexOfFirst { it.opcode == Opcode.AGET_OBJECT && (it as ThreeRegisterInstruction).registerB == labels }
+        if (label < 0) return@mapNotNull null
+        val check = ahead.getOrNull(label + 1)
+        val speed = ahead.getOrNull(label + 2)
+        if (check?.opcode != Opcode.IF_EQZ || (check as OneRegisterInstruction).registerA != values) return@mapNotNull null
+        if (speed?.opcode != Opcode.AGET) return@mapNotNull null
+        GearMeet(index, labels, (speed as ThreeRegisterInstruction).registerB, values)
+    }
+}
 
 private fun Method.isStatic() = AccessFlags.STATIC.isSet(accessFlags)
 private fun Method.parameters() = parameterTypes.map(CharSequence::toString)

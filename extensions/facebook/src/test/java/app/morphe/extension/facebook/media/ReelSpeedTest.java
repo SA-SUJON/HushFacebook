@@ -686,4 +686,59 @@ public class ReelSpeedTest {
         assertTrue(statusLine(), HookStatus.missing(FamilyNames.KEEP_REEL_SPEED).contains("a working 'speed menu' hook (it threw "
                 + ClassCastException.class.getName() + ")"));
     }
+
+    /**
+     * #95: the gear menu's speed sheet reads each speed from its float with the switch on, and gets
+     * 0.1x and 0.25x ahead of its own speeds, each with its label, the two arrays still in step.
+     */
+    @Test
+    public void theGearSheetOffersSlowerSpeedsWithTheirLabels() {
+        float[] facebooks = {0.5f, 0.75f, 1f, 1.25f, 1.5f, 1.75f, 2f};
+        String[] labels = {"0.5", "0.75", "1", "1.25", "1.5", "1.75", "2"};
+        assertFalse("off, Facebook's flag stands", ReelSpeed.gearValues(false));
+        assertTrue("a flag Facebook set stays set", ReelSpeed.gearValues(true));
+        assertSame("off, Facebook's speeds stand", facebooks, ReelSpeed.gearSpeeds(facebooks));
+        assertSame("off, Facebook's labels stand", labels, ReelSpeed.gearLabels(labels));
+
+        Settings.SLOWER_REEL_SPEEDS.save(true);
+        assertTrue("on, the sheet reads its speeds from their floats", ReelSpeed.gearValues(false));
+        float[] speeds = ReelSpeed.gearSpeeds(facebooks);
+        String[] named = ReelSpeed.gearLabels(labels);
+        assertEquals("[0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]", Arrays.toString(speeds));
+        assertEquals(Arrays.asList("0.1", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2"), Arrays.asList(named));
+        assertSame("the labels were taken once", labels, ReelSpeed.gearLabels(labels));
+
+        // A server list that already starts at 0.25x gets only 0.1x, and the labels get one too.
+        float[] server = ReelSpeed.gearSpeeds(new float[] {0.25f, 1f, 2f});
+        assertEquals("[0.1, 0.25, 1.0, 2.0]", Arrays.toString(server));
+        assertEquals(Arrays.asList("0.1", "0.25", "1.0", "2.0"),
+                Arrays.asList(ReelSpeed.gearLabels(new String[] {"0.25", "1.0", "2.0"})));
+        assertEquals(FamilyNames.KEEP_REEL_SPEED + ": invoked 3, 1 found, 0 missing. Counted: "
+                + ReelSpeed.GEAR_SLOWER_OFFERED + " 2", statusLine());
+    }
+
+    /**
+     * Speeds of zero are a sheet still reading its labels, which a float added here would never
+     * reach: nothing is added, so no label is either. Paused, the sheet is Facebook's.
+     */
+    @Test
+    public void theGearSheetKeepsItsSpeedsWhenItReadsLabelsOrIsPaused() {
+        Settings.SLOWER_REEL_SPEEDS.save(true);
+        float[] zeros = new float[3];
+        String[] labels = {"0.5", "1", "2"};
+        assertSame(zeros, ReelSpeed.gearSpeeds(zeros));
+        assertSame(labels, ReelSpeed.gearLabels(labels));
+
+        float[] facebooks = {0.5f, 1f, 2f};
+        for (HushfacebookPause.Reason reason : new HushfacebookPause.Reason[] {
+                HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP}) {
+            PauseForTests.pause(reason);
+            assertFalse(reason.name(), ReelSpeed.gearValues(false));
+            assertSame(reason.name(), facebooks, ReelSpeed.gearSpeeds(facebooks));
+            assertSame(reason.name(), labels, ReelSpeed.gearLabels(labels));
+        }
+        PauseForTests.resume();
+        assertEquals("the control: running, the slower speeds come back", 5, ReelSpeed.gearSpeeds(facebooks).length);
+        assertEquals("and their labels", 5, ReelSpeed.gearLabels(labels).length);
+    }
 }
