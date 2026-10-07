@@ -4,11 +4,16 @@
  */
 package app.morphe.extension.facebook.chats;
 
+import android.net.Uri;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 /** Sends a photo and a video through the hooks the way Facebook's chat transcoder does. */
 public final class OriginalChatMediaForTests {
@@ -49,6 +54,67 @@ public final class OriginalChatMediaForTests {
             out.write(content);
         }
         return file.getPath();
+    }
+
+    /** Writes [content] to a new video file and returns its {@code file://} address, as the transcoder gets it. */
+    public static String video(byte[] content) throws IOException {
+        File file = File.createTempFile("chat-video", ".mp4");
+        file.deleteOnExit();
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            out.write(content);
+        }
+        return Uri.fromFile(file).toString();
+    }
+
+    /** [text] as bytes, one per character, so a box type like ©xyz is its four bytes. */
+    public static byte[] bytes(String text) {
+        return text.getBytes(StandardCharsets.ISO_8859_1);
+    }
+
+    /** The parts one after another. */
+    public static byte[] join(byte[]... parts) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        for (byte[] part : parts) out.write(part, 0, part.length);
+        return out.toByteArray();
+    }
+
+    /** An MP4 box: its 32-bit size, its four-letter type and its payload. */
+    public static byte[] box(String type, byte[]... payload) {
+        byte[] body = join(payload);
+        int size = 8 + body.length;
+        byte[] header = {(byte) (size >>> 24), (byte) (size >>> 16), (byte) (size >>> 8), (byte) size};
+        return join(header, bytes(type), body);
+    }
+
+    /** A track's media handler: version and flags, QuickTime's component type, the handler, its reserved words and an empty name. */
+    public static byte[] handler(String type) {
+        return box("hdlr", new byte[8], bytes(type), new byte[12], new byte[1]);
+    }
+
+    /** A track with the given media handler and [extra] boxes after its media. */
+    public static byte[] track(String handlerType, byte[]... extra) {
+        byte[] media = box("mdia", box("mdhd", new byte[24]), handler(handlerType), box("minf", box("vmhd", new byte[12])));
+        return box("trak", box("tkhd", new byte[84]), media, join(extra));
+    }
+
+    /** The movie box with its header and [boxes]. */
+    public static byte[] movie(byte[]... boxes) {
+        return box("moov", box("mvhd", new byte[100]), join(boxes));
+    }
+
+    /** The file type box a phone writes first. */
+    public static byte[] fileType() {
+        return box("ftyp", bytes("isom"), new byte[4], bytes("isommp42"));
+    }
+
+    /** Some media. */
+    public static byte[] media() {
+        return box("mdat", new byte[64]);
+    }
+
+    /** A phone video with no tags: a video and a sound track, the movie box first. */
+    public static byte[] plainVideo() {
+        return join(fileType(), movie(track("vide"), track("soun")), media());
     }
 
     /** Facebook's own completion callback, as far as the hook calls it. */
@@ -93,8 +159,19 @@ public final class OriginalChatMediaForTests {
         }
     }
 
-    /** True when a small video's size check says it can skip the re-encode, though Facebook's compare said it can't. */
+    /**
+     * True when a small video with no tags gets a size check answer that it can skip the re-encode,
+     * though Facebook's compare said it can't. Run off the main thread, as Facebook's chats ask it.
+     */
     public static boolean passesAVideo() {
-        return OriginalChatMedia.videoPassthrough(7, 4_000_000L) < 0;
+        BooleanSupplier was = OriginalChatMedia.onMainThread;
+        OriginalChatMedia.onMainThread = () -> false;
+        try {
+            return OriginalChatMedia.videoPassthrough(7, 4_000_000L, video(plainVideo())) < 0;
+        } catch (IOException failure) {
+            throw new IllegalStateException(failure);
+        } finally {
+            OriginalChatMedia.onMainThread = was;
+        }
     }
 }

@@ -30,12 +30,14 @@ import org.junit.Test
  * the patch on that class. Photos: each method calls the extension first with its arguments as one
  * range of parameter registers (past v15 in transcodeImage on all three builds, so a plain invoke would be dropped),
  * and returns what the extension hands back. Videos: the size check's answer goes through a plain
- * invoke on the compare's register and the size pair, with the branch still after it. Reads the
- * fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
+ * invoke on the compare's register, the size pair and the video's address (the method's first
+ * parameter, never written in it), with the branch still after it. Reads the fixture bundles from
+ * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  *
  * Read from 581 (2026-10-07): the transcoder is `Lcom/facebook/msys/mci/transcoder/DefaultMediaTranscoder;`
  * and its size check sits in `extractMimeTypeAndCheckCanSkipVideoTranscoding` at index 27, a compare
- * of `LX/MUh;->A09` (size) with the limit, 577 and 580 alike.
+ * of `LX/MUh;->A09` (size) with the limit, 577 and 580 alike. The method has 20 registers and its
+ * first parameter, the `file://` address the transcoder's worker checked, is v9 on all three.
  */
 class OriginalChatMediaFixtureTest {
     private val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
@@ -108,11 +110,14 @@ class OriginalChatMediaFixtureTest {
                 assertEquals("$where: the hook call", Opcode.INVOKE_STATIC, video[at + 1].opcode)
                 assertEquals("$where: the hook", VIDEO_HOOK, video[at + 1].target())
                 val call = video[at + 1] as FiveRegisterInstruction
-                assertEquals("$where: three registers", 3, call.registerCount)
+                assertEquals("$where: four registers", 4, call.registerCount)
                 assertEquals("$where: the compare's answer", cmp.registerA, call.registerC)
                 assertEquals("$where: the size", cmp.registerB, call.registerD)
                 assertEquals("$where: the size's other half", cmp.registerB + 1, call.registerE)
-                assertTrue("$where: a plain invoke names only v0 to v15", listOf(call.registerC, call.registerD, call.registerE).all { it <= 15 })
+                assertEquals("$where: the video's address, the first parameter", firstArgument(anchors.video), call.registerF)
+                assertEquals("$where: the address is a String", "Ljava/lang/String;", anchors.video.parameterTypes.first().toString())
+                assertTrue("$where: a plain invoke names only v0 to v15",
+                    listOf(call.registerC, call.registerD, call.registerE, call.registerF).all { it <= 15 })
                 assertEquals("$where: the answer", Opcode.MOVE_RESULT, video[at + 2].opcode)
                 assertEquals("$where: lands where the compare did", cmp.registerA, (video[at + 2] as OneRegisterInstruction).registerA)
                 assertEquals("$where: the branch is still next", Opcode.IF_LTZ, video[at + 3].opcode)

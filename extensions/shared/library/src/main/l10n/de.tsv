@@ -1158,8 +1158,8 @@ Facebook will keep its own blue.	Facebook behält sein eigenes Blau.
 With Accent color in the build, Facebook's blue will be %1$s.	Mit Akzentfarbe im Build wird das Blau von Facebook %1$s.
 # context: switch title under Chats; photos and videos sent from a chat inside Facebook go out as the originals
 Send photos and videos at original quality	Fotos und Videos in Originalqualität senden
-# context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again
-Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.	Fotos und Videos, die du aus einem Chat in Facebook sendest, gehen als Original raus. Fotos verlieren Standort und Kameradaten. Fotos über 20 MB und Videos über 25 MB werden weiter verkleinert.
+# context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again; a video with a location tag is shrunk by Facebook, which drops the tag
+Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. A video with a location tag is still shrunk, and one sent as it is keeps its date and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.	Fotos und Videos, die du aus einem Chat in Facebook sendest, gehen als Original raus. Fotos verlieren Standort und Kameradaten. Ein Video mit Standortangabe wird weiter verkleinert, und eines, das unverändert rausgeht, behält Datum und Kameradaten. Fotos über 20 MB und Videos über 25 MB werden weiter verkleinert.
 # context: button in the Words to hide editor that opens a list of ready-made word lists for common topics
 Add a topic pack	Themenpaket hinzufügen
 # context: topic pack name: words about politics

@@ -1158,8 +1158,8 @@ Facebook will keep its own blue.	Facebook akan tetap memakai birunya sendiri.
 With Accent color in the build, Facebook's blue will be %1$s.	Dengan Warna aksen di build, biru Facebook akan menjadi %1$s.
 # context: switch title under Chats; photos and videos sent from a chat inside Facebook go out as the originals
 Send photos and videos at original quality	Kirim foto dan video dalam kualitas asli
-# context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again
-Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.	Foto dan video yang kamu kirim dari chat di dalam Facebook terkirim sebagai aslinya. Foto kehilangan lokasi dan data kameranya. Foto di atas 20 MB dan video di atas 25 MB tetap dikecilkan.
+# context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again; a video with a location tag is shrunk by Facebook, which drops the tag
+Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. A video with a location tag is still shrunk, and one sent as it is keeps its date and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.	Foto dan video yang kamu kirim dari chat di dalam Facebook terkirim sebagai aslinya. Foto kehilangan lokasi dan data kameranya. Video dengan tag lokasi tetap dikecilkan, dan video yang terkirim apa adanya tetap menyimpan tanggal dan data kameranya. Foto di atas 20 MB dan video di atas 25 MB tetap dikecilkan.
 # context: button in the Words to hide editor that opens a list of ready-made word lists for common topics
 Add a topic pack	Tambahkan paket topik
 # context: topic pack name: words about politics

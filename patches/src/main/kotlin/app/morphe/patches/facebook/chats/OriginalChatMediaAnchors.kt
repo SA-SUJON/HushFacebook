@@ -45,7 +45,10 @@ import com.android.tools.smali.dexlib2.iface.reference.FieldReference
  * out as it is. For a video with a bitrate target it compares the file's size with
  * `bitrate * duration / 8000 + slack` and only a smaller file may skip the re-encode (581
  * `LX/MUh;->A09` is the size, `A08` the duration). The `cmp-long` before that `if-ltz` is the one
- * size check; the checks for edits, the Messenger size cap and the forced transcode stay.
+ * size check; the checks for edits, the Messenger size cap and the forced transcode stay. The
+ * method's first parameter is the video's `file://` address (the transcoder's private worker hands
+ * on the input it checked for that scheme), which the hook passes on so the extension can read the
+ * file's tags before it lets the video skip the re-encode.
  */
 internal const val ORIGINAL_MEDIA_PATCH = "Send chat photos and videos at original quality"
 
@@ -53,7 +56,7 @@ private const val ORIGINAL_MEDIA = "$EXTENSION_PACKAGE/chats/OriginalChatMedia;"
 internal const val PHOTO_HOOK = "$ORIGINAL_MEDIA->photo(Ljava/lang/String;DDLjava/lang/String;Ljava/util/Map;)[B"
 internal const val PHOTO_ASYNC_HOOK =
     "$ORIGINAL_MEDIA->photoAsync(Ljava/lang/String;DDLjava/lang/String;Ljava/util/Map;Ljava/lang/Object;)Z"
-internal const val VIDEO_HOOK = "$ORIGINAL_MEDIA->videoPassthrough(IJ)I"
+internal const val VIDEO_HOOK = "$ORIGINAL_MEDIA->videoPassthrough(IJLjava/lang/String;)I"
 
 internal const val MEDIA_TRANSCODER = "Lcom/facebook/msys/mci/transcoder/DefaultMediaTranscoder;"
 internal const val IMAGE_CALLBACK = "Lcom/facebook/msys/mci/TranscodeImageCompletionCallback;"
@@ -127,7 +130,7 @@ internal fun jumpTargets(code: List<Instruction>): Set<Int> {
  *
  * The hook gets vR and the size pair after the compare, so the size pair and vR have to be v15 or
  * below for a plain invoke, vR must not be one of the size's registers, and nothing may jump onto
- * the if.
+ * the if. It gets the video's address too, from the first parameter ([videoSourceRegister]).
  */
 internal fun Method.videoSizeCheck(): Int {
     val code = implementation?.instructions?.toList() ?: refuse("$name has no code")
@@ -183,6 +186,27 @@ internal fun Method.videoSizeCheck(): Int {
 }
 
 /**
+ * The register of the method's first parameter, the video's `file://` address, which the size
+ * check's hook passes on. A plain invoke names it, so it has to be v15 or below, and nothing in the
+ * method may write over it before the hook reads it. On 577, 580 and 581 it's v9 of 20 registers.
+ */
+internal fun Method.videoSourceRegister(): Int {
+    val code = implementation?.instructions?.toList() ?: refuse("$name has no code")
+    if (parameterTypes.firstOrNull()?.toString() != "Ljava/lang/String;") refuse("$name no longer takes the address first")
+    val width = 1 + parameterTypes.sumOf { if (it.toString() == "J" || it.toString() == "D") 2 else 1 }
+    val source = implementation!!.registerCount - width + 1
+    if (source > 15) refuse("the address in $name is out of range")
+    for (instruction in code) {
+        if (!instruction.opcode.setsRegister()) continue
+        val written = (instruction as? OneRegisterInstruction)?.registerA ?: continue
+        if (written == source || (instruction.opcode.setsWideRegister() && written + 1 == source)) {
+            refuse("$name writes over the address")
+        }
+    }
+    return source
+}
+
+/**
  * Finds all three places before anything changes. Refuses unless the transcoder is there once,
  * with one of each photo method, one video size check, and the passthrough note somewhere in it.
  */
@@ -205,7 +229,9 @@ internal fun transcoderAnchors(transcoder: ClassDef): OriginalMediaAnchors {
     if (transcoder.methods.none { holdsString(it, VIDEO_PASSTHROUGH_MARK) }) {
         refuse("${transcoder.type} no longer writes \"$VIDEO_PASSTHROUGH_MARK\"")
     }
-    return OriginalMediaAnchors(photo, photoAsync, video, video.videoSizeCheck())
+    val sizeCheck = video.videoSizeCheck()
+    video.videoSourceRegister()
+    return OriginalMediaAnchors(photo, photoAsync, video, sizeCheck)
 }
 
 /**
@@ -242,15 +268,19 @@ internal fun MutableMethod.hookPhotoAsync() {
     )
 }
 
-/** Hands the compare's answer and the file size to the extension, which may turn a re-encode into a pass. */
+/**
+ * Hands the compare's answer, the file size and the video's address to the extension, which may
+ * turn a re-encode into a pass.
+ */
 internal fun MutableMethod.hookVideoSizeCheck(index: Int) {
     val cmp = implementation!!.instructions.elementAt(index) as ThreeRegisterInstruction
     val result = cmp.registerA
     val size = cmp.registerB
+    val source = videoSourceRegister()
     addInstructions(
         index + 1,
         """
-            invoke-static { v$result, v$size, v${size + 1} }, $VIDEO_HOOK
+            invoke-static { v$result, v$size, v${size + 1}, v$source }, $VIDEO_HOOK
             move-result v$result
         """,
     )

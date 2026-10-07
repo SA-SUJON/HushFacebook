@@ -57,8 +57,9 @@ final class AppPages {
             if (build.contains(PatchFamily.ORIGINAL_CHAT_MEDIA)) {
                 chats.addPreference(toggle(context, Settings.ORIGINAL_CHAT_MEDIA,
                         L10n.t("Photos and videos you send from a chat that opens inside Facebook go out as the "
-                                + "originals. Photos lose their location and camera details. Files over 20 MB for photos "
-                                + "and 25 MB for videos are still shrunk.")));
+                                + "originals. Photos lose their location and camera details. A video with a location tag "
+                                + "is still shrunk, and one sent as it is keeps its date and camera details. Files over "
+                                + "20 MB for photos and 25 MB for videos are still shrunk.")));
             }
         }
     }

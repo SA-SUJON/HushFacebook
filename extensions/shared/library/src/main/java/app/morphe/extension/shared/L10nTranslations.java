@@ -1099,8 +1099,8 @@ public final class L10nTranslations {
                 "Foto gespeichert");
         table.put("Photo subfolder",
                 "Unterordner f\u00fcr Fotos");
-        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
-                "Fotos und Videos, die du aus einem Chat in Facebook sendest, gehen als Original raus. Fotos verlieren Standort und Kameradaten. Fotos \u00fcber 20 MB und Videos \u00fcber 25 MB werden weiter verkleinert.");
+        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. A video with a location tag is still shrunk, and one sent as it is keeps its date and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
+                "Fotos und Videos, die du aus einem Chat in Facebook sendest, gehen als Original raus. Fotos verlieren Standort und Kameradaten. Ein Video mit Standortangabe wird weiter verkleinert, und eines, das unver\u00e4ndert rausgeht, beh\u00e4lt Datum und Kameradaten. Fotos \u00fcber 20 MB und Videos \u00fcber 25 MB werden weiter verkleinert.");
         table.put("Photos are named %1$s.",
                 "Fotos hei\u00dfen %1$s.");
         table.put("Photos go to %1$s.",
@@ -2838,8 +2838,8 @@ public final class L10nTranslations {
                 "Foto guardada");
         table.put("Photo subfolder",
                 "Subcarpeta de fotos");
-        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
-                "Las fotos y los videos que env\u00edas desde un chat dentro de Facebook salen como originales. Las fotos pierden la ubicaci\u00f3n y los datos de la c\u00e1mara. Las fotos de m\u00e1s de 20 MB y los videos de m\u00e1s de 25 MB se siguen reduciendo.");
+        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. A video with a location tag is still shrunk, and one sent as it is keeps its date and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
+                "Las fotos y los videos que env\u00edas desde un chat dentro de Facebook salen como originales. Las fotos pierden la ubicaci\u00f3n y los datos de la c\u00e1mara. Un video con etiqueta de ubicaci\u00f3n se sigue reduciendo, y uno que sale tal cual conserva su fecha y los datos de la c\u00e1mara. Las fotos de m\u00e1s de 20 MB y los videos de m\u00e1s de 25 MB se siguen reduciendo.");
         table.put("Photos are named %1$s.",
                 "Las fotos se llaman %1$s.");
         table.put("Photos go to %1$s.",
@@ -4577,8 +4577,8 @@ public final class L10nTranslations {
                 "Foto tersimpan");
         table.put("Photo subfolder",
                 "Subfolder foto");
-        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
-                "Foto dan video yang kamu kirim dari chat di dalam Facebook terkirim sebagai aslinya. Foto kehilangan lokasi dan data kameranya. Foto di atas 20 MB dan video di atas 25 MB tetap dikecilkan.");
+        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. A video with a location tag is still shrunk, and one sent as it is keeps its date and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
+                "Foto dan video yang kamu kirim dari chat di dalam Facebook terkirim sebagai aslinya. Foto kehilangan lokasi dan data kameranya. Video dengan tag lokasi tetap dikecilkan, dan video yang terkirim apa adanya tetap menyimpan tanggal dan data kameranya. Foto di atas 20 MB dan video di atas 25 MB tetap dikecilkan.");
         table.put("Photos are named %1$s.",
                 "Foto diberi nama %1$s.");
         table.put("Photos go to %1$s.",
@@ -6316,8 +6316,8 @@ public final class L10nTranslations {
                 "Foto salva");
         table.put("Photo subfolder",
                 "Subpasta de fotos");
-        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
-                "As fotos e os v\u00eddeos que voc\u00ea envia de um chat dentro do Facebook saem como originais. As fotos perdem a localiza\u00e7\u00e3o e os dados da c\u00e2mera. Fotos acima de 20 MB e v\u00eddeos acima de 25 MB continuam sendo reduzidos.");
+        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. A video with a location tag is still shrunk, and one sent as it is keeps its date and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
+                "As fotos e os v\u00eddeos que voc\u00ea envia de um chat dentro do Facebook saem como originais. As fotos perdem a localiza\u00e7\u00e3o e os dados da c\u00e2mera. Um v\u00eddeo com marca\u00e7\u00e3o de local continua sendo reduzido, e um que sai como est\u00e1 mant\u00e9m a data e os dados da c\u00e2mera. Fotos acima de 20 MB e v\u00eddeos acima de 25 MB continuam sendo reduzidos.");
         table.put("Photos are named %1$s.",
                 "As fotos ser\u00e3o nomeadas como %1$s.");
         table.put("Photos go to %1$s.",
@@ -8055,8 +8055,8 @@ public final class L10nTranslations {
                 "Foto\u011fraf kaydedildi");
         table.put("Photo subfolder",
                 "Foto\u011fraf alt klas\u00f6r\u00fc");
-        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
-                "Facebook i\u00e7indeki bir sohbetten g\u00f6nderdi\u011fin foto\u011fraflar ve videolar orijinal olarak gider. Foto\u011fraflar konum ve kamera bilgisini kaybeder. 20 MB \u00fcst\u00fc foto\u011fraflar ve 25 MB \u00fcst\u00fc videolar yine k\u00fc\u00e7\u00fclt\u00fcl\u00fcr.");
+        table.put("Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. A video with a location tag is still shrunk, and one sent as it is keeps its date and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.",
+                "Facebook i\u00e7indeki bir sohbetten g\u00f6nderdi\u011fin foto\u011fraflar ve videolar orijinal olarak gider. Foto\u011fraflar konum ve kamera bilgisini kaybeder. Konum etiketi olan bir video yine k\u00fc\u00e7\u00fclt\u00fcl\u00fcr, oldu\u011fu gibi giden bir video ise tarihini ve kamera bilgisini korur. 20 MB \u00fcst\u00fc foto\u011fraflar ve 25 MB \u00fcst\u00fc videolar yine k\u00fc\u00e7\u00fclt\u00fcl\u00fcr.");
         table.put("Photos are named %1$s.",
                 "Foto\u011fraflar\u0131n ad\u0131 %1$s olur.");
         table.put("Photos go to %1$s.",

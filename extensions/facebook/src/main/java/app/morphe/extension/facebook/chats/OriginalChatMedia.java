@@ -5,12 +5,15 @@
  */
 package app.morphe.extension.facebook.chats;
 
+import android.os.Looper;
+import androidx.annotation.Nullable;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.diagnostics.HookStatus;
 import java.io.IOException;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 /**
  * What the Send chat photos and videos at original quality patch asks before a chat inside Facebook
@@ -20,8 +23,11 @@ import java.util.Map;
  * as a copy of its own image data (see {@link OriginalPhoto}), without its metadata except the
  * rotation tag. Videos: the transcoder only skips the re-encode for a file smaller than its target
  * size plus a little, and the size check's answer comes through {@link #videoPassthrough}, which
- * says "smaller" for any file under {@link #VIDEO_MAX_BYTES}. Trims, overlays, muting and the
- * forced transcode still take their own path.
+ * says "smaller" for a file under {@link #VIDEO_MAX_BYTES} that {@link VideoLocation} finds no
+ * place in. A passed video goes out byte for byte, so one with a location tag, or one whose layout
+ * can't be read in full, keeps Facebook's re-encode, which drops the tags. A passed video keeps its
+ * date and the camera's make and model. Trims, overlays, muting and the forced transcode still
+ * take their own path.
  *
  * <p>Off, paused, settings that aren't ready yet, a file this can't pass through, or a failure in
  * here, and Facebook does what it meant to.
@@ -33,10 +39,21 @@ public final class OriginalChatMedia {
     /** Counted each time a video's size check is answered "small enough to send as it is". */
     static final String VIDEO_PASSED = "video sent without re-encoding";
 
+    /** Counted each time a video that could skip the re-encode keeps it, for a location or a layout not read in full. */
+    static final String VIDEO_KEPT = "video re-encoded for its location tag";
+
     /** Larger videos keep Facebook's transcode, which fits them under the chat's upload limit. */
     static final long VIDEO_MAX_BYTES = 25_000_000;
 
     private static final String FAMILY = FamilyNames.ORIGINAL_CHAT_MEDIA;
+
+    /**
+     * Whether this runs on the main thread, where the video's file isn't read. Facebook's chats ask
+     * the size check on their own media thread. Tests, which run on the main thread, stand in.
+     */
+    static final BooleanSupplier MAIN_THREAD = () -> Looper.myLooper() == Looper.getMainLooper();
+
+    static volatile BooleanSupplier onMainThread = MAIN_THREAD;
 
     private OriginalChatMedia() {
     }
@@ -80,14 +97,19 @@ public final class OriginalChatMedia {
     }
 
     /**
-     * Injection point, right after the video size check's compare: a negative answer lets the file
-     * skip the re-encode. A file that already skips, one with no size or one over
-     * {@link #VIDEO_MAX_BYTES} gets Facebook's answer back.
+     * Injection point, right after the video size check's compare, with the {@code file://} address
+     * of the video: a negative answer lets the file skip the re-encode. A file that already skips,
+     * one with no size or one over {@link #VIDEO_MAX_BYTES} gets Facebook's answer back, and so does
+     * one {@link VideoLocation} doesn't find clear, or any file while on the main thread.
      */
-    public static int videoPassthrough(int comparison, long bytes) {
+    public static int videoPassthrough(int comparison, long bytes, @Nullable String source) {
         try {
             HookStatus.invoked(FAMILY);
             if (!on() || comparison < 0 || bytes <= 0 || bytes > VIDEO_MAX_BYTES) return comparison;
+            if (onMainThread.getAsBoolean() || !VideoLocation.clear(source)) {
+                HookStatus.counted(FAMILY, VIDEO_KEPT);
+                return comparison;
+            }
             HookStatus.counted(FAMILY, VIDEO_PASSED);
             return -1;
         } catch (Throwable failure) {

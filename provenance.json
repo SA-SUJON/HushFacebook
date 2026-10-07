@@ -769,6 +769,15 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/VideoLocation.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: before Send chat photos and videos at original quality lets a video skip Facebook's re-encode, a read-only walk over the file's top-level MP4 box headers and its movie box, capped at 4 MB, looks through every udta and meta of the movie, its tracks and their media for a place (a ©xyz or loci box, a location or ISO 6709 key, GPS tags in XMP). A file that isn't local, is cut short, fragmented, laid out in a way it doesn't read, or has a track that isn't video or sound keeps the re-encode."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/chats/TypingIndicator.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/chats/HideTypingIndicatorPatch.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/chats/TypingAnchors.kt"
