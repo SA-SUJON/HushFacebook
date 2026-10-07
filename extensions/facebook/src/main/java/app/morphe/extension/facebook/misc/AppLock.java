@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import app.morphe.extension.facebook.download.SavedFileActions;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.facebook.settings.SettingsEntry;
 import app.morphe.extension.shared.L10n;
@@ -631,6 +632,11 @@ public final class AppLock {
         refusal = null;
         for (Cover cover : new ArrayList<>(covers.values())) cover.close();
         covers.clear();
+        Activity shown = unlockedOn != null ? unlockedOn : front.get();
+        if (shown != null && !shown.isFinishing()) {
+            // A saved file Facebook was asked to open while it was locked is opened now.
+            SavedFileActions.onUnlocked(shown);
+        }
         if (unlockedOn != null && !unlockedOn.isFinishing()) SettingsEntry.openIfRequested(unlockedOn);
     }
 

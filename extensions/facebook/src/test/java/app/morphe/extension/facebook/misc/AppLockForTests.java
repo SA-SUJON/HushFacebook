@@ -39,4 +39,38 @@ public final class AppLockForTests {
             AppLock.forgetForTests();
         }
     }
+
+    private static AppLock.Answer lastAnswer;
+
+    /** A phone with a screen lock and a fresh process, with Android's prompt stood in for. */
+    public static void arm() {
+        AppLock.forgetForTests();
+        lastAnswer = null;
+        AppLock.prompter = (activity, answer) -> lastAnswer = answer;
+        KeyguardManager keyguard = RuntimeEnvironment.getApplication().getSystemService(KeyguardManager.class);
+        shadowOf(keyguard).setIsDeviceSecure(true);
+    }
+
+    /** The lock hears a Facebook screen start. */
+    public static void started(Activity activity) {
+        AppLock.started(activity);
+    }
+
+    /** The lock hears a Facebook screen resume, and the main thread runs. */
+    public static void resumed(Activity activity) {
+        AppLock.resumed(activity);
+        ShadowLooper.idleMainLooper();
+    }
+
+    /** The person passes the check the lock asked for. */
+    public static void unlock() {
+        lastAnswer.unlocked();
+        ShadowLooper.idleMainLooper();
+    }
+
+    /** Back to a fresh process. */
+    public static void disarm() {
+        AppLock.forgetForTests();
+        lastAnswer = null;
+    }
 }
