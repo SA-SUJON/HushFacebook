@@ -626,10 +626,12 @@ public class PausedHooksTest {
                         return true;
                     }
                 }, android.view.HapticFeedbackConstants.LONG_PRESS)));
-        // ReelsPipUtil's check and the Reels viewer's gate say yes on Android 12 with the phone's feature.
+        // ReelsPipUtil's check and the Reels viewer's gate say yes on Android 12 with the phone's feature,
+        // and so do the Watch viewer's flag and the Video tab's copy of the gate and its flag.
         probes.put(PatchFamily.PICTURE_IN_PICTURE, Arrays.asList(
                 PictureInPictureForTests::allowsWithTheFeature, PictureInPictureForTests::surfaceAllows,
-                PictureInPictureForTests::immersiveAllows));
+                PictureInPictureForTests::immersiveAllows, PictureInPictureForTests::homeGateAllows,
+                PictureInPictureForTests::homeFlagAllows));
         // An HDR window comes out in the default colour mode, and a headroom as none.
         probes.put(PatchFamily.HDR_BRIGHTNESS, Arrays.asList(
                 HdrBrightnessForTests::keepsAnHdrWindowInTheUsualRange, HdrBrightnessForTests::holdsTheHeadroom));

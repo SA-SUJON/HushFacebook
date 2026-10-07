@@ -43,6 +43,36 @@ public final class PictureInPictureForTests {
         }
     }
 
+    /** Whether the Video tab's copy of the Reels viewer's gate, which Facebook answered no, comes out yes on Android 12. */
+    public static boolean homeGateAllows() {
+        return homeGateAllows(Build.VERSION_CODES.S, false);
+    }
+
+    /** Whether the Video tab's deep-dive flag, which Facebook answered no, comes out yes on Android 12. */
+    public static boolean homeFlagAllows() {
+        return homeFlagAllows(Build.VERSION_CODES.S, false);
+    }
+
+    static boolean homeGateAllows(int apiLevel, boolean answer) {
+        int was = PictureInPicture.apiLevel;
+        PictureInPicture.apiLevel = apiLevel;
+        try {
+            return PictureInPicture.homeGateAllowed(answer);
+        } finally {
+            PictureInPicture.apiLevel = was;
+        }
+    }
+
+    static boolean homeFlagAllows(int apiLevel, boolean answer) {
+        int was = PictureInPicture.apiLevel;
+        PictureInPicture.apiLevel = apiLevel;
+        try {
+            return PictureInPicture.homeFlagAllowed(answer);
+        } finally {
+            PictureInPicture.apiLevel = was;
+        }
+    }
+
     static boolean allows(int apiLevel, boolean feature) {
         shadowOf(RuntimeEnvironment.getApplication().getPackageManager())
                 .setSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE, feature);

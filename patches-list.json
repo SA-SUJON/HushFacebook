@@ -3515,7 +3515,7 @@
     },
     {
       "name": "Picture-in-picture",
-      "description": "A reel playing in the Reels tab, or a video playing in Facebook's full-screen Watch viewer, keeps going in a small window when you leave Facebook, through the picture-in-picture Facebook already has for them. Needs Android 12 or later.",
+      "description": "A reel playing in the Reels tab, or a video playing in the Video tab or Facebook's full-screen Watch viewer, keeps going in a small window when you leave Facebook, through the picture-in-picture Facebook already has for them. Needs Android 12 or later.",
       "category": "Interface",
       "use": false,
       "dependencies": [
