@@ -134,11 +134,18 @@ internal fun isGearSheet(method: Method, pick: String): Boolean {
  * Where [method] walks its labels and reads each one's speed: an array-length of the labels, then
  * within a few instructions an aget-object from them, an if-eqz on the last parameter and an aget
  * of the speed. The last parameter is one register wide, a boolean, so it's the method's last.
+ * None when anything in [method] writes that register, since the flag is forced at its start.
  */
 internal fun gearMeets(method: Method): List<GearMeet> {
     val implementation = method.implementation ?: return emptyList()
     val code = implementation.instructions.toList()
     val values = implementation.registerCount - 1
+    val rewritten = code.any {
+        val written = (it as? OneRegisterInstruction)?.registerA
+        it.opcode.setsRegister() && written != null &&
+            (written == values || it.opcode.setsWideRegister() && written + 1 == values)
+    }
+    if (rewritten) return emptyList()
     return code.withIndex().mapNotNull { (index, instruction) ->
         if (instruction.opcode != Opcode.ARRAY_LENGTH) return@mapNotNull null
         val labels = (instruction as TwoRegisterInstruction).registerB

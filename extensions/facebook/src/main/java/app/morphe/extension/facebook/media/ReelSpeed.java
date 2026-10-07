@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -84,8 +83,8 @@ public final class ReelSpeed {
     /** Counted under the patch's name each time the gear menu's speed sheet offers the slower speeds. */
     static final String GEAR_SLOWER_OFFERED = "gear speed sheet offered slower speeds";
 
-    /** The speeds {@link #gearSpeeds} just put ahead of the sheet's own, for {@link #gearLabels} to label. */
-    private static final ThreadLocal<float[]> GEAR_ADDED = new ThreadLocal<>();
+    /** The labels of the speeds {@link #gearSpeeds} just put ahead of the sheet's own, for {@link #gearLabels}. */
+    private static final ThreadLocal<String[]> GEAR_ADDED = new ThreadLocal<>();
 
     /**
      * What a player's origin holds when it plays somewhere a kept video speed doesn't belong: chats,
@@ -328,7 +327,10 @@ public final class ReelSpeed {
             float[] choices = new float[added + speeds.length];
             System.arraycopy(SLOWER, 0, choices, 0, added);
             System.arraycopy(speeds, 0, choices, added, speeds.length);
-            GEAR_ADDED.set(Arrays.copyOf(SLOWER, added));
+            // Labelled here, so all that's left for gearLabels is to join two arrays.
+            String[] names = new String[added];
+            for (int i = 0; i < added; i++) names[i] = String.valueOf(SLOWER[i]);
+            GEAR_ADDED.set(names);
             HookStatus.counted(FAMILY, GEAR_SLOWER_OFFERED);
             return choices;
         } catch (Throwable failure) {
@@ -344,12 +346,12 @@ public final class ReelSpeed {
      * labels come back unchanged when nothing was added.
      */
     public static String[] gearLabels(String[] labels) {
-        float[] added = GEAR_ADDED.get();
+        String[] added = GEAR_ADDED.get();
         GEAR_ADDED.remove();
         if (added == null || labels == null) return labels;
         try {
             String[] choices = new String[added.length + labels.length];
-            for (int i = 0; i < added.length; i++) choices[i] = String.valueOf(added[i]);
+            System.arraycopy(added, 0, choices, 0, added.length);
             System.arraycopy(labels, 0, choices, added.length, labels.length);
             return choices;
         } catch (Throwable failure) {
