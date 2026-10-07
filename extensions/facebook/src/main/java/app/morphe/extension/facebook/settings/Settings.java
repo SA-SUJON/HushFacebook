@@ -1036,9 +1036,13 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_SEEN_POSTS =
             new BooleanSetting("hushfacebook_hide_seen_posts", FALSE);
 
-    /** How long a seen post stays hidden while {@link #HIDE_SEEN_POSTS} is on. It isn't a switch. */
+    /**
+     * How long a seen post stays hidden while {@link #HIDE_SEEN_POSTS} is on. It isn't a switch.
+     * Its row is greyed out while the switch is off: the settings page enables each row by its
+     * setting's availability after every change, which would otherwise undo the row's own greying.
+     */
     public static final EnumSetting<SeenPosts.Keep> SEEN_POSTS_KEEP =
-            new EnumSetting<>("hushfacebook_seen_posts_keep", SeenPosts.Keep.SEVEN_DAYS);
+            new EnumSetting<>("hushfacebook_seen_posts_keep", SeenPosts.Keep.SEVEN_DAYS, Setting.parent(HIDE_SEEN_POSTS));
 
     /**
      * Posts come without the row of Meta AI questions Facebook adds under some of them
