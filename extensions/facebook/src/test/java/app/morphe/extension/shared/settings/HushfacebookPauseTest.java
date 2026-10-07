@@ -341,6 +341,44 @@ public class HushfacebookPauseTest {
         }
     }
 
+    /** A handler that puts itself back in front each time gets the front after a bounded number of moves. */
+    @Test public void theCrashHandlerMovesToTheFrontABoundedNumberOfTimes() {
+        Thread.UncaughtExceptionHandler before = Thread.getDefaultUncaughtExceptionHandler();
+        try {
+            start(null);
+            Thread.UncaughtExceptionHandler pushy = (thread, crash) -> { };
+            int moves = 0;
+            for (int screen = 0; screen < HushfacebookPause.CRASH_MARK_MOVES_MAX + 5; screen++) {
+                Thread.setDefaultUncaughtExceptionHandler(pushy);
+                HushfacebookPause.keepCrashMarkOnTop();
+                if (Thread.getDefaultUncaughtExceptionHandler() != pushy) moves++;
+            }
+            assertEquals(HushfacebookPause.CRASH_MARK_MOVES_MAX, moves);
+            assertSame("past the bound it stays behind", pushy, Thread.getDefaultUncaughtExceptionHandler());
+        } finally {
+            Thread.setDefaultUncaughtExceptionHandler(before);
+        }
+    }
+
+    /** An exception off the main thread that a later handler swallowed leaves the earlier crash in the report. */
+    @Test public void aSwallowedExceptionOffTheMainThreadLeavesTheEarlierCrash() throws Exception {
+        Thread.UncaughtExceptionHandler before = Thread.getDefaultUncaughtExceptionHandler();
+        try {
+            Thread.setDefaultUncaughtExceptionHandler((thread, crash) -> { });
+            LogBufferManager.clearLogBuffer();
+            LogBufferManager.persistCrashReport(context, "an earlier start's crash");
+            start(null);
+            Thread.getDefaultUncaughtExceptionHandler()
+                    .uncaughtException(new Thread("CombinedTP3"), new IllegalStateException("swallowed"));
+            String kept = LogBufferManager.readCrashReport(context);
+            assertTrue(kept, kept.contains("an earlier start's crash"));
+            assertFalse(kept, kept.contains("swallowed"));
+        } finally {
+            Thread.setDefaultUncaughtExceptionHandler(before);
+            LogBufferManager.clearLogBuffer();
+        }
+    }
+
     @Test public void theStreakFileSurvivesNonsense() {
         HushfacebookPause.write(streak, "not a number");
         assertEquals(0, HushfacebookPause.parseCount(HushfacebookPause.read(streak)));

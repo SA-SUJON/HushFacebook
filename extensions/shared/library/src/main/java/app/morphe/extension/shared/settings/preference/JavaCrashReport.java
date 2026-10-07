@@ -7,13 +7,14 @@ package app.morphe.extension.shared.settings.preference;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.ref.WeakReference;
 import java.time.Instant;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.diagnostics.DiagnosticRedactor;
@@ -24,27 +25,56 @@ import app.morphe.extension.shared.diagnostics.DiagnosticRedactor;
  * <p>Android keeps no stack trace for a Java crash: its exit record says CRASH and nothing more, so
  * a report sent after "Facebook keeps stopping" (#94) couldn't say what stopped it. The pause
  * module's uncaught-exception handler hands each crash here before passing it on. The trace and
- * the last diagnostic events go through the redactor and stay in Facebook's own files until the
- * person exports a report; the next crash replaces them.
+ * the last diagnostic events go through the redactor and stay in Facebook's own files, so every
+ * report exported after it carries them, until the next crash replaces them or the diagnostic log
+ * is cleared.
+ *
+ * <p>The handler sits in front of Facebook's own, so it also sees an exception one of Facebook's
+ * swallows. When the handlers after it return, the process lives on, and an exception off the main
+ * thread put the report back as it was ({@link #survived}), so it can't push out a crash from an
+ * earlier start. One swallowed on the main thread stays: that thread is gone, and Facebook freezes.
  */
 public final class JavaCrashReport {
     /** How much of the diagnostic event log goes in after the trace. */
     static final int RECENT_EVENTS_MAX_CHARS = 12_000;
 
-    /** A crash is kept once per process: a handler Facebook put on top of ours can hand it back. */
-    private static final AtomicBoolean SAVED = new AtomicBoolean();
+    /** The exception kept last, weakly: a handler Facebook put on top of ours can hand it back. */
+    private static volatile WeakReference<Throwable> lastSaved = new WeakReference<>(null);
 
     private JavaCrashReport() {
     }
 
-    /** Keeps [throwable] as the latest Java crash, the first time a process asks. Never throws. */
-    public static void save(@Nullable Thread thread, @Nullable Throwable throwable) {
+    /**
+     * Keeps [throwable] as the latest Java crash, unless it's the one kept last. Answers what the
+     * report held before, "" for nothing, for {@link #survived}, or null when nothing was written.
+     * Never throws.
+     */
+    @Nullable
+    public static String save(@Nullable Thread thread, @Nullable Throwable throwable) {
         try {
             Context context = Utils.getContext();
-            if (context == null || throwable == null || !SAVED.compareAndSet(false, true)) return;
+            if (context == null || throwable == null || lastSaved.get() == throwable) return null;
+            lastSaved = new WeakReference<>(throwable);
+            String before = LogBufferManager.readCrashReport(context);
             LogBufferManager.persistCrashReport(context, build(context, thread, throwable));
+            return before;
         } catch (Throwable ignored) {
             // Crash-time code must never get in the way of the handlers after this one.
+            return null;
+        }
+    }
+
+    /**
+     * The handlers after ours returned for [thread]'s exception, so the process lives on. Off the
+     * main thread, the report goes back to [before], what {@link #save} answered. Never throws.
+     */
+    public static void survived(@Nullable Thread thread, @Nullable String before) {
+        try {
+            Context context = Utils.getContext();
+            if (context == null || before == null || thread == null || thread == Looper.getMainLooper().getThread()) return;
+            LogBufferManager.persistCrashReport(context, before);
+        } catch (Throwable ignored) {
+            // The exception's report stays; nothing else is lost.
         }
     }
 
@@ -76,8 +106,8 @@ public final class JavaCrashReport {
         return text.toString();
     }
 
-    /** Lets the next crash be kept again, as in a new process. Called by the pause module's reset. */
+    /** Forgets the exception kept last, as in a new process. Called by the pause module's reset. */
     public static void resetForTests() {
-        SAVED.set(false);
+        lastSaved = new WeakReference<>(null);
     }
 }

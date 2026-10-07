@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
@@ -64,6 +65,9 @@ public final class HushfacebookPause {
     @Nullable private static volatile Context appContext;
     /** Whether this process installed the crash handler, so {@link #keepCrashMarkOnTop} keeps it there. */
     private static volatile boolean crashMarkWanted;
+    /** How many times a process puts the crash handler back in front: Facebook installs five of its own. */
+    static final int CRASH_MARK_MOVES_MAX = 8;
+    private static final AtomicInteger CRASH_MARK_MOVES = new AtomicInteger();
 
     /** Whether Android still holds this process in its crash state. Tests put an answer here. */
     interface CrashState {
@@ -278,11 +282,14 @@ public final class HushfacebookPause {
      * before it (581 {@code LX/0lE;->A00}, {@code LX/05L;->start}, {@code LX/0uA;->start}, {@code
      * LX/0hs;->A0Y}, and the browser's {@code LX/f4g}), and one that ends the process itself would
      * never reach ours. Run as each screen is created; a process that never installed the handler
-     * (anything but the main one) is left alone. Never throws.
+     * (anything but the main one) is left alone. It moves to the front at most
+     * {@link #CRASH_MARK_MOVES_MAX} times a process, so a handler that puts itself back in front
+     * whenever it isn't can't grow the chain without end. Never throws.
      */
     public static void keepCrashMarkOnTop() {
-        if (!crashMarkWanted) return;
+        if (!crashMarkWanted || Thread.getDefaultUncaughtExceptionHandler() instanceof CrashMark) return;
         try {
+            if (CRASH_MARK_MOVES.incrementAndGet() > CRASH_MARK_MOVES_MAX) return;
             installCrashMark();
         } catch (Throwable failure) {
             Logger.printException(() -> "Hushfacebook pause: could not put the crash handler back in front", failure);
@@ -312,8 +319,10 @@ public final class HushfacebookPause {
             } catch (Throwable ignored) {
                 // The crash belongs to the handler after this one.
             }
-            JavaCrashReport.save(thread, throwable);
+            String before = JavaCrashReport.save(thread, throwable);
             if (delegate != null) delegate.uncaughtException(thread, throwable);
+            // Still here: the handlers after this one let the process live on.
+            JavaCrashReport.survived(thread, before);
         }
     }
 
@@ -355,6 +364,7 @@ public final class HushfacebookPause {
         STARTED.set(false);
         CRASH_MARKED.set(false);
         crashMarkWanted = false;
+        CRASH_MARK_MOVES.set(0);
         JavaCrashReport.resetForTests();
         reason = Reason.NONE;
         filesDir = null;
