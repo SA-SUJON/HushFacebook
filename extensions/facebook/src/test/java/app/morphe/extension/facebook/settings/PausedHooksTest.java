@@ -327,7 +327,9 @@ public class PausedHooksTest {
                     return !section.items.contains(ad);
                 },
                 () -> ReelsAdFilter.holdsAdPill(
-                        "com.facebook.feedback.comments.plugins.indicatorpill.reelsadsfloatingcta.ReelsAdsFloatingCtaPlugin")));
+                        "com.facebook.feedback.comments.plugins.indicatorpill.reelsadsfloatingcta.ReelsAdsFloatingCtaPlugin"),
+                // A profile's Reels tab sends no query for its ads.
+                ReelsAdFilter::holdProfileReelAds));
         // A search results page leaves its SEARCH_ADS module out.
         probes.put(PatchFamily.SPONSORED_SEARCH, Collections.singletonList(SearchAdFilterForTests::dropsAnAd));
         // A timeline story with sponsored data isn't drawn on a profile.
