@@ -632,9 +632,11 @@ public class PausedHooksTest {
                 PictureInPictureForTests::allowsWithTheFeature, PictureInPictureForTests::surfaceAllows,
                 PictureInPictureForTests::immersiveAllows, PictureInPictureForTests::homeGateAllows,
                 PictureInPictureForTests::homeFlagAllows));
-        // An HDR window comes out in the default colour mode, and a headroom as none.
+        // An HDR window comes out in the default colour mode, a headroom as none, and the screen
+        // answers as one that shows no HDR.
         probes.put(PatchFamily.HDR_BRIGHTNESS, Arrays.asList(
-                HdrBrightnessForTests::keepsAnHdrWindowInTheUsualRange, HdrBrightnessForTests::holdsTheHeadroom));
+                HdrBrightnessForTests::keepsAnHdrWindowInTheUsualRange, HdrBrightnessForTests::holdsTheHeadroom,
+                HdrBrightnessForTests::answersTheScreenAsShowingNoHdr));
         // A reel's bar is kept full size, and a full-screen video sets no fade timer.
         probes.put(PatchFamily.PROGRESS_BAR, Arrays.asList(ProgressBar::keepsReelBar, ProgressBar::keepsControls));
         // A tab asked for shows without its slide.
