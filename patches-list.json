@@ -1955,6 +1955,7 @@
       "category": "Feed",
       "use": false,
       "dependencies": [
+        "BytecodePatch",
         "Hushfacebook settings"
       ],
       "compatiblePackages": {

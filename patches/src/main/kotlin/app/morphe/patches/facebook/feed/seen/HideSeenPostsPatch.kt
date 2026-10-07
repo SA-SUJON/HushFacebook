@@ -11,6 +11,7 @@ import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.hook.feedFilterHookPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.parameterRegisterNumber
 import app.morphe.patches.facebook.misc.settings.settingsPatch
@@ -45,7 +46,8 @@ internal const val SEEN = "$SEEN_POSTS->seen(Ljava/lang/Object;)V"
  * feed cache, and it reads the unit's cache id to do it. The patch hands the same unit to the
  * extension, first thing in that method, and the extension remembers the id. The feed guard drops a
  * remembered post before Facebook adds it, so the rule lives with the other feed rules and this
- * patch only adds the signal.
+ * patch only adds the signal. It brings the guard ([feedFilterHookPatch]) itself, so picked alone
+ * it hides as well as remembers.
  */
 @Suppress("unused")
 val hideSeenPostsPatch = bytecodePatch(
@@ -56,7 +58,7 @@ val hideSeenPostsPatch = bytecodePatch(
     default = false,
 ) {
     category("Feed")
-    dependsOn(settingsPatch)
+    dependsOn(settingsPatch, feedFilterHookPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {

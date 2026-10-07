@@ -9,6 +9,7 @@ import app.morphe.Fixtures
 import app.morphe.PatchContexts
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
+import app.morphe.patches.facebook.feed.hook.feedFilterHookPatch
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.Opcode
@@ -32,6 +33,15 @@ import java.io.File
  */
 class HideSeenPostsFixtureTest {
     private fun Method.code(): List<Instruction> = implementation!!.instructions.toList()
+
+    /**
+     * The feed guard is what keeps a remembered post out, so the patch brings it. Picked on its own
+     * without another feed patch, it used to remember posts and never hide one.
+     */
+    @Test
+    fun `the patch brings the feed guard that hides what it remembers`() {
+        assertTrue("Hide seen posts doesn't bring the feed guard", feedFilterHookPatch in hideSeenPostsPatch.dependencies)
+    }
 
     private fun declaredBundles(): Map<String, List<File>> {
         val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
