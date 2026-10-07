@@ -5,6 +5,7 @@
 package app.morphe.extension.facebook.media;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,5 +110,11 @@ public final class ReelSpeedForTests {
         } finally {
             ReelSpeed.forget();
         }
+    }
+
+    /** True when a Reels speed picker's list comes back with slower speeds ahead of Facebook's. */
+    public static boolean offersSlowerSpeeds() {
+        List<Float> facebooks = Arrays.asList(0.5f, 1f, 2f);
+        return ReelSpeed.speedChoices(facebooks).size() > facebooks.size();
     }
 }

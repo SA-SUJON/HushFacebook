@@ -350,6 +350,7 @@ public class ColdStartHooksTest {
         assertFalse("a reel built before the context was given its play button", TapToPlay.showReelPlayButton(false));
         assertFalse("a long video started before the context was moved", ResumePlaybackForTests.resumesALongVideo());
         assertFalse("a reel started before the context got a picked speed", ReelSpeedForTests.keepsAPickedSpeed());
+        assertFalse("a speed menu built before the context offered slower speeds", ReelSpeedForTests.offersSlowerSpeeds());
         assertFalse("a video started before the context played at the chosen quality",
                 QualityChoiceForTests.playsTheChosenQuality());
         String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
