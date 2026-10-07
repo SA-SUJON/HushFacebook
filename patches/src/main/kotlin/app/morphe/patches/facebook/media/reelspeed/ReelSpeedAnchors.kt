@@ -11,6 +11,7 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
@@ -111,6 +112,29 @@ internal const val GEAR_VALUES = "$REEL_SPEED->gearValues(Z)Z"
 internal const val GEAR_SPEEDS = "$REEL_SPEED->gearSpeeds([F)[F"
 internal const val GEAR_LABELS = "$REEL_SPEED->gearLabels([Ljava/lang/String;)[Ljava/lang/String;"
 private const val LOCALE_NUMBERS = "Ljava/text/NumberFormat;->getInstance(Ljava/util/Locale;)Ljava/text/NumberFormat;"
+
+/**
+ * Kept literal. HeroManager's setPlaybackSpeed logs it for a speed outside 0.25x to 4x, then keeps
+ * the speed and the pitch in that range before the service player gets them (581 LX/7t3;->A0D, read
+ * on a phone 2026-10-07: a 0.1x pick played at 0.25x). The service player's audio takes 0.1x to 8x.
+ */
+internal const val SPEED_RANGE_LOG = "Trying to set playback speed with invalid value"
+
+/** HeroManager's slowest speed, and the slowest of the slower speeds, which replaces it. */
+internal const val HERO_FLOOR = 0.25f
+internal const val SLOWEST = 0.1f
+
+/** The const/high16 instructions of [method] loading [HERO_FLOOR], by index. */
+internal fun speedFloors(method: Method): List<Int> =
+    method.implementation?.instructions?.withIndex()?.filter { (_, instruction) ->
+        instruction.opcode == Opcode.CONST_HIGH16 &&
+            (instruction as NarrowLiteralInstruction).narrowLiteral == HERO_FLOOR.toRawBits()
+    }?.map { it.index }.orEmpty()
+
+/** Whether [method] keeps a float from going under a floor with Math.max. */
+internal fun callsFloatMax(method: Method): Boolean = method.implementation?.instructions?.any {
+    (it as? ReferenceInstruction)?.reference?.toString() == "Ljava/lang/Math;->max(FF)F"
+} == true
 
 /**
  * Where the gear menu's speed sheet builder walks its labels: [index] is the array-length of

@@ -7,6 +7,7 @@ package app.morphe.patches.facebook.media.reelspeed
 import app.morphe.patcher.StringComparisonType
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
@@ -32,6 +33,7 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
@@ -55,6 +57,8 @@ internal const val PATCH = "Keep the reel speed"
  * pickers offers ([addSlowerSpeeds]), and a pick of one of the added speeds goes through the same
  * toast and setter, so Keep the reel speed keeps it like any other. The gear menu's speed sheet
  * gets them too ([addSlowerGearSpeeds]), and its pick goes through the setter the gear hook follows.
+ * Facebook's player keeps every speed at 0.25x or faster, so the patch lowers that floor to 0.1x
+ * ([lowerSpeedFloor]). Facebook itself never asks for less than 0.5x.
  */
 @Suppress("unused")
 val keepReelSpeedPatch = bytecodePatch(
@@ -82,6 +86,11 @@ val keepReelSpeedPatch = bytecodePatch(
             addSlowerGearSpeeds(anchors.gearPick)
         } catch (moved: PatchException) {
             patchLog.warning("${moved.message}. The patch goes on without the slower speeds in the gear menu.")
+        }
+        try {
+            lowerSpeedFloor()
+        } catch (moved: PatchException) {
+            patchLog.warning("${moved.message}. The patch goes on, and 0.1x plays at Facebook's slowest, 0.25x.")
         }
         enableStatus("keepReelSpeed")
     }
@@ -253,6 +262,26 @@ internal fun BytecodePatchContext.addSlowerGearSpeeds(gearPick: Method) {
             move-result v${meet.values}
         """,
     )
+}
+
+/**
+ * HeroManager's setPlaybackSpeed keeps the speed and the pitch at [HERO_FLOOR] or faster. Its one
+ * load of that floor loads [SLOWEST] instead, into the same register, so a 0.1x pick reaches the
+ * service player, whose audio goes down to 0.1x.
+ */
+private fun BytecodePatchContext.lowerSpeedFloor() {
+    val methods = classDefByStrings(SPEED_RANGE_LOG, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        .flatMap { holder -> holder.methods.filter { holdsString(it, SPEED_RANGE_LOG) } }
+    val method = methods.singleOrNull()
+        ?: refuse("expected one speed setter holding \"$SPEED_RANGE_LOG\", found ${methods.size}")
+    val floors = speedFloors(method)
+    val floor = floors.singleOrNull()
+        ?: refuse("expected ${method.definingClass}->${method.name} to load ${HERO_FLOOR}f once, found ${floors.size}")
+    if (!callsFloatMax(method)) refuse("${method.definingClass}->${method.name} keeps no speed over a floor")
+    val register = (method.implementation!!.instructions.elementAt(floor) as OneRegisterInstruction).registerA
+    mutableClassDefBy(method.definingClass).findMutableMethodOf(method)
+        .replaceInstruction(floor, "const v$register, 0x${SLOWEST.toRawBits().toString(16)}")
 }
 
 /** 2 when [setter] starts with the release guard's hook and its move-result, else 0. */

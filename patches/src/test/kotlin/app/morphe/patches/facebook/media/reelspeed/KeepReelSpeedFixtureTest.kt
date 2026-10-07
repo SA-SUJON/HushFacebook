@@ -173,7 +173,16 @@ class KeepReelSpeedFixtureTest {
                 val meet = meets.single()
                 val sheetClass = sheetHolders.single { it.type == sheet.definingClass }
 
-                fun classes() = listOf(owner, toastClass, gearClass, paramsClass, dropdownClass, sheetClass,
+                // HeroManager's setPlaybackSpeed loads its 0.25x floor once and keeps speeds over it.
+                val rangeHolders = FixtureDex.classesHolding(bundle, SPEED_RANGE_LOG).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+                val ranged = rangeHolders.flatMap { it.methods }.filter { holdsString(it, SPEED_RANGE_LOG) }
+                assertEquals("$name: methods holding \"$SPEED_RANGE_LOG\"", 1, ranged.size)
+                val speedRange = ranged.single()
+                assertEquals("$name: loads of the ${HERO_FLOOR}f floor", 1, speedFloors(speedRange).size)
+                assertTrue("$name: the floor isn't kept with Math.max", callsFloatMax(speedRange))
+                val rangeClass = rangeHolders.single { it.type == speedRange.definingClass }
+
+                fun classes() = listOf(owner, toastClass, gearClass, paramsClass, dropdownClass, sheetClass, rangeClass,
                     ExtensionDex.classDef(REEL_SPEED), ExtensionDex.classDef(SETTINGS_STATUS)).distinctBy { it.type }
                 val context = PatchContexts.of(classes())
                 keepReelSpeedPatch.execute(context)
@@ -272,6 +281,16 @@ class KeepReelSpeedFixtureTest {
                 assertEquals("$name: the guard's answer isn't taken", Opcode.MOVE_RESULT, chain[1].opcode)
                 assertEquals("$name: the hook after the guard's answer", SPEED_SET, chain[2].call.toString())
                 assertEquals("$name: the registers the hook after the guard hands over", listOf(self, self + 1), chain[2].registers())
+
+                // The floor loads 0.1f into the same register, and nothing else in the method moved.
+                val floorAt = speedFloors(speedRange).single()
+                val lowered = patched(speedRange.definingClass, speedRange)
+                assertEquals("$name: the lowered floor", Opcode.CONST, lowered[floorAt].opcode)
+                assertEquals("$name: the lowered floor's value", SLOWEST.toRawBits(), (lowered[floorAt] as NarrowLiteralInstruction).narrowLiteral)
+                assertEquals("$name: the lowered floor's register", (speedRange.code()[floorAt] as OneRegisterInstruction).registerA,
+                    (lowered[floorAt] as OneRegisterInstruction).registerA)
+                assertEquals("$name: the setter's other instructions", speedRange.code().map { it.opcode }.filterIndexed { i, _ -> i != floorAt },
+                    lowered.map { it.opcode }.filterIndexed { i, _ -> i != floorAt })
                 checked += version
             }
         }
