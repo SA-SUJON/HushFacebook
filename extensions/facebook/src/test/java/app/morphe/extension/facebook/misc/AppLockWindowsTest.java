@@ -196,6 +196,59 @@ public class AppLockWindowsTest {
         assertTrue(takesNoTouch(overlay));
     }
 
+    private final android.os.IBinder screenToken = new android.os.Binder();
+
+    /** A window of [owner]'s of the given type that can't take the focus, with the given token. */
+    private View typedWindow(Activity owner, int type, android.os.IBinder token) {
+        View view = new View(owner);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
+                type, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
+        params.token = token;
+        owner.getWindowManager().addView(view, params);
+        windows.add(view);
+        return view;
+    }
+
+    /** The list is in the order windows were added, so a sub-window of the screen's own sits under the cover wherever it is listed. */
+    @Test
+    public void aSubWindowOfTheScreenAboveTheCoverInTheListIsLeftAloneButAnotherTokensIsNot() {
+        AppLock.tokenOf = screen -> screenToken;
+        Activity screen = lockedScreen();
+        Dialog cover = ShadowDialog.getLatestDialog();
+        AppLock.roots.list();
+        View popup = typedWindow(screen, WindowManager.LayoutParams.TYPE_APPLICATION_PANEL, screenToken);
+
+        AppLock.sweep(screen);
+
+        assertFalse("a popup attached to the screen was stopped", takesNoTouch(popup));
+        assertSame("the cover moved for a popup of the screen", cover, ShadowDialog.getLatestDialog());
+
+        View other = typedWindow(screen, WindowManager.LayoutParams.TYPE_APPLICATION_PANEL, new android.os.Binder());
+        AppLock.sweep(screen);
+        assertTrue("a sub-window of some other window kept its touches", takesNoTouch(other));
+        assertNotSame(cover, ShadowDialog.getLatestDialog());
+    }
+
+    /** An overlay layers above every cover, so it is flagged even listed before the cover, and only the first time moves the cover. */
+    @Test
+    public void anOverlayTypeWindowListedBeforeTheCoverIsStoppedOnce() {
+        AppLock.tokenOf = screen -> screenToken;
+        activity = screen();
+        windows.add(decorOf(activity));
+        View overlay = typedWindow(activity, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, null);
+        front(activity);
+        AppLock.roots.list();
+
+        AppLock.sweep(activity);
+
+        assertTrue("an overlay-type window listed under the cover kept its touches", takesNoTouch(overlay));
+        Dialog top = ShadowDialog.getLatestDialog();
+        AppLock.sweep(activity);
+        assertSame("the cover was put back on top again for a window it can't get above", top,
+                ShadowDialog.getLatestDialog());
+    }
+
     @Test
     public void theTouchesComeBackWithTheUnlockAndAWindowUnderTheCoverIsLeftAlone() {
         activity = screen();

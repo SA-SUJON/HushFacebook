@@ -188,12 +188,15 @@ public final class AppLock {
 
     /** The window lists of this process: a test's stand-in, or the framework's own list. */
     interface Roots {
-        /** Every window's root view, oldest first, or null when this phone won't say. */
+        /** Every window's root view in the order they were added, or null when this phone won't say. */
         @Nullable
         List<View> list();
     }
 
     static Roots roots = AppLock::frameworkRoots;
+    /** The token of a screen's own window, which its sub-windows carry. A test's stand-in where a window manager has none. */
+    static java.util.function.Function<Activity, android.os.IBinder> tokenOf =
+            screen -> screen.getWindow().getDecorView().getApplicationWindowToken();
     private static boolean rootsFailureLogged;
     static final int WINDOW_CHECK_UNKNOWN = 0;
     static final int WINDOW_CHECK_WORKS = 1;
@@ -656,6 +659,7 @@ public final class AppLock {
         sideFile = null;
         sideFileContext = null;
         roots = AppLock::frameworkRoots;
+        tokenOf = screen -> screen.getWindow().getDecorView().getApplicationWindowToken();
         rootsFailureLogged = false;
         windowCheck = WINDOW_CHECK_UNKNOWN;
         readersFound = false;
@@ -689,9 +693,14 @@ public final class AppLock {
      * A window of [activity]'s above its cover takes taps whether or not it can take the focus: a
      * popup, a tooltip bubble, anything added to the window manager with FLAG_NOT_FOCUSABLE. The
      * cover only learns of windows that take the focus, so while locked the screen's windows are
-     * read in the order Android layers them. Whatever sits above the cover stops taking touches, so
-     * a tap goes through to the cover, and the cover goes back on top of it. Fails safe: when this
-     * phone won't give its window list, nothing changes and the cover stays as it was.
+     * read. The list is in the order they were added, not the order Android layers them, so two
+     * kinds are judged by what they are rather than where they sit. A sub-window attached to the
+     * screen's own window (a popup menu, a spinner list) is layered with the screen, under the
+     * cover, wherever it sits in the list, so it is left alone. A window of the screen's whose type
+     * is above the application range, such as an overlay, is layered above every cover, so it is
+     * flagged wherever it sits. Whatever is flagged stops taking touches, so a tap goes through to
+     * the cover, and the cover goes back on top of what it can. Fails safe: when this phone won't
+     * give its window list, nothing changes and the cover stays as it was.
      */
     static void sweep(Activity activity) {
         try {
@@ -704,11 +713,20 @@ public final class AppLock {
             View mine = window == null ? null : window.getDecorView();
             int at = mine == null ? -1 : all.lastIndexOf(mine);
             if (at < 0) return;
+            android.os.IBinder own = tokenOf.apply(activity);
             boolean foreign = false;
-            for (View root : all.subList(at + 1, all.size())) {
+            for (int i = 0; i < all.size(); i++) {
+                View root = all.get(i);
                 if (isCover(root) || !belongsTo(root, activity)) continue;
-                foreign = true;
-                stopTouches(activity, root);
+                WindowManager.LayoutParams params = root.getLayoutParams() instanceof WindowManager.LayoutParams
+                        ? (WindowManager.LayoutParams) root.getLayoutParams() : null;
+                if (params != null && isSubWindowOf(params, own)) continue;
+                boolean above = i > at;
+                boolean overlay = params != null && params.type > WindowManager.LayoutParams.LAST_APPLICATION_WINDOW;
+                if (!above && !overlay) continue;
+                boolean stopped = stopTouches(activity, root);
+                // A window that sits below the cover is only worth a fresh cover the once, when it is first stopped.
+                if (above || stopped) foreign = true;
             }
             if (foreign) {
                 Logger.printInfo(() -> "App lock: a window opened above the cover, so the cover went back on top of it");
@@ -717,6 +735,13 @@ public final class AppLock {
         } catch (Throwable failure) {
             Logger.printException(() -> "App lock: could not look for windows above the cover", failure);
         }
+    }
+
+    /** A sub-window type (popup, panel, media) whose parent is the screen's own window. */
+    private static boolean isSubWindowOf(WindowManager.LayoutParams params, @Nullable android.os.IBinder own) {
+        return params.type >= WindowManager.LayoutParams.FIRST_SUB_WINDOW
+                && params.type <= WindowManager.LayoutParams.LAST_SUB_WINDOW
+                && own != null && params.token == own;
     }
 
     private static boolean isCover(View root) {
@@ -735,20 +760,23 @@ public final class AppLock {
             context = ((android.content.ContextWrapper) context).getBaseContext();
         }
         android.os.IBinder token = root.getApplicationWindowToken();
-        return token != null && token == activity.getWindow().getDecorView().getApplicationWindowToken();
+        return token != null && token == tokenOf.apply(activity);
     }
 
-    private static void stopTouches(Activity activity, View root) {
-        if (untouchable.containsKey(root) || !(root.getLayoutParams() instanceof WindowManager.LayoutParams)) return;
+    /** Takes the touches from [root] unless it is already flagged, and says whether the lock did. */
+    private static boolean stopTouches(Activity activity, View root) {
+        if (untouchable.containsKey(root) || !(root.getLayoutParams() instanceof WindowManager.LayoutParams)) return false;
         WindowManager.LayoutParams params = (WindowManager.LayoutParams) root.getLayoutParams();
-        if ((params.flags & WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE) != 0) return;
+        if ((params.flags & WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE) != 0) return false;
         WindowManager manager = activity.getWindowManager();
         params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         try {
             manager.updateViewLayout(root, params);
             untouchable.put(root, manager);
+            return true;
         } catch (RuntimeException gone) {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+            return false;
         }
     }
 
