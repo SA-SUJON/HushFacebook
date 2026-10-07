@@ -942,7 +942,7 @@ public final class L10nTranslations {
         table.put("Material You theme",
                 "Material-You-Design");
         table.put("Material You theme is in this build and picks Facebook's colors, so this has no effect.",
-                "Das Material-You-Design ist in diesem Build und bestimmt die Farben von Facebook, daher hat das hier keine Wirkung.");
+                "Das Material-You-Design ist in diesem Build enthalten und bestimmt die Farben von Facebook, daher hat das hier keine Wirkung.");
         table.put("Memories between posts, like \"On this day\" and friendship anniversaries. Your Memories page stays.",
                 "Erinnerungen zwischen Beitr\u00e4gen, etwa \u201eAn diesem Tag\u201c und Freundschaftstage. Deine Erinnerungen-Seite bleibt.");
         table.put("Menu",
@@ -2695,7 +2695,7 @@ public final class L10nTranslations {
         table.put("Material You theme",
                 "Tema Material You");
         table.put("Material You theme is in this build and picks Facebook's colors, so this has no effect.",
-                "El tema Material You est\u00e1 en esta versi\u00f3n y elige los colores de Facebook, as\u00ed que esto no tiene efecto.");
+                "El tema Material You est\u00e1 en esta compilaci\u00f3n y elige los colores de Facebook, as\u00ed que esto no tiene efecto.");
         table.put("Memories between posts, like \"On this day\" and friendship anniversaries. Your Memories page stays.",
                 "Los recuerdos entre las publicaciones, como \u00abUn d\u00eda como hoy\u00bb y los aniversarios de amistad. Tu p\u00e1gina de Recuerdos se queda.");
         table.put("Menu",
@@ -6201,7 +6201,7 @@ public final class L10nTranslations {
         table.put("Material You theme",
                 "Tema Material You");
         table.put("Material You theme is in this build and picks Facebook's colors, so this has no effect.",
-                "O tema Material You est\u00e1 neste build e escolhe as cores do Facebook, ent\u00e3o isso n\u00e3o tem efeito.");
+                "O tema Material You faz parte desta vers\u00e3o e escolhe as cores do Facebook, ent\u00e3o isso n\u00e3o tem efeito.");
         table.put("Memories between posts, like \"On this day\" and friendship anniversaries. Your Memories page stays.",
                 "Lembran\u00e7as entre as publica\u00e7\u00f5es, como \"Neste dia\" e anivers\u00e1rios de amizade. Sua p\u00e1gina de Lembran\u00e7as continua.");
         table.put("Menu",
@@ -7954,7 +7954,7 @@ public final class L10nTranslations {
         table.put("Material You theme",
                 "Material You temas\u0131");
         table.put("Material You theme is in this build and picks Facebook's colors, so this has no effect.",
-                "Material You temas\u0131 bu derlemede var ve Facebook'un renklerini se\u00e7iyor, bu y\u00fczden bunun bir etkisi yok.");
+                "Material You temas\u0131 bu s\u00fcr\u00fcmde var ve Facebook'un renklerini se\u00e7iyor, bu y\u00fczden bunun bir etkisi yok.");
         table.put("Memories between posts, like \"On this day\" and friendship anniversaries. Your Memories page stays.",
                 "G\u00f6nderilerin aras\u0131ndaki an\u0131lar, \u00f6rne\u011fin \"Ge\u00e7mi\u015fte bug\u00fcn\" ve arkada\u015fl\u0131k y\u0131l d\u00f6n\u00fcmleri. An\u0131lar sayfan kal\u0131r.");
         table.put("Menu",

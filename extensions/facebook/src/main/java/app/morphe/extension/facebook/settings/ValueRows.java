@@ -897,6 +897,12 @@ final class ValueRows {
             setEnabled(!materialYou);
         }
 
+        /** The shared page enables every row it syncs from a setting; with Material You this one stays off. */
+        @Override
+        public void setEnabled(boolean enabled) {
+            super.setEnabled(enabled && !materialYou);
+        }
+
         @Override
         public void setValue(String value) {
             super.setValue(value);

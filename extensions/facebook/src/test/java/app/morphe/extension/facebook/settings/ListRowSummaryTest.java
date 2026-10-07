@@ -69,7 +69,8 @@ public class ListRowSummaryTest {
         assertEquals(false, taken.isEnabled());
         assertEquals("Material You theme is in this build and picks Facebook's colors, so this has no effect.",
                 String.valueOf(taken.getSummary()));
-        taken.setValue("TEAL");
+        taken.setValue("PINK");
+        taken.setEnabled(true);
         assertEquals(false, taken.isEnabled());
         assertEquals("Material You theme is in this build and picks Facebook's colors, so this has no effect.",
                 String.valueOf(taken.getSummary()));

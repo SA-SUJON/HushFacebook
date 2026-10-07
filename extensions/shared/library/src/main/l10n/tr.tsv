@@ -1157,7 +1157,7 @@ Indigo	Çivit
 # context: Accent color choice, a yellow-orange
 Amber	Kehribar
 # context: summary of the Accent color row, greyed out because the Material You theme patch is in the build
-Material You theme is in this build and picks Facebook's colors, so this has no effect.	Material You teması bu derlemede var ve Facebook'un renklerini seçiyor, bu yüzden bunun bir etkisi yok.
+Material You theme is in this build and picks Facebook's colors, so this has no effect.	Material You teması bu sürümde var ve Facebook'un renklerini seçiyor, bu yüzden bunun bir etkisi yok.
 # context: summary of the Accent color row at its default
 Links, buttons, switches and the selected tab keep Facebook's blue.	Bağlantılar, düğmeler, anahtarlar ve seçili sekme Facebook'un mavisini korur.
 # context: summary of the Accent color row; %1$s is a color name such as Teal
