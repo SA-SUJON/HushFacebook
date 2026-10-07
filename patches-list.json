@@ -3406,6 +3406,7 @@
       "category": "Interface",
       "use": true,
       "dependencies": [
+        "BytecodePatch",
         "Hushfacebook settings"
       ],
       "compatiblePackages": {
