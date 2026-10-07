@@ -115,6 +115,9 @@ public final class AppLock {
 
     private static final long NEVER = -1;
 
+    /** How long after a check ends a cover that hasn't got the focus back goes on top again. */
+    static final long SETTLE_MS = 500;
+
     static Prompter prompter = AppLock::askAndroid;
 
     /** Facebook screens between their start and their stop. */
@@ -130,6 +133,8 @@ public final class AppLock {
     private static boolean everUnlocked;
     /** The screens are covered until a check passes. */
     private static boolean locked;
+    /** The Facebook screen in front, between its resume and its pause. */
+    private static WeakReference<Activity> front = new WeakReference<>(null);
     /** A check is on screen. */
     private static boolean asking;
     /** The screen the check was asked over, so its going away ends the wait for an answer. */
@@ -212,6 +217,7 @@ public final class AppLock {
      */
     public static void paused(Activity activity) {
         try {
+            if (front.get() == activity) front = new WeakReference<>(null);
             if (!inPictureInPicture(activity) || floating.contains(activity) || !inFront()) return;
             floating.add(activity);
             if (!inFront()) leftAt = SystemClock.elapsedRealtime();
@@ -240,6 +246,7 @@ public final class AppLock {
      */
     public static void resumed(Activity activity) {
         try {
+            front = new WeakReference<>(activity);
             if (floating.contains(activity) && !inPictureInPicture(activity)) {
                 boolean returning = !inFront();
                 floating.remove(activity);
@@ -270,6 +277,7 @@ public final class AppLock {
         if (cover != null) cover.close();
         keptFromRecents.remove(activity);
         floating.remove(activity);
+        if (front.get() == activity) front = new WeakReference<>(null);
         // Android ends a check whose screen goes, and an answer that never comes mustn't stop the next one.
         WeakReference<Activity> asked = askedOn;
         if (asked != null && asked.get() == activity) {
@@ -308,6 +316,11 @@ public final class AppLock {
 
     private static void cover(Activity activity) {
         Cover cover = covers.get(activity);
+        if (cover != null && cover.isShowing()) {
+            // Already up: back on top, over anything Facebook opened on the screen while it was away.
+            raise(activity);
+            return;
+        }
         if (cover == null) {
             try {
                 cover = new Cover(activity);
@@ -321,6 +334,43 @@ public final class AppLock {
         }
         cover.showReason();
         if (!cover.isShowing()) cover.show();
+    }
+
+    /**
+     * Puts a fresh cover on [activity] and then takes the old one away, so the cover is the newest
+     * of the screen's windows again and nothing shows between the two. A dialog or sheet Facebook
+     * opened over the old cover ends up under it.
+     */
+    private static void raise(Activity activity) {
+        Cover old = covers.get(activity);
+        if (old == null || activity.isFinishing() || activity.isDestroyed()) return;
+        // Its loss of focus to the fresh one is no reason to move again.
+        old.retired = true;
+        Cover fresh;
+        try {
+            fresh = new Cover(activity);
+            fresh.show();
+        } catch (RuntimeException failure) {
+            old.retired = false;
+            Logger.printException(() -> "App lock: could not put the cover back on top", failure);
+            return;
+        }
+        covers.put(activity, fresh);
+        old.close();
+    }
+
+    /**
+     * After [cover] lost the focus, or a check ended without it getting the focus back. When
+     * Facebook is still locked, [activity] is still in front and no check is on screen, the window
+     * holding the focus is one Facebook opened on the screen over the cover, so a fresh cover goes
+     * on top of it. Android's own windows, the notification shade among them, sit above every app
+     * window anyway, and a cover put back under one of them changes nothing.
+     */
+    private static void keepOnTop(Activity activity, Cover cover) {
+        if (!locked || asking || cover.retired || cover.focused || covers.get(activity) != cover) return;
+        if (front.get() != activity) return;
+        Logger.printInfo(() -> "App lock: another window took the focus from the cover, so the cover went back on top");
+        raise(activity);
     }
 
     /**
@@ -352,6 +402,14 @@ public final class AppLock {
                         refusal = message;
                         Logger.printInfo(() -> "App lock: the check ended with code " + code + ", Facebook stays covered");
                         for (Cover cover : covers.values()) cover.showReason();
+                        // A dialog Facebook opened while the check was up sits over the cover, which
+                        // then never gets the focus back to notice. Once the check has gone, it does.
+                        Activity shown = front.get();
+                        if (shown == null) return;
+                        Utils.runOnMainThreadDelayed(() -> {
+                            Cover cover = covers.get(shown);
+                            if (cover != null) keepOnTop(shown, cover);
+                        }, SETTLE_MS);
                     }
                 });
             } catch (Throwable failure) {
@@ -380,6 +438,7 @@ public final class AppLock {
         covers.clear();
         keptFromRecents.clear();
         floating.clear();
+        front = new WeakReference<>(null);
         started = 0;
         leftAt = NEVER;
         everUnlocked = false;
@@ -415,14 +474,22 @@ public final class AppLock {
 
     /**
      * An opaque window over a Facebook screen, added after the windows it already has, so a sheet
-     * or dialog Facebook left open stays under it too. It takes every touch, and Back sends
-     * Facebook to the background rather than closing it.
+     * or dialog Facebook left open stays under it too. One Facebook opens later lands above it and
+     * takes the focus, and the cover answers by going back on top ({@link #keepOnTop}). It takes
+     * every touch, and Back sends Facebook to the background rather than closing it. It comes and
+     * goes without an animation, so a fresh one put on top shows nothing of the screen between.
      */
     private static final class Cover extends Dialog {
+        private final Activity activity;
         private final TextView reason;
+        /** A fresh cover replaced it, so its own loss of focus means nothing. */
+        boolean retired;
+        /** Whether its window has the focus, as Android last said. */
+        boolean focused;
 
         Cover(Activity activity) {
             super(activity, android.R.style.Theme_DeviceDefault_NoActionBar);
+            this.activity = activity;
             setCancelable(false);
             setCanceledOnTouchOutside(false);
             float density = activity.getResources().getDisplayMetrics().density;
@@ -471,6 +538,7 @@ public final class AppLock {
             if (window != null) {
                 window.setBackgroundDrawable(new ColorDrawable(Color.BLACK));
                 window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                window.setWindowAnimations(0);
             }
             setOnKeyListener((dialog, keyCode, event) -> {
                 if (keyCode != KeyEvent.KEYCODE_BACK) return false;
@@ -478,6 +546,14 @@ public final class AppLock {
                 return true;
             });
             showReason();
+        }
+
+        @Override
+        public void onWindowFocusChanged(boolean hasFocus) {
+            super.onWindowFocusChanged(hasFocus);
+            focused = hasFocus;
+            // Judged once the change has settled, when the screen's own pause has been heard.
+            if (!hasFocus && !retired) Utils.runOnMainThread(() -> keepOnTop(activity, this));
         }
 
         /** Android's reason the last check ended, or what unlocks Facebook. */

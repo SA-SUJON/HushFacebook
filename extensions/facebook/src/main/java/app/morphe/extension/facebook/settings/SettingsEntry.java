@@ -472,8 +472,6 @@ public final class SettingsEntry {
         @Override
         public void onActivityResumed(Activity activity) {
             resumed = new WeakReference<>(activity);
-            // First, so a locked Facebook is covered before anything else of Hushfacebook's shows.
-            AppLock.resumed(activity);
             TextSize.activity(activity);
             ScreenLog.resumed(activity);
             SavedFileActions.onResumed(activity);
@@ -485,6 +483,11 @@ public final class SettingsEntry {
             if (openPending) openWhenSettled(activity);
             relabelIfStale(activity);
             SavedShortcut.refresh(activity);
+            // Last, so the lock's cover is the newest window and anything this resume opened sits
+            // under it. Whether Facebook is locked was settled at the start, so covering() already
+            // holds the settings back above. A window Facebook opens later lands above the cover,
+            // which then goes back on top (AppLock.Cover).
+            AppLock.resumed(activity);
         }
 
         @Override

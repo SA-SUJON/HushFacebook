@@ -6,7 +6,10 @@ package app.morphe.extension.facebook.misc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
@@ -203,6 +206,65 @@ public class AppLockTest {
         cover.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
         assertTrue(cover.isShowing());
         assertTrue(shadowOf(activity).isTaskMovedToBack());
+    }
+
+    /** Facebook opens a dialog on a locked screen, and the window manager hands it the focus. */
+    private static Dialog facebooksDialogOver(Activity activity, Dialog cover) {
+        Dialog facebooks = new Dialog(activity);
+        facebooks.show();
+        assertSame(facebooks, ShadowDialog.getLatestDialog());
+        cover.onWindowFocusChanged(false);
+        ShadowLooper.idleMainLooper();
+        return facebooks;
+    }
+
+    @Test
+    public void aDialogFacebookOpensOverTheCoverEndsUpUnderIt() {
+        Settings.APP_LOCK.save(true);
+        Activity activity = screen();
+        front(activity);
+        asked.get(0).answer.refused(BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED, "Cancelled");
+        Dialog cover = ShadowDialog.getLatestDialog();
+
+        Dialog facebooks = facebooksDialogOver(activity, cover);
+        Dialog top = ShadowDialog.getLatestDialog();
+        assertNotSame("the cover stayed under Facebook's dialog", facebooks, top);
+        assertNotNull("what went on top isn't a cover", button(top.getWindow().getDecorView()));
+        assertTrue(top.isShowing());
+        assertTrue(AppLock.covered(activity));
+        assertFalse("the old cover stayed up too", cover.isShowing());
+        assertTrue("Facebook's dialog was closed rather than covered", facebooks.isShowing());
+
+        // A screen on its way out losing the focus is left alone.
+        AppLock.paused(activity);
+        top.onWindowFocusChanged(false);
+        ShadowLooper.idleMainLooper();
+        assertSame(top, ShadowDialog.getLatestDialog());
+    }
+
+    @Test
+    public void theScreenLockCheckTakingTheFocusLeavesTheCoverButADialogUnderItDoesnt() {
+        Settings.APP_LOCK.save(true);
+        Activity activity = screen();
+        front(activity);
+        assertEquals(1, asked.size());
+        Dialog cover = ShadowDialog.getLatestDialog();
+
+        // Android's check takes the focus: the cover stays where it is, under it.
+        cover.onWindowFocusChanged(false);
+        ShadowLooper.idleMainLooper();
+        assertSame("the cover moved for the screen lock check", cover, ShadowDialog.getLatestDialog());
+
+        // Facebook opens a dialog while the check is up, then the check is cancelled.
+        Dialog facebooks = new Dialog(activity);
+        facebooks.show();
+        asked.get(0).answer.refused(BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED, "Cancelled");
+        ShadowSystemClock.advanceBy(Duration.ofMillis(AppLock.SETTLE_MS));
+        ShadowLooper.idleMainLooper();
+        Dialog top = ShadowDialog.getLatestDialog();
+        assertNotSame("the cover stayed under a dialog opened during the check", facebooks, top);
+        assertNotNull(button(top.getWindow().getDecorView()));
+        assertTrue(AppLock.covered(activity));
     }
 
     @Test
