@@ -219,9 +219,9 @@ public final class AppLock {
         return started > floating.size();
     }
 
-    /** Whether [activity] is a picture-in-picture window. Android 7 brought the mode. */
+    /** Whether [activity] is a picture-in-picture window. */
     private static boolean inPictureInPicture(Activity activity) {
-        return Build.VERSION.SDK_INT >= 24 && activity.isInPictureInPictureMode();
+        return activity.isInPictureInPictureMode();
     }
 
     /**
