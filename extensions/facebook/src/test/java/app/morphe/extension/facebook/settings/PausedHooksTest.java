@@ -114,7 +114,7 @@ import app.morphe.extension.facebook.reels.ReelPrompts;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
 import app.morphe.extension.facebook.stories.StoryAdvance;
-import app.morphe.extension.facebook.stories.StorySeen;
+import app.morphe.extension.facebook.stories.StorySeenForTests;
 import app.morphe.extension.facebook.stories.SuggestedStoriesForTests;
 import app.morphe.extension.facebook.theme.ForceDarkModeForTests;
 import app.morphe.extension.facebook.updates.UpdatePrompts;
@@ -347,8 +347,12 @@ public class PausedHooksTest {
         // A tray of a friend's bucket, a suggested one and one labelled SUGGESTED keeps only the friend's.
         probes.put(PatchFamily.SUGGESTED_STORIES, Collections.singletonList(SuggestedStoriesForTests::hidesSuggestions));
         probes.put(PatchFamily.STORY_AUTO_ADVANCE, Arrays.asList(StoryAdvance::waitForTap, StoryAdvance::loop));
-        // The story viewer's report of the stories you viewed goes out.
-        probes.put(PatchFamily.STORY_SEEN, Collections.singletonList(StorySeen::holdBack));
+        // The story viewer's report of the stories you viewed goes out whole, and with Mark as seen
+        // on a marked card goes alone and the button follows the card on screen.
+        probes.put(PatchFamily.STORY_SEEN, Arrays.asList(
+                StorySeenForTests::holdsABatch,
+                StorySeenForTests::sendsOnlyTheMarked,
+                StorySeenForTests::pointsTheButton));
         probes.put(PatchFamily.SPONSORED_REELS, Arrays.asList(
                 () -> {
                     VideoAd ad = new VideoAd();

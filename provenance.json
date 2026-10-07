@@ -308,14 +308,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/stories/StoryMarks.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/stories/StorySeen.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/stories/StorySeenButton.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/stories/seen/StorySeenAnchors.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/stories/seen/ViewStoriesAnonymouslyPatch.kt"
       ],
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: the switch on the report of viewed stories that Facebook's story viewer sends as DirectSeenMutation, which puts the viewer on a story's viewer list. The patch finds the mutation's query class in Facebook 577 and 580 by its name and root field, the one method that creates it and fills story_ids_list, and the one other method of that class that calls it, and asks the extension first thing in that sender, which returns without sending while the switch is on. Loukious/FacebookAppAdsRemover and gnadgnaoh/NexAlloy-XES offer the same feature; neither is licensed for reuse, so nothing was taken from them."
+      "changes": "Written for Hushfacebook: the switch on the report of viewed stories that Facebook's story viewer sends as DirectSeenMutation, which puts the viewer on a story's viewer list. The patch finds the mutation's query class in Facebook 577 and 580 by its name and root field, the one method that creates it and fills story_ids_list, and the one other method of that class that calls it, and asks the extension first thing in that sender, which returns without sending while the switch is on. Its Mark as seen button (issue #88) follows the design of HushGram's button of the same name by the same maintainer, written again here for Facebook: the hook hands the sender's arguments to the extension and sends the set of marked card ids it answers, a second hook in the story viewer's seen helper names the card on screen, and the eye is drawn over StoryViewerActivity's window, since Facebook's story header is a Litho component. Loukious/FacebookAppAdsRemover and gnadgnaoh/NexAlloy-XES offer the same feature; neither is licensed for reuse, so nothing was taken from them."
     },
     {
       "paths": [

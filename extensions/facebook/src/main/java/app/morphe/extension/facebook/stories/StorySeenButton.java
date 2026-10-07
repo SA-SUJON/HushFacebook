@@ -1,0 +1,343 @@
+/*
+ * Copyright 2026 Hushfacebook contributors
+ * https://github.com/SysAdminDoc/Hushfacebook
+ */
+package app.morphe.extension.facebook.stories;
+
+import android.app.Activity;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.lang.ref.WeakReference;
+import java.util.function.Function;
+
+import app.morphe.extension.facebook.settings.FamilyNames;
+import app.morphe.extension.facebook.settings.Settings;
+import app.morphe.extension.shared.L10n;
+import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.diagnostics.HookStatus;
+
+/**
+ * The second switch of View stories anonymously: a Mark as seen button over the story viewer.
+ *
+ * <p>Facebook draws the story viewer's header with Litho, so there's no row of views to put a
+ * button in. The eye goes on the story viewer's window instead, at the top end, left of where the
+ * header's menu and close buttons sit. The patch calls {@link #onCard} first thing in the seen
+ * helper's per-card method, which runs for each card Facebook is about to count as viewed, with the
+ * account's session, so the button always speaks for the card on screen. It shows where that card
+ * stands ({@link StoryMarks}): an eye with a slash while it's held back, a solid eye once marked,
+ * dimmed once sent. A tap marks the card, or takes the mark back before it goes. A card a batch
+ * already held back is sent straight away through the sender that held it ({@link StorySeen#sendHeld}).
+ *
+ * <p>The button shows only while views are anonymous and its own switch is on, and only over
+ * StoryViewerActivity while it's in front. Either switch off, Hushfacebook paused or the settings
+ * not read yet, it's hidden and forgets its card, and the send hook holds batches back or lets them
+ * through as it would without it.
+ */
+public final class StorySeenButton {
+    /** The story viewer's activity, a kept class name. */
+    static final String VIEWER = "com.facebook.stories.viewer.activity.StoryViewerActivity";
+
+    static final String HOOK = "story seen button";
+
+    /** The eye's size, and its place from the window's top end, in dp: left of the menu and close buttons. */
+    static final int SIZE_DP = 40;
+    static final int TOP_DP = 14;
+    static final int END_DP = 92;
+
+    /** The card on screen: the account it's viewed on and its id. */
+    static final class Shown {
+        final String account;
+        final String card;
+
+        Shown(String account, String card) {
+            this.account = account;
+            this.card = card;
+        }
+    }
+
+    /** Where {@link #onCard} reads a card's id: the patch's filled stub. Tests hand in their own. */
+    static volatile Function<Object, String> cardIds = StorySeenButton::cardId;
+
+    @Nullable
+    private static volatile Shown shown;
+    private static volatile WeakReference<Activity> viewer = new WeakReference<>(null);
+    private static volatile WeakReference<ImageView> button = new WeakReference<>(null);
+
+    private StorySeenButton() {
+    }
+
+    /**
+     * Injected first thing in the seen helper's per-card method, with the account's session, the
+     * card's bucket and the card. Points the button at that card while the switches are on, and
+     * hides it otherwise. Never throws.
+     */
+    public static void onCard(@Nullable Object session, @Nullable Object bucket, @Nullable Object card) {
+        try {
+            HookStatus.invoked(FamilyNames.STORY_SEEN);
+            Shown now = null;
+            if (switchedOn() && card != null) {
+                String id = cardIds.apply(card);
+                String account = StorySeen.account(session);
+                if (id != null && !id.isEmpty() && account != null) now = new Shown(account, id);
+            }
+            if (now == null && shown == null) return;
+            shown = now;
+            Utils.runOnMainThread(StorySeenButton::refresh);
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
+    /** Whether the button shows: views held back and its own switch on. Both read off while paused. */
+    static boolean switchedOn() {
+        return Utils.settingsReady() && Settings.VIEW_STORIES_ANONYMOUSLY.get() && Settings.MARK_STORIES_SEEN.get();
+    }
+
+    /** The card the button speaks for, or null. */
+    @Nullable
+    static Shown shown() {
+        return shown;
+    }
+
+    /** From the activity callbacks: [activity] came to the front. Never throws. */
+    public static void activityResumed(Activity activity) {
+        try {
+            if (!VIEWER.equals(activity.getClass().getName())) return;
+            viewer = new WeakReference<>(activity);
+            refresh();
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
+    /** From the activity callbacks: [activity] left the front. Hides the eye if it was over it. Never throws. */
+    public static void activityPaused(Activity activity) {
+        try {
+            if (viewer.get() != activity) return;
+            viewer = new WeakReference<>(null);
+            shown = null;
+            ImageView eye = button.get();
+            if (eye != null) hide(eye);
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
+    /** Shows the eye for the card on screen over the story viewer in front, or hides it. Main thread. */
+    static void refresh() {
+        try {
+            Activity activity = viewer.get();
+            Shown now = shown;
+            ImageView eye = button.get();
+            if (activity == null || now == null || !switchedOn()) {
+                if (eye != null) hide(eye);
+                return;
+            }
+            if (eye == null || eye.getContext() != activity || eye.getParent() == null) {
+                eye = attach(activity);
+                if (eye == null) return;
+                button = new WeakReference<>(eye);
+            }
+            eye.setTag(now);
+            show(eye, StorySeen.MARKS.state(now.account, now.card));
+            eye.setVisibility(View.VISIBLE);
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
+    /** A tap on [eye]: marks its card or takes the mark back, and shows where it stands. Never throws. */
+    static void tapped(ImageView eye) {
+        try {
+            if (!(eye.getTag() instanceof Shown)) return;
+            if (!switchedOn()) {
+                hide(eye);
+                return;
+            }
+            Shown bound = (Shown) eye.getTag();
+            if (StorySeen.MARKS.toggle(bound.account, bound.card) == StoryMarks.State.MARKED) {
+                StorySeen.sendHeld(bound.account, bound.card);
+            }
+            StoryMarks.State now = StorySeen.MARKS.state(bound.account, bound.card);
+            show(eye, now);
+            eye.announceForAccessibility(describe(now));
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
+    /** What the button says it does, for TalkBack. */
+    static String describe(StoryMarks.State state) {
+        switch (state) {
+            case MARKED:
+                return L10n.t("Marked as seen. Tap again to undo.");
+            case SENT:
+                return L10n.t("Marked as seen and sent");
+            default:
+                return L10n.t("Mark as seen");
+        }
+    }
+
+    /** Forgets the card, the viewer and the button. */
+    static void resetForTests() {
+        cardIds = StorySeenButton::cardId;
+        shown = null;
+        viewer = new WeakReference<>(null);
+        button = new WeakReference<>(null);
+    }
+
+    /** The eye on [activity]'s window, or null when the window has no frame to put it in. */
+    @Nullable
+    private static ImageView attach(Activity activity) {
+        View decor = activity.getWindow().getDecorView();
+        if (!(decor instanceof FrameLayout)) return null;
+        float density = activity.getResources().getDisplayMetrics().density;
+        ImageView eye = new ImageView(activity);
+        eye.setImageDrawable(new Eye(density));
+        eye.setScaleType(ImageView.ScaleType.CENTER);
+        eye.setClickable(true);
+        eye.setFocusable(true);
+        eye.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        TypedValue ripple = new TypedValue();
+        if (activity.getTheme().resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, ripple, true)
+                && ripple.resourceId != 0) {
+            eye.setBackgroundResource(ripple.resourceId);
+        }
+        eye.setOnClickListener(view -> tapped((ImageView) view));
+        int size = Math.round(SIZE_DP * density);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size, Gravity.TOP | Gravity.END);
+        WindowInsets insets = decor.getRootWindowInsets();
+        params.topMargin = (insets == null ? 0 : insets.getSystemWindowInsetTop()) + Math.round(TOP_DP * density);
+        params.setMarginEnd(Math.round(END_DP * density));
+        ((ViewGroup) decor).addView(eye, params);
+        return eye;
+    }
+
+    /** Hides [eye] and forgets its card, so nothing can mark it until a card shows it again. */
+    private static void hide(ImageView eye) {
+        eye.setVisibility(View.GONE);
+        eye.setTag(null);
+    }
+
+    private static void show(ImageView eye, StoryMarks.State state) {
+        Drawable drawable = eye.getDrawable();
+        if (drawable instanceof Eye) ((Eye) drawable).setState(state);
+        eye.setContentDescription(describe(state));
+        eye.setEnabled(state != StoryMarks.State.SENT);
+        eye.setAlpha(state == StoryMarks.State.SENT ? 0.6f : 1f);
+    }
+
+    /**
+     * The button's eye, drawn rather than taken from Facebook's resources: an outline with a slash
+     * while the card is held back, solid once it's marked or sent. White with a soft shadow, so it
+     * reads over any story.
+     */
+    static final class Eye extends Drawable {
+        private final float unit;
+        private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint iris = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Path outline = new Path();
+        private StoryMarks.State state = StoryMarks.State.UNMARKED;
+
+        Eye(float density) {
+            unit = density;
+            stroke.setStyle(Paint.Style.STROKE);
+            stroke.setStrokeWidth(2 * density);
+            stroke.setStrokeCap(Paint.Cap.ROUND);
+            stroke.setColor(Color.WHITE);
+            stroke.setShadowLayer(2 * density, 0, 0, 0x66000000);
+            fill.setStyle(Paint.Style.FILL);
+            fill.setColor(Color.WHITE);
+            fill.setShadowLayer(2 * density, 0, 0, 0x66000000);
+            iris.setStyle(Paint.Style.FILL);
+            iris.setColor(0xFF1C1E21);
+        }
+
+        StoryMarks.State state() {
+            return state;
+        }
+
+        void setState(StoryMarks.State state) {
+            if (this.state == state) return;
+            this.state = state;
+            invalidateSelf();
+        }
+
+        @Override
+        public void draw(@NonNull Canvas canvas) {
+            Rect bounds = getBounds();
+            float x = bounds.exactCenterX();
+            float y = bounds.exactCenterY();
+            float reach = 10 * unit;
+            outline.reset();
+            outline.moveTo(x - reach, y);
+            outline.cubicTo(x - 5 * unit, y - 8 * unit, x + 5 * unit, y - 8 * unit, x + reach, y);
+            outline.cubicTo(x + 5 * unit, y + 8 * unit, x - 5 * unit, y + 8 * unit, x - reach, y);
+            outline.close();
+            if (state == StoryMarks.State.UNMARKED) {
+                canvas.drawPath(outline, stroke);
+                canvas.drawCircle(x, y, 2.5f * unit, stroke);
+                canvas.drawLine(x - 9 * unit, y + 9 * unit, x + 9 * unit, y - 9 * unit, stroke);
+            } else {
+                canvas.drawPath(outline, fill);
+                canvas.drawCircle(x, y, 3 * unit, iris);
+            }
+        }
+
+        @Override
+        public int getIntrinsicWidth() {
+            return Math.round(24 * unit);
+        }
+
+        @Override
+        public int getIntrinsicHeight() {
+            return Math.round(24 * unit);
+        }
+
+        @Override
+        public void setAlpha(int alpha) {
+            stroke.setAlpha(alpha);
+            fill.setAlpha(alpha);
+            iris.setAlpha(alpha);
+            invalidateSelf();
+        }
+
+        @Override
+        public void setColorFilter(@Nullable ColorFilter filter) {
+            stroke.setColorFilter(filter);
+            fill.setColorFilter(filter);
+            invalidateSelf();
+        }
+
+        @Override
+        public int getOpacity() {
+            return PixelFormat.TRANSLUCENT;
+        }
+    }
+
+    // ------------------------------------------------------------------ what the patch fills in
+
+    /** Filled in by the patch: the id Facebook's seen helper queues for [card], a StoryCard. */
+    @Nullable
+    public static String cardId(Object card) {
+        return null;
+    }
+}

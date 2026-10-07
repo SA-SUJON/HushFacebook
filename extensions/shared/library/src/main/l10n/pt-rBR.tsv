@@ -941,3 +941,13 @@ No thanks	Não, obrigado
 Couldn't find the video in that link, so it opened in Facebook instead.	Não foi possível encontrar o vídeo nesse link, então ele foi aberto no Facebook.
 # context: toast when Download on a copied link opens the video first, so Facebook loads it and the save can start
 Opening the video to save it	Abrindo o vídeo para salvá-lo
+# context: switch title under Stories, View stories anonymously's second switch; it adds an eye button over each story
+Mark as seen button	Botão Marcar como visto
+# context: description of the Mark as seen button switch
+Adds an eye button to the top of each story while you view anonymously. Tap it to show up on that story's viewer list. The other stories stay hidden.	Adiciona um botão de olho no topo de cada Story enquanto você assiste anonimamente. Toque nele para aparecer na lista de quem viu aquele Story. Os outros Stories continuam ocultos.
+# context: what TalkBack reads for the eye button over a story while that story is still hidden from its viewer list
+Mark as seen	Marcar como visto
+# context: what TalkBack reads for the eye button once the story is marked and waiting to be sent; a second tap takes the mark back
+Marked as seen. Tap again to undo.	Marcado como visto. Toque de novo para desfazer.
+# context: what TalkBack reads for the eye button once the marked story was sent as seen
+Marked as seen and sent	Marcado como visto e enviado

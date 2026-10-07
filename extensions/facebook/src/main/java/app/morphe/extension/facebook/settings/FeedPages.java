@@ -264,6 +264,9 @@ final class FeedPages {
                         L10n.t("Facebook isn't told which stories you watch, so you stay off their viewer lists. "
                                 + "Replying or reacting still shows you, and stories you've watched keep their "
                                 + "unwatched ring.")));
+                stories.addPreference(toggle(context, Settings.MARK_STORIES_SEEN,
+                        L10n.t("Adds an eye button to the top of each story while you view anonymously. Tap it to "
+                                + "show up on that story's viewer list. The other stories stay hidden.")));
             }
             if (build.contains(PatchFamily.STORY_DOWNLOAD)) {
                 stories.addPreference(toggle(context, Settings.DOWNLOAD_STORIES,

@@ -14,6 +14,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
@@ -168,20 +169,26 @@ class StorySeenShapesTest {
 
     private fun MutableMethod.at(index: Int) = implementation!!.instructions.elementAt(index)
 
+    /** The sender as Facebook has it: a callback, then what the hook hands over. */
+    private val sendShape = listOf("Lfixture/Callback;") + SENDER_SHAPE
+
     @Test
-    fun `the sender returns first thing while the views stay and sends as its own otherwise`() {
-        val sender = MutableMethod(sender())
+    fun `the sender sends the set the extension answers and returns first thing on null`() {
+        val sender = MutableMethod(sender(parameters = sendShape, registers = 12))
         val own = sender.implementation!!.instructions.count()
-        sender.holdBackViews()
-        val hook = (sender.at(0) as ReferenceInstruction).reference as MethodReference
-        assertEquals(Opcode.INVOKE_STATIC, sender.at(0).opcode)
-        assertEquals("Lapp/morphe/extension/facebook/stories/StorySeen;", hook.definingClass)
-        assertEquals("holdBack", hook.name)
-        assertTrue(hook.parameterTypes.isEmpty())
-        assertEquals("Z", hook.returnType)
-        assertEquals(Opcode.MOVE_RESULT, sender.at(1).opcode)
-        assertEquals("the hook's answer isn't in a local", 0, (sender.at(1) as OneRegisterInstruction).registerA)
-        assertEquals(Opcode.IF_EQZ, sender.at(2).opcode)
+        sender.filterViews()
+        val hook = sender.at(0)
+        assertEquals(Opcode.INVOKE_STATIC_RANGE, hook.opcode)
+        val call = (hook as ReferenceInstruction).reference as MethodReference
+        assertEquals("Lapp/morphe/extension/facebook/stories/StorySeen;", call.definingClass)
+        assertEquals("toSend", call.name)
+        assertEquals("Ljava/util/Set;", call.returnType)
+        assertEquals("every argument goes, the sender first", 3, (hook as RegisterRangeInstruction).startRegister)
+        assertEquals(9, hook.registerCount)
+        assertEquals(Opcode.MOVE_RESULT_OBJECT, sender.at(1).opcode)
+        assertEquals("the answer isn't in the set's register", 10, (sender.at(1) as OneRegisterInstruction).registerA)
+        assertEquals(Opcode.IF_NEZ, sender.at(2).opcode)
+        assertEquals(10, (sender.at(2) as OneRegisterInstruction).registerA)
         assertEquals(Opcode.RETURN_VOID, sender.at(3).opcode)
         // The branch lands on the sender's own first instruction, so none of it is skipped.
         assertEquals(own + 4, sender.implementation!!.instructions.count())
@@ -189,14 +196,14 @@ class StorySeenShapesTest {
         assertEquals(4, offsetTarget(sender, 2))
     }
 
-    /** A sender with no local register to borrow is refused by name, before anything goes in. */
+    /** A sender that doesn't take what the hook hands over is refused by name, before anything goes in. */
     @Test
-    fun `a sender with no local to borrow stops the patch`() {
-        val tight = MutableMethod(sender(registers = 6))
-        val refusal = assertThrows(PatchException::class.java) { tight.holdBackViews() }
+    fun `a sender of another shape stops the patch`() {
+        val other = MutableMethod(sender())
+        val refusal = assertThrows(PatchException::class.java) { other.filterViews() }
         assertTrue(refusal.message, refusal.message!!.contains(PATCH))
-        assertEquals(Opcode.INVOKE_VIRTUAL, tight.at(0).opcode)
-        assertEquals(3, tight.implementation!!.instructions.count())
+        assertEquals(Opcode.INVOKE_VIRTUAL, other.at(0).opcode)
+        assertEquals(3, other.implementation!!.instructions.count())
     }
 
     /** The instruction index a branch at [index] lands on. */

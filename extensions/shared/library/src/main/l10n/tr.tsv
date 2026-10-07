@@ -1047,3 +1047,13 @@ No thanks	Hayır, teşekkürler
 Couldn't find the video in that link, so it opened in Facebook instead.	Bu bağlantıda video bulunamadı, bu yüzden Facebook'ta açıldı.
 # context: toast when Download on a copied link opens the video first, so Facebook loads it and the save can start
 Opening the video to save it	Video kaydetmek için açılıyor
+# context: switch title under Stories, View stories anonymously's second switch; it adds an eye button over each story
+Mark as seen button	Görüldü olarak işaretle düğmesi
+# context: description of the Mark as seen button switch
+Adds an eye button to the top of each story while you view anonymously. Tap it to show up on that story's viewer list. The other stories stay hidden.	Anonim izlerken her hikayenin üstüne bir göz düğmesi ekler. O hikayenin izleyici listesinde görünmek için düğmeye dokun. Diğer hikayeler gizli kalır.
+# context: what TalkBack reads for the eye button over a story while that story is still hidden from its viewer list
+Mark as seen	Görüldü olarak işaretle
+# context: what TalkBack reads for the eye button once the story is marked and waiting to be sent; a second tap takes the mark back
+Marked as seen. Tap again to undo.	Görüldü olarak işaretlendi. Geri almak için tekrar dokun.
+# context: what TalkBack reads for the eye button once the marked story was sent as seen
+Marked as seen and sent	Görüldü olarak işaretlendi ve gönderildi

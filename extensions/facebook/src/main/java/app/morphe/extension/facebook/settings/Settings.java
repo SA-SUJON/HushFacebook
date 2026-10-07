@@ -262,6 +262,13 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting VIEW_STORIES_ANONYMOUSLY =
             new BooleanSetting("hushfacebook_view_stories_anonymously", TRUE);
 
+    /**
+     * View stories anonymously's second switch: an eye button over each story that marks it, so the
+     * next report of viewed stories carries the marked ones and nothing else. Off until it's turned on.
+     */
+    public static final BooleanSetting MARK_STORIES_SEEN =
+            new BooleanSetting("hushfacebook_mark_stories_seen", FALSE);
+
     /** The two page filters that take server-inlined ads out of Reels and Watch. */
     public static final BooleanSetting HIDE_SPONSORED_REELS =
             new BooleanSetting("hushfacebook_hide_sponsored_reels", TRUE);

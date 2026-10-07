@@ -46,6 +46,7 @@ import app.morphe.extension.facebook.media.ResumePlayback;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.misc.ScreenTransitions;
 import app.morphe.extension.facebook.navigation.ReelsTab;
+import app.morphe.extension.facebook.stories.StorySeenButton;
 import app.morphe.extension.facebook.theme.MaterialYouTheme;
 
 /**
@@ -474,6 +475,7 @@ public final class SettingsEntry {
             TapToPlay.activityResumed(activity);
             // Only with Download any video in the build, whose switch it is an option of.
             if (SettingsStatus.videoDownload()) ClipboardLink.onResumed(activity);
+            if (SettingsStatus.storySeen()) StorySeenButton.activityResumed(activity);
             if (openPending) openWhenSettled(activity);
             relabelIfStale(activity);
             SavedShortcut.refresh(activity);
@@ -483,6 +485,7 @@ public final class SettingsEntry {
         public void onActivityPaused(Activity activity) {
             SavedFileActions.onPaused(activity);
             ClipboardLink.onPaused(activity);
+            StorySeenButton.activityPaused(activity);
             ScreenTransitions.activityPaused(activity);
             if (resumed != null && resumed.get() == activity) resumed = null;
             LastScreen.read(activity);
