@@ -11,7 +11,6 @@ import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.diagnostics.HookStatus;
-import app.morphe.extension.shared.settings.BooleanSetting;
 
 /**
  * What the Hide Meta upsells patch asks wherever Facebook pushes Meta's other products outside the
@@ -38,10 +37,6 @@ public final class MetaUpsells {
     private MetaUpsells() {
     }
 
-    private static boolean on(BooleanSetting setting) {
-        return Utils.settingsReady() && setting.get();
-    }
-
     private static void hid(String hook, String counter) {
         HookStatus.bound(FAMILY, hook);
         HookStatus.counted(FAMILY, counter);
@@ -58,7 +53,7 @@ public final class MetaUpsells {
     public static boolean editsHeader(boolean show) {
         try {
             HookStatus.invoked(FAMILY);
-            if (!show || !on(Settings.HIDE_EDITS_UPSELLS)) return show;
+            if (!show || !(Utils.settingsReady() && Settings.HIDE_EDITS_UPSELLS.get())) return show;
             hid("Edits header flag", EDITS_HIDDEN);
             return false;
         } catch (Throwable failure) {
@@ -75,7 +70,7 @@ public final class MetaUpsells {
     public static boolean fetchEditsPill(boolean fetch) {
         try {
             HookStatus.invoked(FAMILY);
-            if (!fetch || !on(Settings.HIDE_EDITS_UPSELLS)) return fetch;
+            if (!fetch || !(Utils.settingsReady() && Settings.HIDE_EDITS_UPSELLS.get())) return fetch;
             hid("Edits pill request", EDITS_HIDDEN);
             return false;
         } catch (Throwable failure) {
@@ -89,7 +84,8 @@ public final class MetaUpsells {
     public static Boolean fetchEditsPill(@Nullable Boolean fetch) {
         try {
             HookStatus.invoked(FAMILY);
-            if (Boolean.FALSE.equals(fetch) || !on(Settings.HIDE_EDITS_UPSELLS)) return fetch;
+            if (Boolean.FALSE.equals(fetch) ||
+                    !(Utils.settingsReady() && Settings.HIDE_EDITS_UPSELLS.get())) return fetch;
             hid("Edits pill request", EDITS_HIDDEN);
             return Boolean.FALSE;
         } catch (Throwable failure) {
@@ -107,7 +103,7 @@ public final class MetaUpsells {
         boolean shows = show != 0;
         try {
             HookStatus.invoked(FAMILY);
-            if (!shows || !on(Settings.HIDE_THREADS_CROSS_POSTING)) return shows;
+            if (!shows || !(Utils.settingsReady() && Settings.HIDE_THREADS_CROSS_POSTING.get())) return shows;
             hid("Threads cross-posting onboarding", THREADS_HIDDEN);
             return false;
         } catch (Throwable failure) {
@@ -125,7 +121,8 @@ public final class MetaUpsells {
     public static Object metaVerifiedSheet(@Nullable Object answer) {
         try {
             HookStatus.invoked(FAMILY);
-            if (!Boolean.TRUE.equals(answer) || !on(Settings.HIDE_META_VERIFIED_UPSELLS)) return answer;
+            if (!Boolean.TRUE.equals(answer) ||
+                    !(Utils.settingsReady() && Settings.HIDE_META_VERIFIED_UPSELLS.get())) return answer;
             hid("Meta Verified sheet eligibility", VERIFIED_HIDDEN);
             return Boolean.FALSE;
         } catch (Throwable failure) {
@@ -143,7 +140,7 @@ public final class MetaUpsells {
     public static String metaVerifiedLabel(@Nullable String label) {
         try {
             HookStatus.invoked(FAMILY);
-            if (label == null || !on(Settings.HIDE_META_VERIFIED_UPSELLS)) return label;
+            if (label == null || !(Utils.settingsReady() && Settings.HIDE_META_VERIFIED_UPSELLS.get())) return label;
             hid("Meta Verified label", VERIFIED_HIDDEN);
             return null;
         } catch (Throwable failure) {
@@ -159,7 +156,7 @@ public final class MetaUpsells {
     public static boolean hidesAvatarUpsell() {
         try {
             HookStatus.invoked(FAMILY);
-            if (!on(Settings.HIDE_AVATAR_UPSELLS)) return false;
+            if (!(Utils.settingsReady() && Settings.HIDE_AVATAR_UPSELLS.get())) return false;
             hid("avatar sticker upsell", AVATAR_HIDDEN);
             return true;
         } catch (Throwable failure) {
