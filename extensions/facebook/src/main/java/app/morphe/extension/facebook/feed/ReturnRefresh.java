@@ -27,11 +27,13 @@ import app.morphe.extension.shared.settings.Setting;
  * first check after the UI was hidden decides, and every check within {@link #SAME_RETURN_MS} of it
  * gets the same answer. Later checks of those three are Facebook's own.
  *
- * <p>Inside the app, a tab switch back to Home or the feed back from another screen reaches three
+ * <p>Inside the app, a tab switch back to Home or the feed back from another screen reaches four
  * more: the feed's hot-start check, its stale-post executor (from the visibility change, and from
- * the worker it posts on pause) and NewsFeedTabDataFetch's AUTO_REFRESH. Those keep the feed while
- * the switch is on, and never use a return up ({@link #decideInApp}). The hot-start check keeps it
- * through the warm-start check it asks, past that check's empty-feed load, so an empty feed loads.
+ * the worker it posts on pause), NewsFeedTabDataFetch's AUTO_REFRESH and, on accounts with the
+ * friendly feed, the HOT_LOAD NewsFeedFragment's onTabEntered starts once Home has been left long
+ * enough. Those keep the feed while the switch is on, and never use a return up
+ * ({@link #decideInApp}). The hot-start check keeps it through the warm-start check it asks, past
+ * that check's empty-feed load, so an empty feed loads.
  *
  * <p>While Facebook is away it also tears the feed's stories down once it has been gone as long as
  * the warm-start threshold, and a torn-down feed loads new posts on the return whatever the checks
@@ -52,12 +54,14 @@ public final class ReturnRefresh {
     static final String HOT_START = "hot start";
     static final String STALE_POST = "stale-post refresh";
     static final String TAB_AUTO_REFRESH = "tab auto refresh";
+    static final String TAB_ENTRY_HOT_LOAD = "Home tab hot load";
     private static final String KEPT_ON_RESUME = "kept the feed on resume";
     private static final String KEPT_ON_WARM_START = "kept the feed at warm start";
     private static final String KEPT_ON_AUTO_SCROLL = "kept the feed from the foreground auto-scroll";
     private static final String KEPT_ON_HOT_START = "kept the feed at hot start";
     private static final String KEPT_ON_STALE_POST = "kept the feed from a stale-post refresh";
     private static final String KEPT_ON_TAB_AUTO_REFRESH = "kept the feed from the tab's auto refresh";
+    private static final String KEPT_ON_TAB_ENTRY_HOT_LOAD = "kept the feed from the Home tab's hot load";
     private static final String KEPT_WHILE_AWAY = "kept the feed loaded while away";
     /** Prefix for a refusal's count label; one label per fixed reason from refreshBecause()/offBecause(). */
     private static final String LET_FACEBOOK_REFRESH = "let Facebook refresh: ";
@@ -200,6 +204,16 @@ public final class ReturnRefresh {
      */
     public static boolean holdTabAutoRefresh() {
         return askInApp(TAB_AUTO_REFRESH, KEPT_ON_TAB_AUTO_REFRESH, true);
+    }
+
+    /**
+     * Called right before NewsFeedFragment's onTabEntered reloads the friendly feed with a HOT_LOAD,
+     * which it does as Home comes back once the tab has been left longer than Facebook's limit. The
+     * first entry of a launch never gets there, so a fresh launch loads as it always has. True skips
+     * the reload and goes on with the rest of the tab entry.
+     */
+    public static boolean holdTabEntryHotLoad() {
+        return askInApp(TAB_ENTRY_HOT_LOAD, KEPT_ON_TAB_ENTRY_HOT_LOAD, true);
     }
 
     /**

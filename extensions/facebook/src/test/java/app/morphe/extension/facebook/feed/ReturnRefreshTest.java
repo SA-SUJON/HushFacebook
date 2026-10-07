@@ -168,6 +168,40 @@ public class ReturnRefreshTest {
     }
 
     /**
+     * On accounts with the friendly feed, onTabEntered reloads it with a HOT_LOAD once Home was left
+     * long enough. With the switch on that keeps the feed and counts it, inside a return it gets the
+     * return's answer without using the return up, and switched off or paused it's Facebook's.
+     */
+    @Test public void theHomeTabsHotLoadKeepsTheFeedWithTheSwitchOn() {
+        HookStatus.clear();
+        try {
+            assertTrue(ReturnRefresh.holdTabEntryHotLoad());
+            String report = String.join("\n", HookStatus.report());
+            assertTrue(report, report.contains(FamilyNames.RETURN_REFRESH + ": invoked 1"));
+            assertTrue(report, report.contains("kept the feed from the Home tab's hot load 1"));
+        } finally {
+            HookStatus.clear();
+        }
+
+        ReturnRefresh.uiHidden(1_000);
+        long back = 1_000 + 7 * 60 * 1000;
+        assertTrue("seven minutes away", ReturnRefresh.askInAppAt(back, ReturnRefresh.TAB_ENTRY_HOT_LOAD, true));
+        assertTrue("the return was left for its own check", ReturnRefresh.askAt(back + 1, ReturnRefresh.WARM_START));
+        ReturnRefresh.uiHidden(1_000);
+        back = 1_000 + 11 * 60 * 1000;
+        assertFalse("eleven minutes away", ReturnRefresh.askInAppAt(back, ReturnRefresh.TAB_ENTRY_HOT_LOAD, true));
+        assertFalse(ReturnRefresh.askAt(back + 1, ReturnRefresh.WARM_START));
+        long later = back + ReturnRefresh.SAME_RETURN_MS + 3;
+        assertTrue("inside the app", ReturnRefresh.askInAppAt(later, ReturnRefresh.TAB_ENTRY_HOT_LOAD, true));
+
+        Settings.BLOCK_RETURN_REFRESH.save(false);
+        assertFalse("switch off", ReturnRefresh.holdTabEntryHotLoad());
+        Settings.BLOCK_RETURN_REFRESH.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertFalse("paused", ReturnRefresh.holdTabEntryHotLoad());
+    }
+
+    /**
      * The hot-start check holds nothing itself, so an empty feed, which never reaches the warm-start
      * check's question, still loads. The warm-start check it asks next gets the in-app answer once,
      * and only straight after it, and only with no return from the background pending.

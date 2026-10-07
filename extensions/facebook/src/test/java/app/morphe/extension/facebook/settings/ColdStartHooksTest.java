@@ -171,6 +171,7 @@ public class ColdStartHooksTest {
         ReturnRefresh.uiHidden();
         assertFalse("a return before the context held the foreground auto-scroll", ReturnRefresh.holdAutoScroll());
         assertFalse("a feed left before the context skipped its teardown", ReturnRefresh.keepFeedWhileAway());
+        assertFalse("a Home tab entry before the context held its hot load", ReturnRefresh.holdTabEntryHotLoad());
         assertFalse(FeedGuardForTests.hides(Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.detectedInfo(true)));
         assertFalse(FeedGuardForTests.hidesLabelled(Category.ORGANIC, new GraphQLStory(),
                 FeedGuardForTests.detectedInfo(false), FeedGuardForTests.selfDisclosureInfo(true)));

@@ -275,7 +275,8 @@ public class PausedHooksTest {
                 FeedFilter::hidePreEofReels));
         // The refresh controller's resume callback, the feed's warm-start check and the foreground
         // auto-scroll, each the first check of a return, the feed teardown while away, and the
-        // hot-start check, stale-post executor and tab AUTO_REFRESH a tab switch back to Home reaches.
+        // hot-start check, stale-post executor, tab AUTO_REFRESH and the friendly feed's HOT_LOAD a
+        // tab switch back to Home reaches.
         probes.put(PatchFamily.RETURN_REFRESH, Arrays.asList(
                 () -> {
                     ReturnRefresh.uiHidden();
@@ -297,7 +298,8 @@ public class PausedHooksTest {
                     return ReturnRefresh.holdWarmStart();
                 },
                 ReturnRefresh::holdStalePost,
-                ReturnRefresh::holdTabAutoRefresh));
+                ReturnRefresh::holdTabAutoRefresh,
+                ReturnRefresh::holdTabEntryHotLoad));
         // A story Facebook's own detection marked as made with AI, one only its creator labelled as AI,
         // and a reel whose GenAI attribution carries the detected flag, at both levels a page of reels
         // enters.

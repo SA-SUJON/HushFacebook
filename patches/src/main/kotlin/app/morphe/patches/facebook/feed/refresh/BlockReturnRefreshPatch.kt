@@ -15,6 +15,7 @@ import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -84,6 +85,20 @@ private const val NOTE_HOT_START = "$EXTENSION_PACKAGE/feed/ReturnRefresh;->hotS
 internal const val TAB_DATA_FETCH = "NewsFeedTabDataFetchSpec"
 private const val HOLD_TAB_AUTO_REFRESH = "$EXTENSION_PACKAGE/feed/ReturnRefresh;->holdTabAutoRefresh()Z"
 
+/** What NewsFeedFragment's onTabEntered marks about the tab's badge, which no other onTabEntered loads. */
+internal const val TAB_ENTRY_BADGED = "isTabEntryBadged"
+private const val ON_TAB_ENTERED = "onTabEntered"
+
+/**
+ * The friendly feed's prefetch on a first tab entry. Only its loader loads it, the class onTabEntered
+ * tests the feed's loader against before it reloads the friendly feed.
+ */
+internal const val FRIENDLY_FEED_PREFETCH = "friendlyFeedPrefetch"
+
+/** The refresh cause onTabEntered hands the friendly feed's reload as Home comes back. */
+internal const val HOT_LOAD = "HOT_LOAD"
+private const val HOLD_TAB_ENTRY_HOT_LOAD = "$EXTENSION_PACKAGE/feed/ReturnRefresh;->holdTabEntryHotLoad()Z"
+
 /**
  * Stops what Facebook does to the feed when it returns to view: the refresh FeedRefreshTriggerController
  * fires, the feed's warm-start check, which NewsFeedFragment's onResume reaches and which refreshes
@@ -94,13 +109,16 @@ private const val HOLD_TAB_AUTO_REFRESH = "$EXTENSION_PACKAGE/feed/ReturnRefresh
  * the resume callback was held. The runnable asks first too, and does nothing while the switch is
  * on. Facebook's reset to feed only logs what it decided, for a debug log to say whether it ran.
  *
- * Inside the app, switching back to Home reaches three more: the feed's hot-start check, its
+ * Inside the app, switching back to Home reaches four more: the feed's hot-start check, its
  * stale-post executor (a re-rank or a refresh that clears the feed, from the tab's visibility
- * change and from the worker the feed posts on pause) and NewsFeedTabDataFetch's AUTO_REFRESH once
- * the tab's data is stale. The executor and the data fetch ask the extension and do nothing while
- * it holds. The hot-start check only tells the extension it's running: it asks the warm-start
- * check next, and that check's own question, past its empty-feed load, gets the in-app answer, so
- * a feed that came back empty still loads.
+ * change and from the worker the feed posts on pause), NewsFeedTabDataFetch's AUTO_REFRESH once
+ * the tab's data is stale and, on accounts with the friendly feed, the HOT_LOAD NewsFeedFragment's
+ * onTabEntered starts once Home has been left longer than Facebook's limit. The executor, the data
+ * fetch and the tab entry ask the extension and skip their refresh while it holds. The hot-start
+ * check only tells the extension it's running: it asks the warm-start check next, and that check's
+ * own question, past its empty-feed load, gets the in-app answer, so a feed that came back empty
+ * still loads. The friendly feed's first load of a launch, which onTabEntered starts on the first
+ * entry, is left alone: it's what fills the feed.
  *
  * Every anchor is found and checked before anything changes, so a build that moved one refuses
  * the whole patch rather than keeping some hooks with its switch row hidden.
@@ -175,6 +193,14 @@ val blockReturnRefreshPatch = bytecodePatch(
             "Expected one static NewsFeedTabDataFetch dispatch holding $TAB_DATA_FETCH, found ${fetches.size}",
         )
 
+        val entries = classDefByStrings(TAB_ENTRY_BADGED, StringComparisonType.EQUALS)
+            .flatMap { it.methods.filter(::isTabEntry) }
+        val entry = entries.singleOrNull() ?: throw PatchException(
+            "Expected one $ON_TAB_ENTERED holding $TAB_ENTRY_BADGED, found ${entries.size}",
+        )
+        val friendlyLoaders = classDefByStrings(FRIENDLY_FEED_PREFETCH, StringComparisonType.EQUALS).map { it.type }.toSet()
+        val classDefOf = { type: String -> classDefByOrNull(type) }
+
         val warmStartCheck = mutableClassDefBy(check.definingClass).findMutableMethodOf(check)
         val resetLog = mutableClassDefBy(log.definingClass).findMutableMethodOf(log)
         val teardownRun = mutableClassDefBy(teardown.definingClass).findMutableMethodOf(teardown)
@@ -183,10 +209,12 @@ val blockReturnRefreshPatch = bytecodePatch(
         val stalePost = mutableClassDefBy(executor.definingClass).findMutableMethodOf(executor)
         val hotStartCheck = mutableClassDefBy(hotStart.definingClass).findMutableMethodOf(hotStart)
         val tabFetch = mutableClassDefBy(fetch.definingClass).findMutableMethodOf(fetch)
+        val tabEntry = mutableClassDefBy(entry.definingClass).findMutableMethodOf(entry)
         for (method in listOf(callback, teardownRun, autoScroll, stalePost)) method.requireLocals(PATCH, 1)
         emptyFeedAnswer(warmStartCheck)
         noAutoScrollAnswer(autoScroll, noScroll)
         tabAutoRefreshCause(tabFetch)
+        tabEntryHotLoad(tabEntry, friendlyLoaders, classDefOf)
 
         callback.skipBriefReturnRefresh()
         warmStartCheck.holdWarmStartOfAFeedWithStories()
@@ -196,6 +224,7 @@ val blockReturnRefreshPatch = bytecodePatch(
         stalePost.holdFirst(HOLD_STALE_POST)
         hotStartCheck.noteHotStartFirst()
         tabFetch.holdTabAutoRefreshBeforeIt()
+        tabEntry.holdTabEntryHotLoadBeforeIt(friendlyLoaders, classDefOf)
         enableStatus("returnRefresh")
     }
 }
@@ -503,6 +532,74 @@ internal fun MutableMethod.holdTabAutoRefreshBeforeIt() {
             if-nez v$register, :refreshed
         """,
         ExternalLabel("refreshed", getInstruction(cause + 2)),
+    )
+}
+
+/** Whether [method] is NewsFeedFragment's onTabEntered: an instance void of one parameter that marks the tab's badge. */
+internal fun isTabEntry(method: Method): Boolean =
+    !AccessFlags.STATIC.isSet(method.accessFlags) && method.name == ON_TAB_ENTERED && method.returnType == "V" &&
+        method.parameterTypes.size == 1 && method.implementation != null && holdsString(method, TAB_ENTRY_BADGED)
+
+/**
+ * The index of the load of the cause onTabEntered hands the friendly feed's reload: the one
+ * sget-object of an enum's [HOT_LOAD] (its class from [classDefOf]) followed by the fragment's own
+ * virtual (cause) void call, which takes it with this. It comes after the instance-of that finds
+ * the feed's loader is the friendly feed's, one of [friendlyLoaders], only the instruction before
+ * it reaches it, and nothing after the call reads the cause's register before writing it. Throws
+ * naming what differs.
+ */
+internal fun tabEntryHotLoad(method: Method, friendlyLoaders: Set<String>, classDefOf: (String) -> ClassDef?): Int {
+    val what = "Block background-return feed refresh: ${method.definingClass}->${method.name}"
+    val implementation = method.implementation ?: throw PatchException("$what has no body")
+    val instructions = implementation.instructions.toList()
+    val hotLoads = mutableMapOf<String, String?>()
+    fun hotLoadOf(type: String) = hotLoads.getOrPut(type) { classDefOf(type)?.let { enumConstant(it, HOT_LOAD) } }
+    val loads = instructions.indices.filter { at ->
+        val field = (instructions[at] as? ReferenceInstruction)?.reference as? FieldReference
+        val target = (instructions.getOrNull(at + 1) as? ReferenceInstruction)?.reference as? MethodReference
+        instructions[at].opcode == Opcode.SGET_OBJECT && field != null && field.definingClass == field.type &&
+            target != null && instructions[at + 1].opcode == Opcode.INVOKE_VIRTUAL &&
+            target.definingClass == method.definingClass && target.returnType == "V" &&
+            target.parameterTypes.map { it.toString() } == listOf(field.type) && hotLoadOf(field.type) == field.toString()
+    }
+    val load = loads.singleOrNull() ?: throw PatchException("$what hands its own refresh $HOT_LOAD ${loads.size} times")
+    val register = (instructions[load] as OneRegisterInstruction).registerA
+    val call = instructions[load + 1] as FiveRegisterInstruction
+    if (call.registerCount != 2 || call.registerC != method.localRegisterCount() || call.registerD != register) {
+        throw PatchException("$what doesn't hand $HOT_LOAD to its own refresh right after loading it")
+    }
+    val friendly = instructions.subList(0, load).any {
+        it.opcode == Opcode.INSTANCE_OF && (it as ReferenceInstruction).reference.toString() in friendlyLoaders
+    }
+    if (!friendly) throw PatchException("$what doesn't check for the friendly feed's loader before its $HOT_LOAD")
+    val flow = ControlFlow.of(method)
+    val arrivals = flow.instructions.indices.filter { load in flow.normal[it] || load in flow.exceptional[it] }
+    if (arrivals != listOf(load - 1)) {
+        throw PatchException("$what reaches its $HOT_LOAD from ${arrivals.joinToString()}, not only the instruction before it")
+    }
+    if (register in RegisterLiveness.of(method).liveInto(load + 2)) {
+        throw PatchException("$what reads v$register after its $HOT_LOAD")
+    }
+    return load
+}
+
+/**
+ * Asks the extension in place of loading the friendly feed's HOT_LOAD and, while it holds, goes on
+ * past the reload to the rest of the tab entry. The question takes no register and borrows the
+ * cause's for its answer: the load writes it next and nothing after the reload reads it (see
+ * [tabEntryHotLoad]).
+ */
+internal fun MutableMethod.holdTabEntryHotLoadBeforeIt(friendlyLoaders: Set<String>, classDefOf: (String) -> ClassDef?) {
+    val load = tabEntryHotLoad(this, friendlyLoaders, classDefOf)
+    val register = getInstruction<OneRegisterInstruction>(load).registerA
+    addInstructionsWithLabels(
+        load,
+        """
+            invoke-static { }, $HOLD_TAB_ENTRY_HOT_LOAD
+            move-result v$register
+            if-nez v$register, :entered
+        """,
+        ExternalLabel("entered", getInstruction(load + 2)),
     )
 }
 
