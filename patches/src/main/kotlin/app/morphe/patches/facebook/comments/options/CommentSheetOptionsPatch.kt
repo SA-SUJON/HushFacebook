@@ -5,6 +5,7 @@
 package app.morphe.patches.facebook.comments.options
 
 import app.morphe.patcher.StringComparisonType
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
@@ -26,12 +27,22 @@ import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.extension.requireStatusMethod
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
+import app.morphe.util.ControlFlow
+import app.morphe.util.namedRegisters
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.SwitchPayload
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 private const val PATCH = "Comment sheet options"
@@ -53,14 +64,26 @@ internal const val DOCK_NAME = "reactions_dock"
 /** The reaction picker the Like button's long press opens, a kept class. */
 internal const val UFI_DOCK = "Lcom/facebook/feedback/sharedcomponents/reactions/dock/RopeStyleUFIDockView;"
 
+/**
+ * The name the comment section gives itself in its constructor. It draws one comment and, under
+ * it, either the collapsed View replies row or the open reply thread.
+ */
+internal const val COMMENT_SECTION = "CommentSection"
+
+/** The state update a tap on View replies sends the comment section, named where it's sent. */
+internal const val EXPAND_REPLIES = "updateState:CommentSection.expandReplySection"
+
 private const val VIEW = "Landroid/view/View;"
+
+private const val OBJECTS = "[Ljava/lang/Object;"
 
 internal const val COMMENT_SHEET_OPTIONS = "$EXTENSION_PACKAGE/comments/CommentSheetOptions;"
 internal const val HOLDS_BUTTON = "$COMMENT_SHEET_OPTIONS->holdsButton(Ljava/lang/String;)Z"
 internal const val SKIP_PICKER = "$COMMENT_SHEET_OPTIONS->skipReactionPicker()Z"
+internal const val OPEN_REPLY_THREADS = "$COMMENT_SHEET_OPTIONS->openReplyThreads(Z)Z"
 
 /**
- * Two switches for comments and reactions, both off until turned on.
+ * Three switches for comments and reactions, all off until turned on.
  *
  * Hide GIF and sticker buttons: the comment box draws its buttons through a plugin socket, the one
  * that names itself [BUTTON_SOCKET] in the method going through its plugins (581
@@ -78,15 +101,28 @@ internal const val SKIP_PICKER = "$COMMENT_SHEET_OPTIONS->skipReactionPicker()Z"
  * `LX/34y;->A06`, each an instance (View, View)V method). The extension goes first there, and while
  * the switch is on the method returns before anything opens, so a tap on Like still likes.
  *
+ * Open every reply thread: the comment section, which names itself [COMMENT_SECTION] in its
+ * constructor (581 `LX/AeN`, 580 `LX/B9p`, 577 `LX/Afk`), keeps whether its reply thread is open in
+ * a boolean of its state class (581 `LX/AeO;->A06`, 580 `LX/B9u;->A06`, 577 `LX/Afl;->A06`). Its
+ * initial-state method writes it false (581 `A0n`, 580 `A1W`, 577 `A3j`), a tap on View replies
+ * sends the [EXPAND_REPLIES] update that sets it true, and the method drawing the comment's
+ * children reads it: open draws the ExpandedReplySection, which loads the thread through its own
+ * paginated replies list, and closed draws the CollapsedReplySection with the View replies row.
+ * The flag is found through the update: the number the update is built with picks the arm of the
+ * state's update switch, and that arm's first boolean write is the flag. Just before the
+ * initial-state method returns, the extension is handed the flag and its answer is written back,
+ * so with the switch on every comment starts the way a tap on View replies leaves it.
+ *
  * Off in the default selection.
  */
 @Suppress("unused")
 val commentSheetOptionsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Comment sheet options",
-    description = "Adds two switches under Comments, both off to start. Like only stops a long press on Like from " +
-        "opening the reactions, and the other takes the GIF and sticker buttons out of the comment box. A row " +
-        "there opens Facebook's own settings, where Reaction preferences can hide reaction counts.",
+    description = "Adds three switches under Comments, all off to start. Like only stops a long press on Like " +
+        "from opening the reactions, another takes the GIF and sticker buttons out of the comment box, and Open " +
+        "every reply thread shows each comment's replies without a tap on View replies. A row there opens " +
+        "Facebook's own settings, where Reaction preferences can hide reaction counts.",
     default = false,
 ) {
     category("Interface")
@@ -101,11 +137,18 @@ val commentSheetOptionsPatch = bytecodePatch(
             holders(BUTTON_SOCKET).flatMap { methodsHolding(it, BUTTON_SOCKET) },
         ) { types -> types.mapNotNull { classDefByOrNull(it) }.associateBy { it.type } }
         val dock = reactionPicker(holders(DOCK_NAME))
+        val threads = replyThreads(
+            holders(COMMENT_SECTION),
+            holders(EXPAND_REPLIES).flatMap { methodsHolding(it, EXPAND_REPLIES) },
+        ) { types -> types.mapNotNull { classDefByOrNull(it) }.associateBy { it.type } }
 
         mutableClassDefBy(buttons.check.definingClass).methods.single { it.descriptor() == buttons.check.descriptor() }
             .holdButtons(buttons.table)
         mutableClassDefBy(dock.definingClass).methods.single { it.descriptor() == dock.descriptor() }
             .skipPicker()
+        mutableClassDefBy(threads.initialState.definingClass).methods
+            .single { it.descriptor() == threads.initialState.descriptor() }
+            .openReplyThreads(threads)
         enableStatus("commentSheetOptions")
     }
 }
@@ -211,5 +254,173 @@ internal fun MutableMethod.skipPicker() {
             return-void
         """,
         ExternalLabel("open", getInstruction(0)),
+    )
+}
+
+/**
+ * The comment section's [initialState] method and the open flag of its state, [flag], which the
+ * method writes false at instruction [write] before its one return-void at [end].
+ */
+internal class ReplyThreads(val initialState: Method, val flag: FieldReference, val write: Int, val end: Int)
+
+private fun Instruction.methodCall() = (this as? ReferenceInstruction)?.reference as? MethodReference
+
+private fun Instruction.field() = (this as? ReferenceInstruction)?.reference as? FieldReference
+
+private fun FieldReference.sameAs(other: FieldReference) =
+    definingClass == other.definingClass && name == other.name && type == other.type
+
+private fun Instruction.writes(register: Int): Boolean {
+    if (!opcode.setsRegister() || this !is OneRegisterInstruction) return false
+    return registerA == register || (opcode.setsWideRegister() && registerA + 1 == register)
+}
+
+/** The literal the nearest instruction before [index] that writes [register] puts there, or null. */
+private fun literalBefore(code: List<Instruction>, index: Int, register: Int): Int? =
+    (index - 1 downTo 0).map { code[it] }.firstOrNull { it.writes(register) }
+        .let { (it as? NarrowLiteralInstruction)?.narrowLiteral }
+
+private val UPDATE_FACTORIES = setOf(Opcode.INVOKE_STATIC, Opcode.INVOKE_STATIC_RANGE)
+private val UPDATE_CONSTRUCTORS = setOf(Opcode.INVOKE_DIRECT, Opcode.INVOKE_DIRECT_RANGE)
+
+/**
+ * The update [update] sends: its type and its number, read from the last call before
+ * [EXPAND_REPLIES] that builds something from an Object[] and an int, a static factory on 577 and
+ * 581 and a constructor on 580. The number is the int, and it has to be a literal.
+ */
+internal fun expandUpdate(update: Method): Pair<String, Int> {
+    val code = update.implementation?.instructions?.toList().orEmpty()
+    val named = code.indexOfFirst { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string == EXPAND_REPLIES }
+    if (named < 0) refuse("${update.descriptor()} doesn't name \"$EXPAND_REPLIES\"")
+    val build = (named - 1 downTo 0).firstOrNull { index ->
+        val call = code[index].methodCall() ?: return@firstOrNull false
+        call.parameterTypes.map(CharSequence::toString) == listOf(OBJECTS, "I") && when (code[index].opcode) {
+            in UPDATE_FACTORIES -> call.returnType.startsWith("L")
+            in UPDATE_CONSTRUCTORS -> call.name == "<init>"
+            else -> false
+        }
+    } ?: refuse("${update.descriptor()} builds no update from an Object[] and a number before \"$EXPAND_REPLIES\"")
+    val call = code[build].methodCall()!!
+    val type = if (code[build].opcode in UPDATE_FACTORIES) call.returnType else call.definingClass
+    val number = literalBefore(code, build, code[build].namedRegisters().last())
+        ?: refuse("${update.descriptor()} builds its update with a number that isn't a literal")
+    return type to number
+}
+
+/**
+ * The boolean on [state] that the arm for update [number] of its one update method, an instance
+ * ([type])V method with a switch, writes first. Refuses unless there's exactly one such method,
+ * an arm for the number, and a boolean write on [state] in that arm before it leaves.
+ */
+internal fun openFlag(state: ClassDef, type: String, number: Int): FieldReference {
+    val methods = state.methods.filter {
+        !AccessFlags.STATIC.isSet(it.accessFlags) && it.returnType == "V" &&
+            it.parameterTypes.map(CharSequence::toString) == listOf(type)
+    }
+    val apply = methods.singleOrNull() ?: refuse("expected one update method on ${state.type}, found ${methods.size}")
+    val code = apply.implementation?.instructions?.toList().orEmpty()
+    val addresses = code.runningFold(0) { address, instruction -> address + instruction.codeUnits }
+    val switch = code.indexOfFirst { it.opcode == Opcode.PACKED_SWITCH || it.opcode == Opcode.SPARSE_SWITCH }
+    if (switch < 0) refuse("${apply.descriptor()} has no switch")
+    val payload = code.getOrNull(addresses.indexOf(addresses[switch] + (code[switch] as OffsetInstruction).codeOffset))
+        as? SwitchPayload ?: refuse("${apply.descriptor()}'s switch has no payload")
+    val arm = payload.switchElements.singleOrNull { it.key == number }
+        ?: refuse("${apply.descriptor()} has no arm for update $number")
+    val start = addresses.indexOf(addresses[switch] + arm.offset)
+    if (start < 0) refuse("${apply.descriptor()}'s arm for update $number lands between instructions")
+    return code.drop(start)
+        .takeWhile { !it.opcode.name.startsWith("return") && it.opcode != Opcode.THROW }
+        .firstOrNull { it.opcode == Opcode.IPUT_BOOLEAN && it.field()?.definingClass == state.type }
+        ?.field() ?: refuse("${apply.descriptor()}'s arm for update $number writes no boolean on ${state.type}")
+}
+
+/**
+ * The comment section's reply flag and the method that starts it, from [sections], the classes
+ * loading [COMMENT_SECTION], and [updates], the methods loading [EXPAND_REPLIES]. [classes] reads
+ * the state class.
+ *
+ * The section is the one class whose constructor names itself [COMMENT_SECTION]. Its state is the
+ * one class its no-argument methods make, and the flag is the boolean [EXPAND_REPLIES]'s update
+ * sets on it ([openFlag]). The initial-state method is the section's one instance (x)V method that
+ * writes the flag without reading it. It must write it once, from a literal false, then run
+ * straight to its one return-void with nothing jumping in and the state's register kept, so the
+ * hook just before that return still has the state and a free register to work with.
+ */
+internal fun replyThreads(
+    sections: List<ClassDef>,
+    updates: List<Method>,
+    classes: (Set<String>) -> Map<String, ClassDef>,
+): ReplyThreads {
+    val named = sections.filter { section ->
+        section.methods.any { it.name == "<init>" && holdsString(it, COMMENT_SECTION) }
+    }.distinctBy { it.type }
+    val section = named.singleOrNull()
+        ?: refuse("expected one class naming itself \"$COMMENT_SECTION\", found ${named.size}")
+    val sent = updates.distinctBy { it.descriptor() }
+    val update = sent.singleOrNull() ?: refuse("expected one method sending \"$EXPAND_REPLIES\", found ${sent.size}")
+    val (type, number) = expandUpdate(update)
+
+    val made = section.methods.filter {
+        !AccessFlags.STATIC.isSet(it.accessFlags) && it.parameterTypes.isEmpty() && it.returnType.startsWith("L")
+    }.flatMap { method ->
+        method.implementation?.instructions?.toList().orEmpty().filter { it.opcode == Opcode.NEW_INSTANCE }
+            .map { ((it as ReferenceInstruction).reference as TypeReference).type }
+    }.toSet()
+    val stateType = made.singleOrNull() ?: refuse("expected one state class made by ${section.type}, found ${made.size}")
+    val state = classes(setOf(stateType))[stateType] ?: refuse("$stateType isn't in this APK")
+    val flag = openFlag(state, type, number)
+
+    fun touching(method: Method, opcode: Opcode) = method.implementation?.instructions?.toList().orEmpty()
+        .withIndex().filter { (_, instruction) -> instruction.opcode == opcode && instruction.field()?.sameAs(flag) == true }
+        .map { it.index }
+    val starters = section.methods.filter {
+        !AccessFlags.STATIC.isSet(it.accessFlags) && it.returnType == "V" && it.parameterTypes.size == 1 &&
+            touching(it, Opcode.IPUT_BOOLEAN).isNotEmpty() && touching(it, Opcode.IGET_BOOLEAN).isEmpty()
+    }
+    val start = starters.singleOrNull()
+        ?: refuse("expected one method of ${section.type} starting its reply flag, found ${starters.size}")
+    val where = start.descriptor()
+    val write = touching(start, Opcode.IPUT_BOOLEAN).singleOrNull() ?: refuse("$where writes the reply flag more than once")
+    val code = start.implementation!!.instructions.toList()
+    val put = code[write] as TwoRegisterInstruction
+    if (literalBefore(code, write, put.registerA) != 0) refuse("$where doesn't start the reply flag false")
+    val end = code.indices.singleOrNull { code[it].opcode == Opcode.RETURN_VOID }
+        ?: refuse("$where doesn't have exactly one return-void")
+    if (end < write || code.indices.any { code[it].opcode.name.startsWith("return") && it != end }) {
+        refuse("$where doesn't end at one return-void after the reply flag")
+    }
+    val flow = ControlFlow.of(start)
+    for (index in code.indices) {
+        for (next in flow.normal[index] + flow.exceptional[index]) {
+            if (next in write + 1..end && next != index + 1) refuse("$where has a jump to instruction $next, after the reply flag")
+        }
+    }
+    if ((write + 1 until end).any { flow.normal[it] != listOf(it + 1) || code[it].writes(put.registerB) }) {
+        refuse("$where doesn't run straight from the reply flag to its return with the state kept")
+    }
+    if (freeRegister(put.registerB) >= start.localRegisterCount()) refuse("$where has no local register for the hook")
+    return ReplyThreads(start, flag, write, end)
+}
+
+/** The register the reply hook borrows: any but the state's, every register being free at the return. */
+internal fun freeRegister(state: Int) = if (state == 0) 1 else 0
+
+/**
+ * Just before the initial-state method returns, hand the extension the reply flag as Facebook
+ * left it and write back its answer. The state's register is the one the flag was written
+ * through, and the call takes the flag as a range.
+ */
+internal fun MutableMethod.openReplyThreads(threads: ReplyThreads) {
+    val state = getInstruction<TwoRegisterInstruction>(threads.write).registerB
+    val field = threads.flag.let { "${it.definingClass}->${it.name}:${it.type}" }
+    val free = freeRegister(state)
+    addInstructions(
+        threads.end,
+        """
+            iget-boolean v$free, v$state, $field
+            invoke-static/range { v$free .. v$free }, $OPEN_REPLY_THREADS
+            move-result v$free
+            iput-boolean v$free, v$state, $field
+        """,
     )
 }

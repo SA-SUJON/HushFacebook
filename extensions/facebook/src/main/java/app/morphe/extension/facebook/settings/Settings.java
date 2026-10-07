@@ -543,6 +543,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_comment_gif_sticker_buttons", FALSE);
 
     /**
+     * Every comment starts with its reply thread open, as if View replies had been tapped
+     * ({@link app.morphe.extension.facebook.comments.CommentSheetOptions}). Off by default. A
+     * change shows on the next comments drawn.
+     */
+    public static final BooleanSetting OPEN_REPLY_THREADS =
+            new BooleanSetting("hushfacebook_open_reply_threads", FALSE);
+
+    /**
      * Facebook's text boxes (posts, comments, captions, a story's text) look people up to tag only
      * for a word that starts with @. Off, they also look them up for a plain word Facebook takes for
      * a name, what its code calls an implicit mention

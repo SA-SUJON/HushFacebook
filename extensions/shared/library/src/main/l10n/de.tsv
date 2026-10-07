@@ -421,6 +421,10 @@ A long press on Like doesn't open the reactions. A tap still likes.	Langes Drüc
 Hide GIF and sticker buttons	GIF- und Sticker-Schaltflächen ausblenden
 # context: summary of that switch; the comment box is where you type a comment
 The comment box loses its GIF and sticker buttons. Typing, photos and posting work as before.	Das Kommentarfeld verliert seine GIF- und Sticker-Schaltflächen. Schreiben, Fotos und Posten funktionieren wie bisher.
+# context: switch title under Comments; a reply thread is the replies under a comment, which Facebook folds behind View replies
+Open every reply thread	Alle Antwort-Threads öffnen
+# context: summary of that switch; View replies is the link Facebook shows under a comment that has replies
+Comments show their replies right away, so there's no View replies to tap.	Kommentare zeigen ihre Antworten sofort, ein Tippen auf „Antworten ansehen“ ist nicht nötig.
 # context: row title under Comments that opens Facebook's own settings; reaction counts are the numbers next to the reactions on a post
 Hide reaction counts	Anzahl der Reaktionen ausblenden
 # context: summary of that row; Preferences and Reaction preferences are the names Facebook's own settings use

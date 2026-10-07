@@ -110,7 +110,7 @@ public enum PatchFamily {
     META_AI_SUMMARIES(FamilyNames.META_AI_SUMMARIES, "metaAiSummaries", null,
             Settings.HIDE_META_AI_SUMMARIES),
     COMMENT_SHEET_OPTIONS(FamilyNames.COMMENT_SHEET_OPTIONS, "commentSheetOptions", null,
-            Settings.LIKE_ONLY, Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS),
+            Settings.LIKE_ONLY, Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS, Settings.OPEN_REPLY_THREADS),
     TAG_SUGGESTIONS(FamilyNames.TAG_SUGGESTIONS, "tagSuggestions", null,
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT),
     TAP_TO_PLAY(FamilyNames.TAP_TO_PLAY, "tapToPlay", null,

@@ -179,6 +179,7 @@ public final class SettingsBackup {
             Settings.HIDE_META_AI_SUMMARIES,
             Settings.LIKE_ONLY,
             Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS,
+            Settings.OPEN_REPLY_THREADS,
             Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT,
             Settings.TAP_TO_PLAY,
             Settings.RESUME_LONG_VIDEOS,

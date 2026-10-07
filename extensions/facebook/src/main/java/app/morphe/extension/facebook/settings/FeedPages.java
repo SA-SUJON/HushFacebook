@@ -356,6 +356,8 @@ final class FeedPages {
                     L10n.t("A long press on Like doesn't open the reactions. A tap still likes.")));
             comments.addPreference(toggle(context, Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS,
                     L10n.t("The comment box loses its GIF and sticker buttons. Typing, photos and posting work as before.")));
+            comments.addPreference(toggle(context, Settings.OPEN_REPLY_THREADS,
+                    L10n.t("Comments show their replies right away, so there's no View replies to tap.")));
             comments.addPreference(reactionCountsRow(context));
         }
     }

@@ -294,6 +294,8 @@ public class ColdStartHooksTest {
                 CommentSheetOptions.holdsButton(CommentSheetOptions.GIF_BUTTON));
         assertFalse("a long press on Like before the context kept the reaction picker closed",
                 CommentSheetOptions.skipReactionPicker());
+        assertFalse("a comment drawn before the context had its reply thread open",
+                CommentSheetOptions.openReplyThreads(false));
         assertFalse("a word typed before the context lost its tag suggestions", TagSuggestionsForTests.skipsAPlainWord());
         assertFalse("a list of people open before the context was closed", TagSuggestionsForTests.closesAListLeftOpen());
         assertFalse("a Chats list built before the context lost the Get Messenger card",

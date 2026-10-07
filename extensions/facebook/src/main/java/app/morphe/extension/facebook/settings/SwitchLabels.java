@@ -66,6 +66,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_META_AI_SUMMARIES) return L10n.t("Hide Meta AI comment summaries");
         if (setting == Settings.LIKE_ONLY) return L10n.t("Like only");
         if (setting == Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS) return L10n.t("Hide GIF and sticker buttons");
+        if (setting == Settings.OPEN_REPLY_THREADS) return L10n.t("Open every reply thread");
         if (setting == Settings.TAG_SUGGESTIONS_ONLY_AFTER_AT) return L10n.t("Tag suggestions only after @");
         if (setting == Settings.HIDE_REELS_TAB) return L10n.t("Hide the Reels tab");
         if (setting == Settings.HIDE_REELS_TAB_DOT) return L10n.t("Hide the Reels tab dot");

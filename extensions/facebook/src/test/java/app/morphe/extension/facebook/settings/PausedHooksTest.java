@@ -568,7 +568,8 @@ public class PausedHooksTest {
         probes.put(PatchFamily.COMMENT_SHEET_OPTIONS, Arrays.asList(
                 () -> CommentSheetOptions.holdsButton(CommentSheetOptions.GIF_BUTTON),
                 () -> CommentSheetOptions.holdsButton(CommentSheetOptions.STICKER_BUTTON),
-                CommentSheetOptions::skipReactionPicker));
+                CommentSheetOptions::skipReactionPicker,
+                () -> CommentSheetOptions.openReplyThreads(false)));
         // A word without @ in a post or comment box looks nobody up, and a list of people left open
         // by an earlier @ is closed.
         probes.put(PatchFamily.TAG_SUGGESTIONS, Arrays.asList(

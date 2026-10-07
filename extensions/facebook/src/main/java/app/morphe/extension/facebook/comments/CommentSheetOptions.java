@@ -21,17 +21,19 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
 
 /**
  * Comment sheet options: the comment box without its GIF and sticker buttons, Like without the
- * reaction picker a long press opens, and a way to Facebook's own setting that hides reaction
- * counts.
+ * reaction picker a long press opens, every comment's reply thread open from the start, and a way
+ * to Facebook's own setting that hides reaction counts.
  *
  * <p>The comment box draws its buttons through a socket that asks a check of each button, by
  * number, whether it shows. The patch asks {@link #holdsButton} first in that check with the
  * button's name, and a yes answers no for that button. A long press on Like opens the reaction
  * picker through one method, and the patch asks {@link #skipReactionPicker} first there; a yes
- * returns before anything opens.
+ * returns before anything opens. A comment keeps whether its reply thread is open in its state,
+ * which starts closed until a tap on View replies opens it. The patch hands
+ * {@link #openReplyThreads} that flag as the state is first set up and writes back the answer.
  *
- * <p>Off, paused, before the settings are ready, or when anything here fails, both answers are no
- * and Facebook's code runs as written.
+ * <p>Off, paused, before the settings are ready, or when anything here fails, the answers are
+ * Facebook's own and its code runs as written.
  */
 public final class CommentSheetOptions {
     /** The comment box's GIF button, as the socket's name table gives it. */
@@ -48,11 +50,17 @@ public final class CommentSheetOptions {
     /** Counted each time a long press on Like doesn't open the reaction picker. */
     static final String PICKER_SKIPPED = "Reaction picker kept closed";
 
+    /** Counted each time a comment starts with its reply thread open. */
+    static final String THREAD_OPENED = "Reply thread opened";
+
     /** The member the report names once the comment box's socket has asked about the GIF or sticker button. */
     static final String BUTTONS = "comment box buttons";
 
     /** The member the report names once the reaction picker has been asked to open. */
     static final String PICKER = "reaction picker";
+
+    /** The member the report names once a comment's state has been set up. */
+    static final String REPLY_THREADS = "reply threads";
 
     /**
      * Facebook's own settings, a route its links table carries on 577, 580 and 581. Reaction
@@ -98,6 +106,24 @@ public final class CommentSheetOptions {
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "reaction picker", failure);
             return false;
+        }
+    }
+
+    /**
+     * The hook, as a comment's state is first set up, handed whether its reply thread starts open,
+     * which Facebook leaves false. True opens it, the way a tap on View replies does, while Open
+     * every reply thread is on; otherwise Facebook's own value comes back.
+     */
+    public static boolean openReplyThreads(boolean open) {
+        try {
+            HookStatus.invoked(FAMILY);
+            HookStatus.bound(FAMILY, REPLY_THREADS);
+            if (open || !Utils.settingsReady() || !Settings.OPEN_REPLY_THREADS.get()) return open;
+            HookStatus.counted(FAMILY, THREAD_OPENED);
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "reply thread", failure);
+            return open;
         }
     }
 

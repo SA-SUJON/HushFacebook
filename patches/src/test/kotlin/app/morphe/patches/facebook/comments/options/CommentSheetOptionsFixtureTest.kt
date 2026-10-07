@@ -16,11 +16,14 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.util.ControlFlow
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -34,8 +37,10 @@ import java.io.File
  * one method that builds the UFI dock and logs its name. Then each hook: the button's name from
  * the table with the check's own number as a range, the extension asked, a yes answering no; and
  * the picker asking first and returning on a yes. A no lands on Facebook's first instruction, and
- * nothing of Facebook's code moves. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and
- * skips without it.
+ * nothing of Facebook's code moves. The comment section is found by its name, its reply flag
+ * through the expandReplySection update, and the flag goes through the extension, as a range
+ * call, just before the initial state returns. Reads the fixture bundles from
+ * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class CommentSheetOptionsFixtureTest {
     private fun bundles(check: (File) -> Unit) {
@@ -119,6 +124,68 @@ class CommentSheetOptionsFixtureTest {
         assertEquals("$where: a yes returns before the picker opens", Opcode.RETURN_VOID, patched[3].opcode)
         assertEquals("$where: Facebook's code stays", original.map { it.opcode }, patched.drop(4).map { it.opcode })
         assertEquals("$where: a no lands on Facebook's first instruction", setOf(3, 4), ControlFlow.of(method).normal[2].toSet())
+    }
+
+    private fun replies(bundle: File) {
+        val name = bundle.name
+        val updates = holders(bundle, EXPAND_REPLIES).flatMap { methodsHolding(it, EXPAND_REPLIES) }
+        assertEquals("$name: one method sends \"$EXPAND_REPLIES\"", 1, updates.size)
+        val (_, number) = expandUpdate(updates.single())
+        assertEquals("$name: the update a tap on View replies sends", 1, number)
+        val threads = replyThreads(holders(bundle, COMMENT_SECTION), updates) { types -> FixtureDex.classes(bundle, types) }
+        val start = threads.initialState
+        val where = "$name: ${start.descriptor()}"
+        val flag = threads.flag
+        assertEquals("$where: the reply flag isn't a boolean", "Z", flag.type)
+        assertNotEquals("$where: the reply flag sits on the section, not its state", start.definingClass, flag.definingClass)
+
+        val section = FixtureDex.classes(bundle, setOf(start.definingClass)).values.single()
+        fun reads(method: Method) = method.implementation?.instructions?.any {
+            it.opcode == Opcode.IGET_BOOLEAN && ((it as ReferenceInstruction).reference as FieldReference).let { field ->
+                field.definingClass == flag.definingClass && field.name == flag.name
+            }
+        } == true
+        assertTrue("$where: the method drawing the comment doesn't read the reply flag",
+            methodsHolding(section, COMMENT_SECTION).any { it.name != "<init>" && reads(it) })
+
+        val context = PatchContexts.of(listOf(section))
+        val method = context.mutableClassDefBy(section.type).methods.single { it.descriptor() == start.descriptor() }
+        val original = method.implementation!!.instructions.toList()
+        val put = original[threads.write] as TwoRegisterInstruction
+        assertEquals("$where: the flag is written false", Opcode.IPUT_BOOLEAN, original[threads.write].opcode)
+        assertEquals("$where: the hook goes before the return", Opcode.RETURN_VOID, original[threads.end].opcode)
+        val state = put.registerB
+        val free = freeRegister(state)
+        assertTrue("$where: the hook borrows v$free, which isn't a local", free < method.localRegisterCount())
+
+        method.openReplyThreads(threads)
+        val patched = method.implementation!!.instructions.toList()
+        val end = threads.end
+        val field = "${flag.definingClass}->${flag.name}:${flag.type}"
+        assertEquals("$where gains four instructions", original.size + 4, patched.size)
+        assertEquals("$where: Facebook's code up to the return stays", original.take(end).map { it.opcode },
+            patched.take(end).map { it.opcode })
+        assertEquals("$where: the flag is read back", Opcode.IGET_BOOLEAN, patched[end].opcode)
+        assertEquals("$where: the flag is read back", field, patched[end].reference())
+        assertEquals("$where: from the state, into the borrowed register", listOf(free, state),
+            (patched[end] as TwoRegisterInstruction).let { listOf(it.registerA, it.registerB) })
+        assertEquals("$where: the extension is asked with a range call", Opcode.INVOKE_STATIC_RANGE, patched[end + 1].opcode)
+        assertEquals("$where: the extension is asked", OPEN_REPLY_THREADS, patched[end + 1].reference())
+        val range = patched[end + 1] as RegisterRangeInstruction
+        assertEquals("$where: with the flag it was handed", listOf(free, 1), listOf(range.startRegister, range.registerCount))
+        assertEquals("$where: its answer is kept", Opcode.MOVE_RESULT, patched[end + 2].opcode)
+        assertEquals("$where: its answer is kept", free, (patched[end + 2] as OneRegisterInstruction).registerA)
+        assertEquals("$where: and written back", Opcode.IPUT_BOOLEAN, patched[end + 3].opcode)
+        assertEquals("$where: and written back", field, patched[end + 3].reference())
+        assertEquals("$where: to the state", listOf(free, state),
+            (patched[end + 3] as TwoRegisterInstruction).let { listOf(it.registerA, it.registerB) })
+        assertEquals("$where: then Facebook returns", Opcode.RETURN_VOID, patched[end + 4].opcode)
+        assertEquals("$where: the code before the return runs into the hook", listOf(end), ControlFlow.of(method).normal[end - 1])
+    }
+
+    @Test
+    fun `each declared build opens every reply thread through the comment section's first state`() = bundles { bundle ->
+        replies(bundle)
     }
 
     @Test

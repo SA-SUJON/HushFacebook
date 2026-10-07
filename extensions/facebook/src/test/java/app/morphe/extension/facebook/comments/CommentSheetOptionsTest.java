@@ -36,8 +36,9 @@ import app.morphe.extension.shared.settings.PauseForTests;
 /**
  * Comment sheet options: with its switch on, the comment box's check answers no for the GIF and
  * sticker buttons, each counted, and leaves every other button to Facebook. With Like only on, the
- * reaction picker's method is told to return. Off, paused, or before the settings are ready,
- * nothing changes. The row opens Facebook's own settings, in this package only.
+ * reaction picker's method is told to return. With Open every reply thread on, a comment's state
+ * starts with its replies open. Off, paused, or before the settings are ready, nothing changes. The
+ * row opens Facebook's own settings, in this package only.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -58,6 +59,7 @@ public class CommentSheetOptionsTest {
         PauseForTests.resume();
         Settings.LIKE_ONLY.resetToDefault();
         Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS.resetToDefault();
+        Settings.OPEN_REPLY_THREADS.resetToDefault();
         HookStatus.clear();
     }
 
@@ -82,6 +84,40 @@ public class CommentSheetOptionsTest {
     }
 
     @Test
+    public void onEveryReplyThreadStartsOpenAndIsCounted() {
+        Settings.OPEN_REPLY_THREADS.save(true);
+        assertTrue("a comment started with its replies closed", CommentSheetOptions.openReplyThreads(false));
+        assertTrue("a comment started with its replies closed", CommentSheetOptions.openReplyThreads(false));
+        assertTrue("a thread Facebook opened was closed", CommentSheetOptions.openReplyThreads(true));
+        assertEquals(FamilyNames.COMMENT_SHEET_OPTIONS + ": invoked 3, 1 found, 0 missing. Counted: "
+                + CommentSheetOptions.THREAD_OPENED + " 2", statusLine());
+    }
+
+    @Test
+    public void offPausedOrColdTheReplyThreadIsFacebooks() {
+        assertFalse("Open every reply thread doesn't start off", Settings.OPEN_REPLY_THREADS.get());
+        assertFalse("off, a comment started with its replies open", CommentSheetOptions.openReplyThreads(false));
+        assertTrue("off, a thread Facebook opened was closed", CommentSheetOptions.openReplyThreads(true));
+
+        Settings.OPEN_REPLY_THREADS.save(true);
+        for (HushfacebookPause.Reason reason : new HushfacebookPause.Reason[] {
+                HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP,
+                HushfacebookPause.Reason.MARKER_FILE}) {
+            PauseForTests.pause(reason);
+            assertFalse("a Hushfacebook paused by " + reason + " opened a reply thread",
+                    CommentSheetOptions.openReplyThreads(false));
+            PauseForTests.resume();
+        }
+        SettingsContextRule.withoutContext(() -> assertFalse(
+                "a reply thread was opened before the settings were ready", CommentSheetOptions.openReplyThreads(false)));
+
+        String line = statusLine();
+        assertFalse("a thread left to Facebook was counted: " + line, line != null && line.contains("Counted"));
+        assertTrue("on again after the pause, a comment started with its replies closed",
+                CommentSheetOptions.openReplyThreads(false));
+    }
+
+    @Test
     public void eachSwitchAnswersOnlyForItsOwnHook() {
         Settings.LIKE_ONLY.save(true);
         assertFalse("Like only held the GIF button", CommentSheetOptions.holdsButton(CommentSheetOptions.GIF_BUTTON));
@@ -89,7 +125,13 @@ public class CommentSheetOptionsTest {
         Settings.LIKE_ONLY.save(false);
         Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS.save(true);
         assertFalse("the button switch kept the picker closed", CommentSheetOptions.skipReactionPicker());
+        assertFalse("the button switch opened a reply thread", CommentSheetOptions.openReplyThreads(false));
         assertTrue("the button switch left the GIF button", CommentSheetOptions.holdsButton(CommentSheetOptions.GIF_BUTTON));
+        Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS.save(false);
+        Settings.OPEN_REPLY_THREADS.save(true);
+        assertFalse("the reply switch held the GIF button", CommentSheetOptions.holdsButton(CommentSheetOptions.GIF_BUTTON));
+        assertFalse("the reply switch kept the picker closed", CommentSheetOptions.skipReactionPicker());
+        assertTrue("the reply switch left a thread closed", CommentSheetOptions.openReplyThreads(false));
     }
 
     @Test
@@ -127,7 +169,7 @@ public class CommentSheetOptionsTest {
     @Test
     public void theSwitchesNeedNoRestartAndTravelWithTheirFamily() {
         for (app.morphe.extension.shared.settings.BooleanSetting setting : new app.morphe.extension.shared.settings.BooleanSetting[] {
-                Settings.LIKE_ONLY, Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS}) {
+                Settings.LIKE_ONLY, Settings.HIDE_COMMENT_GIF_STICKER_BUTTONS, Settings.OPEN_REPLY_THREADS}) {
             assertFalse(setting.key + " asks for a restart, but each hook reads it again", setting.rebootApp);
             assertNull(setting.key + " asks before it changes", setting.userDialogMessage);
             assertTrue("Pause and the report don't know " + setting.key,
