@@ -584,6 +584,9 @@ public class SettingsNavigationTest {
         assertEquals("Playback", focusedTitle(a11y));
         page.navigation.navigate("more");
         layout(dialog.getView());
+        // A reader reaches About before opening it: it's the last row, below the fold here.
+        list().setSelection(list().getCount() - 1);
+        layout(dialog.getView());
         page.navigation.navigate("About");
         layout(dialog.getView());
         page.navigation.back();
@@ -804,7 +807,7 @@ public class SettingsNavigationTest {
         assertEquals(9, list().getCount());
         page.navigation.navigate("About");
         dialog.getDialog().onBackPressed();
-        assertEquals(14, list().getCount());
+        assertEquals(15, list().getCount());
         dialog.getDialog().onBackPressed();
         assertEquals(9, list().getCount());
         dialog.getDialog().onBackPressed();
