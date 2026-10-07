@@ -12,7 +12,10 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
 /**
  * Keeps the progress bar of a video on screen. Two players hide theirs a few seconds in.
  *
- * <p>The Reels viewer's bottom bar (FbShortsViewerBottomSeekBarPlugin) has two sizes. Facebook
+ * <p>The Reels viewer's bar on 581 is the unified video scrubber (VDDScrubberPlugin). It has an
+ * active look and a passive one, a thin line, and the patch asks {@link #keepsReelBar} first in the
+ * passive one: a yes runs the active look instead. Older builds' viewer used a bottom bar
+ * (FbShortsViewerBottomSeekBarPlugin), which has two sizes. Facebook
  * makes it full size, with the thumb showing and the bar taking drags, when it shows a reel's
  * controls or while you scrub, and shrinks it to a line 2 dp high with the thumb hidden and drags
  * turned off when the controls go away or the reel plays on. The patch asks {@link #keepsReelBar}

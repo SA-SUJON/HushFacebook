@@ -30,6 +30,13 @@ private const val PATCH = "Keep the progress bar"
 /** The name the Reels viewer's bottom progress bar plugin gives itself, a kept literal. */
 internal const val REEL_SEEK_BAR_PLUGIN = "FbShortsViewerBottomSeekBarPlugin"
 
+/**
+ * The trace names the unified video scrubber (the Reels viewer's bar on 581) gives its two looks:
+ * full size, with the thumb showing, and the thin passive line. Kept literals, one per method.
+ */
+internal const val SCRUBBER_ACTIVE = "VDDScrubberPlugin.updateToActiveScrubber"
+internal const val SCRUBBER_PASSIVE = "VDDScrubberPlugin.updateToPassiveScrubber"
+
 /** A kept class whose superclass is the full-screen video controls every such player builds on. */
 internal const val FULLSCREEN_CONTROLS = "Lcom/facebook/feed/video/fullscreen/orion/FeedFullscreenVideoControlsPlugin;"
 
@@ -44,10 +51,19 @@ internal const val KEEPS_REEL_BAR = "$PROGRESS_BAR->keepsReelBar()Z"
 internal const val KEEPS_CONTROLS = "$PROGRESS_BAR->keepsControls()Z"
 
 /**
- * Keeps a video's progress bar on screen, in two players that hide theirs a few seconds in.
+ * Keeps a video's progress bar on screen, in the players that hide theirs a few seconds in.
  *
- * The Reels viewer's bottom bar plugin, named [REEL_SEEK_BAR_PLUGIN], sizes its SeekBar with two
- * static (SeekBar, plugin) methods (581 `LX/8sg;->A00` and `A01`): one shrinks it to a 2 dp line,
+ * The unified video scrubber, which is the bar of 581's Reels viewer, has an "active" look (full
+ * height track, thumb at full alpha) and a "passive" one (a 2 dp line, thumb hidden) that Facebook
+ * switches to before a touch and again about a second after a drag ends. Both are `()V` methods
+ * that begin by tracing their own name, [SCRUBBER_ACTIVE] and [SCRUBBER_PASSIVE] (581 `LX/RV4;`
+ * `A18` and `A19`, 580 `LX/Rln;` `A15` and `A16`, 577 `LX/SHD;` `A18` and `A19`). The extension
+ * goes first in the passive one, and while the switch is on it runs the active one instead and
+ * returns.
+ *
+ * Older builds' Reels viewer used a bottom bar plugin, named [REEL_SEEK_BAR_PLUGIN], sizes its SeekBar with two
+ * static (SeekBar, plugin) methods (581 `LX/8sg;->A00` and `A01`, still present on every declared
+ * build): one shrinks it to a 2 dp line,
  * hides the thumb and turns drags off, the other makes it full size with the thumb at full alpha
  * and drags on. Facebook shrinks it when a reel's controls go away and when the reel plays on, so
  * the extension goes first in the shrinking one, and while the switch is on it calls the other
@@ -76,18 +92,26 @@ val keepProgressBarPatch = bytecodePatch(
 
     execute {
         // Everything is found before anything changes, so a build missing one part is left as it was.
-        val plugin = reelSeekBarPlugin(
-            classDefByStrings(REEL_SEEK_BAR_PLUGIN, StringComparisonType.EQUALS)
+        val scrubber = vddScrubber(
+            classDefByStrings(SCRUBBER_PASSIVE, StringComparisonType.EQUALS)
                 .filterNot { it.type.startsWith(EXTENSION_CLASSES) },
         )
-        val sizes = barSizes(plugin)
+        // The older bottom bar plugin is kept hooked where a build still has it, but needn't exist.
+        val pluginHolders = classDefByStrings(REEL_SEEK_BAR_PLUGIN, StringComparisonType.EQUALS)
+            .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        val plugin = if (pluginHolders.isEmpty()) null else reelSeekBarPlugin(pluginHolders)
+        val sizes = plugin?.let { barSizes(it) }
         val controls = classDefByOrNull(FULLSCREEN_CONTROLS)?.superclass
             ?.let { classDefByOrNull(it) }
             ?: refuse("FeedFullscreenVideoControlsPlugin or the controls class it extends isn't in this APK")
         val timer = fadeTimer(controls)
 
-        mutableClassDefBy(plugin.type).methods.single { it.sameAs(sizes.shrink) }
-            .fullSizeInstead(plugin.type, sizes.fullSize)
+        mutableClassDefBy(scrubber.type).methods.single { it.sameAs(scrubber.passive) }
+            .activeInstead(scrubber.type, scrubber.active)
+        if (plugin != null && sizes != null) {
+            mutableClassDefBy(plugin.type).methods.single { it.sameAs(sizes.shrink) }
+                .fullSizeInstead(plugin.type, sizes.fullSize)
+        }
         mutableClassDefBy(controls.type).methods.single { it.sameAs(timer) }.noTimerWhileKept()
         enableStatus("keepProgressBar")
     }
@@ -115,6 +139,24 @@ internal fun reelSeekBarPlugin(holders: List<ClassDef>): ClassDef {
     }.distinctBy { it.type }
     return plugins.singleOrNull()
         ?: refuse("expected one plugin naming itself \"$REEL_SEEK_BAR_PLUGIN\", found ${plugins.size}")
+}
+
+/** The unified scrubber's class and its two looks. */
+internal class ScrubberLooks(val type: String, val active: Method, val passive: Method)
+
+/**
+ * The scrubber class: the one of [holders] with an instance `()V` method tracing
+ * [SCRUBBER_ACTIVE] and another tracing [SCRUBBER_PASSIVE]. Refuses unless there's exactly one
+ * such class with exactly one method of each.
+ */
+internal fun vddScrubber(holders: List<ClassDef>): ScrubberLooks {
+    fun look(holder: ClassDef, string: String) = methodsHolding(holder, string).filter {
+        !AccessFlags.STATIC.isSet(it.accessFlags) && it.returnType == "V" && it.parameterTypes.isEmpty()
+    }
+    val scrubbers = holders.distinctBy { it.type }.filter { look(it, SCRUBBER_ACTIVE).size == 1 && look(it, SCRUBBER_PASSIVE).size == 1 }
+    val scrubber = scrubbers.singleOrNull()
+        ?: refuse("expected one class tracing both \"$SCRUBBER_ACTIVE\" and \"$SCRUBBER_PASSIVE\", found ${scrubbers.size}")
+    return ScrubberLooks(scrubber.type, look(scrubber, SCRUBBER_ACTIVE).single(), look(scrubber, SCRUBBER_PASSIVE).single())
 }
 
 /** The plugin's two size methods. */
@@ -157,6 +199,26 @@ internal fun fadeTimer(controls: ClassDef): Method {
         refuse("${controls.type}->${timer.name}, its fade timer, is no longer an instance ()V that drops the old timer first")
     }
     return timer
+}
+
+/**
+ * First thing in the scrubber's passive look: while the extension keeps the bar, run the active
+ * look on the same instance and return. Otherwise Facebook's own code runs from its first
+ * instruction. The range form names p0, which can sit past v15 in these long methods.
+ */
+internal fun MutableMethod.activeInstead(scrubber: String, active: Method) {
+    requireLocals(PATCH, 1)
+    addInstructionsWithLabels(
+        0,
+        """
+            invoke-static { }, $KEEPS_REEL_BAR
+            move-result v0
+            if-eqz v0, :facebook
+            invoke-virtual/range { p0 .. p0 }, $scrubber->${active.name}()V
+            return-void
+        """,
+        ExternalLabel("facebook", getInstruction(0)),
+    )
 }
 
 /**

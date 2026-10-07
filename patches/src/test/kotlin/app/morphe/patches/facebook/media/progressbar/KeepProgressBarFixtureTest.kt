@@ -16,6 +16,7 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
 import org.junit.Assert.assertEquals
@@ -90,6 +91,43 @@ class KeepProgressBarFixtureTest {
         assertEquals("$where: and returns", Opcode.RETURN_VOID, patched[4].opcode)
         assertEquals("$where: Facebook's code stays", original.map { it.opcode }, patched.drop(5).map { it.opcode })
         assertEquals("$where: a no lands on Facebook's first instruction", setOf(3, 5), ControlFlow.of(shrink).normal[2].toSet())
+    }
+
+    @Test
+    fun `each declared build runs the scrubber's active look in place of its passive one while kept`() = bundles { bundle ->
+        val name = bundle.name
+        val holders = FixtureDex.classesHolding(bundle, SCRUBBER_PASSIVE).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        assertTrue("$name: nothing traces \"$SCRUBBER_PASSIVE\"", holders.isNotEmpty())
+        val looks = vddScrubber(holders)
+        assertNotEquals("$name: the active and passive looks are one method", looks.active.name, looks.passive.name)
+        assertTrue("$name: the active look doesn't load 255 for the thumb",
+            looks.active.code().any { (it as? WideLiteralInstruction)?.wideLiteral == 255L })
+        assertTrue("$name: the passive look doesn't set the bar's max height",
+            looks.passive.code().any { it.reference()?.endsWith("ProgressBar;->setMaxHeight(I)V") == true })
+        val registers = looks.passive.implementation!!.registerCount
+        // The hook borrows v0: this is the one parameter register.
+        assertTrue("$name: ${looks.type}->${looks.passive.name} has no local register for the hook", registers - 1 >= 1)
+
+        val context = PatchContexts.of(listOf(holders.single { it.type == looks.type }))
+        val passive = context.mutableClassDefBy(looks.type).methods.single { it.sameAs(looks.passive) }
+        val original = passive.code()
+        passive.activeInstead(looks.type, looks.active)
+        val patched = passive.code()
+        val where = "$name: ${looks.type}->${looks.passive.name}"
+        assertEquals("$where gains five instructions", original.size + 5, patched.size)
+        assertEquals("$where: the extension is asked first", KEEPS_REEL_BAR, patched[0].reference())
+        assertEquals("$where: its answer is kept", Opcode.MOVE_RESULT, patched[1].opcode)
+        val register = (patched[1] as OneRegisterInstruction).registerA
+        assertTrue("$where: the hook writes v$register, which isn't a local", register < passive.localRegisterCount())
+        assertEquals("$where: a no goes on to Facebook", Opcode.IF_EQZ, patched[2].opcode)
+        assertEquals("$where: a yes runs the active look", "${looks.type}->${looks.active.name}()V", patched[3].reference())
+        assertEquals("$where: through the range form, which reaches any register", Opcode.INVOKE_VIRTUAL_RANGE, patched[3].opcode)
+        val call = patched[3] as RegisterRangeInstruction
+        assertEquals("$where: on this instance only", listOf(passive.localRegisterCount(), 1),
+            listOf(call.startRegister, call.registerCount))
+        assertEquals("$where: and returns", Opcode.RETURN_VOID, patched[4].opcode)
+        assertEquals("$where: Facebook's code stays", original.map { it.opcode }, patched.drop(5).map { it.opcode })
+        assertEquals("$where: a no lands on Facebook's first instruction", setOf(3, 5), ControlFlow.of(passive).normal[2].toSet())
     }
 
     @Test
