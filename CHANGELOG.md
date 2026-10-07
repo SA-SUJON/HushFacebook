@@ -48,6 +48,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Hide Meta upsells` has a new **Hide Meta AI's Imagine** switch, off to start. It takes the Imagine me button off posts and takes Imagine out of the post composer and the row of tools at the top of Create story.
 * **Facebook:** `Hide Meta upsells` has a new **Hide Threads in the share sheet** switch, off to start. The share sheet loses its Threads button and keeps every other way to share in the same order.
 * **Facebook:** `Download any video` has a new switch, **Offer to download copied links**, off to start. Come back to Facebook with a reel or video link copied and it asks once whether to download it. With the switch off, your clipboard is never read.
+* **Facebook:** `Hide Meta upsells` has a new **Hide other Meta AI buttons under posts** switch next to Hide Meta AI's Imagine. It takes the rest of Meta AI's buttons off posts, and the post's next button shows instead if it has one. It starts off.
+* **Facebook:** `Block promotional notifications` has new switches for group activity, event invites, live videos and reactions to your posts and comments. **Quiet hours**, a separate switch, blocks the kinds you picked only between two times you choose (10 PM to 7 AM to start). Everything starts off, and messages and calls always come through.
 
 ### Fixed
 
