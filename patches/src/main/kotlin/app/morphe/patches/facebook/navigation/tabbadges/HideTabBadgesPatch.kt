@@ -130,14 +130,16 @@ internal fun BytecodePatchContext.findBadgeWriters(): List<Method> {
 
 /**
  * The extension goes first in [write] and hands back the count to write, which replaces the int
- * parameter. The parameter register is overwritten in place, so no local is borrowed.
+ * parameter. The parameter register is overwritten in place, so no local is borrowed. The call is
+ * a range: some writers have more than 16 registers (Htc's on 581 has 18), where the count's
+ * register is past what a plain invoke can name.
  */
 internal fun BytecodePatchContext.applyIconCount(write: Method) {
     val method = mutableClassDefBy(write.definingClass).findMutableMethodOf(write)
     method.addInstructions(
         0,
         """
-            invoke-static { p2 }, $ICON_COUNT
+            invoke-static/range { p2 .. p2 }, $ICON_COUNT
             move-result p2
         """,
     )

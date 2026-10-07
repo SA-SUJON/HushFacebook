@@ -16,7 +16,7 @@ import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
-import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction35c
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import org.junit.Assert.assertEquals
@@ -76,9 +76,13 @@ class HideTabBadgesFixtureTest {
                     val code = patched.instructions.toList()
                     val count = patched.registerCount - 1
                     val first = code[0]
+                    assertTrue("$name ${badgerName(writer)} ${writer.type}->${write.name}: the first instruction is " +
+                        code.take(4).map { it.opcode } + ", registers ${patched.registerCount}",
+                        first is RegisterRangeInstruction)
                     assertEquals("$name ${badgerName(writer)}: the first call", ICON_COUNT,
                         ((first as ReferenceInstruction).reference as MethodReference).toString())
-                    assertEquals("$name ${badgerName(writer)}: the count is handed over", count, (first as Instruction35c).registerC)
+                    assertEquals("$name ${badgerName(writer)}: the count is handed over", count,
+                        (first as RegisterRangeInstruction).startRegister)
                     assertEquals("$name ${badgerName(writer)}: one register handed over", 1, first.registerCount)
                     assertEquals("$name ${badgerName(writer)}: the answer", Opcode.MOVE_RESULT, code[1].opcode)
                     assertEquals("$name ${badgerName(writer)}: the answer replaces the count", count,
