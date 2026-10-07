@@ -905,3 +905,7 @@ Save photo	Foto speichern
 Save all photos	Alle Fotos speichern
 # context: short message shown when the photos of a post could not start saving
 Couldn't save this post's photos. Try again in a moment.	Die Fotos dieses Beitrags ließen sich nicht speichern. Versuche es gleich noch einmal.
+# context: settings switch under Block Instant Games ads that makes a game's rewarded ad count as watched
+Answer rewarded game ads as watched	Belohnte Spielwerbung als angesehen melden
+# context: description under that switch
+With Block Instant Games ads on, a game's rewarded ad counts as watched: no ad plays and the game gives its reward. Other game ads still get none.	Wenn Werbung in Instant Games blockieren an ist, gilt eine belohnte Werbung eines Spiels als angesehen: Es läuft keine Werbung und das Spiel gibt dir die Belohnung. Andere Spielwerbung bleibt blockiert.

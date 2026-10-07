@@ -799,3 +799,7 @@ Save photo	Salvar foto
 Save all photos	Salvar todas as fotos
 # context: short message shown when the photos of a post could not start saving
 Couldn't save this post's photos. Try again in a moment.	Não foi possível salvar as fotos desta publicação. Tente de novo em instantes.
+# context: settings switch under Block Instant Games ads that makes a game's rewarded ad count as watched
+Answer rewarded game ads as watched	Considerar assistidos os anúncios premiados dos jogos
+# context: description under that switch
+With Block Instant Games ads on, a game's rewarded ad counts as watched: no ad plays and the game gives its reward. Other game ads still get none.	Com Bloquear anúncios do Instant Games ativado, o anúncio premiado de um jogo conta como assistido: nenhum anúncio é exibido e o jogo dá a recompensa. Os outros anúncios de jogos continuam bloqueados.

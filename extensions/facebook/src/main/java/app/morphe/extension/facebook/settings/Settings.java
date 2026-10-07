@@ -295,6 +295,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_block_game_ads", TRUE);
 
     /**
+     * With {@link #BLOCK_GAME_ADS} on, a rewarded video a game asks for is answered as watched
+     * ({@link app.morphe.extension.facebook.ads.GameAds#answer}): no ad loads and the game grants
+     * its reward. Other game ads still get none.
+     */
+    public static final BooleanSetting ANSWER_REWARDED_GAME_ADS =
+            new BooleanSetting("hushfacebook_answer_rewarded_game_ads", FALSE);
+
+    /**
      * The product cards of the shop links a creator attaches to a post go: on a reel, under a feed
      * post and floating over the comment box ({@link app.morphe.extension.facebook.ads.AffiliateLinks}).
      * The "Commission eligible" label stays. A change shows on the reels, posts and comment sheets

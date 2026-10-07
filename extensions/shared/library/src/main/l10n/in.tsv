@@ -905,3 +905,7 @@ Save photo	Simpan foto
 Save all photos	Simpan semua foto
 # context: short message shown when the photos of a post could not start saving
 Couldn't save this post's photos. Try again in a moment.	Foto postingan ini tidak dapat disimpan. Coba lagi sebentar lagi.
+# context: settings switch under Block Instant Games ads that makes a game's rewarded ad count as watched
+Answer rewarded game ads as watched	Anggap iklan berhadiah game sudah ditonton
+# context: description under that switch
+With Block Instant Games ads on, a game's rewarded ad counts as watched: no ad plays and the game gives its reward. Other game ads still get none.	Saat Blokir iklan Instant Games aktif, iklan berhadiah dari game dianggap sudah ditonton: tidak ada iklan yang diputar dan game memberikan hadiahnya. Iklan game lainnya tetap diblokir.

@@ -80,7 +80,7 @@ public enum PatchFamily {
     SPONSORED_MARKETPLACE(FamilyNames.SPONSORED_MARKETPLACE, "sponsoredMarketplace", null,
             Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS),
     GAME_ADS(FamilyNames.GAME_ADS, "gameAds", null,
-            Settings.BLOCK_GAME_ADS),
+            Settings.BLOCK_GAME_ADS, Settings.ANSWER_REWARDED_GAME_ADS),
     AFFILIATE_LINKS(FamilyNames.AFFILIATE_LINKS, "affiliateLinks", null,
             Settings.HIDE_AFFILIATE_LINKS),
     REEL_DECLUTTER(FamilyNames.REEL_DECLUTTER, "reelDeclutter", null,

@@ -78,6 +78,9 @@ final class AppPages {
             menu.addPreference(toggle(context, Settings.BLOCK_GAME_ADS,
                     L10n.t("Games you play in Facebook get no ads. A game asking for one hears there's none to show, "
                             + "so rewarded ads give no reward.")));
+            menu.addPreference(toggle(context, Settings.ANSWER_REWARDED_GAME_ADS,
+                    L10n.t("With Block Instant Games ads on, a game's rewarded ad counts as watched: no ad plays and "
+                            + "the game gives its reward. Other game ads still get none.")));
         }
         if (build.contains(PatchFamily.META_UPSELLS)) {
             PreferenceCategory upsells = category(screen, L10n.t("Meta's other products"));

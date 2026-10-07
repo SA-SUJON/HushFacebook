@@ -136,6 +136,7 @@ public final class SettingsBackup {
             Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS,
             Settings.SHOW_SELLER_VIEW_PROFILE,
             Settings.BLOCK_GAME_ADS,
+            Settings.ANSWER_REWARDED_GAME_ADS,
             Settings.HIDE_AFFILIATE_LINKS,
             Settings.HIDE_REEL_CHIPS,
             Settings.HIDE_REEL_FOLLOW_BUTTON,

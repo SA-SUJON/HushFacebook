@@ -34,6 +34,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Download any photo` has a second switch under Downloads, **Save photo in post menus**, which starts off. A photo post's three-dot menu gets Save photo, and an album gets Save all photos, which saves each one in turn.
 * **Facebook:** New patch, `Following feed on Home`, with a switch under Opening Facebook that starts off. With it on, Home asks Facebook for its Following feed instead of the ranked one. The Feeds tab's filters keep their own feeds.
 * **Facebook:** New patch, `Disable Play Store updates`, which starts off. Google Play stops offering Facebook updates, so you no longer need Morphe Patches as a second source just for that. It's Morphe's own patch with its notice kept, and Facebook still reads its real version (issue #46).
+* **Facebook:** `Block Instant Games ads` has a new switch under it, **Answer rewarded game ads as watched**, which starts off. With it on, a game's rewarded ad counts as watched, so the game gives its reward while no ad is fetched or played. Interstitials and banners still get no ad.
 
 ### Fixed
 
