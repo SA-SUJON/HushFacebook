@@ -6,6 +6,9 @@ package app.morphe.extension.facebook.misc;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.Logger;
@@ -14,21 +17,30 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
 
 /**
  * What the Hide Meta upsells patch asks wherever Facebook pushes Meta's other products outside the
- * Menu. Four switches, all off by default: Edits (the Reels composer header's button and badge, and
+ * Menu. Five switches, all off by default: Edits (the Reels composer header's button and badge, and
  * the server's Edits pill under feed videos, which the feed's requests stop asking for), Threads
  * cross-posting (the composer's onboarding), Meta Verified (the offer sheet after you post and the
- * label under some posts' headers) and avatar stickers (the upsell components in comments and
- * Facebook's promotion slots).
+ * label under some posts' headers), avatar stickers (the upsell components in comments and
+ * Facebook's promotion slots) and Meta AI's Imagine (the Imagine me button under posts, the post
+ * composer's Imagine and Create story's Imagine tile).
  *
  * <p>Off, paused, before the settings are ready, or when anything here fails, every answer is
  * Facebook's own.
  */
 public final class MetaUpsells {
-    /** Counted under the patch's name each time one of the four is answered away. */
+    /** Counted under the patch's name each time one of the five is answered away. */
     static final String EDITS_HIDDEN = "Edits promotion kept out";
     static final String THREADS_HIDDEN = "Threads cross-posting prompt kept out";
     static final String VERIFIED_HIDDEN = "Meta Verified offer kept out";
     static final String AVATAR_HIDDEN = "Avatar sticker promotion kept out";
+    static final String IMAGINE_HIDDEN = "Imagine entry kept out";
+
+    /** The post call-to-action plugin for Imagine me, as the CTA selector's name table gives it. */
+    public static final String IMAGINE_ME_PLUGIN =
+            "com.facebook.feed.plugins.calltoaction.impl.imagineme.ImagineMePlugin";
+
+    /** The name of Create story's Imagine tool, a constant of Facebook's enum of story tools. */
+    static final String STORY_IMAGINE = "IMAGINE";
 
     private static final String FAMILY = FamilyNames.META_UPSELLS;
 
@@ -162,6 +174,70 @@ public final class MetaUpsells {
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "avatar sticker upsell", failure);
             return false;
+        }
+    }
+
+    /**
+     * The hook, first thing in the post call-to-action selector's check of whether a plugin
+     * applies, handed the plugin's name. True answers no for the Imagine me button while the Imagine
+     * switch is on, so the selector goes on to the next button; false leaves the check to Facebook.
+     */
+    public static boolean hidesImagineCta(@Nullable String plugin) {
+        try {
+            HookStatus.invoked(FAMILY);
+            if (!IMAGINE_ME_PLUGIN.equals(plugin)) return false;
+            if (!Utils.settingsReady() || !Settings.HIDE_META_AI_IMAGINE.get()) return false;
+            hid("Imagine me button", IMAGINE_HIDDEN);
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "Imagine me button", failure);
+            return false;
+        }
+    }
+
+    /**
+     * The hook after each time the post composer asks whether its Imagine capability is on, handed
+     * the answer. Answers false while the Imagine switch is on, so the composer has no Imagine.
+     */
+    public static boolean imagineCapability(boolean on) {
+        try {
+            HookStatus.invoked(FAMILY);
+            if (!on || !Utils.settingsReady() || !Settings.HIDE_META_AI_IMAGINE.get()) return on;
+            hid("composer Imagine capability", IMAGINE_HIDDEN);
+            return false;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "composer Imagine capability", failure);
+            return on;
+        }
+    }
+
+    /**
+     * The hook on the list of tools Create story builds its row of tiles from, constants of
+     * Facebook's enum. Answers the same tools in the same order without Imagine while the Imagine
+     * switch is on, and the list it was handed otherwise. The patch copies the answer back into an
+     * ImmutableList.
+     */
+    @Nullable
+    public static List<?> storyTools(@Nullable List<?> tools) {
+        try {
+            HookStatus.invoked(FAMILY);
+            if (tools == null || tools.isEmpty()) return tools;
+            if (!Utils.settingsReady() || !Settings.HIDE_META_AI_IMAGINE.get()) return tools;
+            List<Object> kept = null;
+            for (int index = 0; index < tools.size(); index++) {
+                Object tool = tools.get(index);
+                if (tool instanceof Enum && STORY_IMAGINE.equals(((Enum<?>) tool).name())) {
+                    if (kept == null) kept = new ArrayList<>(tools.subList(0, index));
+                } else if (kept != null) {
+                    kept.add(tool);
+                }
+            }
+            if (kept == null) return tools;
+            hid("Create story Imagine tile", IMAGINE_HIDDEN);
+            return kept;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "Create story tools", failure);
+            return tools;
         }
     }
 }

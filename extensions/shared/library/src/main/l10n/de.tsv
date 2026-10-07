@@ -903,7 +903,7 @@ The "What's on your mind?" row at the top of Home. The create button in the top 
 Always use Clean mode	Immer den Clean-Modus verwenden
 # context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
 Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. You can still leave Clean mode on a video the usual way. It's off by default because it hasn't been tested on a real account yet.	Reels und Videos öffnen sich in Facebooks Clean-Modus, ohne die Buttons an der Seite. Du kannst den Clean-Modus bei einem Video weiterhin wie gewohnt verlassen. Der Schalter ist standardmäßig aus, weil er noch nicht mit einem echten Konto getestet wurde.
-# context: settings section title on the App page, above the four switches of Hide Meta upsells; Meta is the company
+# context: settings section title on the App page, above the switches of Hide Meta upsells; Meta is the company
 Meta's other products	Andere Produkte von Meta
 # context: switch title; Edits is Meta's video editing app, keep its name
 Hide Edits promotions	Edits-Werbung ausblenden
@@ -921,6 +921,10 @@ The composer stops prompting you to share your posts to Threads too. Your posts 
 No Meta Verified offer after you post, and no Meta Verified label under the names on posts. Posting works as usual.	Kein Meta-Verified-Angebot nach dem Posten und kein Meta-Verified-Label unter den Namen bei Beiträgen. Posten funktioniert wie gewohnt.
 # context: summary of the avatar sticker switch; promotion slots are the cards Facebook uses to suggest its own features
 Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.	Werbung für Avatar-Sticker verschwindet aus Kommentaren und Facebooks Werbeplätzen, ebenso die Aufforderung, einen Avatar zu erstellen. Sticker lassen sich weiterhin senden.
+# context: switch title under Meta's other products; Imagine is Meta AI's image maker, keep its name
+Hide Meta AI's Imagine	Imagine von Meta AI ausblenden
+# context: summary of the Imagine switch; Imagine me is a button Facebook puts under some posts, keep its name; Create story is Facebook's screen for making a story, use Facebook's own name for it in this language
+Posts lose the Imagine me button, and Imagine leaves the post composer and the top of Create story. Everything else there works as before.	Beiträge verlieren die Schaltfläche „Imagine me“, und Imagine verschwindet aus dem Fenster zum Erstellen von Beiträgen und oben bei „Story erstellen“. Alles andere dort funktioniert wie gewohnt.
 # context: label of a switch under Stories that replays a finished story; it works together with the Stop Story auto-advance switch
 Loop stories	Stories wiederholen
 # context: summary of the Loop stories switch; "Stop Story auto-advance" is the label of the switch above it, so use its translation

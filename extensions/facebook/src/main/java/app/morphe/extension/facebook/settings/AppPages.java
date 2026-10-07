@@ -96,6 +96,9 @@ final class AppPages {
             upsells.addPreference(toggle(context, Settings.HIDE_AVATAR_UPSELLS,
                     L10n.t("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with "
                             + "the prompt to make an avatar. Stickers still send.")));
+            upsells.addPreference(toggle(context, Settings.HIDE_META_AI_IMAGINE,
+                    L10n.t("Posts lose the Imagine me button, and Imagine leaves the post composer and the top of "
+                            + "Create story. Everything else there works as before.")));
         }
     }
 

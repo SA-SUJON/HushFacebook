@@ -12,7 +12,10 @@ import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
+import app.morphe.patches.facebook.comments.summaries.descriptor
+import app.morphe.patches.facebook.comments.summaries.holdSummaries
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.methodsHolding
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.filterBooleanReturns
 import app.morphe.patches.facebook.misc.extension.filterObjectReturns
@@ -64,6 +67,9 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
  * AvatarStickerHorizonUpsellQPComponent and InstantAvatarNuxComponent (a render method) and
  * CommentAvatarStickerUpsellAttachmentComponent (the layout method). Each draws nothing when the
  * extension says so, and Litho leaves no room for a null.
+ *
+ * Imagine, Meta AI's image maker: the Imagine me button under posts, the post composer's Imagine
+ * and Create story's Imagine tile. See ImagineAnchors.kt.
  */
 
 internal const val PATCH = "Hide Meta upsells"
@@ -259,21 +265,45 @@ internal fun MutableMethod.drawNothingWhenHidden() {
     )
 }
 
+private fun BytecodePatchContext.holders(string: String) =
+    classDefByStrings(string, StringComparisonType.EQUALS).filterNot { it.type.startsWith(EXTENSION_PACKAGE) }.distinctBy { it.type }
+
+/** The one enum naming every one of [names], found by the first of them. */
+private fun BytecodePatchContext.enumNaming(names: List<String>): ClassDef {
+    val enums = holders(names.first()).filter { isEnumNaming(it, names) }
+    return enums.singleOrNull() ?: refuse("expected one enum naming ${names.joinToString()}, found ${enums.size}")
+}
+
 /** Every hook of the patch. Refuses unless each part's anchor is found. */
 internal fun BytecodePatchContext.hideMetaUpsells() {
+    // Imagine, all found before anything changes: the CTA selector's check, the composer's
+    // capability and Create story's tools.
+    val ctaTable = ctaTable(holders(IMAGINE_ME_PLUGIN))
+    val ctaSockets = holders(IMAGINE_CTA_SOCKET).flatMap { methodsHolding(it, IMAGINE_CTA_SOCKET) }
+    val ctaCheck = ctaCheck(ctaTable, ctaSockets) { classDefByOrNull(it) }
+    val composerImagine = enumConstant(enumNaming(COMPOSER_CAPABILITIES), COMPOSER_IMAGINE)
+    val storyImagine = enumConstant(enumNaming(STORY_TOOLS_NAMES), STORY_IMAGINE)
+
     // Edits: the header flags, read wherever they're read, and the pill's request parameter.
     val serializer = classDefByOrNull(LANDING_SERIALIZER) ?: refuse("this Facebook build has no $LANDING_SERIALIZER")
     val fields = editsFlagFields(serializer)
     val label = verifiedLabelText(classDefByOrNull(VERIFIED_LABEL_PLUGIN) ?: refuse("this Facebook build has no $VERIFIED_LABEL_PLUGIN"))
     val flagReaders = mutableListOf<Pair<String, Method>>()
     val labelAskers = mutableListOf<Pair<String, Method>>()
+    val imagineAskers = mutableListOf<Pair<String, Method>>()
+    val storyBuilders = mutableListOf<Pair<String, Method>>()
     classDefForEach { classDef ->
         if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@classDefForEach
         for (method in classDef.methods) {
             if (editsFlagReads(method, fields).isNotEmpty()) flagReaders += classDef.type to method
             if (verifiedLabelAsks(method, label).isNotEmpty()) labelAskers += classDef.type to method
+            if (capabilityAsks(method, composerImagine).isNotEmpty()) imagineAskers += classDef.type to method
+            if (storyToolList(method, storyImagine) != null) storyBuilders += classDef.type to method
         }
     }
+    if (imagineAskers.isEmpty()) refuse("nothing asks the composer's capabilities about $COMPOSER_IMAGINE")
+    val storyBuilder = storyBuilders.singleOrNull()
+        ?: refuse("expected one Create story tile builder reading $storyImagine, found ${storyBuilders.map { it.first }}")
     if (flagReaders.none { !it.first.startsWith(LANDING_CONFIG.removeSuffix(";")) }) {
         refuse("nothing outside $LANDING_CONFIG reads the Edits flags")
     }
@@ -315,4 +345,14 @@ internal fun BytecodePatchContext.hideMetaUpsells() {
         val component = components.singleOrNull() ?: refuse("expected one class naming \"$spec\", found ${components.size}")
         mutableClassDefBy(component.type).findMutableMethodOf(avatarUpsellDraw(component)).drawNothingWhenHidden()
     }
+
+    // Imagine: the Imagine me button's check, every capability question, and Create story's tools.
+    mutableClassDefBy(ctaCheck.definingClass).methods.single { it.descriptor() == ctaCheck.descriptor() }
+        .holdSummaries(ctaTable, HIDES_IMAGINE_CTA, PATCH)
+    imagineAskers.forEach { (type, method) ->
+        val mutable = mutableClassDefBy(type).findMutableMethodOf(method)
+        capabilityAsks(mutable, composerImagine).asReversed().forEach { mutable.answerAfter(it, IMAGINE_CAPABILITY) }
+    }
+    val builder = mutableClassDefBy(storyBuilder.first).findMutableMethodOf(storyBuilder.second)
+    builder.filterStoryTools(storyToolList(builder, storyImagine)!!)
 }

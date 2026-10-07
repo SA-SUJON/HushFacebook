@@ -1415,7 +1415,7 @@
     },
     {
       "name": "Hide Meta upsells",
-      "description": "Hides the pushes for Edits, Threads cross-posting, Meta Verified and avatar stickers outside the Menu, such as the Edits button in the Reels composer and the offer sheet after you post. Each has its own switch.",
+      "description": "Hides the pushes for Edits, Threads cross-posting, Meta Verified, avatar stickers and Meta AI's Imagine outside the Menu, such as the Edits button in the Reels composer and the offer sheet after you post. Each has its own switch.",
       "category": "Interface",
       "use": false,
       "dependencies": [

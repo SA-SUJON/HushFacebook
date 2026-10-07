@@ -173,18 +173,19 @@ internal fun socketCheck(table: Method, owner: ClassDef, sockets: List<Method>):
 
 /**
  * First thing in the check: get the plugin's name from [table] with the check's own number, ask
- * the extension, and answer no when it holds that plugin. Otherwise the check runs from its first
- * instruction. The number is the last register, so the call takes it as a range.
+ * the extension ([hook], a static (String)Z), and answer no when it holds that plugin. Otherwise
+ * the check runs from its first instruction. The number is the last register, so the call takes
+ * it as a range. [patch] names who refuses a check with no local register.
  */
-internal fun MutableMethod.holdSummaries(table: Method) {
-    requireLocals(PATCH, 1)
+internal fun MutableMethod.holdSummaries(table: Method, hook: String = HOLDS, patch: String = PATCH) {
+    requireLocals(patch, 1)
     val number = implementation!!.registerCount - 1
     addInstructionsWithLabels(
         0,
         """
             invoke-static/range { v$number .. v$number }, ${table.descriptor()}
             move-result-object v0
-            invoke-static { v0 }, $HOLDS
+            invoke-static { v0 }, $hook
             move-result v0
             if-eqz v0, :check
             const/4 v0, 0x0

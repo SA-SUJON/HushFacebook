@@ -15,10 +15,12 @@ import app.morphe.patches.shared.compat.AppCompatibilities
  * out of everywhere else, each behind its own switch, all off until they're turned on: the Edits
  * button and badge in the Reels composer's header and the Edits pill under feed videos, the Threads
  * cross-posting onboarding in the composer, the Meta Verified offer sheet after you post and the
- * label under some posts' headers, and the avatar sticker promotions in comments and Facebook's own
- * promotion slots. Posting, sharing and ordinary stickers are untouched.
+ * label under some posts' headers, the avatar sticker promotions in comments and Facebook's own
+ * promotion slots, and Meta AI's Imagine: the Imagine me button under posts, the post composer's
+ * Imagine and Create story's Imagine tile. Posting, sharing and ordinary stickers are untouched.
  *
- * Every anchor is a kept class name or a literal (see MetaUpsellAnchors.kt), and every one is
+ * Every anchor is a kept class name, an enum constant's name or a literal (see MetaUpsellAnchors.kt
+ * and ImagineAnchors.kt), and every one is
  * required. The hooks ask the extension, which answers Facebook's own way until the settings are
  * ready, while paused, and whenever it fails.
  *
@@ -27,8 +29,8 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 @Suppress("unused")
 val hideMetaUpsellsPatch = bytecodePatch(
     name = "Hide Meta upsells",
-    description = "Hides the pushes for Edits, Threads cross-posting, Meta Verified and avatar stickers " +
-        "outside the Menu, such as the Edits button in the Reels composer and the offer sheet after you post. " +
+    description = "Hides the pushes for Edits, Threads cross-posting, Meta Verified, avatar stickers and Meta AI's " +
+        "Imagine outside the Menu, such as the Edits button in the Reels composer and the offer sheet after you post. " +
         "Each has its own switch.",
     default = false,
 ) {

@@ -291,6 +291,11 @@ public class ColdStartHooksTest {
         assertEquals("a header built before the context lost its Meta Verified label", "Meta Verified",
                 MetaUpsells.metaVerifiedLabel("Meta Verified"));
         assertFalse("an avatar upsell drawn before the context drew nothing", MetaUpsells.hidesAvatarUpsell());
+        assertFalse("a post button checked before the context lost Imagine me",
+                MetaUpsells.hidesImagineCta(MetaUpsells.IMAGINE_ME_PLUGIN));
+        assertTrue("a composer opened before the context lost Imagine", MetaUpsells.imagineCapability(true));
+        List<Thread.State> tools = Arrays.asList(Thread.State.values());
+        assertSame("Create story's tools listed before the context changed", tools, MetaUpsells.storyTools(tools));
         assertFalse("a results page built before the context lost its Meta AI answer", MetaAiSearchForTests.hidesAnswer());
         assertFalse("a results page built before the context lost its Meta AI prompts", MetaAiSearchForTests.dropsPrompts());
         assertFalse("a suggestion parsed before the context lost its Meta AI route",

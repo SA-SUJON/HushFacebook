@@ -188,6 +188,9 @@ public class PausedHooksTest {
     /** A reel overlay call-to-action kind named like Facebook's storefront card. */
     private enum ReelCta { STOREFRONT }
 
+    /** Stands in for Facebook's enum of Create story tools: the hook goes by the constant's name. */
+    private enum StoryTool { TEXT_BASE, IMAGINE }
+
     @After
     public void restore() {
         PauseForTests.resume();
@@ -537,7 +540,8 @@ public class PausedHooksTest {
                 MenuSectionsForTests::hidesServerUpgrades,
                 MenuSectionsForTests::hidesServerAlsoFromMeta));
         // Edits' header flag and both shapes of its pill request, the Threads cross-posting
-        // onboarding, the Meta Verified sheet and label, and an avatar sticker upsell.
+        // onboarding, the Meta Verified sheet and label, an avatar sticker upsell, and Imagine's
+        // post button, composer capability and Create story tile.
         probes.put(PatchFamily.META_UPSELLS, Arrays.asList(
                 () -> !MetaUpsells.editsHeader(true),
                 () -> !MetaUpsells.fetchEditsPill(true),
@@ -545,7 +549,10 @@ public class PausedHooksTest {
                 () -> !MetaUpsells.threadsOnboarding(1),
                 () -> Boolean.FALSE.equals(MetaUpsells.metaVerifiedSheet(Boolean.TRUE)),
                 () -> MetaUpsells.metaVerifiedLabel("Meta Verified") == null,
-                MetaUpsells::hidesAvatarUpsell));
+                MetaUpsells::hidesAvatarUpsell,
+                () -> MetaUpsells.hidesImagineCta(MetaUpsells.IMAGINE_ME_PLUGIN),
+                () -> !MetaUpsells.imagineCapability(true),
+                () -> MetaUpsells.storyTools(Arrays.asList(StoryTool.values())).size() == 1));
         // Search leaves out its Meta AI answer and its prompt modules, and a suggestion set to open
         // Meta AI opens the results.
         probes.put(PatchFamily.META_AI_SEARCH, Arrays.asList(

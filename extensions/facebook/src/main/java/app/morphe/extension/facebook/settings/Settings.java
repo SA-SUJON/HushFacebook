@@ -636,6 +636,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_avatar_upsells", FALSE);
 
     /**
+     * Meta AI's Imagine: the Imagine me button under posts, the post composer's Imagine and Create
+     * story's Imagine tile. Off until it's turned on.
+     */
+    public static final BooleanSetting HIDE_META_AI_IMAGINE =
+            new BooleanSetting("hushfacebook_hide_meta_ai_imagine", FALSE);
+
+    /**
      * Meta AI in Facebook's search: the answer a results page adds on top, the Meta AI modules and
      * "Ask Meta AI" prompts among the results, and the suggestions Facebook's server sets to open in
      * Meta AI. People, groups, pages and posts stay, and so do the Meta AI button and the results

@@ -7,7 +7,9 @@ package app.morphe.patches.facebook.misc.upsells
 import app.morphe.ExtensionDex
 import app.morphe.Fixtures
 import app.morphe.PatchContexts
+import app.morphe.patches.facebook.comments.summaries.descriptor
 import app.morphe.patches.facebook.feed.FixtureDex
+import app.morphe.patches.facebook.feed.methodsHolding
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.Opcode
@@ -28,9 +30,11 @@ import java.io.File
  * Hide Meta upsells' anchors on every Facebook build the bundle declares: the Edits flags the
  * landing configuration's serializer writes and every read of them, the gates that set the Edits
  * pill's request parameter, the Threads cross-posting capability's one answer, the Meta Verified
- * sheet's eligibility check and the one place that asks for the label, and the three avatar sticker
- * upsell components. Then the whole patch on those classes: each hook where it belongs, on the
- * anchor's own register, and nothing else moved. Reads the fixture bundles from
+ * sheet's eligibility check and the one place that asks for the label, the three avatar sticker
+ * upsell components, and Imagine's three: the post call-to-action selector's check, every question
+ * the composer asks about its Imagine capability and Create story's tile builder. Then the whole
+ * patch on those classes: each hook where it belongs, on the anchor's own register, and nothing
+ * else moved. Reads the fixture bundles from
  * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class HideMetaUpsellsFixtureTest {
@@ -129,9 +133,38 @@ class HideMetaUpsellsFixtureTest {
                 }
                 val draws = components.associate { it.type to avatarUpsellDraw(it) }
 
-                val readerClasses = FixtureDex.classes(bundle, (flagReaders + labelAskers).map { it.definingClass }.toSet())
+                // Imagine: the selector's table and check, the composer's capability, Create story's tools.
+                val ctaTableHolders = FixtureDex.classesHolding(bundle, IMAGINE_ME_PLUGIN)
+                val ctaTable = ctaTable(ctaTableHolders)
+                val ctaSocketHolders = FixtureDex.classesHolding(bundle, IMAGINE_CTA_SOCKET)
+                val ctaSockets = ctaSocketHolders.flatMap { methodsHolding(it, IMAGINE_CTA_SOCKET) }
+                val calledTypes = ctaSockets.flatMap { method ->
+                    method.code().mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }.map { it.definingClass }
+                }.toSet()
+                val calledClasses = FixtureDex.classes(bundle, calledTypes)
+                val ctaCheck = ctaCheck(ctaTable, ctaSockets) { calledClasses[it] }
+                assertTrue("$name: the Imagine me check has no local register",
+                    ctaCheck.implementation!!.registerCount - ctaCheck.parameterTypes.size >= 1)
+                val composerEnums = FixtureDex.classesHolding(bundle, COMPOSER_IMAGINE).filter { isEnumNaming(it, COMPOSER_CAPABILITIES) }
+                assertEquals("$name: composer capability enums", 1, composerEnums.size)
+                val composerImagine = enumConstant(composerEnums.single(), COMPOSER_IMAGINE)
+                val imagineAskers = FixtureDex.methodsWhere(bundle, { dex -> dex.fieldSection.any { it.toString() == composerImagine.toString() } }) {
+                    capabilityAsks(it, composerImagine).isNotEmpty()
+                }
+                assertTrue("$name: nothing asks about $COMPOSER_IMAGINE", imagineAskers.isNotEmpty())
+                val storyEnums = FixtureDex.classesHolding(bundle, STORY_IMAGINE).filter { isEnumNaming(it, STORY_TOOLS_NAMES) }
+                assertEquals("$name: Create story tool enums", 1, storyEnums.size)
+                val storyImagine = enumConstant(storyEnums.single(), STORY_IMAGINE)
+                val storyBuilders = FixtureDex.methodsWhere(bundle, { dex -> dex.fieldSection.any { it.toString() == storyImagine.toString() } }) {
+                    storyToolList(it, storyImagine) != null
+                }
+                assertEquals("$name: Create story tile builders", 1, storyBuilders.size)
+
+                val readerClasses = FixtureDex.classes(bundle,
+                    (flagReaders + labelAskers + imagineAskers + storyBuilders).map { it.definingClass }.toSet())
                 val pool = (kept.values + readerClasses.values + pillClasses + capabilities + components +
-                    ExtensionDex.classDef(SETTINGS_STATUS)).associateBy { it.type }.values
+                    ctaTableHolders + ctaSocketHolders + listOfNotNull(calledClasses[ctaCheck.definingClass]) +
+                    composerEnums + storyEnums + ExtensionDex.classDef(SETTINGS_STATUS)).associateBy { it.type }.values
                 val context = PatchContexts.of(pool)
                 hideMetaUpsellsPatch.execute(context)
                 fun patched(method: Method) = context.mutableClassDefBy(method.definingClass).method(method).code()
@@ -165,6 +198,39 @@ class HideMetaUpsellsFixtureTest {
                     assertEquals("$name: $type returns null on a yes", Opcode.RETURN_OBJECT, after[4].opcode)
                     assertEquals("$name: $type draws as before otherwise", draw.code().map { it.opcode }, after.drop(5).map { it.opcode })
                 }
+
+                // Imagine me: the plugin's name from the table with the check's own number, then the extension.
+                val check = ctaCheck.code()
+                val guarded = patched(ctaCheck)
+                val where = "$name: ${ctaCheck.descriptor()}"
+                assertEquals("$where gains seven instructions", check.size + 7, guarded.size)
+                assertEquals("$where: the plugin's name comes from the table", Opcode.INVOKE_STATIC_RANGE, guarded[0].opcode)
+                assertEquals("$where: the plugin's name comes from the table", ctaTable.descriptor(), guarded[0].called())
+                assertEquals("$where: with the check's own number", ctaCheck.implementation!!.registerCount - 1,
+                    (guarded[0] as RegisterRangeInstruction).startRegister)
+                assertEquals("$where: the extension is asked", HIDES_IMAGINE_CTA, guarded[2].called())
+                assertEquals("$where: Facebook's code stays", check.map { it.opcode }, guarded.drop(7).map { it.opcode })
+                for (asker in imagineAskers) {
+                    assertAnsweredAfter("$name: ${asker.definingClass}->${asker.name}", asker.code(), patched(asker),
+                        capabilityAsks(asker, composerImagine), IMAGINE_CAPABILITY)
+                }
+                val builder = storyBuilders.single()
+                val list = storyToolList(builder, storyImagine)!!
+                val register = (builder.code()[list] as OneRegisterInstruction).registerA
+                val built = patched(builder)
+                assertEquals("$name: Create story's tools gain four instructions", builder.code().size + 4, built.size)
+                listOf(STORY_TOOLS, IMMUTABLE_COPY).forEachIndexed { step, hook ->
+                    val call = built[list + 1 + 2 * step]
+                    assertEquals("$name: $hook", Opcode.INVOKE_STATIC_RANGE, call.opcode)
+                    assertEquals("$name: $hook", hook, call.called())
+                    assertEquals("$name: $hook handed v$register", listOf(register, 1),
+                        listOf((call as RegisterRangeInstruction).startRegister, call.registerCount))
+                    val answer = built[list + 2 + 2 * step]
+                    assertEquals("$name: $hook's answer in v$register", listOf(Opcode.MOVE_RESULT_OBJECT, register),
+                        listOf(answer.opcode, (answer as OneRegisterInstruction).registerA))
+                }
+                assertEquals("$name: the rest of Create story's builder stays", builder.code().map { it.opcode },
+                    built.take(list + 1).map { it.opcode } + built.drop(list + 5).map { it.opcode })
 
                 val status = context.mutableClassDefBy(SETTINGS_STATUS).methods.single { it.name == "metaUpsells" }
                 assertEquals("$name: SettingsStatus.metaUpsells() isn't switched on", 1,
