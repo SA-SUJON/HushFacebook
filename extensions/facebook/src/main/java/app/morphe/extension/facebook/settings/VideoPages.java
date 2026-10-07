@@ -107,6 +107,9 @@ final class VideoPages {
             reels.addPreference(toggle(context, Settings.HIDE_REEL_SOCIAL_FOOTER,
                     L10n.t("The comment Facebook previews under a reel and the bubbles of friends who reacted. "
                             + "Open the comments to see them all.")));
+            reels.addPreference(toggle(context, Settings.HIDE_REEL_THREADS_CARDS,
+                    L10n.t("The \"Threads you might like\" card between reels, starting with the next batch Facebook "
+                            + "loads. It's off by default because it hasn't been tested on a real account yet.")));
         }
         if (build.contains(PatchFamily.REEL_WATCH_HISTORY)) {
             reels.addPreference(toggle(context, Settings.DONT_SEND_REEL_WATCH_HISTORY,

@@ -79,6 +79,7 @@ import app.morphe.extension.facebook.reels.DoubleTapLike;
 import app.morphe.extension.facebook.reels.ReelHold;
 import app.morphe.extension.facebook.reels.ReelHoldForTests;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
+import app.morphe.extension.facebook.reels.ReelMidCardsForTests;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
 import app.morphe.extension.facebook.stories.StorySeen;
@@ -202,6 +203,7 @@ public class ColdStartHooksTest {
         assertFalse(ReelDeclutter.hideFollowingButton());
         assertFalse(ReelDeclutter.skipHotComment());
         assertFalse(ReelDeclutter.skipSocialBubbles());
+        assertFalse("a Threads card read before the context came off", ReelMidCardsForTests.dropsAThreadsCard());
         assertFalse("a batch of watched reels sent before the context was held back", SeenStateSendForTests.heldBack());
         assertFalse("an analytics upload before the context was held back", AnalyticsUploads.holdXAnalyticsUpload());
         assertNull("a game's ad before the context was answered with no ad",

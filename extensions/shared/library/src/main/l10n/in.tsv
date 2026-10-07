@@ -277,6 +277,8 @@ Hide the Follow button on reels	Sembunyikan tombol Ikuti di reel
 The Follow button next to the reel's author. You can still follow them from their profile.	Tombol Ikuti di samping nama pembuat reel. Anda tetap bisa mengikutinya dari profilnya.
 Hide comment and reaction previews	Sembunyikan pratinjau komentar dan reaksi
 The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.	Komentar yang ditampilkan Facebook sebagai pratinjau di bawah reel, dan gelembung teman yang memberi reaksi. Buka komentar untuk melihat semuanya.
+Hide Threads cards between reels	Sembunyikan kartu Threads di antara reel
+The "Threads you might like" card between reels, starting with the next batch Facebook loads. It's off by default because it hasn't been tested on a real account yet.	Kartu “Threads yang mungkin Anda sukai” di antara reel, mulai dari kumpulan berikutnya yang dimuat Facebook. Sakelar ini nonaktif secara default karena belum diuji dengan akun sungguhan.
 Download quality	Kualitas unduhan
 Best	Terbaik
 Smallest	Terkecil

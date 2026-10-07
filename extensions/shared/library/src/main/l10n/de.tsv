@@ -277,6 +277,8 @@ Hide the Follow button on reels	Folgen-Button bei Reels ausblenden
 The Follow button next to the reel's author. You can still follow them from their profile.	Der Folgen-Button neben der Person, die das Reel gepostet hat. Über ihr Profil kannst du ihr weiterhin folgen.
 Hide comment and reaction previews	Vorschau von Kommentaren und Reaktionen ausblenden
 The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.	Der Kommentar, den Facebook unter einem Reel als Vorschau zeigt, und die Blasen der Freunde, die reagiert haben. Öffne die Kommentare, um alle zu sehen.
+Hide Threads cards between reels	Threads-Karten zwischen Reels ausblenden
+The "Threads you might like" card between reels, starting with the next batch Facebook loads. It's off by default because it hasn't been tested on a real account yet.	Die Karte „Threads, die dir gefallen könnten“ zwischen Reels, ab den nächsten, die Facebook lädt. Der Schalter ist standardmäßig aus, weil er noch nicht mit einem echten Konto getestet wurde.
 Download quality	Download-Qualität
 Best	Beste
 Smallest	Kleinste

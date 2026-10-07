@@ -277,6 +277,8 @@ Hide the Follow button on reels	Reels videolarındaki Takip Et düğmesini gizle
 The Follow button next to the reel's author. You can still follow them from their profile.	Reels videosunu paylaşan kişinin adının yanındaki Takip Et düğmesi. Onu profilinden yine takip edebilirsin.
 Hide comment and reaction previews	Yorum ve tepki önizlemelerini gizle
 The comment Facebook previews under a reel and the bubbles of friends who reacted. Open the comments to see them all.	Facebook'un bir Reels videosunun altında önizleme olarak gösterdiği yorum ve tepki veren arkadaşlarının baloncukları. Hepsini görmek için yorumları aç.
+Hide Threads cards between reels	Reels arasındaki Threads kartlarını gizle
+The "Threads you might like" card between reels, starting with the next batch Facebook loads. It's off by default because it hasn't been tested on a real account yet.	Reels arasındaki “Beğenebileceğin Threads gönderileri” kartı, Facebook'un yüklediği bir sonraki gruptan itibaren. Bu anahtar henüz gerçek bir hesapla test edilmediği için varsayılan olarak kapalıdır.
 Download quality	İndirme kalitesi
 Best	En iyi
 Smallest	En küçük

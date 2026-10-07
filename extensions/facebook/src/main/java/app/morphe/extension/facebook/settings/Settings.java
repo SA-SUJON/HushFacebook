@@ -320,6 +320,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reel_social_footer", TRUE);
 
     /**
+     * The "Threads you might like" card between reels, a mid-card Facebook types THREADS_MIDCARD.
+     * It comes off each batch of reels as it arrives. Off until it's turned on, since nobody has
+     * seen the card go on a signed-in Reels feed yet.
+     */
+    public static final BooleanSetting HIDE_REEL_THREADS_CARDS =
+            new BooleanSetting("hushfacebook_hide_reel_threads_cards", FALSE);
+
+    /**
      * The batches of watched reels the Reels viewer sends as FbShortsSeenStateMutation: only their
      * ids, the record Facebook ranks the Reels feed with, which nobody else sees. Held back, reels
      * already watched may come back in the feed.
