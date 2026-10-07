@@ -32,7 +32,7 @@ val blockPromotionalNotificationsPatch = bytecodePatch(
     name = "Block promotional notifications",
     description = "Keeps the kinds of notification you pick off your phone, such as trending videos, memories and " +
         "birthdays. Each kind has its own switch, and they all start off. Quiet hours can limit them to the " +
-        "night, or any two times you pick. Messages, friend requests, comments, mentions and login alerts " +
+        "night, or to any hours you pick. Messages, friend requests, comments, mentions and login alerts " +
         "always come through.",
     default = true,
 ) {
