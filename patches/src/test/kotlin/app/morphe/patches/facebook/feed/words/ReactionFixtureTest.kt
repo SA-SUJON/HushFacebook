@@ -19,6 +19,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction35c
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -66,6 +67,13 @@ class ReactionFixtureTest {
                 val reactors = reactorLists.single()
                 assertTrue("${bundle.name}: no public getCachedInt(int)", hasPublicIntReader(kept(BASE_MODEL_WITH_TREE)))
 
+                // Facebook's own reading of the count agrees: a static helper taking a GraphQLFeedback calls the
+                // reactors accessor, loads the key of `count` and reads it with getCachedInt. Found by that shape.
+                val helpers = FixtureDex.methodsWhere(bundle, { dex -> dex.stringSection.any { it == GRAPHQL_FEEDBACK } }) { method ->
+                    readsReactorCount(method, reactors)
+                }
+                assertTrue("${bundle.name}: no helper reads the count the way the extension does", helpers.isNotEmpty())
+
                 // The patch needs the helpers toString reads the message with, as Hide posts by words' own test loads them.
                 val message = messageAccessors(story).single()
                 val toString = storyToString(story) ?: throw AssertionError("${bundle.name}: GraphQLStory has no toString()")
@@ -98,6 +106,21 @@ class ReactionFixtureTest {
             }
         }
         assertEquals("a declared build went unchecked: $checked", versions, checked.keys)
+    }
+
+    /** Whether [method] is a static (GraphQLFeedback)I that calls [reactors], loads the count key and calls getCachedInt. */
+    private fun readsReactorCount(method: Method, reactors: Method): Boolean {
+        if (method.parameterTypes.map { it.toString() } != listOf(GRAPHQL_FEEDBACK) || method.returnType != "I") return false
+        val body = method.implementation?.instructions?.toList().orEmpty()
+        val calls = body.mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
+        return calls.any {
+            it.definingClass == GRAPHQL_FEEDBACK && it.name == reactors.name && it.returnType == reactors.returnType &&
+                it.parameterTypes.isEmpty()
+        } && body.any { (it as? NarrowLiteralInstruction)?.narrowLiteral == treeFieldKey(COUNT_FIELD) } &&
+            calls.any {
+                it.definingClass == BASE_MODEL_WITH_TREE && it.name == "getCachedInt" &&
+                    it.parameterTypes.map { type -> type.toString() } == listOf("I") && it.returnType == "I"
+            }
     }
 
     private fun describe(method: Method) =
