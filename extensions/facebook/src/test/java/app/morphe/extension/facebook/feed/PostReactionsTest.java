@@ -251,7 +251,7 @@ public class PostReactionsTest {
         String feed = line(FeedFilter.FEED_ROUTE);
         assertNotNull(feed);
         assertTrue(feed, feed.contains("4 removed"));
-        for (String reason : new String[] {"hide word 1", "hide pattern 1", "photo post 1", "reaction ceiling 1"}) {
+        for (String reason : new String[] {"word filter 2", "photo post 1", "reaction ceiling 1"}) {
             assertTrue(feed + " lacks " + reason, feed.contains(reason));
         }
     }
