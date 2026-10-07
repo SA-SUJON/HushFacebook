@@ -134,6 +134,9 @@ final class VideoPages {
                     L10n.t("A playback speed you pick in a feed or Watch video's gear menu stays for the next videos "
                             + "until you pick another or Facebook restarts. Reels keep their own speed. It's off by "
                             + "default because it hasn't been tested on a real account yet.")));
+            reels.addPreference(toggle(context, Settings.SLOWER_REEL_SPEEDS,
+                    L10n.t("A reel's speed menu also offers 0.1x and 0.25x, for a detail that goes by too fast. "
+                            + "The gear menu on feed and Watch videos keeps Facebook's speeds.")));
         }
         if (build.contains(PatchFamily.REEL_HOLD)) {
             reels.addPreference(toggle(context, Settings.HOLD_REEL_FOR_2X,

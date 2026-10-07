@@ -491,6 +491,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_keep_video_speed", FALSE);
 
     /**
+     * The Reels menu's two speed pickers also offer 0.1x and 0.25x, slower than Facebook's 0.5x
+     * (#95). It rides on Keep the reel speed's patch
+     * ({@link app.morphe.extension.facebook.media.ReelSpeed#speedChoices}). Off by default until
+     * it's seen on a phone. Off or paused, the pickers offer Facebook's speeds.
+     */
+    public static final BooleanSetting SLOWER_REEL_SPEEDS =
+            new BooleanSetting("hushfacebook_slower_reel_speeds", FALSE);
+
+    /**
      * A reel you hold plays at double speed until you let go, through the speed-up Facebook's Reels
      * controls already have, in place of Facebook's long-press menu
      * ({@link app.morphe.extension.facebook.reels.ReelHold}). On once the patch is picked, since

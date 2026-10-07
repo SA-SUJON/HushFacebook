@@ -9,7 +9,9 @@ import android.os.SystemClock;
 import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -52,6 +54,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * speed goes on through the same FbGrootPlayer setter Facebook's own gear menu uses. Stories, chats
  * and the composer's previews keep Facebook's speed, so a pick there isn't kept either. With that
  * switch off, a gear pick on a video that isn't a reel stays with that video, as Facebook has it.
+ *
+ * <p>Slower speeds in the Reels menu, the third switch, adds 0.1x and 0.25x to the speeds the Reels
+ * menu's two pickers offer ({@link #speedChoices}). The gear menu's sheet keeps Facebook's list.
  */
 public final class ReelSpeed {
     static final float NORMAL = 1f;
@@ -67,6 +72,12 @@ public final class ReelSpeed {
 
     /** Counted under the patch's name for each feed or Watch video started at the kept video speed. */
     static final String VIDEO_APPLIED = "video started at the kept speed";
+
+    /** The speeds Slower speeds in the Reels menu offers, slowest first. ExoPlayer plays down to 0.1x. */
+    static final float[] SLOWER = {0.1f, 0.25f};
+
+    /** Counted under the patch's name each time a Reels speed picker offers the slower speeds. */
+    static final String SLOWER_OFFERED = "Reels speed menu offered slower speeds";
 
     /**
      * What a player's origin holds when it plays somewhere a kept video speed doesn't belong: chats,
@@ -231,6 +242,36 @@ public final class ReelSpeed {
      */
     public static void gearPicked(float speed) {
         pick(speed, true, "gear speed picked");
+    }
+
+    /**
+     * The hook where each of the Reels menu's two speed pickers, the attribute selector and the
+     * dropdown, has just made its list of speeds, which it builds its items from (#95). With
+     * {@link Settings#SLOWER_REEL_SPEEDS} on, the list that comes back starts with the
+     * {@link #SLOWER} speeds slower than any it offers, so 0.1x and 0.25x come before Facebook's
+     * 0.5x. A pick of one goes through the toast and the speed setter like any other, so Keep the
+     * reel speed keeps it. Off, paused, or anything here failing, Facebook's own list comes back.
+     */
+    public static List<?> speedChoices(List<?> speeds) {
+        try {
+            HookStatus.invoked(FAMILY);
+            if (speeds == null || speeds.isEmpty() || !Utils.settingsReady() || !Settings.SLOWER_REEL_SPEEDS.get()) {
+                return speeds;
+            }
+            HookStatus.bound(FAMILY, "speed menu");
+            float slowest = Float.MAX_VALUE;
+            for (Object speed : speeds) slowest = Math.min(slowest, ((Float) speed));
+            List<Object> choices = new ArrayList<>(speeds.size() + SLOWER.length);
+            for (float speed : SLOWER) {
+                if (speed < slowest - SAME) choices.add(speed);
+            }
+            choices.addAll(speeds);
+            HookStatus.counted(FAMILY, SLOWER_OFFERED);
+            return choices;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "speed menu", failure);
+            return speeds;
+        }
     }
 
     private static void pick(float speed, boolean gear, String where) {

@@ -7,9 +7,11 @@ package app.morphe.patches.facebook.media.reelspeed
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
@@ -50,6 +52,16 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  *   but an account whose Reels live in the Video tab plays them under "video_home" (its immersive
  *   player config's surface is FB_SHORTS_IN_WATCH_TAB), beside the tab's other videos, and reels
  *   in the feed play under others (fb_shorts_native_in_feed_unit and more).
+ * - The speeds the Reels menu's two pickers offer (read from 577, 580 and 581, 2026-10-07): each
+ *   builds a Float[] of fixed speeds, 0.5x, 1x, 2x, 2.5x and 3x, or 0.5x, 1x, 1.5x and 2x behind a
+ *   flag, then turns it into a List with Arrays.asList in one place both branches reach, and makes
+ *   one item per speed, labelled by the toast class's (F)String formatter. The attribute selector
+ *   is the toast class's static method answering FDSAttributeSelectorHScroll, a kept class (581
+ *   LX/JsV;->A00); the dropdown is the method holding "fds_control_playback_speed" (581
+ *   LX/TmY;->A08, 580 LX/U1V;->A08, 577 LX/UFS;->A09). Nothing branches to the instruction after
+ *   either asList's move-result. The gear menu's speed sheet builds its list elsewhere, from a
+ *   server list or two resource arrays, and parses its labels back with the locale's NumberFormat
+ *   on some paths, so it isn't touched here.
  */
 
 internal const val REEL_SPEED = "$EXTENSION_PACKAGE/media/ReelSpeed;"
@@ -57,6 +69,7 @@ internal const val SPEED_SET = "$REEL_SPEED->speedSet(Ljava/lang/Object;F)V"
 internal const val PICKED = "$REEL_SPEED->picked(F)V"
 internal const val GEAR_PICKED = "$REEL_SPEED->gearPicked(F)V"
 internal const val STARTED = "$REEL_SPEED->started(Ljava/lang/Object;)V"
+internal const val SPEED_CHOICES = "$REEL_SPEED->speedChoices(Ljava/util/List;)Ljava/util/List;"
 internal const val SET_SPEED_STUB = "setPlayerSpeed"
 internal const val ORIGIN_STUB = "playerOrigin"
 internal const val REEL_PARAMS_STUB = "playerParams"
@@ -72,6 +85,14 @@ internal const val PLAYER_ORIGIN = "Lcom/facebook/video/common/playerorigin/Play
 internal const val SPEED_CACHE_SWITCH =
     "Lcom/facebook/video/heroplayer/setting/HeroPlayerSetting;->enableLastPlaybackSpeedCacheUpdate:Z"
 private const val CONTEXT = "Landroid/content/Context;"
+
+/** Kept literal. The Reels menu's speed dropdown names its control with it. */
+internal const val SPEED_DROPDOWN = "fds_control_playback_speed"
+
+/** Kept class the Reels menu's speed attribute selector answers. */
+internal const val ATTRIBUTE_SELECTOR = "Lcom/facebook/fds/attributeselector/FDSAttributeSelectorHScroll;"
+private const val AS_LIST = "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;"
+private const val FLOATS = "[Ljava/lang/Float;"
 
 private fun Method.isStatic() = AccessFlags.STATIC.isSet(accessFlags)
 private fun Method.parameters() = parameterTypes.map(CharSequence::toString)
@@ -105,6 +126,23 @@ internal fun setterCalls(method: Method, owner: String, setter: Method): List<Pa
             else -> null
         }
     }.orEmpty()
+
+/**
+ * Where [method], which fills a Float[], turns an array into its list of speeds: the index of each
+ * Arrays.asList's move-result-object, with the register it writes. Empty when it fills no Float[].
+ */
+internal fun speedLists(method: Method): List<Pair<Int, Int>> {
+    val code = method.implementation?.instructions?.toList() ?: return emptyList()
+    if (code.none { it.opcode == Opcode.FILLED_NEW_ARRAY && (it as ReferenceInstruction).reference.toString() == FLOATS }) {
+        return emptyList()
+    }
+    return code.withIndex().mapNotNull { (index, instruction) ->
+        if ((instruction as? ReferenceInstruction)?.reference?.toString() != AS_LIST) return@mapNotNull null
+        val result = code.getOrNull(index + 1)
+        if (result?.opcode != Opcode.MOVE_RESULT_OBJECT) return@mapNotNull null
+        index + 1 to (result as OneRegisterInstruction).registerA
+    }
+}
 
 /** [owner]'s PlayerOrigin getters: instance methods with a body, taking nothing and answering one. */
 internal fun originGetters(owner: ClassDef): List<Method> = owner.methods.filter {

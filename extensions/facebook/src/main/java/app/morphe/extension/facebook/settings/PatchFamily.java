@@ -102,7 +102,7 @@ public enum PatchFamily {
     DOUBLE_TAP_LIKE(FamilyNames.DOUBLE_TAP_LIKE, "doubleTapLike", null,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE),
     KEEP_REEL_SPEED(FamilyNames.KEEP_REEL_SPEED, "keepReelSpeed", null,
-            Settings.KEEP_REEL_SPEED, Settings.KEEP_VIDEO_SPEED),
+            Settings.KEEP_REEL_SPEED, Settings.KEEP_VIDEO_SPEED, Settings.SLOWER_REEL_SPEEDS),
     REEL_HOLD(FamilyNames.HOLD_REEL_FOR_2X, "reelHold", null,
             Settings.HOLD_REEL_FOR_2X, Settings.HOLD_REEL_RIGHT_EDGE),
     DEFAULT_COMMENT_ORDER(FamilyNames.DEFAULT_COMMENT_ORDER, "defaultCommentOrder", null,

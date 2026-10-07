@@ -6,6 +6,7 @@ package app.morphe.extension.facebook.media;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import android.os.SystemClock;
@@ -19,6 +20,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,6 +169,7 @@ public class ReelSpeedTest {
         PauseForTests.resume();
         Settings.KEEP_REEL_SPEED.resetToDefault();
         Settings.KEEP_VIDEO_SPEED.resetToDefault();
+        Settings.SLOWER_REEL_SPEEDS.resetToDefault();
         BaseSettings.DEBUG.resetToDefault();
         LogBufferManager.clearLogBuffer();
         ReelSpeed.forget();
@@ -647,5 +650,40 @@ public class ReelSpeedTest {
         PauseForTests.resume();
         play(players.player(FEED, NOT_A_REEL));
         assertEquals(List.of(FEED + " 1.5"), players.set);
+    }
+
+    /** #95: with the switch on, both Reels speed pickers offer 0.1x and 0.25x ahead of Facebook's speeds. */
+    @Test
+    public void theReelsMenuOffersSlowerSpeedsFirst() {
+        List<Float> facebooks = Arrays.asList(0.5f, 1f, 2f, 2.5f, 3f);
+        assertFalse("the switch starts off", Settings.SLOWER_REEL_SPEEDS.get());
+        assertSame("off, Facebook's list stands", facebooks, ReelSpeed.speedChoices(facebooks));
+
+        Settings.SLOWER_REEL_SPEEDS.save(true);
+        assertEquals(Arrays.asList(0.1f, 0.25f, 0.5f, 1f, 2f, 2.5f, 3f), ReelSpeed.speedChoices(facebooks));
+        assertEquals("the other list Facebook can offer", Arrays.asList(0.1f, 0.25f, 0.5f, 1f, 1.5f, 2f),
+                ReelSpeed.speedChoices(Arrays.asList(0.5f, 1f, 1.5f, 2f)));
+        assertEquals("a speed Facebook already offers isn't offered twice", Arrays.asList(0.1f, 0.25f, 1f),
+                ReelSpeed.speedChoices(Arrays.asList(0.25f, 1f)));
+        assertEquals(FamilyNames.KEEP_REEL_SPEED + ": invoked 4, 1 found, 0 missing. Counted: "
+                + ReelSpeed.SLOWER_OFFERED + " 3", statusLine());
+    }
+
+    @Test
+    public void pausedOrUnreadableTheReelsMenuKeepsFacebooksSpeeds() {
+        Settings.SLOWER_REEL_SPEEDS.save(true);
+        List<Float> facebooks = Arrays.asList(0.5f, 1f, 1.5f, 2f);
+        for (HushfacebookPause.Reason reason : new HushfacebookPause.Reason[] {
+                HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP}) {
+            PauseForTests.pause(reason);
+            assertSame(reason.name(), facebooks, ReelSpeed.speedChoices(facebooks));
+        }
+        PauseForTests.resume();
+        assertEquals("the control: running, the slower speeds come back", 6, ReelSpeed.speedChoices(facebooks).size());
+
+        List<Object> unreadable = Arrays.asList("0.5", 1f);
+        assertSame("a list that isn't speeds stands", unreadable, ReelSpeed.speedChoices(unreadable));
+        assertTrue(statusLine(), HookStatus.missing(FamilyNames.KEEP_REEL_SPEED).contains("a working 'speed menu' hook (it threw "
+                + ClassCastException.class.getName() + ")"));
     }
 }

@@ -29,6 +29,7 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
@@ -46,7 +47,8 @@ import java.io.File
  * the params' one debug dump reporting isFbShorts, isSponsored and isLiveNow, each a public boolean;
  * and the Reels menu's speed toast, the only method
  * holding its selector's name, which only FbShortsInlinePlaybackSpeedUtil's two pickers call. The
- * gear menu's speed sheet sets its pick with the same setter. Then the patch itself, run on those
+ * gear menu's speed sheet sets its pick with the same setter. The Reels menu's two speed pickers each
+ * list their Float[] of speeds in one place, where the slower speeds go in. Then the patch itself, run on those
  * classes: each hook first in its method, reading the method's own arguments, and each stub calling
  * the method or reading the field it stands for. Reads the fixture bundles from
  * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
@@ -144,8 +146,24 @@ class KeepReelSpeedFixtureTest {
                 val gearClass = gearHolders.single { it.type == gearPick.definingClass }
 
                 val toastClass = toastHolders.single { it.type == toast.definingClass }
-                val context = PatchContexts.of(listOf(owner, toastClass, gearClass, paramsClass,
-                    ExtensionDex.classDef(REEL_SPEED), ExtensionDex.classDef(SETTINGS_STATUS)))
+
+                // The Reels menu's two speed pickers each fill a Float[] and list it in one place (#95).
+                val selectors = toastClass.methods.filter {
+                    AccessFlags.STATIC.isSet(it.accessFlags) && it.returnType == ATTRIBUTE_SELECTOR && speedLists(it).isNotEmpty()
+                }
+                assertEquals("$name: speed selectors answering $ATTRIBUTE_SELECTOR in ${toastClass.type}", 1, selectors.size)
+                val dropdownHolders = FixtureDex.classesHolding(bundle, SPEED_DROPDOWN).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+                val dropdowns = dropdownHolders.flatMap { it.methods }.filter { holdsString(it, SPEED_DROPDOWN) && speedLists(it).isNotEmpty() }
+                assertEquals("$name: speed dropdowns holding \"$SPEED_DROPDOWN\" and filling a Float[]", 1, dropdowns.size)
+                val pickers = selectors + dropdowns
+                for (picker in pickers) {
+                    assertEquals("$name: the lists of speeds ${picker.definingClass}->${picker.name} makes", 1, speedLists(picker).size)
+                }
+                val dropdownClass = dropdownHolders.single { it.type == dropdowns.single().definingClass }
+
+                fun classes() = listOf(owner, toastClass, gearClass, paramsClass, dropdownClass,
+                    ExtensionDex.classDef(REEL_SPEED), ExtensionDex.classDef(SETTINGS_STATUS)).distinctBy { it.type }
+                val context = PatchContexts.of(classes())
                 keepReelSpeedPatch.execute(context)
 
                 fun patched(type: String, method: Method): List<Instruction> = context.mutableClassDefBy(type).methods.single {
@@ -173,6 +191,18 @@ class KeepReelSpeedFixtureTest {
                         "${owner.type}->${setter.name}(F)V", gearCode[index - 1].call?.let(::key))
                     assertEquals("$name: the speed the gear pick's hook gets", gearCode[index - 1].registers().last(),
                         instruction.registers().single())
+                }
+
+                // Each picker's list goes to the extension straight after asList makes it, and the picker
+                // builds its items from the list that comes back, in the same register.
+                for (picker in pickers) {
+                    val (result, list) = speedLists(picker).single()
+                    val code = patched(picker.definingClass, picker)
+                    val what = "${picker.definingClass}->${picker.name}"
+                    assertEquals("$name: $what's list doesn't go to the extension", SPEED_CHOICES, code[result + 1].call.toString())
+                    assertEquals("$name: the register $what hands over", listOf(list), code[result + 1].registers())
+                    assertEquals("$name: $what doesn't take the list back", Opcode.MOVE_RESULT_OBJECT, code[result + 2].opcode)
+                    assertEquals("$name: the register $what takes it back in", list, (code[result + 2] as OneRegisterInstruction).registerA)
                 }
 
                 val stubs = context.mutableClassDefBy(REEL_SPEED)
@@ -204,8 +234,7 @@ class KeepReelSpeedFixtureTest {
 
                 // As the patcher runs it, after the release guard it brings: the guard's answer stays
                 // first in the setter, and the hook after it reads the speed the player gets.
-                val guarded = PatchContexts.of(listOf(owner, toastClass, gearClass, paramsClass,
-                    ExtensionDex.classDef(REEL_SPEED), ExtensionDex.classDef(SETTINGS_STATUS)))
+                val guarded = PatchContexts.of(classes())
                 guarded.hookSpeedSetter(setter)
                 keepReelSpeedPatch.execute(guarded)
                 val chain = guarded.mutableClassDefBy(owner.type).methods.single {

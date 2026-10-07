@@ -21,6 +21,7 @@ import app.morphe.patches.facebook.media.resume.trackers
 import app.morphe.patches.facebook.media.taptoplay.GROOT_PLAY
 import app.morphe.patches.facebook.media.taptoplay.grootPlays
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.facebook.reels.hold.reelLiftGuardPatch
 import app.morphe.patches.facebook.reels.hold.SPEED_SET as GUARD_SPEED_SET
@@ -48,6 +49,10 @@ internal const val PATCH = "Keep the reel speed"
  * Keep the video speed, the extension's second switch for this patch, needs nothing more: the same
  * hooks fire for every FbGrootPlayer, so a gear pick on a feed or Watch video and each later video's
  * start already reach the extension, which tells reels from other videos by isFbShorts.
+ *
+ * Slower speeds in the Reels menu, the third switch, hands the extension the list of speeds each
+ * of the Reels menu's pickers offers ([addSlowerSpeeds]), and a pick of one of the added speeds goes
+ * through the same toast and setter, so Keep the reel speed keeps it like any other.
  */
 @Suppress("unused")
 val keepReelSpeedPatch = bytecodePatch(
@@ -65,6 +70,12 @@ val keepReelSpeedPatch = bytecodePatch(
     execute {
         val anchors = findReelSpeedAnchors()
         applyReelSpeedAnchors(anchors)
+        // The slower speeds are the extension's third switch; a build where the menus moved keeps the rest.
+        try {
+            addSlowerSpeeds(anchors.toast)
+        } catch (moved: PatchException) {
+            patchLog.warning("${moved.message}. The patch goes on without the slower speeds in that picker.")
+        }
         enableStatus("keepReelSpeed")
     }
 }
@@ -165,6 +176,39 @@ internal fun BytecodePatchContext.applyReelSpeedAnchors(anchors: ReelSpeedAnchor
         gear.addInstruction(call + 1, "invoke-static/range { v$speed .. v$speed }, $GEAR_PICKED")
     }
     fillStubs(anchors)
+}
+
+/**
+ * The Reels menu's two speed pickers hand their list of speeds to the extension as soon as
+ * Arrays.asList makes it, and build their items from the list it answers (#95): the attribute
+ * selector, found in the toast's class by the kept class it answers, and the dropdown, by the
+ * literal naming its control. More than one of either refuses before anything changes; either one
+ * missing refuses after the other is hooked.
+ */
+internal fun BytecodePatchContext.addSlowerSpeeds(toast: Method) {
+    val selectors = classDefBy(toast.definingClass).methods.filter {
+        AccessFlags.STATIC.isSet(it.accessFlags) && it.returnType == ATTRIBUTE_SELECTOR && speedLists(it).isNotEmpty()
+    }
+    val dropdowns = classDefByStrings(SPEED_DROPDOWN, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        .flatMap { holder -> holder.methods.filter { holdsString(it, SPEED_DROPDOWN) && speedLists(it).isNotEmpty() } }
+    if (selectors.size > 1 || dropdowns.size > 1) {
+        refuse("expected one speed selector and one speed dropdown, found ${selectors.size} and ${dropdowns.size}")
+    }
+    (selectors + dropdowns).forEach { picker ->
+        val method = mutableClassDefBy(picker.definingClass).findMutableMethodOf(picker)
+        speedLists(method).asReversed().forEach { (result, list) ->
+            method.addInstructions(
+                result + 1,
+                """
+                    invoke-static/range { v$list .. v$list }, $SPEED_CHOICES
+                    move-result-object v$list
+                """,
+            )
+        }
+    }
+    if (selectors.isEmpty()) refuse("no speed selector answering $ATTRIBUTE_SELECTOR in ${toast.definingClass} fills a Float[]")
+    if (dropdowns.isEmpty()) refuse("no speed dropdown holding \"$SPEED_DROPDOWN\" fills a Float[]")
 }
 
 /** 2 when [setter] starts with the release guard's hook and its move-result, else 0. */
