@@ -577,12 +577,13 @@
     {
       "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/PostPattern.java",
-        "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/PostTypes.java"
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/PostTypes.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/TopicPacks.java"
       ],
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: a regular expression matcher for the word lists that never backtracks and counts its steps against a budget per post, and the four switches for kinds of feed post, which read an attachment's style_list and a story's text_format_metadata through accessors the Hide posts by words patch fills in."
+      "changes": "Written for Hushfacebook: a regular expression matcher for the word lists that never backtracks and counts its steps against a budget per post, and the four switches for kinds of feed post, which read an attachment's style_list and a story's text_format_metadata through accessors the Hide posts by words patch fills in. Also the topic packs the Words to hide editor adds."
     },
     {
       "paths": [

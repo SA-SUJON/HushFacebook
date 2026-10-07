@@ -1160,3 +1160,35 @@ With Accent color in the build, Facebook's blue will be %1$s.	Derlemede Vurgu re
 Send photos and videos at original quality	Fotoğrafları ve videoları orijinal kalitede gönder
 # context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again
 Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.	Facebook içindeki bir sohbetten gönderdiğin fotoğraflar ve videolar orijinal olarak gider. Fotoğraflar konum ve kamera bilgisini kaybeder. 20 MB üstü fotoğraflar ve 25 MB üstü videolar yine küçültülür.
+# context: button in the Words to hide editor that opens a list of ready-made word lists for common topics
+Add a topic pack	Konu paketi ekle
+# context: topic pack name: words about politics
+Politics	Siyaset
+# context: topic pack name: words about elections and voting
+Elections	Seçimler
+# context: topic pack name: words about cryptocurrency
+Crypto	Kripto
+# context: topic pack name: words about sports
+Sports	Spor
+# context: topic pack name: words about celebrity gossip
+Celebrity gossip	Ünlü dedikodusu
+# context: topic pack name: words that weight loss advertisements use
+Weight loss ads	Kilo verme reklamları
+# context: topic pack name: words that giveaway posts and engagement bait use
+Giveaways and engagement bait	Çekilişler ve etkileşim tuzakları
+# context: toast after adding a topic pack: one word went in; %2$s is the pack's name
+Added %1$d word from %2$s.	%2$s paketinden %1$d kelime eklendi.
+# context: toast after adding a topic pack: several words went in; %2$s is the pack's name
+Added %1$d words from %2$s.	%2$s paketinden %1$d kelime eklendi.
+# context: added to the topic pack toast: one word of the pack was in the list already
+%1$d was already in the list.	%1$d zaten listedeydi.
+# context: added to the topic pack toast: several words of the pack were in the list already
+%1$d were already in the list.	%1$d zaten listedeydi.
+# context: added to the topic pack toast: the list or its shared room ran out partway through the pack
+The list is full, so the rest weren't added.	Liste dolu, bu yüzden kalanlar eklenmedi.
+# context: topic pack toast when the list had no room for even the first word
+The list is full, so nothing was added.	Liste dolu, bu yüzden hiçbir şey eklenmedi.
+# context: topic pack toast when the pack's words were all in the list; %1$s is the pack's name
+Every word from %1$s is already in the list.	%1$s paketindeki tüm kelimeler zaten listede.
+# context: last sentence of the topic pack toast: the words are only typed into the editor until Save
+Tap Save to keep the list.	Listeyi tutmak için Kaydet'e dokun.

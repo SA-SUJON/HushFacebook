@@ -1160,3 +1160,35 @@ With Accent color in the build, Facebook's blue will be %1$s.	Mit Akzentfarbe im
 Send photos and videos at original quality	Fotos und Videos in Originalqualität senden
 # context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again
 Photos and videos you send from a chat that opens inside Facebook go out as the originals. Photos lose their location and camera details. Files over 20 MB for photos and 25 MB for videos are still shrunk.	Fotos und Videos, die du aus einem Chat in Facebook sendest, gehen als Original raus. Fotos verlieren Standort und Kameradaten. Fotos über 20 MB und Videos über 25 MB werden weiter verkleinert.
+# context: button in the Words to hide editor that opens a list of ready-made word lists for common topics
+Add a topic pack	Themenpaket hinzufügen
+# context: topic pack name: words about politics
+Politics	Politik
+# context: topic pack name: words about elections and voting
+Elections	Wahlen
+# context: topic pack name: words about cryptocurrency
+Crypto	Krypto
+# context: topic pack name: words about sports
+Sports	Sport
+# context: topic pack name: words about celebrity gossip
+Celebrity gossip	Promi-Klatsch
+# context: topic pack name: words that weight loss advertisements use
+Weight loss ads	Werbung für Abnehmprodukte
+# context: topic pack name: words that giveaway posts and engagement bait use
+Giveaways and engagement bait	Gewinnspiele und Interaktionsköder
+# context: toast after adding a topic pack: one word went in; %2$s is the pack's name
+Added %1$d word from %2$s.	%1$d Wort aus %2$s hinzugefügt.
+# context: toast after adding a topic pack: several words went in; %2$s is the pack's name
+Added %1$d words from %2$s.	%1$d Wörter aus %2$s hinzugefügt.
+# context: added to the topic pack toast: one word of the pack was in the list already
+%1$d was already in the list.	%1$d war schon in der Liste.
+# context: added to the topic pack toast: several words of the pack were in the list already
+%1$d were already in the list.	%1$d waren schon in der Liste.
+# context: added to the topic pack toast: the list or its shared room ran out partway through the pack
+The list is full, so the rest weren't added.	Die Liste ist voll, der Rest wurde nicht hinzugefügt.
+# context: topic pack toast when the list had no room for even the first word
+The list is full, so nothing was added.	Die Liste ist voll, deshalb wurde nichts hinzugefügt.
+# context: topic pack toast when the pack's words were all in the list; %1$s is the pack's name
+Every word from %1$s is already in the list.	Alle Wörter aus %1$s stehen schon in der Liste.
+# context: last sentence of the topic pack toast: the words are only typed into the editor until Save
+Tap Save to keep the list.	Tippe auf Speichern, um die Liste zu behalten.

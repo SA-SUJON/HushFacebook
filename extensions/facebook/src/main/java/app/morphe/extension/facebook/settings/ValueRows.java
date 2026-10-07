@@ -26,6 +26,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.startTabSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.subfolderSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.surfaceQualitySummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.packResult;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.wordsEditorLine;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.wordsRefusal;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.wordsSummary;
@@ -55,6 +56,7 @@ import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
+import app.morphe.extension.facebook.feed.TopicPacks;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
@@ -65,6 +67,7 @@ import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.facebook.settings.SettingsRows.RowSemantics;
 import app.morphe.extension.shared.L10n;
+import app.morphe.extension.shared.Utils;
 
 /**
  * The rows that edit a value: the text rows, whose dialogs fit above the keyboard, and the lists,
@@ -161,6 +164,11 @@ final class ValueRows {
         @Nullable private TextView count;
         /** The other list's share of the room, read when the dialog opens. */
         private int otherBytes;
+        /**
+         * Opens the list of topic packs, set by the page for the list that hides posts. The words a
+         * pack adds go into the open dialog's text as ordinary lines, and nothing is saved until Save.
+         */
+        @Nullable Runnable choosePack;
 
         WordsRow(Context context, boolean hides) {
             super(context);
@@ -207,7 +215,34 @@ final class ValueRows {
             count.setTextSize(14);
             count.setTextColor(colors.summary);
             count.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-            return scrollingBody(context, help, count, getEditText());
+            if (choosePack == null) return scrollingBody(context, help, count, getEditText());
+            Button packs = new Button(context);
+            packs.setText(L10n.t("Add a topic pack"));
+            packs.setAllCaps(false);
+            packs.setTextSize(14);
+            packs.setTextColor(colors.heading);
+            packs.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            int touch = Math.round(48 * context.getResources().getDisplayMetrics().density);
+            packs.setMinHeight(touch);
+            packs.setMinimumHeight(touch);
+            packs.setPadding(0, 0, 0, 0);
+            packs.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
+            packs.setOnClickListener(ignored -> choosePack.run());
+            return scrollingBody(context, help, count, packs, getEditText());
+        }
+
+        /**
+         * Adds [pack]'s words to the text in the open dialog, after what's there, and says what came
+         * of it. The list isn't saved: the words are lines in the editor until Save.
+         */
+        void addPack(TopicPacks.Pack pack) {
+            String typed = getEditText().getText().toString();
+            TopicPacks.Result result = TopicPacks.add(typed, pack, otherBytes);
+            if (result.added > 0) {
+                getEditText().setText(result.text);
+                getEditText().setSelection(getEditText().getText().length());
+            }
+            Utils.showToastLong(packResult(pack, result));
         }
 
         @Override protected void onBindDialogView(View view) {

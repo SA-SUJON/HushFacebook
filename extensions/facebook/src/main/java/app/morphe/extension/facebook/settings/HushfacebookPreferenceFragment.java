@@ -49,6 +49,7 @@ import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
+import app.morphe.extension.facebook.feed.TopicPacks;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
@@ -1715,6 +1716,17 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         field.setMinLines(3);
         field.setHint(L10n.t("One word or phrase per line"));
         row.setText(setting.savedValue());
+        if (hides) {
+            row.choosePack = () -> {
+                TopicPacks.Pack[] packs = TopicPacks.Pack.values();
+                CharSequence[] names = new CharSequence[packs.length];
+                for (int i = 0; i < packs.length; i++) names[i] = packLabel(packs[i]);
+                show(new AlertDialog.Builder(row.getContext())
+                        .setTitle(L10n.t("Add a topic pack"))
+                        .setItems(names, (dialog, which) -> row.addPack(packs[which]))
+                        .setNegativeButton(L10n.t("Cancel"), null));
+            };
+        }
         row.refused = why -> show(new AlertDialog.Builder(row.getContext())
                 .setTitle(title)
                 .setMessage(why)
@@ -1834,6 +1846,46 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         String why = wordsRefusal(size);
         return count + " " + (why != null ? why
                 : L10n.f("Both lists together fill %1$d%% of the room they share.", size.percent()));
+    }
+
+    /** What the topic pack list calls [pack]. */
+    static String packLabel(TopicPacks.Pack pack) {
+        switch (pack) {
+            case POLITICS:
+                return L10n.t("Politics");
+            case ELECTIONS:
+                return L10n.t("Elections");
+            case CRYPTO:
+                return L10n.t("Crypto");
+            case SPORTS:
+                return L10n.t("Sports");
+            case CELEBRITY_GOSSIP:
+                return L10n.t("Celebrity gossip");
+            case WEIGHT_LOSS_ADS:
+                return L10n.t("Weight loss ads");
+            default:
+                return L10n.t("Giveaways and engagement bait");
+        }
+    }
+
+    /** What the toast says after a pack was added: how many words went in, and why any didn't. */
+    static String packResult(TopicPacks.Pack pack, TopicPacks.Result result) {
+        String label = packLabel(pack);
+        String line;
+        if (result.added > 0) {
+            line = L10n.quantity(result.added, "Added %1$d word from %2$s.", "Added %1$d words from %2$s.",
+                    result.added, label);
+            if (result.duplicates > 0) {
+                line += " " + L10n.quantity(result.duplicates, "%1$d was already in the list.",
+                        "%1$d were already in the list.", result.duplicates);
+            }
+            if (result.full) line += " " + L10n.t("The list is full, so the rest weren't added.");
+        } else if (result.full) {
+            line = L10n.t("The list is full, so nothing was added.");
+        } else {
+            line = L10n.f("Every word from %1$s is already in the list.", label);
+        }
+        return line + " " + L10n.t("Tap Save to keep the list.");
     }
 
     /**
