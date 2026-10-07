@@ -821,6 +821,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/feed/AutoTranslation.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/feed/autotranslation/TurnOffAutoTranslationPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Turn off auto-translation. Posts: the one getter of the post translatability model's translation_type (a no-argument BaseModelWithTree method returning the enum whose static setup names AUTO_TRANSLATION and SEE_TRANSLATION, reading the field's key with getCachedEnum) hands its answer to the extension, which turns AUTO_TRANSLATION into SEE_TRANSLATION while the switch is on, so the feed picks its See translation plugin over its auto-translate one. Reels: the two reads of the caption's translatable flag in the class that records FbShortsViewerFooterComponent.updateAutoTranslateTriggered go through the extension, which answers false while the switch is on, so the footer never asks for a caption translation."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/navigation/TabBadges.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/navigation/tabbadges/HideTabBadgesPatch.kt"
       ],

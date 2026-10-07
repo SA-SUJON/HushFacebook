@@ -953,3 +953,7 @@ No dot or count on Feeds, Gaming, Events and the other tabs not listed here. The
 No dot or count on this tab. Its page still shows what's new when you open it.	Tanpa titik atau angka di tab ini. Halamannya tetap menampilkan yang baru saat kamu membukanya.
 # context: summary of the app icon count switch
 No count on Facebook's app icon. Notifications still come in. A launcher that counts notifications on its own may still show them.	Tanpa angka di ikon aplikasi Facebook. Notifikasi tetap masuk. Launcher yang menghitung notifikasi sendiri mungkin tetap menampilkannya.
+# context: switch title under News feed; it shows posts and reel captions in their original language instead of Facebook's automatic translation
+Turn off auto-translation	Matikan terjemahan otomatis
+# context: description of that switch; See translation is the name of Facebook's own link under a post that translates it on request
+Posts and reel captions stay in the language they were written in. Facebook's See translation link stays under them.	Postingan dan keterangan reel tetap dalam bahasa aslinya. Tautan Lihat Terjemahan dari Facebook tetap ada di bawahnya.

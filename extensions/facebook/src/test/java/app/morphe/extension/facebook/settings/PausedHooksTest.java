@@ -61,6 +61,7 @@ import app.morphe.extension.facebook.download.ReelDownload;
 import app.morphe.extension.facebook.download.SaveRulesForTests;
 import app.morphe.extension.facebook.download.VideoMenuItemForTests;
 import app.morphe.extension.facebook.emoji.SystemEmoji;
+import app.morphe.extension.facebook.feed.AutoTranslationForTests;
 import app.morphe.extension.facebook.feed.FeedFilter;
 import app.morphe.extension.facebook.feed.FeedsHeader;
 import app.morphe.extension.facebook.feed.FollowingHome;
@@ -317,6 +318,10 @@ public class PausedHooksTest {
                 () -> MetaAiQuestions.dropsDefaultPill(MetaAiQuestions.META_AI_TYPE)));
         // A post header's yes to rotating its subtitle is answered as a no, so it keeps the one line.
         probes.put(PatchFamily.POST_DATES, Collections.singletonList(() -> !PostDates.cycling(true)));
+        // A post marked for automatic translation reads as one to translate on request, and the
+        // reels footer hears a caption can't be translated by itself, so it asks for nothing.
+        probes.put(PatchFamily.AUTO_TRANSLATION, Arrays.asList(AutoTranslationForTests::keepsThePost,
+                AutoTranslationForTests::keepsTheCaption));
         // The Feeds tab's yes to a title row is answered as a no, its filters go to a container
         // that's never on screen, and its posts get no room for them. The room follows what the
         // tab did with its filters, so that probe builds a tab first.

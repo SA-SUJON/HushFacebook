@@ -330,7 +330,7 @@ public class PatchFamilyTest {
                         + "the background",
                 "not in this build: Hide suggested and promoted posts, Hide Stories tray, Hide Reels in the feed, "
                         + "Block background-return feed refresh, Hide AI-detected posts, Hide posts by words, "
-                        + "Hide post prompts, Hide Meta AI questions under posts, Keep post dates, Hide the Feeds header, Hide sponsored stories, Hide suggested stories, Stop Story auto-advance, View stories anonymously, Hide sponsored search results, "
+                        + "Hide post prompts, Hide Meta AI questions under posts, Keep post dates, Turn off auto-translation, Hide the Feeds header, Hide sponsored stories, Hide suggested stories, Stop Story auto-advance, View stories anonymously, Hide sponsored search results, "
                         + "Hide sponsored profile posts, Hide sponsored Marketplace listings, Block Instant Games ads, Hide affiliate product links, Clean up Reels, Hide reel interest prompts, Don't send reel watch history, Turn off double tap to like, Keep the reel speed, Hold a reel for 2x, Default comment order, Hide Meta AI comment summaries, "
                         + "Tag suggestions only after @, Tap to play, Resume long videos, Default playback quality, Picture-in-picture, Turn off HDR brightness, Keep the progress bar, "
                         + "Use the system font, Use the phone's emoji, Turn off haptics, Turn off screen transitions, Open links in "
@@ -338,7 +338,7 @@ public class PatchFamilyTest {
                         + "Download any video, Download any photo, Open on a chosen tab, Following feed on Home, Marketplace only, Show View profile on Marketplace sellers, Hide the Reels tab, Hide the Reels tab dot, Hide tab badges, Hide tabs, Tab bar at the bottom, Force dark mode, Hide the Get Messenger card, Open Messenger from the top bar, Hide Menu promotions, Hide Meta upsells, Hide Meta AI in search, Hold back analytics uploads, Allow screenshots, Block screenshot detection, Hide typing indicator, Hide read receipts, Block promotional notifications, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material You theme, "
                         + "Restore screens on re-signed builds, Start on x86 devices, Install beside Meta's apps, Disable Play Store updates, Hushfacebook in the Menu",
                 "left out of Manager's default selection: Hide suggested and promoted posts, Hide AI-detected posts, "
-                        + "Hide posts by words, Hide post prompts, Hide Meta AI questions under posts, Keep post dates, Hide the Feeds header, Hide sponsored stories, Hide suggested stories, Hide sponsored search "
+                        + "Hide posts by words, Hide post prompts, Hide Meta AI questions under posts, Keep post dates, Turn off auto-translation, Hide the Feeds header, Hide sponsored stories, Hide suggested stories, Hide sponsored search "
                         + "results, Hide sponsored profile posts, Hide sponsored Marketplace listings, Block Instant Games ads, Hide affiliate product links, Hide reel interest prompts, Keep the reel "
                         + "speed, Hide Meta AI comment summaries, Resume long videos, Keep the progress bar, Open links in external browser, Sanitize sharing links, Stop "
                         + "update prompts, Download any story, Download any reel, Download any photo, Following feed on Home, Marketplace only, Show View profile on "

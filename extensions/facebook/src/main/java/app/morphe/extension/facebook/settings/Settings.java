@@ -882,6 +882,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_keep_post_dates", TRUE);
 
     /**
+     * Posts and reel captions keep the language they were written in, with Facebook's See
+     * translation link under them ({@link app.morphe.extension.facebook.feed.AutoTranslation}). A
+     * change shows on the posts and reels drawn after it.
+     */
+    public static final BooleanSetting TURN_OFF_AUTO_TRANSLATION =
+            new BooleanSetting("hushfacebook_turn_off_auto_translation", FALSE);
+
+    /**
      * The Feeds tab opens on its posts, without the title row or the filters under it
      * ({@link app.morphe.extension.facebook.feed.FeedsHeader}). Facebook settles both as the tab is
      * built, so a change waits for a restart.
