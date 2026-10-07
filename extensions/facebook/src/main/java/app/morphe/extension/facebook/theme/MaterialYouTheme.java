@@ -4,6 +4,8 @@
  */
 package app.morphe.extension.facebook.theme;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.ComponentCallbacks;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -11,6 +13,10 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.InsetDrawable;
+import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -298,6 +304,93 @@ public final class MaterialYouTheme {
         plain.mutate();
         plain.setColor(themed);
         return plain;
+    }
+
+    /** Whether {@link #watchWindows} has registered its callbacks. */
+    private static boolean windowsWatched;
+
+    /**
+     * The page under the feed's last unit in dark mode. It's the window's own background, which the
+     * framework draws from the activity theme's {@code android:windowBackground}: Facebook's main
+     * theme points it at {@code ?attr/WASH} (581 attribute 0x7f040633, 580 0x7f040632, 577
+     * 0x7f040635), and the dark FDS style gives WASH its #101011 colour resource, which has no night
+     * value. The framework reads it, so no hook sees it, and some code reads WASH as a plain colour
+     * too, so the night style can't move it when no system tone sits that close. Called once the
+     * application is created, with the theme in the build: from then on each activity's window
+     * background takes the palette when the activity is created and again as it resumes
+     * ({@link #recolourWindow}).
+     */
+    public static synchronized void watchWindows(Context context) {
+        if (windowsWatched || !(context instanceof Application)) return;
+        ((Application) context).registerActivityLifecycleCallbacks(new WindowBackgrounds());
+        windowsWatched = true;
+    }
+
+    /**
+     * Gives a window background of one of the {@link #SURFACES} the palette's neutral at the same
+     * lightness in dark mode, the colour route three gives the rest of the page. Another colour, a
+     * background that is no plain colour, light mode and a window with no view yet keep theirs, and so
+     * does AMOLED's, whose route two made it the background colour already.
+     *
+     * @return whether it changed the background
+     */
+    static boolean recolourWindow(@Nullable Window window, boolean amoled) {
+        if (window == null || amoled) return false;
+        View decor = window.peekDecorView();
+        if (decor == null) return false;
+        Drawable background = decor.getBackground();
+        if (background instanceof InsetDrawable) background = ((InsetDrawable) background).getDrawable();
+        if (!(background instanceof ColorDrawable)) return false;
+        int color = ((ColorDrawable) background).getColor();
+        if (!isSurface(color) || !DarkMode.on()) return false;
+        window.setBackgroundDrawable(new ColorDrawable(palette().sameLightness(TonePalette.NEUTRAL, color)));
+        return true;
+    }
+
+    /** Runs {@link #recolourWindow} for each activity once it's created and each time it resumes. */
+    static final class WindowBackgrounds implements Application.ActivityLifecycleCallbacks {
+        @Override
+        public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle state) {
+            recolour(activity);
+        }
+
+        @Override
+        public void onActivityResumed(@NonNull Activity activity) {
+            recolour(activity);
+        }
+
+        private static void recolour(Activity activity) {
+            HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
+            try {
+                recolourWindow(activity.getWindow(), SettingsStatus.amoledTheme());
+            } catch (RuntimeException failure) {
+                Logger.printException(() -> "Material You theme: could not recolour the window", failure);
+            }
+        }
+
+        @Override
+        public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle state) {
+        }
+
+        @Override
+        public void onActivityStarted(@NonNull Activity activity) {
+        }
+
+        @Override
+        public void onActivityPaused(@NonNull Activity activity) {
+        }
+
+        @Override
+        public void onActivityStopped(@NonNull Activity activity) {
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle state) {
+        }
+
+        @Override
+        public void onActivityDestroyed(@NonNull Activity activity) {
+        }
     }
 
     /**

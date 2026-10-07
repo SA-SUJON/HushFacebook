@@ -45,6 +45,7 @@ import app.morphe.extension.facebook.media.ResumePlayback;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.misc.ScreenTransitions;
 import app.morphe.extension.facebook.navigation.ReelsTab;
+import app.morphe.extension.facebook.theme.MaterialYouTheme;
 
 /**
  * How the Hushfacebook screen is reached.
@@ -95,7 +96,8 @@ public final class SettingsEntry {
     /**
      * Injected before each return of the application's {@code onCreate}, after Facebook's own
      * startup. Watches every Facebook activity, so a pending open lands on whichever one resumes next:
-     * signed out, the launcher hands straight over to the login screen. Also where the release
+     * signed out, the launcher hands straight over to the login screen. With Material You in the
+     * build, each activity's dark window background takes the palette from here on. Also where the release
      * check, when it's on, asks at most once a day, on a worker, and where what a save cut short
      * by Android left behind is removed, on a worker too.
      */
@@ -107,6 +109,8 @@ public final class SettingsEntry {
                 callbacksRegistered = true;
             }
             ReturnRefresh.register(context);
+            // Only with the theme in the build, so its class and palette aren't loaded otherwise.
+            if (SettingsStatus.materialYouTheme()) MaterialYouTheme.watchWindows(context);
         } catch (Exception ex) {
             Logger.printException(() -> "Settings entry: could not watch activities", ex);
         }

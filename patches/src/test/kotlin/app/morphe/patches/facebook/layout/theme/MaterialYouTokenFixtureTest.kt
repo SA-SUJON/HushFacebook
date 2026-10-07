@@ -23,6 +23,8 @@ import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.reandroid.arsc.chunk.TableBlock
+import com.reandroid.arsc.chunk.xml.ResXmlDocument
+import com.reandroid.arsc.chunk.xml.ResXmlElement
 import com.reandroid.arsc.model.ResourceEntry
 import com.reandroid.arsc.value.Entry
 import com.reandroid.arsc.value.ResConfig
@@ -60,6 +62,14 @@ import org.w3c.dom.Element
  */
 class MaterialYouTokenFixtureTest {
     private companion object {
+        /** WASH in Facebook's dark style, the page under the feed's last unit. */
+        const val WASH_DARK = 0xFF101011.toInt()
+
+        const val ANDROID_THEME = 0x01010000
+        const val ANDROID_NAME = 0x01010003
+        const val WINDOW_BACKGROUND = 0x01010054
+        const val MAIN_ACTIVITY = "com.facebook.katana.activity.FbMainTabActivity"
+
         /**
          * The FDS tokens 577 and 580 resolve and read as `TypedValue.data`: straight from a literal, off a
          * token constant, or through a helper handed the attribute or a token constant as a parameter.
@@ -227,6 +237,77 @@ class MaterialYouTokenFixtureTest {
         for (surface in surfaces) {
             assertTrue("$build: ${hex(setOf(surface))} is a light style's colour", surface !in lightColours)
         }
+    }
+
+    /**
+     * The page under the feed's last unit in dark mode: FbMainTabActivity's theme, through its
+     * parents, sets `android:windowBackground` to `?attr/WASH`, and the dark style gives WASH
+     * #101011, one of SURFACES. The framework draws that background, so MaterialYouTheme.recolourWindow
+     * gives it the palette from an activity callback rather than a hook.
+     */
+    @Test
+    fun `the main activity's window background is WASH, dark's #101011, in each declared build`() {
+        assertTrue("SURFACES lists #101011", WASH_DARK in listedSurfaces())
+        var builds = 0
+        for (target in AppCompatibilities.facebook().single().targets) {
+            val version = checkNotNull(target.version)
+            for (fixture in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                withBaseApk(fixture) { apk -> checkWindowBackground(fixture.name, apk) }
+                builds++
+            }
+        }
+        assertEquals("one fixture for each declared build", declaredBuilds(), builds)
+    }
+
+    private fun checkWindowBackground(build: String, apk: File) {
+        val attributes = tokenAttributes(apk)
+        val wash = attributes["WASH"] ?: error("$build: no FDS token WASH")
+        val styles = fdsStyles(apk, attributes.values.toSet())
+        val light = styles.values.single { it.parent == 0 && it.sets > 300 }
+        val dark = styles.values.single { it.parent == light.id && it.sets > 300 }
+        assertEquals("$build: dark's WASH", WASH_DARK, dark.values[wash])
+
+        val byId = resources(apk)
+        var style = mainActivityTheme(apk)
+        var found = false
+        var depth = 0
+        while (!found && style ushr 24 == 0x7f && depth++ < 40) {
+            val entries = checkNotNull(byId[style]) { "$build: theme %08x isn't in the table".format(style) }
+                .iterator().asSequence().filter { it != null && !it.isNull && it.isComplex }.toList()
+            for (entry in entries) {
+                for (item in entry.tableEntry as ResTableMapEntry) {
+                    if (item.nameId != WINDOW_BACKGROUND) continue
+                    val where = "$build: style %08x %s windowBackground".format(style, entry.resConfig)
+                    assertEquals(where, ValueType.ATTRIBUTE, item.valueType)
+                    assertEquals(where, wash, item.data)
+                    found = true
+                }
+            }
+            style = (entries.firstOrNull { it.resConfig.isDefault }?.tableEntry as? ResTableMapEntry)?.parentId ?: 0
+        }
+        assertTrue("$build: FbMainTabActivity's theme sets no windowBackground", found)
+    }
+
+    /** The theme the manifest gives FbMainTabActivity. */
+    private fun mainActivityTheme(apk: File): Int = ZipFile(apk).use { zip ->
+        val manifest = ResXmlDocument()
+        zip.getInputStream(zip.getEntry("AndroidManifest.xml")).use { manifest.readBytes(it) }
+        fun ResXmlElement.attribute(id: Int) = (0 until attributeCount).map { getAttributeAt(it) }.firstOrNull { it.nameId == id }
+        val activity = manifest.recursiveElements().asSequence().filterIsInstance<ResXmlElement>().single {
+            it.name == "activity" && it.attribute(ANDROID_NAME)?.valueString == MAIN_ACTIVITY
+        }
+        checkNotNull(activity.attribute(ANDROID_THEME)) { "$MAIN_ACTIVITY names no theme" }.data
+    }
+
+    private fun resources(apk: File): Map<Int, ResourceEntry> {
+        val table = ZipFile(apk).use { zip -> zip.getInputStream(zip.getEntry(TableBlock.FILE_NAME)).use { TableBlock.load(it) } }
+        val byId = mutableMapOf<Int, ResourceEntry>()
+        for (block in table.listPackages()) {
+            for (pair in block.listSpecTypePairs()) {
+                for (resource in pair.resources) if (resource != null && !resource.isEmpty) byId[resource.resourceId] = resource
+            }
+        }
+        return byId
     }
 
     /**
@@ -606,13 +687,7 @@ class MaterialYouTokenFixtureTest {
 
     /** Every style that sets 20 or more FDS attributes, with each one's colour where it resolves to one. */
     private fun fdsStyles(apk: File, fdsAttributes: Set<Int>): Map<Int, Style> {
-        val table = ZipFile(apk).use { zip -> zip.getInputStream(zip.getEntry(TableBlock.FILE_NAME)).use { TableBlock.load(it) } }
-        val byId = mutableMapOf<Int, ResourceEntry>()
-        for (block in table.listPackages()) {
-            for (pair in block.listSpecTypePairs()) {
-                for (resource in pair.resources) if (resource != null && !resource.isEmpty) byId[resource.resourceId] = resource
-            }
-        }
+        val byId = resources(apk)
         val styles = mutableMapOf<Int, Style>()
         for (resource in byId.values) {
             if (!resource.type.startsWith("style")) continue

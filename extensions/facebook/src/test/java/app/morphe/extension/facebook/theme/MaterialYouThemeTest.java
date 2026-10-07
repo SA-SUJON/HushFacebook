@@ -9,15 +9,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
+import android.view.Window;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
@@ -718,6 +722,54 @@ public class MaterialYouThemeTest {
         DarkMode.answer(false);
         ColorDrawable light = new ColorDrawable(0xFF252728);
         assertEquals("light mode", 0xFF252728, ((ColorDrawable) MaterialYouTheme.recolour(light)).getColor());
+    }
+
+    /**
+     * The page under the feed's last unit in dark mode is the window's own background, the #101011
+     * the dark style gives WASH, and the framework draws it with no hook to see it. Once the activity
+     * is created, and again as it resumes, it takes the palette's neutral at the same lightness, the
+     * colour route three gives the rest of the page. Light mode, AMOLED, another colour and a
+     * background that is no plain colour keep theirs.
+     */
+    @Test
+    public void theWindowUnderTheFeedTakesThePaletteInDarkMode() {
+        Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
+        Window window = activity.getWindow();
+        MaterialYouTheme.WindowBackgrounds callbacks = new MaterialYouTheme.WindowBackgrounds();
+        int themed = palette.sameLightness(TonePalette.NEUTRAL, 0xFF101011);
+        assertNotEquals("the palette moves #101011", 0xFF101011, themed);
+
+        DarkMode.answer(true);
+        window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
+        callbacks.onActivityPostCreated(activity, null);
+        assertEquals("once the activity is created", themed, windowColour(window));
+        assertFalse("the palette's colour is left as it is", MaterialYouTheme.recolourWindow(window, false));
+        window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
+        callbacks.onActivityResumed(activity);
+        assertEquals("as it resumes", themed, windowColour(window));
+
+        window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
+        assertFalse("AMOLED", MaterialYouTheme.recolourWindow(window, true));
+        assertEquals(0xFF101011, windowColour(window));
+        window.setBackgroundDrawable(new ColorDrawable(0xFFC9CCD1));
+        assertFalse("a colour that is no dark surface", MaterialYouTheme.recolourWindow(window, false));
+        assertEquals(0xFFC9CCD1, windowColour(window));
+        GradientDrawable shape = new GradientDrawable();
+        shape.setColor(0xFF101011);
+        window.setBackgroundDrawable(shape);
+        assertFalse("a background that is no plain colour", MaterialYouTheme.recolourWindow(window, false));
+        assertFalse("no window", MaterialYouTheme.recolourWindow(null, false));
+
+        DarkMode.answer(false);
+        window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
+        callbacks.onActivityResumed(activity);
+        assertEquals("light mode", 0xFF101011, windowColour(window));
+    }
+
+    private static int windowColour(Window window) {
+        Drawable background = window.getDecorView().getBackground();
+        if (background instanceof InsetDrawable) background = ((InsetDrawable) background).getDrawable();
+        return ((ColorDrawable) background).getColor();
     }
 
     /** The tokens of the bars at the bottom of the screen. */
