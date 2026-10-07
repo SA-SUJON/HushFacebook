@@ -316,10 +316,10 @@ public final class SettingsEntry {
     /** Injected at the start of every Facebook activity's {@code onCreate}. */
     public static void onActivityCreate(Activity activity) {
         HushfacebookPause.keepCrashMarkOnTop();
+        MenuLayoutDump.screenCreated(activity);
         try {
             SavedFileActions.receive(activity.getIntent());
             noteIntent(activity.getIntent());
-            MenuLayoutDump.screenCreated(activity);
         } catch (Exception ex) {
             Logger.printException(() -> "Settings entry: onActivityCreate failure", ex);
         }
