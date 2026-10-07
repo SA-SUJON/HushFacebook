@@ -30,6 +30,10 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Clean up Reels` can open reels and videos in Facebook's own Clean mode, with the buttons down the side hidden. Turn on **Always use Clean mode**, which starts off, and you won't have to pick it from the menu on every reel (issue #75).
 * **Facebook:** In dark mode, `Material You theme` colours the selected tab in the tab bar, its icon and the line over it, with your wallpaper's accent (issue #65).
 * **Facebook:** New patch, `Hide Meta upsells`, with its own section in settings for Meta's other products. Its four switches start off: **Hide Edits promotions**, **Hide Threads cross-posting prompts**, **Hide Meta Verified offers** and **Hide avatar sticker promotions**. They cover the places outside the Menu where Facebook pushes those, like the Reels camera and the sheet after you post.
+* **Facebook:** `Stop Story auto-advance` has a second switch, **Loop stories**, which starts off. A story that finishes plays again from the start instead of stopping on its last frame, and a tap or a swipe still moves on.
+* **Facebook:** `Download any photo` has a second switch under Downloads, **Save photo in post menus**, which starts off. A photo post's three-dot menu gets Save photo, and an album gets Save all photos, which saves each one in turn.
+* **Facebook:** New patch, `Following feed on Home`, with a switch under Opening Facebook that starts off. With it on, Home asks Facebook for its Following feed instead of the ranked one. The Feeds tab's filters keep their own feeds.
+* **Facebook:** New patch, `Disable Play Store updates`, which starts off. Google Play stops offering Facebook updates, so you no longer need Morphe Patches as a second source just for that. It's Morphe's own patch with its notice kept, and Facebook still reads its real version (issue #46).
 
 ### Fixed
 
