@@ -174,9 +174,9 @@ public class PostPatternTest {
     public void aPositionThatCantStartAMatchCostsNothing() throws Exception {
         StringBuilder xs = new StringBuilder();
         for (int i = 0; i < 5_000; i++) xs.append('x');
-        assertEquals(PostPattern.Result.NO_MATCH, PostPattern.compile("\b(abc|abd)\b").find(xs, new PostPattern.Budget(10)));
+        assertEquals(PostPattern.Result.NO_MATCH, PostPattern.compile("\\b(abc|abd)\\b").find(xs, new PostPattern.Budget(10)));
         assertEquals(PostPattern.Result.MATCH,
-                PostPattern.compile("\b(abc|abd)\b").find(xs + " abd", new PostPattern.Budget(1_000)));
+                PostPattern.compile("\\b(abc|abd)\\b").find(xs + " abd", new PostPattern.Budget(1_000)));
         assertEquals("a pattern that can match nothing", PostPattern.Result.MATCH,
                 PostPattern.compile("x*").find("", new PostPattern.Budget(10)));
         assertEquals(PostPattern.Result.MATCH, PostPattern.compile("x*$").find(xs, new PostPattern.Budget(1_000_000)));
