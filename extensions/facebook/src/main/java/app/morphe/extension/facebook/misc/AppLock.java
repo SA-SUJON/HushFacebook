@@ -9,7 +9,6 @@ import android.app.Application;
 import android.app.Dialog;
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.biometrics.BiometricManager;
@@ -19,6 +18,7 @@ import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.SystemClock;
 import android.util.TypedValue;
+import android.util.Xml;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
@@ -29,6 +29,15 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -77,7 +86,9 @@ import app.morphe.extension.shared.settings.Setting;
  * <p>Only the main process writes the settings file, and a setting holds the value its process
  * loaded at start. So Facebook's other processes, such as its games and ad screens, read the switch
  * and the time away fresh from the file at each check ({@link #lockOn}, {@link #lockAfter}), and a
- * change reaches a game that was already running.
+ * change reaches a game that was already running. They read the XML themselves rather than through
+ * SharedPreferences ({@link #readSettingsFile}), whose reload can delete a file the main process is
+ * writing.
  */
 public final class AppLock {
     /** How long Facebook may be away before a return asks again. */
@@ -225,8 +236,8 @@ public final class AppLock {
     static boolean lockOn() {
         if (!Utils.isMainProcess()) {
             try {
-                SharedPreferences file = freshSettings();
-                if (file != null) return file.getBoolean(Settings.APP_LOCK.key, Settings.APP_LOCK.defaultValue);
+                FileSettings file = readSettingsFile();
+                if (file != null) return file.on != null ? file.on : Settings.APP_LOCK.defaultValue;
             } catch (RuntimeException failure) {
                 Logger.printException(() -> "App lock: could not read the switch from the settings file", failure);
             }
@@ -238,11 +249,8 @@ public final class AppLock {
     static After lockAfter() {
         if (!Utils.isMainProcess()) {
             try {
-                SharedPreferences file = freshSettings();
-                if (file != null) {
-                    String name = file.getString(Settings.APP_LOCK_AFTER.key, null);
-                    return name == null ? Settings.APP_LOCK_AFTER.defaultValue : After.valueOf(name);
-                }
+                FileSettings file = readSettingsFile();
+                if (file != null) return file.after == null ? Settings.APP_LOCK_AFTER.defaultValue : After.valueOf(file.after);
             } catch (RuntimeException failure) {
                 Logger.printException(() -> "App lock: could not read the time away from the settings file", failure);
             }
@@ -250,16 +258,94 @@ public final class AppLock {
         return Settings.APP_LOCK_AFTER.get();
     }
 
+    /** The lock's two settings as the settings file holds them. A null is one the file doesn't name. */
+    static final class FileSettings {
+        @Nullable final Boolean on;
+        @Nullable final String after;
+
+        FileSettings(@Nullable Boolean on, @Nullable String after) {
+            this.on = on;
+            this.after = after;
+        }
+    }
+
+    /** What the settings file last said when it could be read whole, for a read that finds it mid-write. */
+    @Nullable
+    private static volatile FileSettings lastRead;
+
     /**
-     * The settings file, reloaded when another process wrote it since this one last read it. The
-     * multi-process mode is deprecated for writing from two processes, which nothing here does: only
-     * the main process writes.
+     * The lock's settings as the settings file holds them now, read in a side process straight from
+     * its XML, opened to read and nothing else. Not through SharedPreferences: its reload, finding the
+     * {@code .bak} copy the main process keeps while it writes, deletes the half-written file and
+     * renames the copy over it, and that save is lost once the main process restarts.
+     *
+     * <p>While the copy is there it holds the last save, so it's read instead of the file. A file
+     * cut short as the write starts is read again once, by which time the copy is there. When neither
+     * can be read whole, the last value read stands, or null before there was one. With no file and
+     * no copy, nothing was ever saved, and both settings are at their defaults.
      */
     @Nullable
-    @SuppressWarnings("deprecation")
-    private static SharedPreferences freshSettings() {
+    static FileSettings readSettingsFile() {
         Context context = Utils.getContext();
-        return context == null ? null : context.getSharedPreferences(Setting.PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+        if (context == null) return lastRead;
+        File file = new File(new File(context.getDataDir(), "shared_prefs"), Setting.PREFERENCES_NAME + ".xml");
+        File backup = new File(file.getPath() + ".bak");
+        for (int attempt = 0; attempt < 2; attempt++) {
+            File source = backup.exists() ? backup : file;
+            if (source == file && !file.exists()) {
+                if (backup.exists()) continue;
+                FileSettings defaults = new FileSettings(null, null);
+                lastRead = defaults;
+                return defaults;
+            }
+            FileSettings read = parseSettings(source);
+            if (read != null) {
+                lastRead = read;
+                return read;
+            }
+        }
+        return lastRead;
+    }
+
+    /** The two settings in a settings file's XML, or null when it can't be opened or read to its end. */
+    @Nullable
+    static FileSettings parseSettings(File source) {
+        byte[] bytes;
+        try (InputStream in = new FileInputStream(source)) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            for (int read; (read = in.read(buffer)) > 0; ) out.write(buffer, 0, read);
+            bytes = out.toByteArray();
+        } catch (IOException gone) {
+            return null;
+        }
+        try {
+            XmlPullParser parser = Xml.newPullParser();
+            parser.setInput(new ByteArrayInputStream(bytes), "UTF-8");
+            Boolean on = null;
+            String after = null;
+            boolean closed = false;
+            for (int event = parser.getEventType(); event != XmlPullParser.END_DOCUMENT; event = parser.next()) {
+                if (event == XmlPullParser.START_TAG) {
+                    if (parser.getDepth() == 1) {
+                        if (!"map".equals(parser.getName())) return null;
+                        continue;
+                    }
+                    String name = parser.getAttributeValue(null, "name");
+                    if ("boolean".equals(parser.getName()) && Settings.APP_LOCK.key.equals(name)) {
+                        on = Boolean.valueOf(parser.getAttributeValue(null, "value"));
+                    } else if ("string".equals(parser.getName()) && Settings.APP_LOCK_AFTER.key.equals(name)) {
+                        after = parser.nextText();
+                    }
+                } else if (event == XmlPullParser.END_TAG && parser.getDepth() == 1) {
+                    closed = true;
+                }
+            }
+            // A file cut short mid-write either fails to parse or ends before its map closes.
+            return closed ? new FileSettings(on, after) : null;
+        } catch (XmlPullParserException | IOException | RuntimeException unreadable) {
+            return null;
+        }
     }
 
     /** Whether a Facebook screen is in front: started, and not a picture-in-picture window. */
@@ -564,6 +650,7 @@ public final class AppLock {
         declined = false;
         refusal = null;
         prompter = AppLock::askAndroid;
+        lastRead = null;
     }
 
     /** Android's own prompt: a biometric the phone counts as at least weak, or its PIN, pattern or password. */

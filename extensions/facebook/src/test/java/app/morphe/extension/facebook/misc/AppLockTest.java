@@ -4,6 +4,7 @@
  */
 package app.morphe.extension.facebook.misc;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -39,6 +40,10 @@ import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.ShadowSystemClock;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -636,6 +641,76 @@ public class AppLockTest {
         } finally {
             info.processName = main;
         }
+    }
+
+    /**
+     * A side process reads the lock's settings straight from the settings file, never through
+     * SharedPreferences, whose reload deletes a file the main process is part way through writing
+     * and renames its backup over it. Nothing on disk changes: a backup left mid-write and the
+     * half-written file stay byte for byte, and the backup's values are the ones read while it's
+     * there. A finished write still reaches the side process, and a file cut short with no backup
+     * leaves the last values read.
+     */
+    @Test
+    public void aSideProcessReadsTheSettingsFileWithoutChangingIt() throws IOException {
+        Application app = RuntimeEnvironment.getApplication();
+        ApplicationInfo info = app.getApplicationInfo();
+        String main = info.processName;
+        File folder = new File(app.getDataDir(), "shared_prefs");
+        assertTrue(folder.isDirectory() || folder.mkdirs());
+        File file = new File(folder, Setting.PREFERENCES_NAME + ".xml");
+        File backup = new File(file.getPath() + ".bak");
+        byte[] before = file.exists() ? Files.readAllBytes(file.toPath()) : null;
+        info.processName = app.getPackageName() + ":quicksilver";
+        try {
+            assertFalse(Utils.isMainProcess());
+            Files.write(backup.toPath(), lockFile(true, AppLock.After.IMMEDIATELY));
+            String whole = new String(lockFile(false, AppLock.After.ONE_HOUR), StandardCharsets.UTF_8);
+            byte[] cutShort = whole.substring(0, whole.indexOf("<string")).getBytes(StandardCharsets.UTF_8);
+            Files.write(file.toPath(), cutShort);
+            byte[] backupBytes = Files.readAllBytes(backup.toPath());
+
+            assertTrue("the backup's switch wasn't the one read", AppLock.lockOn());
+            assertEquals(AppLock.After.IMMEDIATELY, AppLock.lockAfter());
+            assertTrue("the backup was consumed", backup.exists());
+            assertArrayEquals("the backup changed", backupBytes, Files.readAllBytes(backup.toPath()));
+            assertArrayEquals("the file being written changed", cutShort, Files.readAllBytes(file.toPath()));
+
+            // The write lands: the file holds the new save and the backup goes.
+            Files.write(file.toPath(), lockFile(false, AppLock.After.FIVE_MINUTES));
+            assertTrue(backup.delete());
+            assertFalse("a finished write didn't reach the side process", AppLock.lockOn());
+            assertEquals(AppLock.After.FIVE_MINUTES, AppLock.lockAfter());
+
+            // Cut short with no backup: the last values read stand, and the file is left as it is.
+            Files.write(file.toPath(), cutShort);
+            assertFalse(AppLock.lockOn());
+            assertEquals(AppLock.After.FIVE_MINUTES, AppLock.lockAfter());
+            assertArrayEquals(cutShort, Files.readAllBytes(file.toPath()));
+            assertFalse(backup.exists());
+
+            // No file and no backup: nothing was saved, so both are at their defaults.
+            assertTrue(file.delete());
+            assertEquals(Settings.APP_LOCK.defaultValue, AppLock.lockOn());
+            assertEquals(Settings.APP_LOCK_AFTER.defaultValue, AppLock.lockAfter());
+        } finally {
+            info.processName = main;
+            //noinspection ResultOfMethodCallIgnored
+            backup.delete();
+            if (before != null) Files.write(file.toPath(), before);
+            else //noinspection ResultOfMethodCallIgnored
+                file.delete();
+        }
+    }
+
+    /** A settings file as Android's SharedPreferences writes one, holding the lock's two settings among others. */
+    private static byte[] lockFile(boolean on, AppLock.After after) {
+        return ("<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n<map>\n"
+                + "    <boolean name=\"hushfacebook_some_other_switch\" value=\"" + !on + "\" />\n"
+                + "    <boolean name=\"" + Settings.APP_LOCK.key + "\" value=\"" + on + "\" />\n"
+                + "    <string name=\"" + Settings.APP_LOCK_AFTER.key + "\">" + after.name() + "</string>\n"
+                + "    <string name=\"hushfacebook_words\">a &amp; b</string>\n"
+                + "</map>\n").getBytes(StandardCharsets.UTF_8);
     }
 
     @Test
