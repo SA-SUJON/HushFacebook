@@ -896,13 +896,18 @@ public class DexDiff {
             }
         }
 
-        // A move-result takes the result of the instruction right before it, so an instruction
-        // injected between an invoke and its move-result leaves nothing to take.
+        // A move-result takes the result of the instruction right before it, an invoke or a
+        // filled-new-array, so an instruction injected between the two leaves nothing to take. So
+        // does a call that never made it into the dex: Morphe's inline compiler drops a plain
+        // invoke naming a register past v15 (a parameter of a method with more than 16 registers)
+        // without a word and keeps the move-result after it, which is how Hide tab badges reached
+        // 581's Htc badge writer as a lone move-result first in the method.
         for (int k = 0; k < layout.instructions.size(); k++) {
             if (!isMoveResult(layout.instructions.get(k).getOpcode())) continue;
             if (k == 0 || !layout.instructions.get(k - 1).getOpcode().setsResult()) {
                 findings.add("result: " + layout.instructions.get(k).getOpcode().name + " at "
-                        + layout.addresses.get(k) + " does not follow an invoke");
+                        + layout.addresses.get(k) + " does not follow an invoke or filled-new-array"
+                        + (k == 0 ? "; it opens the method" : ", it follows " + layout.instructions.get(k - 1).getOpcode().name));
             }
         }
 

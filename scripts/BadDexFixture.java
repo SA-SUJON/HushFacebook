@@ -85,7 +85,9 @@ import java.util.Set;
  * bar's jewel count, holding its log name, with Hide the Reels tab dot's call to
  * {@code ReelsTabDot.clear} first. And the three places Facebook asks its configured tabs about a
  * link, holding "extra_launch_uri", "DEEPLINK" and "target_tab_id", each asking {@code TabBarFilter}
- * once, as the tab links patch has them. Beside each
+ * once, as the tab links patch has them. And a launcher badge writer of 18 registers, whose count
+ * parameter sits in v17, with Hide tab badges' call to {@code TabBadges.iconCount} first as a range
+ * call, as the patch has to make it there. Beside each
  * method a start-call, next-call,
  * sole-call or once-call rule picks sit methods holding part of what it's picked by: the
  * refresh controller's onPause, two other methods naming both surfaces and one
@@ -186,6 +188,10 @@ public class BadDexFixture {
     private static final String TAB_TAG = "Lcom/facebook/navigation/tabbar/state/model/TabTag;";
     private static final String REELS_TAB_DOT = "Lapp/morphe/extension/facebook/navigation/ReelsTabDot;";
     private static final ImmutableMethodReference CLEAR_DOT = method(REELS_TAB_DOT, "clear", "Z", OBJECT);
+    private static final String ICON_BADGER = "Lfixture/IconBadger;";
+    private static final String TAB_BADGES = "Lapp/morphe/extension/facebook/navigation/TabBadges;";
+    private static final ImmutableMethodReference ICON_COUNT = method(TAB_BADGES, "iconCount", "I", "I");
+    private static final ImmutableMethodReference STORE_COUNT = method(ICON_BADGER, "store", "V", "I");
     private static final String TAB_LINKS = "Lfixture/TabLinks;";
     private static final String INTENT = "Landroid/content/Intent;";
     private static final String TAB_BAR_FILTER = "Lapp/morphe/extension/facebook/navigation/TabBarFilter;";
@@ -1039,6 +1045,41 @@ public class BadDexFixture {
         return late;
     }
 
+    /**
+     * A launcher badge writer the way Facebook's twelve are shaped where it matters: an instance
+     * write taking a context and the count, in a method of 18 registers, so the count, p2, is v17.
+     * [hook] goes first, then Facebook's own use of the count, handed on as a range.
+     */
+    private static ClassDef iconBadger(List<Instruction> hook) {
+        List<Instruction> instructions = new ArrayList<>(hook);
+        instructions.add(new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, 17, 1, STORE_COUNT));
+        instructions.add(op(Opcode.RETURN_VOID));
+        return new ImmutableClassDef(ICON_BADGER, AccessFlags.PUBLIC.getValue(), OBJECT, null, null, null, null,
+                Collections.singletonList(define(ICON_BADGER, "write", "V", false,
+                        new ImmutableMethodImplementation(18, instructions, null, null), CONTEXT, "I")));
+    }
+
+    /** What Hide tab badges puts first: the count in v17 handed over as a range, its answer written back there. */
+    private static List<Instruction> iconHook() {
+        return Arrays.asList(new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, 17, 1, ICON_COUNT),
+                op(Opcode.MOVE_RESULT, 17));
+    }
+
+    /**
+     * What Morphe's inline compiler made of {@code invoke-static { p2 }} and its move-result in that
+     * method: a plain invoke names only v0 to v15, so it dropped the call without a word and kept the
+     * move-result, which then takes the result of nothing (Hide tab badges on 581's Htc writer).
+     */
+    private static List<Instruction> droppedIconHook() {
+        return Collections.singletonList(op(Opcode.MOVE_RESULT, 17));
+    }
+
+    private static ClassDef tabBadges() {
+        return new ImmutableClassDef(TAB_BADGES, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
+                OBJECT, null, null, null, null, Collections.singletonList(
+                        define(TAB_BADGES, "iconCount", "I", true, body(1, op(Opcode.RETURN, 0)), "I")));
+    }
+
     private static ClassDef reelsTabDot() {
         return new ImmutableClassDef(REELS_TAB_DOT, AccessFlags.PUBLIC.getValue() | AccessFlags.FINAL.getValue(),
                 OBJECT, null, null, null, null, Collections.singletonList(
@@ -1646,7 +1687,7 @@ public class BadDexFixture {
                 speedToast(toastHook(3), Collections.<Instruction>emptyList()), reelSpeed(),
                 jewelController(dotHook(4), Collections.<Instruction>emptyList()), reelsTabDot(),
                 tabLinks(true, true, true), tabBarFilter(), postText(FILLED_STUB, FILLED_STUB),
-                postSources(FILLED_STUB, FILLED_STUB), mailbox(typingHook(), 1)));
+                postSources(FILLED_STUB, FILLED_STUB), mailbox(typingHook(), 1), iconBadger(iconHook()), tabBadges()));
         classes.addAll(chatStubs());
         return classes;
     }
@@ -1667,7 +1708,8 @@ public class BadDexFixture {
                 attachmentTap(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 speedToast(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
                 jewelController(Collections.<Instruction>emptyList(), Collections.<Instruction>emptyList()),
-                tabLinks(false, false, false), mailbox(Collections.<Instruction>emptyList(), 0)));
+                tabLinks(false, false, false), mailbox(Collections.<Instruction>emptyList(), 0),
+                iconBadger(Collections.<Instruction>emptyList())));
         return classes;
     }
 
@@ -2057,6 +2099,9 @@ public class BadDexFixture {
         dexes.put("bad-move-result", withFeedEdge(body(4,
                 invoke(HIDE_EDGE, 2, 3), op(Opcode.NOP), op(Opcode.MOVE_RESULT, 0), ifEqz(0, 3),
                 op(Opcode.RETURN_VOID), op(Opcode.RETURN_VOID))));
+        // result: Hide tab badges' invoke-static { p2 } in an 18-register writer, as Morphe's inline
+        // compiler left it: the call dropped and its move-result first in the method.
+        dexes.put("bad-dropped-invoke", replaced(good(), iconBadger(droppedIconHook())));
         // try: the range starts inside the invoke it means to cover.
         dexes.put("bad-try-range", withTry(tryBlock(1, 2, 5)));
         // try: the handler starts inside the invoke.

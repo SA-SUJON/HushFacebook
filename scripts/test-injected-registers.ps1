@@ -17,7 +17,8 @@
     int on the other) read by each instruction and in each register that takes a value, or read
     through a copy, a wide move of a conflict, a long and a lone upper half tested against zero,
     an int and an object tested for equality in either order, a move-result the patch separated
-    from its invoke, bad try ranges and handlers (a handler at a switch or array payload among
+    from its invoke or left behind when Morphe's inline compiler dropped a plain invoke of a
+    parameter past v15 (Hide tab badges in an 18-register writer), bad try ranges and handlers (a handler at a switch or array payload among
     them), a move-exception the method's entry reaches, the one feed guard doubled, moved or
     missing, the reels hook deleted from the pre-EOF injector or put after a branch, the showcase
     stub left unfilled, calling another class, or calling a class that isn't the only one
@@ -180,6 +181,8 @@ Assert-True (Test-VerifiesWhatItPatched $allPatches) `
     'verify-all-patches.ps1 does not run the structural checks on the APK it patched.'
 Assert-True (Test-PushGateRunsSuite $prePush 'scripts/test-injected-registers.ps1') `
     'The push gate does not run the injected-register fixture test.'
+Assert-True (Test-PushGatePatchesFixtures $prePush) `
+    'The push gate does not apply the bundle to the Facebook fixtures and check what it injected.'
 Assert-True ((Get-Content -LiteralPath $prePush -Raw) -notmatch 'so it has nothing to run there') `
     'The push gate still skips a suite it expects when the file is missing.'
 
@@ -198,6 +201,15 @@ try {
     $talliesBothSides = { param($Path) Test-TalliesBothSides $Path }
     $verifiesPatched = { param($Path) Test-VerifiesWhatItPatched $Path }
     $gateRunsSuite = { param($Path) Test-PushGateRunsSuite $Path 'scripts/test-injected-registers.ps1' }
+    $gatePatchesFixtures = { param($Path) Test-PushGatePatchesFixtures $Path }
+    # The pre-push call that runs verify-all-patches.ps1 on a fixture, and the one call to the
+    # function holding it.
+    $fixtureRun = { param($Node)
+        $Node -is [System.Management.Automation.Language.CommandAst] -and
+        $Node.GetCommandName() -eq 'Invoke-CommitScript' -and $Node.Extent.Text -like '*verify-all-patches.ps1*' }
+    $fixtureCheckCall = { param($Node)
+        $Node -is [System.Management.Automation.Language.CommandAst] -and
+        $Node.GetCommandName() -eq 'Invoke-PatchedFixtureCheck' }
     # The nodes the copies take the wiring out around: the & $Java DexDiff call in Invoke-DexDiff,
     # the call to Invoke-DexDiff, the contracts helper's dot-source, verify-all-patches' verifier
     # call, and the pre-push line that runs this suite.
@@ -260,6 +272,11 @@ try {
                 $Text.Replace('-PatchedApk $out', '-PatchedApk $stockApk') } }
         @{ Name = 'the suite line in a block comment'; Check = $gateRunsSuite
             Text = Edit-ScriptNode $prePushSource $suiteLine { param($Text) "<#`n$Text`n#>" } }
+        @{ Name = 'the untouched pre-push.ps1'; Check = $gatePatchesFixtures; Expect = $true; Text = $prePushSource }
+        @{ Name = 'the fixture run behind if ($false)'; Check = $gatePatchesFixtures
+            Text = Edit-ScriptNode $prePushSource $fixtureRun { param($Text) "if (`$false) { $Text }" } }
+        @{ Name = 'the fixture check never called'; Check = $gatePatchesFixtures
+            Text = Edit-ScriptNode $prePushSource $fixtureCheckCall { param($Text) '$null = $gateRoot' } }
         # One copy for each rule of what a script can't reach, each taking the wiring out by that
         # rule alone, so none of them can be dropped without a copy here passing its check.
         @{ Name = 'the contracts helper dot-sourced in a while ($false) body'; Check = $dotSourcesContracts
@@ -591,6 +608,11 @@ try {
         "The good build's guard was not reported at its one call site.`n$($good.Output -join "`n")"
     Assert-True (($good.Output -join "`n") -match 'structural findings: 0') `
         "The good build did not report its structural count.`n$($good.Output -join "`n")"
+    # The badge writer's count handed over as a range from v17 is a changed method the good build
+    # passes with, so the dropped-call control below is refused for the lone move-result alone.
+    Assert-True ((Get-Content -LiteralPath $good.Report -Raw) -match
+        '(?m)^==== Lfixture/IconBadger;->write\(Landroid/content/Context;I\)V\r?$') `
+        "The good build's badge writer, hooked with a range call, was not among its changed methods.`n$(Get-Content -LiteralPath $good.Report -Raw)"
     foreach ($stub in 'GenAiLabel;->detectedInfo', 'GenAiLabel;->selfDisclosureInfo',
             'RecommendationLabel;->recommendationContext', 'PostText;->message', 'PostText;->attachedStory',
             'PostSources;->actors', 'PostSources;->attachments') {
@@ -829,6 +851,7 @@ try {
         'bad-zero-for-wide-branch' = 'width'
         'bad-move-wide-conflict' = 'width'
         'bad-move-result' = 'result'
+        'bad-dropped-invoke' = 'result'
         'bad-try-range' = 'try'
         'bad-try-handler' = 'try'
         'bad-try-handler-result' = 'try'
@@ -1130,6 +1153,10 @@ try {
         'bad-register-changed' = @(
             '*register: move-result at 3 reaches v4, and the method declares 4 registers  in Lfixture/Feed;->addNewEdgeToCollection(*',
             '*register: if-eqz at 4 reaches v4, and the method declares 4 registers  in Lfixture/Feed;->addNewEdgeToCollection(*')
+        # The positive control for Morphe's inline compiler dropping invoke-static { p2 } in a method
+        # of 18 registers: the lone move-result is named, with the class and method it opens.
+        'bad-dropped-invoke' = @(('*result: move-result at 0 does not follow an invoke or filled-new-array; it opens the ' +
+            'method  in Lfixture/IconBadger;->write(Landroid/content/Context;I)V'))
     }
     foreach ($case in $wrongPlace.GetEnumerator()) {
         $fails = @((Get-Findings $badResults[$case.Key]).Fails)
