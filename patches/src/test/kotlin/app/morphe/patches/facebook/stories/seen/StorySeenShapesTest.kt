@@ -15,6 +15,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
@@ -186,14 +187,20 @@ class StorySeenShapesTest {
         assertEquals("every argument goes, the sender first", 3, (hook as RegisterRangeInstruction).startRegister)
         assertEquals(9, hook.registerCount)
         assertEquals(Opcode.MOVE_RESULT_OBJECT, sender.at(1).opcode)
-        assertEquals("the answer isn't in the set's register", 10, (sender.at(1) as OneRegisterInstruction).registerA)
+        assertEquals("the answer goes in a local first", 0, (sender.at(1) as OneRegisterInstruction).registerA)
         assertEquals(Opcode.IF_NEZ, sender.at(2).opcode)
-        assertEquals(10, (sender.at(2) as OneRegisterInstruction).registerA)
+        assertEquals(0, (sender.at(2) as OneRegisterInstruction).registerA)
         assertEquals(Opcode.RETURN_VOID, sender.at(3).opcode)
-        // The branch lands on the sender's own first instruction, so none of it is skipped.
-        assertEquals(own + 4, sender.implementation!!.instructions.count())
-        assertEquals(Opcode.INVOKE_VIRTUAL, sender.at(4).opcode)
+        // An answer of its own drops the card filters (p6, v9 here) before it becomes the set (p7, v10).
         assertEquals(4, offsetTarget(sender, 2))
+        assertEquals(Opcode.IF_EQ, sender.at(5).opcode)
+        assertEquals(8, offsetTarget(sender, 5))
+        assertEquals(9, (sender.at(7) as TwoRegisterInstruction).registerA)
+        assertEquals(10, (sender.at(8) as TwoRegisterInstruction).registerA)
+        assertEquals(0, (sender.at(8) as TwoRegisterInstruction).registerB)
+        // Then the sender's own code, none of it skipped.
+        assertEquals(own + 9, sender.implementation!!.instructions.count())
+        assertEquals(Opcode.INVOKE_VIRTUAL, sender.at(9).opcode)
     }
 
     /** A sender that doesn't take what the hook hands over is refused by name, before anything goes in. */

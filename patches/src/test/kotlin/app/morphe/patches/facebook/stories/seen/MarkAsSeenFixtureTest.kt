@@ -73,18 +73,29 @@ class MarkAsSeenFixtureTest {
 
                 val patched = MutableMethod(sender).apply { filterViews() }
                 val after = patched.implementation!!.instructions.toList()
-                assertEquals("$name: instructions added to the sender", code.size + 4, after.size)
+                assertEquals("$name: instructions added to the sender", code.size + 9, after.size)
                 assertEquals("$name: the send hook's form", Opcode.INVOKE_STATIC_RANGE, after[0].opcode)
                 assertEquals("$name: the send hook", TO_SEND, after[0].call!!.descriptor())
                 assertEquals("$name: the send hook's arguments", (count - 9 until count).toList(), registers(after[0]))
                 assertTrue("$name: the arguments sit past v15, where only a range reaches", count - 1 > 15)
                 assertEquals("$name: the answer", Opcode.MOVE_RESULT_OBJECT, after[1].opcode)
-                assertEquals("$name: the answer goes in the set's register", set, (after[1] as OneRegisterInstruction).registerA)
+                assertEquals("$name: the answer goes in a local first", 0, (after[1] as OneRegisterInstruction).registerA)
                 assertEquals("$name: the null check", Opcode.IF_NEZ, after[2].opcode)
-                assertEquals("$name: the null check's register", set, (after[2] as OneRegisterInstruction).registerA)
+                assertEquals("$name: the null check's register", 0, (after[2] as OneRegisterInstruction).registerA)
                 assertEquals("$name: the hold", Opcode.RETURN_VOID, after[3].opcode)
+                // A set of the extension's own (the marked cards) sends no card filters, which would
+                // name the held cards; Facebook's own set keeps them. p6 and p7 sit past v15.
+                assertEquals("$name: the set read for the compare", listOf(Opcode.MOVE_OBJECT_FROM16, 1, set),
+                    listOf(after[4].opcode, (after[4] as TwoRegisterInstruction).registerA, (after[4] as TwoRegisterInstruction).registerB))
+                assertEquals("$name: the compare", Opcode.IF_EQ, after[5].opcode)
+                assertEquals("$name: null", Opcode.CONST_4, after[6].opcode)
+                assertEquals("$name: the filters dropped", listOf(Opcode.MOVE_OBJECT_FROM16, set - 1, 1),
+                    listOf(after[7].opcode, (after[7] as TwoRegisterInstruction).registerA, (after[7] as TwoRegisterInstruction).registerB))
+                assertEquals("$name: the answer goes in the set's register", listOf(Opcode.MOVE_OBJECT_FROM16, set, 0),
+                    listOf(after[8].opcode, (after[8] as TwoRegisterInstruction).registerA, (after[8] as TwoRegisterInstruction).registerB))
+                assertEquals("$name: the filters are the argument before the set", "Ljava/util/Map;", sender.parameterTypes[sender.parameterTypes.size - 3].toString())
                 for (index in code.indices) {
-                    assertEquals("$name: sender instruction $index changed", code[index].opcode, after[index + 4].opcode)
+                    assertEquals("$name: sender instruction $index changed", code[index].opcode, after[index + 9].opcode)
                 }
 
                 // The seen helper and the card it's about to count, read through StoryCard.getId().

@@ -57,11 +57,15 @@ public final class StorySeen {
 
     /**
      * One call of Facebook's sender, kept with the cards it held back, so a card marked later can
-     * go out through the same sender, callback and account. Facebook's objects are held weakly.
+     * go out through the same sender, callback and account. The sender and the session are held
+     * weakly. The callback is held as it is: Facebook makes a new one for each batch and nothing
+     * else keeps it, so a weak hold lost it at the next garbage collection and a mark waited for
+     * a later batch. {@link StoryMarks} keeps at most {@link StoryMarks#MAX_HELD} held cards for 24
+     * hours, so these stay few.
      */
     static final class Call {
         final WeakReference<Object> sender;
-        final WeakReference<Object> listener;
+        @Nullable final Object listener;
         final WeakReference<Object> session;
         @Nullable final String first;
         @Nullable final String second;
@@ -71,7 +75,7 @@ public final class StorySeen {
         Call(@Nullable Object sender, @Nullable Object listener, @Nullable Object session, @Nullable String first,
              @Nullable String second, @Nullable String third, boolean peek) {
             this.sender = new WeakReference<>(sender);
-            this.listener = new WeakReference<>(listener);
+            this.listener = listener;
             this.session = new WeakReference<>(session);
             this.first = first;
             this.second = second;
@@ -88,7 +92,8 @@ public final class StorySeen {
      * callback, the account's session, its three strings, the card filters, the set of card ids and
      * whether the cards were only peeked at. Answers the set to send: [ids] itself while the switch
      * is off, paused or before the settings are ready; a new set holding only the cards marked with
-     * Mark as seen; or null, and the sender returns before building anything. Never throws.
+     * Mark as seen, which the patch sends without the card filters; or null, and the sender returns
+     * before building anything. Never throws.
      */
     @Nullable
     public static Set<?> toSend(@Nullable Object sender, @Nullable Object listener, @Nullable Object session,
@@ -139,7 +144,7 @@ public final class StorySeen {
             Call call = MARKS.heldBy(account, card);
             if (call == null) return false;
             Object sender = call.sender.get();
-            Object listener = call.listener.get();
+            Object listener = call.listener;
             Object session = call.session.get();
             if (sender == null || listener == null || session == null) return false;
             send(sender, listener, session, call.first, call.second, call.third, null, new LinkedHashSet<String>(),

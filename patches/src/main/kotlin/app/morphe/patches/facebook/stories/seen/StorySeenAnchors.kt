@@ -9,9 +9,9 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLa
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
-import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.feed.holdsString
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
+import app.morphe.patches.facebook.misc.extension.requireLocals
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -173,22 +173,32 @@ internal fun cardSeen(helper: ClassDef): Method {
 
 /**
  * First thing in the sender: hand the extension everything the sender was handed, and send the
- * set of card ids it answers in the set's place, or return without sending on null. Every
- * argument goes as a range, since the sender's registers run past v15.
+ * set of card ids it answers in the set's place, or return without sending on null. When the
+ * answer is a set of its own (only the marked cards), the card filters go as null too: Facebook
+ * builds them from every card the viewer saw and writes them into the same report, so they'd
+ * carry the held cards' ids along. Every argument goes as a range, since the sender's registers
+ * run past v15, and the moves that reach p6 and p7 take the 16-bit forms for the same reason.
  */
 internal fun MutableMethod.filterViews() {
     if (!hasSendShape(this)) {
         refuse("the sender $definingClass->$name doesn't take a callback and ${SENDER_SHAPE.joinToString("")}")
     }
+    requireLocals(PATCH, 2)
     addInstructionsWithLabels(
         0,
         """
             invoke-static/range { p0 .. p8 }, $TO_SEND
-            move-result-object p7
-            if-nez p7, :send
+            move-result-object v0
+            if-nez v0, :answered
             return-void
+            :answered
+            move-object/from16 v1, p7
+            if-eq v0, v1, :own
+            const/4 v1, 0x0
+            move-object/from16 p6, v1
+            :own
+            move-object/from16 p7, v0
         """,
-        ExternalLabel("send", getInstruction(0)),
     )
 }
 
