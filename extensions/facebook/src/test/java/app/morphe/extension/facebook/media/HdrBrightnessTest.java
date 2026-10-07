@@ -13,6 +13,7 @@ import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.hardware.display.DisplayManager;
 import android.view.Display;
 import android.view.SurfaceView;
 import android.view.Window;
@@ -103,9 +104,12 @@ public class HdrBrightnessTest {
                 + HdrBrightness.HEADROOM_HELD + " 2", statusLine());
     }
 
-    /** The activity's screen, set up to show HLG and HDR10, the kind Facebook lifts ordinary videos on. */
+    /**
+     * The phone's screen, set up to show HLG and HDR10, the kind Facebook lifts ordinary videos on.
+     * From DisplayManager, since an activity Robolectric only created has no display of its own.
+     */
     private Display hdrScreen() {
-        Display display = activity.getDisplay();
+        Display display = activity.getSystemService(DisplayManager.class).getDisplay(Display.DEFAULT_DISPLAY);
         shadowOf(display).setDisplayHdrCapabilities(display.getDisplayId(), 1000f, 500f, 0.1f,
                 Display.HdrCapabilities.HDR_TYPE_HLG, Display.HdrCapabilities.HDR_TYPE_HDR10);
         return display;
