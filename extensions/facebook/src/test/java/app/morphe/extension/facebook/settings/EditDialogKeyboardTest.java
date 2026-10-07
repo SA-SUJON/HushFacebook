@@ -278,7 +278,8 @@ public class EditDialogKeyboardTest {
 
             String typed = row.getEditText().getText().toString();
             assertTrue(typed.startsWith("Bitcoin" + (char) 10));
-            assertEquals("the pack's words went in once", TopicPacks.Pack.CRYPTO.words().size(), PostWords.count(typed));
+            assertEquals("the pack's lines went in once after the typed word",
+                    1 + TopicPacks.Pack.CRYPTO.lines().size(), PostWords.count(typed));
             assertEquals("nothing is saved yet", "", Settings.HIDDEN_WORDS.savedValue());
 
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
