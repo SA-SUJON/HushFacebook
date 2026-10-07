@@ -84,6 +84,31 @@ final class ValueRows {
     private ValueRows() { }
 
     /**
+     * A list row whose summary is shown as written. Android's ListPreference runs its summary
+     * through String.format with the chosen entry, so a summary with a percent sign in it, like
+     * the text size row's "130% of the size", threw as the row was drawn and closed Facebook.
+     */
+    abstract static class PlainSummaryList extends ListPreference {
+        @Nullable
+        private CharSequence summary;
+
+        PlainSummaryList(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setSummary(@Nullable CharSequence summary) {
+            this.summary = summary;
+            super.setSummary(summary);
+        }
+
+        @Override
+        public CharSequence getSummary() {
+            return summary;
+        }
+    }
+
+    /**
      * The save folder's row. Its summary follows its text, whoever sets it: the person, the shared
      * page syncing it from the setting, or an import.
      */
@@ -443,7 +468,7 @@ final class ValueRows {
      * The download quality's row. Its summary follows its value, whoever sets it: the person, the
      * shared page syncing it from the setting, or an import.
      */
-    static final class QualityRow extends ListPreference {
+    static final class QualityRow extends PlainSummaryList {
         QualityRow(Context context) {
             super(context);
         }
@@ -482,7 +507,7 @@ final class ValueRows {
      * The Save to row. Its summary follows its value, whoever sets it: the person, the shared page
      * syncing it from the setting, or an import.
      */
-    static final class SaveToRow extends ListPreference {
+    static final class SaveToRow extends PlainSummaryList {
         SaveToRow(Context context) {
             super(context);
         }
@@ -521,7 +546,7 @@ final class ValueRows {
      * The download action's row. Its summary follows its value, whoever sets it: the person or the
      * shared page syncing it from the setting.
      */
-    static final class DownloadActionRow extends ListPreference {
+    static final class DownloadActionRow extends PlainSummaryList {
         DownloadActionRow(Context context) {
             super(context);
         }
@@ -589,7 +614,7 @@ final class ValueRows {
      * The start tab's row. Its summary follows its value, whoever sets it: the person, the shared
      * page syncing it from the setting, or an import.
      */
-    static final class StartTabRow extends ListPreference {
+    static final class StartTabRow extends PlainSummaryList {
         StartTabRow(Context context) {
             super(context);
         }
@@ -628,7 +653,7 @@ final class ValueRows {
      * The Feeds filter's row, under the start tab's. Its summary follows its value, whoever sets
      * it: the person, the shared page syncing it from the setting, or an import.
      */
-    static final class FeedsSubtabRow extends ListPreference {
+    static final class FeedsSubtabRow extends PlainSummaryList {
         FeedsSubtabRow(Context context) {
             super(context);
         }
@@ -667,7 +692,7 @@ final class ValueRows {
      * The comment order's row. Its summary follows its value, whoever sets it: the person, the
      * shared page syncing it from the setting, or an import.
      */
-    static final class CommentOrderRow extends ListPreference {
+    static final class CommentOrderRow extends PlainSummaryList {
         CommentOrderRow(Context context) {
             super(context);
         }
@@ -706,7 +731,7 @@ final class ValueRows {
      * The app lock's time away row. Its summary follows its value, whoever sets it: the person, the
      * shared page syncing it from the setting, or an import.
      */
-    static final class LockAfterRow extends ListPreference {
+    static final class LockAfterRow extends PlainSummaryList {
         LockAfterRow(Context context) {
             super(context);
         }
@@ -745,7 +770,7 @@ final class ValueRows {
      * The seen posts row: how long a post you've scrolled past stays hidden. Its summary follows its
      * value, whoever sets it: the person, the shared page syncing it from the setting, or an import.
      */
-    static final class SeenKeepRow extends ListPreference {
+    static final class SeenKeepRow extends PlainSummaryList {
         SeenKeepRow(Context context) {
             super(context);
         }
@@ -784,7 +809,7 @@ final class ValueRows {
      * The text size row. Its summary follows its value, whoever sets it: the person, the shared
      * page syncing it from the setting, or an import.
      */
-    static final class TextSizeRow extends ListPreference {
+    static final class TextSizeRow extends PlainSummaryList {
         TextSizeRow(Context context) {
             super(context);
         }
@@ -823,7 +848,7 @@ final class ValueRows {
      * The reaction ceiling row. Its summary follows its value, whoever sets it: the person, the
      * shared page syncing it from the setting, or an import.
      */
-    static final class ReactionCeilingRow extends ListPreference {
+    static final class ReactionCeilingRow extends PlainSummaryList {
         ReactionCeilingRow(Context context) {
             super(context);
         }
@@ -862,7 +887,7 @@ final class ValueRows {
      * The accent color row. Its summary follows its value, whoever sets it: the person, the shared
      * page syncing it from the setting, or an import.
      */
-    static final class AccentRow extends ListPreference {
+    static final class AccentRow extends PlainSummaryList {
         AccentRow(Context context) {
             super(context);
         }
@@ -901,7 +926,7 @@ final class ValueRows {
      * The playback quality's row. Its summary follows its value, whoever sets it: the person, the
      * shared page syncing it from the setting, or an import.
      */
-    static final class PlaybackQualityRow extends ListPreference {
+    static final class PlaybackQualityRow extends PlainSummaryList {
         PlaybackQualityRow(Context context) {
             super(context);
         }
@@ -940,7 +965,7 @@ final class ValueRows {
      * The Reels ([reels]) or Stories quality's row. Its summary follows its value, whoever sets it,
      * as the playback quality's does.
      */
-    static final class SurfaceQualityRow extends ListPreference {
+    static final class SurfaceQualityRow extends PlainSummaryList {
         final boolean reels;
 
         SurfaceQualityRow(Context context, boolean reels) {
@@ -982,7 +1007,7 @@ final class ValueRows {
      * The row for the hour quiet hours start or end. Its summary follows its value, whoever sets it,
      * as the playback quality's does.
      */
-    static final class QuietHourRow extends ListPreference {
+    static final class QuietHourRow extends PlainSummaryList {
         QuietHourRow(Context context) {
             super(context);
         }
