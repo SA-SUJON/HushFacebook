@@ -670,6 +670,22 @@ Videos play at the best quality up to %1$s that Facebook offers for each, or the
 Videos play at the highest quality Facebook offers for each.	Video diputar dengan kualitas tertinggi yang ditawarkan Facebook untuk masing-masing.
 Facebook will pick the quality videos play at.	Facebook akan memilih kualitas pemutaran video.
 Playback quality will be set to %1$s.	Kualitas pemutaran akan diatur ke %1$s.
+# context: import preview and toast sentence when a settings file sets the Reels quality to follow the playback quality
+Reels will play at the same quality as other videos.	Reel akan diputar dengan kualitas yang sama seperti video lainnya.
+# context: import preview and toast sentence; %1$s is a Reels quality choice such as Up to 720p
+Reels quality will be set to %1$s.	Kualitas reel akan diatur ke %1$s.
+# context: import preview and toast sentence when a settings file sets the Stories quality to follow the playback quality
+Video stories will play at the same quality as other videos.	Cerita video akan diputar dengan kualitas yang sama seperti video lainnya.
+# context: import preview and toast sentence; %1$s is a Stories quality choice such as Up to 720p
+Stories quality will be set to %1$s.	Kualitas cerita akan diatur ke %1$s.
+# context: import preview and toast sentence; %1$s is the folder inside the save folder that videos will go in
+Videos will go in a subfolder named %1$s.	Video akan disimpan ke subfolder bernama %1$s.
+# context: import preview and toast sentence when a settings file clears the Video subfolder
+Videos will go in the save folder itself.	Video akan disimpan langsung di folder simpan.
+# context: import preview and toast sentence; %1$s is the folder inside the save folder that photos will go in
+Photos will go in a subfolder named %1$s.	Foto akan disimpan ke subfolder bernama %1$s.
+# context: import preview and toast sentence when a settings file clears the Photo subfolder
+Photos will go in the save folder itself.	Foto akan disimpan langsung di folder simpan.
 Reels and videos will save to this phone when you tap Download.	Saat mengetuk Unduh, reel dan video akan disimpan di ponsel ini.
 Tapping Download on a reel or video will send its link to an app.	Mengetuk Unduh pada reel atau video akan mengirim tautannya ke aplikasi.
 Android will ask which app gets the links each time.	Android akan menanyakan aplikasi penerima tautan setiap kali.

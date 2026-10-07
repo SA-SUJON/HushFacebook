@@ -670,6 +670,22 @@ Videos play at the best quality up to %1$s that Facebook offers for each, or the
 Videos play at the highest quality Facebook offers for each.	Videolar, Facebook'un her biri için sunduğu en yüksek kalitede oynatılır.
 Facebook will pick the quality videos play at.	Videoların oynatma kalitesini Facebook seçecek.
 Playback quality will be set to %1$s.	Oynatma kalitesi %1$s olarak ayarlanacak.
+# context: import preview and toast sentence when a settings file sets the Reels quality to follow the playback quality
+Reels will play at the same quality as other videos.	Reels, diğer videolarla aynı kalitede oynatılacak.
+# context: import preview and toast sentence; %1$s is a Reels quality choice such as Up to 720p
+Reels quality will be set to %1$s.	Reels kalitesi %1$s olarak ayarlanacak.
+# context: import preview and toast sentence when a settings file sets the Stories quality to follow the playback quality
+Video stories will play at the same quality as other videos.	Video hikayeler, diğer videolarla aynı kalitede oynatılacak.
+# context: import preview and toast sentence; %1$s is a Stories quality choice such as Up to 720p
+Stories quality will be set to %1$s.	Hikaye kalitesi %1$s olarak ayarlanacak.
+# context: import preview and toast sentence; %1$s is the folder inside the save folder that videos will go in
+Videos will go in a subfolder named %1$s.	Videolar %1$s adlı bir alt klasöre kaydedilecek.
+# context: import preview and toast sentence when a settings file clears the Video subfolder
+Videos will go in the save folder itself.	Videolar doğrudan kayıt klasörüne kaydedilecek.
+# context: import preview and toast sentence; %1$s is the folder inside the save folder that photos will go in
+Photos will go in a subfolder named %1$s.	Fotoğraflar %1$s adlı bir alt klasöre kaydedilecek.
+# context: import preview and toast sentence when a settings file clears the Photo subfolder
+Photos will go in the save folder itself.	Fotoğraflar doğrudan kayıt klasörüne kaydedilecek.
 Reels and videos will save to this phone when you tap Download.	İndir'e dokunduğunuzda reel'ler ve videolar bu telefona kaydedilecek.
 Tapping Download on a reel or video will send its link to an app.	Bir reel'de veya videoda İndir'e dokunmak bağlantısını bir uygulamaya gönderecek.
 Android will ask which app gets the links each time.	Android bağlantıları hangi uygulamanın alacağını her seferinde soracak.

@@ -51,6 +51,7 @@ import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -377,7 +378,9 @@ public class SettingsBackupPreference extends Preference {
             parts.addAll(valueSentences(snapshot.folderChange(), snapshot.qualityChange(), snapshot.fileNameChange(),
                     snapshot.startChange(), snapshot.orderChange(), snapshot.hiddenChange(), snapshot.keptChange(),
                     snapshot.playbackChange(), snapshot.actionChange(), snapshot.appChange(), snapshot.toChange(),
-                    snapshot.subtabChange(), snapshot.sourcesChange(), snapshot.photoNameChange()));
+                    snapshot.subtabChange(), snapshot.sourcesChange(), snapshot.photoNameChange(),
+                    snapshot.videoSubfolderChange(), snapshot.photoSubfolderChange(), snapshot.reelsQualityChange(),
+                    snapshot.storiesQualityChange()));
             message = String.join("\n\n", parts);
         }
         if (snapshot.unknown > 0) {
@@ -534,6 +537,17 @@ public class SettingsBackupPreference extends Preference {
         return L10n.f("Playback quality will be set to %1$s.", HushfacebookPreferenceFragment.playbackQualityLabel(quality));
     }
 
+    /** The sentence that says what quality reels ([reels]) or video stories play at after an import. */
+    static String surfaceQualitySentence(SurfaceQuality choice, boolean reels) {
+        if (choice.quality == null) {
+            return reels ? L10n.t("Reels will play at the same quality as other videos.")
+                    : L10n.t("Video stories will play at the same quality as other videos.");
+        }
+        String label = HushfacebookPreferenceFragment.playbackQualityLabel(choice.quality);
+        return reels ? L10n.f("Reels quality will be set to %1$s.", label)
+                : L10n.f("Stories quality will be set to %1$s.", label);
+    }
+
     /** The sentence that says what a tap on Download does after an import. */
     static String downloadActionSentence(SendLink.Action action) {
         return action == SendLink.Action.SEND
@@ -545,6 +559,19 @@ public class SettingsBackupPreference extends Preference {
     static String sendAppSentence(String app) {
         if (app.isEmpty()) return L10n.t("Android will ask which app gets the links each time.");
         return L10n.f("Links will go to %1$s.", L10n.isolate(app));
+    }
+
+    /**
+     * The sentence that says where video ([video]) or photo saves go inside the save folder after an
+     * import, for [subfolder], blank for the save folder itself.
+     */
+    static String subfolderSentence(boolean video, String subfolder) {
+        if (subfolder.isEmpty()) {
+            return video ? L10n.t("Videos will go in the save folder itself.")
+                    : L10n.t("Photos will go in the save folder itself.");
+        }
+        return video ? L10n.f("Videos will go in a subfolder named %1$s.", L10n.isolate(subfolder))
+                : L10n.f("Photos will go in a subfolder named %1$s.", L10n.isolate(subfolder));
     }
 
     /**
@@ -636,12 +663,7 @@ public class SettingsBackupPreference extends Preference {
                 sources, null);
     }
 
-    /**
-     * A sentence for each setting that isn't a switch an import changes, in the order the screen
-     * shows them: the tab Facebook opens on and the Feeds filter, the word filter's lists and the
-     * people, Pages and sites list, the order comments open in, the quality videos play at, then the
-     * download settings.
-     */
+    /** A sentence for each setting that isn't a switch an import changes, the subfolders and the reels and video stories qualities aside. */
     static List<String> valueSentences(@Nullable String folder, @Nullable DownloadQuality quality,
                                        @Nullable String fileName, @Nullable StartTab start,
                                        @Nullable CommentOrder order, @Nullable String hidden,
@@ -649,6 +671,25 @@ public class SettingsBackupPreference extends Preference {
                                        @Nullable SendLink.Action action, @Nullable String app,
                                        @Nullable SaveTo to, @Nullable FeedsSubtab subtab,
                                        @Nullable String sources, @Nullable String photoName) {
+        return valueSentences(folder, quality, fileName, start, order, hidden, kept, playback, action, app, to, subtab,
+                sources, photoName, null, null, null, null);
+    }
+
+    /**
+     * A sentence for each setting that isn't a switch an import changes, in the order the screen
+     * shows them: the tab Facebook opens on and the Feeds filter, the word filter's lists and the
+     * people, Pages and sites list, the order comments open in, the qualities videos, reels and video
+     * stories play at, then the download settings.
+     */
+    static List<String> valueSentences(@Nullable String folder, @Nullable DownloadQuality quality,
+                                       @Nullable String fileName, @Nullable StartTab start,
+                                       @Nullable CommentOrder order, @Nullable String hidden,
+                                       @Nullable String kept, @Nullable PlaybackQuality playback,
+                                       @Nullable SendLink.Action action, @Nullable String app,
+                                       @Nullable SaveTo to, @Nullable FeedsSubtab subtab,
+                                       @Nullable String sources, @Nullable String photoName,
+                                       @Nullable String videoSubfolder, @Nullable String photoSubfolder,
+                                       @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality) {
         List<String> sentences = new ArrayList<>();
         if (start != null) sentences.add(startTabSentence(start));
         if (subtab != null) sentences.add(feedsSubtabSentence(subtab));
@@ -657,6 +698,8 @@ public class SettingsBackupPreference extends Preference {
         if (sources != null) sentences.add(sourcesSentence(sources));
         if (order != null) sentences.add(commentOrderSentence(order));
         if (playback != null) sentences.add(playbackQualitySentence(playback));
+        if (reelsQuality != null) sentences.add(surfaceQualitySentence(reelsQuality, true));
+        if (storiesQuality != null) sentences.add(surfaceQualitySentence(storiesQuality, false));
         if (quality != null) sentences.add(qualitySentence(quality));
         if (to != null) sentences.add(saveToSentence(to));
         if (folder != null) sentences.add(folderSentence(folder));
@@ -664,6 +707,8 @@ public class SettingsBackupPreference extends Preference {
         if (photoName != null) sentences.add(photoNameSentence(photoName));
         if (action != null) sentences.add(downloadActionSentence(action));
         if (app != null) sentences.add(sendAppSentence(app));
+        if (videoSubfolder != null) sentences.add(subfolderSentence(true, videoSubfolder));
+        if (photoSubfolder != null) sentences.add(subfolderSentence(false, photoSubfolder));
         return sentences;
     }
 
@@ -685,7 +730,9 @@ public class SettingsBackupPreference extends Preference {
             String done = importedMessage(snapshot.switchChanges(), snapshot.folderChange(), snapshot.qualityChange(),
                     snapshot.fileNameChange(), snapshot.startChange(), snapshot.orderChange(), snapshot.hiddenChange(),
                     snapshot.keptChange(), snapshot.playbackChange(), snapshot.actionChange(), snapshot.appChange(),
-                    snapshot.toChange(), snapshot.subtabChange(), snapshot.sourcesChange(), snapshot.photoNameChange());
+                    snapshot.toChange(), snapshot.subtabChange(), snapshot.sourcesChange(), snapshot.photoNameChange(),
+                    snapshot.videoSubfolderChange(), snapshot.photoSubfolderChange(), snapshot.reelsQualityChange(),
+                    snapshot.storiesQualityChange());
             accepted = Utils.runOnBackgroundThread(() -> {
                 try {
                     SettingsBackup.apply(snapshot);
@@ -787,6 +834,16 @@ public class SettingsBackupPreference extends Preference {
                 to, subtab, sources, null);
     }
 
+    /** What the toast after an import says, the subfolders and the reels and video stories qualities aside. */
+    static String importedMessage(int switches, @Nullable String folder, @Nullable DownloadQuality quality,
+                                  @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                                  @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                                  @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
+                                  @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName) {
+        return importedMessage(switches, folder, quality, fileName, start, order, hidden, kept, playback, action, app,
+                to, subtab, sources, photoName, null, null, null, null);
+    }
+
     /**
      * What the toast after an import says: how many switches changed, then a sentence for each
      * other setting that did. A folder alone keeps the one sentence it always had.
@@ -795,17 +852,20 @@ public class SettingsBackupPreference extends Preference {
                                   @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
                                   @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
                                   @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
-                                  @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName) {
+                                  @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName,
+                                  @Nullable String videoSubfolder, @Nullable String photoSubfolder,
+                                  @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality) {
         if (switches == 0 && folder != null && quality == null && fileName == null && start == null && order == null
                 && hidden == null && kept == null && playback == null && action == null && app == null && to == null
-                && subtab == null && sources == null && photoName == null) {
+                && subtab == null && sources == null && photoName == null && videoSubfolder == null
+                && photoSubfolder == null && reelsQuality == null && storiesQuality == null) {
             return L10n.f("Settings imported. Saves will go to a folder named %1$s.", L10n.isolate(folder));
         }
         List<String> parts = new ArrayList<>();
         parts.add(switches == 0 ? L10n.t("Settings imported.") : L10n.quantity(switches,
                 "Settings imported. %1$d switch changed.", "Settings imported. %1$d switches changed.", switches));
         parts.addAll(valueSentences(folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
-                subtab, sources, photoName));
+                subtab, sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality));
         return String.join(" ", parts);
     }
 

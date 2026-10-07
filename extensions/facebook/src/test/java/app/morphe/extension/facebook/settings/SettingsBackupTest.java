@@ -79,6 +79,7 @@ import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.feed.PostWordsTest;
 import app.morphe.extension.facebook.feed.WordsCorpus;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -129,12 +130,6 @@ public class SettingsBackupTest {
 
     private static Map<String, String> valuesStayOut() {
         Map<String, String> out = new java.util.LinkedHashMap<>();
-        // Not carried yet: a file has no format for them, and the rest of a file stays readable
-        // by an older build. They're the next ones to give one.
-        out.put("hushfacebook_video_subfolder", "a settings file has no format for the subfolders yet.");
-        out.put("hushfacebook_photo_subfolder", "a settings file has no format for the subfolders yet.");
-        out.put("hushfacebook_reels_playback_quality", "a settings file has no format for the Reels quality yet.");
-        out.put("hushfacebook_stories_playback_quality", "a settings file has no format for the Stories quality yet.");
         out.put("hushfacebook_font_source",
                 "it names the font file Use the system font draws in, whose copy only this install holds. A settings "
                         + "file can't carry the font itself, and the name alone would point at nothing on another phone.");
@@ -182,6 +177,10 @@ public class SettingsBackupTest {
         Settings.FEEDS_SUBTAB.resetToDefault();
         Settings.COMMENT_ORDER.resetToDefault();
         Settings.PLAYBACK_QUALITY.resetToDefault();
+        Settings.REELS_PLAYBACK_QUALITY.resetToDefault();
+        Settings.STORIES_PLAYBACK_QUALITY.resetToDefault();
+        Settings.VIDEO_SUBFOLDER.resetToDefault();
+        Settings.PHOTO_SUBFOLDER.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
         Settings.SEND_TO_APP.resetToDefault();
         Settings.SAVE_TO.resetToDefault();
@@ -231,9 +230,10 @@ public class SettingsBackupTest {
             assertFalse(setting.key + " is carried and kept out at once", VALUES_STAY_OUT.containsKey(setting.key));
         }
         assertEquals(Arrays.<Setting<?>>asList(Settings.HIDDEN_WORDS, Settings.KEPT_WORDS, Settings.HIDDEN_SOURCES, Settings.SAVE_TO,
-                Settings.SAVE_FOLDER, Settings.DOWNLOAD_QUALITY, Settings.FILENAME_TEMPLATE, Settings.PHOTO_FILENAME_TEMPLATE,
-                Settings.DOWNLOAD_ACTION, Settings.SEND_TO_APP, Settings.START_TAB, Settings.FEEDS_SUBTAB,
-                Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY), SettingsBackup.VALUES);
+                Settings.SAVE_FOLDER, Settings.VIDEO_SUBFOLDER, Settings.PHOTO_SUBFOLDER, Settings.DOWNLOAD_QUALITY,
+                Settings.FILENAME_TEMPLATE, Settings.PHOTO_FILENAME_TEMPLATE, Settings.DOWNLOAD_ACTION, Settings.SEND_TO_APP,
+                Settings.START_TAB, Settings.FEEDS_SUBTAB, Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY,
+                Settings.REELS_PLAYBACK_QUALITY, Settings.STORIES_PLAYBACK_QUALITY), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_TO, SettingsBackup.TO);
         assertEquals(Settings.HIDDEN_WORDS, SettingsBackup.HIDDEN);
         assertEquals(Settings.KEPT_WORDS, SettingsBackup.KEPT);
@@ -246,6 +246,10 @@ public class SettingsBackupTest {
         assertEquals(Settings.FEEDS_SUBTAB, SettingsBackup.SUBTAB);
         assertEquals(Settings.COMMENT_ORDER, SettingsBackup.ORDER);
         assertEquals(Settings.PLAYBACK_QUALITY, SettingsBackup.PLAYBACK);
+        assertEquals(Settings.REELS_PLAYBACK_QUALITY, SettingsBackup.REELS_QUALITY);
+        assertEquals(Settings.STORIES_PLAYBACK_QUALITY, SettingsBackup.STORIES_QUALITY);
+        assertEquals(Settings.VIDEO_SUBFOLDER, SettingsBackup.VIDEO_SUBFOLDER);
+        assertEquals(Settings.PHOTO_SUBFOLDER, SettingsBackup.PHOTO_SUBFOLDER);
         assertEquals(Settings.DOWNLOAD_ACTION, SettingsBackup.ACTION);
         assertEquals(Settings.SEND_TO_APP, SettingsBackup.APP);
     }
@@ -899,6 +903,9 @@ public class SettingsBackupTest {
                 fileName.codePointCount(0, fileName.length()));
         Settings.FILENAME_TEMPLATE.save(fileName);
         Settings.PHOTO_FILENAME_TEMPLATE.save(FileNameTemplate.sanitizePhoto(emoji(80)));
+        assertEquals("a subfolder keeps fifty", emoji(50), SaveFolder.cleanSubfolder(emoji(80)));
+        Settings.VIDEO_SUBFOLDER.save(emoji(80));
+        Settings.PHOTO_SUBFOLDER.save(emoji(80));
         String app = "a." + repeat('b', 1024 - 2);
         assertTrue(SendLink.isFileApp(app));
         Settings.SEND_TO_APP.save(app);
@@ -1625,6 +1632,227 @@ public class SettingsBackupTest {
         }
         assertEquals("Settings imported. Facebook will pick the quality videos play at.",
                 SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, PlaybackQuality.AUTO));
+    }
+
+    /**
+     * The qualities reels and video stories play at go out as their file values and come back only
+     * as ones this build offers, each on its own: any other value, or one that isn't text, refuses
+     * the whole file.
+     */
+    @Test
+    public void theReelsAndStoriesQualitiesRoundTripAndComeBackOnlyAsOnesThisBuildOffers() throws Exception {
+        for (SurfaceQuality choice : SurfaceQuality.values()) {
+            SurfaceQuality other = choice == SurfaceQuality.P720 ? SurfaceQuality.SAME : SurfaceQuality.P720;
+            Settings.REELS_PLAYBACK_QUALITY.save(choice);
+            Settings.STORIES_PLAYBACK_QUALITY.save(other);
+            String file = SettingsBackup.create();
+            JSONObject written = new JSONObject(file).getJSONObject("settings");
+            assertEquals(choice.fileValue, written.get(SettingsBackup.REELS_QUALITY.key));
+            assertEquals(other.fileValue, written.get(SettingsBackup.STORIES_QUALITY.key));
+            Settings.REELS_PLAYBACK_QUALITY.save(other);
+            Settings.STORIES_PLAYBACK_QUALITY.save(choice);
+
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+            assertEquals(choice, snapshot.reelsQuality);
+            assertEquals(other, snapshot.storiesQuality);
+            assertEquals(choice, snapshot.reelsQualityChange());
+            assertEquals(other, snapshot.storiesQualityChange());
+            assertEquals(0, snapshot.switchChanges());
+            Map<Setting<?>, Object> expected = new LinkedHashMap<>();
+            expected.put(SettingsBackup.REELS_QUALITY, choice);
+            expected.put(SettingsBackup.STORIES_QUALITY, other);
+            assertEquals(expected, snapshot.changes());
+            assertEquals(2, SettingsBackup.apply(snapshot));
+            assertEquals(choice, Settings.REELS_PLAYBACK_QUALITY.savedValue());
+            assertEquals(other, Settings.STORIES_PLAYBACK_QUALITY.savedValue());
+            assertEquals("a file read back is the file", file, SettingsBackup.create());
+            assertEquals("the same qualities again change nothing", 0, SettingsBackup.parse(file).changes().size());
+        }
+
+        Settings.REELS_PLAYBACK_QUALITY.save(SurfaceQuality.DATA_SAVER);
+        Settings.STORIES_PLAYBACK_QUALITY.save(SurfaceQuality.HIGHEST);
+        String file = SettingsBackup.create();
+        Map<String, ?> before = store();
+        for (String key : new String[]{SettingsBackup.REELS_QUALITY.key, SettingsBackup.STORIES_QUALITY.key}) {
+            for (Object refused : new Object[]{"SAME", "Same as videos", "DATA_SAVER", "480", " 720p", "", "1080p", 720,
+                    true, JSONObject.NULL, new JSONObject(), new org.json.JSONArray()}) {
+                JSONObject hostile = new JSONObject(file);
+                hostile.getJSONObject("settings").put(key, refused);
+                try {
+                    SettingsBackup.parse(hostile.toString());
+                    fail("a file with " + key + " " + printable(String.valueOf(refused)) + " was read");
+                } catch (SettingsBackup.Rejected rejected) {
+                    assertEquals(key + " " + printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+                }
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the qualities were carried leaves them alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.reelsQuality);
+        assertNull(older.storiesQuality);
+        assertNull(older.reelsQualityChange());
+        assertNull(older.storiesQualityChange());
+        SettingsBackup.apply(older);
+        assertEquals(SurfaceQuality.DATA_SAVER, Settings.REELS_PLAYBACK_QUALITY.savedValue());
+        assertEquals(SurfaceQuality.HIGHEST, Settings.STORIES_PLAYBACK_QUALITY.savedValue());
+
+        // A preview kept across a rebuild keeps both, and only ones this build offers come back.
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(SurfaceQuality.DATA_SAVER, SettingsBackup.Snapshot.fromBundle(state).reelsQuality);
+        assertEquals(SurfaceQuality.HIGHEST, SettingsBackup.Snapshot.fromBundle(state).storiesQuality);
+        state.putString("reels_quality", "DATA_SAVER");
+        state.putInt("stories_quality", 3);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).reelsQuality);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).storiesQuality);
+    }
+
+    /**
+     * The video and photo subfolders go out as the names the saves use, blank for none, and come
+     * back only as a name the subfolder row would keep as typed, or blank. A path, a name the row
+     * would change, or a value that isn't text refuses the whole file, so a file can't point the
+     * saves anywhere the row couldn't.
+     */
+    @Test
+    public void theSubfoldersRoundTripAndComeBackOnlyAsCleanNamesOrBlank() throws Exception {
+        // Stored as typed, and written as the folder the saves really use.
+        Settings.VIDEO_SUBFOLDER.save("/Clips/");
+        Settings.PHOTO_SUBFOLDER.save("Pics");
+        String file = SettingsBackup.create();
+        JSONObject written = new JSONObject(file).getJSONObject("settings");
+        assertEquals("Clips", written.get(SettingsBackup.VIDEO_SUBFOLDER.key));
+        assertEquals("Pics", written.get(SettingsBackup.PHOTO_SUBFOLDER.key));
+        Settings.VIDEO_SUBFOLDER.resetToDefault();
+        Settings.PHOTO_SUBFOLDER.save("Old");
+
+        SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+        assertEquals("Clips", snapshot.videoSubfolder);
+        assertEquals("Pics", snapshot.photoSubfolder);
+        assertEquals("Clips", snapshot.videoSubfolderChange());
+        assertEquals("Pics", snapshot.photoSubfolderChange());
+        assertEquals(0, snapshot.switchChanges());
+        Map<Setting<?>, Object> expected = new LinkedHashMap<>();
+        expected.put(SettingsBackup.VIDEO_SUBFOLDER, "Clips");
+        expected.put(SettingsBackup.PHOTO_SUBFOLDER, "Pics");
+        assertEquals(expected, snapshot.changes());
+        assertEquals(2, SettingsBackup.apply(snapshot));
+        assertEquals("Clips", Settings.VIDEO_SUBFOLDER.savedValue());
+        assertEquals("Pics", Settings.PHOTO_SUBFOLDER.savedValue());
+        assertEquals("a file read back is the file", file, SettingsBackup.create());
+        assertEquals("the same subfolders again change nothing", 0, SettingsBackup.parse(file).changes().size());
+
+        // Blank is no subfolder, and a file that says so takes a subfolder away.
+        JSONObject blank = new JSONObject(file);
+        blank.getJSONObject("settings").put(SettingsBackup.VIDEO_SUBFOLDER.key, "");
+        SettingsBackup.Snapshot none = SettingsBackup.parse(blank.toString());
+        assertEquals("", none.videoSubfolderChange());
+        assertNull(none.photoSubfolderChange());
+        assertEquals(Collections.singletonMap(SettingsBackup.VIDEO_SUBFOLDER, ""), none.changes());
+        assertEquals(1, SettingsBackup.apply(none));
+        assertEquals("", Settings.VIDEO_SUBFOLDER.savedValue());
+        Settings.VIDEO_SUBFOLDER.save("Clips");
+
+        Map<String, ?> before = store();
+        for (String key : new String[]{SettingsBackup.VIDEO_SUBFOLDER.key, SettingsBackup.PHOTO_SUBFOLDER.key}) {
+            for (Object refused : new Object[]{"../Clips", "My/Clips", "My\\Clips", "/Clips", "Clips/", ".hidden",
+                    "Clips.", " Clips", " ", "..", "a\u200Bb", "a\u202Eb", "a\nb", repeat('a', 51), 5, true,
+                    JSONObject.NULL, new JSONObject()}) {
+                JSONObject hostile = new JSONObject(file);
+                hostile.getJSONObject("settings").put(key, refused);
+                try {
+                    SettingsBackup.parse(hostile.toString());
+                    fail("a file with " + key + " " + printable(String.valueOf(refused)) + " was read");
+                } catch (SettingsBackup.Rejected rejected) {
+                    assertEquals(key + " " + printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+                }
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A name from a newer Android comes in as the name the saves here will use, as the folder does.
+        String unknown = new String(Character.toChars(0x50000));
+        assertEquals(Character.UNASSIGNED, Character.getType(0x50000));
+        JSONObject newer = new JSONObject(file);
+        newer.getJSONObject("settings").put(SettingsBackup.PHOTO_SUBFOLDER.key, "Snaps " + unknown);
+        assertEquals("Snaps", SettingsBackup.parse(newer.toString()).photoSubfolder);
+        newer.getJSONObject("settings").put(SettingsBackup.PHOTO_SUBFOLDER.key, "My/" + unknown);
+        try {
+            SettingsBackup.parse(newer.toString());
+            fail("a file with the photo subfolder My/ and a newer character was read");
+        } catch (SettingsBackup.Rejected rejected) {
+            assertEquals(SettingsBackup.Reason.VALUE, rejected.reason);
+        }
+
+        // A file from before the subfolders were carried leaves them alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.videoSubfolder);
+        assertNull(older.photoSubfolder);
+        assertNull(older.videoSubfolderChange());
+        SettingsBackup.apply(older);
+        assertEquals("Clips", Settings.VIDEO_SUBFOLDER.savedValue());
+        assertEquals("Pics", Settings.PHOTO_SUBFOLDER.savedValue());
+
+        // A preview kept across a rebuild keeps both, blank included, and only clean names come back.
+        Bundle state = SettingsBackup.parse(blank.toString()).toBundle();
+        assertEquals("", SettingsBackup.Snapshot.fromBundle(state).videoSubfolder);
+        assertEquals("Pics", SettingsBackup.Snapshot.fromBundle(state).photoSubfolder);
+        state.putString("video_subfolder", "My/Clips");
+        state.putInt("photo_subfolder", 3);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).videoSubfolder);
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).photoSubfolder);
+    }
+
+    /**
+     * A file that changes the reels and video stories qualities and the subfolders counts each one in
+     * the preview and the toast, with a sentence saying what it'll do, and the rows show them after.
+     */
+    @Test
+    public void importOfTheSurfaceQualitiesAndSubfoldersSaysWhatEachWillDo() throws Exception {
+        Settings.STORIES_PLAYBACK_QUALITY.save(SurfaceQuality.HIGHEST);
+        Settings.PHOTO_SUBFOLDER.save("Pics");
+        JSONObject file = new JSONObject(fileWith(Settings.DOWNLOAD_REELS, false));
+        file.getJSONObject("settings").put(SettingsBackup.REELS_QUALITY.key, "720p")
+                .put(SettingsBackup.STORIES_QUALITY.key, "same")
+                .put(SettingsBackup.VIDEO_SUBFOLDER.key, "Clips")
+                .put(SettingsBackup.PHOTO_SUBFOLDER.key, "");
+        assertEquals(5, SettingsBackup.parse(file.toString()).changes().size());
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            Activity activity = controller.get();
+            HushfacebookPreferenceFragment page = SettingsL10nTest.pageOf(SettingsL10nTest.show(activity));
+            deliver(activity, tap(activity, page, IMPORT_ROW), file.toString());
+            AlertDialog preview = shownPreview();
+            String reels = "Reels quality will be set to Up to " + L10n.isolate("720p") + ".";
+            String stories = "Video stories will play at the same quality as other videos.";
+            String videos = "Videos will go in a subfolder named " + L10n.isolate("Clips") + ".";
+            String photos = "Photos will go in the save folder itself.";
+            assertEquals("1 switch will change.\n\n" + reels + "\n\n" + stories + "\n\n" + videos + "\n\n" + photos,
+                    String.valueOf(shadowOf(preview).getMessage()));
+            preview.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+            settle();
+            assertEquals("Settings imported. 1 switch changed. " + reels + " " + stories + " " + videos + " " + photos,
+                    ShadowToast.getTextOfLatestToast());
+            assertEquals(SurfaceQuality.P720, Settings.REELS_PLAYBACK_QUALITY.savedValue());
+            assertEquals(SurfaceQuality.SAME, Settings.STORIES_PLAYBACK_QUALITY.savedValue());
+            assertEquals("Clips", Settings.VIDEO_SUBFOLDER.savedValue());
+            assertEquals("", Settings.PHOTO_SUBFOLDER.savedValue());
+            assertEquals("the Reels quality row still shows the old quality",
+                    HushfacebookPreferenceFragment.surfaceQualitySummary(SurfaceQuality.P720, true),
+                    String.valueOf(page.findPreference(Settings.REELS_PLAYBACK_QUALITY.key).getSummary()));
+            assertEquals("the Video subfolder row still shows the old folder",
+                    HushfacebookPreferenceFragment.subfolderSummary(true, "Clips"),
+                    String.valueOf(page.findPreference(Settings.VIDEO_SUBFOLDER.key).getSummary()));
+        }
+        assertEquals("Settings imported. Photos will go in a subfolder named " + L10n.isolate("Pics") + ".",
+                SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null, null, null,
+                        null, null, null, null, null, "Pics", null, null));
+        assertEquals("Settings imported. Saves will go to a folder named " + L10n.isolate("Clips") + ".",
+                SettingsBackupPreference.importedMessage(0, "Clips", null, null, null, null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null));
+        assertEquals("Settings imported. Stories quality will be set to Highest. Saves will go to a folder named "
+                        + L10n.isolate("Clips") + ".",
+                SettingsBackupPreference.importedMessage(0, "Clips", null, null, null, null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, SurfaceQuality.HIGHEST));
     }
 
     /**

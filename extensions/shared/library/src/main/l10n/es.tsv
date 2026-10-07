@@ -670,6 +670,22 @@ Videos play at the best quality up to %1$s that Facebook offers for each, or the
 Videos play at the highest quality Facebook offers for each.	Los vídeos se reproducen en la calidad más alta que Facebook ofrece para cada uno.
 Facebook will pick the quality videos play at.	Facebook elegirá la calidad de reproducción de los vídeos.
 Playback quality will be set to %1$s.	La calidad de reproducción será %1$s.
+# context: import preview and toast sentence when a settings file sets the Reels quality to follow the playback quality
+Reels will play at the same quality as other videos.	Los reels se reproducirán con la misma calidad que los demás videos.
+# context: import preview and toast sentence; %1$s is a Reels quality choice such as Up to 720p
+Reels quality will be set to %1$s.	La calidad de los reels será %1$s.
+# context: import preview and toast sentence when a settings file sets the Stories quality to follow the playback quality
+Video stories will play at the same quality as other videos.	Las historias en video se reproducirán con la misma calidad que los demás videos.
+# context: import preview and toast sentence; %1$s is a Stories quality choice such as Up to 720p
+Stories quality will be set to %1$s.	La calidad de las historias será %1$s.
+# context: import preview and toast sentence; %1$s is the folder inside the save folder that videos will go in
+Videos will go in a subfolder named %1$s.	Los videos irán a una subcarpeta llamada %1$s.
+# context: import preview and toast sentence when a settings file clears the Video subfolder
+Videos will go in the save folder itself.	Los videos irán directamente a la carpeta de guardado.
+# context: import preview and toast sentence; %1$s is the folder inside the save folder that photos will go in
+Photos will go in a subfolder named %1$s.	Las fotos irán a una subcarpeta llamada %1$s.
+# context: import preview and toast sentence when a settings file clears the Photo subfolder
+Photos will go in the save folder itself.	Las fotos irán directamente a la carpeta de guardado.
 Reels and videos will save to this phone when you tap Download.	Al tocar Descargar, los reels y videos se guardarán en este teléfono.
 Tapping Download on a reel or video will send its link to an app.	Al tocar Descargar en un reel o video, su enlace se enviará a una app.
 Android will ask which app gets the links each time.	Android preguntará cada vez qué app recibe los enlaces.

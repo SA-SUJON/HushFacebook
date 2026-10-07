@@ -99,6 +99,20 @@ public final class SaveFolder {
         return isClean(withUnknownAsKnown(name));
     }
 
+    /** Whether [name] is already a subfolder the saves would use exactly as written, blank for none included. */
+    public static boolean isCleanSubfolder(String name) {
+        return name != null && name.equals(cleanSubfolder(name));
+    }
+
+    /**
+     * Whether a settings file's [name] may be taken as a subfolder: blank, which is no subfolder,
+     * or a name the subfolder row would keep as typed, a character this phone doesn't know counting
+     * as an ordinary one the way {@link #isImportable} counts it for the folder.
+     */
+    public static boolean isImportableSubfolder(String name) {
+        return name != null && isCleanSubfolder(withUnknownAsKnown(name));
+    }
+
     /** [name] with each character this phone doesn't know turned into one every phone does. */
     static String withUnknownAsKnown(String name) {
         StringBuilder known = new StringBuilder(name.length());

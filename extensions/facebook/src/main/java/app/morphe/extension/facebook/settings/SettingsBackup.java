@@ -40,6 +40,7 @@ import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.settings.BooleanSetting;
@@ -56,14 +57,15 @@ import app.morphe.extension.shared.settings.StringSetting;
  * over. This writes them to a JSON file the person chooses and reads one back.
  *
  * <p>Only the switches in {@link #ALLOWLIST} and the settings in {@link #VALUES} (the word
- * filter's two lists, the top folder saves go to, the save folder, the save quality, the video
- * file name, what a tap on Download does, the app links go to, the tab Facebook opens on, the
- * order comments open in and the quality videos play at) go out or come in. Pause, safe mode, the
- * debug settings, the app language and the counters Hushfacebook keeps for itself stay out, and so
- * do the log, the diagnostic data and anything about the person or the phone: a file is a format
- * name, a version number, one true or false per switch, two word lists, one top folder, one folder
- * name, one save quality, one file name template, one download action, one package name or none,
- * one tab, one comment order and one playback quality. The word lists go only into the file the
+ * filter's two lists, the top folder saves go to, the save folder and its video and photo
+ * subfolders, the save quality, the video file name, what a tap on Download does, the app links go
+ * to, the tab Facebook opens on, the order comments open in and the qualities videos, reels and
+ * video stories play at) go out or come in. Pause, safe mode, the debug settings, the app language
+ * and the counters Hushfacebook keeps for itself stay out, and so do the log, the diagnostic data
+ * and anything about the person or the phone: a file is a format name, a version number, one true
+ * or false per switch, two word lists, one top folder, one folder name and two subfolder names,
+ * one save quality, one file name template, one download action, one package name or none, one
+ * tab, one comment order and three playback qualities. The word lists go only into the file the
  * person picks, with the rest. An import applies what it read in one preference commit. A file
  * that is too large, isn't JSON, names something twice, holds a value of the wrong type, a word
  * list that isn't one clean list, word lists past the room they share, a folder or a template
@@ -263,6 +265,14 @@ public final class SettingsBackup {
     static final StringSetting FOLDER = Settings.SAVE_FOLDER;
 
     /**
+     * The folders inside the save folder that video and photo saves go in, held in a file as the
+     * clean name the saves use, or blank for none, and taken back only as one of those
+     * ({@link SaveFolder#isImportableSubfolder}), so a file can't point the saves at a path.
+     */
+    static final StringSetting VIDEO_SUBFOLDER = Settings.VIDEO_SUBFOLDER;
+    static final StringSetting PHOTO_SUBFOLDER = Settings.PHOTO_SUBFOLDER;
+
+    /**
      * The quality video saves ask for, held in a file as its {@link DownloadQuality#fileValue}.
      * Anything but one of those refuses the whole file, as a switch that isn't true or false does.
      */
@@ -317,10 +327,17 @@ public final class SettingsBackup {
      */
     static final EnumSetting<PlaybackQuality> PLAYBACK = Settings.PLAYBACK_QUALITY;
 
+    /**
+     * The quality reels and video stories play at, each held in a file as its
+     * {@link SurfaceQuality#fileValue}. Anything else refuses the whole file, as a playback quality does.
+     */
+    static final EnumSetting<SurfaceQuality> REELS_QUALITY = Settings.REELS_PLAYBACK_QUALITY;
+    static final EnumSetting<SurfaceQuality> STORIES_QUALITY = Settings.STORIES_PLAYBACK_QUALITY;
+
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, TO, FOLDER, QUALITY, FILE_NAME, PHOTO_NAME, ACTION, APP,
-                    START, SUBTAB, ORDER, PLAYBACK));
+            Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, TO, FOLDER, VIDEO_SUBFOLDER, PHOTO_SUBFOLDER, QUALITY,
+                    FILE_NAME, PHOTO_NAME, ACTION, APP, START, SUBTAB, ORDER, PLAYBACK, REELS_QUALITY, STORIES_QUALITY));
 
     /** The longest name or value a file holds that isn't a word list, far past a package name. */
     private static final int MAX_OTHER_CHARS = 1024;
@@ -393,7 +410,8 @@ public final class SettingsBackup {
     /**
      * What a file says: a value for each switch it names, the folder, the quality, the file name,
      * the start tab, the comment order, the playback quality, the download action, the app links go
-     * to, the top folder and the Feeds filter when it names them, and how many other names it holds.
+     * to, the top folder, the Feeds filter, the two subfolders and the reels and video stories
+     * qualities when it names them, and how many other names it holds.
      */
     public static final class Snapshot {
         private static final String SWITCHES = "switches";
@@ -412,6 +430,10 @@ public final class SettingsBackup {
         private static final String TO_NAME = "save_to";
         private static final String SUBTAB_NAME = "feeds_subtab";
         private static final String PHOTO_NAME_NAME = "photo_name";
+        private static final String VIDEO_SUBFOLDER_NAME = "video_subfolder";
+        private static final String PHOTO_SUBFOLDER_NAME = "photo_subfolder";
+        private static final String REELS_QUALITY_NAME = "reels_quality";
+        private static final String STORIES_QUALITY_NAME = "stories_quality";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -457,6 +479,18 @@ public final class SettingsBackup {
         /** The clean photo file name template the file holds, or null when it names none. */
         @Nullable
         final String photoName;
+        /** The clean video subfolder the file holds, blank for none, or null when it names none. */
+        @Nullable
+        final String videoSubfolder;
+        /** The clean photo subfolder the file holds, blank for none, or null when it names none. */
+        @Nullable
+        final String photoSubfolder;
+        /** The quality reels play at that the file holds, or null when it names none. */
+        @Nullable
+        final SurfaceQuality reelsQuality;
+        /** The quality video stories play at that the file holds, or null when it names none. */
+        @Nullable
+        final SurfaceQuality storiesQuality;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -515,6 +549,17 @@ public final class SettingsBackup {
                  @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
                  @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
                  @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName, int unknown) {
+            this(values, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to, subtab,
+                    sources, photoName, null, null, null, null, unknown);
+        }
+
+        Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                 @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                 @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
+                 @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName,
+                 @Nullable String videoSubfolder, @Nullable String photoSubfolder,
+                 @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
@@ -530,6 +575,10 @@ public final class SettingsBackup {
             this.subtab = subtab;
             this.sources = sources;
             this.photoName = photoName;
+            this.videoSubfolder = videoSubfolder;
+            this.photoSubfolder = photoSubfolder;
+            this.reelsQuality = reelsQuality;
+            this.storiesQuality = storiesQuality;
             this.unknown = unknown;
         }
 
@@ -548,6 +597,10 @@ public final class SettingsBackup {
             if (toChange != null) changes.put(TO, toChange);
             String folderChange = folderChange();
             if (folderChange != null) changes.put(FOLDER, folderChange);
+            String videoSubfolderChange = videoSubfolderChange();
+            if (videoSubfolderChange != null) changes.put(VIDEO_SUBFOLDER, videoSubfolderChange);
+            String photoSubfolderChange = photoSubfolderChange();
+            if (photoSubfolderChange != null) changes.put(PHOTO_SUBFOLDER, photoSubfolderChange);
             DownloadQuality qualityChange = qualityChange();
             if (qualityChange != null) changes.put(QUALITY, qualityChange);
             String fileNameChange = fileNameChange();
@@ -568,6 +621,10 @@ public final class SettingsBackup {
             if (sourcesChange != null) changes.put(SOURCES, sourcesChange);
             PlaybackQuality playbackChange = playbackChange();
             if (playbackChange != null) changes.put(PLAYBACK, playbackChange);
+            SurfaceQuality reelsQualityChange = reelsQualityChange();
+            if (reelsQualityChange != null) changes.put(REELS_QUALITY, reelsQualityChange);
+            SurfaceQuality storiesQualityChange = storiesQualityChange();
+            if (storiesQualityChange != null) changes.put(STORIES_QUALITY, storiesQualityChange);
             SendLink.Action actionChange = actionChange();
             if (actionChange != null) changes.put(ACTION, actionChange);
             String appChange = appChange();
@@ -592,6 +649,27 @@ public final class SettingsBackup {
         String folderChange() {
             if (folder == null) return null;
             return folder.equals(SaveFolder.sanitize(FOLDER.savedValue())) ? null : folder;
+        }
+
+        /**
+         * The subfolder this file moves video saves to, blank for the save folder itself, or null
+         * when it names none or the one video saves already use.
+         */
+        @Nullable
+        String videoSubfolderChange() {
+            return subfolderChange(videoSubfolder, VIDEO_SUBFOLDER);
+        }
+
+        /** The same as {@link #videoSubfolderChange}, for photo saves. */
+        @Nullable
+        String photoSubfolderChange() {
+            return subfolderChange(photoSubfolder, PHOTO_SUBFOLDER);
+        }
+
+        @Nullable
+        private static String subfolderChange(@Nullable String subfolder, StringSetting setting) {
+            if (subfolder == null) return null;
+            return subfolder.equals(SaveFolder.cleanSubfolder(setting.savedValue())) ? null : subfolder;
         }
 
         /** The quality this file sets, or null when it names none or the one saves already use. */
@@ -636,6 +714,18 @@ public final class SettingsBackup {
         @Nullable
         PlaybackQuality playbackChange() {
             return playback == null || playback == PLAYBACK.savedValue() ? null : playback;
+        }
+
+        /** The reels quality this file sets, or null when it names none or the one already set. */
+        @Nullable
+        SurfaceQuality reelsQualityChange() {
+            return reelsQuality == null || reelsQuality == REELS_QUALITY.savedValue() ? null : reelsQuality;
+        }
+
+        /** The video stories quality this file sets, or null when it names none or the one already set. */
+        @Nullable
+        SurfaceQuality storiesQualityChange() {
+            return storiesQuality == null || storiesQuality == STORIES_QUALITY.savedValue() ? null : storiesQuality;
         }
 
         /** The top folder this file sends saves to, or null when it names none or the one already set. */
@@ -707,6 +797,10 @@ public final class SettingsBackup {
             if (app != null) state.putString(APP_NAME, app);
             if (to != null) state.putString(TO_NAME, to.fileValue);
             if (subtab != null) state.putString(SUBTAB_NAME, subtab.fileValue);
+            if (videoSubfolder != null) state.putString(VIDEO_SUBFOLDER_NAME, videoSubfolder);
+            if (photoSubfolder != null) state.putString(PHOTO_SUBFOLDER_NAME, photoSubfolder);
+            if (reelsQuality != null) state.putString(REELS_QUALITY_NAME, reelsQuality.fileValue);
+            if (storiesQuality != null) state.putString(STORIES_QUALITY_NAME, storiesQuality.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -734,6 +828,8 @@ public final class SettingsBackup {
             Object sources = state.get(SOURCES_NAME);
             Object app = state.get(APP_NAME);
             Object photoName = state.get(PHOTO_NAME_NAME);
+            Object videoSubfolder = state.get(VIDEO_SUBFOLDER_NAME);
+            Object photoSubfolder = state.get(PHOTO_SUBFOLDER_NAME);
             return new Snapshot(values, folder instanceof String && SaveFolder.isClean((String) folder)
                     ? (String) folder : null, DownloadQuality.fromFile(state.get(QUALITY_NAME)),
                     fileName instanceof String && FileNameTemplate.isClean((String) fileName) ? (String) fileName : null,
@@ -745,6 +841,12 @@ public final class SettingsBackup {
                     FeedsSubtab.fromFile(state.get(SUBTAB_NAME)),
                     sources instanceof String && PostSources.isClean((String) sources) ? (String) sources : null,
                     photoName instanceof String && FileNameTemplate.isCleanPhoto((String) photoName) ? (String) photoName : null,
+                    videoSubfolder instanceof String && SaveFolder.isCleanSubfolder((String) videoSubfolder)
+                            ? (String) videoSubfolder : null,
+                    photoSubfolder instanceof String && SaveFolder.isCleanSubfolder((String) photoSubfolder)
+                            ? (String) photoSubfolder : null,
+                    SurfaceQuality.fromFile(state.get(REELS_QUALITY_NAME)),
+                    SurfaceQuality.fromFile(state.get(STORIES_QUALITY_NAME)),
                     unknown);
         }
     }
@@ -761,6 +863,8 @@ public final class SettingsBackup {
         switches.put(TO.key, TO.savedValue().fileValue);
         // The name the saves use, so a file never carries one an import would refuse.
         switches.put(FOLDER.key, SaveFolder.sanitize(FOLDER.savedValue()));
+        switches.put(VIDEO_SUBFOLDER.key, SaveFolder.cleanSubfolder(VIDEO_SUBFOLDER.savedValue()));
+        switches.put(PHOTO_SUBFOLDER.key, SaveFolder.cleanSubfolder(PHOTO_SUBFOLDER.savedValue()));
         switches.put(QUALITY.key, QUALITY.savedValue().fileValue);
         switches.put(FILE_NAME.key, FileNameTemplate.sanitize(FILE_NAME.savedValue()));
         switches.put(PHOTO_NAME.key, FileNameTemplate.sanitizePhoto(PHOTO_NAME.savedValue()));
@@ -768,6 +872,8 @@ public final class SettingsBackup {
         switches.put(SUBTAB.key, SUBTAB.savedValue().fileValue);
         switches.put(ORDER.key, ORDER.savedValue().fileValue);
         switches.put(PLAYBACK.key, PLAYBACK.savedValue().fileValue);
+        switches.put(REELS_QUALITY.key, REELS_QUALITY.savedValue().fileValue);
+        switches.put(STORIES_QUALITY.key, STORIES_QUALITY.savedValue().fileValue);
         switches.put(ACTION.key, ACTION.savedValue().fileValue);
         // The app links really go to, so a file never carries a name an import would refuse.
         switches.put(APP.key, SendLink.fileApp(APP.savedValue()));
@@ -874,6 +980,10 @@ public final class SettingsBackup {
         String app = null;
         SaveTo to = null;
         FeedsSubtab subtab = null;
+        String videoSubfolder = null;
+        String photoSubfolder = null;
+        SurfaceQuality reelsQuality = null;
+        SurfaceQuality storiesQuality = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -893,6 +1003,18 @@ public final class SettingsBackup {
                 // A newer phone's name can hold characters this one doesn't know yet, which the
                 // saves here drop, so the folder taken is the one they'll really use.
                 folder = SaveFolder.sanitize((String) value);
+                continue;
+            }
+            if (VIDEO_SUBFOLDER.key.equals(name) || PHOTO_SUBFOLDER.key.equals(name)) {
+                Object value = values.opt(name);
+                // Blank is no subfolder. Anything else is one name the row would keep as typed,
+                // never a path.
+                if (!(value instanceof String) || !SaveFolder.isImportableSubfolder((String) value)) {
+                    throw new Rejected(Reason.VALUE, "Not one clean folder name or blank: " + name);
+                }
+                String subfolder = SaveFolder.cleanSubfolder((String) value);
+                if (VIDEO_SUBFOLDER.key.equals(name)) videoSubfolder = subfolder;
+                else photoSubfolder = subfolder;
                 continue;
             }
             if (QUALITY.key.equals(name)) {
@@ -934,6 +1056,13 @@ public final class SettingsBackup {
             if (PLAYBACK.key.equals(name)) {
                 playback = PlaybackQuality.fromFile(values.opt(name));
                 if (playback == null) throw new Rejected(Reason.VALUE, "Not a playback quality: " + name);
+                continue;
+            }
+            if (REELS_QUALITY.key.equals(name) || STORIES_QUALITY.key.equals(name)) {
+                SurfaceQuality choice = SurfaceQuality.fromFile(values.opt(name));
+                if (choice == null) throw new Rejected(Reason.VALUE, "Not a playback quality: " + name);
+                if (REELS_QUALITY.key.equals(name)) reelsQuality = choice;
+                else storiesQuality = choice;
                 continue;
             }
             if (TO.key.equals(name)) {
@@ -1003,7 +1132,7 @@ public final class SettingsBackup {
             if (value != null) ordered.put(setting, value);
         }
         return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
-                subtab, sources, photoName, unknown);
+                subtab, sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, unknown);
     }
 
     /**
