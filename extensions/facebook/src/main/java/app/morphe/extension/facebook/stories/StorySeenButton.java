@@ -5,6 +5,7 @@
 package app.morphe.extension.facebook.stories;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -27,6 +28,7 @@ import androidx.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -55,7 +57,13 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * tap on an eye that no longer matches the active card marks nothing. A card is sent at once only
  * while it's still the active card; otherwise the mark waits for the next batch that holds it. A
  * viewer that only goes behind another screen, like the share sheet, keeps its card and comes
- * back with the eye on it; one that closes forgets it.
+ * back with the eye on it; one that closes forgets it, whether it closes in front or behind
+ * another screen.
+ *
+ * <p>Each card is named for the story viewer that was newest when Facebook named it, and the eye
+ * binds a card only over that viewer. One viewer is the same from its open to its close, through
+ * a rebuild for a configuration change. So a viewer opened after another one closed never shows,
+ * or sends with a quick tap, the card the closed one left behind.
  *
  * <p>The button shows only while views are anonymous and its own switch is on, and only over
  * StoryViewerActivity while it's in front. Either switch off, Hushfacebook paused or the settings
@@ -73,14 +81,30 @@ public final class StorySeenButton {
     static final int TOP_DP = 14;
     static final int END_DP = 92;
 
-    /** The card on screen: the account it's viewed on and its id. */
+    /** The card on screen: the account it's viewed on, its id and the story viewer it was named for. */
     static final class Shown {
         final String account;
         final String card;
+        /** The viewer's token ({@link #viewers}), or null when no viewer was open. */
+        @Nullable
+        final Object viewer;
 
-        Shown(String account, String card) {
+        Shown(String account, String card, @Nullable Object viewer) {
             this.account = account;
             this.card = card;
+            this.viewer = viewer;
+        }
+    }
+
+    /** The card Facebook made active, and the story viewer it was made active in. */
+    static final class Active {
+        final String card;
+        @Nullable
+        final Object viewer;
+
+        Active(String card, @Nullable Object viewer) {
+            this.card = card;
+            this.viewer = viewer;
         }
     }
 
@@ -95,9 +119,20 @@ public final class StorySeenButton {
 
     @Nullable
     private static volatile Shown shown;
-    /** The id of the card Facebook made active last, or null before any, or once the viewer closed. */
+    /** The card Facebook made active last, or null before any, or once its viewer closed. */
     @Nullable
-    private static volatile String active;
+    private static volatile Active active;
+    /**
+     * A token for each open story viewer, one viewer from its open to its close. Read and written on
+     * the main thread only.
+     */
+    private static final Map<Activity, Object> viewers = new WeakHashMap<>();
+    /** The newest story viewer's token, which the cards Facebook names now belong to, or null with none open. */
+    @Nullable
+    private static volatile Object newest;
+    /** The token of a viewer destroyed to be rebuilt for a configuration change, for the instance that replaces it. */
+    @Nullable
+    private static Object rebuilding;
     /** The account each recently counted card was viewed on, so a card returned to can show the eye again. */
     private static final Map<String, String> known = new LinkedHashMap<String, String>() {
         @Override
@@ -126,8 +161,9 @@ public final class StorySeenButton {
                 if (id != null && !id.isEmpty() && account != null) {
                     remember(id, account);
                     // A card counted after the viewer moved on isn't the one on screen.
-                    String current = active;
-                    if (current == null || current.equals(id)) now = new Shown(account, id);
+                    Object viewer = newest;
+                    String current = activeIn(viewer);
+                    if (current == null || current.equals(id)) now = new Shown(account, id, viewer);
                 }
             }
             rebind(now);
@@ -147,19 +183,27 @@ public final class StorySeenButton {
             HookStatus.invoked(FamilyNames.STORY_SEEN);
             String id = card == null ? null : cardIds.apply(card);
             if (id != null && id.isEmpty()) id = null;
-            active = id;
+            Object viewer = newest;
+            active = id == null ? null : new Active(id, viewer);
             Shown now = null;
             if (id != null && switchedOn()) {
                 String account;
                 synchronized (known) {
                     account = known.get(id);
                 }
-                if (account != null) now = new Shown(account, id);
+                if (account != null) now = new Shown(account, id, viewer);
             }
             rebind(now);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
         }
+    }
+
+    /** The card active in [viewer], or null when the active card belongs to another viewer or there's none. */
+    @Nullable
+    private static String activeIn(@Nullable Object viewer) {
+        Active current = active;
+        return current != null && current.viewer == viewer ? current.card : null;
     }
 
     private static void remember(String id, String account) {
@@ -172,7 +216,10 @@ public final class StorySeenButton {
     private static void rebind(@Nullable Shown now) {
         Shown was = shown;
         if (now == null && was == null) return;
-        if (now != null && was != null && now.card.equals(was.card) && now.account.equals(was.account)) return;
+        if (now != null && was != null && now.card.equals(was.card) && now.account.equals(was.account)
+                && now.viewer == was.viewer) {
+            return;
+        }
         shown = now;
         Utils.runOnMainThread(StorySeenButton::refresh);
     }
@@ -188,15 +235,43 @@ public final class StorySeenButton {
         return shown;
     }
 
+    /**
+     * From the activity callbacks: [activity] was created. A story viewer gets its token here, the
+     * one of the viewer it replaces when that one was rebuilt for a configuration change, so the
+     * cards Facebook names while it opens are its own. Never throws.
+     */
+    public static void activityCreated(Activity activity) {
+        try {
+            if (!VIEWER.equals(activity.getClass().getName())) return;
+            Object token = rebuilding != null ? rebuilding : new Object();
+            rebuilding = null;
+            viewers.put(activity, token);
+            newest = token;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
     /** From the activity callbacks: [activity] came to the front. Never throws. */
     public static void activityResumed(Activity activity) {
         try {
             if (!VIEWER.equals(activity.getClass().getName())) return;
+            newest = tokenOf(activity);
             viewer = new WeakReference<>(activity);
             refresh();
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
         }
+    }
+
+    /** [activity]'s token, given one now when its creation went unseen. Main thread. */
+    private static Object tokenOf(Activity activity) {
+        Object token = viewers.get(activity);
+        if (token == null) {
+            token = new Object();
+            viewers.put(activity, token);
+        }
+        return token;
     }
 
     /**
@@ -209,7 +284,7 @@ public final class StorySeenButton {
         try {
             if (viewer.get() != activity) return;
             viewer = new WeakReference<>(null);
-            if (activity.isFinishing()) forget();
+            if (activity.isFinishing()) closed(viewers.get(activity));
             ImageView eye = button.get();
             if (eye != null) hide(eye);
         } catch (Throwable failure) {
@@ -217,10 +292,52 @@ public final class StorySeenButton {
         }
     }
 
-    /** Forgets the card on screen, the active one and the accounts of the cards counted. */
+    /**
+     * From the activity callbacks: [activity] is gone. A story viewer that closed behind another
+     * screen forgets its cards here, since its pause didn't know it was closing. One destroyed to be
+     * rebuilt for a configuration change hands its token to the instance that replaces it. Never
+     * throws.
+     */
+    public static void activityDestroyed(Activity activity) {
+        try {
+            if (!VIEWER.equals(activity.getClass().getName())) return;
+            Object token = viewers.remove(activity);
+            if (viewer.get() == activity) {
+                viewer = new WeakReference<>(null);
+                ImageView eye = button.get();
+                if (eye != null) hide(eye);
+            }
+            if (token == null) return;
+            if (activity.isChangingConfigurations()) {
+                rebuilding = token;
+                return;
+            }
+            closed(token);
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
+    /**
+     * The viewer with [token] closed. The newest viewer closing forgets everything, as before a
+     * viewer opens. An older one, closing behind a newer viewer, takes only its own cards with it.
+     */
+    private static void closed(@Nullable Object token) {
+        if (token == null || token == newest) {
+            forget();
+            return;
+        }
+        Shown was = shown;
+        if (was != null && was.viewer == token) shown = null;
+        Active current = active;
+        if (current != null && current.viewer == token) active = null;
+    }
+
+    /** Forgets the card on screen, the active one, the accounts of the cards counted and the newest viewer. */
     private static void forget() {
         shown = null;
         active = null;
+        newest = null;
         synchronized (known) {
             known.clear();
         }
@@ -232,7 +349,9 @@ public final class StorySeenButton {
             Activity activity = viewer.get();
             Shown now = shown;
             ImageView eye = button.get();
-            if (activity == null || now == null || !switchedOn()) {
+            // A card named for another viewer, or before any, is never this viewer's to show.
+            if (activity == null || now == null || now.viewer == null || now.viewer != viewers.get(activity)
+                    || !switchedOn()) {
                 if (eye != null) hide(eye);
                 return;
             }
@@ -258,7 +377,13 @@ public final class StorySeenButton {
                 return;
             }
             Shown bound = (Shown) eye.getTag();
-            String current = active;
+            Context shownOn = eye.getContext();
+            if (!(shownOn instanceof Activity) || bound.viewer == null || bound.viewer != viewers.get(shownOn)) {
+                // The eye's card belongs to another viewer than the one it sits on.
+                hide(eye);
+                return;
+            }
+            String current = activeIn(bound.viewer);
             if (current != null && !current.equals(bound.card)) {
                 // The viewer moved on and the eye hasn't caught up: this tap isn't for that card.
                 hide(eye);
@@ -295,6 +420,8 @@ public final class StorySeenButton {
         cardIds = StorySeenButton::cardId;
         sendNow = StorySeen::sendHeld;
         forget();
+        viewers.clear();
+        rebuilding = null;
         viewer = new WeakReference<>(null);
         button = new WeakReference<>(null);
     }

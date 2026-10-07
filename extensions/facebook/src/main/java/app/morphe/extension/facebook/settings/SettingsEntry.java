@@ -516,6 +516,7 @@ public final class SettingsEntry {
         public void onActivityCreated(Activity activity, Bundle state) {
             TapToPlay.activityCreated(activity, state);
             ScreenTransitions.activityCreated(activity);
+            if (SettingsStatus.storySeen()) StorySeenButton.activityCreated(activity);
         }
 
         @Override public void onActivityStarted(Activity activity) { }
@@ -525,6 +526,7 @@ public final class SettingsEntry {
         @Override
         public void onActivityDestroyed(Activity activity) {
             SavedFileActions.onPaused(activity);
+            if (SettingsStatus.storySeen()) StorySeenButton.activityDestroyed(activity);
             // The screen can land on an activity just before it clears itself for the next one.
             // If its host goes away before the person closed it, ask again.
             WeakReference<Activity> shownOver = host;

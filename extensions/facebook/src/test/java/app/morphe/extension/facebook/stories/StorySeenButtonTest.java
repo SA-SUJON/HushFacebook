@@ -266,6 +266,88 @@ public class StorySeenButtonTest {
         controller.pause().stop().destroy();
     }
 
+    /** A story viewer opening as Facebook's activity callbacks report it: created, then in front. */
+    private static StoryViewerActivity openViewer(List<ActivityController<StoryViewerActivity>> controllers) {
+        ActivityController<StoryViewerActivity> controller = Robolectric.buildActivity(StoryViewerActivity.class).setup();
+        controllers.add(controller);
+        StoryViewerActivity viewer = controller.get();
+        StorySeenButton.activityCreated(viewer);
+        StorySeenButton.activityResumed(viewer);
+        ShadowLooper.idleMainLooper();
+        return viewer;
+    }
+
+    /**
+     * Facebook closes a viewer while the share sheet is over it, so its pause didn't know it was
+     * closing. Its destroy forgets its card, and the next viewer shows no eye for it, so a quick
+     * tap there can't mark or send the old story.
+     */
+    @Test
+    public void aViewerClosedBehindAnotherScreenForgetsItsCard() {
+        Settings.MARK_STORIES_SEEN.save(true);
+        List<String> sent = new ArrayList<>();
+        StorySeenButton.sendNow = (account, card) -> sent.add(account + "/" + card);
+        List<ActivityController<StoryViewerActivity>> controllers = new ArrayList<>();
+        StoryViewerActivity first = openViewer(controllers);
+        StorySeenButton.onActive("c1");
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c1");
+        ShadowLooper.idleMainLooper();
+        assertNotNull(eyeIn(first));
+
+        StorySeenButton.activityPaused(first);
+        first.finish();
+        StorySeenButton.activityDestroyed(first);
+        assertNull("a viewer closed behind the share sheet kept its card", StorySeenButton.shown());
+        StorySeenButton.onActive("c1");
+        assertNull("a closed viewer's card kept its account", StorySeenButton.shown());
+
+        StoryViewerActivity second = openViewer(controllers);
+        ImageView eye = eyeIn(second);
+        assertTrue("the next viewer showed the closed one's eye", eye == null || eye.getVisibility() != View.VISIBLE);
+        if (eye != null) eye.performClick();
+        assertTrue("the closed viewer's story went out: " + sent, sent.isEmpty());
+        assertEquals(StoryMarks.State.UNMARKED, StorySeen.MARKS.state("100", "c1"));
+        for (ActivityController<StoryViewerActivity> controller : controllers) controller.pause().stop().destroy();
+    }
+
+    /**
+     * A second viewer over one that's still open: the first one's card never binds the eye on the
+     * second, the second's own card does, and the first closing behind it leaves that card alone.
+     */
+    @Test
+    public void aCardNamedForAnotherViewerNeverBindsTheEye() {
+        Settings.MARK_STORIES_SEEN.save(true);
+        List<String> sent = new ArrayList<>();
+        StorySeenButton.sendNow = (account, card) -> sent.add(account + "/" + card);
+        List<ActivityController<StoryViewerActivity>> controllers = new ArrayList<>();
+        StoryViewerActivity first = openViewer(controllers);
+        StorySeenButton.onActive("c1");
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c1");
+        ShadowLooper.idleMainLooper();
+        assertNotNull(eyeIn(first));
+
+        StorySeenButton.activityPaused(first);
+        StoryViewerActivity second = openViewer(controllers);
+        ImageView early = eyeIn(second);
+        assertTrue("the first viewer's card bound the eye on the second",
+                early == null || early.getVisibility() != View.VISIBLE);
+
+        StorySeenButton.onActive("c2");
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c2");
+        ShadowLooper.idleMainLooper();
+        ImageView eye = eyeIn(second);
+        assertNotNull(eye);
+        assertEquals(View.VISIBLE, eye.getVisibility());
+        assertEquals("c2", ((StorySeenButton.Shown) eye.getTag()).card);
+
+        first.finish();
+        StorySeenButton.activityDestroyed(first);
+        assertEquals("the first viewer closing took the second's card", "c2", StorySeenButton.shown().card);
+        assertTrue(eye.performClick());
+        assertEquals(Collections.singletonList("100/c2"), sent);
+        for (ActivityController<StoryViewerActivity> controller : controllers) controller.pause().stop().destroy();
+    }
+
     @Test
     public void marksLapseAfterADay() {
         AtomicLong now = new AtomicLong(1_000);
