@@ -244,6 +244,7 @@ public class ColdStartHooksTest {
         ReelHoldForTests.withHold(() -> {
             assertFalse("a long press on a reel before the context went to the speed-up", ReelHold.longPress(false));
             assertFalse("a hold before the context counted anywhere on a reel", ReelHold.anywhere(false));
+            assertFalse("a press on a reel's right third before the context counted", ReelHoldForTests.pressAt(290, false));
             assertFalse("a reel before the context got a release listener", ReelHold.speedUp(false));
             ReelHold.held();
             assertEquals("a speed set before the context changed", 2f, ReelHold.speedSet(new Object(), 2f), 0f);

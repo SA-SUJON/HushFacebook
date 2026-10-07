@@ -414,6 +414,8 @@ public class PausedHooksTest {
         probes.put(PatchFamily.REEL_HOLD, Arrays.asList(
                 () -> ReelHoldForTests.withHold(() -> ReelHold.longPress(false)),
                 () -> ReelHoldForTests.withHold(() -> ReelHold.anywhere(false)),
+                // With Only on the right edge on, a press on a reel's right third.
+                () -> ReelHoldForTests.withHold(() -> ReelHoldForTests.pressAt(290, false)),
                 () -> ReelHoldForTests.withHold(() -> ReelHold.speedUp(false)),
                 () -> ReelHoldForTests.withHold(() -> ReelHold.holdSpeed(1.0) != 1.0),
                 () -> ReelHoldForTests.withHold(() -> {

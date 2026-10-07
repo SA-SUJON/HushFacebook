@@ -452,6 +452,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hold_reel_for_2x", TRUE);
 
     /**
+     * With {@link #HOLD_REEL_FOR_2X} on, only a hold on a reel's right third speeds it up, measured
+     * against the reel's width where the finger landed. A hold anywhere else gets Facebook's own
+     * answer, its long-press menu on most accounts. Off by default.
+     */
+    public static final BooleanSetting HOLD_REEL_RIGHT_EDGE =
+            new BooleanSetting("hushfacebook_hold_reel_right_edge", FALSE);
+
+    /**
      * Comment sheets ask for the order in {@link #COMMENT_ORDER} where Facebook's servers would
      * choose one, and an order picked in a post's comments stays for that post until Facebook
      * restarts ({@link app.morphe.extension.facebook.comments.DefaultCommentOrder}). A request that

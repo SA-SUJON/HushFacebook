@@ -139,6 +139,9 @@ final class VideoPages {
             reels.addPreference(toggle(context, Settings.HOLD_REEL_FOR_2X,
                     L10n.t("Holding a reel plays it at double speed until you let go, in place of Facebook's long-press "
                             + "menu. The reel's more button still opens that menu.")));
+            reels.addPreference(toggle(context, Settings.HOLD_REEL_RIGHT_EDGE,
+                    L10n.t("With the switch above on, only a hold on the right third of a reel plays it at double "
+                            + "speed. Hold anywhere else and Facebook does what it always does, usually its long-press menu.")));
         }
         if (build.contains(PatchFamily.REEL_DOWNLOAD)) {
             reels.addPreference(toggle(context, Settings.DOWNLOAD_REELS,
