@@ -328,6 +328,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reel_threads_cards", FALSE);
 
     /**
+     * Reels and the videos that open in the same viewer start in Facebook's own Clean mode, the
+     * state its three-dot menu's Clean mode item puts one reel in, with the buttons down the side
+     * hidden. Facebook's own pinch and menu still bring them back for that reel, and an ad reel's
+     * overlay keeps its controls. Off until it's turned on, since nobody has seen it on a phone yet.
+     */
+    public static final BooleanSetting REEL_CLEAN_MODE =
+            new BooleanSetting("hushfacebook_reel_clean_mode", FALSE);
+
+    /**
      * The batches of watched reels the Reels viewer sends as FbShortsSeenStateMutation: only their
      * ids, the record Facebook ranks the Reels feed with, which nobody else sees. Held back, reels
      * already watched may come back in the feed.

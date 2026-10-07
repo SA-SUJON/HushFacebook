@@ -863,3 +863,7 @@ Couldn't save the sound. Try again.	Der Ton konnte nicht gespeichert werden. Ver
 Hide the composer row	Zeile zum Posten ausblenden
 # context: summary of that switch; use the wording Facebook itself uses in this language for "What's on your mind?" and Home
 The "What's on your mind?" row at the top of Home. The create button in the top bar still starts a post.	Die Zeile „Was machst du gerade?“ oben auf der Startseite. Mit der Erstellen-Schaltfläche oben kannst du weiterhin einen Beitrag beginnen.
+# context: switch title under Reels and Watch; Clean mode is Facebook's own three-dot menu item on a reel or video that hides the buttons down the side, so use Facebook's name for it in this language (#75)
+Always use Clean mode	Immer den Clean-Modus verwenden
+# context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
+Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. You can still leave Clean mode on a video the usual way. It's off by default because it hasn't been tested on a real account yet.	Reels und Videos öffnen sich in Facebooks Clean-Modus, ohne die Buttons an der Seite. Du kannst den Clean-Modus bei einem Video weiterhin wie gewohnt verlassen. Der Schalter ist standardmäßig aus, weil er noch nicht mit einem echten Konto getestet wurde.

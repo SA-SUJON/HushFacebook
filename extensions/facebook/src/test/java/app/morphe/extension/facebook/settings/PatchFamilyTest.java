@@ -348,10 +348,11 @@ public class PatchFamilyTest {
                         + "Audience Network, Restore screens on re-signed builds, Start on x86 devices, Install beside Meta's apps, "
                         + "Hushfacebook in the Menu"),
                 running);
-        // Clean up Reels has four switches, and the report names each one.
+        // Clean up Reels has five switches, and the report names each one.
         Settings.HIDE_REEL_FOLLOW_BUTTON.save(false);
         assertEquals("Clean up Reels: on (hushfacebook_hide_reel_chips=on, hushfacebook_hide_reel_follow_button=off, "
-                        + "hushfacebook_hide_reel_social_footer=on, hushfacebook_hide_reel_threads_cards=off)",
+                        + "hushfacebook_hide_reel_social_footer=on, hushfacebook_hide_reel_threads_cards=off, "
+                        + "hushfacebook_reel_clean_mode=off)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.REEL_DECLUTTER), false).get(0));
         // The reel button has a switch now, so the report says what it's set to.
         assertEquals("Download any reel: on (hushfacebook_download_reels=on)",

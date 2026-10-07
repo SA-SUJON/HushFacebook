@@ -78,6 +78,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_REEL_FOLLOW_BUTTON) return L10n.t("Hide the Follow button on reels");
         if (setting == Settings.HIDE_REEL_SOCIAL_FOOTER) return L10n.t("Hide comment and reaction previews");
         if (setting == Settings.HIDE_REEL_THREADS_CARDS) return L10n.t("Hide Threads cards between reels");
+        if (setting == Settings.REEL_CLEAN_MODE) return L10n.t("Always use Clean mode");
         if (setting == Settings.DONT_SEND_REEL_WATCH_HISTORY) return L10n.t("Don't send reel watch history");
         if (setting == Settings.HOLD_ANALYTICS_UPLOADS) return L10n.t("Hold back analytics uploads");
         if (setting == Settings.ALLOW_SCREENSHOTS) return L10n.t("Allow screenshots");

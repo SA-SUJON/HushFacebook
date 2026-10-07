@@ -140,6 +140,7 @@ public final class SettingsBackup {
             Settings.HIDE_REEL_FOLLOW_BUTTON,
             Settings.HIDE_REEL_SOCIAL_FOOTER,
             Settings.HIDE_REEL_THREADS_CARDS,
+            Settings.REEL_CLEAN_MODE,
             Settings.DONT_SEND_REEL_WATCH_HISTORY,
             Settings.HOLD_ANALYTICS_UPLOADS,
             Settings.ALLOW_SCREENSHOTS,

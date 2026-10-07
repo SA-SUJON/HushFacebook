@@ -863,3 +863,7 @@ Couldn't save the sound. Try again.	Suara tidak bisa disimpan. Coba lagi.
 Hide the composer row	Sembunyikan baris pembuat postingan
 # context: summary of that switch; use the wording Facebook itself uses in this language for "What's on your mind?" and Home
 The "What's on your mind?" row at the top of Home. The create button in the top bar still starts a post.	Baris "Apa yang Anda pikirkan?" di bagian atas Beranda. Tombol buat di bilah atas tetap bisa memulai postingan.
+# context: switch title under Reels and Watch; Clean mode is Facebook's own three-dot menu item on a reel or video that hides the buttons down the side, so use Facebook's name for it in this language (#75)
+Always use Clean mode	Selalu gunakan mode bersih
+# context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
+Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. You can still leave Clean mode on a video the usual way. It's off by default because it hasn't been tested on a real account yet.	Reel dan video terbuka dalam mode bersih Facebook, tanpa tombol di sisi layar. Anda tetap bisa keluar dari mode bersih di sebuah video seperti biasa. Sakelar ini nonaktif secara default karena belum diuji dengan akun sungguhan.

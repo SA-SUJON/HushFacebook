@@ -110,6 +110,10 @@ final class VideoPages {
             reels.addPreference(toggle(context, Settings.HIDE_REEL_THREADS_CARDS,
                     L10n.t("The \"Threads you might like\" card between reels, starting with the next batch Facebook "
                             + "loads. It's off by default because it hasn't been tested on a real account yet.")));
+            reels.addPreference(toggle(context, Settings.REEL_CLEAN_MODE,
+                    L10n.t("Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. "
+                            + "You can still leave Clean mode on a video the usual way. It's off by default because "
+                            + "it hasn't been tested on a real account yet.")));
         }
         if (build.contains(PatchFamily.REEL_WATCH_HISTORY)) {
             reels.addPreference(toggle(context, Settings.DONT_SEND_REEL_WATCH_HISTORY,

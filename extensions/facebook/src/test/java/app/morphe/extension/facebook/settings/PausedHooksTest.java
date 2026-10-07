@@ -99,6 +99,7 @@ import app.morphe.extension.facebook.notifications.NotificationKindsForTests;
 import app.morphe.extension.facebook.reels.DoubleTapLike;
 import app.morphe.extension.facebook.reels.ReelHold;
 import app.morphe.extension.facebook.reels.ReelHoldForTests;
+import app.morphe.extension.facebook.reels.ReelCleanMode;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
 import app.morphe.extension.facebook.reels.ReelMidCardsForTests;
 import app.morphe.extension.facebook.reels.ReelPrompts;
@@ -356,14 +357,15 @@ public class PausedHooksTest {
                 () -> AffiliateLinks.keepCommentCard(new Object()) == null,
                 () -> AffiliateLinks.keepReelCtas(null, Collections.singletonList(ReelCta.STOREFRONT)) != null));
         // A Remix chip under a reel, the Follow and Following buttons beside its author, both
-        // footer queries, and a Threads card between reels.
+        // footer queries, a Threads card between reels, and a reel starting outside Clean mode.
         probes.put(PatchFamily.REEL_DECLUTTER, Arrays.asList(
                 () -> ReelDeclutter.filterChips(Arrays.asList(new TypedFeedUnit("XFBFBShortsRemixAttribution"))) != null,
                 ReelDeclutter::hideFollowButton,
                 ReelDeclutter::hideFollowingButton,
                 ReelDeclutter::skipHotComment,
                 ReelDeclutter::skipSocialBubbles,
-                ReelMidCardsForTests::dropsAThreadsCard));
+                ReelMidCardsForTests::dropsAThreadsCard,
+                () -> ReelCleanMode.startClean(false)));
         // A reel that would get the interest prompt is answered as one that doesn't.
         probes.put(PatchFamily.REEL_PROMPTS, Collections.singletonList(() -> !ReelPrompts.keep(true)));
         // The Reels batcher's send of the reels you watched never reaches its executor.

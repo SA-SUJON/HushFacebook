@@ -757,3 +757,7 @@ Couldn't save the sound. Try again.	Não foi possível salvar o som. Tente de no
 Hide the composer row	Ocultar a linha de publicar
 # context: summary of that switch; use the wording Facebook itself uses in this language for "What's on your mind?" and Home
 The "What's on your mind?" row at the top of Home. The create button in the top bar still starts a post.	A linha "No que você está pensando?" no topo da Página inicial. O botão de criar na barra superior continua iniciando uma publicação.
+# context: switch title under Reels and Watch; Clean mode is Facebook's own three-dot menu item on a reel or video that hides the buttons down the side, so use Facebook's name for it in this language (#75)
+Always use Clean mode	Sempre usar o modo limpo
+# context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
+Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. You can still leave Clean mode on a video the usual way. It's off by default because it hasn't been tested on a real account yet.	Reels e vídeos abrem no modo limpo do Facebook, sem os botões na lateral. Você ainda pode sair do modo limpo em um vídeo do jeito de sempre. Esta opção vem desativada por padrão porque ainda não foi testada com uma conta real.

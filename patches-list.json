@@ -447,7 +447,7 @@
     },
     {
       "name": "Clean up Reels",
-      "description": "Hides the Follow button on reels and the comment and reaction previews under them. Buttons such as Remix, Use template, Add yours and Stars go too, and so can the Threads cards Facebook puts between reels. Each part has its own switch.",
+      "description": "Hides the Follow button on reels and the comment and reaction previews under them. Buttons such as Remix, Use template, Add yours and Stars go too, and so can the Threads cards Facebook puts between reels. Reels and videos can also open in Facebook's Clean mode. Each part has its own switch.",
       "category": "Interface",
       "use": false,
       "dependencies": [

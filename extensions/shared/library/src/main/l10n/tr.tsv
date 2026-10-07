@@ -863,3 +863,7 @@ Couldn't save the sound. Try again.	Ses kaydedilemedi. Tekrar dene.
 Hide the composer row	Gönderi oluşturma satırını gizle
 # context: summary of that switch; use the wording Facebook itself uses in this language for "What's on your mind?" and Home
 The "What's on your mind?" row at the top of Home. The create button in the top bar still starts a post.	Ana Sayfa'nın üstündeki "Ne düşünüyorsun?" satırı. Üst çubuktaki oluştur düğmesiyle yine gönderi başlatabilirsin.
+# context: switch title under Reels and Watch; Clean mode is Facebook's own three-dot menu item on a reel or video that hides the buttons down the side, so use Facebook's name for it in this language (#75)
+Always use Clean mode	Her zaman temiz modu kullan
+# context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
+Reels and videos open in Facebook's Clean mode, with the buttons down the side hidden. You can still leave Clean mode on a video the usual way. It's off by default because it hasn't been tested on a real account yet.	Reels videoları ve videolar, yandaki düğmeler gizli olarak Facebook'un temiz modunda açılır. Bir videoda temiz moddan yine her zamanki gibi çıkabilirsin. Bu anahtar henüz gerçek bir hesapla test edilmediği için varsayılan olarak kapalıdır.
