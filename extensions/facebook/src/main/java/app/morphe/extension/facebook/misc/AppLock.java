@@ -5,6 +5,7 @@
 package app.morphe.extension.facebook.misc;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Dialog;
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.hardware.biometrics.BiometricManager;
 import android.hardware.biometrics.BiometricPrompt;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.SystemClock;
 import android.util.TypedValue;
@@ -51,15 +53,18 @@ import app.morphe.extension.shared.Utils;
  * only keep the screen out of the recent apps view, log, or filter a promotion. There's no lock
  * screen behind it to turn on, so this is the extension's own.
  *
- * <p>The settings entry's activity callbacks drive it. Facebook is in front while one of its
- * screens is started and isn't a picture-in-picture window. "Away" starts when the last of those
- * stops, or shrinks into a picture-in-picture window, which Android reports as a pause with the
- * screen already in that mode. The floating window keeps playing and is never covered, but the
- * first full-screen Facebook screen after the chosen time asks, the video brought back to full
- * screen included. A reply typed into a notification runs without any screen, so it starts nothing.
- * A rotation, or a screen Facebook rebuilds for a new configuration, isn't a leave. While the
- * switch is on, Android 13 and later keep Facebook's screens out of the recent apps view, as
- * Facebook's own lock does.
+ * <p>Its own activity callbacks drive it ({@link #watch}), registered in every one of Facebook's
+ * processes: Instant Games, the Audience Network ads and Facebook's crash screen run in processes
+ * of their own, and each process locks on its own cold start and its own time away.
+ *
+ * <p>Facebook is in front while one of its screens is started and isn't a picture-in-picture
+ * window. "Away" starts when the last of those stops, or shrinks into a picture-in-picture window,
+ * which Android reports as a pause with the screen already in that mode. The floating window keeps
+ * playing and is never covered, but the first full-screen Facebook screen after the chosen time
+ * asks, the video brought back to full screen included. A reply typed into a notification runs
+ * without any screen, so it starts nothing. A rotation, or a screen Facebook rebuilds for a new
+ * configuration, isn't a leave. While the switch is on, Android 13 and later keep Facebook's
+ * screens out of the recent apps view, as Facebook's own lock does.
  *
  * <p>Off, settings that aren't ready yet, or a phone without a screen lock, and nothing is covered
  * or asked. Turning the switch on doesn't lock the screen in front. A pause doesn't turn it off,
@@ -148,7 +153,60 @@ public final class AppLock {
     private static final Map<Activity, Cover> covers = new WeakHashMap<>();
     private static final Set<Activity> keptFromRecents = Collections.newSetFromMap(new WeakHashMap<>());
 
+    /** The application this process's callbacks went on, so a second start of the hook adds none. */
+    private static WeakReference<Application> watching = new WeakReference<>(null);
+
     private AppLock() {
+    }
+
+    /**
+     * From the settings entry's application hook, in every one of Facebook's processes. Its
+     * callbacks go on after the entry's, so on a resume the cover is the newest window, over
+     * anything the entry's callbacks opened. Facebook's application only wraps the callbacks it's
+     * handed, in any process, so registering them early in a side process is safe.
+     */
+    public static void watch(Context context) {
+        if (!(context instanceof Application)) return;
+        Application application = (Application) context;
+        if (watching.get() == application) return;
+        application.registerActivityLifecycleCallbacks(new Watcher());
+        watching = new WeakReference<>(application);
+    }
+
+    /** The lock's own activity callbacks. */
+    static final class Watcher implements Application.ActivityLifecycleCallbacks {
+        @Override
+        public void onActivityCreated(Activity activity, @Nullable Bundle state) {
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) {
+            started(activity);
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+            resumed(activity);
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+            paused(activity);
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+            stopped(activity);
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle state) {
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+            destroyed(activity);
+        }
     }
 
     /** Whether the lock is on: its switch, which reads the same paused or not, once the settings are ready. */
@@ -167,7 +225,7 @@ public final class AppLock {
     }
 
     /**
-     * From the settings entry's callbacks, as a Facebook screen starts. The first start with no
+     * From the lock's callbacks, as a Facebook screen starts. The first start with no
      * Facebook screen in front is a return, and it locks when the lock is due.
      */
     public static void started(Activity activity) {
@@ -211,7 +269,7 @@ public final class AppLock {
     }
 
     /**
-     * From the settings entry's callbacks, as a Facebook screen leaves the front. A screen that
+     * From the lock's callbacks, as a Facebook screen leaves the front. A screen that
      * pauses as a picture-in-picture window no longer counts as Facebook in front, and when it was
      * the last one that did, the time away starts.
      */
@@ -227,7 +285,7 @@ public final class AppLock {
     }
 
     /**
-     * From the settings entry's callbacks, as a Facebook screen stops. The last full-screen one to
+     * From the lock's callbacks, as a Facebook screen stops. The last full-screen one to
      * stop starts the time away.
      */
     public static void stopped(Activity activity) {
@@ -240,7 +298,7 @@ public final class AppLock {
     }
 
     /**
-     * From the settings entry's callbacks, as a Facebook screen comes to the front: covered while
+     * From the lock's callbacks, as a Facebook screen comes to the front: covered while
      * locked, and the check asked for unless the person just called one off. A picture-in-picture
      * window is left as it is, and one brought back to full screen is a return.
      */
@@ -271,7 +329,7 @@ public final class AppLock {
         }
     }
 
-    /** From the settings entry's callbacks, as a Facebook screen goes away for good. */
+    /** From the lock's callbacks, as a Facebook screen goes away for good. */
     public static void destroyed(Activity activity) {
         Cover cover = covers.remove(activity);
         if (cover != null) cover.close();

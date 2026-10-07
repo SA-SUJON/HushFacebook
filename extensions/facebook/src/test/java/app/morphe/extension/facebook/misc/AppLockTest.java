@@ -14,8 +14,10 @@ import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Dialog;
 import android.app.KeyguardManager;
+import android.content.pm.ApplicationInfo;
 import android.hardware.biometrics.BiometricPrompt;
 import android.view.KeyEvent;
 import android.view.View;
@@ -45,6 +47,7 @@ import java.util.Set;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.facebook.settings.SettingsEntry;
 import app.morphe.extension.shared.SettingsContextRule;
+import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 
@@ -501,6 +504,48 @@ public class AppLockTest {
             awayAndBack(activity, Duration.ofMinutes(6));
             assertTrue("paused by " + why + ", a return after the time wasn't covered", AppLock.covered(activity));
             assertEquals(2, asked.size());
+        }
+    }
+
+    /**
+     * Instant Games, their ads and Facebook's crash screen run in processes of their own, where
+     * the settings entry starts nothing but the lock's watch. A screen there is covered on the
+     * process's cold start and after Lock after, as in the main one.
+     */
+    @Test
+    public void aScreenInAnotherOfFacebooksProcessesLocksToo() {
+        Settings.APP_LOCK.save(true);
+        Application app = RuntimeEnvironment.getApplication();
+        ApplicationInfo info = app.getApplicationInfo();
+        String main = info.processName;
+        info.processName = app.getPackageName() + ":quicksilver";
+        try {
+            assertFalse(Utils.isMainProcess());
+            SettingsEntry.onApplicationCreate(app);
+            // A second run of the hook adds no second watch, which would count every start twice.
+            SettingsEntry.onApplicationCreate(app);
+            ActivityController<Activity> game = Robolectric.buildActivity(Activity.class).setup();
+            controllers.add(game);
+            ShadowLooper.idleMainLooper();
+            assertTrue("a game's screen opened without the lock", AppLock.covered(game.get()));
+            assertEquals(1, asked.size());
+            asked.get(0).answer.unlocked();
+            assertFalse(AppLock.covered(game.get()));
+
+            game.pause().stop();
+            ShadowSystemClock.advanceBy(Duration.ofSeconds(30));
+            game.restart().resume();
+            ShadowLooper.idleMainLooper();
+            assertFalse("half a minute away locked a one minute lock", AppLock.covered(game.get()));
+
+            game.pause().stop();
+            ShadowSystemClock.advanceBy(Duration.ofMinutes(2));
+            game.restart().resume();
+            ShadowLooper.idleMainLooper();
+            assertTrue("a game brought back after the time wasn't covered", AppLock.covered(game.get()));
+            assertEquals(2, asked.size());
+        } finally {
+            info.processName = main;
         }
     }
 

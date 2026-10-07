@@ -103,15 +103,26 @@ public final class SettingsEntry {
      * signed out, the launcher hands straight over to the login screen. With Material You in the
      * build, each activity's dark window background takes the palette from here on. Also where the release
      * check, when it's on, asks at most once a day, on a worker, and where what a save cut short
-     * by Android left behind is removed, on a worker too.
+     * by Android left behind is removed, on a worker too. In Facebook's other processes it only
+     * starts Lock Facebook's watch ({@link AppLock#watch}).
      */
     public static void onApplicationCreate(Context context) {
         try {
-            if (!Utils.isMainProcess()) return;
+            if (!Utils.isMainProcess()) {
+                // Instant Games, the Audience Network ads and Facebook's crash screen have
+                // processes of their own. Only the lock watches their screens.
+                AppLock.watch(context);
+                return;
+            }
             if (context instanceof Application && !callbacksRegistered) {
                 ((Application) context).registerActivityLifecycleCallbacks(new OpenWhenResumed());
                 callbacksRegistered = true;
             }
+            // After the entry's, so on a resume the cover goes on last, over anything they opened.
+            // Whether Facebook is locked is settled before a settings request is judged, since that
+            // waits for a post, and covering() holds it back. A window Facebook opens later lands
+            // above the cover, which then goes back on top (AppLock.Cover).
+            AppLock.watch(context);
             ReturnRefresh.register(context);
             TextSize.application(context);
             // Only with the theme in the build, so its class and palette aren't loaded otherwise.
@@ -483,16 +494,10 @@ public final class SettingsEntry {
             if (openPending) openWhenSettled(activity);
             relabelIfStale(activity);
             SavedShortcut.refresh(activity);
-            // Last, so the lock's cover is the newest window and anything this resume opened sits
-            // under it. Whether Facebook is locked was settled at the start, so covering() already
-            // holds the settings back above. A window Facebook opens later lands above the cover,
-            // which then goes back on top (AppLock.Cover).
-            AppLock.resumed(activity);
         }
 
         @Override
         public void onActivityPaused(Activity activity) {
-            AppLock.paused(activity);
             SavedFileActions.onPaused(activity);
             ClipboardLink.onPaused(activity);
             StorySeenButton.activityPaused(activity);
@@ -513,21 +518,13 @@ public final class SettingsEntry {
             ScreenTransitions.activityCreated(activity);
         }
 
-        @Override
-        public void onActivityStarted(Activity activity) {
-            AppLock.started(activity);
-        }
-
-        @Override
-        public void onActivityStopped(Activity activity) {
-            AppLock.stopped(activity);
-        }
+        @Override public void onActivityStarted(Activity activity) { }
+        @Override public void onActivityStopped(Activity activity) { }
 
         @Override public void onActivitySaveInstanceState(Activity activity, Bundle state) { }
         @Override
         public void onActivityDestroyed(Activity activity) {
             SavedFileActions.onPaused(activity);
-            AppLock.destroyed(activity);
             // The screen can land on an activity just before it clears itself for the next one.
             // If its host goes away before the person closed it, ask again.
             WeakReference<Activity> shownOver = host;
