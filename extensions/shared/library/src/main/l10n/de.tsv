@@ -889,3 +889,13 @@ Promotions for avatar stickers leave comments and Facebook's promotion slots, al
 Loop stories	Stories wiederholen
 # context: summary of the Loop stories switch; "Stop Story auto-advance" is the label of the switch above it, so use its translation
 With Stop Story auto-advance on, a finished story plays again from the start instead of waiting on its last frame. Tap or swipe to move on.	Wenn „Automatisches Weiterspringen bei Stories stoppen“ an ist, startet eine abgeschlossene Story wieder von vorn, statt auf ihrem letzten Bild stehen zu bleiben. Tippe oder wische, um weiterzugehen.
+# context: label of a switch under Downloads that adds a Save photo item to the three-dot menu of posts with photos
+Save photo in post menus	Foto speichern im Beitragsmenü
+# context: summary of the Save photo in post menus switch; "Save any photo" is the label of the switch above it and "Save photo" is the menu item, so use their translations
+With Save any photo on, a post with photos gets Save photo in its three-dot menu too. A post with several saves each one, one after another.	Wenn „Jedes Foto speichern“ an ist, bekommt ein Beitrag mit Fotos auch im Drei-Punkte-Menü „Foto speichern“. Bei mehreren Fotos wird jedes nacheinander gespeichert.
+# context: menu item in a post's three-dot menu that saves the post's one photo to the phone
+Save photo	Foto speichern
+# context: menu item in a post's three-dot menu that saves every photo of a post with several photos
+Save all photos	Alle Fotos speichern
+# context: short message shown when the photos of a post could not start saving
+Couldn't save this post's photos. Try again in a moment.	Die Fotos dieses Beitrags ließen sich nicht speichern. Versuche es gleich noch einmal.

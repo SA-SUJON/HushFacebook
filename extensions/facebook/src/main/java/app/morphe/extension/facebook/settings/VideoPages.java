@@ -194,6 +194,8 @@ final class VideoPages {
             if (build.contains(PatchFamily.PHOTO_DOWNLOAD)) {
                 downloads.addPreference(toggle(context, Settings.DOWNLOAD_PHOTOS,
                         L10n.t("Shows Save photo on every photo you open, even where the poster turned saving off, and saves the biggest size where your downloads go. Off or paused, Facebook decides again.")));
+                downloads.addPreference(toggle(context, Settings.POST_MENU_PHOTO_SAVE,
+                        L10n.t("With Save any photo on, a post with photos gets Save photo in its three-dot menu too. A post with several saves each one, one after another.")));
             }
             // Every save reads it, a story's and a reel's as much as a feed video's, so it's here
             // whichever download patch is in, above the quality it keeps within.

@@ -135,7 +135,7 @@ public enum PatchFamily {
     VIDEO_DOWNLOAD(FamilyNames.VIDEO_DOWNLOAD, "videoDownload", null,
             Settings.DOWNLOAD_VIDEOS),
     PHOTO_DOWNLOAD(FamilyNames.PHOTO_DOWNLOAD, "photoDownload", null,
-            Settings.DOWNLOAD_PHOTOS),
+            Settings.DOWNLOAD_PHOTOS, Settings.POST_MENU_PHOTO_SAVE),
     START_TAB(FamilyNames.START_TAB, "startTab", null,
             Settings.OPEN_ON_CHOSEN_TAB),
     MARKETPLACE_ONLY(FamilyNames.MARKETPLACE_ONLY, "marketplaceOnly", null,

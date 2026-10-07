@@ -689,6 +689,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_download_photos", TRUE);
 
     /**
+     * Download any photo's second switch: Save photo in the three-dot menu of a post holding
+     * photos, saving its photo, or each photo of a multi-photo post. Off until you turn it on, and
+     * it needs {@link #DOWNLOAD_PHOTOS} on too.
+     */
+    public static final BooleanSetting POST_MENU_PHOTO_SAVE =
+            new BooleanSetting("hushfacebook_post_menu_photo_save", FALSE);
+
+    /**
      * A start from Facebook's launcher icon opens the tab in {@link #START_TAB} instead of the one
      * Facebook would choose. Notifications, links and shortcuts keep their own destination.
      */

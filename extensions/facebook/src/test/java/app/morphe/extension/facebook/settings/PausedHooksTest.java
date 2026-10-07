@@ -53,6 +53,7 @@ import app.morphe.extension.facebook.chats.MessengerIconForTests;
 import app.morphe.extension.facebook.chats.ReadReceipts;
 import app.morphe.extension.facebook.chats.TypingIndicator;
 import app.morphe.extension.facebook.download.MediaDownload;
+import app.morphe.extension.facebook.download.PhotoMenuItemForTests;
 import app.morphe.extension.facebook.download.PhotoSave;
 import app.morphe.extension.facebook.download.PlayerSourcesForTests;
 import app.morphe.extension.facebook.download.ReelDownload;
@@ -450,8 +451,10 @@ public class PausedHooksTest {
         probes.put(PatchFamily.VIDEO_DOWNLOAD, Arrays.asList(
                 VideoMenuItemForTests::addsAnItem,
                 PlayerSourcesForTests::recordsAVideoPlayer));
-        // Every photo the viewer opens offers Save photo.
-        probes.put(PatchFamily.PHOTO_DOWNLOAD, Collections.singletonList(() -> PhotoSave.offersSave(false)));
+        // Every photo the viewer opens offers Save photo, and a photo post's menu gets Save photo.
+        probes.put(PatchFamily.PHOTO_DOWNLOAD, Arrays.asList(
+                () -> PhotoSave.offersSave(false),
+                PhotoMenuItemForTests::addsAnItem));
         // A start from the launcher icon asks Facebook for the chosen tab.
         probes.put(PatchFamily.START_TAB, Collections.singletonList(StartTabRouteForTests::routes));
         // The tab bar builder is told to leave Home out.
