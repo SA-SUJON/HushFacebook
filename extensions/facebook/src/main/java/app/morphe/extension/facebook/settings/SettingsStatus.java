@@ -226,6 +226,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean accentColor() {
+        return false;
+    }
+
     public static boolean storyDownload() {
         return false;
     }

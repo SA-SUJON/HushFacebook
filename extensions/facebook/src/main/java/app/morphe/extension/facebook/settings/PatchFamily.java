@@ -19,6 +19,7 @@ import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.diagnostics.HookStatus;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.HushfacebookPause;
+import app.morphe.extension.shared.settings.Setting;
 import app.morphe.extension.shared.settings.preference.LogBufferManager;
 
 /**
@@ -201,6 +202,8 @@ public enum PatchFamily {
     AUDIENCE_NETWORK(FamilyNames.AUDIENCE_NETWORK, "audienceNetwork", "the Audience Network block"),
     AMOLED_THEME(FamilyNames.AMOLED_THEME, "amoledTheme", "the black background in dark mode"),
     MATERIAL_YOU_THEME(FamilyNames.MATERIAL_YOU_THEME, "materialYouTheme", "the recoloured dark mode"),
+    // No switch: a list picks the accent, and Pause makes it read Facebook's blue, so nothing stays in.
+    ACCENT_COLOR(FamilyNames.ACCENT_COLOR, "accentColor", Settings.ACCENT_COLOR),
     RESTORE_TRUST(FamilyNames.RESTORE_TRUST, "restoreTrust", "the re-signed build fix"),
     // Runs while the application is built, before a switch can be read, and keeps Facebook starting.
     TRANSLATED_START(FamilyNames.TRANSLATED_START, "translatedStart", "the start-up fix for x86 devices"),
@@ -235,6 +238,13 @@ public enum PatchFamily {
 
     /** The switches Pause turns off for this patch. Empty when it has none. */
     public final List<BooleanSetting> switches;
+
+    /**
+     * For a patch a list picks rather than a switch: the list setting, which Pause makes read its
+     * default, Facebook as it ships. Null for the rest.
+     */
+    @Nullable
+    public final Setting<?> choice;
 
     /**
      * The switches of the settings entry itself, which no family owns: every build with this screen
@@ -282,6 +292,15 @@ public enum PatchFamily {
         this.statusMethod = statusMethod;
         this.staysWhilePaused = staysWhilePaused;
         this.switches = Collections.unmodifiableList(Arrays.asList(switches));
+        this.choice = null;
+    }
+
+    PatchFamily(String patchName, String statusMethod, Setting<?> choice) {
+        this.patchName = patchName;
+        this.statusMethod = statusMethod;
+        this.staysWhilePaused = null;
+        this.switches = Collections.emptyList();
+        this.choice = choice;
     }
 
     /** Whether this patch was selected for this build. */
@@ -382,6 +401,11 @@ public enum PatchFamily {
      */
     private String reportLine(boolean paused) {
         StringBuilder line = new StringBuilder(patchName).append(": ");
+        if (choice != null) {
+            String saved = choice.key + "=" + choice.savedValue();
+            return line.append(paused ? "disabled while paused (saved " + saved + ")" : "set by its list (" + saved + ")")
+                    .toString();
+        }
         if (switches.isEmpty()) {
             return line.append("no switch, stays in while paused: ").append(staysWhilePaused).toString();
         }
@@ -423,7 +447,7 @@ public enum PatchFamily {
         LogBufferManager.registerReportSection(ScreenLog.REPORT);
         LogBufferManager.registerReportSection(MaterialYouTheme.REPORT);
         for (PatchFamily family : values()) {
-            if (family.switches.isEmpty()) HookStatus.runsWhilePaused(family.patchName);
+            if (family.switches.isEmpty() && family.choice == null) HookStatus.runsWhilePaused(family.patchName);
         }
     }
 

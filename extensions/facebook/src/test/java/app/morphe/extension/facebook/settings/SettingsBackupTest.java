@@ -83,6 +83,7 @@ import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.TextSize;
+import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -186,6 +187,7 @@ public class SettingsBackupTest {
         Settings.QUIET_HOURS_UNTIL.resetToDefault();
         Settings.APP_LOCK_AFTER.resetToDefault();
         Settings.TEXT_SIZE.resetToDefault();
+        Settings.ACCENT_COLOR.resetToDefault();
         Settings.VIDEO_SUBFOLDER.resetToDefault();
         Settings.PHOTO_SUBFOLDER.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
@@ -241,7 +243,7 @@ public class SettingsBackupTest {
                 Settings.FILENAME_TEMPLATE, Settings.PHOTO_FILENAME_TEMPLATE, Settings.DOWNLOAD_ACTION, Settings.SEND_TO_APP,
                 Settings.START_TAB, Settings.FEEDS_SUBTAB, Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY,
                 Settings.REELS_PLAYBACK_QUALITY, Settings.STORIES_PLAYBACK_QUALITY, Settings.QUIET_HOURS_FROM,
-                Settings.QUIET_HOURS_UNTIL, Settings.APP_LOCK_AFTER, Settings.TEXT_SIZE), SettingsBackup.VALUES);
+                Settings.QUIET_HOURS_UNTIL, Settings.APP_LOCK_AFTER, Settings.TEXT_SIZE, Settings.ACCENT_COLOR), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_TO, SettingsBackup.TO);
         assertEquals(Settings.HIDDEN_WORDS, SettingsBackup.HIDDEN);
         assertEquals(Settings.KEPT_WORDS, SettingsBackup.KEPT);
@@ -259,6 +261,7 @@ public class SettingsBackupTest {
         assertEquals(Settings.QUIET_HOURS_FROM, SettingsBackup.QUIET_FROM);
         assertEquals(Settings.QUIET_HOURS_UNTIL, SettingsBackup.QUIET_UNTIL);
         assertEquals(Settings.TEXT_SIZE, SettingsBackup.TEXT_SIZE);
+        assertEquals(Settings.ACCENT_COLOR, SettingsBackup.ACCENT);
         assertEquals(Settings.VIDEO_SUBFOLDER, SettingsBackup.VIDEO_SUBFOLDER);
         assertEquals(Settings.PHOTO_SUBFOLDER, SettingsBackup.PHOTO_SUBFOLDER);
         assertEquals(Settings.DOWNLOAD_ACTION, SettingsBackup.ACTION);
@@ -1906,6 +1909,62 @@ public class SettingsBackupTest {
         assertEquals("Settings imported. Facebook's text will be 130% of the size your phone's font size setting gives it.",
                 SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null, null, null,
                         null, null, null, null, null, null, null, null, null, null, null, TextSize.Scale.P130));
+    }
+
+    /**
+     * The accent color goes out as its file value and comes back only as one this build offers:
+     * anything else, or a value that isn't text, refuses the whole file.
+     */
+    @Test
+    public void theAccentColorRoundTripsAndComesBackOnlyAsOneThisBuildOffers() throws Exception {
+        for (AccentColor.Preset choice : AccentColor.Preset.values()) {
+            AccentColor.Preset other = choice == AccentColor.Preset.TEAL ? AccentColor.Preset.RED : AccentColor.Preset.TEAL;
+            Settings.ACCENT_COLOR.save(choice);
+            String file = SettingsBackup.create();
+            assertEquals(choice.fileValue, new JSONObject(file).getJSONObject("settings").get(SettingsBackup.ACCENT.key));
+            Settings.ACCENT_COLOR.save(other);
+
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+            assertEquals(choice, snapshot.accent);
+            assertEquals(choice, snapshot.accentChange());
+            assertEquals(1, SettingsBackup.apply(snapshot));
+            assertEquals(choice, Settings.ACCENT_COLOR.savedValue());
+            assertEquals("a file read back is the file", file, SettingsBackup.create());
+            assertEquals("the same accent again changes nothing", 0, SettingsBackup.parse(file).changes().size());
+        }
+
+        Settings.ACCENT_COLOR.save(AccentColor.Preset.PURPLE);
+        String file = SettingsBackup.create();
+        Map<String, ?> before = store();
+        for (Object refused : new Object[]{"PURPLE", "Purple", "mauve", "", 7, true, JSONObject.NULL,
+                new JSONObject(), new org.json.JSONArray()}) {
+            JSONObject hostile = new JSONObject(file);
+            hostile.getJSONObject("settings").put(SettingsBackup.ACCENT.key, refused);
+            try {
+                SettingsBackup.parse(hostile.toString());
+                fail("a file with the accent " + printable(String.valueOf(refused)) + " was read");
+            } catch (SettingsBackup.Rejected rejected) {
+                assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the accent was carried leaves it alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.accent);
+        assertNull(older.accentChange());
+        SettingsBackup.apply(older);
+        assertEquals(AccentColor.Preset.PURPLE, Settings.ACCENT_COLOR.savedValue());
+
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(AccentColor.Preset.PURPLE, SettingsBackup.Snapshot.fromBundle(state).accent);
+        state.putString("accent_color", "PURPLE");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).accent);
+
+        assertEquals("Settings imported. Facebook will keep its own blue.",
+                SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, null,
+                        AccentColor.Preset.FACEBOOK));
     }
 
     /**

@@ -1125,3 +1125,31 @@ Facebook's text is %1$s of the size your phone's font size setting gives it. Res
 Facebook's text will be the size your phone's font size setting gives it.	Facebook'taki metin, telefonunun yazı tipi boyutu ayarının verdiği boyutta olacak.
 # context: what a settings import changes; %1$s is a percentage such as 115%
 Facebook's text will be %1$s of the size your phone's font size setting gives it.	Facebook'taki metin, telefonunun yazı tipi boyutu ayarının verdiği boyutun %1$s kadarı olacak.
+# context: title of the row and list that picks the color that stands in for Facebook's blue
+Accent color	Vurgu rengi
+# context: Accent color choice and color name: Facebook's own blue, no change
+Facebook blue	Facebook mavisi
+# context: Accent color choice, a blue-green
+Teal	Turkuaz
+# context: Accent color choice
+Green	Yeşil
+# context: Accent color choice
+Purple	Mor
+# context: Accent color choice
+Pink	Pembe
+# context: Accent color choice
+Orange	Turuncu
+# context: Accent color choice
+Red	Kırmızı
+# context: Accent color choice, a blue-violet
+Indigo	Çivit
+# context: Accent color choice, a yellow-orange
+Amber	Kehribar
+# context: summary of the Accent color row at its default
+Links, buttons, switches and the selected tab keep Facebook's blue.	Bağlantılar, düğmeler, anahtarlar ve seçili sekme Facebook'un mavisini korur.
+# context: summary of the Accent color row; %1$s is a color name such as Teal
+Links, buttons, switches and the selected tab are %1$s where Facebook uses its blue. Restart Facebook after changing it. The Material You theme, when it's in, takes over.	Facebook'un mavisini kullandığı yerlerde bağlantılar, düğmeler, anahtarlar ve seçili sekme %1$s olur. Değiştirdikten sonra Facebook'u yeniden başlat. Material You teması varsa o öncelikli olur.
+# context: what a settings import changes: Facebook goes back to its own blue
+Facebook will keep its own blue.	Facebook kendi mavisini koruyacak.
+# context: what a settings import changes; %1$s is a color name such as Teal
+With Accent color in the build, Facebook's blue will be %1$s.	Derlemede Vurgu rengi varsa Facebook'un mavisi %1$s olacak.

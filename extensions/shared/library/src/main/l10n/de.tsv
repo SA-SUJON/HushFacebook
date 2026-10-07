@@ -1125,3 +1125,31 @@ Facebook's text is %1$s of the size your phone's font size setting gives it. Res
 Facebook's text will be the size your phone's font size setting gives it.	Der Text in Facebook hat dann die Größe, die die Schriftgrößeneinstellung deines Handys vorgibt.
 # context: what a settings import changes; %1$s is a percentage such as 115%
 Facebook's text will be %1$s of the size your phone's font size setting gives it.	Der Text in Facebook wird %1$s so groß, wie es die Schriftgrößeneinstellung deines Handys vorgibt.
+# context: title of the row and list that picks the color that stands in for Facebook's blue
+Accent color	Akzentfarbe
+# context: Accent color choice and color name: Facebook's own blue, no change
+Facebook blue	Facebook-Blau
+# context: Accent color choice, a blue-green
+Teal	Türkis
+# context: Accent color choice
+Green	Grün
+# context: Accent color choice
+Purple	Violett
+# context: Accent color choice
+Pink	Pink
+# context: Accent color choice
+Orange	Orange
+# context: Accent color choice
+Red	Rot
+# context: Accent color choice, a blue-violet
+Indigo	Indigo
+# context: Accent color choice, a yellow-orange
+Amber	Bernstein
+# context: summary of the Accent color row at its default
+Links, buttons, switches and the selected tab keep Facebook's blue.	Links, Schaltflächen, Schalter und der gewählte Tab behalten das Blau von Facebook.
+# context: summary of the Accent color row; %1$s is a color name such as Teal
+Links, buttons, switches and the selected tab are %1$s where Facebook uses its blue. Restart Facebook after changing it. The Material You theme, when it's in, takes over.	Links, Schaltflächen, Schalter und der gewählte Tab sind %1$s, wo Facebook sein Blau verwendet. Starte Facebook nach der Änderung neu. Das Material-You-Design übernimmt, wenn es dabei ist.
+# context: what a settings import changes: Facebook goes back to its own blue
+Facebook will keep its own blue.	Facebook behält sein eigenes Blau.
+# context: what a settings import changes; %1$s is a color name such as Teal
+With Accent color in the build, Facebook's blue will be %1$s.	Mit Akzentfarbe im Build wird das Blau von Facebook %1$s.

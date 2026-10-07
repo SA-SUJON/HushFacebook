@@ -205,6 +205,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/theme/AccentColor.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/layout/theme/AccentColorPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Accent color, which swaps Facebook's blues on a chosen set of FDS tokens for a preset's tonal ramp at the lightness each had, holding text roles to 4.5:1. It rides the colour resolver hooks the themes share and steps aside for the Material You theme."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/theme/DarkMode.java"
       ],
       "origin": "original",

@@ -65,6 +65,7 @@ import app.morphe.extension.facebook.media.ReelSpeedForTests;
 import app.morphe.extension.facebook.media.ResumePlaybackForTests;
 import app.morphe.extension.facebook.misc.AppLockForTests;
 import app.morphe.extension.facebook.misc.TextSizeForTests;
+import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
@@ -183,6 +184,10 @@ public class ColdStartHooksTest {
         assertFalse(FeedGuardForTests.hidesAiReel(new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true))));
         assertFalse("a start before the context locked Facebook", AppLockForTests.aStartLocks());
         assertFalse("a start before the context scaled Facebook's text", TextSizeForTests.aStartScales());
+        assertEquals("a colour before the context took an accent", 0xFF0866FF,
+                AccentColor.fds(0xFF0866FF, Thread.State.NEW));
+        assertEquals("a Mig colour before the context took an accent", 0xFF0866FF,
+                AccentColor.mig(0xFF0866FF, new Object()));
         FeedGuardForTests.ReelItem flaggedReel = new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true));
         Section reelSection = new Section(new ArrayList<>(Arrays.asList(new Reel(), flaggedReel)));
         FeedGuardForTests.aiReelSections(Collections.singletonList(reelSection));

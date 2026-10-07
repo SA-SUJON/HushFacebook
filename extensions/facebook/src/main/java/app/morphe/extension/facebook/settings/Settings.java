@@ -20,6 +20,7 @@ import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
+import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.shared.settings.BaseSettings;
@@ -1189,6 +1190,14 @@ public class Settings extends BaseSettings {
      */
     public static final EnumSetting<TextSize.Scale> TEXT_SIZE =
             new EnumSetting<>("hushfacebook_text_size", TextSize.Scale.P100);
+
+    /**
+     * The colour that stands in for Facebook's blue on links, buttons, switches and the selected
+     * tab ({@link AccentColor}), with the Accent color patch in the build. Facebook blue is Facebook
+     * as it ships, which is also what a paused Facebook reads. Not a switch.
+     */
+    public static final EnumSetting<AccentColor.Preset> ACCENT_COLOR =
+            new EnumSetting<>("hushfacebook_accent_color", AccentColor.Preset.FACEBOOK);
 
     /**
      * Where {@link #USE_SYSTEM_FONT} takes its font from: empty for the phone's own, or the name of

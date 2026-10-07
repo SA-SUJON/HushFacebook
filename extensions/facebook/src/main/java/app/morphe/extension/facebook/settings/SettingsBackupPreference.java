@@ -55,6 +55,7 @@ import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.TextSize;
+import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -384,7 +385,7 @@ public class SettingsBackupPreference extends Preference {
                     snapshot.subtabChange(), snapshot.sourcesChange(), snapshot.photoNameChange(),
                     snapshot.videoSubfolderChange(), snapshot.photoSubfolderChange(), snapshot.reelsQualityChange(),
                     snapshot.storiesQualityChange(), snapshot.quietFromChange(), snapshot.quietUntilChange(),
-                    snapshot.lockAfterChange(), snapshot.textSizeChange()));
+                    snapshot.lockAfterChange(), snapshot.textSizeChange(), snapshot.accentChange()));
             message = String.join("\n\n", parts);
         }
         if (snapshot.unknown > 0) {
@@ -546,6 +547,13 @@ public class SettingsBackupPreference extends Preference {
         if (after == AppLock.After.IMMEDIATELY) return L10n.t("With Lock Facebook on, it will lock as soon as you leave it.");
         return L10n.f("With Lock Facebook on, it will lock once you've been away for %1$s.",
                 HushfacebookPreferenceFragment.lockAfterLabel(after));
+    }
+
+    /** The sentence that says which accent color Facebook will have after an import. */
+    static String accentSentence(AccentColor.Preset accent) {
+        if (accent == AccentColor.Preset.FACEBOOK) return L10n.t("Facebook will keep its own blue.");
+        return L10n.f("With Accent color in the build, Facebook's blue will be %1$s.",
+                HushfacebookPreferenceFragment.accentLabel(accent));
     }
 
     /** The sentence that says how large Facebook's text will be after an import. */
@@ -765,6 +773,24 @@ public class SettingsBackupPreference extends Preference {
                                        @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
                                        @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil,
                                        @Nullable AppLock.After lockAfter, @Nullable TextSize.Scale textSize) {
+        return valueSentences(folder, quality, fileName, start, order, hidden, kept, playback, action, app, to, subtab,
+                sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom, quietUntil,
+                lockAfter, textSize, null);
+    }
+
+    /** {@link #valueSentences} with the accent color, which comes last. */
+    static List<String> valueSentences(@Nullable String folder, @Nullable DownloadQuality quality,
+                                       @Nullable String fileName, @Nullable StartTab start,
+                                       @Nullable CommentOrder order, @Nullable String hidden,
+                                       @Nullable String kept, @Nullable PlaybackQuality playback,
+                                       @Nullable SendLink.Action action, @Nullable String app,
+                                       @Nullable SaveTo to, @Nullable FeedsSubtab subtab,
+                                       @Nullable String sources, @Nullable String photoName,
+                                       @Nullable String videoSubfolder, @Nullable String photoSubfolder,
+                                       @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
+                                       @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil,
+                                       @Nullable AppLock.After lockAfter, @Nullable TextSize.Scale textSize,
+                                       @Nullable AccentColor.Preset accent) {
         List<String> sentences = new ArrayList<>();
         if (start != null) sentences.add(startTabSentence(start));
         if (subtab != null) sentences.add(feedsSubtabSentence(subtab));
@@ -788,6 +814,7 @@ public class SettingsBackupPreference extends Preference {
         if (quietUntil != null) sentences.add(quietHourSentence(quietUntil, false));
         if (lockAfter != null) sentences.add(lockAfterSentence(lockAfter));
         if (textSize != null) sentences.add(textSizeSentence(textSize));
+        if (accent != null) sentences.add(accentSentence(accent));
         return sentences;
     }
 
@@ -812,7 +839,7 @@ public class SettingsBackupPreference extends Preference {
                     snapshot.toChange(), snapshot.subtabChange(), snapshot.sourcesChange(), snapshot.photoNameChange(),
                     snapshot.videoSubfolderChange(), snapshot.photoSubfolderChange(), snapshot.reelsQualityChange(),
                     snapshot.storiesQualityChange(), snapshot.quietFromChange(), snapshot.quietUntilChange(),
-                    snapshot.lockAfterChange(), snapshot.textSizeChange());
+                    snapshot.lockAfterChange(), snapshot.textSizeChange(), snapshot.accentChange());
             accepted = Utils.runOnBackgroundThread(() -> {
                 try {
                     SettingsBackup.apply(snapshot);
@@ -978,11 +1005,27 @@ public class SettingsBackupPreference extends Preference {
                                   @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
                                   @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil,
                                   @Nullable AppLock.After lockAfter, @Nullable TextSize.Scale textSize) {
+        return importedMessage(switches, folder, quality, fileName, start, order, hidden, kept, playback, action, app,
+                to, subtab, sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom,
+                quietUntil, lockAfter, textSize, null);
+    }
+
+    /** {@link #importedMessage}, with the accent color after the import. */
+    static String importedMessage(int switches, @Nullable String folder, @Nullable DownloadQuality quality,
+                                  @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                                  @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                                  @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
+                                  @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName,
+                                  @Nullable String videoSubfolder, @Nullable String photoSubfolder,
+                                  @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
+                                  @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil,
+                                  @Nullable AppLock.After lockAfter, @Nullable TextSize.Scale textSize,
+                                  @Nullable AccentColor.Preset accent) {
         if (switches == 0 && folder != null && quality == null && fileName == null && start == null && order == null
                 && hidden == null && kept == null && playback == null && action == null && app == null && to == null
                 && subtab == null && sources == null && photoName == null && videoSubfolder == null
                 && photoSubfolder == null && reelsQuality == null && storiesQuality == null && quietFrom == null
-                && quietUntil == null && lockAfter == null && textSize == null) {
+                && quietUntil == null && lockAfter == null && textSize == null && accent == null) {
             return L10n.f("Settings imported. Saves will go to a folder named %1$s.", L10n.isolate(folder));
         }
         List<String> parts = new ArrayList<>();
@@ -990,7 +1033,7 @@ public class SettingsBackupPreference extends Preference {
                 "Settings imported. %1$d switch changed.", "Settings imported. %1$d switches changed.", switches));
         parts.addAll(valueSentences(folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
                 subtab, sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom,
-                quietUntil, lockAfter, textSize));
+                quietUntil, lockAfter, textSize, accent));
         return String.join(" ", parts);
     }
 

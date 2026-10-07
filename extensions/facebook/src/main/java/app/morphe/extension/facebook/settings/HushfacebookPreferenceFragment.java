@@ -53,6 +53,7 @@ import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.TextSize;
+import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.HiddenTabs;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -64,6 +65,7 @@ import app.morphe.extension.facebook.settings.SettingsRows.SaveRow;
 import app.morphe.extension.facebook.settings.SettingsRows.Toggle;
 import app.morphe.extension.facebook.settings.ValueRows.CommentOrderRow;
 import app.morphe.extension.facebook.settings.ValueRows.LockAfterRow;
+import app.morphe.extension.facebook.settings.ValueRows.AccentRow;
 import app.morphe.extension.facebook.settings.ValueRows.TextSizeRow;
 import app.morphe.extension.facebook.settings.ValueRows.DownloadActionRow;
 import app.morphe.extension.facebook.settings.ValueRows.FeedsSubtabRow;
@@ -1192,6 +1194,64 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * The accent color, with the Accent color patch in the build. Like the text size row, its values
+     * are the setting's own names and its summary says what the choice does.
+     */
+    static AccentRow accentRow(Context context) {
+        AccentRow row = new AccentRow(context);
+        row.setKey(Settings.ACCENT_COLOR.key);
+        row.setTitle(L10n.t("Accent color"));
+        row.setDialogTitle(L10n.t("Accent color"));
+        // Android's own Cancel follows the activity's language, as the other lists' did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        AccentColor.Preset[] choices = AccentColor.Preset.values();
+        CharSequence[] entries = new CharSequence[choices.length];
+        CharSequence[] values = new CharSequence[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            entries[i] = accentLabel(choices[i]);
+            values[i] = choices[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.ACCENT_COLOR.savedValue().name());
+        return row;
+    }
+
+    /** What the list and the sentences about it call [accent]. */
+    static String accentLabel(AccentColor.Preset accent) {
+        switch (accent) {
+            case TEAL:
+                return L10n.t("Teal");
+            case GREEN:
+                return L10n.t("Green");
+            case PURPLE:
+                return L10n.t("Purple");
+            case PINK:
+                return L10n.t("Pink");
+            case ORANGE:
+                return L10n.t("Orange");
+            case RED:
+                return L10n.t("Red");
+            case INDIGO:
+                return L10n.t("Indigo");
+            case AMBER:
+                return L10n.t("Amber");
+            default:
+                return L10n.t("Facebook blue");
+        }
+    }
+
+    /** What a choice does, for the row's summary. */
+    static String accentSummary(AccentColor.Preset accent) {
+        if (accent == AccentColor.Preset.FACEBOOK) {
+            return L10n.t("Links, buttons, switches and the selected tab keep Facebook's blue.");
+        }
+        return L10n.f("Links, buttons, switches and the selected tab are %1$s where Facebook uses its blue. "
+                + "Restart Facebook after changing it. The Material You theme, when it's in, takes over.",
+                accentLabel(accent));
+    }
+
+    /**
      * The quality videos play at. Like the comment order row, its values are the setting's own
      * names and its summary says what the choice does.
      */
@@ -1338,6 +1398,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((LockAfterRow) listPreference).showSummary();
         } else if (listPreference instanceof TextSizeRow) {
             ((TextSizeRow) listPreference).showSummary();
+        } else if (listPreference instanceof AccentRow) {
+            ((AccentRow) listPreference).showSummary();
         } else if (listPreference instanceof PlaybackQualityRow) {
             ((PlaybackQualityRow) listPreference).showSummary();
         } else if (listPreference instanceof SurfaceQualityRow) {

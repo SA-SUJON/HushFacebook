@@ -13,6 +13,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.category;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.info;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.mark;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.accentRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.textSizeRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.toggle;
 
@@ -82,6 +83,10 @@ final class HushfacebookPages {
         PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
         // The settings entry's own, so every build has it. 100% is Facebook as it ships.
         appearance.addPreference(textSizeRow(context));
+        if (build.contains(PatchFamily.ACCENT_COLOR)) {
+            // Colours Facebook asks for as each screen builds, so a change shows fully after a restart.
+            appearance.addPreference(accentRow(context));
+        }
         if (build.contains(PatchFamily.SYSTEM_FONT)) {
             appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT,
                     L10n.t("Use your phone's font or a file chosen below. Restart Facebook after changing it.")));
