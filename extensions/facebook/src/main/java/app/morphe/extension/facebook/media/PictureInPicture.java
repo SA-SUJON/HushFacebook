@@ -43,6 +43,10 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * Native view on the main screen can already hold. The extension swaps such an id for a free one,
  * or the viewer opens hidden and the window stays black.
  *
+ * <p>Facebook's full-screen Watch viewer arms the same window for the video on screen, behind a
+ * server flag of its own. With the switch on, the extension answers that flag yes, and Facebook's
+ * own code arms the window; the rest here treats that arming like any other.
+ *
  * <p>Off, paused, before the settings are ready, or when anything here fails, the answer is
  * Facebook's own.
  */
@@ -64,6 +68,9 @@ public final class PictureInPicture {
 
     /** Counted each time the window's viewer gets a view id of its own instead of one a view already holds. */
     static final String VIEWER_ID = "viewer id replaced";
+
+    /** Counted each time the full-screen Watch viewer's flag says yes where Facebook's answer was no. */
+    static final String IMMERSIVE = "watch viewer flag opened";
 
     /** How many new view ids the viewer may go through for one nothing on screen holds. */
     private static final int VIEWER_ID_TRIES = 64;
@@ -291,6 +298,25 @@ public final class PictureInPicture {
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "viewer id", failure);
             return id;
+        }
+    }
+
+    /**
+     * The hook, right after the full-screen Watch viewer reads the server flag that lets it arm its
+     * picture-in-picture window, with Facebook's [answer]. A no turns into a yes while the switch is
+     * on; a yes stays one, and everything else is Facebook's own.
+     */
+    public static boolean immersiveAllowed(boolean answer) {
+        try {
+            boolean enabled = on();
+            if (!enabled) return answer;
+            HookStatus.bound(FAMILY, "watch viewer flag");
+            if (answer) return true;
+            HookStatus.counted(FAMILY, IMMERSIVE);
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, "watch viewer flag", failure);
+            return answer;
         }
     }
 

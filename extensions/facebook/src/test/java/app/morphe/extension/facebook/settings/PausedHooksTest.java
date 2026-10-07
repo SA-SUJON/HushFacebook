@@ -627,7 +627,8 @@ public class PausedHooksTest {
                 }, android.view.HapticFeedbackConstants.LONG_PRESS)));
         // ReelsPipUtil's check and the Reels viewer's gate say yes on Android 12 with the phone's feature.
         probes.put(PatchFamily.PICTURE_IN_PICTURE, Arrays.asList(
-                PictureInPictureForTests::allowsWithTheFeature, PictureInPictureForTests::surfaceAllows));
+                PictureInPictureForTests::allowsWithTheFeature, PictureInPictureForTests::surfaceAllows,
+                PictureInPictureForTests::immersiveAllows));
         // An HDR window comes out in the default colour mode, and a headroom as none.
         probes.put(PatchFamily.HDR_BRIGHTNESS, Arrays.asList(
                 HdrBrightnessForTests::keepsAnHdrWindowInTheUsualRange, HdrBrightnessForTests::holdsTheHeadroom));

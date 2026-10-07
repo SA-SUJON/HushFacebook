@@ -28,6 +28,21 @@ public final class PictureInPictureForTests {
         return surfaceAllows(Build.VERSION_CODES.S);
     }
 
+    /** Whether the full-screen Watch viewer's flag, which Facebook answered no, comes out yes on Android 12. */
+    public static boolean immersiveAllows() {
+        return immersiveAllows(Build.VERSION_CODES.S, false);
+    }
+
+    static boolean immersiveAllows(int apiLevel, boolean answer) {
+        int was = PictureInPicture.apiLevel;
+        PictureInPicture.apiLevel = apiLevel;
+        try {
+            return PictureInPicture.immersiveAllowed(answer);
+        } finally {
+            PictureInPicture.apiLevel = was;
+        }
+    }
+
     static boolean allows(int apiLevel, boolean feature) {
         shadowOf(RuntimeEnvironment.getApplication().getPackageManager())
                 .setSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE, feature);

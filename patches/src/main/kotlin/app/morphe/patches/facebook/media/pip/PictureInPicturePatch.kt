@@ -21,6 +21,7 @@ import app.morphe.patches.facebook.media.taptoplay.grootPauses
 import app.morphe.patches.facebook.media.taptoplay.grootPlays
 import app.morphe.patches.facebook.media.taptoplay.innerPause
 import app.morphe.patches.facebook.misc.extension.enableStatus
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.extension.parameterRegisterNumber
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.facebook.misc.extension.requireParameterIntact
@@ -33,6 +34,7 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -85,6 +87,14 @@ internal const val FRAGMENT_ACTIVITY = "Landroidx/fragment/app/FragmentActivity;
 
 internal const val VIEWER_ID = "$PICTURE_IN_PICTURE->viewerId(${ACTIVITY}I)I"
 
+/** The Watch topic feed's fragment is the one class holding this error text, in its engagement-state check. */
+internal const val TOPIC_FEED = "isEngagementState(): Topic Params is null"
+
+/** Facebook's MobileConfig reader. The class keeps its name; its methods are renamed, so a call is told by its shape. */
+internal const val PIP_MOBILE_CONFIG = "Lcom/facebook/mobileconfig/factory/MobileConfigUnsafeContext;"
+
+internal const val IMMERSIVE_ALLOWED = "$PICTURE_IN_PICTURE->immersiveAllowed(Z)Z"
+
 /**
  * A playing reel keeps going in a small window when you leave Facebook. Facebook ships
  * picture-in-picture for its Reels viewer (ReelsPipUtil: 581 `LX/BB6;`, 580 `LX/B3H;`, 577
@@ -112,14 +122,24 @@ internal const val VIEWER_ID = "$PICTURE_IN_PICTURE->viewerId(${ACTIVITY}I)I"
  * opens inside the hidden main screen at no size, which leaves the window black. The extension
  * swaps an id a view holds for a free one.
  *
+ * Facebook's full-screen Watch viewer (the Watch topic feed fragment: 581 `LX/Anv;`, 580 `LX/Aex;`,
+ * 577 `LX/ArV;`) arms the same window itself in onResume, behind a server flag of its own, for a
+ * video in its engagement state. The flag is the MobileConfig read nearest before that onResume's
+ * call of ReelsPipUtil's check (it reads the same in 577, 580 and 581, as the move-result before an
+ * if-eqz), and the extension answers it. Facebook's own code then arms the window for the video on
+ * screen, and the rest here treats it like any other arming. Its onStop disarm is left behind
+ * the same flag, still Facebook's: a screen leaving with the video paused is held by the pause
+ * hook, and an immersive screen that closes takes its window arming with it.
+ *
  * Off in the default selection: it changes what leaving Facebook does. Picked, its switch starts on.
  */
 @Suppress("unused")
 val pictureInPicturePatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Picture-in-picture",
-    description = "A reel playing in the Reels tab keeps going in a small window when you leave Facebook, " +
-        "through the picture-in-picture Facebook already has for Reels. Needs Android 12 or later.",
+    description = "A reel playing in the Reels tab, or a video playing in Facebook's full-screen Watch viewer, " +
+        "keeps going in a small window when you leave Facebook, through the picture-in-picture Facebook " +
+        "already has for them. Needs Android 12 or later.",
     default = false,
 ) {
     category("Interface")
@@ -137,6 +157,7 @@ val pictureInPicturePatch = bytecodePatch(
         val disarms = findDisarms(check)
         val stateChange = findStateChange(check)
         val opening = findViewerOpening()
+        val topic = findTopicFlag(check)
         applyPipCheck(check)
         applySurfaceGate(gate)
         applyArming(arming, player.play.definingClass, videoParams)
@@ -144,6 +165,7 @@ val pictureInPicturePatch = bytecodePatch(
         applyPlayer(player)
         applyStateChange(stateChange)
         applyViewerId(opening)
+        applyTopicFlag(topic)
         enableStatus("pictureInPicture")
     }
 }
@@ -511,6 +533,65 @@ internal fun BytecodePatchContext.applyViewerId(opening: Method) {
         """
             invoke-static { v$activity, v$id }, $VIEWER_ID
             move-result v$id
+        """,
+    )
+}
+
+/** Whether [call] is a MobileConfig boolean read: a static (Object, long) -> boolean call on Facebook's reader. */
+internal fun isConfigRead(instruction: Instruction): Boolean {
+    val call = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: return false
+    return instruction.opcode == Opcode.INVOKE_STATIC && call.definingClass == PIP_MOBILE_CONFIG && call.returnType == "Z" &&
+        call.parameterList() == listOf("Ljava/lang/Object;", "J")
+}
+
+/**
+ * Where the Watch topic feed's onResume asks its picture-in-picture flag: the index of the
+ * move-result of the last MobileConfig boolean read before its call of [check], when an if-eqz
+ * follows it. Changes nothing.
+ */
+internal fun topicFlagAt(onResume: Method, check: Method): Int {
+    val code = onResume.implementation?.instructions?.toList().orEmpty()
+    val asked = code.indexOfFirst { instruction ->
+        val call = (instruction as? ReferenceInstruction)?.reference as? MethodReference
+        call != null && instruction.opcode.name.startsWith("invoke") && call.definingClass == check.definingClass &&
+            call.name == check.name && call.parameterList() == listOf(ACTIVITY) && call.returnType == "Z"
+    }
+    if (asked < 0) return -1
+    val read = (asked - 1 downTo 0).firstOrNull { isConfigRead(code[it]) } ?: return -1
+    val result = code.getOrNull(read + 1)
+    if (result?.opcode != Opcode.MOVE_RESULT || code.getOrNull(read + 2)?.opcode != Opcode.IF_EQZ) return -1
+    return read + 1
+}
+
+/** The Watch topic feed's onResume and the move-result of its flag. Changes nothing. */
+internal class TopicFlag(val onResume: Method, val result: Int)
+
+/** The one Watch topic feed fragment's onResume, found by the text of its engagement-state check. Changes nothing. */
+internal fun BytecodePatchContext.findTopicFlag(check: Method): TopicFlag {
+    val topics = classDefByStrings(TOPIC_FEED, StringComparisonType.EQUALS).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+    val topic = topics.singleOrNull() ?: refuse("expected one class holding \"$TOPIC_FEED\", found ${topics.size}")
+    val resumes = topic.methods.filter { it.name == "onResume" && it.parameterTypes.isEmpty() && it.returnType == "V" }
+    val resume = resumes.singleOrNull() ?: refuse("${topic.type} has ${resumes.size} onResume(), expected 1")
+    val at = topicFlagAt(resume, check)
+    if (at < 0) refuse("${topic.type}->onResume reads no MobileConfig flag in front of if-eqz before it asks ${check.name}")
+    return TopicFlag(resume, at)
+}
+
+/**
+ * The flag's answer goes through the extension before the branch reads it, so the viewer arms its
+ * window for the video on screen with Facebook's own code. The register is the move-result's own,
+ * a local, and the range form names it wherever it is.
+ */
+internal fun BytecodePatchContext.applyTopicFlag(topic: TopicFlag) {
+    val method = mutableClassDefBy(topic.onResume.definingClass).findMutableMethodOf(topic.onResume)
+    val result = method.implementation!!.instructions.toList()[topic.result] as OneRegisterInstruction
+    val register = result.registerA
+    if (register >= method.localRegisterCount()) refuse("${method.definingClass}->${method.name} reads its flag into a parameter register")
+    method.addInstructions(
+        topic.result + 1,
+        """
+            invoke-static/range { v$register .. v$register }, $IMMERSIVE_ALLOWED
+            move-result v$register
         """,
     )
 }

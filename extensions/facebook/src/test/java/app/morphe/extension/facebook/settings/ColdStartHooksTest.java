@@ -238,6 +238,7 @@ public class ColdStartHooksTest {
         assertTrue("a tab before the context lost its slide", ScreenTransitionsForTests.slides());
         assertFalse("a picture-in-picture check before the context said yes", PictureInPictureForTests.allowsWithTheFeature());
         assertFalse("the Reels viewer's gate before the context said yes", PictureInPictureForTests.surfaceAllows());
+        assertFalse("the Watch viewer's flag before the context said yes", PictureInPictureForTests.immersiveAllows());
         assertFalse("an HDR window kept in the usual range before the context said yes",
                 HdrBrightnessForTests.keepsAnHdrWindowInTheUsualRange());
         assertFalse("a headroom held before the context said yes", HdrBrightnessForTests.holdsTheHeadroom());

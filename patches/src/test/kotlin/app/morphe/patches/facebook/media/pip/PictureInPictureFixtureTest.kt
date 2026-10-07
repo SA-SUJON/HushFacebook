@@ -43,7 +43,9 @@ import java.io.File
  * bundles from HUSHFACEBOOK_FIXTURE_DIR and skips without it. Also the hold's hooks: ReelsPipUtil's arming and
  * disarms, and FbGrootPlayer's pause and play; the helpers that hand the arming over and arm again,
  * and the stub calling the second; the runnable whose change is set aside; and the viewer's new view
- * id going through the extension.
+ * id going through the extension. And the Watch viewer's flag: the one fragment holding the engagement-state
+ * text, its onResume, and the MobileConfig read in front of its call of the check, answered through the
+ * extension in the read's own register.
  */
 class PictureInPictureFixtureTest {
     private fun Method.code(): List<Instruction> = implementation!!.instructions.toList()
@@ -118,13 +120,29 @@ class PictureInPictureFixtureTest {
                 val openings = viewers.flatMap { viewer -> viewer.methods.filter(::isViewerOpening) }
                 assertEquals("$name: viewer openings", 1, openings.size)
                 val opening = openings.single()
+                val topics = FixtureDex.classesHolding(bundle, TOPIC_FEED).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+                assertEquals("$name: classes holding \"$TOPIC_FEED\"", 1, topics.size)
+                val topic = topics.single()
+                val resume = topic.methods.single { it.name == "onResume" && it.parameterTypes.isEmpty() && it.returnType == "V" }
+                val resumeAt = topicFlagAt(resume, check)
+                assertTrue("$name: ${topic.type}->onResume has no flag in front of the check", resumeAt > 0)
+                val originalResume = resume.code()
+                val flagRegister = (originalResume[resumeAt] as OneRegisterInstruction).registerA
+                assertTrue("$name: the flag's register v$flagRegister isn't a local of ${resume.localRegisterCount()}",
+                    flagRegister < resume.localRegisterCount())
+                assertTrue("$name: the flag read isn't a MobileConfig boolean read", isConfigRead(originalResume[resumeAt - 1]))
+                val resumeCheckAt = originalResume.indexOfFirst {
+                    it.call?.name == check.name && it.call?.definingClass == check.definingClass
+                }
+                assertTrue("$name: the flag read isn't the last one before the check",
+                    (resumeAt until resumeCheckAt).none { isConfigRead(originalResume[it]) })
 
                 val originalCheck = check.code()
                 val originalGate = gate.code()
                 val originalPlay = play.code()
                 val originalRun = run.code()
                 val originalOpening = opening.code()
-                val context = PatchContexts.of((listOf(util, holder, owner, runnable) + viewers + listOf(
+                val context = PatchContexts.of((listOf(util, holder, owner, runnable, topic) + viewers + listOf(
                     ExtensionDex.classDef(PICTURE_IN_PICTURE), ExtensionDex.classDef(SETTINGS_STATUS))).distinctBy { it.type })
                 pictureInPicturePatch.execute(context)
 
@@ -208,13 +226,25 @@ class PictureInPictureFixtureTest {
                 assertEquals("$name: the answer is the id", idRegister, (opened[newId + 3] as OneRegisterInstruction).registerA)
                 assertEquals("$name: the rest of Facebook's opening", originalOpening.size + 2, opened.size)
 
+                val resumed = patchedOf(resume).code()
+                val swapped = resumed[resumeAt + 1] as RegisterRangeInstruction
+                assertEquals("$name: the call after the flag", IMMERSIVE_ALLOWED, resumed[resumeAt + 1].call.toString())
+                assertEquals("$name: the flag's answer is handed over by range", Opcode.INVOKE_STATIC_RANGE, resumed[resumeAt + 1].opcode)
+                assertEquals("$name: the register handed over is the flag's", listOf(flagRegister, 1),
+                    listOf(swapped.startRegister, swapped.registerCount))
+                assertEquals("$name: the answer goes back in the flag's register", Opcode.MOVE_RESULT, resumed[resumeAt + 2].opcode)
+                assertEquals("$name: the answer is the flag's register", flagRegister, (resumed[resumeAt + 2] as OneRegisterInstruction).registerA)
+                assertEquals("$name: the branch follows the answer", Opcode.IF_EQZ, resumed[resumeAt + 3].opcode)
+                assertEquals("$name: the rest of Facebook's onResume", originalResume.size + 2, resumed.size)
+
                 val status = context.mutableClassDefBy(SETTINGS_STATUS).methods.single { it.name == "pictureInPicture" }
                 assertEquals("$name: SettingsStatus.pictureInPicture() isn't switched on", 1,
                     (status.code()[0] as NarrowLiteralInstruction).narrowLiteral)
                 println("$name: check ${check.definingClass}->${check.name}, gate ${gate.definingClass}->${gate.name} " +
                     "asked by ${arming.name}, armed in ${arm.name}, disarmed in ${disarms.joinToString { it.name }}, " +
                     "player ${play.definingClass}->${play.name}/${pause.name}, video ${videoParams.call.name}, " +
-                    "set aside in ${runnable.type}, viewer ${opening.definingClass}->${opening.name}")
+                    "set aside in ${runnable.type}, viewer ${opening.definingClass}->${opening.name}, " +
+                    "watch viewer ${topic.type}->onResume flag at $resumeAt in v$flagRegister of ${resume.localRegisterCount()} locals")
                 checked += version
             }
         }

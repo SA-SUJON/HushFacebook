@@ -86,4 +86,32 @@ public class PictureInPictureTest {
             PauseForTests.resume();
         }
     }
+
+    @Test
+    public void onTheWatchViewerFlagOpensAndCountsOnlyAFlip() {
+        assertTrue("a no stayed a no with the switch on", PictureInPictureForTests.immersiveAllows());
+        assertTrue("a yes turned into a no", PictureInPictureForTests.immersiveAllows(Build.VERSION_CODES.S, true));
+        assertEquals(FamilyNames.PICTURE_IN_PICTURE + ": invoked 2, 1 found, 0 missing. Counted: "
+                + PictureInPicture.IMMERSIVE + " 1", statusLine());
+    }
+
+    @Test
+    public void offPausedOrBeforeAndroid12TheWatchViewerFlagIsFacebooks() {
+        assertFalse("Android 11 changed a no", PictureInPictureForTests.immersiveAllows(Build.VERSION_CODES.R, false));
+        assertTrue("Android 11 changed a yes", PictureInPictureForTests.immersiveAllows(Build.VERSION_CODES.R, true));
+        Settings.PICTURE_IN_PICTURE.save(false);
+        assertFalse("the switch off changed a no", PictureInPictureForTests.immersiveAllows());
+        assertTrue("the switch off changed a yes", PictureInPictureForTests.immersiveAllows(Build.VERSION_CODES.S, true));
+        Settings.PICTURE_IN_PICTURE.save(true);
+        for (HushfacebookPause.Reason reason : new HushfacebookPause.Reason[] {
+                HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP}) {
+            PauseForTests.pause(reason);
+            assertFalse("a Hushfacebook paused by " + reason + " changed a no", PictureInPictureForTests.immersiveAllows());
+            assertTrue("a Hushfacebook paused by " + reason + " changed a yes",
+                    PictureInPictureForTests.immersiveAllows(Build.VERSION_CODES.S, true));
+            PauseForTests.resume();
+        }
+        String line = statusLine();
+        assertFalse("a flag left alone was counted", line != null && line.contains(PictureInPicture.IMMERSIVE));
+    }
 }
