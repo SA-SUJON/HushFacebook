@@ -47,6 +47,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** New `Comment sheet options` with two switches under Comments, both off to start. **Like only** stops a long press on Like from opening the reactions, so a tap just likes, and **Hide GIF and sticker buttons** takes them out of the comment box. A **Hide reaction counts** row opens Facebook's own settings, where Reaction preferences lives. Pick the patch in Manager to get it.
 * **Facebook:** `Hide Meta upsells` has a new **Hide Meta AI's Imagine** switch, off to start. It takes the Imagine me button off posts and takes Imagine out of the post composer and the row of tools at the top of Create story.
 * **Facebook:** `Hide Meta upsells` has a new **Hide Threads in the share sheet** switch, off to start. The share sheet loses its Threads button and keeps every other way to share in the same order.
+* **Facebook:** `Download any video` has a new switch, **Offer to download copied links**, off to start. Come back to Facebook with a reel or video link copied and it asks once whether to download it. With the switch off, your clipboard is never read.
 
 ### Fixed
 
