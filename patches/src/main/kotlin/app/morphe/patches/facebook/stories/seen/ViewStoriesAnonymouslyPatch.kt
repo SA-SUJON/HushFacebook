@@ -25,7 +25,8 @@ import com.android.tools.smali.dexlib2.iface.Method
  * sender already returns when it has no cards. Only the viewing report stops: replies and
  * reactions are sent by another class. With the Mark as seen button's switch on as well, the hook
  * sends the cards you marked instead, in a set of their own, and a second hook in the seen helper
- * tells the button which card is on screen.
+ * tells the button which card is on screen. A third hook, where Facebook's story controllers make a card the
+ * active one, keeps the button on that card.
  *
  * Off in the default selection, since it changes what other people see, and stories you've viewed
  * keep their unwatched ring: Facebook greys a ring only once the server has taken the report, and
@@ -70,11 +71,22 @@ val viewStoriesAnonymouslyPatch = bytecodePatch(
         if (storyCard.methods.none { "${it.definingClass}->${it.name}()${it.returnType}" == CARD_ID && it.parameterTypes.isEmpty() }) {
             throw PatchException("$PATCH: $STORY_CARD has no getId()")
         }
+        val activations = classDefByStrings(ACTIVATE_STATE, StringComparisonType.EQUALS)
+            .flatMap { owner -> owner.methods.filter(::isCardActivation).map { owner to it } }
+        val (activationOwner, activation) = activations.singleOrNull() ?: throw PatchException(
+            "$PATCH: expected one controller method that loads \"$ACTIVATE_STATE\" and \"$ACTIVATE_CARD\", " +
+                "found ${activations.size}",
+        )
+        val store = activeCardStore(activation)
+        if (store < 0) {
+            throw PatchException("$PATCH: ${activationOwner.type}->${activation.name} doesn't store the activated $STORY_CARD once")
+        }
         val sendStub = stub(STORY_SEEN, SEND_STUB, "V")
         val cardIdStub = stub(STORY_SEEN_BUTTON, CARD_ID_STUB, "Ljava/lang/String;")
 
         mutableClassDefBy(sender.definingClass).methods.single { it.sameAs(sender) }.filterViews()
         mutableClassDefBy(card.definingClass).methods.single { it.sameAs(card) }.reportCard()
+        mutableClassDefBy(activationOwner.type).methods.single { it.sameAs(activation) }.reportActive(store)
         sendStub.fillSend(sender)
         cardIdStub.fillCardId()
         enableStatus("storySeen")

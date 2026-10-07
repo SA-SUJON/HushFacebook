@@ -16,7 +16,9 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
@@ -56,6 +58,14 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  * through StoryCard.getId(), a kept method. The hook goes first in it with the session, the bucket
  * and the card, so the button knows the card on screen. The extension's two stubs are filled to
  * call the sender and StoryCard.getId().
+ *
+ * The eye must follow the card on screen, which the helper doesn't promise: its caller skips the
+ * counted method for some bucket types and some cards, and a late callback can count a card the
+ * viewer has left. Facebook's story controllers share a base class whose onCardActivated method
+ * (log strings "Received onCardActivated when not attached" and "Card object cannot be null", the
+ * same method on 577, 580 and 581: 577 LX/CII;->A0I, 580 LX/CGa;->A0J, 581 LX/CGv;->A0I) checks its
+ * state and stores the activated StoryCard in a field of its own class. The hook goes right after
+ * that store and hands the card to the button, as a range over the register the store read.
  */
 internal const val PATCH = "View stories anonymously"
 
@@ -91,7 +101,12 @@ private const val SEND_ARGUMENTS =
 internal const val TO_SEND = "$STORY_SEEN->toSend($SEND_ARGUMENTS)Ljava/util/Set;"
 internal const val SEND_STUB = "send"
 internal const val ON_CARD = "$STORY_SEEN_BUTTON->onCard(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V"
+internal const val ON_ACTIVE = "$STORY_SEEN_BUTTON->onActive(Ljava/lang/Object;)V"
 internal const val CARD_ID_STUB = "cardId"
+
+/** Literals the controllers' onCardActivated method loads: its state check and its card check. */
+internal const val ACTIVATE_STATE = "Received onCardActivated when not attached"
+internal const val ACTIVATE_CARD = "Card object cannot be null"
 
 private fun refuse(detail: String): Nothing = throw PatchException("$PATCH: $detail")
 
@@ -208,6 +223,32 @@ internal fun MutableMethod.reportCard() {
         0,
         """
             invoke-static/range { p0 .. p2 }, $ON_CARD
+        """,
+    )
+}
+
+/** Whether [method] is the controllers' onCardActivated: an instance void taking two objects, with both literals. */
+internal fun isCardActivation(method: Method): Boolean =
+    !AccessFlags.STATIC.isSet(method.accessFlags) && method.returnType == "V" && method.parameterTypes.size == 2 &&
+        holdsString(method, ACTIVATE_STATE) && holdsString(method, ACTIVATE_CARD)
+
+/** The index of the store of the activated card in [method], an iput-object of a StoryCard into the method's own class, or -1. */
+internal fun activeCardStore(method: Method): Int {
+    val stores = method.implementation?.instructions?.withIndex()?.filter { (_, instruction) ->
+        val ref = (instruction as? ReferenceInstruction)?.reference as? FieldReference
+        instruction.opcode == Opcode.IPUT_OBJECT && ref != null && ref.type == STORY_CARD &&
+            ref.definingClass == method.definingClass
+    }.orEmpty().toList()
+    return stores.singleOrNull()?.index ?: -1
+}
+
+/** Right after the activated card is stored: hand the button the card, which the store's register still holds. */
+internal fun MutableMethod.reportActive(store: Int) {
+    val register = (getInstruction(store) as OneRegisterInstruction).registerA
+    addInstructions(
+        store + 1,
+        """
+            invoke-static/range { v$register .. v$register }, $ON_ACTIVE
         """,
     )
 }

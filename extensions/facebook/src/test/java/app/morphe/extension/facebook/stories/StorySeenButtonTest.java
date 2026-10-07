@@ -27,6 +27,9 @@ import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLooper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import app.morphe.extension.facebook.settings.Settings;
@@ -137,6 +140,91 @@ public class StorySeenButtonTest {
         StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c1");
         ShadowLooper.idleMainLooper();
         assertNull(eyeIn(other));
+    }
+
+    @Test
+    public void movingToACardTheHelperNeverCountedHidesTheEye() {
+        Settings.MARK_STORIES_SEEN.save(true);
+        ActivityController<StoryViewerActivity> controller = Robolectric.buildActivity(StoryViewerActivity.class).setup();
+        StoryViewerActivity viewer = controller.get();
+        StorySeenButton.activityResumed(viewer);
+        StorySeenButton.onActive("c1");
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c1");
+        ShadowLooper.idleMainLooper();
+        ImageView eye = eyeIn(viewer);
+        assertNotNull(eye);
+        assertEquals(View.VISIBLE, eye.getVisibility());
+
+        // Facebook skips its count for c2, so only the activation names it.
+        StorySeenButton.onActive("c2");
+        ShadowLooper.idleMainLooper();
+        assertNull("the eye stayed bound to the card the viewer left", StorySeenButton.shown());
+        assertEquals(View.GONE, eye.getVisibility());
+
+        // Back on c1, which the helper counted before, the eye returns for c1.
+        StorySeenButton.onActive("c1");
+        ShadowLooper.idleMainLooper();
+        assertEquals("c1", StorySeenButton.shown().card);
+        assertEquals(View.VISIBLE, eye.getVisibility());
+        controller.pause().stop().destroy();
+    }
+
+    @Test
+    public void aCardCountedAfterTheViewerMovedOnNeverGetsTheEye() {
+        Settings.MARK_STORIES_SEEN.save(true);
+        StorySeenButton.onActive("c2");
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c1");
+        assertNull("a late count took the eye", StorySeenButton.shown());
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c2");
+        assertEquals("c2", StorySeenButton.shown().card);
+    }
+
+    @Test
+    public void aTapAfterTheViewerMovedNeverMarksTheOldCard() {
+        Settings.MARK_STORIES_SEEN.save(true);
+        ActivityController<StoryViewerActivity> controller = Robolectric.buildActivity(StoryViewerActivity.class).setup();
+        StoryViewerActivity viewer = controller.get();
+        StorySeenButton.activityResumed(viewer);
+        StorySeenButton.onActive("c1");
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c1");
+        ShadowLooper.idleMainLooper();
+        ImageView eye = eyeIn(viewer);
+        assertNotNull(eye);
+
+        // The activation lands, but the main thread hasn't redrawn yet when the tap does.
+        StorySeenButton.onActive("c2");
+        eye.performClick();
+        assertEquals("the old card was marked", StoryMarks.State.UNMARKED, StorySeen.MARKS.state("100", "c1"));
+        assertEquals("the new card was marked", StoryMarks.State.UNMARKED, StorySeen.MARKS.state("100", "c2"));
+        assertEquals(View.GONE, eye.getVisibility());
+        controller.pause().stop().destroy();
+    }
+
+    @Test
+    public void aTapSendsAHeldCardOnlyWhileItIsTheActiveOne() {
+        Settings.MARK_STORIES_SEEN.save(true);
+        List<String> sent = new ArrayList<>();
+        StorySeenButton.sendNow = (account, card) -> sent.add(account + "/" + card);
+        ActivityController<StoryViewerActivity> controller = Robolectric.buildActivity(StoryViewerActivity.class).setup();
+        StoryViewerActivity viewer = controller.get();
+        StorySeenButton.activityResumed(viewer);
+
+        // No activation signal: the card is marked and waits for the next batch.
+        StorySeenButton.onCard(StorySeenForTests.ACCOUNT, null, "c1");
+        ShadowLooper.idleMainLooper();
+        ImageView eye = eyeIn(viewer);
+        assertNotNull(eye);
+        assertTrue(eye.performClick());
+        assertEquals(StoryMarks.State.MARKED, StorySeen.MARKS.state("100", "c1"));
+        assertTrue("sent with no word that the card is on screen: " + sent, sent.isEmpty());
+        assertTrue(eye.performClick());
+
+        // Active and counted: the same tap sends it now.
+        StorySeenButton.onActive("c1");
+        assertTrue(eye.performClick());
+        assertEquals(StoryMarks.State.MARKED, StorySeen.MARKS.state("100", "c1"));
+        assertEquals(Collections.singletonList("100/c1"), sent);
+        controller.pause().stop().destroy();
     }
 
     @Test

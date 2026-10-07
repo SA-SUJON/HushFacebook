@@ -66,12 +66,14 @@ public final class StorySeenForTests {
         }
     }
 
-    /** Whether the seen helper's card hook points the button at the card. Forgets the card. */
+    /** Whether the seen helper's card hook and the controllers' active card hook point the button at the card. Forgets the card. */
     public static boolean pointsTheButton() {
         try {
             StorySeenButton.cardIds = card -> (String) card;
             StorySeenButton.onCard(ACCOUNT, null, "card");
-            return StorySeenButton.shown() != null;
+            boolean counted = StorySeenButton.shown() != null;
+            StorySeenButton.onActive("card");
+            return counted && StorySeenButton.shown() != null;
         } finally {
             reset();
         }

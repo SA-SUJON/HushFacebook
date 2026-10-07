@@ -25,6 +25,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
@@ -44,6 +47,13 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * stands ({@link StoryMarks}): an eye with a slash while it's held back, a solid eye once marked,
  * dimmed once sent. A tap marks the card, or takes the mark back before it goes. A card a batch
  * already held back is sent straight away through the sender that held it ({@link StorySeen#sendHeld}).
+ *
+ * <p>The seen helper doesn't count every card (some bucket types skip it, and a late callback can
+ * count a card the viewer has already left), so a second patch hook, {@link #onActive}, runs when
+ * Facebook makes a card the active one. The button speaks for that card only: moving to a card the
+ * helper hasn't named hides the eye, a card counted after the viewer moved on never gets it, and a
+ * tap on an eye that no longer matches the active card marks nothing. A card is sent at once only
+ * while it's still the active card; otherwise the mark waits for the next batch that holds it.
  *
  * <p>The button shows only while views are anonymous and its own switch is on, and only over
  * StoryViewerActivity while it's in front. Either switch off, Hushfacebook paused or the settings
@@ -75,8 +85,24 @@ public final class StorySeenButton {
     /** Where {@link #onCard} reads a card's id: the patch's filled stub. Tests hand in their own. */
     static volatile Function<Object, String> cardIds = StorySeenButton::cardId;
 
+    /** What a tap uses to send a held card at once, with its account and id. Tests record the calls instead. */
+    static volatile BiPredicate<String, String> sendNow = StorySeen::sendHeld;
+
+    /** How many cards' accounts {@link #known} remembers. */
+    static final int KNOWN_CARDS = 64;
+
     @Nullable
     private static volatile Shown shown;
+    /** The id of the card Facebook made active last, or null before any, or once the viewer left. */
+    @Nullable
+    private static volatile String active;
+    /** The account each recently counted card was viewed on, so a card returned to can show the eye again. */
+    private static final Map<String, String> known = new LinkedHashMap<String, String>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
+            return size() > KNOWN_CARDS;
+        }
+    };
     private static volatile WeakReference<Activity> viewer = new WeakReference<>(null);
     private static volatile WeakReference<ImageView> button = new WeakReference<>(null);
 
@@ -95,14 +121,58 @@ public final class StorySeenButton {
             if (switchedOn() && card != null) {
                 String id = cardIds.apply(card);
                 String account = StorySeen.account(session);
-                if (id != null && !id.isEmpty() && account != null) now = new Shown(account, id);
+                if (id != null && !id.isEmpty() && account != null) {
+                    remember(id, account);
+                    // A card counted after the viewer moved on isn't the one on screen.
+                    String current = active;
+                    if (current == null || current.equals(id)) now = new Shown(account, id);
+                }
             }
-            if (now == null && shown == null) return;
-            shown = now;
-            Utils.runOnMainThread(StorySeenButton::refresh);
+            rebind(now);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
         }
+    }
+
+    /**
+     * Injected where Facebook's story controllers take a card as the active one, with the card.
+     * Points the button at that card when the seen helper has counted it on an account, and hides
+     * the eye otherwise, so it never stays on the card the viewer left. Runs once per controller
+     * that listens, so it's cheap and repeats harmlessly. Never throws.
+     */
+    public static void onActive(@Nullable Object card) {
+        try {
+            HookStatus.invoked(FamilyNames.STORY_SEEN);
+            String id = card == null ? null : cardIds.apply(card);
+            if (id != null && id.isEmpty()) id = null;
+            active = id;
+            Shown now = null;
+            if (id != null && switchedOn()) {
+                String account;
+                synchronized (known) {
+                    account = known.get(id);
+                }
+                if (account != null) now = new Shown(account, id);
+            }
+            rebind(now);
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, HOOK, failure);
+        }
+    }
+
+    private static void remember(String id, String account) {
+        synchronized (known) {
+            known.put(id, account);
+        }
+    }
+
+    /** Points the button at [now], or hides it for null, redrawing only when that changes something. */
+    private static void rebind(@Nullable Shown now) {
+        Shown was = shown;
+        if (now == null && was == null) return;
+        if (now != null && was != null && now.card.equals(was.card) && now.account.equals(was.account)) return;
+        shown = now;
+        Utils.runOnMainThread(StorySeenButton::refresh);
     }
 
     /** Whether the button shows: views held back and its own switch on. Both read off while paused. */
@@ -133,6 +203,10 @@ public final class StorySeenButton {
             if (viewer.get() != activity) return;
             viewer = new WeakReference<>(null);
             shown = null;
+            active = null;
+            synchronized (known) {
+                known.clear();
+            }
             ImageView eye = button.get();
             if (eye != null) hide(eye);
         } catch (Throwable failure) {
@@ -172,8 +246,17 @@ public final class StorySeenButton {
                 return;
             }
             Shown bound = (Shown) eye.getTag();
-            if (StorySeen.MARKS.toggle(bound.account, bound.card) == StoryMarks.State.MARKED) {
-                StorySeen.sendHeld(bound.account, bound.card);
+            String current = active;
+            if (current != null && !current.equals(bound.card)) {
+                // The viewer moved on and the eye hasn't caught up: this tap isn't for that card.
+                hide(eye);
+                return;
+            }
+            // Send at once only while the card is known to be on screen. Without that, the mark
+            // waits and goes with the next batch that holds the card.
+            boolean onScreen = current != null;
+            if (StorySeen.MARKS.toggle(bound.account, bound.card) == StoryMarks.State.MARKED && onScreen) {
+                sendNow.test(bound.account, bound.card);
             }
             StoryMarks.State now = StorySeen.MARKS.state(bound.account, bound.card);
             show(eye, now);
@@ -198,7 +281,12 @@ public final class StorySeenButton {
     /** Forgets the card, the viewer and the button. */
     static void resetForTests() {
         cardIds = StorySeenButton::cardId;
+        sendNow = StorySeen::sendHeld;
         shown = null;
+        active = null;
+        synchronized (known) {
+            known.clear();
+        }
         viewer = new WeakReference<>(null);
         button = new WeakReference<>(null);
     }

@@ -26,7 +26,8 @@ import org.junit.Test
  * the set the hook answers is the one the sender's own empty check and request builder read, and
  * the hook goes first as a range over every argument with its answer in the set's register. The
  * seen helper and its per-card method are found, read the card's id through StoryCard.getId(), and
- * get the card hook as a range over the session, bucket and card. Reads the fixture bundles from
+ * get the card hook as a range over the session, bucket and card. The controllers' onCardActivated
+ * method is found by its literals and takes the active card hook after its card store. Reads the fixture bundles from
  * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class MarkAsSeenFixtureTest {
@@ -123,12 +124,46 @@ class MarkAsSeenFixtureTest {
     }
 
     @Test
+    fun `each declared build's card activation takes the active card hook as a range`() {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        assertTrue("the bundle declares no Facebook build", versions.isNotEmpty())
+        val checked = mutableSetOf<String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                val name = bundle.name
+                val found = FixtureDex.classesHolding(bundle, ACTIVATE_STATE)
+                    .flatMap { owner -> owner.methods.filter(::isCardActivation) }
+                assertEquals("$name: expected one card activation method", 1, found.size)
+                val method = found.single()
+                val store = activeCardStore(method)
+                assertTrue("$name: the activation never stores a StoryCard once", store >= 0)
+                val code = method.implementation!!.instructions.toList()
+                val stored = (code[store] as OneRegisterInstruction).registerA
+                val locals = method.implementation!!.registerCount - 3
+                assertTrue("$name: the stored card sits in a local, v$stored of $locals", stored < locals)
+
+                val patched = MutableMethod(method).apply { reportActive(store) }
+                val after = patched.implementation!!.instructions.toList()
+                assertEquals("$name: instructions added", code.size + 1, after.size)
+                assertEquals("$name: the store stays", Opcode.IPUT_OBJECT, after[store].opcode)
+                assertEquals("$name: the hook's form", Opcode.INVOKE_STATIC_RANGE, after[store + 1].opcode)
+                assertEquals("$name: the hook", ON_ACTIVE, after[store + 1].call!!.descriptor())
+                assertEquals("$name: the hook's argument is the stored card", listOf(stored), registers(after[store + 1]))
+                assertEquals("$name: the method still ends", Opcode.RETURN_VOID, after.last().opcode)
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", versions, checked)
+    }
+
+    @Test
     fun `the extension has the hooks and the stubs the patch fills`() {
         val seen = ExtensionDex.classDef(STORY_SEEN).methods
         val button = ExtensionDex.classDef(STORY_SEEN_BUTTON).methods
         fun MethodReference.key() = descriptor()
         assertTrue("StorySeen has no $TO_SEND", seen.any { it.key() == TO_SEND })
         assertTrue("StorySeenButton has no $ON_CARD", button.any { it.key() == ON_CARD })
+        assertTrue("StorySeenButton has no $ON_ACTIVE", button.any { it.key() == ON_ACTIVE })
         assertEquals("StorySeen's send stub takes what the sender takes",
             listOf("Ljava/lang/Object;", "Ljava/lang/Object;", "Ljava/lang/Object;") + SENDER_SHAPE.drop(1),
             seen.single { it.name == SEND_STUB }.parameterTypes.map { it.toString() })
