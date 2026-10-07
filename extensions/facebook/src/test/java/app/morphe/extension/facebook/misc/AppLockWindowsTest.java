@@ -173,6 +173,29 @@ public class AppLockWindowsTest {
         assertNotSame(cover, ShadowDialog.getLatestDialog());
     }
 
+    private static boolean nothingScheduled() {
+        return ShadowLooper.shadowMainLooper().getNextScheduledTaskTime().isZero();
+    }
+
+    @Test
+    public void aLockedFacebookThatIsAwayStopsLookingForWindowsAndComingBackStartsAgain() {
+        Activity screen = lockedScreen();
+        AppLock.roots.list();
+        assertFalse("no look was scheduled while the cover was up", nothingScheduled());
+
+        AppLock.paused(screen);
+        // The look already on its way runs once, finds nothing in front and doesn't go again.
+        ShadowLooper.idleMainLooper(AppLock.WATCH_MS * 3, TimeUnit.MILLISECONDS);
+        assertTrue("the poll kept waking the main thread with Facebook away", nothingScheduled());
+        assertTrue(AppLock.covering());
+
+        AppLock.resumed(screen);
+        assertFalse("coming back didn't restart the poll", nothingScheduled());
+        View overlay = notFocusableWindow(screen);
+        ShadowLooper.idleMainLooper(AppLock.WATCH_MS * 2, TimeUnit.MILLISECONDS);
+        assertTrue(takesNoTouch(overlay));
+    }
+
     @Test
     public void theTouchesComeBackWithTheUnlockAndAWindowUnderTheCoverIsLeftAlone() {
         activity = screen();

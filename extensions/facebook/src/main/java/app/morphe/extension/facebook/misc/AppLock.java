@@ -195,6 +195,11 @@ public final class AppLock {
 
     static Roots roots = AppLock::frameworkRoots;
     private static boolean rootsFailureLogged;
+    static final int WINDOW_CHECK_UNKNOWN = 0;
+    static final int WINDOW_CHECK_WORKS = 1;
+    static final int WINDOW_CHECK_UNAVAILABLE = -1;
+    /** Whether the last read of the framework's window list worked, for the diagnostics report. */
+    private static int windowCheck = WINDOW_CHECK_UNKNOWN;
     private static boolean watchingWindows;
     /** Windows made untouchable while locked, with the window manager that holds each. */
     private static final Map<View, WindowManager> untouchable = new IdentityHashMap<>();
@@ -455,6 +460,8 @@ public final class AppLock {
             }
             if (!locked || inPictureInPicture(activity)) return;
             cover(activity);
+            // A cover already up is only raised, which doesn't start the look for windows above it.
+            watchWindows();
             if (!asking && !declined) ask(activity);
         } catch (Throwable failure) {
             Logger.printException(() -> "App lock: could not lock a screen", failure);
@@ -650,6 +657,8 @@ public final class AppLock {
         sideFileContext = null;
         roots = AppLock::frameworkRoots;
         rootsFailureLogged = false;
+        windowCheck = WINDOW_CHECK_UNKNOWN;
+        readersFound = false;
         watchingWindows = false;
         restoreTouch();
         shareUnlock(NEVER);
@@ -662,11 +671,17 @@ public final class AppLock {
         Utils.runOnMainThreadDelayed(AppLock::watchTick, WATCH_MS);
     }
 
+    /**
+     * One look, and the next only while a cover is up on the screen in front. With Facebook away
+     * there's nothing to look at, so the poll stops there instead of waking the main thread ten
+     * times a second for hours; {@link #resumed} starts it again on the way back.
+     */
     private static void watchTick() {
         watchingWindows = false;
         if (!locked) return;
         Activity shown = front.get();
-        if (shown != null) sweep(shown);
+        if (shown == null || !covered(shown)) return;
+        sweep(shown);
         watchWindows();
     }
 
@@ -754,35 +769,70 @@ public final class AppLock {
         untouchable.clear();
     }
 
+    /** The framework's window list reader, found once: its holder, the view list, or the name lookups. */
+    private static Object windowGlobal;
+    @Nullable private static Field viewsField;
+    @Nullable private static Method rootNames;
+    @Nullable private static Method rootView;
+    private static boolean readersFound;
+
+    private static void findReaders() throws ReflectiveOperationException {
+        if (readersFound) return;
+        Class<?> global = Class.forName("android.view.WindowManagerGlobal");
+        windowGlobal = global.getMethod("getInstance").invoke(null);
+        try {
+            Field views = global.getDeclaredField("mViews");
+            views.setAccessible(true);
+            viewsField = views;
+        } catch (ReflectiveOperationException | RuntimeException blocked) {
+            viewsField = null;
+        }
+        try {
+            rootNames = global.getMethod("getViewRootNames");
+            rootView = global.getMethod("getRootView", String.class);
+        } catch (ReflectiveOperationException | RuntimeException blocked) {
+            rootNames = null;
+            rootView = null;
+        }
+        readersFound = true;
+    }
+
     /**
-     * This process's windows from the framework's own list, oldest first. Reads WindowManagerGlobal's
-     * list of views, and when a phone won't give that, its root names. Null when neither is reachable.
+     * This process's windows from the framework's own list, in the order they were added, which is
+     * not the order Android layers them. Reads WindowManagerGlobal's list of views, and when a phone
+     * won't give that, its root names. Null when neither is reachable. The reflection objects are
+     * found once, since this runs ten times a second while a cover is up.
      */
     @Nullable
     @SuppressWarnings("unchecked")
     private static List<View> frameworkRoots() {
         try {
-            Class<?> global = Class.forName("android.view.WindowManagerGlobal");
-            Object instance = global.getMethod("getInstance").invoke(null);
-            try {
-                Field views = global.getDeclaredField("mViews");
-                views.setAccessible(true);
-                Object list = views.get(instance);
-                if (list instanceof List) {
-                    return new ArrayList<>((List<View>) list);
+            findReaders();
+            Field views = viewsField;
+            if (views != null) {
+                try {
+                    Object list = views.get(windowGlobal);
+                    if (list instanceof List) {
+                        windowCheck = WINDOW_CHECK_WORKS;
+                        return new ArrayList<>((List<View>) list);
+                    }
+                } catch (ReflectiveOperationException | RuntimeException blocked) {
+                    // Fall back to the names below.
                 }
-            } catch (ReflectiveOperationException | RuntimeException blocked) {
-                // Fall back to the names below.
             }
-            String[] names = (String[]) global.getMethod("getViewRootNames").invoke(instance);
-            Method rootView = global.getMethod("getRootView", String.class);
+            Method names = rootNames;
+            Method lookup = rootView;
+            if (names == null || lookup == null) throw new NoSuchMethodException("getViewRootNames");
+            String[] all = (String[]) names.invoke(windowGlobal);
             List<View> found = new ArrayList<>();
-            for (String name : names) {
-                Object view = rootView.invoke(instance, name);
+            for (String name : all) {
+                Object view = lookup.invoke(windowGlobal, name);
                 if (view instanceof View) found.add((View) view);
             }
+            windowCheck = WINDOW_CHECK_WORKS;
             return found;
         } catch (Throwable unavailable) {
+            windowCheck = WINDOW_CHECK_UNAVAILABLE;
             if (!rootsFailureLogged) {
                 rootsFailureLogged = true;
                 Logger.printInfo(() -> "App lock: this phone doesn't give its window list, so only windows that take the focus are noticed");
