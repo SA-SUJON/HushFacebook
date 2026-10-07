@@ -277,6 +277,45 @@ public class OriginalChatMediaTest {
                 OriginalChatMedia.videoPassthrough(9, 4_000_000L, video(join(fileType(), media(), plainMovie))));
     }
 
+    /** A media box of [size] zero bytes with [marker] written at [at]. */
+    private static byte[] mediaWith(int size, int at, String marker) {
+        byte[] payload = new byte[size];
+        byte[] text = bytes(marker);
+        System.arraycopy(text, 0, payload, at, text.length);
+        return box("mdat", payload);
+    }
+
+    /**
+     * Some Novatek-family dashcams write freeGPS blocks inside the media data with no gps box in
+     * the movie, and others log NMEA sentences or LigoGPS there. A marker anywhere in the media,
+     * including one split across two 64 KB reads, keeps the re-encode.
+     */
+    @Test
+    public void aGpsLogInsideTheMediaKeepsTheReEncode() throws IOException {
+        Settings.ORIGINAL_CHAT_MEDIA.save(true);
+        byte[] plainMovie = movie(track("vide"), track("soun"));
+        int chunk = VideoLocation.MDAT_CHUNK;
+        Map<String, byte[]> inside = new LinkedHashMap<>();
+        inside.put("a freeGPS block", mediaWith(4096, 1000, "freeGPS \u0000\u0000"));
+        inside.put("an RMC sentence", mediaWith(4096, 7, "$GPRMC,103001.00,A,3725.32,N"));
+        inside.put("a multi-constellation GGA sentence", mediaWith(4096, 4000, "$GNGGA,103001.00,3725.32"));
+        inside.put("LigoGPS", mediaWith(4096, 0, "LIGOGPSINFO "));
+        inside.put("a marker that ends the media", mediaWith(4096, 4096 - 7, "freeGPS"));
+        inside.put("a marker split across the first chunk boundary", mediaWith(chunk * 2, chunk - 3, "$GPRMC,"));
+        inside.put("a marker split across the second chunk boundary", mediaWith(chunk * 3, chunk * 2 - 5, "LIGOGPSINFO"));
+        inside.put("a marker in the last, short chunk", mediaWith(chunk * 2 + 100, chunk * 2 + 50, "freeGPS"));
+        for (Map.Entry<String, byte[]> log : inside.entrySet()) {
+            assertEquals(log.getKey() + ", movie first", 9, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                    video(join(fileType(), plainMovie, log.getValue()))));
+            assertEquals(log.getKey() + ", movie last", 9, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                    video(join(fileType(), log.getValue(), plainMovie))));
+        }
+        assertEquals("the control: clean media of the same size", -1, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                video(join(fileType(), plainMovie, mediaWith(chunk * 3, 0, "")))));
+        assertEquals("bare gps in the media isn't a log", -1, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                video(join(fileType(), plainMovie, mediaWith(4096, 100, "gps GPS $GP")))));
+    }
+
     /**
      * A box the movie, a track, its media or their information isn't known to hold, a track with
      * no media or no handler, and every track that isn't video or sound keep the re-encode, since

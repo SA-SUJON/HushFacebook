@@ -28,11 +28,13 @@ import java.util.Set;
  * place as a {@code ©xyz} or 3GPP {@code loci} box in a {@code udta}, or as a
  * {@code com.apple.quicktime.location.ISO6709} key in a {@code meta}, on the movie or on a track.
  * A dashcam can write it elsewhere: a Novatek camera indexes its GPS log from a {@code gps } box in
- * the movie and keeps the log in {@code free} boxes, and a BlackVue keeps NMEA sentences in a
- * {@code gps } box inside a top-level {@code free} box. This reads the file's top-level box
- * headers, the movie box and the contents of every top-level {@code free}, {@code skip} and
- * {@code wide} box, never the media, and looks through every {@code udta}, {@code meta} and padding
- * box of the movie, its tracks and their media.
+ * the movie and keeps the log in {@code free} boxes or, on some models, in {@code freeGPS} blocks
+ * inside the media data itself, and a BlackVue keeps NMEA sentences in a {@code gps } box inside a
+ * top-level {@code free} box. This reads the file's top-level box headers, the movie box, the
+ * contents of every top-level {@code free}, {@code skip} and {@code wide} box, and the media data
+ * ({@code mdat}) in chunks, looking in the media data only for the long markers a dashcam writes
+ * (see {@link #LOG_MARKERS}), and looks through every {@code udta}, {@code meta} and padding box
+ * of the movie, its tracks and their media.
  *
  * <p>It answers "clear" only when it read the whole layout, knew every box in it, and found
  * nothing. Each container this walks has a list of the boxes it may hold, taken from ISO/IEC
@@ -42,7 +44,8 @@ import java.util.Set;
  * box twice, holds more than {@link #MAX_MOVIE_BYTES} in its movie and padding boxes together, has
  * a top-level box this doesn't know, or a track with no media or no handler, or with a handler that
  * isn't video or sound (a timed metadata track, such as GoPro's {@code gpmd} or Google's
- * {@code camm}, can carry a GPS trace). The date and the camera's make and model aren't looked at: a
+ * {@code camm}, can carry a GPS trace). Video frames aren't decoded, so GPS written into the video
+ * stream as binary SEI, with none of the markers above, isn't seen. The date and the camera's make and model aren't looked at: a
  * video that passes keeps them.
  */
 final class VideoLocation {
@@ -51,6 +54,10 @@ final class VideoLocation {
 
     /** How many top-level boxes a file may have before this stops reading it. */
     static final int MAX_TOP_BOXES = 64;
+
+    /** The most of the media data this reads for a GPS log, and the chunk it reads at a time. */
+    static final long MAX_MDAT_BYTES = 64L << 20;
+    static final int MDAT_CHUNK = 64 << 10;
 
     /** How deep the movie box's containers may nest: track, media, media information. */
     private static final int MAX_DEPTH = 4;
@@ -97,7 +104,60 @@ final class VideoLocation {
             ascii("$gngga"),
     };
 
+    /**
+     * What a dashcam's GPS log holds, each long enough that it never turns up in video by chance:
+     * Novatek's {@code freeGPS} block (the name ExifTool gives its parser for those blocks),
+     * LigoGPS's {@code LIGOGPSINFO} header (ExifTool's LIGOGPS parser), and the NMEA 0183 sentence
+     * starts (RMC, GGA, GLL, VTG, GSA) that BlackVue, Viofo, Thinkware and others log in plain
+     * text, from a GPS or a multi-constellation receiver. Matched with case, as NMEA writes them.
+     * Never a bare "gps", which random bytes spell.
+     */
+    static final byte[][] LOG_MARKERS = logMarkers();
+
+    private static byte[][] logMarkers() {
+        java.util.List<byte[]> markers = new java.util.ArrayList<>();
+        markers.add(ascii("freeGPS"));
+        markers.add(ascii("LIGOGPSINFO"));
+        for (String talker : new String[] {"GP", "GN"}) {
+            for (String sentence : new String[] {"RMC", "GGA", "GLL", "VTG", "GSA"}) {
+                markers.add(ascii("$" + talker + sentence + ","));
+            }
+        }
+        return markers.toArray(new byte[0][]);
+    }
+
     private VideoLocation() {
+    }
+
+    /**
+     * Whether [length] bytes of [in] from [start] hold one of {@link #LOG_MARKERS}, read in
+     * {@link #MDAT_CHUNK}-byte chunks that overlap enough to catch a marker split across two.
+     */
+    static boolean holdsGpsLog(RandomAccessFile in, long start, long length) throws IOException {
+        int overlap = 0;
+        boolean[] first = new boolean[256];
+        for (byte[] marker : LOG_MARKERS) {
+            overlap = Math.max(overlap, marker.length - 1);
+            first[marker[0] & 0xFF] = true;
+        }
+        byte[] buffer = new byte[MDAT_CHUNK + overlap];
+        int kept = 0;
+        in.seek(start);
+        for (long left = length; left > 0; ) {
+            int read = (int) Math.min(MDAT_CHUNK, left);
+            in.readFully(buffer, kept, read);
+            int total = kept + read;
+            for (int i = 0; i < total; i++) {
+                if (!first[buffer[i] & 0xFF]) continue;
+                for (byte[] marker : LOG_MARKERS) {
+                    if (matches(buffer, i, total, marker, false)) return true;
+                }
+            }
+            kept = Math.min(overlap, total);
+            System.arraycopy(buffer, total - kept, buffer, 0, kept);
+            left -= read;
+        }
+        return false;
     }
 
     /**
@@ -171,8 +231,11 @@ final class VideoLocation {
                     room -= payload;
                     if (namesAPlace(padding, 0, padding.length)) return null;
                     break;
-                case "ftyp":
                 case "mdat":
+                    // Some dashcams write their GPS log into the media data, as freeGPS blocks.
+                    if (payload > MAX_MDAT_BYTES || holdsGpsLog(in, at + headerSize, payload)) return null;
+                    break;
+                case "ftyp":
                 case "pdin":
                     break;
                 default:
