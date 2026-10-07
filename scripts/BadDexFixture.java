@@ -146,6 +146,11 @@ public class BadDexFixture {
     private static final ImmutableMethodReference ATTRIBUTION_FINDER =
             method("Lfixture/Attributions;", "A02", MODEL, REEL_MODEL, "Ljava/lang/String;");
 
+    private static final String REEL_MID_CARDS = "Lapp/morphe/extension/facebook/reels/ReelMidCards;";
+    /** A Reels mid-card item and its read of the card's unit, both names Redex made up. */
+    private static final String MID_CARD_ITEM = "Lfixture/MidCardItem;";
+    private static final ImmutableMethodReference MID_CARD_UNIT = method(MID_CARD_ITEM, "A0F", OBJECT);
+
     private static final String FOLLOW_CHECK = "Lfixture/FollowCheck;";
     private static final String FB_USER_SESSION = "Lcom/facebook/auth/usersession/FbUserSession;";
     private static final String REEL_DECLUTTER = "Lapp/morphe/extension/facebook/reels/ReelDeclutter;";
@@ -1630,6 +1635,7 @@ public class BadDexFixture {
                 recommendationLabel, showcaseUnit(), showcaseType, preEof, returnController(returnHook()), returnRefresh(),
                 shortcuts(Collections.<String>emptySet()), settingsEntry(), followCheck(followHook()), reelDeclutter(),
                 topBar(false, true, 1), finderStub(FILLED_FINDER_STUB),
+                stub(REEL_MID_CARDS, "midCardType", FILLED_MID_CARD_STUB),
                 emojiProvider(emojiHook(), Collections.<Instruction>emptyList()), systemEmoji(),
                 emojiPictures(emojiPicturesHook(), Collections.<Instruction>emptyList()),
                 batcher(heldBack(), false, false), reelWatchHistory(), edgeSwap(swapGuard(), false, false),
@@ -1681,6 +1687,13 @@ public class BadDexFixture {
             new ImmutableInstruction3rc(Opcode.INVOKE_STATIC_RANGE, 0, 2, ATTRIBUTION_FINDER),
             op(Opcode.MOVE_RESULT_OBJECT, 0),
             op(Opcode.RETURN_OBJECT, 0));
+
+    /** What the reels patch writes in the Threads card stub: the item cast, then its first read. */
+    private static final ImmutableMethodImplementation FILLED_MID_CARD_STUB = body(2,
+            new ImmutableInstruction21c(Opcode.CHECK_CAST, 1, new ImmutableTypeReference(MID_CARD_ITEM)),
+            new ImmutableInstruction35c(Opcode.INVOKE_VIRTUAL, 1, 1, 0, 0, 0, 0, MID_CARD_UNIT),
+            op(Opcode.MOVE_RESULT_OBJECT, 1),
+            op(Opcode.RETURN_OBJECT, 1));
 
     /** The stub as the extension ships it, given a local for its marker: no call at all. */
     private static final ImmutableMethodImplementation UNFILLED_FINDER_STUB = body(3,

@@ -661,6 +661,10 @@ try {
         'Lapp/morphe/extension/: calls Lfixture/Attributions;->A02(Lfixture/ReelModel;Ljava/lang/String;)Lfixture/Model; ' +
         'before its first return')) `
         "The good build's GenAI reel stub was not reported calling Facebook's attribution finder.`n$($good.Output -join "`n")"
+    Assert-True (($good.Output -join "`n") -match [regex]::Escape(
+        'ReelMidCards;->midCardType(Ljava/lang/Object;)Ljava/lang/Object; outside ' +
+        'Lapp/morphe/extension/: calls Lfixture/MidCardItem;->A0F()Ljava/lang/Object; before its first return')) `
+        "The good build's Threads card stub was not reported calling the mid-card item's read.`n$($good.Output -join "`n")"
     # The settings patch sends each of these ShortcutManager calls to SettingsEntry, and the fixture's
     # publisher makes each one from a method of its own (Caller). Every no-call rule in the contract
     # file has to be one of them, or a rule with no bad build below would pass on "0 call sites".
