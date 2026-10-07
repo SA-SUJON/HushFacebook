@@ -17,6 +17,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Dialog;
 import android.app.KeyguardManager;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.hardware.biometrics.BiometricPrompt;
 import android.view.KeyEvent;
@@ -50,6 +51,7 @@ import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
+import app.morphe.extension.shared.settings.Setting;
 
 /**
  * Lock Facebook: a cold start and a return after the chosen time cover Facebook and ask for the
@@ -585,6 +587,51 @@ public class AppLockTest {
             game.restart().resume();
             ShadowLooper.idleMainLooper();
             assertTrue("a game brought back after the time wasn't covered", AppLock.covered(game.get()));
+            assertEquals(2, asked.size());
+        } finally {
+            info.processName = main;
+        }
+    }
+
+    /**
+     * A game already running in its own process while the lock is changed in Facebook's settings:
+     * the main process writes the file, and the game's loaded settings don't see it. Its checks read
+     * the file, so turning the lock off stops the asking, and turning it back on with no wait asks
+     * on the next return.
+     */
+    @Test
+    public void aSideProcessFollowsTheLockAsItsChangedInTheMainOne() {
+        Settings.APP_LOCK.save(true);
+        Application app = RuntimeEnvironment.getApplication();
+        ApplicationInfo info = app.getApplicationInfo();
+        String main = info.processName;
+        SharedPreferences file = Setting.preferences.preferences;
+        info.processName = app.getPackageName() + ":quicksilver";
+        try {
+            SettingsEntry.onApplicationCreate(app);
+            ActivityController<Activity> game = Robolectric.buildActivity(Activity.class).setup();
+            controllers.add(game);
+            ShadowLooper.idleMainLooper();
+            assertTrue(AppLock.covered(game.get()));
+            asked.get(0).answer.unlocked();
+
+            file.edit().putBoolean(Settings.APP_LOCK.key, false).commit();
+            assertTrue("the game's loaded setting should still say on", Settings.APP_LOCK.get());
+            game.pause().stop();
+            ShadowSystemClock.advanceBy(Duration.ofMinutes(5));
+            game.restart().resume();
+            ShadowLooper.idleMainLooper();
+            assertFalse("a lock turned off still covered the game", AppLock.covered(game.get()));
+            assertEquals(1, asked.size());
+
+            file.edit().putBoolean(Settings.APP_LOCK.key, true)
+                    .putString(Settings.APP_LOCK_AFTER.key, AppLock.After.IMMEDIATELY.name()).commit();
+            assertEquals(AppLock.After.ONE_MINUTE, Settings.APP_LOCK_AFTER.get());
+            game.pause().stop();
+            ShadowSystemClock.advanceBy(Duration.ofSeconds(5));
+            game.restart().resume();
+            ShadowLooper.idleMainLooper();
+            assertTrue("a lock turned back on with no wait didn't ask", AppLock.covered(game.get()));
             assertEquals(2, asked.size());
         } finally {
             info.processName = main;

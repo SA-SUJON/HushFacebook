@@ -9,6 +9,7 @@ import android.app.Application;
 import android.app.Dialog;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.biometrics.BiometricManager;
@@ -40,6 +41,7 @@ import app.morphe.extension.facebook.settings.SettingsEntry;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.settings.Setting;
 
 /**
  * Lock Facebook: with its switch on, a cold start and a return after the chosen time cover every
@@ -71,6 +73,11 @@ import app.morphe.extension.shared.Utils;
  * whatever paused Hushfacebook: the Pause switch, the marker file, or safe mode after crashed
  * starts. Each of those is in reach of someone holding the phone, and the switch, which sits
  * behind the lock, is the way off ({@link Settings#APP_LOCK} keeps its value while paused).
+ *
+ * <p>Only the main process writes the settings file, and a setting holds the value its process
+ * loaded at start. So Facebook's other processes, such as its games and ad screens, read the switch
+ * and the time away fresh from the file at each check ({@link #lockOn}, {@link #lockAfter}), and a
+ * change reaches a game that was already running.
  */
 public final class AppLock {
     /** How long Facebook may be away before a return asks again. */
@@ -211,7 +218,48 @@ public final class AppLock {
 
     /** Whether the lock is on: its switch, which reads the same paused or not, once the settings are ready. */
     private static boolean switchedOn() {
-        return Utils.settingsReady() && Settings.APP_LOCK.get();
+        return Utils.settingsReady() && lockOn();
+    }
+
+    /** The lock's switch: the setting in the main process, the settings file as it is now in any other. */
+    static boolean lockOn() {
+        if (!Utils.isMainProcess()) {
+            try {
+                SharedPreferences file = freshSettings();
+                if (file != null) return file.getBoolean(Settings.APP_LOCK.key, Settings.APP_LOCK.defaultValue);
+            } catch (RuntimeException failure) {
+                Logger.printException(() -> "App lock: could not read the switch from the settings file", failure);
+            }
+        }
+        return Settings.APP_LOCK.get();
+    }
+
+    /** How long Facebook may be away: the setting in the main process, the settings file as it is now in any other. */
+    static After lockAfter() {
+        if (!Utils.isMainProcess()) {
+            try {
+                SharedPreferences file = freshSettings();
+                if (file != null) {
+                    String name = file.getString(Settings.APP_LOCK_AFTER.key, null);
+                    return name == null ? Settings.APP_LOCK_AFTER.defaultValue : After.valueOf(name);
+                }
+            } catch (RuntimeException failure) {
+                Logger.printException(() -> "App lock: could not read the time away from the settings file", failure);
+            }
+        }
+        return Settings.APP_LOCK_AFTER.get();
+    }
+
+    /**
+     * The settings file, reloaded when another process wrote it since this one last read it. The
+     * multi-process mode is deprecated for writing from two processes, which nothing here does: only
+     * the main process writes.
+     */
+    @Nullable
+    @SuppressWarnings("deprecation")
+    private static SharedPreferences freshSettings() {
+        Context context = Utils.getContext();
+        return context == null ? null : context.getSharedPreferences(Setting.PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
     }
 
     /** Whether a Facebook screen is in front: started, and not a picture-in-picture window. */
@@ -251,7 +299,7 @@ public final class AppLock {
     private static void returned(Activity activity) {
         try {
             if (!Utils.settingsReady()) return;
-            if (!Settings.APP_LOCK.get() || !canLock(activity)) {
+            if (!lockOn() || !canLock(activity)) {
                 // Nothing to ask with, or nothing asked for: turning the lock on later won't lock this
                 // screen. A lock already up goes too, since with the phone's screen lock gone no check
                 // could ever pass.
@@ -275,7 +323,7 @@ public final class AppLock {
     /** Whether a return now asks: always on a cold start, otherwise after the chosen time away. */
     static boolean due(long now) {
         if (!everUnlocked) return true;
-        return leftAt != NEVER && now - leftAt >= Settings.APP_LOCK_AFTER.get().millis;
+        return leftAt != NEVER && now - leftAt >= lockAfter().millis;
     }
 
     /**
