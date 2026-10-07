@@ -463,6 +463,7 @@ public final class SettingsEntry {
         @Override
         public void onActivityResumed(Activity activity) {
             resumed = new WeakReference<>(activity);
+            ScreenLog.resumed(activity);
             SavedFileActions.onResumed(activity);
             ScreenTransitions.activityResumed(activity);
             TapToPlay.activityResumed(activity);

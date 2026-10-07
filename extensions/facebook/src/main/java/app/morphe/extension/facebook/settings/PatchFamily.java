@@ -385,6 +385,7 @@ public enum PatchFamily {
         LogBufferManager.registerReportSection(REPORT);
         LogBufferManager.registerReportSection(SupportedLinks.REPORT);
         LogBufferManager.registerReportSection(LastScreen.REPORT);
+        LogBufferManager.registerReportSection(ScreenLog.REPORT);
         LogBufferManager.registerReportSection(MaterialYouTheme.REPORT);
         for (PatchFamily family : values()) {
             if (family.switches.isEmpty()) HookStatus.runsWhilePaused(family.patchName);

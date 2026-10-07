@@ -19,6 +19,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Download any photo` has its own **Photo file name** under Downloads, next to the video's. It takes the same tokens, with `{photo_id}` for the photo's number on Facebook, and starts as `FB_IMG_{date}`, the name Facebook's own photo saves get. Export settings carries it.
 * **Facebook:** A **Save Facebook's notification sound** row under Notifications, in every build. It copies Facebook's own chime into the phone's Notifications folder so Android's sound picker lists it, for a notification category that came up as None after a fresh install, which no app can set back on its own (issue #83).
 * **Facebook:** `Turn off screen transitions` also covers tab strips inside a screen. A tap on one of Facebook's in-page tab rows, or on Feelings and Activities in the composer, shows that page at once. Stories, photo viewers and carousels move as before.
+* **Facebook:** With Debug logging on, the diagnostic report lists the last 50 Facebook screens that came to the front, by class, action and the link's host and path (never its query). When a tap opens the wrong screen, the report says which one it was.
 
 ### Fixed
 
