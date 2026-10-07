@@ -713,8 +713,24 @@ public class ReelSpeedTest {
         assertEquals("[0.1, 0.25, 1.0, 2.0]", Arrays.toString(server));
         assertEquals(Arrays.asList("0.1", "0.25", "1.0", "2.0"),
                 Arrays.asList(ReelSpeed.gearLabels(new String[] {"0.25", "1.0", "2.0"})));
-        assertEquals(FamilyNames.KEEP_REEL_SPEED + ": invoked 3, 1 found, 0 missing. Counted: "
-                + ReelSpeed.GEAR_SLOWER_OFFERED + " 2", statusLine());
+
+        // Seen on a phone in German: Facebook's own labels read "0,5x", and the added ones match them.
+        ReelSpeed.gearSpeeds(facebooks);
+        assertEquals(Arrays.asList("0,1x", "0,25x", "0,5x", "0,75x", "1x (Normal)"), Arrays.asList(ReelSpeed.gearLabels(
+                new String[] {"0,5x", "0,75x", "1x (Normal)"})));
+        assertEquals(FamilyNames.KEEP_REEL_SPEED + ": invoked 4, 1 found, 0 missing. Counted: "
+                + ReelSpeed.GEAR_SLOWER_OFFERED + " 3", statusLine());
+    }
+
+    @Test
+    public void anAddedSpeedIsWrittenLikeTheSheetsOwnLabels() {
+        assertEquals("0.25", ReelSpeed.styled("0.25", "0.5"));
+        assertEquals("0,25x", ReelSpeed.styled("0.25", "0,5x"));
+        assertEquals("x0.1", ReelSpeed.styled("0.1", "x0.5"));
+        assertEquals("no model", "0.1", ReelSpeed.styled("0.1", null));
+        assertEquals("a model with no decimal in it", "0.1", ReelSpeed.styled("0.1", "1x (Normal)"));
+        String arabicHalf = new String(new char[] {0x0660, 0x066b, 0x0665});
+        assertEquals("digits [0-9] doesn't read", "0.1", ReelSpeed.styled("0.1", arabicHalf));
     }
 
     /**

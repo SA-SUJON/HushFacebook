@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
@@ -85,6 +87,9 @@ public final class ReelSpeed {
 
     /** The labels of the speeds {@link #gearSpeeds} just put ahead of the sheet's own, for {@link #gearLabels}. */
     private static final ThreadLocal<String[]> GEAR_ADDED = new ThreadLocal<>();
+
+    /** A speed label with a decimal in it: what comes before the number, the decimal mark, and what comes after. */
+    private static final Pattern DECIMAL_LABEL = Pattern.compile("([^0-9]*)[0-9]+([.,])[0-9]+([^0-9]*)");
 
     /**
      * What a player's origin holds when it plays somewhere a kept video speed doesn't belong: chats,
@@ -341,23 +346,42 @@ public final class ReelSpeed {
     }
 
     /**
-     * The labels for the speeds {@link #gearSpeeds} just added on this thread, written the way
-     * Facebook labels a speed from its server list, ahead of the sheet's own labels. Facebook's
-     * labels come back unchanged when nothing was added.
+     * The labels for the speeds {@link #gearSpeeds} just added on this thread, ahead of the sheet's
+     * own labels and written like the first of those with a decimal in it: German's "0,5x" makes
+     * "0,25x", English's "0.5" makes "0.25" ({@link #styled}). Facebook's labels come back unchanged
+     * when nothing was added.
      */
     public static String[] gearLabels(String[] labels) {
         String[] added = GEAR_ADDED.get();
         GEAR_ADDED.remove();
         if (added == null || labels == null) return labels;
         try {
+            String model = null;
+            for (String label : labels) {
+                if (label != null && DECIMAL_LABEL.matcher(label).matches()) {
+                    model = label;
+                    break;
+                }
+            }
             String[] choices = new String[added.length + labels.length];
-            System.arraycopy(added, 0, choices, 0, added.length);
+            for (int i = 0; i < added.length; i++) choices[i] = styled(added[i], model);
             System.arraycopy(labels, 0, choices, added.length, labels.length);
             return choices;
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "gear speed sheet", failure);
             return labels;
         }
+    }
+
+    /**
+     * [plain], a speed like "0.25", with the decimal mark and whatever goes around the number in
+     * [model], a label of Facebook's like "0,5x". [plain] as it is with no model.
+     */
+    static String styled(String plain, @Nullable String model) {
+        if (model == null) return plain;
+        Matcher label = DECIMAL_LABEL.matcher(model);
+        if (!label.matches()) return plain;
+        return label.group(1) + plain.replace('.', label.group(2).charAt(0)) + label.group(3);
     }
 
     private static void pick(float speed, boolean gear, String where) {
