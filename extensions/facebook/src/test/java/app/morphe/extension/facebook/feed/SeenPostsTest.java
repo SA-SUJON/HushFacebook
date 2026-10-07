@@ -6,6 +6,7 @@ package app.morphe.extension.facebook.feed;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -263,13 +264,13 @@ public class SeenPostsTest {
 
     /**
      * Posts past their days go when the file is read, so a list from before a long break doesn't
-     * wait for each post to be looked up, and again when it's written. A time ahead of the clock
-     * goes as well.
+     * wait for each post to be looked up, and again when it's written. A time more than a day
+     * ahead of the clock goes as well.
      */
     @Test
     public void postsPastTheirDaysArePrunedOnReadAndOnWrite() throws IOException {
         long fresh = now.get() - HOUR;
-        Files.write(file.toPath(), ((now.get() - 8 * DAY) + " old\n" + fresh + " fresh\n" + (now.get() + DAY)
+        Files.write(file.toPath(), ((now.get() - 8 * DAY) + " old\n" + fresh + " fresh\n" + (now.get() + 2 * DAY)
                 + " ahead\n").getBytes(StandardCharsets.UTF_8));
         assertEquals("the read kept a post past its days or ahead of the clock", 1, SeenPosts.size());
         SeenPosts.writeNow();
@@ -282,18 +283,90 @@ public class SeenPostsTest {
     }
 
     /**
-     * A clock set back leaves times ahead of it. Such a post counts as past its days rather than
-     * staying hidden until the clock catches up and the whole keep time after that.
+     * A clock set far back leaves times more than a day ahead of it. Such a post counts as past its
+     * days rather than staying hidden until the clock catches up and the whole keep time after that.
+     * This test used to set the clock back an hour, which the day of slack now covers.
      */
     @Test
-    public void aPostSeenAheadOfTheClockIsNotHidden() {
+    public void aPostSeenFarAheadOfTheClockIsNotHidden() {
         Story story = new Story("clock set back");
         SeenPosts.seen(story);
-        now.addAndGet(-HOUR);
-        assertNull("a post seen after now stayed hidden", SeenPosts.hideReason(story));
+        now.addAndGet(-(DAY + HOUR));
+        assertNull("a post seen over a day after now stayed hidden", SeenPosts.hideReason(story));
         assertEquals(0, SeenPosts.size());
-        assertTrue(SeenPosts.expired(now.get() + 1, now.get(), DAY));
+        assertTrue(SeenPosts.expired(now.get() + DAY + 1, now.get(), DAY));
         assertFalse(SeenPosts.expired(now.get(), now.get(), DAY));
+    }
+
+    /**
+     * A one-second correction, or a few minutes of drift, must not bring back the post just seen.
+     * A time up to a day ahead counts as now, so the post stays hidden for its whole keep time from
+     * the corrected clock, and not a moment longer.
+     */
+    @Test
+    public void aSmallClockCorrectionKeepsAJustSeenPostHidden() {
+        Settings.SEEN_POSTS_KEEP.save(SeenPosts.Keep.ONE_DAY);
+        Story story = new Story("clock nudged");
+        long seenAt = now.get();
+        SeenPosts.seen(story);
+        now.addAndGet(-1_000);
+        assertEquals("one second back brought the post back", SeenPosts.REASON, SeenPosts.hideReason(story));
+        now.addAndGet(-HOUR);
+        assertEquals("an hour back brought the post back", SeenPosts.REASON, SeenPosts.hideReason(story));
+        assertEquals(1, SeenPosts.size());
+        assertFalse(SeenPosts.expired(now.get() + DAY, now.get(), DAY));
+        assertFalse(SeenPosts.expired(now.get() + 1, now.get(), DAY));
+        assertFalse(SeenPosts.expired(now.get() + HOUR, now.get() + HOUR + DAY - 1, DAY));
+        assertTrue(SeenPosts.expired(now.get() + HOUR, now.get() + HOUR + DAY, DAY));
+        now.set(seenAt + DAY - 1);
+        assertEquals("the keep time hasn't run out yet", SeenPosts.REASON, SeenPosts.hideReason(story));
+        now.set(seenAt + DAY);
+        assertNull("a day on, the post is past its day", SeenPosts.hideReason(story));
+    }
+
+    /** A second post class whose getCacheId() is its own method, so the reader differs from Story's. */
+    private static final class OtherStory extends GraphQLStory {
+        private final String id;
+
+        OtherStory(String id) {
+            this.id = id;
+        }
+
+        public String getCacheId() {
+            return id;
+        }
+    }
+
+    /**
+     * The reader and the class it was found on are one object, so a thread that sees a class never
+     * gets another class's reader. Two classes asked from several threads each answer for their own
+     * id, never a miss from a reader invoked on the wrong class.
+     */
+    @Test
+    public void everyThreadGetsTheReaderOfItsOwnClass() throws Exception {
+        String expectedStory = SeenPosts.idOf(new Story("one"));
+        String expectedOther = SeenPosts.idOf(new OtherStory("two"));
+        assertNotNull(expectedStory);
+        assertNotNull(expectedOther);
+        assertFalse(expectedStory.equals(expectedOther));
+        java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(4);
+        try {
+            List<java.util.concurrent.Future<Integer>> runs = new ArrayList<>();
+            for (int t = 0; t < 4; t++) {
+                final boolean story = t % 2 == 0;
+                runs.add(pool.submit(() -> {
+                    int wrong = 0;
+                    for (int i = 0; i < 20_000; i++) {
+                        String got = story ? SeenPosts.idOf(new Story("one")) : SeenPosts.idOf(new OtherStory("two"));
+                        if (!(story ? expectedStory : expectedOther).equals(got)) wrong++;
+                    }
+                    return wrong;
+                }));
+            }
+            for (java.util.concurrent.Future<Integer> run : runs) assertEquals(0, (int) run.get());
+        } finally {
+            pool.shutdownNow();
+        }
     }
 
     @Test

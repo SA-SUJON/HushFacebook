@@ -52,9 +52,10 @@ import app.morphe.extension.shared.settings.preference.LogBufferManager;
  * seen. It never leaves the phone and isn't part of an exported settings file. At most {@link #CAP}
  * posts are kept, the oldest forgotten first, and a post is forgotten once it's older than the days
  * the setting names: on a lookup, and for every post when the file is read and each time it's
- * written, so nothing sits in it past its days. A time ahead of the clock, as after the clock was
- * set back, counts as past rather than keeping a post hidden longer. Every write is off the main
- * thread, and an empty list leaves no file.
+ * written, so nothing sits in it past its days. A time up to a day ahead of the clock, as after a
+ * small correction, counts as now, so a post just seen stays hidden. A time more than a day ahead,
+ * as after the clock was set far back, counts as past rather than keeping a post hidden longer.
+ * Every write is off the main thread, and an empty list leaves no file.
  *
  * <p>Turning the switch off forgets the list: the settings screen empties it as the switch goes
  * off, and a hook that finds the switch off (after an import or a reset turned it off) empties it
@@ -108,6 +109,8 @@ public final class SeenPosts {
     private static final String FAMILY = FamilyNames.SEEN_POSTS;
     private static final String FILE_NAME = "hushfacebook_seen_posts.txt";
     private static final long DAY_MS = 24L * 60 * 60 * 1000;
+    /** How far ahead of the clock a time may be and still count as now. */
+    static final long CLOCK_SLACK_MS = DAY_MS;
     private static final long WRITE_DELAY_MS = 5_000;
 
     /** Id to the time it was seen, oldest first. Guarded by itself. */
@@ -131,8 +134,18 @@ public final class SeenPosts {
     @Nullable static Executor backgroundForTests;
     static LongSupplier clock = System::currentTimeMillis;
 
-    private static volatile Method cacheIdReader;
-    private static volatile Class<?> cacheIdOwner;
+    /** The getCacheId() of a unit's class. One object, so a thread never pairs one class with another's reader. */
+    private static final class CacheIdReader {
+        final Class<?> owner;
+        final Method reader;
+
+        CacheIdReader(Class<?> owner, Method reader) {
+            this.owner = owner;
+            this.reader = reader;
+        }
+    }
+
+    @Nullable private static volatile CacheIdReader cacheIdReader;
 
     private SeenPosts() {
     }
@@ -208,14 +221,14 @@ public final class SeenPosts {
     @Nullable
     static String idOf(Object unit) {
         try {
-            Method reader = cacheIdReader;
-            if (reader == null || cacheIdOwner != unit.getClass()) {
-                reader = unit.getClass().getMethod("getCacheId");
+            CacheIdReader known = cacheIdReader;
+            if (known == null || known.owner != unit.getClass()) {
+                Method reader = unit.getClass().getMethod("getCacheId");
                 if (reader.getReturnType() != String.class) return null;
-                cacheIdOwner = unit.getClass();
-                cacheIdReader = reader;
+                known = new CacheIdReader(unit.getClass(), reader);
+                cacheIdReader = known;
             }
-            Object id = reader.invoke(unit);
+            Object id = known.reader.invoke(unit);
             if (!(id instanceof String) || ((String) id).isEmpty()) return null;
             return hash((String) id);
         } catch (ReflectiveOperationException | RuntimeException ignored) {
@@ -248,7 +261,7 @@ public final class SeenPosts {
         }
     }
 
-    /** Whether [id] was seen less than [keepMs] before [now]. An older one is dropped, and so is one seen after [now]. */
+    /** Whether [id] was seen less than [keepMs] before [now]. An older one is dropped, and so is one seen over a day after [now]. */
     static boolean isRemembered(String id, long now, long keepMs) {
         synchronized (STORE) {
             loadLocked();
@@ -265,12 +278,14 @@ public final class SeenPosts {
     }
 
     /**
-     * Whether a post seen at [at] is past [keepMs] at [now]. A time ahead of [now], left by a clock
-     * that was set back, counts as past: it would otherwise keep the post hidden until the clock
-     * caught up and then for the whole keep time again.
+     * Whether a post seen at [at] is past [keepMs] at [now]. A time up to {@link #CLOCK_SLACK_MS}
+     * ahead of [now], left by a small clock correction, counts as now, so the post a moment ago
+     * isn't brought back. One further ahead, left by a clock set far back, counts as past: it would
+     * otherwise keep the post hidden until the clock caught up and then for the whole keep time again.
      */
     static boolean expired(long at, long now, long keepMs) {
-        return at > now || now - at >= keepMs;
+        if (at > now + CLOCK_SLACK_MS) return true;
+        return now - Math.min(at, now) >= keepMs;
     }
 
     /** Drops every post past the days the setting names. Marks the store for a write when it drops one. */
