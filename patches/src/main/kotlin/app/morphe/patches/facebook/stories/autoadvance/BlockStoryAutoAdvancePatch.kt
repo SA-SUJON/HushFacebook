@@ -37,6 +37,7 @@ private const val STORY_BUCKET = "Lcom/facebook/stories/model/StoryBucket;"
 private const val STORY_CARD = "Lcom/facebook/stories/model/StoryCard;"
 private const val WAIT_FOR_TAP = "$EXTENSION_PACKAGE/stories/StoryAdvance;->waitForTap()Z"
 private const val LOOP = "$EXTENSION_PACKAGE/stories/StoryAdvance;->loop()Z"
+private const val LOOP_FAILED = "$EXTENSION_PACKAGE/stories/StoryAdvance;->loopFailed(Ljava/lang/Throwable;)V"
 
 /** The method the patch adds to the progress callback's class to start a finished story again. */
 internal const val LOOP_HELPER = "hushfacebookLoopStory"
@@ -184,7 +185,9 @@ internal fun restartRoute(navigator: Method, owner: String): RestartRoute? {
  * A static method of [owner], the callback's class, taking the callback: when Loop stories is on
  * it makes Facebook's own restart through [route] with false, as the navigator does, so the
  * finished card plays again from the start. It has registers of its own, so the callback lends it
- * none.
+ * none. The navigator reaches the restart only after its own checks, and the environment getter
+ * throws once the viewer has detached, so a throw or a missing restart leaves the story on its
+ * last frame instead of reaching the progress callback.
  */
 internal fun loopHelper(owner: String, route: RestartRoute): MutableMethod = ImmutableMethod(
     owner,
@@ -199,26 +202,31 @@ internal fun loopHelper(owner: String, route: RestartRoute): MutableMethod = Imm
     addInstructions(
         0,
         """
+            invoke-static { }, $LOOP
+            move-result v0
+            if-eqz v0, :done
             invoke-virtual { p0 }, ${route.environment}
             move-result-object v0
             invoke-static { v0 }, ${route.lookup}
             move-result-object v0
+            if-eqz v0, :done
             const/4 v1, 0x0
             invoke-interface { v0, v1 }, ${route.reset}
+            :done
+            return-void
+            move-exception v0
+            invoke-static { v0 }, $LOOP_FAILED
             return-void
         """,
     )
-    // The label binds to the return already in place, so a no from the switch skips the restart.
-    addInstructionsWithLabels(
-        0,
-        """
-            invoke-static { }, $LOOP
-            move-result v0
-            if-eqz v0, :done
-        """,
-        ExternalLabel("done", getInstruction(6)),
-    )
+    val body = implementation!!
+    body.addCatch(body.newLabelForIndex(LOOP_RESTART_FROM), body.newLabelForIndex(LOOP_RESTART_TO),
+        body.newLabelForIndex(LOOP_RESTART_TO + 1))
 }
+
+/** The helper's restart, from the environment getter up to (not including) the return it skips to. */
+internal const val LOOP_RESTART_FROM = 3
+internal const val LOOP_RESTART_TO = 10
 
 /** The only callback that receives Story progress and invokes this controller's auto navigation. */
 internal fun autoAdvanceHook(owner: ClassDef): Pair<Method, Int>? {

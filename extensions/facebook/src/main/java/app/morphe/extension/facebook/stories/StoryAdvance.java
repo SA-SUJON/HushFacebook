@@ -43,4 +43,12 @@ public final class StoryAdvance {
             return false;
         }
     }
+
+    /**
+     * Facebook's restart threw inside the loop helper: the viewer had detached, or the surface
+     * has no restart. The story stays on its last frame.
+     */
+    public static void loopFailed(Throwable failure) {
+        HookStatus.threw(FamilyNames.STORY_AUTO_ADVANCE, "Story loop restart", failure);
+    }
 }

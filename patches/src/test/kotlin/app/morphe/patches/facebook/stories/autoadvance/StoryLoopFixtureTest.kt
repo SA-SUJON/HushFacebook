@@ -8,6 +8,7 @@ import app.morphe.Fixtures
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.Opcode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -43,9 +44,21 @@ class StoryLoopFixtureTest {
                 assertEquals("${bundle.name}: the reset is the lookup's", route.lookup.returnType, route.reset.definingClass)
                 assertEquals("${bundle.name}: the reset takes a boolean", listOf("Z"), route.reset.parameterTypes.map { it.toString() })
                 assertFalse("${bundle.name}: the class already has the loop helper", owner.methods.any { it.name == LOOP_HELPER })
-                // The helper builds: the switch, the branch over the restart, and the restart's calls.
-                val helper = loopHelper(owner.type, route).implementation!!.instructions.toList()
-                assertEquals("${bundle.name}: the helper's body", 10, helper.size)
+                // The helper builds: the switch, the branch over the restart, the restart's calls with
+                // a null check, and a catch-all around the restart that reports and returns.
+                val body = loopHelper(owner.type, route).implementation!!
+                val helper = body.instructions.toList()
+                assertEquals("${bundle.name}: the helper's body", 14, helper.size)
+                assertEquals("${bundle.name}: the restart starts at the environment getter",
+                    Opcode.INVOKE_VIRTUAL, helper[LOOP_RESTART_FROM].opcode)
+                assertEquals("${bundle.name}: the restart ends at the return it skips to",
+                    Opcode.RETURN_VOID, helper[LOOP_RESTART_TO].opcode)
+                val guard = body.tryBlocks.singleOrNull()
+                assertNotNull("${bundle.name}: one catch around the restart", guard)
+                assertEquals("${bundle.name}: the catch takes every throwable", null,
+                    guard!!.exceptionHandlers.single().exceptionType)
+                assertEquals("${bundle.name}: the handler reads the throwable", Opcode.MOVE_EXCEPTION,
+                    helper[LOOP_RESTART_TO + 1].opcode)
                 checked += version
             }
         }
