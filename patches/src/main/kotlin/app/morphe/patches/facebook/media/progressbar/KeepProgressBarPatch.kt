@@ -20,6 +20,8 @@ import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
@@ -49,6 +51,8 @@ internal const val REMOVE_MESSAGES = "Landroid/os/Handler;->removeMessages(I)V"
 internal const val PROGRESS_BAR = "$EXTENSION_PACKAGE/media/ProgressBar;"
 internal const val KEEPS_REEL_BAR = "$PROGRESS_BAR->keepsReelBar()Z"
 internal const val KEEPS_CONTROLS = "$PROGRESS_BAR->keepsControls()Z"
+internal const val HIDE_TIME_LABEL = "$PROGRESS_BAR->hideTimeLabel(Landroid/view/ViewGroup;)V"
+internal const val VIEW_GROUP = "Landroid/view/ViewGroup;"
 
 /**
  * Keeps a video's progress bar on screen, in the players that hide theirs a few seconds in.
@@ -58,8 +62,12 @@ internal const val KEEPS_CONTROLS = "$PROGRESS_BAR->keepsControls()Z"
  * switches to before a touch and again about a second after a drag ends. Both are `()V` methods
  * that begin by tracing their own name, [SCRUBBER_ACTIVE] and [SCRUBBER_PASSIVE] (581 `LX/RV4;`
  * `A18` and `A19`, 580 `LX/Rln;` `A15` and `A16`, 577 `LX/SHD;` `A18` and `A19`). The extension
- * goes first in the passive one, and while the switch is on it runs the active one instead and
- * returns.
+ * goes first in the passive one, and while the switch is on it runs the active one instead, then
+ * hides the scrubber's time label and returns. The passive look hides that label (a ViewGroup
+ * holding the elapsed and total time, `A09` of the scrubber's views holder) and the active one
+ * shows it, and only a drag updates the times, so without the hide the label would sit frozen at
+ * 0:00 over the reel's author row. A drag still shows it, as the touch path calls the active look
+ * itself and the seek bar listener sets the label's visibility.
  *
  * Older builds' Reels viewer used a bottom bar plugin, named [REEL_SEEK_BAR_PLUGIN], sizes its SeekBar with two
  * static (SeekBar, plugin) methods (581 `LX/8sg;->A00` and `A01`, still present on every declared
@@ -107,7 +115,7 @@ val keepProgressBarPatch = bytecodePatch(
         val timer = fadeTimer(controls)
 
         mutableClassDefBy(scrubber.type).methods.single { it.sameAs(scrubber.passive) }
-            .activeInstead(scrubber.type, scrubber.active)
+            .activeInstead(scrubber)
         if (plugin != null && sizes != null) {
             mutableClassDefBy(plugin.type).methods.single { it.sameAs(sizes.shrink) }
                 .fullSizeInstead(plugin.type, sizes.fullSize)
@@ -142,7 +150,14 @@ internal fun reelSeekBarPlugin(holders: List<ClassDef>): ClassDef {
 }
 
 /** The unified scrubber's class and its two looks. */
-internal class ScrubberLooks(val type: String, val active: Method, val passive: Method)
+internal class ScrubberLooks(
+    val type: String,
+    val active: Method,
+    val passive: Method,
+    /** The scrubber's field holding its views (581 `A0I`), and the time label field in that holder (`A09`). */
+    val viewsField: String,
+    val labelField: String,
+)
 
 /**
  * The scrubber class: the one of [holders] with an instance `()V` method tracing
@@ -156,7 +171,31 @@ internal fun vddScrubber(holders: List<ClassDef>): ScrubberLooks {
     val scrubbers = holders.distinctBy { it.type }.filter { look(it, SCRUBBER_ACTIVE).size == 1 && look(it, SCRUBBER_PASSIVE).size == 1 }
     val scrubber = scrubbers.singleOrNull()
         ?: refuse("expected one class tracing both \"$SCRUBBER_ACTIVE\" and \"$SCRUBBER_PASSIVE\", found ${scrubbers.size}")
-    return ScrubberLooks(scrubber.type, look(scrubber, SCRUBBER_ACTIVE).single(), look(scrubber, SCRUBBER_PASSIVE).single())
+    val passive = look(scrubber, SCRUBBER_PASSIVE).single()
+    val (viewsField, labelField) = timeLabelFields(scrubber.type, passive)
+    return ScrubberLooks(scrubber.type, look(scrubber, SCRUBBER_ACTIVE).single(), passive, viewsField, labelField)
+}
+
+/**
+ * The time label's two fields, read from the passive look, which hides the label: the one
+ * `iget-object` of a [VIEW_GROUP] field in it, straight after the `iget-object` of the scrubber's
+ * own field that holds the views class declaring it. Refuses unless that's exactly one field.
+ */
+internal fun timeLabelFields(scrubber: String, passive: Method): Pair<String, String> {
+    val code = passive.implementation!!.instructions.toList()
+    val found = code.indices.mapNotNull { index ->
+        val label = (code[index] as? ReferenceInstruction)?.takeIf { it.opcode == Opcode.IGET_OBJECT }?.reference as? FieldReference
+        val views = (code.getOrNull(index - 1) as? ReferenceInstruction)?.takeIf { it.opcode == Opcode.IGET_OBJECT }?.reference as? FieldReference
+        if (label != null && views != null && label.type == VIEW_GROUP && views.definingClass == scrubber &&
+            views.type == label.definingClass
+        ) {
+            views.toString() to label.toString()
+        } else {
+            null
+        }
+    }.distinct()
+    return found.singleOrNull()
+        ?: refuse("$scrubber->${passive.name} reads ${found.size} view group fields off the scrubber's views, expected the one time label")
 }
 
 /** The plugin's two size methods. */
@@ -203,10 +242,11 @@ internal fun fadeTimer(controls: ClassDef): Method {
 
 /**
  * First thing in the scrubber's passive look: while the extension keeps the bar, run the active
- * look on the same instance and return. Otherwise Facebook's own code runs from its first
- * instruction. The range form names p0, which can sit past v15 in these long methods.
+ * look on the same instance, hide the time label the way the passive look does, and return.
+ * Otherwise Facebook's own code runs from its first instruction. The range form names p0, which
+ * can sit past v15 in these long methods, and so does the move that reads it into v0 (format 22x).
  */
-internal fun MutableMethod.activeInstead(scrubber: String, active: Method) {
+internal fun MutableMethod.activeInstead(looks: ScrubberLooks) {
     requireLocals(PATCH, 1)
     addInstructionsWithLabels(
         0,
@@ -214,7 +254,11 @@ internal fun MutableMethod.activeInstead(scrubber: String, active: Method) {
             invoke-static { }, $KEEPS_REEL_BAR
             move-result v0
             if-eqz v0, :facebook
-            invoke-virtual/range { p0 .. p0 }, $scrubber->${active.name}()V
+            invoke-virtual/range { p0 .. p0 }, ${looks.type}->${looks.active.name}()V
+            move-object/from16 v0, p0
+            iget-object v0, v0, ${looks.viewsField}
+            iget-object v0, v0, ${looks.labelField}
+            invoke-static { v0 }, $HIDE_TIME_LABEL
             return-void
         """,
         ExternalLabel("facebook", getInstruction(0)),

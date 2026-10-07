@@ -9,12 +9,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import android.view.View;
+import android.widget.LinearLayout;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
@@ -101,5 +105,24 @@ public class ProgressBarTest {
         assertNull("nothing asks before the switch changes", Settings.KEEP_PROGRESS_BAR.userDialogMessage);
         assertTrue("Pause and the report don't know the switch",
                 PatchFamily.PROGRESS_BAR.switches.contains(Settings.KEEP_PROGRESS_BAR));
+    }
+
+    @Test
+    public void theTimeLabelIsHiddenAfterTheActiveLookAndCountedOnce() {
+        LinearLayout label = new LinearLayout(RuntimeEnvironment.getApplication());
+        label.setVisibility(View.VISIBLE);
+        ProgressBar.hideTimeLabel(label);
+        assertEquals("the label stayed on screen", View.INVISIBLE, label.getVisibility());
+        // Already hidden: nothing to do, nothing counted again.
+        ProgressBar.hideTimeLabel(label);
+        assertEquals(View.INVISIBLE, label.getVisibility());
+        assertEquals(FamilyNames.PROGRESS_BAR + ": invoked 0, 0 found, 0 missing. Counted: "
+                + ProgressBar.TIME_LABEL_HIDDEN + " 1", statusLine());
+    }
+
+    @Test
+    public void aMissingTimeLabelIsLeftAlone() {
+        ProgressBar.hideTimeLabel(null);
+        assertNull("a missing label was reported", statusLine());
     }
 }

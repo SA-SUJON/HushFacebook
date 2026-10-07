@@ -18,7 +18,9 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -111,10 +113,10 @@ class KeepProgressBarFixtureTest {
         val context = PatchContexts.of(listOf(holders.single { it.type == looks.type }))
         val passive = context.mutableClassDefBy(looks.type).methods.single { it.sameAs(looks.passive) }
         val original = passive.code()
-        passive.activeInstead(looks.type, looks.active)
+        passive.activeInstead(looks)
         val patched = passive.code()
         val where = "$name: ${looks.type}->${looks.passive.name}"
-        assertEquals("$where gains five instructions", original.size + 5, patched.size)
+        assertEquals("$where gains nine instructions", original.size + 9, patched.size)
         assertEquals("$where: the extension is asked first", KEEPS_REEL_BAR, patched[0].reference())
         assertEquals("$where: its answer is kept", Opcode.MOVE_RESULT, patched[1].opcode)
         val register = (patched[1] as OneRegisterInstruction).registerA
@@ -125,9 +127,40 @@ class KeepProgressBarFixtureTest {
         val call = patched[3] as RegisterRangeInstruction
         assertEquals("$where: on this instance only", listOf(passive.localRegisterCount(), 1),
             listOf(call.startRegister, call.registerCount))
-        assertEquals("$where: and returns", Opcode.RETURN_VOID, patched[4].opcode)
-        assertEquals("$where: Facebook's code stays", original.map { it.opcode }, patched.drop(5).map { it.opcode })
-        assertEquals("$where: a no lands on Facebook's first instruction", setOf(3, 5), ControlFlow.of(passive).normal[2].toSet())
+        val local = passive.localRegisterCount()
+        assertEquals("$where: the instance moves into a local through the wide form", Opcode.MOVE_OBJECT_FROM16, patched[4].opcode)
+        val move = patched[4] as TwoRegisterInstruction
+        assertEquals("$where: from p0 into the hook's local", listOf(register, local), listOf(move.registerA, move.registerB))
+        assertEquals("$where: the views holder is read off the scrubber", looks.viewsField, patched[5].reference())
+        assertEquals("$where: then the time label out of it", looks.labelField, patched[6].reference())
+        for (index in 5..6) {
+            val read = patched[index] as TwoRegisterInstruction
+            assertEquals("$where: read $index stays in the local", listOf(register, register), listOf(read.registerA, read.registerB))
+        }
+        assertEquals("$where: the label is a ViewGroup of the views holder", VIEW_GROUP,
+            (patched[6] as ReferenceInstruction).reference.let { (it as FieldReference).type })
+        assertEquals("$where: the label goes to the extension", HIDE_TIME_LABEL, patched[7].reference())
+        assertEquals("$where: with the local", listOf(register), listOf((patched[7] as FiveRegisterInstruction).registerC))
+        assertEquals("$where: and returns", Opcode.RETURN_VOID, patched[8].opcode)
+        assertEquals("$where: Facebook's code stays", original.map { it.opcode }, patched.drop(9).map { it.opcode })
+        assertEquals("$where: a no lands on Facebook's first instruction", setOf(3, 9), ControlFlow.of(passive).normal[2].toSet())
+    }
+
+    @Test
+    fun `each declared build hides the time label where the passive look does`() = bundles { bundle ->
+        val name = bundle.name
+        val holders = FixtureDex.classesHolding(bundle, SCRUBBER_PASSIVE).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        val looks = vddScrubber(holders)
+        // The passive look sets the label INVISIBLE (4) through the same fields the hook reads.
+        val code = looks.passive.code()
+        val read = code.indexOfFirst { it.reference() == looks.labelField }
+        assertTrue("$name: the passive look doesn't read ${looks.labelField}", read > 0)
+        assertEquals("$name: the views holder is read first", looks.viewsField, code[read - 1].reference())
+        assertTrue("$name: the passive look doesn't make the label invisible",
+            code.drop(read).take(8).any { (it as? WideLiteralInstruction)?.wideLiteral == 4L })
+        // The active look reads the same label field, to show it.
+        assertTrue("$name: the active look doesn't read ${looks.labelField}",
+            looks.active.code().any { it.reference() == looks.labelField })
     }
 
     @Test
