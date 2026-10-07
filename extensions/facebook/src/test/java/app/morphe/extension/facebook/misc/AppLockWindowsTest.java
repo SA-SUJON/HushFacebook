@@ -193,6 +193,8 @@ public class AppLockWindowsTest {
 
         AppLock.resumed(screen);
         assertFalse("coming back didn't restart the poll", nothingScheduled());
+        // The stand-in list learns of the fresh cover the resume put on top before the overlay lands above it.
+        AppLock.roots.list();
         View overlay = notFocusableWindow(screen);
         ShadowLooper.idleMainLooper(AppLock.WATCH_MS * 2, TimeUnit.MILLISECONDS);
         assertTrue(takesNoTouch(overlay));

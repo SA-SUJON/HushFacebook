@@ -380,19 +380,19 @@ public class PostWordsTest {
     @Test
     public void aCapitalisedLongPostReadsEachPatternOnceAndStillHides() throws Exception {
         long probe = 10_000;
-        long perProbe = stepsFor("zzz", repeat("A", (int) probe));
-        assertTrue("the probe pattern costs nothing per character", perProbe > probe / 2);
+        long perProbe = stepsFor("az", repeat("A", (int) probe));
+        assertTrue("the probe pattern can start at every character and costs a step each", perProbe > probe / 2);
         // Between half and the whole of the post's budget: it fits read once, never read twice.
         int length = (int) (probe * (PostWords.STEPS_PER_POST * 3 / 4) / perProbe);
         String longPost = repeat("A", length);
-        assertTrue(stepsFor("zzz", longPost) > PostWords.STEPS_PER_POST / 2);
-        assertTrue(stepsFor("zzz", longPost) < PostWords.STEPS_PER_POST);
+        assertTrue(stepsFor("az", longPost) > PostWords.STEPS_PER_POST / 2);
+        assertTrue(stepsFor("az", longPost) < PostWords.STEPS_PER_POST);
 
-        assertEquals(PostWords.Verdict.NO_MATCH, judge("/zzz/", "", longPost));
-        assertEquals(PostWords.Verdict.HIDE_PATTERN, judge("/zzz/", "", longPost.substring(0, length - 3) + "ZZZ"));
+        assertEquals(PostWords.Verdict.NO_MATCH, judge("/az/", "", longPost));
+        assertEquals(PostWords.Verdict.HIDE_PATTERN, judge("/az/", "", longPost.substring(0, length - 1) + "Z"));
         // Styled and full-width letters differ from their fold by more than case, so they still hide.
-        assertEquals(PostWords.Verdict.HIDE_PATTERN, judge("/zzz/", "", "ｚｚｚ"));
-        assertEquals(PostWords.Verdict.HIDE_PATTERN, judge("/zzz/", "", "𝐳𝐳𝐳"));
+        assertEquals(PostWords.Verdict.HIDE_PATTERN, judge("/az/", "", "ａｚ"));
+        assertEquals(PostWords.Verdict.HIDE_PATTERN, judge("/az/", "", "𝐚𝐳"));
     }
 
     @Test
