@@ -75,7 +75,7 @@ public class RowChevronTest {
             "Video file name", "Photo file name", "When you tap Download", "App to send to", "Supported links", "Meta App Manager", "Messenger", "Instagram",
             "Quiet hours start", "Quiet hours end", "Lock after", "Text size", "Accent color", "Hide posts with more reactions than",
             "Export settings", "Import settings",
-            "Export diagnostic report", "Source code and issues", "Licenses"));
+            "Export diagnostic report", "Facebook's Whitehat settings", "Source code and issues", "Licenses"));
 
     /** Built by the first show(), after a test has set the text size it wants. */
     private ActivityController<Activity> controller;

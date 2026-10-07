@@ -1238,3 +1238,11 @@ Empties the list of posts you've seen, so they can show up again.	Leert die List
 Seen posts forgotten.	Gesehene Beiträge wurden vergessen.
 # context: what a settings import changes; %1$s is a time such as 7 days
 Posts you've seen will stay hidden for %1$s.	Gesehene Beiträge bleiben %1$s lang ausgeblendet.
+# context: settings row under Pause, backup and diagnostics that opens Facebook's own Whitehat screen; Whitehat is Facebook's name for its security researcher program, keep it
+Facebook's Whitehat settings	Facebooks Whitehat-Einstellungen
+# context: summary of that row when Facebook's screen is on the phone
+Facebook's own screen for security research, where it can trust certificates you installed and send its traffic through a proxy. Hushfacebook doesn't change anything there.	Facebooks eigener Bildschirm für Sicherheitsforschung, auf dem es von dir installierten Zertifikaten vertrauen und seinen Datenverkehr über einen Proxy leiten kann. Hushfacebook ändert dort nichts.
+# context: summary of that row when Facebook hasn't downloaded the screen, so the row opens a web page
+Facebook hasn't downloaded this screen to this phone, so a tap opens the Whitehat page on the web instead.	Facebook hat diesen Bildschirm nicht auf dieses Handy geladen. Ein Tippen öffnet deshalb die Whitehat-Seite im Web.
+# context: toast when the Facebook version has no such screen
+This Facebook build has no Whitehat settings screen.	Diese Facebook-Version hat keinen Bildschirm für Whitehat-Einstellungen.
