@@ -91,7 +91,7 @@ public class SettingsNavigationTest {
     @Test public void homeAndEveryCategoryAreReachableWithoutRemovingTheModel() {
         assertNotNull(page.navigation);
         assertEquals(9, list().getCount());
-        assertEquals(20, page.sections().size());
+        assertEquals(21, page.sections().size());
         int total = page.getPreferenceScreen().getRootAdapter().getCount();
         for (Preference section : page.sections()) {
             assertTrue(page.navigation.open(section));

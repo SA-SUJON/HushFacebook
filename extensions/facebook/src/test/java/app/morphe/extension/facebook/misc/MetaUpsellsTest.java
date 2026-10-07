@@ -39,21 +39,27 @@ import app.morphe.extension.shared.settings.PauseForTests;
 public class MetaUpsellsTest {
     @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
 
-    private static final BooleanSetting[] SWITCHES = {Settings.HIDE_EDITS_UPSELLS, Settings.HIDE_THREADS_CROSS_POSTING,
-            Settings.HIDE_META_VERIFIED_UPSELLS, Settings.HIDE_AVATAR_UPSELLS};
+    /**
+     * The four switches, filled in once the rule has set the context: naming Settings in a static
+     * field loads it at class init, before any context, and leaves BaseSettings broken for every
+     * test that runs after it in this sandbox.
+     */
+    private BooleanSetting[] switches;
 
     /** What Kotlin hands back from a suspend method that hasn't finished, as far as the hook can tell. */
     private static final Object NOT_YET = new Object();
 
     @Before
     public void start() {
+        switches = new BooleanSetting[] {Settings.HIDE_EDITS_UPSELLS, Settings.HIDE_THREADS_CROSS_POSTING,
+                Settings.HIDE_META_VERIFIED_UPSELLS, Settings.HIDE_AVATAR_UPSELLS};
         HookStatus.clear();
     }
 
     @After
     public void restore() {
         PauseForTests.resume();
-        for (BooleanSetting setting : SWITCHES) setting.resetToDefault();
+        for (BooleanSetting setting : switches) setting.resetToDefault();
         HookStatus.clear();
     }
 
@@ -77,7 +83,7 @@ public class MetaUpsellsTest {
 
     @Test
     public void everySwitchStartsOffAndFacebookDecides() {
-        for (BooleanSetting setting : SWITCHES) assertFalse(setting.key + " starts on", setting.get());
+        for (BooleanSetting setting : switches) assertFalse(setting.key + " starts on", setting.get());
         assertTrue(Arrays.toString(hiding()), Arrays.equals(new boolean[4], hiding()));
         assertEquals("Meta Verified", MetaUpsells.metaVerifiedLabel("Meta Verified"));
         assertEquals(Boolean.TRUE, MetaUpsells.fetchEditsPill(Boolean.TRUE));
@@ -85,11 +91,13 @@ public class MetaUpsellsTest {
 
     @Test
     public void eachSwitchHidesOnlyItsOwnAndIsCounted() {
-        for (int on = 0; on < SWITCHES.length; on++) {
-            for (BooleanSetting setting : SWITCHES) setting.save(setting == SWITCHES[on]);
+        for (int on = 0; on < switches.length; on++) {
+            for (BooleanSetting setting : switches) setting.save(setting == switches[on]);
             boolean[] expected = new boolean[4];
             expected[on] = true;
-            assertTrue(SWITCHES[on].key + " hid " + Arrays.toString(hiding()), Arrays.equals(expected, hiding()));
+            // Asked once per switch: each ask counts, so the counts below are one round of asks.
+            boolean[] hid = hiding();
+            assertTrue(switches[on].key + " hid " + Arrays.toString(hid), Arrays.equals(expected, hid));
         }
         String line = statusLine();
         assertTrue(line, line.contains(MetaUpsells.EDITS_HIDDEN + " 3"));
@@ -100,7 +108,7 @@ public class MetaUpsellsTest {
 
     @Test
     public void aNoStaysANoAndTheSuspendMarkerPasses() {
-        for (BooleanSetting setting : SWITCHES) setting.save(true);
+        for (BooleanSetting setting : switches) setting.save(true);
         assertFalse(MetaUpsells.editsHeader(false));
         assertFalse(MetaUpsells.fetchEditsPill(false));
         assertFalse(MetaUpsells.threadsOnboarding(0));
@@ -114,7 +122,7 @@ public class MetaUpsellsTest {
 
     @Test
     public void pausedEveryAnswerIsFacebooks() {
-        for (BooleanSetting setting : SWITCHES) setting.save(true);
+        for (BooleanSetting setting : switches) setting.save(true);
         for (HushfacebookPause.Reason reason : new HushfacebookPause.Reason[] {
                 HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP}) {
             PauseForTests.pause(reason);
@@ -126,7 +134,7 @@ public class MetaUpsellsTest {
 
     @Test
     public void theSwitchesTravelWithThePatch() {
-        assertEquals(Arrays.asList(SWITCHES), PatchFamily.META_UPSELLS.switches);
+        assertEquals(Arrays.asList(switches), PatchFamily.META_UPSELLS.switches);
         assertEquals("Hide Meta upsells", FamilyNames.META_UPSELLS);
     }
 }
