@@ -56,25 +56,29 @@ val downloadPhotoPatch = bytecodePatch(
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {
+        // The post menu's anchors are found before either hook goes in, so a build without one
+        // fails whole instead of keeping the photo hooks with no switch in settings.
+        val addPostMenuItem = postMenuPhotoItem()
         unlockPhotoSave()
-        addPostMenuPhotoItem()
+        addPostMenuItem()
         enableStatus("photoDownload")
     }
 }
 
-/** Adds the post menu's Save photo item, which the extension shows only while its switch is on. */
-internal fun BytecodePatchContext.addPostMenuPhotoItem() {
+/**
+ * Finds the post menu's Save photo item, which the extension shows only while its switch is on.
+ * Nothing changes until the step it returns runs.
+ */
+internal fun BytecodePatchContext.postMenuPhotoItem(): () -> Unit {
     val menu = postMenu()
     val subattachments = graphQlGetter(GRAPHQL_STORY_ATTACHMENT, IMMUTABLE_LIST, SUBATTACHMENTS_FIELD, "subattachments")
-    callAfterMenuFill(
+    val helper = postMenuHelper(
         menu,
-        postMenuHelper(
-            menu,
-            PHOTO_MENU_HELPER,
-            ADD_PHOTO_ITEM,
-            listOf(menu.attachments, menu.media, menu.attachedStory, subattachments),
-        ),
+        PHOTO_MENU_HELPER,
+        ADD_PHOTO_ITEM,
+        listOf(menu.attachments, menu.media, menu.attachedStory, subattachments),
     )
+    return { callAfterMenuFill(menu, helper) }
 }
 
 /** Puts the switch on every photo-menu read of `can_viewer_download` and wraps Save photo's action. */

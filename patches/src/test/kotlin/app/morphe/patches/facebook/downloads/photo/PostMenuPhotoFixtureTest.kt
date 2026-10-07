@@ -101,7 +101,7 @@ class PostMenuPhotoFixtureTest {
                 assertEquals("$name: classes read", types, classes.keys)
 
                 val context = PatchContexts.of(classes.values)
-                with(context) { addPostMenuPhotoItem() }
+                with(context) { postMenuPhotoItem()() }
 
                 val creator = context.mutableClassDefBy(site.definingClass)
                 val helper = creator.methods.single { it.name == PHOTO_MENU_HELPER }
