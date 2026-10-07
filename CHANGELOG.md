@@ -45,6 +45,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Keep the reel speed` has a second switch, **Keep the video speed**, under Reels and Watch. Turn it on and a playback speed you pick in a feed or Watch video's gear menu carries to the next videos you play, until you pick another or Facebook restarts. Reels keep their own speed, and ads, live videos, stories and videos in chats start at Facebook's speed. It starts off.
 * **Facebook:** A settings file now carries the Reels and Stories playback qualities and the video and photo subfolders. The import preview says what each will change, and an unknown quality or a subfolder with a path in it is refused.
 * **Facebook:** New `Comment sheet options` with two switches under Comments, both off to start. **Like only** stops a long press on Like from opening the reactions, so a tap just likes, and **Hide GIF and sticker buttons** takes them out of the comment box. A **Hide reaction counts** row opens Facebook's own settings, where Reaction preferences lives. Pick the patch in Manager to get it.
+* **Facebook:** `Hide Meta upsells` has a new **Hide Meta AI's Imagine** switch, off to start. It takes the Imagine me button off posts and takes Imagine out of the post composer and the row of tools at the top of Create story.
+* **Facebook:** `Hide Meta upsells` has a new **Hide Threads in the share sheet** switch, off to start. The share sheet loses its Threads button and keeps every other way to share in the same order.
 
 ### Fixed
 
