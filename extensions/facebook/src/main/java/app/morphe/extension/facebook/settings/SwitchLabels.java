@@ -35,6 +35,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_HOME_COMPOSER) return L10n.t("Hide the composer row");
         if (setting == Settings.HIDE_FEED_REELS) return L10n.t("Hide Reels in the feed");
         if (setting == Settings.HIDE_POST_PROMPTS) return L10n.t("Hide post prompts");
+        if (setting == Settings.HIDE_SEEN_POSTS) return L10n.t("Hide posts you've already seen");
         if (setting == Settings.HIDE_META_AI_QUESTIONS) return L10n.t("Hide Meta AI questions under posts");
         if (setting == Settings.KEEP_POST_DATES) return L10n.t("Keep post dates");
         if (setting == Settings.TURN_OFF_AUTO_TRANSLATION) return L10n.t("Turn off auto-translation");

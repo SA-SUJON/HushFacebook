@@ -14,6 +14,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.folderSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.lockAfterSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.photoNameSummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.seenKeepSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.playbackQualitySummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.qualitySummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.accentSummary;
@@ -59,6 +60,7 @@ import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.feed.ReactionCeiling;
 import app.morphe.extension.facebook.feed.TopicPacks;
+import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
@@ -721,6 +723,45 @@ final class ValueRows {
                 if (candidate.name().equals(getValue())) after = candidate;
             }
             setSummary(lockAfterSummary(after));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The seen posts row: how long a post you've scrolled past stays hidden. Its summary follows its
+     * value, whoever sets it: the person, the shared page syncing it from the setting, or an import.
+     */
+    static final class SeenKeepRow extends ListPreference {
+        SeenKeepRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            SeenPosts.Keep keep = SeenPosts.Keep.SEVEN_DAYS;
+            for (SeenPosts.Keep candidate : SeenPosts.Keep.values()) {
+                if (candidate.name().equals(getValue())) keep = candidate;
+            }
+            setSummary(seenKeepSummary(keep));
         }
 
         @Override

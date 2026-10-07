@@ -65,6 +65,7 @@ import app.morphe.extension.facebook.download.VideoMenuItemForTests;
 import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.AutoTranslationForTests;
 import app.morphe.extension.facebook.feed.FeedFilter;
+import app.morphe.extension.facebook.feed.SeenPostsForTests;
 import app.morphe.extension.facebook.feed.FeedsHeader;
 import app.morphe.extension.facebook.feed.FollowingHome;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
@@ -350,6 +351,8 @@ public class PausedHooksTest {
                 () -> FeedGuardForTests.hidesPopularPost(Category.ORGANIC)));
         // A story with a bumper is answered as one without, so no strip is drawn and no room kept.
         probes.put(PatchFamily.POST_PROMPTS, Collections.singletonList(() -> !PostPrompts.keep(true)));
+        // A post the store remembers is dropped by the feed guard while the switch is on.
+        probes.put(PatchFamily.SEEN_POSTS, Collections.singletonList(SeenPostsForTests::hidesARememberedPost));
         // The pill socket's yes for Meta AI's questions is answered as a no, so it draws no row for
         // them, and its default way of drawing a pill drops one typed meta_ai.
         probes.put(PatchFamily.META_AI_QUESTIONS, Arrays.asList(

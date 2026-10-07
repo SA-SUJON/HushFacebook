@@ -1204,3 +1204,27 @@ Hides posts with more than %1$s reactions, read from the count Facebook shows un
 The feed won't hide posts for how many reactions they have.	Akış, gönderileri tepki sayısına göre gizlemeyecek.
 # context: settings import preview and result: the file sets a reaction ceiling; %1$s is a number such as 5,000
 The feed will hide posts with more than %1$s reactions.	Akış, %1$s tepkiden fazlası olan gönderileri gizleyecek.
+# context: switch title under News feed; it keeps posts you scrolled past out of the feed on later loads
+Hide posts you've already seen	Daha önce gördüğün gönderileri gizle
+# context: description of that switch; Facebook decides what counts as seen, the list never leaves the phone
+Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.	Üzerinden geçtiğin gönderiler, akış yeniden yüklendiğinde akışın dışında kalır. Neyin görülmüş sayılacağına Facebook karar verir. Liste bu telefonda kalır, değişiklik bir sonraki yüklemede görünür.
+# context: title of the row under that switch that picks how many days a seen post stays hidden
+Keep them hidden for	Gizli kalma süresi
+# context: choice in that row
+1 day	1 gün
+# context: choice in that row
+3 days	3 gün
+# context: choice in that row
+7 days	7 gün
+# context: choice in that row
+30 days	30 gün
+# context: summary of that row; %1$s is a time such as 7 days
+A post you've scrolled past stays out of the feed for %1$s.	Üzerinden geçtiğin bir gönderi %1$s boyunca akışın dışında kalır.
+# context: title of the row that empties the list of seen posts
+Forget seen posts	Görülen gönderileri unut
+# context: description of that row
+Empties the list of posts you've seen, so they can show up again.	Görülen gönderilerin listesini boşaltır, böylece gönderiler yeniden görünebilir.
+# context: toast after tapping that row
+Seen posts forgotten.	Görülen gönderiler unutuldu.
+# context: what a settings import changes; %1$s is a time such as 7 days
+Posts you've seen will stay hidden for %1$s.	Gördüğün gönderiler %1$s boyunca gizli kalacak.

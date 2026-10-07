@@ -527,6 +527,8 @@ public final class FeedFilter {
             if (reason == null && wordsPatched && typeReaders != null) {
                 reason = reactionsReason(feedUnit, typeReaders);
             }
+            // The seen rule goes last so a post another rule would hide is counted under that rule.
+            if (reason == null) reason = SeenPosts.hideReason(feedUnit);
             if (reason == null) return false;
 
             FeedFilterCounters.removed(FEED_ROUTE, 1, reason);

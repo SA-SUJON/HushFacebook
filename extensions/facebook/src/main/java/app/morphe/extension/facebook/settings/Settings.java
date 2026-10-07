@@ -15,6 +15,7 @@ import app.morphe.extension.facebook.download.FileNameTemplate;
 import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
+import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
@@ -1011,6 +1012,19 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting HIDE_POST_PROMPTS =
             new BooleanSetting("hushfacebook_hide_post_prompts", TRUE);
+
+    /**
+     * Posts you've already scrolled past stay out of the feed on later loads
+     * ({@link app.morphe.extension.facebook.feed.SeenPosts}). Off by default: it remembers which
+     * posts you saw, on the phone only. Posts already on screen are never touched, and a change
+     * shows on the next feed load.
+     */
+    public static final BooleanSetting HIDE_SEEN_POSTS =
+            new BooleanSetting("hushfacebook_hide_seen_posts", FALSE);
+
+    /** How long a seen post stays hidden while {@link #HIDE_SEEN_POSTS} is on. It isn't a switch. */
+    public static final EnumSetting<SeenPosts.Keep> SEEN_POSTS_KEEP =
+            new EnumSetting<>("hushfacebook_seen_posts_keep", SeenPosts.Keep.SEVEN_DAYS);
 
     /**
      * Posts come without the row of Meta AI questions Facebook adds under some of them

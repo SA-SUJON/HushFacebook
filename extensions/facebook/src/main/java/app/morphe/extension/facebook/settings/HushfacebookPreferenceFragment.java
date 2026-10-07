@@ -51,6 +51,7 @@ import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.feed.ReactionCeiling;
 import app.morphe.extension.facebook.feed.TopicPacks;
+import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
@@ -67,6 +68,7 @@ import app.morphe.extension.facebook.settings.SettingsRows.SaveRow;
 import app.morphe.extension.facebook.settings.SettingsRows.Toggle;
 import app.morphe.extension.facebook.settings.ValueRows.CommentOrderRow;
 import app.morphe.extension.facebook.settings.ValueRows.LockAfterRow;
+import app.morphe.extension.facebook.settings.ValueRows.SeenKeepRow;
 import app.morphe.extension.facebook.settings.ValueRows.AccentRow;
 import app.morphe.extension.facebook.settings.ValueRows.ReactionCeilingRow;
 import app.morphe.extension.facebook.settings.ValueRows.TextSizeRow;
@@ -1159,6 +1161,49 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * How long a seen post stays hidden. Like the lock row, its values are the setting's own names
+     * and its summary says what the choice does.
+     */
+    static SeenKeepRow seenKeepRow(Context context) {
+        SeenKeepRow row = new SeenKeepRow(context);
+        row.setKey(Settings.SEEN_POSTS_KEEP.key);
+        row.setTitle(L10n.t("Keep them hidden for"));
+        row.setDialogTitle(L10n.t("Keep them hidden for"));
+        // Android's own Cancel follows the activity's language, as the other lists' did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        SeenPosts.Keep[] choices = SeenPosts.Keep.values();
+        CharSequence[] entries = new CharSequence[choices.length];
+        CharSequence[] values = new CharSequence[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            entries[i] = seenKeepLabel(choices[i]);
+            values[i] = choices[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.SEEN_POSTS_KEEP.savedValue().name());
+        return row;
+    }
+
+    /** What the list and the sentences about it call [keep]. */
+    static String seenKeepLabel(SeenPosts.Keep keep) {
+        switch (keep) {
+            case ONE_DAY:
+                return L10n.t("1 day");
+            case THREE_DAYS:
+                return L10n.t("3 days");
+            case THIRTY_DAYS:
+                return L10n.t("30 days");
+            default:
+                return L10n.t("7 days");
+        }
+    }
+
+    /** What the choice does, for the row's summary. */
+    static String seenKeepSummary(SeenPosts.Keep keep) {
+        return L10n.f("A post you've scrolled past stays out of the feed for %1$s.", seenKeepLabel(keep));
+    }
+
+    /**
      * How large Facebook's text is. Like the comment order row, its values are the setting's own
      * names and its summary says what the choice does.
      */
@@ -1441,6 +1486,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((CommentOrderRow) listPreference).showSummary();
         } else if (listPreference instanceof LockAfterRow) {
             ((LockAfterRow) listPreference).showSummary();
+        } else if (listPreference instanceof SeenKeepRow) {
+            ((SeenKeepRow) listPreference).showSummary();
         } else if (listPreference instanceof TextSizeRow) {
             ((TextSizeRow) listPreference).showSummary();
         } else if (listPreference instanceof AccentRow) {

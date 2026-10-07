@@ -47,6 +47,7 @@ import app.morphe.extension.facebook.feed.ReactionCeiling;
 import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
+import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.EnumSetting;
@@ -133,6 +134,7 @@ public final class SettingsBackup {
             Settings.HIDE_LINK_POSTS,
             Settings.HIDE_BACKGROUND_POSTS,
             Settings.HIDE_POST_PROMPTS,
+            Settings.HIDE_SEEN_POSTS,
             Settings.HIDE_META_AI_QUESTIONS,
             Settings.KEEP_POST_DATES,
             Settings.TURN_OFF_AUTO_TRANSLATION,
@@ -373,6 +375,13 @@ public final class SettingsBackup {
     static final EnumSetting<AppLock.After> LOCK_AFTER = Settings.APP_LOCK_AFTER;
 
     /**
+     * How long a seen post stays hidden, held in a file as its {@link SeenPosts.Keep#fileValue}.
+     * Anything else refuses the whole file, as a lock time does. The list of seen posts itself is
+     * never carried: it stays on the phone.
+     */
+    static final EnumSetting<SeenPosts.Keep> SEEN_KEEP = Settings.SEEN_POSTS_KEEP;
+
+    /**
      * How large Facebook's text is, held in a file as its {@link TextSize.Scale#fileValue}, the
      * percentage. Anything else refuses the whole file, as a lock time does.
      */
@@ -392,7 +401,7 @@ public final class SettingsBackup {
 
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
-            Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, CEILING, TO, FOLDER, VIDEO_SUBFOLDER, PHOTO_SUBFOLDER, QUALITY,
+            Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, CEILING, SEEN_KEEP, TO, FOLDER, VIDEO_SUBFOLDER, PHOTO_SUBFOLDER, QUALITY,
                     FILE_NAME, PHOTO_NAME, ACTION, APP, START, SUBTAB, ORDER, PLAYBACK, REELS_QUALITY, STORIES_QUALITY,
                     QUIET_FROM, QUIET_UNTIL, LOCK_AFTER, TEXT_SIZE, ACCENT));
 
@@ -494,6 +503,7 @@ public final class SettingsBackup {
         private static final String QUIET_FROM_NAME = "quiet_hours_from";
         private static final String QUIET_UNTIL_NAME = "quiet_hours_until";
         private static final String LOCK_AFTER_NAME = "app_lock_after";
+        private static final String SEEN_KEEP_NAME = "seen_posts_keep";
         private static final String TEXT_SIZE_NAME = "text_size";
         private static final String ACCENT_NAME = "accent_color";
         private static final String CEILING_NAME = "hide_posts_over_reactions";
@@ -572,6 +582,9 @@ public final class SettingsBackup {
         /** The reaction ceiling the file says to use, or null when it names none. */
         @Nullable
         final ReactionCeiling ceiling;
+        /** How long the file says a seen post stays hidden, or null when it names none. Set once, as it's read. */
+        @Nullable
+        SeenPosts.Keep seenKeep;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -781,6 +794,7 @@ public final class SettingsBackup {
             if (accentChange != null) changes.put(ACCENT, accentChange);
             ReactionCeiling ceilingChange = ceilingChange();
             if (ceilingChange != null) changes.put(CEILING, ceilingChange);
+            if (seenKeep != null && seenKeep != SEEN_KEEP.savedValue()) changes.put(SEEN_KEEP, seenKeep);
             SendLink.Action actionChange = actionChange();
             if (actionChange != null) changes.put(ACTION, actionChange);
             String appChange = appChange();
@@ -999,6 +1013,7 @@ public final class SettingsBackup {
             if (textSize != null) state.putString(TEXT_SIZE_NAME, textSize.fileValue);
             if (accent != null) state.putString(ACCENT_NAME, accent.fileValue);
             if (ceiling != null) state.putString(CEILING_NAME, ceiling.fileValue);
+            if (seenKeep != null) state.putString(SEEN_KEEP_NAME, seenKeep.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -1028,7 +1043,7 @@ public final class SettingsBackup {
             Object photoName = state.get(PHOTO_NAME_NAME);
             Object videoSubfolder = state.get(VIDEO_SUBFOLDER_NAME);
             Object photoSubfolder = state.get(PHOTO_SUBFOLDER_NAME);
-            return new Snapshot(values, folder instanceof String && SaveFolder.isClean((String) folder)
+            Snapshot read = new Snapshot(values, folder instanceof String && SaveFolder.isClean((String) folder)
                     ? (String) folder : null, DownloadQuality.fromFile(state.get(QUALITY_NAME)),
                     fileName instanceof String && FileNameTemplate.isClean((String) fileName) ? (String) fileName : null,
                     StartTab.fromFile(state.get(START_NAME)), CommentOrder.fromFile(state.get(ORDER_NAME)),
@@ -1051,6 +1066,8 @@ public final class SettingsBackup {
                     AccentColor.Preset.fromFile(state.get(ACCENT_NAME)),
                     ReactionCeiling.fromFile(state.get(CEILING_NAME)),
                     unknown);
+            read.seenKeep = SeenPosts.Keep.fromFile(state.get(SEEN_KEEP_NAME));
+            return read;
         }
     }
 
@@ -1080,6 +1097,7 @@ public final class SettingsBackup {
         switches.put(QUIET_FROM.key, QUIET_FROM.savedValue().fileValue());
         switches.put(QUIET_UNTIL.key, QUIET_UNTIL.savedValue().fileValue());
         switches.put(LOCK_AFTER.key, LOCK_AFTER.savedValue().fileValue);
+        switches.put(SEEN_KEEP.key, SEEN_KEEP.savedValue().fileValue);
         switches.put(TEXT_SIZE.key, TEXT_SIZE.savedValue().fileValue);
         switches.put(ACCENT.key, ACCENT.savedValue().fileValue);
         switches.put(CEILING.key, CEILING.savedValue().fileValue);
@@ -1196,6 +1214,7 @@ public final class SettingsBackup {
         QuietHour quietFrom = null;
         QuietHour quietUntil = null;
         AppLock.After lockAfter = null;
+        SeenPosts.Keep seenKeep = null;
         TextSize.Scale textSize = null;
         AccentColor.Preset accent = null;
         ReactionCeiling ceiling = null;
@@ -1287,6 +1306,11 @@ public final class SettingsBackup {
                 else quietUntil = hour;
                 continue;
             }
+            if (SEEN_KEEP.key.equals(name)) {
+                seenKeep = SeenPosts.Keep.fromFile(values.opt(name));
+                if (seenKeep == null) throw new Rejected(Reason.VALUE, "Not a seen posts time: " + name);
+                continue;
+            }
             if (LOCK_AFTER.key.equals(name)) {
                 lockAfter = AppLock.After.fromFile(values.opt(name));
                 if (lockAfter == null) throw new Rejected(Reason.VALUE, "Not an app lock time: " + name);
@@ -1373,9 +1397,11 @@ public final class SettingsBackup {
             Boolean value = found.get(setting);
             if (value != null) ordered.put(setting, value);
         }
-        return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
+        Snapshot read = new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
                 subtab, sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom,
                 quietUntil, lockAfter, textSize, accent, ceiling, unknown);
+        read.seenKeep = seenKeep;
+        return read;
     }
 
     /**

@@ -388,6 +388,10 @@ public class SettingsBackupPreference extends Preference {
                     snapshot.storiesQualityChange(), snapshot.quietFromChange(), snapshot.quietUntilChange(),
                     snapshot.lockAfterChange(), snapshot.textSizeChange(), snapshot.accentChange()));
             if (snapshot.ceilingChange() != null) parts.add(ceilingSentence(snapshot.ceilingChange()));
+            if (snapshot.seenKeep != null && snapshot.changes().containsKey(SettingsBackup.SEEN_KEEP)) {
+                parts.add(L10n.f("Posts you've seen will stay hidden for %1$s.",
+                        HushfacebookPreferenceFragment.seenKeepLabel(snapshot.seenKeep)));
+            }
             message = String.join("\n\n", parts);
         }
         if (snapshot.unknown > 0) {

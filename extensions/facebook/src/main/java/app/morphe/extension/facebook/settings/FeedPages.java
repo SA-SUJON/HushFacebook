@@ -11,6 +11,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.feedsSubtabRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.mark;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.reactionCeilingRow;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.seenKeepRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.startTabRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.toggle;
 
@@ -18,10 +19,12 @@ import android.content.Context;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 
 import java.util.Set;
 
 import app.morphe.extension.facebook.comments.CommentSheetOptions;
+import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.navigation.MarketplaceOnly;
 import app.morphe.extension.facebook.settings.SettingsRows.Row;
 import app.morphe.extension.shared.L10n;
@@ -94,6 +97,7 @@ final class FeedPages {
                 || build.contains(PatchFamily.AFFILIATE_LINKS)
                 || build.contains(PatchFamily.POST_WORDS)
                 || build.contains(PatchFamily.POST_PROMPTS)
+                || build.contains(PatchFamily.SEEN_POSTS)
                 || build.contains(PatchFamily.META_AI_QUESTIONS)
                 || build.contains(PatchFamily.POST_DATES)
                 || build.contains(PatchFamily.AUTO_TRANSLATION)
@@ -167,6 +171,9 @@ final class FeedPages {
                                 + "or who recently commented, and the follow and chat suggestions in the same place. "
                                 + "The post stays.")));
             }
+            if (build.contains(PatchFamily.SEEN_POSTS)) {
+                seenPosts(feed, context);
+            }
             if (build.contains(PatchFamily.META_AI_QUESTIONS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_META_AI_QUESTIONS,
                         L10n.t("The row of Meta AI questions under some posts. The post, its link card and its "
@@ -239,6 +246,34 @@ final class FeedPages {
                 feed.addPreference(reactionCeilingRow(context));
             }
         }
+    }
+
+    /**
+     * Hide posts you've already seen, with how long they stay hidden and a row that forgets them.
+     * The two rows stay greyed out while the switch is off.
+     */
+    private static void seenPosts(PreferenceCategory feed, Context context) {
+        SwitchPreference seen = toggle(context, Settings.HIDE_SEEN_POSTS,
+                L10n.t("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what "
+                        + "counts as seen. The list stays on this phone, and a change shows on the next load."));
+        Preference keep = seenKeepRow(context);
+        Row forget = new Row(context);
+        forget.setTitle(L10n.t("Forget seen posts"));
+        forget.setSummary(L10n.t("Empties the list of posts you've seen, so they can show up again."));
+        forget.setPersistent(false);
+        forget.actsAtOnce = true;
+        forget.setOnPreferenceClickListener(p -> {
+            SeenPosts.clear();
+            Utils.showToastShort(SeenPosts.clearedMessage());
+            return true;
+        });
+        mark(forget, SettingsIcons.DELETE);
+        // The two rows follow the switch: they're greyed out until it's on.
+        keep.setDependency(Settings.HIDE_SEEN_POSTS.key);
+        forget.setDependency(Settings.HIDE_SEEN_POSTS.key);
+        feed.addPreference(seen);
+        feed.addPreference(keep);
+        feed.addPreference(forget);
     }
 
     /** Stories. */

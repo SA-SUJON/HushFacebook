@@ -50,6 +50,7 @@ import app.morphe.extension.facebook.download.ReelDownload;
 import app.morphe.extension.facebook.download.VideoMenuItemForTests;
 import app.morphe.extension.facebook.emoji.SystemEmoji;
 import app.morphe.extension.facebook.feed.FeedFilter;
+import app.morphe.extension.facebook.feed.SeenPostsForTests;
 import app.morphe.extension.facebook.feed.FeedGuardForTests;
 import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
@@ -184,6 +185,7 @@ public class ColdStartHooksTest {
         assertFalse("a photo post before the context was hidden", FeedGuardForTests.hidesPhotoPost(Category.ORGANIC));
         assertFalse("a popular post before the context was hidden", FeedGuardForTests.hidesPopularPost(Category.ORGANIC));
         assertFalse(FeedGuardForTests.hidesAiReel(new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true))));
+        assertFalse("a seen post before the context was hidden", SeenPostsForTests.hidesBeforeTheContext());
         assertFalse("a start before the context locked Facebook", AppLockForTests.aStartLocks());
         assertFalse("a start before the context scaled Facebook's text", TextSizeForTests.aStartScales());
         assertEquals("a colour before the context took an accent", 0xFF0866FF,

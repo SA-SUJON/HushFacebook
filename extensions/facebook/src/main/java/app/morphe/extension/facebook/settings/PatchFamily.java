@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.theme.MaterialYouTheme;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
@@ -59,6 +60,8 @@ public enum PatchFamily {
             Settings.HIDE_BACKGROUND_POSTS),
     POST_PROMPTS(FamilyNames.POST_PROMPTS, "postPrompts", null,
             Settings.HIDE_POST_PROMPTS),
+    SEEN_POSTS(FamilyNames.SEEN_POSTS, "seenPosts", null,
+            Settings.HIDE_SEEN_POSTS),
     META_AI_QUESTIONS(FamilyNames.META_AI_QUESTIONS, "metaAiQuestions", null,
             Settings.HIDE_META_AI_QUESTIONS),
     POST_DATES(FamilyNames.POST_DATES, "postDates", null,
@@ -448,6 +451,7 @@ public enum PatchFamily {
         LogBufferManager.registerReportSection(LastScreen.REPORT);
         LogBufferManager.registerReportSection(ScreenLog.REPORT);
         LogBufferManager.registerReportSection(MaterialYouTheme.REPORT);
+        LogBufferManager.registerReportSection(SeenPosts.REPORT);
         for (PatchFamily family : values()) {
             if (family.switches.isEmpty() && family.choice == null) HookStatus.runsWhilePaused(family.patchName);
         }

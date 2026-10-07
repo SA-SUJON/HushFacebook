@@ -294,6 +294,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean seenPosts() {
+        return false;
+    }
+
     public static boolean metaAiQuestions() {
         return false;
     }
