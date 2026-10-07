@@ -35,6 +35,7 @@ import app.morphe.extension.shared.settings.PauseForTests;
 import static app.morphe.extension.facebook.chats.OriginalChatMediaForTests.box;
 import static app.morphe.extension.facebook.chats.OriginalChatMediaForTests.bytes;
 import static app.morphe.extension.facebook.chats.OriginalChatMediaForTests.fileType;
+import static app.morphe.extension.facebook.chats.OriginalChatMediaForTests.handler;
 import static app.morphe.extension.facebook.chats.OriginalChatMediaForTests.join;
 import static app.morphe.extension.facebook.chats.OriginalChatMediaForTests.media;
 import static app.morphe.extension.facebook.chats.OriginalChatMediaForTests.movie;
@@ -219,6 +220,93 @@ public class OriginalChatMediaTest {
         toTheEnd[3] = 0;
         assertEquals("media that runs to the end of the file", -1, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
                 video(join(fileType(), movie(track("vide")), toTheEnd))));
+        assertEquals("the empty padding Android reserves beside the movie box", -1, OriginalChatMedia.videoPassthrough(9,
+                4_000_000L, video(join(fileType(), movie(track("vide"), track("soun")), box("free", new byte[4096]), media()))));
+        assertEquals("an iPhone's QuickTime layout", -1,
+                OriginalChatMedia.videoPassthrough(9, 4_000_000L, video(quickTimeVideo())));
+    }
+
+    /**
+     * A plain iPhone video as QuickTime lays it out: a wide box before the media, an aperture box
+     * and an edit list in the video track, a data handler in its media information, and the
+     * make and model as keys in the movie's meta.
+     */
+    private static byte[] quickTimeVideo() {
+        byte[] videoMedia = box("mdia", box("mdhd", new byte[24]), handler("vide"), box("minf",
+                box("vmhd", new byte[12]), box("hdlr", new byte[4], bytes("dhlr"), bytes("alis"), new byte[12], new byte[1]),
+                box("dinf", box("dref", new byte[8])), box("stbl", box("stsd", new byte[8]))));
+        byte[] videoTrack = box("trak", box("tkhd", new byte[84]), box("tapt", box("clef", new byte[12])),
+                box("edts", box("elst", new byte[16])), videoMedia);
+        byte[] tags = box("meta", box("hdlr", new byte[8], bytes("mdta"), new byte[13]),
+                box("keys", new byte[8], box("mdta", bytes("com.apple.quicktime.make")),
+                        box("mdta", bytes("com.apple.quicktime.model"))));
+        return join(box("ftyp", bytes("qt  "), new byte[4], bytes("qt  ")), box("wide"), media(),
+                movie(videoTrack, track("soun"), tags));
+    }
+
+    /**
+     * Dashcams keep their GPS log outside the tags a phone writes. A Novatek indexes it from a
+     * gps box in the movie and writes each block as a free box that starts "GPS "; a BlackVue
+     * writes NMEA sentences into a gps box inside a top-level free box. Either piece alone keeps
+     * the re-encode, and so does a location key or NMEA text in any padding.
+     */
+    @Test
+    public void aDashcamVideoWithAGpsLogKeepsTheReEncode() throws IOException {
+        Settings.ORIGINAL_CHAT_MEDIA.save(true);
+        byte[] plainMovie = movie(track("vide"), track("soun"));
+        byte[] gpsIndex = box("gps ", new byte[8], new byte[16]);
+        byte[] gpsBlock = box("free", bytes("GPS "), new byte[4], bytes("A"), new byte[40]);
+        Map<String, byte[]> dashcams = new LinkedHashMap<>();
+        dashcams.put("a Novatek's GPS index and its log", join(fileType(), media(), gpsBlock,
+                movie(track("vide"), track("soun"), gpsIndex)));
+        dashcams.put("a Novatek's GPS index alone", join(fileType(), media(), movie(track("vide"), track("soun"), gpsIndex)));
+        dashcams.put("a Novatek's GPS log alone", join(fileType(), media(), gpsBlock, plainMovie));
+        dashcams.put("a BlackVue's NMEA log", join(fileType(), box("free",
+                box("gps ", bytes("[1553683130000]$GPRMC,103001.00,A,3725.32,N,12205.04,W,0.0,,270319,,,A*6B\n")),
+                box("3gf ", new byte[30])), media(), plainMovie));
+        dashcams.put("NMEA sentences in padding under no box name", join(fileType(),
+                box("free", bytes("$GNRMC,103001.00,A,3725.32,N,12205.04,W")), plainMovie, media()));
+        dashcams.put("a location key in skip padding", join(fileType(), plainMovie,
+                box("skip", bytes("com.apple.quicktime.location.ISO6709")), media()));
+        dashcams.put("a GPS log in the movie's own padding", join(fileType(),
+                movie(track("vide"), box("free", bytes("GPS "), new byte[24])), media()));
+        for (Map.Entry<String, byte[]> dashcam : dashcams.entrySet()) {
+            assertEquals(dashcam.getKey(), 9, OriginalChatMedia.videoPassthrough(9, 4_000_000L, video(dashcam.getValue())));
+        }
+        assertEquals("the control: the same movie with nothing beside it", -1,
+                OriginalChatMedia.videoPassthrough(9, 4_000_000L, video(join(fileType(), media(), plainMovie))));
+    }
+
+    /**
+     * A box the movie, a track, its media or their information isn't known to hold, a track with
+     * no media or no handler, and every track that isn't video or sound keep the re-encode, since
+     * this can't tell what they carry.
+     */
+    @Test
+    public void aBoxTheScanCantVouchForKeepsTheReEncode() throws IOException {
+        Settings.ORIGINAL_CHAT_MEDIA.save(true);
+        byte[] header = box("tkhd", new byte[84]);
+        Map<String, byte[]> movies = new LinkedHashMap<>();
+        movies.put("a box the movie box doesn't hold", movie(track("vide"), box("abcd", new byte[8])));
+        movies.put("a box a track doesn't hold", movie(track("vide", box("abcd", new byte[8]))));
+        movies.put("a box the media information doesn't hold", movie(box("trak", header, box("mdia",
+                box("mdhd", new byte[24]), handler("vide"), box("minf", box("vmhd", new byte[12]), box("gps ", new byte[8]))))));
+        movies.put("a track with no media", movie(track("vide"), box("trak", header)));
+        movies.put("media with no handler", movie(box("trak", header, box("mdia", box("mdhd", new byte[24]),
+                box("minf", box("vmhd", new byte[12]))))));
+        movies.put("a track with two media", movie(box("trak", header, box("mdia", box("mdhd", new byte[24]), handler("vide")),
+                box("mdia", box("mdhd", new byte[24]), handler("meta")))));
+        movies.put("GoPro's gpmd metadata track", movie(track("vide"), track("soun"), track("meta")));
+        movies.put("Google's camm motion track", movie(track("vide"), track("camm")));
+        movies.put("a text track", movie(track("vide"), track("text")));
+        movies.put("a timecode track", movie(track("vide"), track("tmcd")));
+        for (Map.Entry<String, byte[]> movie : movies.entrySet()) {
+            assertEquals(movie.getKey(), 9, OriginalChatMedia.videoPassthrough(9, 4_000_000L,
+                    video(join(fileType(), movie.getValue(), media()))));
+        }
+        String line = statusLine();
+        assertNotNull(String.join("\n", HookStatus.report()), line);
+        assertFalse(line, line.contains(OriginalChatMedia.VIDEO_PASSED));
     }
 
     @Test
@@ -239,6 +327,8 @@ public class OriginalChatMediaTest {
         unread.put("a uuid in the movie", video(join(fileType(), movie(track("vide"), box("uuid", new byte[16])), media())));
         unread.put("a movie box over the limit", video(join(fileType(),
                 movie(track("vide"), box("free", new byte[VideoLocation.MAX_MOVIE_BYTES])), media())));
+        unread.put("padding that takes the movie box past the limit", video(join(fileType(),
+                box("free", new byte[VideoLocation.MAX_MOVIE_BYTES - 100]), movie(track("vide"), track("soun")), media())));
         unread.put("a box smaller than its own header", video(join(fileType(), new byte[] {0, 0, 0, 4, 'f', 'r', 'e', 'e'},
                 movie(track("vide")), media())));
         unread.put("a content address", "content://media/external/video/media/1");
