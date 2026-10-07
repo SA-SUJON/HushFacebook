@@ -103,6 +103,47 @@ public class PostPatternTest {
         assertNull(PostPattern.compileOrNull("(?:abcdefghij){100}(?:abcdefghij){100}(?:abcdefghij){100}"));
     }
 
+    /**
+     * Stacked repeats of a part that writes nothing, or that would write out past the program's
+     * room, are refused at once. The row compiles the list on every keystroke, on the main thread,
+     * and so does a settings import, so a few characters must never mean billions of steps.
+     */
+    @Test
+    public void repeatsThatWouldTakeForeverToCompileAreRefusedAtOnce() {
+        for (String pattern : Arrays.asList("(){100}{100}{100}{100}{100}", "(?:){100}{100}{100}{100}{100}",
+                "(a{0}){100}{100}{100}{100}", "((){100}){100}{100}", "(|){100}{100}{100}{100}{100}",
+                "(a{0}b{0}){100}{100}{100}", "()*", "(?:){0,100}", "(?:a{1}){100}{100}{100}{100}{100}",
+                "((a?){100}){100}{100}{100}", "(?:(?:a|b){10}){10}{10}{10}{10}")) {
+            long start = System.nanoTime();
+            assertNull(pattern, PostPattern.compileOrNull(pattern));
+            long millis = (System.nanoTime() - start) / 1_000_000;
+            assertTrue(pattern + " took " + millis + " ms to refuse", millis < 1_000);
+        }
+        // The row names it on Save like any pattern it can't read, and a settings file can't carry it.
+        String list = "spoiler\n/(){100}{100}{100}{100}{100}/";
+        assertEquals(2, PostWords.size(list, 0).badLine);
+        assertTrue(!PostWords.isClean(list));
+    }
+
+    /** Counted repeats that fit still compile and match as Java's do, nested ones and {0} included. */
+    @Test
+    public void countedRepeatsThatFitStillMatchAsJavaDoes() throws Exception {
+        String[][] cases = {
+                {"(?:ab){2,3}c", "xababc"}, {"(?:ab){2,3}c", "abc"}, {"x{0}y", "y"}, {"(a?){3}b", "ab"},
+                {"(?:a*){2}b", "aab"}, {"(?:(?:a|b){10}){10}", "ab"}, {"(?:a|b){2,}c", "abbc"},
+                {"colou?r{1,2}", "colorr"}, {"(?:a|){3}b", "aab"}, {"(?:(?:ab){2}){3}", "abababababab"},
+        };
+        int flags = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE | Pattern.UNICODE_CHARACTER_CLASS;
+        for (String[] pair : cases) {
+            boolean java = Pattern.compile(pair[0], flags).matcher(pair[1]).find();
+            assertEquals(pair[0] + " in " + pair[1], java ? PostPattern.Result.MATCH : PostPattern.Result.NO_MATCH,
+                    find(pair[0], pair[1]));
+        }
+        // The largest that fits: 1999 instructions, and the match makes 2000.
+        assertNotNull(PostPattern.compileOrNull("(?:abcdefghij){100}(?:abcdefghij){99}abcdefghi"));
+        assertNull(PostPattern.compileOrNull("(?:abcdefghij){100}(?:abcdefghij){99}abcdefghij"));
+    }
+
     /** Backtracking patterns that take Java's own matcher longer than any test runs finish here. */
     @Test
     public void noPatternHangsALongPost() throws Exception {

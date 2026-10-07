@@ -29,6 +29,13 @@ import java.util.List;
  * {@code \b} know every script's letters and digits. Capital letters never matter. A
  * backreference, a lookaround, an inline flag, a possessive quantifier or an escape this doesn't
  * know is refused when the list is saved rather than read some other way.
+ *
+ * <p>Compiling is bounded too. Every part of the pattern knows how many instructions it writes,
+ * counted as it's parsed, so a pattern whose counted repeats would write out more than
+ * {@link #MAX_PROGRAM} is refused before anything is written, and a repeat of a part that writes
+ * nothing, such as {@code (){100}}, is refused as having nothing to repeat. Without that, stacked
+ * repeats of an empty group made billions of compile steps out of a few characters, on the main
+ * thread as the list was typed.
  */
 final class PostPattern {
     /** The most a counted repeat may ask for, {@code {n,m}} with m at most this. */
@@ -98,6 +105,8 @@ final class PostPattern {
         Parser parser = new Parser(body);
         Node tree = parser.alternation();
         if (parser.at < body.length()) throw new Invalid("unmatched )");
+        // The size is known before anything is written: one too large never gets written out.
+        if (tree.size >= MAX_PROGRAM) throw new Invalid("pattern too large");
         Program program = new Program();
         program.emit(tree);
         program.add(MATCH, 0, 0);
@@ -229,12 +238,20 @@ final class PostPattern {
     // The tree a pattern parses into.
 
     private abstract static class Node {
+        /** The instructions {@link Program#emit} writes for it, never more than {@link #MAX_PROGRAM}. */
+        final int size;
+
+        Node(long size) throws Invalid {
+            if (size > MAX_PROGRAM) throw new Invalid("pattern too large");
+            this.size = (int) size;
+        }
     }
 
     private static final class Literal extends Node {
         final int point;
 
-        Literal(int point) {
+        Literal(int point) throws Invalid {
+            super(1);
             this.point = point;
         }
     }
@@ -243,7 +260,8 @@ final class PostPattern {
         /** {@link #ANY}, {@link #LINE_START}, {@link #LINE_END}, {@link #WORD_EDGE} or {@link #NOT_WORD_EDGE}. */
         final int op;
 
-        Simple(int op) {
+        Simple(int op) throws Invalid {
+            super(1);
             this.op = op;
         }
     }
@@ -251,7 +269,8 @@ final class PostPattern {
     private static final class ClassNode extends Node {
         final CharClass chars;
 
-        ClassNode(CharClass chars) {
+        ClassNode(CharClass chars) throws Invalid {
+            super(1);
             this.chars = chars;
         }
     }
@@ -259,7 +278,8 @@ final class PostPattern {
     private static final class Sequence extends Node {
         final List<Node> parts;
 
-        Sequence(List<Node> parts) {
+        Sequence(List<Node> parts) throws Invalid {
+            super(sum(parts, 0));
             this.parts = parts;
         }
     }
@@ -267,7 +287,9 @@ final class PostPattern {
     private static final class Choice extends Node {
         final List<Node> ways;
 
-        Choice(List<Node> ways) {
+        /** Each way but the last gets a split before it and a jump after it. */
+        Choice(List<Node> ways) throws Invalid {
+            super(sum(ways, 2L * (ways.size() - 1)));
             this.ways = ways;
         }
     }
@@ -278,11 +300,23 @@ final class PostPattern {
         /** -1 for no upper bound. */
         final int max;
 
-        Repeat(Node body, int min, int max) {
+        /**
+         * The required copies, then either a split, one more copy and a jump back, or a split and
+         * a copy for each optional one.
+         */
+        Repeat(Node body, int min, int max) throws Invalid {
+            super((long) min * body.size + (max == -1 ? body.size + 2L : (long) (max - min) * (body.size + 1)));
             this.body = body;
             this.min = min;
             this.max = max;
         }
+    }
+
+    /** [extra] plus the size of every node in [nodes]. Each is at most MAX_PROGRAM, so a long holds it. */
+    private static long sum(List<Node> nodes, long extra) {
+        long total = extra;
+        for (Node node : nodes) total += node.size;
+        return total;
     }
 
     /** A set of characters: ranges, the shorthand classes, and whether it's negated. */
@@ -391,6 +425,8 @@ final class PostPattern {
                 }
                 if (more() && peek() == '?') at++;
                 else if (more() && peek() == '+') throw new Invalid("possessive quantifier");
+                // An empty group, or a part already repeated no times, writes nothing to copy.
+                if (atom.size == 0) throw new Invalid("nothing to repeat");
                 atom = new Repeat(atom, min, max);
             }
             return atom;
@@ -577,6 +613,8 @@ final class PostPattern {
         }
 
         void emit(Node node) throws Invalid {
+            // A part that writes nothing has nothing to walk through either.
+            if (node.size == 0) return;
             if (node instanceof Literal) {
                 add(CHAR, fold(((Literal) node).point), 0);
             } else if (node instanceof Simple) {
