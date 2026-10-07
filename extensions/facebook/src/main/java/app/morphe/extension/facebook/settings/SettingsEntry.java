@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.facebook.download.ClipboardLink;
 import app.morphe.extension.facebook.download.SaveLeftovers;
 import app.morphe.extension.facebook.download.SavedFileActions;
@@ -313,6 +314,7 @@ public final class SettingsEntry {
 
     /** Injected at the start of every Facebook activity's {@code onCreate}. */
     public static void onActivityCreate(Activity activity) {
+        HushfacebookPause.keepCrashMarkOnTop();
         try {
             SavedFileActions.receive(activity.getIntent());
             noteIntent(activity.getIntent());

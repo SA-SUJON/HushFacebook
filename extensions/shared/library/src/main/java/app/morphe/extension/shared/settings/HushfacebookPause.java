@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.settings.preference.JavaCrashReport;
 
 /**
  * Pause Hushfacebook, and the safe mode that turns it on without being asked.
@@ -61,6 +62,8 @@ public final class HushfacebookPause {
     private static volatile long startElapsed;
     @Nullable private static volatile File filesDir;
     @Nullable private static volatile Context appContext;
+    /** Whether this process installed the crash handler, so {@link #keepCrashMarkOnTop} keeps it there. */
+    private static volatile boolean crashMarkWanted;
 
     /** Whether Android still holds this process in its crash state. Tests put an answer here. */
     interface CrashState {
@@ -258,13 +261,32 @@ public final class HushfacebookPause {
 
     /**
      * Marks the start record when an uncaught exception ends the process inside the first
-     * minute, for Android before 11, which keeps no exit reasons. The handler only writes a
-     * word to a file and hands the crash on.
+     * minute, for Android before 11, which keeps no exit reasons, and keeps the crash's trace for
+     * the diagnostic report ({@link JavaCrashReport}), since Android keeps none. The handler only
+     * writes two files and hands the crash on.
      */
     private static void installCrashMark() {
+        crashMarkWanted = true;
         Thread.UncaughtExceptionHandler current = Thread.getDefaultUncaughtExceptionHandler();
         if (current instanceof CrashMark) return;
         Thread.setDefaultUncaughtExceptionHandler(new CrashMark(current));
+    }
+
+    /**
+     * Puts the crash handler back in front when something replaced the default handler since the
+     * start. Facebook installs five handlers of its own during its start-up, each wrapping the one
+     * before it (581 {@code LX/0lE;->A00}, {@code LX/05L;->start}, {@code LX/0uA;->start}, {@code
+     * LX/0hs;->A0Y}, and the browser's {@code LX/f4g}), and one that ends the process itself would
+     * never reach ours. Run as each screen is created; a process that never installed the handler
+     * (anything but the main one) is left alone. Never throws.
+     */
+    public static void keepCrashMarkOnTop() {
+        if (!crashMarkWanted) return;
+        try {
+            installCrashMark();
+        } catch (Throwable failure) {
+            Logger.printException(() -> "Hushfacebook pause: could not put the crash handler back in front", failure);
+        }
     }
 
     static void markCrash() {
@@ -290,6 +312,7 @@ public final class HushfacebookPause {
             } catch (Throwable ignored) {
                 // The crash belongs to the handler after this one.
             }
+            JavaCrashReport.save(thread, throwable);
             if (delegate != null) delegate.uncaughtException(thread, throwable);
         }
     }
@@ -331,6 +354,8 @@ public final class HushfacebookPause {
     static void resetForTests() {
         STARTED.set(false);
         CRASH_MARKED.set(false);
+        crashMarkWanted = false;
+        JavaCrashReport.resetForTests();
         reason = Reason.NONE;
         filesDir = null;
         appContext = null;
