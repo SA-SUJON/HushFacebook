@@ -30,9 +30,6 @@
 package app.morphe.extension.facebook.updates;
 
 import android.content.pm.PackageInfo;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 
 @SuppressWarnings("unused")
 public class DisablePlayStoreUpdatesPatch {
@@ -57,7 +54,6 @@ public class DisablePlayStoreUpdatesPatch {
     /**
      * Injection point.
      */
-    @RequiresApi(api = Build.VERSION_CODES.P)
     public static long getVersionCodeLong(PackageInfo info) {
         final long versionCode = info.getLongVersionCode();
 
