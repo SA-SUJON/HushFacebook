@@ -195,6 +195,9 @@ public enum PatchFamily {
     // code has to keep using the names this install holds whether or not Hushfacebook is paused.
     INSTALL_BESIDE_META_APPS(FamilyNames.INSTALL_BESIDE_META_APPS, "installBesideMetaApps",
             "the rename of the shared permissions"),
+    // The version code is in the manifest, and Facebook's reads of it have to keep answering the
+    // real one whether or not Hushfacebook is paused.
+    PLAY_STORE_UPDATES(FamilyNames.PLAY_STORE_UPDATES, "playStoreUpdates", "the version number Google Play sees"),
     // The settings entry's own way in, like the logo long press and the launcher shortcut, which
     // stay reachable while paused because the settings screen is where a pause is lifted.
     MENU_SETTINGS_ROW(FamilyNames.MENU_SETTINGS_ROW, "menuSettingsRow", "the settings row in Facebook's Menu");

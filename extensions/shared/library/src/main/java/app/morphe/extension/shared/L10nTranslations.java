@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(1356);
+        Map<String, String> table = new HashMap<>(1358);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -1450,10 +1450,12 @@ public final class L10nTranslations {
                 "die Einstellungszeile im Facebook-Men\u00fc");
         table.put("the start-up fix for x86 devices",
                 "der Startfix f\u00fcr x86-Ger\u00e4te");
+        table.put("the version number Google Play sees",
+                "die Versionsnummer, die Google Play sieht");
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(1356);
+        Map<String, String> table = new HashMap<>(1358);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -2859,10 +2861,12 @@ public final class L10nTranslations {
                 "la fila de configuraci\u00f3n en el men\u00fa de Facebook");
         table.put("the start-up fix for x86 devices",
                 "el arreglo de inicio para dispositivos x86");
+        table.put("the version number Google Play sees",
+                "el n\u00famero de versi\u00f3n que ve Google Play");
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(1356);
+        Map<String, String> table = new HashMap<>(1358);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -4268,10 +4272,12 @@ public final class L10nTranslations {
                 "baris pengaturan di Menu Facebook");
         table.put("the start-up fix for x86 devices",
                 "perbaikan saat mulai untuk perangkat x86");
+        table.put("the version number Google Play sees",
+                "nomor versi yang dilihat Google Play");
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(1356);
+        Map<String, String> table = new HashMap<>(1358);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -5677,10 +5683,12 @@ public final class L10nTranslations {
                 "a linha de configura\u00e7\u00f5es no Menu do Facebook");
         table.put("the start-up fix for x86 devices",
                 "a corre\u00e7\u00e3o de inicializa\u00e7\u00e3o para dispositivos x86");
+        table.put("the version number Google Play sees",
+                "o n\u00famero de vers\u00e3o que o Google Play v\u00ea");
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(1356);
+        Map<String, String> table = new HashMap<>(1358);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -7086,5 +7094,7 @@ public final class L10nTranslations {
                 "Facebook men\u00fcs\u00fcndeki ayarlar sat\u0131r\u0131");
         table.put("the start-up fix for x86 devices",
                 "x86 cihazlar i\u00e7in a\u00e7\u0131l\u0131\u015f d\u00fczeltmesi");
+        table.put("the version number Google Play sees",
+                "Google Play'in g\u00f6rd\u00fc\u011f\u00fc s\u00fcr\u00fcm numaras\u0131");
     }
 }

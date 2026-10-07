@@ -326,6 +326,8 @@ People you chat with in a chat that opens inside Facebook don't see that you've 
 Facebook doesn't notice when you take a screenshot or record the screen, so nothing it does in response happens.	Facebook tidak tahu saat kamu mengambil tangkapan layar atau merekam layar, jadi tidak ada yang dilakukannya sebagai tanggapan.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	Hentikan pengiriman daftar reel yang ditonton ke Facebook. Daftar itu mengurutkan feed, jadi reel dapat muncul lagi.
 the rename of the shared permissions	penggantian nama izin bersama
+# context: what stays in while Hushfacebook is paused, shown before the patch's name in brackets; the patch raises the app's version number so Google Play never offers an update
+the version number Google Play sees	nomor versi yang dilihat Google Play
 Room for Meta's apps	Ruang untuk aplikasi Meta
 Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.	Messenger, Facebook Lite, Business Suite, dan Workplace dapat dipasang di samping Facebook ini. Facebook ini memberi nama sendiri pada dua izin yang mereka gunakan bersama dengannya.
 # context: settings section heading for the Open on a chosen tab rows

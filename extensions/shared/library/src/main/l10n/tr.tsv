@@ -326,6 +326,8 @@ People you chat with in a chat that opens inside Facebook don't see that you've 
 Facebook doesn't notice when you take a screenshot or record the screen, so nothing it does in response happens.	Facebook ekran görüntüsü aldığını veya ekranı kaydettiğini fark etmez, bu yüzden buna karşılık yapacağı hiçbir şey olmaz.
 Stop sending watched-reel lists to Facebook. It uses them to rank your feed, so watched reels may return.	İzlenen Reels listelerini Facebook'a göndermeyi durdurur. Listeler akışı sıraladığından izlenen Reels tekrar görünebilir.
 the rename of the shared permissions	paylaşılan izinlerin yeniden adlandırılması
+# context: what stays in while Hushfacebook is paused, shown before the patch's name in brackets; the patch raises the app's version number so Google Play never offers an update
+the version number Google Play sees	Google Play'in gördüğü sürüm numarası
 Room for Meta's apps	Meta uygulamalarına yer
 Messenger, Facebook Lite, Business Suite and Workplace install beside this Facebook. It gives the two permissions they share with it names of its own.	Messenger, Facebook Lite, Business Suite ve Workplace bu Facebook'un yanına yüklenebilir. Onlarla paylaştığı iki izne kendi adlarını verir.
 # context: settings section heading for the Open on a chosen tab rows

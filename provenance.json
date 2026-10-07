@@ -86,6 +86,20 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/updates/playstore/DisablePlayStoreUpdatesPatch.kt",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/updates/DisablePlayStoreUpdatesPatch.java"
+      ],
+      "origin": "ported",
+      "upstream": "https://github.com/MorpheApp/morphe-patches",
+      "commit": "1bcd0bcedf1238e71b0bd8815da2c10df7ef5bd2",
+      "via": [
+        "https://gitlab.com/ReVanced/revanced-patches"
+      ],
+      "license": "GPL-3.0-only with the Morphe section 7 notices",
+      "changes": "Copied from Morphe's universal Disable Play Store updates at that commit, its two files' Morphe notice blocks kept whole, with a line above each saying what changed. The manifest half is the same: the version code read before any patch finalizes and raised to Int.MAX_VALUE after. The extension's code is unchanged and moved into the Facebook extension's updates package, so it ships in Hushfacebook's extension and not the change-version-code one. The patch is Facebook only, tells SettingsStatus it's in, and walks every class for the PackageInfo.versionCode reads and getLongVersionCode calls it sends through the extension instead of matching them by fingerprint, leaving out only the extension class, so Hushfacebook's own extension reads the real version too. The fallback for an iget destination past v15 is gone, since iget only addresses v0 to v15."
+    },
+    {
+      "paths": [
         "patches/src/main/kotlin/app/morphe/patches/facebook/ads/affiliate/HideAffiliateLinksPatch.kt"
       ],
       "origin": "ported",

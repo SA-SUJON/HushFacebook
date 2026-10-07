@@ -210,6 +210,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean playStoreUpdates() {
+        return false;
+    }
+
     public static boolean amoledTheme() {
         return false;
     }
