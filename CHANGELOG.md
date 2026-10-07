@@ -43,6 +43,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Block background-return feed refresh` now keeps your place when you switch back to Home too, so the feed doesn't re-rank or reload behind your back. The **Keep feed position on return** switch covers it, and pull to refresh still works.
 * **Facebook:** New `Turn off auto-translation` shows posts and reel captions in the language they were written in. Turn on **Turn off auto-translation** under News feed, and posts Facebook would translate by itself keep their own text with its See translation link under them, while reels stop asking for a caption translation. It's in the default selection with its switch off, and turning it off or pausing Hushfacebook brings Facebook's translations back.
 * **Facebook:** `Keep the reel speed` has a second switch, **Keep the video speed**, under Reels and Watch. Turn it on and a playback speed you pick in a feed or Watch video's gear menu carries to the next videos you play, until you pick another or Facebook restarts. Reels keep their own speed, and ads, live videos, stories and videos in chats start at Facebook's speed. It starts off.
+* **Facebook:** A settings file now carries the Reels and Stories playback qualities and the video and photo subfolders. The import preview says what each will change, and an unknown quality or a subfolder with a path in it is refused.
+* **Facebook:** New `Comment sheet options` with two switches under Comments, both off to start. **Like only** stops a long press on Like from opening the reactions, so a tap just likes, and **Hide GIF and sticker buttons** takes them out of the comment box. A **Hide reaction counts** row opens Facebook's own settings, where Reaction preferences lives. Pick the patch in Manager to get it.
 
 ### Fixed
 
@@ -52,6 +54,7 @@ Every Hushfacebook release, newest first.
 ### Changed
 
 * **Facebook:** `Show View profile on Marketplace sellers` also answers the seller page's flag when it's read by its number instead of its name. Facebook's React Native pages can ask for a flag either way, so a page that switches over keeps the button.
+* The README's list of patches that are off by default names all 32 again, `Hide Meta upsells`, `Hide read receipts` and `Hide typing indicator` included, and its notes on switches that start off no longer repeat themselves.
 
 ## 0.7.2 (2026-10-06)
 
