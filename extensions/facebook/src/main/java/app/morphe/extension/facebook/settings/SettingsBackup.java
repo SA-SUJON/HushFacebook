@@ -42,6 +42,7 @@ import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
+import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
@@ -368,11 +369,17 @@ public final class SettingsBackup {
      */
     static final EnumSetting<AppLock.After> LOCK_AFTER = Settings.APP_LOCK_AFTER;
 
+    /**
+     * How large Facebook's text is, held in a file as its {@link TextSize.Scale#fileValue}, the
+     * percentage. Anything else refuses the whole file, as a lock time does.
+     */
+    static final EnumSetting<TextSize.Scale> TEXT_SIZE = Settings.TEXT_SIZE;
+
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
             Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, TO, FOLDER, VIDEO_SUBFOLDER, PHOTO_SUBFOLDER, QUALITY,
                     FILE_NAME, PHOTO_NAME, ACTION, APP, START, SUBTAB, ORDER, PLAYBACK, REELS_QUALITY, STORIES_QUALITY,
-                    QUIET_FROM, QUIET_UNTIL, LOCK_AFTER));
+                    QUIET_FROM, QUIET_UNTIL, LOCK_AFTER, TEXT_SIZE));
 
     /** The longest name or value a file holds that isn't a word list, far past a package name. */
     private static final int MAX_OTHER_CHARS = 1024;
@@ -472,6 +479,7 @@ public final class SettingsBackup {
         private static final String QUIET_FROM_NAME = "quiet_hours_from";
         private static final String QUIET_UNTIL_NAME = "quiet_hours_until";
         private static final String LOCK_AFTER_NAME = "app_lock_after";
+        private static final String TEXT_SIZE_NAME = "text_size";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -538,6 +546,9 @@ public final class SettingsBackup {
         /** How long the app lock waits that the file holds, or null when it names none. */
         @Nullable
         final AppLock.After lockAfter;
+        /** How large the file says Facebook's text is, or null when it names none. */
+        @Nullable
+        final TextSize.Scale textSize;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -621,6 +632,20 @@ public final class SettingsBackup {
                  @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
                  @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil, @Nullable AppLock.After lockAfter,
                  int unknown) {
+            this(values, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to, subtab,
+                    sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom,
+                    quietUntil, lockAfter, null, unknown);
+        }
+
+        Snapshot(Map<BooleanSetting, Boolean> values, @Nullable String folder, @Nullable DownloadQuality quality,
+                 @Nullable String fileName, @Nullable StartTab start, @Nullable CommentOrder order,
+                 @Nullable String hidden, @Nullable String kept, @Nullable PlaybackQuality playback,
+                 @Nullable SendLink.Action action, @Nullable String app, @Nullable SaveTo to,
+                 @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName,
+                 @Nullable String videoSubfolder, @Nullable String photoSubfolder,
+                 @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
+                 @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil, @Nullable AppLock.After lockAfter,
+                 @Nullable TextSize.Scale textSize, int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
@@ -643,6 +668,7 @@ public final class SettingsBackup {
             this.quietFrom = quietFrom;
             this.quietUntil = quietUntil;
             this.lockAfter = lockAfter;
+            this.textSize = textSize;
             this.unknown = unknown;
         }
 
@@ -695,6 +721,8 @@ public final class SettingsBackup {
             if (quietUntilChange != null) changes.put(QUIET_UNTIL, quietUntilChange);
             AppLock.After lockAfterChange = lockAfterChange();
             if (lockAfterChange != null) changes.put(LOCK_AFTER, lockAfterChange);
+            TextSize.Scale textSizeChange = textSizeChange();
+            if (textSizeChange != null) changes.put(TEXT_SIZE, textSizeChange);
             SendLink.Action actionChange = actionChange();
             if (actionChange != null) changes.put(ACTION, actionChange);
             String appChange = appChange();
@@ -816,6 +844,12 @@ public final class SettingsBackup {
             return lockAfter == null || lockAfter == LOCK_AFTER.savedValue() ? null : lockAfter;
         }
 
+        /** The text size after this file, or null when it names none or the one already set. */
+        @Nullable
+        TextSize.Scale textSizeChange() {
+            return textSize == null || textSize == TEXT_SIZE.savedValue() ? null : textSize;
+        }
+
         /** The top folder this file sends saves to, or null when it names none or the one already set. */
         @Nullable
         SaveTo toChange() {
@@ -892,6 +926,7 @@ public final class SettingsBackup {
             if (quietFrom != null) state.putString(QUIET_FROM_NAME, quietFrom.fileValue());
             if (quietUntil != null) state.putString(QUIET_UNTIL_NAME, quietUntil.fileValue());
             if (lockAfter != null) state.putString(LOCK_AFTER_NAME, lockAfter.fileValue);
+            if (textSize != null) state.putString(TEXT_SIZE_NAME, textSize.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -940,6 +975,7 @@ public final class SettingsBackup {
                     SurfaceQuality.fromFile(state.get(STORIES_QUALITY_NAME)),
                     QuietHour.fromFile(state.get(QUIET_FROM_NAME)), QuietHour.fromFile(state.get(QUIET_UNTIL_NAME)),
                     AppLock.After.fromFile(state.get(LOCK_AFTER_NAME)),
+                    TextSize.Scale.fromFile(state.get(TEXT_SIZE_NAME)),
                     unknown);
         }
     }
@@ -970,6 +1006,7 @@ public final class SettingsBackup {
         switches.put(QUIET_FROM.key, QUIET_FROM.savedValue().fileValue());
         switches.put(QUIET_UNTIL.key, QUIET_UNTIL.savedValue().fileValue());
         switches.put(LOCK_AFTER.key, LOCK_AFTER.savedValue().fileValue);
+        switches.put(TEXT_SIZE.key, TEXT_SIZE.savedValue().fileValue);
         switches.put(ACTION.key, ACTION.savedValue().fileValue);
         // The app links really go to, so a file never carries a name an import would refuse.
         switches.put(APP.key, SendLink.fileApp(APP.savedValue()));
@@ -1083,6 +1120,7 @@ public final class SettingsBackup {
         QuietHour quietFrom = null;
         QuietHour quietUntil = null;
         AppLock.After lockAfter = null;
+        TextSize.Scale textSize = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -1176,6 +1214,11 @@ public final class SettingsBackup {
                 if (lockAfter == null) throw new Rejected(Reason.VALUE, "Not an app lock time: " + name);
                 continue;
             }
+            if (TEXT_SIZE.key.equals(name)) {
+                textSize = TextSize.Scale.fromFile(values.opt(name));
+                if (textSize == null) throw new Rejected(Reason.VALUE, "Not a text size: " + name);
+                continue;
+            }
             if (TO.key.equals(name)) {
                 to = SaveTo.fromFile(values.opt(name));
                 if (to == null) throw new Rejected(Reason.VALUE, "Not a save location: " + name);
@@ -1244,7 +1287,7 @@ public final class SettingsBackup {
         }
         return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
                 subtab, sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom,
-                quietUntil, lockAfter, unknown);
+                quietUntil, lockAfter, textSize, unknown);
     }
 
     /**

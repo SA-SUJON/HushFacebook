@@ -46,6 +46,7 @@ import app.morphe.extension.facebook.media.ResumePlayback;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.ScreenTransitions;
+import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.navigation.ReelsTab;
 import app.morphe.extension.facebook.stories.StorySeenButton;
 import app.morphe.extension.facebook.theme.MaterialYouTheme;
@@ -112,6 +113,7 @@ public final class SettingsEntry {
                 callbacksRegistered = true;
             }
             ReturnRefresh.register(context);
+            TextSize.application(context);
             // Only with the theme in the build, so its class and palette aren't loaded otherwise.
             if (SettingsStatus.materialYouTheme()) MaterialYouTheme.watchWindows(context);
         } catch (Exception ex) {
@@ -472,6 +474,7 @@ public final class SettingsEntry {
             resumed = new WeakReference<>(activity);
             // First, so a locked Facebook is covered before anything else of Hushfacebook's shows.
             AppLock.resumed(activity);
+            TextSize.activity(activity);
             ScreenLog.resumed(activity);
             SavedFileActions.onResumed(activity);
             ScreenTransitions.activityResumed(activity);
@@ -492,6 +495,12 @@ public final class SettingsEntry {
             ScreenTransitions.activityPaused(activity);
             if (resumed != null && resumed.get() == activity) resumed = null;
             LastScreen.read(activity);
+        }
+
+        /** Before the activity's own onCreate, so its first layout is measured at the chosen text size. */
+        @Override
+        public void onActivityPreCreated(Activity activity, Bundle state) {
+            TextSize.activity(activity);
         }
 
         @Override

@@ -1113,3 +1113,15 @@ Facebook is locked	Facebook está bloqueado
 Use your fingerprint, face or screen lock to open it.	Usa tu huella, tu cara o el bloqueo de pantalla para abrirlo.
 # context: button on the cover that asks for the screen lock again
 Unlock	Desbloquear
+# context: title of the row and list that picks how large Facebook's text is, as a share of the phone's font size
+Text size	Tamaño del texto
+# context: Text size choice for no change: Facebook's text stays at the size the phone's font size setting gives it
+As Facebook has it	Como lo tiene Facebook
+# context: summary of the Text size row at its default
+Facebook's text is the size your phone's font size setting gives it.	El texto de Facebook tiene el tamaño que le da el ajuste de tamaño de fuente de tu teléfono.
+# context: summary of the Text size row; %1$s is a percentage such as 115%
+Facebook's text is %1$s of the size your phone's font size setting gives it. Restart Facebook after changing it.	El texto de Facebook mide el %1$s del tamaño que le da el ajuste de tamaño de fuente de tu teléfono. Reinicia Facebook después de cambiarlo.
+# context: what a settings import changes: Facebook's text goes back to the phone's font size
+Facebook's text will be the size your phone's font size setting gives it.	El texto de Facebook tendrá el tamaño que le da el ajuste de tamaño de fuente de tu teléfono.
+# context: what a settings import changes; %1$s is a percentage such as 115%
+Facebook's text will be %1$s of the size your phone's font size setting gives it.	El texto de Facebook medirá el %1$s del tamaño que le da el ajuste de tamaño de fuente de tu teléfono.

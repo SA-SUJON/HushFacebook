@@ -713,6 +713,15 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/TextSize.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Text size, which sets the font scale Facebook's resources report to the phone's times a chosen 85% to 130%, on each activity as it's created and resumes and on the application's resources, from the settings entry's callbacks rather than a patch. Facebook's native views and Litho text both read Configuration.fontScale and DisplayMetrics.scaledDensity from their context's resources in 577, 580 and 581."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/Haptics.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/haptics/HapticsAnchors.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/haptics/TurnOffHapticsPatch.kt"

@@ -82,6 +82,7 @@ import app.morphe.extension.facebook.feed.WordsCorpus;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
+import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -184,6 +185,7 @@ public class SettingsBackupTest {
         Settings.QUIET_HOURS_FROM.resetToDefault();
         Settings.QUIET_HOURS_UNTIL.resetToDefault();
         Settings.APP_LOCK_AFTER.resetToDefault();
+        Settings.TEXT_SIZE.resetToDefault();
         Settings.VIDEO_SUBFOLDER.resetToDefault();
         Settings.PHOTO_SUBFOLDER.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
@@ -239,7 +241,7 @@ public class SettingsBackupTest {
                 Settings.FILENAME_TEMPLATE, Settings.PHOTO_FILENAME_TEMPLATE, Settings.DOWNLOAD_ACTION, Settings.SEND_TO_APP,
                 Settings.START_TAB, Settings.FEEDS_SUBTAB, Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY,
                 Settings.REELS_PLAYBACK_QUALITY, Settings.STORIES_PLAYBACK_QUALITY, Settings.QUIET_HOURS_FROM,
-                Settings.QUIET_HOURS_UNTIL, Settings.APP_LOCK_AFTER), SettingsBackup.VALUES);
+                Settings.QUIET_HOURS_UNTIL, Settings.APP_LOCK_AFTER, Settings.TEXT_SIZE), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_TO, SettingsBackup.TO);
         assertEquals(Settings.HIDDEN_WORDS, SettingsBackup.HIDDEN);
         assertEquals(Settings.KEPT_WORDS, SettingsBackup.KEPT);
@@ -256,6 +258,7 @@ public class SettingsBackupTest {
         assertEquals(Settings.STORIES_PLAYBACK_QUALITY, SettingsBackup.STORIES_QUALITY);
         assertEquals(Settings.QUIET_HOURS_FROM, SettingsBackup.QUIET_FROM);
         assertEquals(Settings.QUIET_HOURS_UNTIL, SettingsBackup.QUIET_UNTIL);
+        assertEquals(Settings.TEXT_SIZE, SettingsBackup.TEXT_SIZE);
         assertEquals(Settings.VIDEO_SUBFOLDER, SettingsBackup.VIDEO_SUBFOLDER);
         assertEquals(Settings.PHOTO_SUBFOLDER, SettingsBackup.PHOTO_SUBFOLDER);
         assertEquals(Settings.DOWNLOAD_ACTION, SettingsBackup.ACTION);
@@ -1844,6 +1847,65 @@ public class SettingsBackupTest {
         assertEquals("Settings imported. With Lock Facebook on, it will lock once you've been away for 1 hour.",
                 SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null, null, null,
                         null, null, null, null, null, null, null, null, null, null, AppLock.After.ONE_HOUR));
+    }
+
+    /**
+     * The text size goes out as its percentage and comes back only as one this build offers: any
+     * other value, or one that isn't text, refuses the whole file.
+     */
+    @Test
+    public void theTextSizeRoundTripsAndComesBackOnlyAsOneThisBuildOffers() throws Exception {
+        for (TextSize.Scale choice : TextSize.Scale.values()) {
+            TextSize.Scale other = choice == TextSize.Scale.P130 ? TextSize.Scale.P85 : TextSize.Scale.P130;
+            Settings.TEXT_SIZE.save(choice);
+            String file = SettingsBackup.create();
+            assertEquals(choice.fileValue, new JSONObject(file).getJSONObject("settings").get(SettingsBackup.TEXT_SIZE.key));
+            Settings.TEXT_SIZE.save(other);
+
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+            assertEquals(choice, snapshot.textSize);
+            assertEquals(choice, snapshot.textSizeChange());
+            Map<Setting<?>, Object> expected = new LinkedHashMap<>();
+            expected.put(SettingsBackup.TEXT_SIZE, choice);
+            assertEquals(expected, snapshot.changes());
+            assertEquals(1, SettingsBackup.apply(snapshot));
+            assertEquals(choice, Settings.TEXT_SIZE.savedValue());
+            assertEquals("a file read back is the file", file, SettingsBackup.create());
+            assertEquals("the same size again changes nothing", 0, SettingsBackup.parse(file).changes().size());
+        }
+
+        Settings.TEXT_SIZE.save(TextSize.Scale.P115);
+        String file = SettingsBackup.create();
+        Map<String, ?> before = store();
+        for (Object refused : new Object[]{"P115", "115%", "95", "", 115, true, JSONObject.NULL,
+                new JSONObject(), new org.json.JSONArray()}) {
+            JSONObject hostile = new JSONObject(file);
+            hostile.getJSONObject("settings").put(SettingsBackup.TEXT_SIZE.key, refused);
+            try {
+                SettingsBackup.parse(hostile.toString());
+                fail("a file with the text size " + printable(String.valueOf(refused)) + " was read");
+            } catch (SettingsBackup.Rejected rejected) {
+                assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the size was carried leaves it alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.textSize);
+        assertNull(older.textSizeChange());
+        SettingsBackup.apply(older);
+        assertEquals(TextSize.Scale.P115, Settings.TEXT_SIZE.savedValue());
+
+        // A preview kept across a rebuild keeps it, and only one this build offers comes back.
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(TextSize.Scale.P115, SettingsBackup.Snapshot.fromBundle(state).textSize);
+        state.putString("text_size", "P115");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).textSize);
+
+        assertEquals("Settings imported. Facebook's text will be 130% of the size your phone's font size setting gives it.",
+                SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, TextSize.Scale.P130));
     }
 
     /**

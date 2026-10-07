@@ -16,6 +16,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.photoNameSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.playbackQualitySummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.qualitySummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.textSizeSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.quietHourLabel;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.saveToSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.sendAppSummary;
@@ -56,6 +57,7 @@ import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
+import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
@@ -680,6 +682,45 @@ final class ValueRows {
                 if (candidate.name().equals(getValue())) after = candidate;
             }
             setSummary(lockAfterSummary(after));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The text size row. Its summary follows its value, whoever sets it: the person, the shared
+     * page syncing it from the setting, or an import.
+     */
+    static final class TextSizeRow extends ListPreference {
+        TextSizeRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            TextSize.Scale scale = TextSize.Scale.P100;
+            for (TextSize.Scale candidate : TextSize.Scale.values()) {
+                if (candidate.name().equals(getValue())) scale = candidate;
+            }
+            setSummary(textSizeSummary(scale));
         }
 
         @Override

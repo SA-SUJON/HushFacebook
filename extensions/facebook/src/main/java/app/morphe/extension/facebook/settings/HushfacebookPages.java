@@ -13,6 +13,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.category;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.info;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.mark;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.textSizeRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.toggle;
 
 import android.app.AlertDialog;
@@ -75,78 +76,75 @@ final class HushfacebookPages {
         ReleaseCheck.watch(page);
     }
 
-    /** Appearance: the font, the emoji, where the tab bar goes, dark mode, haptics and screen transitions. */
+    /** Appearance, in every build for Text size: the font, the emoji, where the tab bar goes, dark mode, haptics and screen transitions. */
     static void appearance(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
-        if (build.contains(PatchFamily.SYSTEM_FONT) || build.contains(PatchFamily.SYSTEM_EMOJI)
-                || build.contains(PatchFamily.BOTTOM_TAB_BAR) || build.contains(PatchFamily.FORCE_DARK_MODE)
-                || build.contains(PatchFamily.HIDDEN_TABS) || build.contains(PatchFamily.HAPTICS)
-                || build.contains(PatchFamily.SCREEN_TRANSITIONS) || build.contains(PatchFamily.TAB_BADGES)) {
-            PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
-            if (build.contains(PatchFamily.SYSTEM_FONT)) {
-                appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT,
-                        L10n.t("Use your phone's font or a file chosen below. Restart Facebook after changing it.")));
-                // The file the switch draws in, and, while one is picked, the way back to the phone's font.
-                // The way back goes in once whatever is picked, so it keeps its place right after Font file
-                // when a pick brings it back, rather than landing at the end of the section.
-                FontRow choose = new FontRow(page, context, FontFilePreference.CHOOSE);
-                choose.wayBack = new FontRow(page, context, FontFilePreference.PHONE_FONT);
-                appearance.addPreference(choose);
-                appearance.addPreference(choose.wayBack);
-                choose.show();
+        PreferenceCategory appearance = category(screen, L10n.t("Appearance"));
+        // The settings entry's own, so every build has it. 100% is Facebook as it ships.
+        appearance.addPreference(textSizeRow(context));
+        if (build.contains(PatchFamily.SYSTEM_FONT)) {
+            appearance.addPreference(toggle(context, Settings.USE_SYSTEM_FONT,
+                    L10n.t("Use your phone's font or a file chosen below. Restart Facebook after changing it.")));
+            // The file the switch draws in, and, while one is picked, the way back to the phone's font.
+            // The way back goes in once whatever is picked, so it keeps its place right after Font file
+            // when a pick brings it back, rather than landing at the end of the section.
+            FontRow choose = new FontRow(page, context, FontFilePreference.CHOOSE);
+            choose.wayBack = new FontRow(page, context, FontFilePreference.PHONE_FONT);
+            appearance.addPreference(choose);
+            appearance.addPreference(choose.wayBack);
+            choose.show();
+        }
+        if (build.contains(PatchFamily.SYSTEM_EMOJI)) {
+            // The quick emoji picker keeps the first typeface it's given until Facebook restarts.
+            appearance.addPreference(toggle(context, Settings.USE_SYSTEM_EMOJI,
+                    L10n.t("Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.")));
+        }
+        if (build.contains(PatchFamily.BOTTOM_TAB_BAR)) {
+            // Facebook places the tab bar as its main screen starts, so a change waits for a restart.
+            appearance.addPreference(toggle(context, Settings.BOTTOM_TAB_BAR,
+                    L10n.t("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. "
+                            + "Restart Facebook after changing it.")));
+            // Facebook adds the bar to the views that scroll away as its main screen starts.
+            appearance.addPreference(toggle(context, Settings.TAB_BAR_SCROLL_AWAY,
+                    L10n.t("When the tab bar is at the bottom, it slides away as you scroll down and comes back "
+                            + "when you scroll up. Restart Facebook after changing it.")));
+        }
+        if (build.contains(PatchFamily.HIDDEN_TABS)) {
+            // Facebook builds the tab bar once, so a change waits for a restart.
+            for (HiddenTabs.Tab tab : HiddenTabs.Tab.values()) {
+                appearance.addPreference(toggle(context, tab.setting(),
+                        L10n.t("Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after "
+                                + "changing it.")));
             }
-            if (build.contains(PatchFamily.SYSTEM_EMOJI)) {
-                // The quick emoji picker keeps the first typeface it's given until Facebook restarts.
-                appearance.addPreference(toggle(context, Settings.USE_SYSTEM_EMOJI,
-                        L10n.t("Use your phone's emoji. Reactions and stickers stay the same. Restart Facebook after changing it.")));
+        }
+        if (build.contains(PatchFamily.TAB_BADGES)) {
+            // The tab bar asks for each tab's count as it changes, so a change shows the next time it asks.
+            for (TabBadges.Tab tab : TabBadges.Tab.values()) {
+                appearance.addPreference(toggle(context, tab.setting(), tab == TabBadges.Tab.OTHER
+                        ? L10n.t("No dot or count on Feeds, Gaming, Events and the other tabs not listed here. "
+                                + "The Reels tab has its own switch.")
+                        : L10n.t("No dot or count on this tab. Its page still shows what's new when you open it.")));
             }
-            if (build.contains(PatchFamily.BOTTOM_TAB_BAR)) {
-                // Facebook places the tab bar as its main screen starts, so a change waits for a restart.
-                appearance.addPreference(toggle(context, Settings.BOTTOM_TAB_BAR,
-                        L10n.t("Put Facebook's tab bar at the bottom of the screen on accounts that have it at the top. "
-                                + "Restart Facebook after changing it.")));
-                // Facebook adds the bar to the views that scroll away as its main screen starts.
-                appearance.addPreference(toggle(context, Settings.TAB_BAR_SCROLL_AWAY,
-                        L10n.t("When the tab bar is at the bottom, it slides away as you scroll down and comes back "
-                                + "when you scroll up. Restart Facebook after changing it.")));
-            }
-            if (build.contains(PatchFamily.HIDDEN_TABS)) {
-                // Facebook builds the tab bar once, so a change waits for a restart.
-                for (HiddenTabs.Tab tab : HiddenTabs.Tab.values()) {
-                    appearance.addPreference(toggle(context, tab.setting(),
-                            L10n.t("Takes the tab off the tab bar. Its page stays in the Menu. Restart Facebook after "
-                                    + "changing it.")));
-                }
-            }
-            if (build.contains(PatchFamily.TAB_BADGES)) {
-                // The tab bar asks for each tab's count as it changes, so a change shows the next time it asks.
-                for (TabBadges.Tab tab : TabBadges.Tab.values()) {
-                    appearance.addPreference(toggle(context, tab.setting(), tab == TabBadges.Tab.OTHER
-                            ? L10n.t("No dot or count on Feeds, Gaming, Events and the other tabs not listed here. "
-                                    + "The Reels tab has its own switch.")
-                            : L10n.t("No dot or count on this tab. Its page still shows what's new when you open it.")));
-                }
-                appearance.addPreference(toggle(context, Settings.HIDE_APP_ICON_COUNT,
-                        L10n.t("No count on Facebook's app icon. Notifications still come in. A launcher that counts "
-                                + "notifications on its own may still show them.")));
-            }
-            if (build.contains(PatchFamily.FORCE_DARK_MODE)) {
-                // Facebook asks for dark mode as each screen applies its theme, so a change shows fully after a restart.
-                appearance.addPreference(toggle(context, Settings.FORCE_DARK_MODE,
-                        L10n.t("Keep Facebook in dark mode whatever its own setting says, for tablets where Facebook's "
-                                + "settings have no Dark mode. Restart Facebook after changing it.")));
-            }
-            if (build.contains(PatchFamily.HAPTICS)) {
-                appearance.addPreference(toggle(context, Settings.TURN_OFF_HAPTICS,
-                        L10n.t("No short vibrations on Facebook's own taps and gestures. The keyboard and your "
-                                + "phone's own haptics stay.")));
-            }
-            if (build.contains(PatchFamily.SCREEN_TRANSITIONS)) {
-                // Asked at each tap and each screen change, so a change shows from the next one.
-                appearance.addPreference(toggle(context, Settings.TURN_OFF_SCREEN_TRANSITIONS,
-                        L10n.t("Tabs, the Menu and screens that open over Facebook show at once, without the slide "
-                                + "between them. Swiping between tabs stays.")));
-            }
+            appearance.addPreference(toggle(context, Settings.HIDE_APP_ICON_COUNT,
+                    L10n.t("No count on Facebook's app icon. Notifications still come in. A launcher that counts "
+                            + "notifications on its own may still show them.")));
+        }
+        if (build.contains(PatchFamily.FORCE_DARK_MODE)) {
+            // Facebook asks for dark mode as each screen applies its theme, so a change shows fully after a restart.
+            appearance.addPreference(toggle(context, Settings.FORCE_DARK_MODE,
+                    L10n.t("Keep Facebook in dark mode whatever its own setting says, for tablets where Facebook's "
+                            + "settings have no Dark mode. Restart Facebook after changing it.")));
+        }
+        if (build.contains(PatchFamily.HAPTICS)) {
+            appearance.addPreference(toggle(context, Settings.TURN_OFF_HAPTICS,
+                    L10n.t("No short vibrations on Facebook's own taps and gestures. The keyboard and your "
+                            + "phone's own haptics stay.")));
+        }
+        if (build.contains(PatchFamily.SCREEN_TRANSITIONS)) {
+            // Asked at each tap and each screen change, so a change shows from the next one.
+            appearance.addPreference(toggle(context, Settings.TURN_OFF_SCREEN_TRANSITIONS,
+                    L10n.t("Tabs, the Menu and screens that open over Facebook show at once, without the slide "
+                            + "between them. Swiping between tabs stays.")));
         }
     }
 

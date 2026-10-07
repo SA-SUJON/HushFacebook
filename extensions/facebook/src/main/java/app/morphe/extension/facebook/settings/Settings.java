@@ -18,6 +18,7 @@ import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
+import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
@@ -1180,6 +1181,14 @@ public class Settings extends BaseSettings {
      */
     public static final EnumSetting<AppLock.After> APP_LOCK_AFTER =
             new EnumSetting<>("hushfacebook_app_lock_after", AppLock.After.ONE_MINUTE);
+
+    /**
+     * How large Facebook's text is, as a share of the phone's font size ({@link TextSize}). It
+     * isn't a switch: 100% is Facebook as it ships, which is also what a paused Facebook reads.
+     * The settings entry carries it, so every build has it.
+     */
+    public static final EnumSetting<TextSize.Scale> TEXT_SIZE =
+            new EnumSetting<>("hushfacebook_text_size", TextSize.Scale.P100);
 
     /**
      * Where {@link #USE_SYSTEM_FONT} takes its font from: empty for the phone's own, or the name of

@@ -52,6 +52,7 @@ import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
+import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.navigation.HiddenTabs;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -63,6 +64,7 @@ import app.morphe.extension.facebook.settings.SettingsRows.SaveRow;
 import app.morphe.extension.facebook.settings.SettingsRows.Toggle;
 import app.morphe.extension.facebook.settings.ValueRows.CommentOrderRow;
 import app.morphe.extension.facebook.settings.ValueRows.LockAfterRow;
+import app.morphe.extension.facebook.settings.ValueRows.TextSizeRow;
 import app.morphe.extension.facebook.settings.ValueRows.DownloadActionRow;
 import app.morphe.extension.facebook.settings.ValueRows.FeedsSubtabRow;
 import app.morphe.extension.facebook.settings.ValueRows.FileNameRow;
@@ -1152,6 +1154,44 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * How large Facebook's text is. Like the comment order row, its values are the setting's own
+     * names and its summary says what the choice does.
+     */
+    static TextSizeRow textSizeRow(Context context) {
+        TextSizeRow row = new TextSizeRow(context);
+        row.setKey(Settings.TEXT_SIZE.key);
+        row.setTitle(L10n.t("Text size"));
+        row.setDialogTitle(L10n.t("Text size"));
+        // Android's own Cancel follows the activity's language, as the other lists' did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        TextSize.Scale[] choices = TextSize.Scale.values();
+        CharSequence[] entries = new CharSequence[choices.length];
+        CharSequence[] values = new CharSequence[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            entries[i] = textSizeLabel(choices[i]);
+            values[i] = choices[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.TEXT_SIZE.savedValue().name());
+        return row;
+    }
+
+    /** What the list and the sentences about it call [scale]. */
+    static String textSizeLabel(TextSize.Scale scale) {
+        return scale == TextSize.Scale.P100 ? L10n.t("As Facebook has it") : scale.percent + "%";
+    }
+
+    /** What a choice does, for the row's summary. */
+    static String textSizeSummary(TextSize.Scale scale) {
+        if (scale == TextSize.Scale.P100) {
+            return L10n.t("Facebook's text is the size your phone's font size setting gives it.");
+        }
+        return L10n.f("Facebook's text is %1$s of the size your phone's font size setting gives it. "
+                + "Restart Facebook after changing it.", scale.percent + "%");
+    }
+
+    /**
      * The quality videos play at. Like the comment order row, its values are the setting's own
      * names and its summary says what the choice does.
      */
@@ -1296,6 +1336,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((CommentOrderRow) listPreference).showSummary();
         } else if (listPreference instanceof LockAfterRow) {
             ((LockAfterRow) listPreference).showSummary();
+        } else if (listPreference instanceof TextSizeRow) {
+            ((TextSizeRow) listPreference).showSummary();
         } else if (listPreference instanceof PlaybackQualityRow) {
             ((PlaybackQualityRow) listPreference).showSummary();
         } else if (listPreference instanceof SurfaceQualityRow) {
