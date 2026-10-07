@@ -167,7 +167,7 @@ public class OriginalChatMediaTest {
     public void theCopyKeepsTheRotationTagAndNothingElse() throws IOException {
         byte[] withExif = OriginalChatMediaForTests.jpeg();
         // An EXIF segment with GPS-sized padding goes in after SOI, as a camera writes it.
-        byte[] exif = new byte[] {(byte) 0xFF, (byte) 0xE1, 0, 10, 'E', 'x', 'i', 'f', 0, 0, 1, 2};
+        byte[] exif = new byte[] {(byte) 0xFF, (byte) 0xE1, 0, 14, 'E', 'x', 'i', 'f', 0, 0, 'C', 'A', 'M', 'E', 'R', 'A'};
         byte[] merged = new byte[withExif.length + exif.length];
         System.arraycopy(withExif, 0, merged, 0, 2);
         System.arraycopy(exif, 0, merged, 2, exif.length);
@@ -177,7 +177,7 @@ public class OriginalChatMediaTest {
         target.deleteOnExit();
         OriginalPhoto.copyImageData(source, target, 6);
         byte[] copy = java.nio.file.Files.readAllBytes(target.toPath());
-        assertFalse("the camera's EXIF is gone", indexOf(copy, new byte[] {1, 2}) >= 0);
+        assertFalse("the camera's EXIF is gone", indexOf(copy, "CAMERA".getBytes()) >= 0);
         assertTrue("the rotation tag is in", indexOf(copy, OriginalPhoto.orientationExif(6)) >= 0);
         OriginalPhoto.copyImageData(source, target, 0);
         byte[] plain = java.nio.file.Files.readAllBytes(target.toPath());

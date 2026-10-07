@@ -346,7 +346,7 @@ public class PatchFamilyTest {
                         + "update prompts, Download any story, Download any reel, Download any photo, Following feed on Home, Marketplace only, Show View profile on "
                         + "Marketplace sellers, Hide the Reels tab "
                         + "dot, Hide tab badges, Hide tabs, Tab bar at the bottom, Force dark mode, Hide the Get Messenger card, Open Messenger from the top bar, Hide Menu promotions, "
-                        + "Hide Meta AI in search, Block promotional notifications, Block ad telemetry, Disable "
+                        + "Hide Meta AI in search, Send chat photos and videos at original quality, Block promotional notifications, Block ad telemetry, Disable "
                         + "Audience Network, Restore screens on re-signed builds, Start on x86 devices, Install beside Meta's apps, "
                         + "Hushfacebook in the Menu"),
                 running);

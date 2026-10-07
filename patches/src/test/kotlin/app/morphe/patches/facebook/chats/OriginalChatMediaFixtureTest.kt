@@ -92,6 +92,8 @@ class OriginalChatMediaFixtureTest {
                 val cmp = videoBefore[anchors.sizeCheck] as ThreeRegisterInstruction
                 assertEquals("$name: a compare", Opcode.CMP_LONG, cmp.opcode)
                 assertEquals("$name: branches on the compare", Opcode.IF_LTZ, videoBefore[anchors.sizeCheck + 1].opcode)
+                assertTrue("$name: the compare's answer is in v0 to v15, which a plain invoke can name", cmp.registerA <= 15)
+                assertTrue("$name: the size's other half is in v0 to v15", cmp.registerB + 1 <= 15)
 
                 originalChatMediaPatch.execute(context)
 
