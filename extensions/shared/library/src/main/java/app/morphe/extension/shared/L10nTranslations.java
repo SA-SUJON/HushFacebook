@@ -1156,8 +1156,8 @@ public final class L10nTranslations {
                 "Beitr\u00e4ge, die die Person, die sie erstellt hat, als mit KI erstellt gekennzeichnet hat. Facebook zeigt sein KI-Label neben dem Namen bei diesen wie auch bei den Beitr\u00e4gen, die seine Erkennung gefunden hat, und mit diesem Schalter verschwinden beide. Der Schalter ist standardm\u00e4\u00dfig aus, weil er noch nicht in einem echten Feed getestet wurde.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
                 "Beitr\u00e4ge, deren Text ein Wort oder eine Wortfolge aus deiner Liste unten enth\u00e4lt. Ein Beitrag mit einem Wort aus deiner Liste zum Behalten bleibt, ebenso ein Beitrag ohne Text. Deine W\u00f6rter verlassen das Handy nur in einer Einstellungsdatei, die du exportierst.");
-        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.",
-                "Beitr\u00e4ge, an denen du vorbeigescrollt bist, bleiben beim n\u00e4chsten Laden aus dem Feed. Facebook entscheidet, was als gesehen z\u00e4hlt. Die Liste bleibt auf diesem Handy, und eine \u00c4nderung gilt ab dem n\u00e4chsten Laden.");
+        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load. Turning this off empties the list.",
+                "Beitr\u00e4ge, an denen du vorbeigescrollt bist, bleiben beim n\u00e4chsten Laden aus dem Feed. Facebook entscheidet, was als gesehen z\u00e4hlt. Die Liste bleibt auf diesem Handy, und eine \u00c4nderung gilt ab dem n\u00e4chsten Laden. Wenn du das ausschaltest, wird die Liste geleert.");
         table.put("Posts you've seen will stay hidden for %1$s.",
                 "Gesehene Beitr\u00e4ge bleiben %1$s lang ausgeblendet.");
         table.put("Privacy",
@@ -2907,8 +2907,8 @@ public final class L10nTranslations {
                 "Publicaciones que su autor marc\u00f3 como creadas con IA. Facebook pone su etiqueta de IA junto al nombre en estas y tambi\u00e9n en las que encontr\u00f3 su propia detecci\u00f3n, y con este interruptor activado se ocultan las dos. Viene desactivado porque todav\u00eda no se prob\u00f3 en un feed real.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
                 "Publicaciones cuyo texto tiene una palabra o frase de tu lista de abajo. Una publicaci\u00f3n con una palabra de tu lista para conservar se mantiene, igual que una publicaci\u00f3n sin texto. Tus palabras solo salen del tel\u00e9fono en un archivo de configuraci\u00f3n que exportes.");
-        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.",
-                "Las publicaciones por las que ya pasaste de largo se quedan fuera del feed cuando se vuelve a cargar. Facebook decide qu\u00e9 cuenta como visto. La lista se queda en este tel\u00e9fono y un cambio se nota en la pr\u00f3xima carga.");
+        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load. Turning this off empties the list.",
+                "Las publicaciones por las que ya pasaste de largo se quedan fuera del feed cuando se vuelve a cargar. Facebook decide qu\u00e9 cuenta como visto. La lista se queda en este tel\u00e9fono y un cambio se nota en la pr\u00f3xima carga. Al desactivarlo, la lista se vac\u00eda.");
         table.put("Posts you've seen will stay hidden for %1$s.",
                 "Las publicaciones que has visto seguir\u00e1n ocultas durante %1$s.");
         table.put("Privacy",
@@ -4658,8 +4658,8 @@ public final class L10nTranslations {
                 "Postingan yang ditandai pembuatnya sebagai buatan AI. Facebook memasang label AI di samping nama pada postingan ini maupun pada postingan yang ditemukan deteksinya, dan saat sakelar ini aktif, keduanya disembunyikan. Sakelar ini nonaktif secara default karena belum diuji di Kabar Beranda sungguhan.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
                 "Postingan yang teksnya berisi kata atau frasa dari daftar Anda di bawah. Postingan dengan kata dari daftar pertahankan Anda tetap ada, begitu juga postingan tanpa teks. Kata-kata Anda hanya keluar dari ponsel dalam file pengaturan yang Anda ekspor.");
-        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.",
-                "Kiriman yang sudah kamu lewati tidak muncul lagi di feed saat dimuat ulang. Facebook yang menentukan apa yang dihitung sebagai sudah dilihat. Daftarnya tetap di ponsel ini, dan perubahan berlaku pada pemuatan berikutnya.");
+        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load. Turning this off empties the list.",
+                "Kiriman yang sudah kamu lewati tidak muncul lagi di feed saat dimuat ulang. Facebook yang menentukan apa yang dihitung sebagai sudah dilihat. Daftarnya tetap di ponsel ini, dan perubahan berlaku pada pemuatan berikutnya. Mematikannya akan mengosongkan daftar.");
         table.put("Posts you've seen will stay hidden for %1$s.",
                 "Kiriman yang sudah kamu lihat akan tetap tersembunyi selama %1$s.");
         table.put("Privacy",
@@ -6409,8 +6409,8 @@ public final class L10nTranslations {
                 "Publica\u00e7\u00f5es que o autor marcou como geradas por IA. O Facebook coloca o r\u00f3tulo de IA ao lado do nome nessas publica\u00e7\u00f5es e tamb\u00e9m nas que a detec\u00e7\u00e3o dele encontrou, e com esta op\u00e7\u00e3o ativada os dois tipos s\u00e3o ocultados. Esta op\u00e7\u00e3o vem desativada por padr\u00e3o porque ainda n\u00e3o foi testada em um feed real.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
                 "Publica\u00e7\u00f5es cujo texto cont\u00e9m uma palavra ou frase da lista abaixo. Uma publica\u00e7\u00e3o com uma palavra da lista para manter permanece, assim como uma publica\u00e7\u00e3o sem texto. Suas palavras s\u00f3 saem do dispositivo em um arquivo de configura\u00e7\u00f5es que voc\u00ea exportar.");
-        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.",
-                "As publica\u00e7\u00f5es pelas quais voc\u00ea j\u00e1 passou ficam fora do feed quando ele carrega de novo. O Facebook decide o que conta como visto. A lista fica neste celular e a mudan\u00e7a vale a partir do pr\u00f3ximo carregamento.");
+        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load. Turning this off empties the list.",
+                "As publica\u00e7\u00f5es pelas quais voc\u00ea j\u00e1 passou ficam fora do feed quando ele carrega de novo. O Facebook decide o que conta como visto. A lista fica neste celular e a mudan\u00e7a vale a partir do pr\u00f3ximo carregamento. Desativar isso esvazia a lista.");
         table.put("Posts you've seen will stay hidden for %1$s.",
                 "As publica\u00e7\u00f5es que voc\u00ea viu ficar\u00e3o ocultas por %1$s.");
         table.put("Privacy",
@@ -8160,8 +8160,8 @@ public final class L10nTranslations {
                 "Olu\u015fturan ki\u015finin yapay zek\u00e2 ile \u00fcretildi\u011fini belirtti\u011fi g\u00f6nderiler. Facebook, yapay zek\u00e2 etiketini hem bunlarda hem de kendi tespitinin buldu\u011fu g\u00f6nderilerde ad\u0131n yan\u0131na koyar ve bu anahtar a\u00e7\u0131kken ikisi de gizlenir. Hen\u00fcz ger\u00e7ek bir ak\u0131\u015fta test edilmedi\u011fi i\u00e7in varsay\u0131lan olarak kapal\u0131d\u0131r.");
         table.put("Posts whose text has a word or phrase from your list below. A post with a word from your keep list stays, and so does a post with no text. Your words only leave the phone in a settings file you export.",
                 "Metninde a\u015fa\u011f\u0131daki listenden bir kelime veya ifade ge\u00e7en g\u00f6nderiler. Tutma listendeki bir kelimeyi i\u00e7eren g\u00f6nderi kal\u0131r, metni olmayan g\u00f6nderi de kal\u0131r. Kelimelerin telefondan yaln\u0131zca d\u0131\u015fa aktard\u0131\u011f\u0131n bir ayar dosyas\u0131yla \u00e7\u0131kar.");
-        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.",
-                "\u00dczerinden ge\u00e7ti\u011fin g\u00f6nderiler, ak\u0131\u015f yeniden y\u00fcklendi\u011finde ak\u0131\u015f\u0131n d\u0131\u015f\u0131nda kal\u0131r. Neyin g\u00f6r\u00fclm\u00fc\u015f say\u0131laca\u011f\u0131na Facebook karar verir. Liste bu telefonda kal\u0131r, de\u011fi\u015fiklik bir sonraki y\u00fcklemede g\u00f6r\u00fcn\u00fcr.");
+        table.put("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load. Turning this off empties the list.",
+                "\u00dczerinden ge\u00e7ti\u011fin g\u00f6nderiler, ak\u0131\u015f yeniden y\u00fcklendi\u011finde ak\u0131\u015f\u0131n d\u0131\u015f\u0131nda kal\u0131r. Neyin g\u00f6r\u00fclm\u00fc\u015f say\u0131laca\u011f\u0131na Facebook karar verir. Liste bu telefonda kal\u0131r, de\u011fi\u015fiklik bir sonraki y\u00fcklemede g\u00f6r\u00fcn\u00fcr. Bunu kapatmak listeyi bo\u015falt\u0131r.");
         table.put("Posts you've seen will stay hidden for %1$s.",
                 "G\u00f6rd\u00fc\u011f\u00fcn g\u00f6nderiler %1$s boyunca gizli kalacak.");
         table.put("Privacy",

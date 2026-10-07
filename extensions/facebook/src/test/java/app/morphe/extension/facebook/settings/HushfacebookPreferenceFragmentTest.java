@@ -25,6 +25,7 @@ import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWordsForTests;
+import app.morphe.extension.facebook.feed.SeenPostsForTests;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
@@ -1359,6 +1360,50 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse("a photo name row with no photo download in the build",
                         row instanceof ValueRows.FileNameRow && ((ValueRows.FileNameRow) row).photo);
             }
+        }
+    }
+
+    /**
+     * Hide seen posts' rows. Keep them hidden for follows the switch, Forget seen posts works with the
+     * switch off too, and turning the switch off forgets the list and its file.
+     */
+    @Test
+    public void turningHideSeenPostsOffForgetsTheListAndForgetWorksEitherWay() throws java.io.IOException {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SEEN_POSTS);
+        java.io.File file = java.io.File.createTempFile("seen-posts", ".txt");
+        SeenPostsForTests.useStore(file);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            int switchAt = indexOfKey(rows, Settings.HIDE_SEEN_POSTS.key);
+            assertTrue("no Hide seen posts switch", switchAt >= 0);
+            Preference seen = rows.get(switchAt);
+            Preference keep = rows.get(switchAt + 1);
+            Preference forget = rows.get(switchAt + 2);
+            assertEquals(Settings.SEEN_POSTS_KEEP.key, keep.getKey());
+            assertEquals("Forget seen posts", String.valueOf(forget.getTitle()));
+            assertFalse("the keep time is open with the switch off", keep.isEnabled());
+            assertTrue("Forget seen posts is greyed out with the switch off", forget.isEnabled());
+
+            SeenPostsForTests.rememberAndWrite("left from before");
+            assertTrue(forget.getOnPreferenceClickListener().onPreferenceClick(forget));
+            ShadowLooper.idleMainLooper();
+            assertEquals("Forget seen posts left the list with the switch off", 0, SeenPostsForTests.size());
+            assertFalse(file.exists());
+
+            assertTrue(seen.getOnPreferenceChangeListener().onPreferenceChange(seen, true));
+            assertTrue(keep.isEnabled());
+            assertTrue(forget.isEnabled());
+            SeenPostsForTests.rememberAndWrite("seen with it on");
+            assertTrue(file.exists());
+            assertTrue(seen.getOnPreferenceChangeListener().onPreferenceChange(seen, false));
+            assertFalse(keep.isEnabled());
+            assertTrue(forget.isEnabled());
+            assertEquals("turning the switch off kept the list", 0, SeenPostsForTests.size());
+            assertFalse("turning the switch off kept the file", file.exists());
+        } finally {
+            SeenPostsForTests.forgetStore();
+            //noinspection ResultOfMethodCallIgnored
+            file.delete();
         }
     }
 

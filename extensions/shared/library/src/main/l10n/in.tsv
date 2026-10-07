@@ -1214,8 +1214,8 @@ The feed won't hide posts for how many reactions they have.	Feed tidak akan meny
 The feed will hide posts with more than %1$s reactions.	Feed akan menyembunyikan postingan dengan lebih dari %1$s reaksi.
 # context: switch title under News feed; it keeps posts you scrolled past out of the feed on later loads
 Hide posts you've already seen	Sembunyikan kiriman yang sudah dilihat
-# context: description of that switch; Facebook decides what counts as seen, the list never leaves the phone
-Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.	Kiriman yang sudah kamu lewati tidak muncul lagi di feed saat dimuat ulang. Facebook yang menentukan apa yang dihitung sebagai sudah dilihat. Daftarnya tetap di ponsel ini, dan perubahan berlaku pada pemuatan berikutnya.
+# context: description of that switch; Facebook decides what counts as seen, the list never leaves the phone; turning the switch off empties the list
+Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load. Turning this off empties the list.	Kiriman yang sudah kamu lewati tidak muncul lagi di feed saat dimuat ulang. Facebook yang menentukan apa yang dihitung sebagai sudah dilihat. Daftarnya tetap di ponsel ini, dan perubahan berlaku pada pemuatan berikutnya. Mematikannya akan mengosongkan daftar.
 # context: title of the row under that switch that picks how many days a seen post stays hidden
 Keep them hidden for	Sembunyikan selama
 # context: choice in that row

@@ -250,12 +250,14 @@ final class FeedPages {
 
     /**
      * Hide posts you've already seen, with how long they stay hidden and a row that forgets them.
-     * The two rows stay greyed out while the switch is off.
+     * The keep time is greyed out while the switch is off, Forget seen posts never is, and turning
+     * the switch off forgets the list.
      */
     private static void seenPosts(PreferenceCategory feed, Context context) {
         SwitchPreference seen = toggle(context, Settings.HIDE_SEEN_POSTS,
                 L10n.t("Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what "
-                        + "counts as seen. The list stays on this phone, and a change shows on the next load."));
+                        + "counts as seen. The list stays on this phone, and a change shows on the next load. "
+                        + "Turning this off empties the list."));
         Preference keep = seenKeepRow(context);
         Row forget = new Row(context);
         forget.setTitle(L10n.t("Forget seen posts"));
@@ -268,14 +270,14 @@ final class FeedPages {
             return true;
         });
         mark(forget, SettingsIcons.DELETE);
-        // The two rows follow the switch: they're greyed out until it's on.
-        boolean on = Settings.HIDE_SEEN_POSTS.savedValue();
-        keep.setEnabled(on);
-        forget.setEnabled(on);
+        // The keep time follows the switch and is greyed out until it's on. Forget seen posts
+        // works either way, so a list is never out of reach.
+        keep.setEnabled(Settings.HIDE_SEEN_POSTS.savedValue());
         seen.setOnPreferenceChangeListener((preference, value) -> {
             boolean now = Boolean.TRUE.equals(value);
             keep.setEnabled(now);
-            forget.setEnabled(now);
+            // Off forgets the list. The file goes on a background thread.
+            if (!now) SeenPosts.clear();
             return true;
         });
         feed.addPreference(seen);

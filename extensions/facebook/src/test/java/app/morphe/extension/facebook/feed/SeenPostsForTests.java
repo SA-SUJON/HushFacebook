@@ -52,6 +52,31 @@ public final class SeenPostsForTests {
         });
     }
 
+    /** Points the store at [file] for a test outside this package, with every write run at once. */
+    public static void useStore(File file) {
+        SeenPosts.resetForTests();
+        SeenPosts.inBuildForTests = Boolean.TRUE;
+        SeenPosts.fileForTests = file;
+        SeenPosts.laterForTests = () -> { };
+        SeenPosts.backgroundForTests = Runnable::run;
+    }
+
+    /** Puts the store back as a test found it. */
+    public static void forgetStore() {
+        SeenPosts.resetForTests();
+    }
+
+    /** Remembers a post by an id of its own and writes the file. */
+    public static void rememberAndWrite(String id) {
+        SeenPosts.remember(id, System.currentTimeMillis());
+        SeenPosts.writeNow();
+    }
+
+    /** How many posts the store remembers. */
+    public static int size() {
+        return SeenPosts.size();
+    }
+
     private interface Check {
         boolean run();
     }
@@ -67,6 +92,7 @@ public final class SeenPostsForTests {
         SeenPosts.inBuildForTests = Boolean.TRUE;
         SeenPosts.fileForTests = file;
         SeenPosts.laterForTests = () -> { };
+        SeenPosts.backgroundForTests = Runnable::run;
         try {
             return check.run();
         } finally {

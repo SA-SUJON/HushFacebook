@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.function.LongSupplier;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
@@ -50,10 +51,17 @@ import app.morphe.extension.shared.settings.preference.LogBufferManager;
  * <p>Only a short hash of each id is kept, in one file in the app's own storage with the time it was
  * seen. It never leaves the phone and isn't part of an exported settings file. At most {@link #CAP}
  * posts are kept, the oldest forgotten first, and a post is forgotten once it's older than the days
- * the setting names. Writes are batched off the main thread.
+ * the setting names: on a lookup, and for every post when the file is read and each time it's
+ * written, so nothing sits in it past its days. A time ahead of the clock, as after the clock was
+ * set back, counts as past rather than keeping a post hidden longer. Every write is off the main
+ * thread, and an empty list leaves no file.
+ *
+ * <p>Turning the switch off forgets the list: the settings screen empties it as the switch goes
+ * off, and a hook that finds the switch off (after an import or a reset turned it off) empties it
+ * once. Forget seen posts empties it whatever the switch says.
  *
  * <p>Off, paused, before the settings are ready, or when anything here fails, nothing is hidden and
- * nothing is remembered.
+ * nothing is remembered. A pause keeps the list as it was.
  */
 public final class SeenPosts {
     /** How long a seen post stays hidden. */
@@ -104,13 +112,23 @@ public final class SeenPosts {
 
     /** Id to the time it was seen, oldest first. Guarded by itself. */
     private static final LinkedHashMap<String, Long> STORE = new LinkedHashMap<>();
+    /** Held across a write, so two writes land in the order their lists were taken. */
+    private static final Object WRITE = new Object();
     private static boolean loaded;
     private static boolean dirty;
     private static boolean writeScheduled;
 
+    /**
+     * Whether the list was emptied and nothing has been remembered since, so a hook that finds the
+     * switch off doesn't empty it again for every post.
+     */
+    private static volatile boolean forgotten;
+
     @Nullable static Boolean inBuildForTests;
     @Nullable static File fileForTests;
     @Nullable static Runnable laterForTests;
+    /** Runs a write at once instead of on a background thread, for tests. */
+    @Nullable static Executor backgroundForTests;
     static LongSupplier clock = System::currentTimeMillis;
 
     private static volatile Method cacheIdReader;
@@ -132,7 +150,12 @@ public final class SeenPosts {
     public static void seen(Object unit) {
         try {
             HookStatus.invoked(FAMILY);
-            if (unit == null || !Utils.settingsReady() || !Settings.HIDE_SEEN_POSTS.get()) return;
+            if (unit == null || !Utils.settingsReady()) return;
+            if (!Settings.HIDE_SEEN_POSTS.savedValue()) {
+                forgetWhileOff();
+                return;
+            }
+            if (!Settings.HIDE_SEEN_POSTS.get()) return;
             if (!isPost(unit)) return;
             String id = idOf(unit);
             if (id == null) {
@@ -155,7 +178,12 @@ public final class SeenPosts {
         try {
             if (unit == null || !inBuild()) return null;
             HookStatus.invoked(FAMILY);
-            if (!Utils.settingsReady() || !Settings.HIDE_SEEN_POSTS.get()) return null;
+            if (!Utils.settingsReady()) return null;
+            if (!Settings.HIDE_SEEN_POSTS.savedValue()) {
+                forgetWhileOff();
+                return null;
+            }
+            if (!Settings.HIDE_SEEN_POSTS.get()) return null;
             if (!isPost(unit)) return null;
             String id = idOf(unit);
             if (id == null) return null;
@@ -214,18 +242,19 @@ public final class SeenPosts {
             STORE.put(id, now);
             trimLocked();
             dirty = true;
+            forgotten = false;
             scheduleWriteLocked();
             return before == null;
         }
     }
 
-    /** Whether [id] was seen less than [keepMs] before [now]. An older one is dropped. */
+    /** Whether [id] was seen less than [keepMs] before [now]. An older one is dropped, and so is one seen after [now]. */
     static boolean isRemembered(String id, long now, long keepMs) {
         synchronized (STORE) {
             loadLocked();
             Long at = STORE.get(id);
             if (at == null) return false;
-            if (now - at >= keepMs) {
+            if (expired(at, now, keepMs)) {
                 STORE.remove(id);
                 dirty = true;
                 scheduleWriteLocked();
@@ -233,6 +262,35 @@ public final class SeenPosts {
             }
             return true;
         }
+    }
+
+    /**
+     * Whether a post seen at [at] is past [keepMs] at [now]. A time ahead of [now], left by a clock
+     * that was set back, counts as past: it would otherwise keep the post hidden until the clock
+     * caught up and then for the whole keep time again.
+     */
+    static boolean expired(long at, long now, long keepMs) {
+        return at > now || now - at >= keepMs;
+    }
+
+    /** Drops every post past the days the setting names. Marks the store for a write when it drops one. */
+    private static void pruneLocked(long now) {
+        long keepMs = savedKeepMs();
+        for (Iterator<Long> times = STORE.values().iterator(); times.hasNext(); ) {
+            if (expired(times.next(), now, keepMs)) {
+                times.remove();
+                dirty = true;
+            }
+        }
+    }
+
+    /**
+     * The days the setting holds, as the store is pruned by on a read or a write. Before the
+     * settings are ready it's the longest choice, so nothing goes early, and the settings aren't
+     * loaded from a thread that got here first.
+     */
+    private static long savedKeepMs() {
+        return (Utils.settingsReady() ? Settings.SEEN_POSTS_KEEP.savedValue() : Keep.THIRTY_DAYS).days * DAY_MS;
     }
 
     /** How many posts are remembered. */
@@ -243,14 +301,29 @@ public final class SeenPosts {
         }
     }
 
-    /** The Forget seen posts row: empties the store and its file. */
+    /**
+     * Forget seen posts, and the switch going off: empties the store now and deletes its file on a
+     * background thread. Safe to call on the main thread.
+     */
     public static void clear() {
         synchronized (STORE) {
             loaded = true;
             STORE.clear();
             dirty = true;
+            forgotten = true;
         }
-        writeNow();
+        Executor forTests = backgroundForTests;
+        if (forTests != null) forTests.execute(SeenPosts::writeNow);
+        else Utils.runOnBackgroundThread(SeenPosts::writeNow);
+    }
+
+    /**
+     * A hook found the switch off. A list left from when it was on, or from before an import or a
+     * reset turned it off, is emptied, once until something is remembered again.
+     */
+    private static void forgetWhileOff() {
+        if (forgotten) return;
+        clear();
     }
 
     private static void trimLocked() {
@@ -261,29 +334,44 @@ public final class SeenPosts {
         }
     }
 
-    /** Writes the store now, on this thread. */
+    /**
+     * Writes the store now, on this thread, which is never the main one: posts past their days are
+     * dropped first, and an empty store deletes the file.
+     */
     static void writeNow() {
-        List<String> lines = new ArrayList<>();
-        synchronized (STORE) {
-            writeScheduled = false;
-            if (!dirty) return;
-            dirty = false;
-            for (Map.Entry<String, Long> entry : STORE.entrySet()) lines.add(entry.getValue() + " " + entry.getKey());
-        }
-        File file = file();
-        if (file == null) return;
-        File temporary = new File(file.getPath() + ".tmp");
-        try (Writer out = new OutputStreamWriter(new FileOutputStream(temporary), StandardCharsets.UTF_8)) {
-            for (String line : lines) out.write(line + "\n");
-        } catch (IOException failure) {
-            Logger.printDebug(() -> "Seen posts: could not write the store: " + failure.getClass().getSimpleName());
-            return;
-        }
-        if (!temporary.renameTo(file)) {
-            //noinspection ResultOfMethodCallIgnored
-            file.delete();
-            //noinspection ResultOfMethodCallIgnored
-            temporary.renameTo(file);
+        synchronized (WRITE) {
+            List<String> lines = new ArrayList<>();
+            synchronized (STORE) {
+                writeScheduled = false;
+                if (loaded) pruneLocked(clock.getAsLong());
+                if (!dirty) return;
+                dirty = false;
+                for (Map.Entry<String, Long> entry : STORE.entrySet()) lines.add(entry.getValue() + " " + entry.getKey());
+            }
+            File file = file();
+            if (file == null) return;
+            File temporary = new File(file.getPath() + ".tmp");
+            if (lines.isEmpty()) {
+                // Nothing to keep, so nothing is left on the phone, a half-written copy included.
+                //noinspection ResultOfMethodCallIgnored
+                temporary.delete();
+                if (file.exists() && !file.delete()) {
+                    Logger.printDebug(() -> "Seen posts: could not delete the store");
+                }
+                return;
+            }
+            try (Writer out = new OutputStreamWriter(new FileOutputStream(temporary), StandardCharsets.UTF_8)) {
+                for (String line : lines) out.write(line + "\n");
+            } catch (IOException failure) {
+                Logger.printDebug(() -> "Seen posts: could not write the store: " + failure.getClass().getSimpleName());
+                return;
+            }
+            if (!temporary.renameTo(file)) {
+                //noinspection ResultOfMethodCallIgnored
+                file.delete();
+                //noinspection ResultOfMethodCallIgnored
+                temporary.renameTo(file);
+            }
         }
     }
 
@@ -320,6 +408,9 @@ public final class SeenPosts {
         } catch (IOException failure) {
             Logger.printDebug(() -> "Seen posts: could not read the store: " + failure.getClass().getSimpleName());
         }
+        // Posts that ran out while Facebook was closed go now, and the file follows.
+        pruneLocked(clock.getAsLong());
+        if (dirty) scheduleWriteLocked();
     }
 
     @Nullable
@@ -338,9 +429,11 @@ public final class SeenPosts {
             dirty = false;
             writeScheduled = false;
         }
+        forgotten = false;
         inBuildForTests = null;
         fileForTests = null;
         laterForTests = null;
+        backgroundForTests = null;
         clock = System::currentTimeMillis;
     }
 

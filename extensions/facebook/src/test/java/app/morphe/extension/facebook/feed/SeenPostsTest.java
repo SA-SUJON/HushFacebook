@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import app.morphe.extension.facebook.feed.SeenPostsForTests.Story;
@@ -36,9 +38,9 @@ import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
  * Hide seen posts: a post Facebook counts as seen is remembered by its cache id, and the feed guard
- * drops it on a later load for the days the setting names. The store is capped, expires, clears,
- * survives a restart through its file, and stays out of the way off, paused or before the settings
- * are ready.
+ * drops it on a later load for the days the setting names. The store is capped, expires on a lookup,
+ * a read and a write, clears off the main thread, is forgotten when the switch goes off, survives a
+ * restart through its file, and stays out of the way off, paused or before the settings are ready.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -63,6 +65,7 @@ public class SeenPostsTest {
         SeenPosts.inBuildForTests = Boolean.TRUE;
         SeenPosts.fileForTests = file;
         SeenPosts.laterForTests = () -> { };
+        SeenPosts.backgroundForTests = Runnable::run;
         SeenPosts.clock = now::get;
         Settings.HIDE_SEEN_POSTS.save(true);
     }
@@ -116,7 +119,51 @@ public class SeenPostsTest {
         SeenPosts.remember(SeenPosts.idOf(story), now.get());
         assertNull("a post was hidden with the switch off", SeenPosts.hideReason(story));
         Settings.HIDE_SEEN_POSTS.save(true);
+        SeenPosts.seen(story);
         assertEquals("the control: the same post is hidden with it on", SeenPosts.REASON, SeenPosts.hideReason(story));
+    }
+
+    /**
+     * A list left from when the switch was on is forgotten once a hook finds it off, as after an
+     * import or a reset turned it off, file and all. It isn't emptied again for every post, and
+     * turning the switch back on starts from nothing.
+     */
+    @Test
+    public void aHookThatFindsTheSwitchOffForgetsTheListOnce() {
+        Story story = new Story("left over");
+        SeenPosts.seen(story);
+        SeenPosts.writeNow();
+        assertTrue("the store wasn't written", file.length() > 0);
+        List<Runnable> writes = new ArrayList<>();
+        SeenPosts.backgroundForTests = writes::add;
+
+        Settings.HIDE_SEEN_POSTS.save(false);
+        assertNull(SeenPosts.hideReason(story));
+        assertEquals("the list outlived the switch", 0, SeenPosts.size());
+        assertEquals("the file was written on the hook's own thread", 1, writes.size());
+        assertTrue("the file went before the background write ran", file.length() > 0);
+        writes.get(0).run();
+        assertFalse("the file outlived the switch", file.exists());
+
+        SeenPosts.hideReason(new Story("another"));
+        SeenPosts.seen(new Story("another"));
+        assertEquals("the list was emptied again for every post", 1, writes.size());
+
+        Settings.HIDE_SEEN_POSTS.save(true);
+        assertNull("a post from before the switch went off was hidden", SeenPosts.hideReason(story));
+    }
+
+    /** A pause keeps the list: only the switch going off forgets it. */
+    @Test
+    public void aPauseKeepsTheList() {
+        Story story = new Story("kept");
+        SeenPosts.seen(story);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        SeenPosts.hideReason(story);
+        SeenPosts.seen(new Story("while paused"));
+        PauseForTests.resume();
+        assertEquals(1, SeenPosts.size());
+        assertEquals(SeenPosts.REASON, SeenPosts.hideReason(story));
     }
 
     @Test
@@ -191,7 +238,61 @@ public class SeenPostsTest {
         SeenPosts.clear();
         assertEquals(0, SeenPosts.size());
         assertNull(SeenPosts.hideReason(story));
-        assertEquals("the file still holds posts", 0, file.length());
+        assertFalse("the file is still there", file.exists());
+    }
+
+    /**
+     * Forget seen posts runs on the main thread, so it empties the list at once and hands the file
+     * to a background thread. It works with the switch off too.
+     */
+    @Test
+    public void forgetSeenPostsLeavesTheFileToABackgroundThread() {
+        SeenPosts.seen(new Story("main thread"));
+        SeenPosts.writeNow();
+        Settings.HIDE_SEEN_POSTS.save(false);
+        List<Runnable> writes = new ArrayList<>();
+        SeenPosts.backgroundForTests = writes::add;
+        SeenPosts.clear();
+        assertEquals(0, SeenPosts.size());
+        assertTrue("the file was touched on the caller's thread", file.length() > 0);
+        assertEquals(1, writes.size());
+        writes.get(0).run();
+        assertFalse(file.exists());
+    }
+
+    /**
+     * Posts past their days go when the file is read, so a list from before a long break doesn't
+     * wait for each post to be looked up, and again when it's written. A time ahead of the clock
+     * goes as well.
+     */
+    @Test
+    public void postsPastTheirDaysArePrunedOnReadAndOnWrite() throws IOException {
+        long fresh = now.get() - HOUR;
+        Files.write(file.toPath(), ((now.get() - 8 * DAY) + " old\n" + fresh + " fresh\n" + (now.get() + DAY)
+                + " ahead\n").getBytes(StandardCharsets.UTF_8));
+        assertEquals("the read kept a post past its days or ahead of the clock", 1, SeenPosts.size());
+        SeenPosts.writeNow();
+        assertEquals(fresh + " fresh\n", new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8));
+
+        now.addAndGet(7 * DAY);
+        SeenPosts.writeNow();
+        assertFalse("the write kept a post past its days", file.exists());
+        assertEquals(0, SeenPosts.size());
+    }
+
+    /**
+     * A clock set back leaves times ahead of it. Such a post counts as past its days rather than
+     * staying hidden until the clock catches up and the whole keep time after that.
+     */
+    @Test
+    public void aPostSeenAheadOfTheClockIsNotHidden() {
+        Story story = new Story("clock set back");
+        SeenPosts.seen(story);
+        now.addAndGet(-HOUR);
+        assertNull("a post seen after now stayed hidden", SeenPosts.hideReason(story));
+        assertEquals(0, SeenPosts.size());
+        assertTrue(SeenPosts.expired(now.get() + 1, now.get(), DAY));
+        assertFalse(SeenPosts.expired(now.get(), now.get(), DAY));
     }
 
     @Test
@@ -212,6 +313,7 @@ public class SeenPostsTest {
         SeenPosts.inBuildForTests = Boolean.TRUE;
         SeenPosts.fileForTests = file;
         SeenPosts.laterForTests = () -> { };
+        SeenPosts.backgroundForTests = Runnable::run;
         SeenPosts.clock = now::get;
         assertEquals("a restart forgot the posts", 1, SeenPosts.size());
         assertEquals(SeenPosts.REASON, SeenPosts.hideReason(story));

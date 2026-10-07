@@ -1214,8 +1214,8 @@ The feed won't hide posts for how many reactions they have.	El feed no ocultará
 The feed will hide posts with more than %1$s reactions.	El feed ocultará las publicaciones con más de %1$s reacciones.
 # context: switch title under News feed; it keeps posts you scrolled past out of the feed on later loads
 Hide posts you've already seen	Ocultar publicaciones que ya has visto
-# context: description of that switch; Facebook decides what counts as seen, the list never leaves the phone
-Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.	Las publicaciones por las que ya pasaste de largo se quedan fuera del feed cuando se vuelve a cargar. Facebook decide qué cuenta como visto. La lista se queda en este teléfono y un cambio se nota en la próxima carga.
+# context: description of that switch; Facebook decides what counts as seen, the list never leaves the phone; turning the switch off empties the list
+Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load. Turning this off empties the list.	Las publicaciones por las que ya pasaste de largo se quedan fuera del feed cuando se vuelve a cargar. Facebook decide qué cuenta como visto. La lista se queda en este teléfono y un cambio se nota en la próxima carga. Al desactivarlo, la lista se vacía.
 # context: title of the row under that switch that picks how many days a seen post stays hidden
 Keep them hidden for	Mantenerlas ocultas durante
 # context: choice in that row

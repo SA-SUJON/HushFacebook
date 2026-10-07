@@ -1214,8 +1214,8 @@ The feed won't hide posts for how many reactions they have.	Der Feed blendet Bei
 The feed will hide posts with more than %1$s reactions.	Der Feed blendet Beiträge mit mehr als %1$s Reaktionen aus.
 # context: switch title under News feed; it keeps posts you scrolled past out of the feed on later loads
 Hide posts you've already seen	Bereits gesehene Beiträge ausblenden
-# context: description of that switch; Facebook decides what counts as seen, the list never leaves the phone
-Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load.	Beiträge, an denen du vorbeigescrollt bist, bleiben beim nächsten Laden aus dem Feed. Facebook entscheidet, was als gesehen zählt. Die Liste bleibt auf diesem Handy, und eine Änderung gilt ab dem nächsten Laden.
+# context: description of that switch; Facebook decides what counts as seen, the list never leaves the phone; turning the switch off empties the list
+Posts you've scrolled past stay out of the feed when it loads again. Facebook decides what counts as seen. The list stays on this phone, and a change shows on the next load. Turning this off empties the list.	Beiträge, an denen du vorbeigescrollt bist, bleiben beim nächsten Laden aus dem Feed. Facebook entscheidet, was als gesehen zählt. Die Liste bleibt auf diesem Handy, und eine Änderung gilt ab dem nächsten Laden. Wenn du das ausschaltest, wird die Liste geleert.
 # context: title of the row under that switch that picks how many days a seen post stays hidden
 Keep them hidden for	Ausgeblendet lassen für
 # context: choice in that row
