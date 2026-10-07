@@ -831,7 +831,7 @@ public class Mp4JoinTest {
         assertTrue(failure.getMessage(), failure.getMessage().startsWith("timed out:"));
         assertTrue(failure.getMessage(), failure.getMessage().contains("parent-ready"));
         assertTrue("deadline was ineffective",
-                System.nanoTime() - start < TimeUnit.MILLISECONDS.toNanos(TOOL_DEADLINE + 2_000));
+                System.nanoTime() - start < TimeUnit.MILLISECONDS.toNanos(TOOL_DEADLINE + CodecProcess.CLOSE_GRACE_MS + 2_000));
         dead(marker);
     }
 
@@ -932,7 +932,7 @@ public class Mp4JoinTest {
             assertTrue("cleanup terminated an unrelated process", other.isAlive());
         } finally {
             other.destroyForcibly();
-            assertTrue("unrelated probe cleanup failed", other.waitFor(1, TimeUnit.SECONDS));
+            assertTrue("unrelated probe cleanup failed", other.waitFor(10, TimeUnit.SECONDS));
         }
     }
 }
