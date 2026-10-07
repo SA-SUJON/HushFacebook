@@ -351,6 +351,88 @@ class MaterialYouTokenFixtureTest {
         assertEquals("one fixture for each declared build", declaredBuilds(), builds)
     }
 
+    /** AmoledTheme's TEXT_TOKENS: FDS's names, then Mig's, as its comments mark them. */
+    private fun amoledTextRoles(): Pair<Set<String>, Set<String>> {
+        val start = amoled.indexOf("TEXT_TOKENS =")
+        val block = amoled.substring(start, amoled.indexOf(")));", start))
+        val mig = block.indexOf("// Mig.")
+        check(start >= 0 && mig >= 0) { "AmoledTheme's TEXT_TOKENS has no Mig part" }
+        fun names(text: String) = Regex(""""([A-Z_]+)"""").findAll(text).map { it.groupValues[1] }.toSet()
+        return names(block.substring(0, mig)) to names(block.substring(mig))
+    }
+
+    /** AmoledThemeTest's ROLE_COLOURS, the colours its #34 matrix lifts, as listedTokens reads a table. */
+    private fun roleColours(): Map<String, Set<Int>> {
+        val test = File(RepoFiles.root,
+            "extensions/facebook/src/test/java/app/morphe/extension/facebook/theme/AmoledThemeTest.java").readText()
+        val start = test.indexOf("static final String ROLE_COLOURS =")
+        check(start >= 0) { "AmoledThemeTest declares no ROLE_COLOURS" }
+        val table = Regex(""""([^"]*)"""").findAll(test.substring(start, test.indexOf("\";", start) + 1))
+            .joinToString("") { it.groupValues[1] }
+        return table.split(";").associate { entry ->
+            val (name, values) = entry.split("=")
+            name to values.split(",").map { it.toInt(16) or -0x1000000 }.toSet()
+        }
+    }
+
+    /** The constant names of each Mig colour enum the dark scheme's (token) resolver takes, from their static initializers. */
+    private fun migColourNames(apk: File): Set<String> {
+        val container = DexFileFactory.loadDexContainer(apk, Opcodes.getDefault())
+        val classes = mutableMapOf<String, ClassDef>()
+        for (name in container.dexEntryNames) {
+            for (classDef in container.getEntry(name)!!.dexFile.classes) classes.putIfAbsent(classDef.type, classDef)
+        }
+        val tokenTypes = classes.getValue(DARK_COLOR_SCHEME).methods
+            .filter { it.returnType == "I" && it.parameterTypes.size == 1 && it.parameterTypes[0].toString() != "Ljava/lang/Integer;" }
+            .map { it.parameterTypes[0].toString() }.toSet()
+        return classes.values
+            .filter { it.superclass == "Ljava/lang/Enum;" && it.interfaces.any { type -> type in tokenTypes } }
+            .flatMap { enum ->
+                enum.methods.single { it.name == "<clinit>" }.implementation!!.instructions
+                    .mapNotNull { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string }
+            }.toSet()
+    }
+
+    /**
+     * Issue #34: on a lighter Background colour AMOLED lifts text and icon roles by their token's
+     * name, so the roles are held to each declared build before a colour is let through. Each FDS
+     * role has to be a token whose dark and darker styles give it only colours AmoledThemeTest's
+     * matrix lifts to 4.5:1 on #5B513F's surfaces (ROLE_COLOURS), and each of those colours has to
+     * be one the styles give. Each of Mig's short names has to be a constant of a Mig colour enum
+     * the dark scheme resolves, and no FDS token's, so the name alone says it's a text role.
+     */
+    @Test
+    fun `every text role AMOLED lifts is a token with the colours its matrix covers in each declared build`() {
+        val (fds, mig) = amoledTextRoles()
+        assertTrue("FDS's text roles", fds.size >= 14 && "SECONDARY_TEXT" in fds && "PLACEHOLDER_TEXT" in fds)
+        assertTrue("Mig's text roles", "SECONDARY" in mig && "PLACEHOLDER" in mig)
+        val matrix = roleColours()
+        assertEquals("the matrix covers every FDS role", fds, matrix.keys)
+        var builds = 0
+        for (target in AppCompatibilities.facebook().single().targets) {
+            val version = checkNotNull(target.version)
+            for (fixture in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                withBaseApk(fixture) { apk ->
+                    val attributes = tokenAttributes(apk)
+                    val styles = fdsStyles(apk, attributes.values.toSet())
+                    val light = styles.values.single { it.parent == 0 && it.sets > 300 }
+                    val dark = styles.values.single { it.parent == light.id && it.sets > 300 }
+                    val darker = styles.values.single { it.parent == dark.id }
+                    for (name in fds) {
+                        val attribute = attributes[name] ?: error("${fixture.name}: no FDS token $name")
+                        val colours = setOfNotNull(dark.values[attribute], darker.values[attribute])
+                        assertEquals("${fixture.name}: $name's dark colours", matrix.getValue(name), colours)
+                    }
+                    val names = migColourNames(apk)
+                    assertTrue("${fixture.name}: Mig's enums have no ${mig - names}", names.containsAll(mig))
+                    assertTrue("${fixture.name}: FDS tokens named ${mig intersect attributes.keys}", (mig intersect attributes.keys).isEmpty())
+                }
+                builds++
+            }
+        }
+        assertEquals("one fixture for each declared build", declaredBuilds(), builds)
+    }
+
     /**
      * The night copies of the FDS styles (MaterialYouStyles.kt), which Find friends on an empty Pages
      * feed takes its blue from, on each declared build's own styles and colours written out as the

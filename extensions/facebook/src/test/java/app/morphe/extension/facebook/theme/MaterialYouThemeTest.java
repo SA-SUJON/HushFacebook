@@ -201,6 +201,46 @@ public class MaterialYouThemeTest {
                 MaterialYouTheme.fds(0x402D88FF, Token.ACCENT_DEEMPHASIZED));
     }
 
+    /**
+     * Issue #34 with both themes: on AMOLED's lighter #5B513F, a text role reaches this theme lifted.
+     * It takes the palette at the lifted lightness, and on every surface AMOLED makes there it keeps
+     * 4.5:1, Mig's roles too. Over black the secondary grey takes the palette as it always did.
+     */
+    @Test
+    public void amoledsLiftedTextTakesThePaletteAndKeepsItsContrast() {
+        DarkMode.answer(true);
+        int sand = 0xFF5B513F;
+        int[] surfaces = {sand, 0xFF5F5543, 0xFF615746, 0xFF625846, 0xFF645A48, 0xFF675D4B,
+                AmoledTheme.over(sand, AmoledTheme.UNREAD_ROW)};
+        try {
+            AmoledTheme.useBackground(sand, 12);
+            for (Token token : new Token[]{Token.SECONDARY_TEXT, Token.PRIMARY_TEXT}) {
+                int colour = DARK[token.ordinal()];
+                int amoled = AmoledTheme.apply(colour, token);
+                int drawn = MaterialYouTheme.fds(amoled, token);
+                assertNotEquals("kept AMOLED's grey for " + Integer.toHexString(colour), amoled, drawn);
+                for (int surface : surfaces) {
+                    assertTrue(Integer.toHexString(drawn) + " on " + Integer.toHexString(surface),
+                            AmoledThemeTest.contrast(drawn, surface) >= AmoledTheme.TEXT_CONTRAST);
+                }
+            }
+            int link = MaterialYouTheme.fds(AmoledTheme.apply(0xFF5AA7FF, Token.BLUE_LINK), Token.BLUE_LINK);
+            for (int surface : surfaces) assertTrue("the link", AmoledThemeTest.contrast(link, surface) >= AmoledTheme.TEXT_CONTRAST);
+            for (int colour : new int[]{0xFFA8ABAF, 0xFFB0B3B8, 0xFFE4E6EB}) {
+                int drawn = MaterialYouTheme.mig(AmoledTheme.apply(colour, AmoledThemeTest.Role.SECONDARY), AmoledThemeTest.Role.SECONDARY);
+                for (int surface : surfaces) {
+                    assertTrue("Mig's " + Integer.toHexString(colour), AmoledThemeTest.contrast(drawn, surface) >= AmoledTheme.TEXT_CONTRAST);
+                }
+            }
+            assertEquals("a divider AMOLED leaves still takes the palette", palette.sameLightness(TonePalette.NEUTRAL, 0xFF65686C),
+                    MaterialYouTheme.fds(0xFF65686C, Token.DIVIDER));
+        } finally {
+            AmoledTheme.useBackground(AmoledTheme.backgroundColour());
+        }
+        assertEquals("over black", palette.sameLightness(TonePalette.NEUTRAL, 0xFFB0B3B8),
+                MaterialYouTheme.fds(AmoledTheme.apply(0xFFB0B3B8, Token.SECONDARY_TEXT), Token.SECONDARY_TEXT));
+    }
+
     /** Issue #37: the Like button's blue after you like, a dark-only colour, takes the palette. */
     @Test
     public void theLikeButtonAfterYouLikeTakesThePalette() {

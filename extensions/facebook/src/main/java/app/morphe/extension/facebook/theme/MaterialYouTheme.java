@@ -172,9 +172,9 @@ public final class MaterialYouTheme {
         HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
         if (!(token instanceof Enum) || !DarkMode.on()) return color;
         String name = ((Enum<?>) token).name();
-        if (listed(FDS.get(name), color) || tintedByAmoled(FDS.get(name), color, name)
+        if (listed(FDS.get(name), color) || madeByAmoled(FDS.get(name), color, name)
                 || (listed(SHARED.get(name), color) && DarkMode.saidOn())) {
-            return recolour(palette(), color);
+            return AmoledTheme.foreground(recolour(palette(), color), name);
         }
         return color;
     }
@@ -188,14 +188,19 @@ public final class MaterialYouTheme {
     }
 
     /**
-     * Whether {@code color} is AMOLED's stronger tint of one of {@code colours}: with AMOLED in the
-     * build its hook goes first, so an unread notification's row reaches this one at
-     * {@link AmoledTheme#NEW_NOTIFICATION_ALPHA}, issue #72. The palette's accent keeps that alpha.
+     * Whether {@code color} is what AMOLED made of one of {@code colours}: with AMOLED in the build
+     * its hook goes first. An unread notification's row reaches this one at
+     * {@link AmoledTheme#NEW_NOTIFICATION_ALPHA}, issue #72, and the palette's accent keeps that
+     * alpha. On a lighter Background colour a text role reaches it lifted
+     * ({@link AmoledTheme#foreground}, issue #34), and takes the palette at the lifted lightness.
      */
-    private static boolean tintedByAmoled(@Nullable int[] colours, int color, String token) {
+    private static boolean madeByAmoled(@Nullable int[] colours, int color, String token) {
         if (colours == null) return false;
         for (int value : colours) {
-            if (value != color && AmoledTheme.unreadRow(value, token) == color) return true;
+            if (value != color && (AmoledTheme.unreadRow(value, token) == color
+                    || AmoledTheme.foreground(value, token) == color)) {
+                return true;
+            }
         }
         return false;
     }
@@ -203,10 +208,15 @@ public final class MaterialYouTheme {
     /**
      * Route one, for Mig: a colour the Mig dark scheme returns. That scheme only answers for a dark
      * surface, so its greys and blues are recoloured whatever the token, in Facebook's dark mode.
+     * The palette's colour keeps the lightness it came with, and on a lighter AMOLED Background
+     * colour a text role is held to AMOLED's contrast again ({@link AmoledTheme#foreground}), since
+     * the palette's steps are only as close as its table.
      */
     public static int mig(int color, Object token) {
         HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
-        return (color >>> 24) == 0xFF && DarkMode.on() ? recolour(palette(), color) : color;
+        if ((color >>> 24) != 0xFF || !DarkMode.on()) return color;
+        int themed = recolour(palette(), color);
+        return token instanceof Enum ? AmoledTheme.foreground(themed, ((Enum<?>) token).name()) : themed;
     }
 
     /**

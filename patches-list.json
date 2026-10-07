@@ -61,7 +61,7 @@
         {
           "key": "backgroundColour",
           "title": "Background colour",
-          "description": "The colour dark mode's backgrounds take, as #RRGGBB. Cards and inputs take a lighter step of it. Leave it blank for black. A colour too light for Facebook's white text is refused.",
+          "description": "The colour dark mode's backgrounds take, as #RRGGBB. Cards and inputs take a lighter step of it. Leave it blank for black. Greys up to #3A3A3A keep Facebook's own text. A little lighter, up to about #535353 for a grey, gets smaller steps and lighter grey text so it stays readable. Anything lighter is refused.",
           "required": false,
           "type": "kotlin.String",
           "default": "#000000",
