@@ -331,6 +331,10 @@ val materialYouThemePatch = bytecodePatch(
         hookMaterialYouStatusBar(darkCheck)
         hookMaterialYouNavigationBar(darkCheck)
 
+        // The selected tab in Facebook's tab bar, its icon and the line over it, which Facebook's
+        // dark theme draws near white: the palette's accent, as HushMessenger's selected tab (#65).
+        hookSelectedTabColour()
+
         // Route four, and the reads of a colour resource, where Facebook's dark palette reaches the
         // Video tab's bottom bar. AMOLED, when it went first, has sent every call to its own
         // stand-in, and the extension's stand-in calls AMOLED's when AMOLED is in the build.

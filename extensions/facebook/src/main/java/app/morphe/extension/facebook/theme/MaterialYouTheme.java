@@ -375,6 +375,41 @@ public final class MaterialYouTheme {
         return palette().sameLightness(TonePalette.NEUTRAL, color);
     }
 
+    /**
+     * The tone of the palette's accent the selected tab takes in the dark theme: Material 3's
+     * primary for a dark surface, the role HushMessenger's selected tab has.
+     */
+    static final int SELECTED_TAB_TONE = 80;
+
+    /**
+     * How light a selected tab's colour has to be to say the tab bar is dark. Facebook's dark theme
+     * gives the selected tab near white (TAB_BAR_ACTIVE_ICON and PRIMARY_ICON, L* 96), and its light
+     * theme near black or its blue (L* 3 and 48), so a light mode answer never passes, even before
+     * Facebook has said which theme is on.
+     */
+    static final double MIN_DARK_BAR_SELECTED_LIGHTNESS = 60;
+
+    /**
+     * Facebook's tab bar asks one method for the selected tab's colour, which tints the selected
+     * tab's icon and paints the line over it (#65). The patch hands each answer here. In Facebook's
+     * dark mode a light answer becomes the palette's accent at {@link #SELECTED_TAB_TONE}, so the
+     * selected tab stands out in the wallpaper's colour as HushMessenger's does, while the other tabs,
+     * the bar and the badges keep the colours route one gives them. A selected tab Facebook already
+     * draws in its blue takes the accent through route one. Light mode, and anything this doesn't
+     * know, is left as Facebook sent it.
+     *
+     * @return the palette's accent for the selected tab in the dark theme, otherwise {@code color}
+     */
+    public static int tabBarSelected(int color) {
+        HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
+        return tabBarSelected(palette(), color, DarkMode.on());
+    }
+
+    static int tabBarSelected(TonePalette palette, int color, boolean dark) {
+        if (!dark || (color >>> 24) == 0 || TonePalette.lstar(color) < MIN_DARK_BAR_SELECTED_LIGHTNESS) return color;
+        return (color & 0xFF000000) | (palette.tone(TonePalette.ACCENT, SELECTED_TAB_TONE) & 0x00FFFFFF);
+    }
+
     /** A grey becomes the palette's neutral, a Facebook blue its accent, both at the same lightness. */
     static int recolour(TonePalette palette, int color) {
         if (isNeutral(color)) return palette.sameLightness(TonePalette.NEUTRAL, color);
