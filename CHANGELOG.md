@@ -61,6 +61,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** The **Words to hide** editor for `Hide posts by words` has an Add a topic pack button: Politics, Elections, Crypto, Sports, Celebrity gossip, Weight loss ads, and Giveaways and engagement bait. A pack adds its words as ordinary lines you can edit, skips ones you already have, and nothing is kept until you save.
 * **Facebook:** `Hide posts by words` can also hide posts with a lot of reactions. Pick a count under **Hide posts with more reactions than**, from 1,000 to 100,000, and posts above it go. It starts on Off, and a post whose count can't be read stays.
 * **Facebook:** New patch, `Hide seen posts`, left out of Manager's default selection. Turn on **Hide posts you've already seen** under News feed and posts you've scrolled past stay out of the feed when it loads again, for 1, 3, 7 or 30 days as you pick under **Keep them hidden for**. **Forget seen posts** starts over. The list is a short code per post and when you saw it, kept on your phone only and left out of exported settings.
+* **Facebook:** New patch, `Clean up Facebook's chat list`, for Chats that open inside Facebook. **Hide the notes and active now row** takes out friends' notes and the row of who's active above your chats, and **Hide chat list promotions** takes out the promotional banners at the top, like the one asking you to turn on notifications. Both switches start off.
 
 ### Fixed
 
