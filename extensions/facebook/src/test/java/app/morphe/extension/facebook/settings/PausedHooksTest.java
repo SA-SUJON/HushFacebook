@@ -72,6 +72,7 @@ import app.morphe.extension.facebook.feed.MetaAiQuestions;
 import app.morphe.extension.facebook.feed.PostDates;
 import app.morphe.extension.facebook.feed.PostPrompts;
 import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
+import app.morphe.extension.facebook.misc.AppLockForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
@@ -216,6 +217,8 @@ public class PausedHooksTest {
         // A Facebook start a day after the last try asks GitHub for the newest release.
         probes.put(Settings.CHECK_FOR_RELEASES, ReleaseCheckForTests::aStartAsksGitHub);
         probes.put(Settings.SAVED_SHORTCUT, SavedShortcutTest::aStartPublishes);
+        // A cold start on a phone with a screen lock covers Facebook and asks for it.
+        probes.put(Settings.APP_LOCK, AppLockForTests::aStartLocks);
         return probes;
     }
 

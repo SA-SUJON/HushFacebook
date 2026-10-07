@@ -9,6 +9,7 @@ package app.morphe.extension.facebook.settings;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.category;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.info;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.quietHourRow;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.lockAfterRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.toggle;
 
 import android.content.Context;
@@ -21,6 +22,7 @@ import androidx.annotation.Nullable;
 
 import java.util.Set;
 
+import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.notifications.NotificationSound;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Utils;
@@ -265,15 +267,28 @@ final class AppPages {
                         + "and your other link settings stay as they are.")));
     }
 
-    /** Privacy: what Facebook sends home in the background, and what it shows others while you write and read. */
+    /**
+     * Privacy, in every build for Lock Facebook: who can open Facebook on this phone, what Facebook
+     * sends home in the background, and what it shows others while you write and read.
+     */
     static void privacy(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
-        if (!build.contains(PatchFamily.ANALYTICS_UPLOADS) && !build.contains(PatchFamily.SCREENSHOTS)
-                && !build.contains(PatchFamily.SCREENSHOT_DETECTION) && !build.contains(PatchFamily.TYPING_INDICATOR)
-                && !build.contains(PatchFamily.READ_RECEIPTS)) {
-            return;
-        }
         PreferenceCategory privacy = category(screen, L10n.t("Privacy"));
+        // The settings entry's own, so it's in every build. A phone without a screen lock has nothing to ask with.
+        SwitchPreference lock = toggle(context, Settings.APP_LOCK,
+                L10n.t("Facebook asks for your fingerprint, face or screen lock when it starts, and when you come back "
+                        + "after the time below. A video in picture-in-picture and a reply from a notification don't "
+                        + "ask. Your phone needs a screen lock."));
+        lock.setOnPreferenceChangeListener((preference, value) -> {
+            if (Boolean.TRUE.equals(value) && !AppLock.canLock(context)) {
+                Utils.showToastLong(L10n.t("Set a screen lock in your phone's settings first, so Facebook has "
+                        + "something to ask for."));
+                return false;
+            }
+            return true;
+        });
+        privacy.addPreference(lock);
+        privacy.addPreference(lockAfterRow(context));
         if (build.contains(PatchFamily.ANALYTICS_UPLOADS)) {
             // XAnalytics resumes its uploader once, as Facebook starts.
             privacy.addPreference(toggle(context, Settings.HOLD_ANALYTICS_UPLOADS,

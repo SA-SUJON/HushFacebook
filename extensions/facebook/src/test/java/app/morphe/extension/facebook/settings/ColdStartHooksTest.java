@@ -63,6 +63,7 @@ import app.morphe.extension.facebook.media.ProgressBar;
 import app.morphe.extension.facebook.media.QualityChoiceForTests;
 import app.morphe.extension.facebook.media.ReelSpeedForTests;
 import app.morphe.extension.facebook.media.ResumePlaybackForTests;
+import app.morphe.extension.facebook.misc.AppLockForTests;
 import app.morphe.extension.facebook.media.TapToPlay;
 import app.morphe.extension.facebook.media.TapToPlayForTests;
 import app.morphe.extension.facebook.menu.MenuSectionsForTests;
@@ -179,6 +180,7 @@ public class ColdStartHooksTest {
                 Category.ORGANIC, new GraphQLStory(), FeedGuardForTests.postText("Big SPOILER inside")));
         assertFalse("a photo post before the context was hidden", FeedGuardForTests.hidesPhotoPost(Category.ORGANIC));
         assertFalse(FeedGuardForTests.hidesAiReel(new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true))));
+        assertFalse("a start before the context locked Facebook", AppLockForTests.aStartLocks());
         FeedGuardForTests.ReelItem flaggedReel = new FeedGuardForTests.ReelItem(FeedGuardForTests.reelModel(true));
         Section reelSection = new Section(new ArrayList<>(Arrays.asList(new Reel(), flaggedReel)));
         FeedGuardForTests.aiReelSections(Collections.singletonList(reelSection));

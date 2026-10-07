@@ -126,6 +126,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_GET_MESSENGER_CARD) return L10n.t("Hide the Get Messenger card");
         if (setting == Settings.OPEN_MESSENGER_APP) return L10n.t("Open the Messenger app");
         if (setting == Settings.SAVED_SHORTCUT) return L10n.t("Saved shortcut");
+        if (setting == Settings.APP_LOCK) return L10n.t("Lock Facebook");
         if (setting == Settings.HIDE_MENU_UPGRADES) return L10n.t("Hide Upgrades");
         if (setting == Settings.HIDE_MENU_ALSO_FROM_META) return L10n.t("Hide Also from Meta");
         if (setting == Settings.HIDE_EDITS_UPSELLS) return L10n.t("Hide Edits promotions");

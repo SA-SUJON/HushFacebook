@@ -704,6 +704,15 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/AppLock.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: Lock Facebook, which covers Facebook's screens on a cold start and on a return after the chosen time until Android's BiometricPrompt passes with a biometric or the phone's screen lock. Facebook's own AuthAppLockState has no lock screen behind it in 577, 580 and 581, so the lock runs from the settings entry's activity callbacks rather than a patch."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/Haptics.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/haptics/HapticsAnchors.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/haptics/TurnOffHapticsPatch.kt"

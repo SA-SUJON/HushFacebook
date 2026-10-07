@@ -17,6 +17,7 @@ import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
+import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
@@ -783,6 +784,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_saved_shortcut", FALSE);
 
     /**
+     * A cold start, and a return after {@link #APP_LOCK_AFTER}, ask for the phone's screen lock
+     * before Facebook shows ({@link app.morphe.extension.facebook.misc.AppLock}). The settings
+     * entry's own switch, so every build has it ({@link PatchFamily#ENTRY_SWITCHES}). Off by default.
+     */
+    public static final BooleanSetting APP_LOCK =
+            new BooleanSetting("hushfacebook_app_lock", FALSE);
+
+    /**
      * The story viewer's menu offers Save on anyone's story, and Save runs Hushfacebook's own
      * download. Off, only your own stories offer it, and it's Facebook's own save.
      */
@@ -1164,6 +1173,13 @@ public class Settings extends BaseSettings {
     /** The hour quiet hours end, 7 AM until someone picks another, the way {@link #QUIET_HOURS_FROM} starts them. */
     public static final EnumSetting<QuietHour> QUIET_HOURS_UNTIL =
             new EnumSetting<>("hushfacebook_quiet_hours_until", QuietHour.H7);
+
+    /**
+     * How long Facebook may be away before a return asks for the screen lock while {@link #APP_LOCK}
+     * is on. It isn't a switch, and a paused Facebook never locks.
+     */
+    public static final EnumSetting<AppLock.After> APP_LOCK_AFTER =
+            new EnumSetting<>("hushfacebook_app_lock_after", AppLock.After.ONE_MINUTE);
 
     /**
      * Where {@link #USE_SYSTEM_FONT} takes its font from: empty for the phone's own, or the name of

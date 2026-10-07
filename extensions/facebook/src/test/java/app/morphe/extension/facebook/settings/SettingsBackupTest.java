@@ -81,6 +81,7 @@ import app.morphe.extension.facebook.feed.PostWordsTest;
 import app.morphe.extension.facebook.feed.WordsCorpus;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
+import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
@@ -182,6 +183,7 @@ public class SettingsBackupTest {
         Settings.STORIES_PLAYBACK_QUALITY.resetToDefault();
         Settings.QUIET_HOURS_FROM.resetToDefault();
         Settings.QUIET_HOURS_UNTIL.resetToDefault();
+        Settings.APP_LOCK_AFTER.resetToDefault();
         Settings.VIDEO_SUBFOLDER.resetToDefault();
         Settings.PHOTO_SUBFOLDER.resetToDefault();
         Settings.DOWNLOAD_ACTION.resetToDefault();
@@ -237,7 +239,7 @@ public class SettingsBackupTest {
                 Settings.FILENAME_TEMPLATE, Settings.PHOTO_FILENAME_TEMPLATE, Settings.DOWNLOAD_ACTION, Settings.SEND_TO_APP,
                 Settings.START_TAB, Settings.FEEDS_SUBTAB, Settings.COMMENT_ORDER, Settings.PLAYBACK_QUALITY,
                 Settings.REELS_PLAYBACK_QUALITY, Settings.STORIES_PLAYBACK_QUALITY, Settings.QUIET_HOURS_FROM,
-                Settings.QUIET_HOURS_UNTIL), SettingsBackup.VALUES);
+                Settings.QUIET_HOURS_UNTIL, Settings.APP_LOCK_AFTER), SettingsBackup.VALUES);
         assertEquals(Settings.SAVE_TO, SettingsBackup.TO);
         assertEquals(Settings.HIDDEN_WORDS, SettingsBackup.HIDDEN);
         assertEquals(Settings.KEPT_WORDS, SettingsBackup.KEPT);
@@ -1742,7 +1744,7 @@ public class SettingsBackupTest {
         String until = HushfacebookPreferenceFragment.quietHourLabel(QuietHour.H6);
         assertEquals(Arrays.asList("Quiet hours will start at " + from + ".", "Quiet hours will end at " + until + "."),
                 SettingsBackupPreference.valueSentences(null, null, null, null, null, null, null, null, null, null, null,
-                        null, null, null, null, null, null, null, snapshot.quietFromChange(), snapshot.quietUntilChange()));
+                        null, null, null, null, null, null, null, snapshot.quietFromChange(), snapshot.quietUntilChange(), null));
         assertEquals(2, SettingsBackup.apply(snapshot));
         assertEquals(QuietHour.H23, Settings.QUIET_HOURS_FROM.savedValue());
         assertEquals(QuietHour.H6, Settings.QUIET_HOURS_UNTIL.savedValue());
@@ -1781,6 +1783,67 @@ public class SettingsBackupTest {
         state.putInt("quiet_hours_until", 6);
         assertNull(SettingsBackup.Snapshot.fromBundle(state).quietFrom);
         assertNull(SettingsBackup.Snapshot.fromBundle(state).quietUntil);
+    }
+
+    /**
+     * How long the app lock waits goes out as its file value and comes back only as one this build
+     * offers: any other value, or one that isn't text, refuses the whole file. The switch rides with
+     * the other switches.
+     */
+    @Test
+    public void theAppLockTimeRoundTripsAndComesBackOnlyAsOneThisBuildOffers() throws Exception {
+        assertTrue(SettingsBackup.ALLOWLIST.contains(Settings.APP_LOCK));
+        for (AppLock.After choice : AppLock.After.values()) {
+            AppLock.After other = choice == AppLock.After.ONE_HOUR ? AppLock.After.IMMEDIATELY : AppLock.After.ONE_HOUR;
+            Settings.APP_LOCK_AFTER.save(choice);
+            String file = SettingsBackup.create();
+            assertEquals(choice.fileValue, new JSONObject(file).getJSONObject("settings").get(SettingsBackup.LOCK_AFTER.key));
+            Settings.APP_LOCK_AFTER.save(other);
+
+            SettingsBackup.Snapshot snapshot = SettingsBackup.parse(file);
+            assertEquals(choice, snapshot.lockAfter);
+            assertEquals(choice, snapshot.lockAfterChange());
+            Map<Setting<?>, Object> expected = new LinkedHashMap<>();
+            expected.put(SettingsBackup.LOCK_AFTER, choice);
+            assertEquals(expected, snapshot.changes());
+            assertEquals(1, SettingsBackup.apply(snapshot));
+            assertEquals(choice, Settings.APP_LOCK_AFTER.savedValue());
+            assertEquals("a file read back is the file", file, SettingsBackup.create());
+            assertEquals("the same time again changes nothing", 0, SettingsBackup.parse(file).changes().size());
+        }
+
+        Settings.APP_LOCK_AFTER.save(AppLock.After.FIVE_MINUTES);
+        String file = SettingsBackup.create();
+        Map<String, ?> before = store();
+        for (Object refused : new Object[]{"FIVE_MINUTES", "5 minutes", "2_minutes", "", 300_000, true, JSONObject.NULL,
+                new JSONObject(), new org.json.JSONArray()}) {
+            JSONObject hostile = new JSONObject(file);
+            hostile.getJSONObject("settings").put(SettingsBackup.LOCK_AFTER.key, refused);
+            try {
+                SettingsBackup.parse(hostile.toString());
+                fail("a file with the lock time " + printable(String.valueOf(refused)) + " was read");
+            } catch (SettingsBackup.Rejected rejected) {
+                assertEquals(printable(String.valueOf(refused)), SettingsBackup.Reason.VALUE, rejected.reason);
+            }
+        }
+        assertEquals("a refused file wrote something", before, store());
+
+        // A file from before the time was carried leaves it alone.
+        SettingsBackup.Snapshot older = SettingsBackup.parse(fileWith(Settings.HIDE_SUGGESTED_POSTS, false));
+        assertNull(older.lockAfter);
+        assertNull(older.lockAfterChange());
+        SettingsBackup.apply(older);
+        assertEquals(AppLock.After.FIVE_MINUTES, Settings.APP_LOCK_AFTER.savedValue());
+
+        // A preview kept across a rebuild keeps it, and only one this build offers comes back.
+        Bundle state = SettingsBackup.parse(file).toBundle();
+        assertEquals(AppLock.After.FIVE_MINUTES, SettingsBackup.Snapshot.fromBundle(state).lockAfter);
+        state.putString("app_lock_after", "FIVE_MINUTES");
+        assertNull(SettingsBackup.Snapshot.fromBundle(state).lockAfter);
+
+        assertEquals("Settings imported. With Lock Facebook on, it will lock once you've been away for 1 hour.",
+                SettingsBackupPreference.importedMessage(0, null, null, null, null, null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, AppLock.After.ONE_HOUR));
     }
 
     /**

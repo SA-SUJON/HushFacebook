@@ -1079,3 +1079,37 @@ Posts that show a video, and shares of them. Reels in the feed have a switch of 
 Posts that share a link to a website, with its preview card.	Postingan yang membagikan tautan ke situs web, dengan kartu pratinjaunya.
 # context: summary of the Hide posts on a colored background switch
 Short posts Facebook shows as big text on a colored background.	Postingan singkat yang ditampilkan Facebook sebagai teks besar di atas latar berwarna.
+# context: switch title in Privacy: asks for the phone's own screen lock before Facebook shows
+Lock Facebook	Kunci Facebook
+# context: summary of the Lock Facebook switch; the time below is the Lock after row under it
+Facebook asks for your fingerprint, face or screen lock when it starts, and when you come back after the time below. A video in picture-in-picture and a reply from a notification don't ask. Your phone needs a screen lock.	Facebook meminta sidik jari, wajah, atau kunci layar Anda saat dimulai, dan saat Anda kembali setelah waktu di bawah. Video gambar dalam gambar dan balasan dari notifikasi tidak memintanya. Ponsel Anda perlu kunci layar.
+# context: toast when Lock Facebook is turned on and the phone has no screen lock to ask for
+Set a screen lock in your phone's settings first, so Facebook has something to ask for.	Atur kunci layar di setelan ponsel Anda terlebih dahulu, agar Facebook punya sesuatu untuk diminta.
+# context: title of the row and list that picks how long Facebook may be away before it locks
+Lock after	Kunci setelah
+# context: Lock after choice: Facebook locks the moment you leave it
+As soon as you leave	Begitu Anda keluar
+# context: Lock after choice, and the %1$s of the lock sentences: a minute away
+1 minute	1 menit
+# context: Lock after choice, and the %1$s of the lock sentences: five minutes away
+5 minutes	5 menit
+# context: Lock after choice, and the %1$s of the lock sentences: fifteen minutes away
+15 minutes	15 menit
+# context: Lock after choice, and the %1$s of the lock sentences: an hour away
+1 hour	1 jam
+# context: summary of the Lock after row when it locks the moment you leave
+Facebook locks as soon as you leave it.	Facebook terkunci begitu Anda keluar.
+# context: summary of the Lock after row; %1$s is a time such as 5 minutes
+Facebook locks once you've been away for %1$s.	Facebook terkunci setelah Anda pergi selama %1$s.
+# context: what a settings import changes: the lock will happen the moment Facebook is left
+With Lock Facebook on, it will lock as soon as you leave it.	Dengan Kunci Facebook aktif, Facebook akan terkunci begitu Anda keluar.
+# context: what a settings import changes; %1$s is a time such as 5 minutes
+With Lock Facebook on, it will lock once you've been away for %1$s.	Dengan Kunci Facebook aktif, Facebook akan terkunci setelah Anda pergi selama %1$s.
+# context: title of Android's fingerprint, face or screen lock prompt that Lock Facebook shows
+Unlock Facebook	Buka kunci Facebook
+# context: title on the screen that covers Facebook until the screen lock check passes
+Facebook is locked	Facebook terkunci
+# context: text under it on the cover
+Use your fingerprint, face or screen lock to open it.	Gunakan sidik jari, wajah, atau kunci layar Anda untuk membukanya.
+# context: button on the cover that asks for the screen lock again
+Unlock	Buka kunci

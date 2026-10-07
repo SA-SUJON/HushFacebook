@@ -51,6 +51,7 @@ import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
+import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.navigation.HiddenTabs;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -61,6 +62,7 @@ import app.morphe.extension.facebook.settings.SettingsRows.Row;
 import app.morphe.extension.facebook.settings.SettingsRows.SaveRow;
 import app.morphe.extension.facebook.settings.SettingsRows.Toggle;
 import app.morphe.extension.facebook.settings.ValueRows.CommentOrderRow;
+import app.morphe.extension.facebook.settings.ValueRows.LockAfterRow;
 import app.morphe.extension.facebook.settings.ValueRows.DownloadActionRow;
 import app.morphe.extension.facebook.settings.ValueRows.FeedsSubtabRow;
 import app.morphe.extension.facebook.settings.ValueRows.FileNameRow;
@@ -1104,6 +1106,52 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * How long Facebook may be away before Lock Facebook asks again. Like the comment order row,
+     * its values are the setting's own names and its summary says what the choice does.
+     */
+    static LockAfterRow lockAfterRow(Context context) {
+        LockAfterRow row = new LockAfterRow(context);
+        row.setKey(Settings.APP_LOCK_AFTER.key);
+        row.setTitle(L10n.t("Lock after"));
+        row.setDialogTitle(L10n.t("Lock after"));
+        // Android's own Cancel follows the activity's language, as the other lists' did.
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        AppLock.After[] choices = AppLock.After.values();
+        CharSequence[] entries = new CharSequence[choices.length];
+        CharSequence[] values = new CharSequence[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            entries[i] = lockAfterLabel(choices[i]);
+            values[i] = choices[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.APP_LOCK_AFTER.savedValue().name());
+        return row;
+    }
+
+    /** What the list and the sentences about it call [after]. */
+    static String lockAfterLabel(AppLock.After after) {
+        switch (after) {
+            case IMMEDIATELY:
+                return L10n.t("As soon as you leave");
+            case FIVE_MINUTES:
+                return L10n.t("5 minutes");
+            case FIFTEEN_MINUTES:
+                return L10n.t("15 minutes");
+            case ONE_HOUR:
+                return L10n.t("1 hour");
+            default:
+                return L10n.t("1 minute");
+        }
+    }
+
+    /** What a return does with [after], for the row's summary. */
+    static String lockAfterSummary(AppLock.After after) {
+        if (after == AppLock.After.IMMEDIATELY) return L10n.t("Facebook locks as soon as you leave it.");
+        return L10n.f("Facebook locks once you've been away for %1$s.", lockAfterLabel(after));
+    }
+
+    /**
      * The quality videos play at. Like the comment order row, its values are the setting's own
      * names and its summary says what the choice does.
      */
@@ -1246,6 +1294,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((FeedsSubtabRow) listPreference).showSummary();
         } else if (listPreference instanceof CommentOrderRow) {
             ((CommentOrderRow) listPreference).showSummary();
+        } else if (listPreference instanceof LockAfterRow) {
+            ((LockAfterRow) listPreference).showSummary();
         } else if (listPreference instanceof PlaybackQualityRow) {
             ((PlaybackQualityRow) listPreference).showSummary();
         } else if (listPreference instanceof SurfaceQualityRow) {

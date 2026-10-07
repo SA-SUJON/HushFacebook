@@ -44,6 +44,7 @@ import app.morphe.extension.facebook.download.SavedFileActions;
 import app.morphe.extension.facebook.feed.ReturnRefresh;
 import app.morphe.extension.facebook.media.ResumePlayback;
 import app.morphe.extension.facebook.media.TapToPlay;
+import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.misc.ScreenTransitions;
 import app.morphe.extension.facebook.navigation.ReelsTab;
 import app.morphe.extension.facebook.stories.StorySeenButton;
@@ -469,6 +470,8 @@ public final class SettingsEntry {
         @Override
         public void onActivityResumed(Activity activity) {
             resumed = new WeakReference<>(activity);
+            // First, so a locked Facebook is covered before anything else of Hushfacebook's shows.
+            AppLock.resumed(activity);
             ScreenLog.resumed(activity);
             SavedFileActions.onResumed(activity);
             ScreenTransitions.activityResumed(activity);
@@ -497,12 +500,21 @@ public final class SettingsEntry {
             ScreenTransitions.activityCreated(activity);
         }
 
-        @Override public void onActivityStarted(Activity activity) { }
-        @Override public void onActivityStopped(Activity activity) { }
+        @Override
+        public void onActivityStarted(Activity activity) {
+            AppLock.started(activity);
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+            AppLock.stopped(activity);
+        }
+
         @Override public void onActivitySaveInstanceState(Activity activity, Bundle state) { }
         @Override
         public void onActivityDestroyed(Activity activity) {
             SavedFileActions.onPaused(activity);
+            AppLock.destroyed(activity);
             // The screen can land on an activity just before it clears itself for the next one.
             // If its host goes away before the person closed it, ask again.
             WeakReference<Activity> shownOver = host;
@@ -553,6 +565,11 @@ public final class SettingsEntry {
                 Logger.printInfo(() -> "Settings wait: " + name + " is finishing");
                 return false;
             }
+            // A dialog over the lock's cover would show above it, and could turn the lock off.
+            if (AppLock.covering()) {
+                Logger.printInfo(() -> "Settings wait: Facebook is locked");
+                return false;
+            }
             FragmentManager fragments = activity.getFragmentManager();
             Fragment shown = fragments.findFragmentByTag(DIALOG_TAG);
             if (shown != null) {
@@ -573,6 +590,14 @@ public final class SettingsEntry {
             Logger.printException(() -> "Could not open the Hushfacebook settings over " + name, ex);
             return false;
         }
+    }
+
+    /**
+     * After the app lock lets Facebook in: a request the lock held back, from the launcher shortcut
+     * or a notification, opens over [activity] now rather than at the next screen.
+     */
+    public static void openIfRequested(Activity activity) {
+        if (openPending) OpenWhenResumed.openWhenSettled(activity);
     }
 
     /** Called by the screen when the person closes it, so it isn't reopened. */

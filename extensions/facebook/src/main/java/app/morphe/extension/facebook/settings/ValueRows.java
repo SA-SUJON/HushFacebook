@@ -12,6 +12,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.fileNameSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.fitAboveKeyboard;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.folderSummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.lockAfterSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.photoNameSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.playbackQualitySummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.qualitySummary;
@@ -54,6 +55,7 @@ import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
+import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
@@ -639,6 +641,45 @@ final class ValueRows {
                 if (candidate.name().equals(getValue())) order = candidate;
             }
             setSummary(commentOrderSummary(order));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The app lock's time away row. Its summary follows its value, whoever sets it: the person, the
+     * shared page syncing it from the setting, or an import.
+     */
+    static final class LockAfterRow extends ListPreference {
+        LockAfterRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            AppLock.After after = AppLock.After.ONE_MINUTE;
+            for (AppLock.After candidate : AppLock.After.values()) {
+                if (candidate.name().equals(getValue())) after = candidate;
+            }
+            setSummary(lockAfterSummary(after));
         }
 
         @Override

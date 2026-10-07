@@ -41,6 +41,7 @@ import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
+import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.notifications.QuietHour;
@@ -61,17 +62,17 @@ import app.morphe.extension.shared.settings.StringSetting;
  * filter's two lists, the top folder saves go to, the save folder and its video and photo
  * subfolders, the save quality, the video file name, what a tap on Download does, the app links go
  * to, the tab Facebook opens on, the order comments open in, the qualities videos, reels and
- * video stories play at, and the hours notification quiet hours start and end) go out or come in. Pause, safe mode, the debug settings, the app language
+ * video stories play at, the hours notification quiet hours start and end, and how long the app lock waits) go out or come in. Pause, safe mode, the debug settings, the app language
  * and the counters Hushfacebook keeps for itself stay out, and so do the log, the diagnostic data
  * and anything about the person or the phone: a file is a format name, a version number, one true
  * or false per switch, two word lists, one top folder, one folder name and two subfolder names,
  * one save quality, one file name template, one download action, one package name or none, one
- * tab, one comment order, three playback qualities and two hours. The word lists go only into the file the
+ * tab, one comment order, three playback qualities, two hours and one lock time. The word lists go only into the file the
  * person picks, with the rest. An import applies what it read in one preference commit. A file
  * that is too large, isn't JSON, names something twice, holds a value of the wrong type, a word
  * list that isn't one clean list, word lists past the room they share, a folder or a template
  * that isn't one clean name, an app that isn't a package name, or a top folder, quality, download
- * action, tab or comment order this build doesn't offer, or comes from a newer version changes
+ * action, tab, comment order or lock time this build doesn't offer, or comes from a newer version changes
  * nothing.
  * <p>The release check stays out of the file: it puts the phone online, so it's switched on
  * from the phone's own screen, never by a file.
@@ -194,6 +195,7 @@ public final class SettingsBackup {
             Settings.OPEN_ON_CHOSEN_TAB,
             Settings.FOLLOWING_FEED_HOME,
             Settings.SAVED_SHORTCUT,
+            Settings.APP_LOCK,
             Settings.MARKETPLACE_ONLY,
             Settings.MARKETPLACE_QUIET_NOTIFICATIONS,
             Settings.MARKETPLACE_SKIP_FEED_PREFETCH,
@@ -360,11 +362,17 @@ public final class SettingsBackup {
     static final EnumSetting<QuietHour> QUIET_FROM = Settings.QUIET_HOURS_FROM;
     static final EnumSetting<QuietHour> QUIET_UNTIL = Settings.QUIET_HOURS_UNTIL;
 
+    /**
+     * How long Facebook may be away before the app lock asks again, held in a file as its
+     * {@link AppLock.After#fileValue}. Anything else refuses the whole file, as a comment order does.
+     */
+    static final EnumSetting<AppLock.After> LOCK_AFTER = Settings.APP_LOCK_AFTER;
+
     /** The settings a file carries that aren't switches, in the order Settings declares them. */
     static final List<Setting<?>> VALUES = Collections.unmodifiableList(
             Arrays.<Setting<?>>asList(HIDDEN, KEPT, SOURCES, TO, FOLDER, VIDEO_SUBFOLDER, PHOTO_SUBFOLDER, QUALITY,
                     FILE_NAME, PHOTO_NAME, ACTION, APP, START, SUBTAB, ORDER, PLAYBACK, REELS_QUALITY, STORIES_QUALITY,
-                    QUIET_FROM, QUIET_UNTIL));
+                    QUIET_FROM, QUIET_UNTIL, LOCK_AFTER));
 
     /** The longest name or value a file holds that isn't a word list, far past a package name. */
     private static final int MAX_OTHER_CHARS = 1024;
@@ -438,7 +446,7 @@ public final class SettingsBackup {
      * What a file says: a value for each switch it names, the folder, the quality, the file name,
      * the start tab, the comment order, the playback quality, the download action, the app links go
      * to, the top folder, the Feeds filter, the two subfolders, the reels and video stories
-     * qualities and the quiet hours when it names them, and how many other names it holds.
+     * qualities, the quiet hours and the app lock's time when it names them, and how many other names it holds.
      */
     public static final class Snapshot {
         private static final String SWITCHES = "switches";
@@ -463,6 +471,7 @@ public final class SettingsBackup {
         private static final String STORIES_QUALITY_NAME = "stories_quality";
         private static final String QUIET_FROM_NAME = "quiet_hours_from";
         private static final String QUIET_UNTIL_NAME = "quiet_hours_until";
+        private static final String LOCK_AFTER_NAME = "app_lock_after";
 
         /** In {@link #ALLOWLIST} order, and only the switches the file named. */
         final Map<BooleanSetting, Boolean> values;
@@ -526,6 +535,9 @@ public final class SettingsBackup {
         /** The hour quiet hours end that the file holds, or null when it names none. */
         @Nullable
         final QuietHour quietUntil;
+        /** How long the app lock waits that the file holds, or null when it names none. */
+        @Nullable
+        final AppLock.After lockAfter;
         /** Names the file holds that aren't settings this build knows. They're left out. */
         final int unknown;
 
@@ -596,7 +608,7 @@ public final class SettingsBackup {
                  @Nullable String videoSubfolder, @Nullable String photoSubfolder,
                  @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality, int unknown) {
             this(values, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to, subtab,
-                    sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, null, null,
+                    sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, null, null, null,
                     unknown);
         }
 
@@ -607,7 +619,8 @@ public final class SettingsBackup {
                  @Nullable FeedsSubtab subtab, @Nullable String sources, @Nullable String photoName,
                  @Nullable String videoSubfolder, @Nullable String photoSubfolder,
                  @Nullable SurfaceQuality reelsQuality, @Nullable SurfaceQuality storiesQuality,
-                 @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil, int unknown) {
+                 @Nullable QuietHour quietFrom, @Nullable QuietHour quietUntil, @Nullable AppLock.After lockAfter,
+                 int unknown) {
             this.values = Collections.unmodifiableMap(values);
             this.folder = folder;
             this.quality = quality;
@@ -629,6 +642,7 @@ public final class SettingsBackup {
             this.storiesQuality = storiesQuality;
             this.quietFrom = quietFrom;
             this.quietUntil = quietUntil;
+            this.lockAfter = lockAfter;
             this.unknown = unknown;
         }
 
@@ -679,6 +693,8 @@ public final class SettingsBackup {
             if (quietFromChange != null) changes.put(QUIET_FROM, quietFromChange);
             QuietHour quietUntilChange = quietUntilChange();
             if (quietUntilChange != null) changes.put(QUIET_UNTIL, quietUntilChange);
+            AppLock.After lockAfterChange = lockAfterChange();
+            if (lockAfterChange != null) changes.put(LOCK_AFTER, lockAfterChange);
             SendLink.Action actionChange = actionChange();
             if (actionChange != null) changes.put(ACTION, actionChange);
             String appChange = appChange();
@@ -794,6 +810,12 @@ public final class SettingsBackup {
             return quietUntil == null || quietUntil == QUIET_UNTIL.savedValue() ? null : quietUntil;
         }
 
+        /** How long the app lock waits after this file, or null when it names none or the one already set. */
+        @Nullable
+        AppLock.After lockAfterChange() {
+            return lockAfter == null || lockAfter == LOCK_AFTER.savedValue() ? null : lockAfter;
+        }
+
         /** The top folder this file sends saves to, or null when it names none or the one already set. */
         @Nullable
         SaveTo toChange() {
@@ -869,6 +891,7 @@ public final class SettingsBackup {
             if (storiesQuality != null) state.putString(STORIES_QUALITY_NAME, storiesQuality.fileValue);
             if (quietFrom != null) state.putString(QUIET_FROM_NAME, quietFrom.fileValue());
             if (quietUntil != null) state.putString(QUIET_UNTIL_NAME, quietUntil.fileValue());
+            if (lockAfter != null) state.putString(LOCK_AFTER_NAME, lockAfter.fileValue);
             state.putInt(UNKNOWN, unknown);
             return state;
         }
@@ -916,6 +939,7 @@ public final class SettingsBackup {
                     SurfaceQuality.fromFile(state.get(REELS_QUALITY_NAME)),
                     SurfaceQuality.fromFile(state.get(STORIES_QUALITY_NAME)),
                     QuietHour.fromFile(state.get(QUIET_FROM_NAME)), QuietHour.fromFile(state.get(QUIET_UNTIL_NAME)),
+                    AppLock.After.fromFile(state.get(LOCK_AFTER_NAME)),
                     unknown);
         }
     }
@@ -945,6 +969,7 @@ public final class SettingsBackup {
         switches.put(STORIES_QUALITY.key, STORIES_QUALITY.savedValue().fileValue);
         switches.put(QUIET_FROM.key, QUIET_FROM.savedValue().fileValue());
         switches.put(QUIET_UNTIL.key, QUIET_UNTIL.savedValue().fileValue());
+        switches.put(LOCK_AFTER.key, LOCK_AFTER.savedValue().fileValue);
         switches.put(ACTION.key, ACTION.savedValue().fileValue);
         // The app links really go to, so a file never carries a name an import would refuse.
         switches.put(APP.key, SendLink.fileApp(APP.savedValue()));
@@ -1057,6 +1082,7 @@ public final class SettingsBackup {
         SurfaceQuality storiesQuality = null;
         QuietHour quietFrom = null;
         QuietHour quietUntil = null;
+        AppLock.After lockAfter = null;
         JSONObject values = (JSONObject) settings;
         for (Iterator<String> names = values.keys(); names.hasNext(); ) {
             String name = names.next();
@@ -1145,6 +1171,11 @@ public final class SettingsBackup {
                 else quietUntil = hour;
                 continue;
             }
+            if (LOCK_AFTER.key.equals(name)) {
+                lockAfter = AppLock.After.fromFile(values.opt(name));
+                if (lockAfter == null) throw new Rejected(Reason.VALUE, "Not an app lock time: " + name);
+                continue;
+            }
             if (TO.key.equals(name)) {
                 to = SaveTo.fromFile(values.opt(name));
                 if (to == null) throw new Rejected(Reason.VALUE, "Not a save location: " + name);
@@ -1213,7 +1244,7 @@ public final class SettingsBackup {
         }
         return new Snapshot(ordered, folder, quality, fileName, start, order, hidden, kept, playback, action, app, to,
                 subtab, sources, photoName, videoSubfolder, photoSubfolder, reelsQuality, storiesQuality, quietFrom,
-                quietUntil, unknown);
+                quietUntil, lockAfter, unknown);
     }
 
     /**
