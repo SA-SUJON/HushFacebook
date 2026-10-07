@@ -58,6 +58,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** **Text size** under Appearance makes Facebook's text 85% to 130% of what your phone's font size setting gives it. It starts at 100%, which is Facebook as it ships, and Pause puts it back. Restart Facebook after changing it.
 * **Facebook:** New patch, `Accent color`, left out of Manager's default selection. Pick Teal, Green, Purple, Pink, Orange, Red, Indigo or Amber under Appearance and the blue Facebook draws links, buttons, switches and the selected tab in takes that color, with link text kept at 4.5 to 1 contrast. It starts on Facebook's blue. `Material You theme` wins when both are in.
 * **Facebook:** New patch, `Send chat photos and videos at original quality`, with a switch under Chats that starts off. Photos and videos you send from a chat that opens inside Facebook go out as the originals instead of shrunken copies. Photos lose their location and camera details (the rotation stays), and photos over 20 MB and videos over 25 MB are still shrunk.
+* **Facebook:** The **Words to hide** editor for `Hide posts by words` has an Add a topic pack button: Politics, Elections, Crypto, Sports, Celebrity gossip, Weight loss ads, and Giveaways and engagement bait. A pack adds its words as ordinary lines you can edit, skips ones you already have, and nothing is kept until you save.
+* **Facebook:** `Hide posts by words` can also hide posts with a lot of reactions. Pick a count under **Hide posts with more reactions than**, from 1,000 to 100,000, and posts above it go. It starts on Off, and a post whose count can't be read stays.
 
 ### Fixed
 
