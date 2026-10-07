@@ -433,6 +433,40 @@ public class AppLockWindowsTest {
         assertTrue("an unlock from before a restart was trusted", AppLock.covered(afterReboot));
     }
 
+    /** The boot count can repeat, so a note from another boot of the phone is no unlock even with the same count. */
+    @Test
+    public void aNoteFromAnotherBootWithTheSameBootCountIsNotTrusted() throws Exception {
+        mainUnlocked();
+        String[] parts = new String(java.nio.file.Files.readAllBytes(note().toPath()),
+                java.nio.charset.StandardCharsets.US_ASCII).split(" ");
+        assertEquals("the note names the boot's start on the wall clock", 3, parts.length);
+        long wallBoot = Long.parseLong(parts[2]);
+        ShadowSystemClock.advanceBy(Duration.ofSeconds(30));
+
+        // The same boot, a few seconds of clock drift: trusted.
+        writeNote(parts[0] + " " + parts[1] + " " + (wallBoot + 5_000));
+        Activity near = newProcess(":quicksilver");
+        front(near);
+        assertFalse("a note from this boot was refused", AppLock.covered(near));
+
+        // The same count, a boot an hour apart: not trusted.
+        writeNote(parts[0] + " " + parts[1] + " " + (wallBoot - 3_600_000));
+        Activity far = newProcess(":adnw");
+        front(far);
+        assertTrue("a note from another boot was trusted", AppLock.covered(far));
+        asked.clear();
+
+        // An old note with no boot start is not trusted either.
+        writeNote(parts[0] + " " + parts[1]);
+        Activity old = newProcess(":quicksilver");
+        front(old);
+        assertTrue(AppLock.covered(old));
+    }
+
+    private void writeNote(String text) throws Exception {
+        java.nio.file.Files.write(note().toPath(), text.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+    }
+
     @Test
     public void theNoteGoesWhenFacebookLocksAndASideProcessNeverWritesOne() {
         mainUnlocked();

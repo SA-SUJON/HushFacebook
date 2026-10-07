@@ -891,6 +891,14 @@ public final class AppLock {
         return new File(context.getNoBackupFilesDir(), "applock-unlocked");
     }
 
+    /** How far the boot time may drift between two reads of the clocks and still be the same boot. */
+    static final long BOOT_SLACK_MS = 60_000;
+
+    /** When this boot began on the wall clock. A restart moves it by the time the phone was off. */
+    private static long bootWallTime() {
+        return System.currentTimeMillis() - SystemClock.elapsedRealtime();
+    }
+
     private static int bootCount(Context context) {
         try {
             return Global.getInt(context.getContentResolver(), Global.BOOT_COUNT, -1);
@@ -900,7 +908,8 @@ public final class AppLock {
     }
 
     /**
-     * The main process's note of when Facebook was last unlocked and in use, for a game or ad screen
+     * The main process's note of the boot (its count and its start on the wall clock) and when Facebook
+     * was last unlocked and in use, for a game or ad screen
      * in a process of its own to read. A private file in the app's own no-backup folder, which only
      * this app's processes reach, written whole and renamed into place; no one else can read or
      * write it. [at] is {@link #NEVER} to take the note away, as when Facebook locks.
@@ -920,7 +929,7 @@ public final class AppLock {
             if (boot < 0) return;
             File part = new File(file.getPath() + ".part");
             try (FileOutputStream out = new FileOutputStream(part)) {
-                out.write((boot + " " + at).getBytes(StandardCharsets.US_ASCII));
+                out.write((boot + " " + at + " " + bootWallTime()).getBytes(StandardCharsets.US_ASCII));
             }
             if (!part.renameTo(file)) {
                 //noinspection ResultOfMethodCallIgnored
@@ -952,9 +961,12 @@ public final class AppLock {
                 }
             }
             String[] parts = new String(bytes, StandardCharsets.US_ASCII).split(" ");
-            if (parts.length != 2) return false;
+            if (parts.length != 3) return false;
             int boot = bootCount(context);
             if (boot < 0 || Integer.parseInt(parts[0]) != boot) return false;
+            // The boot count alone can repeat (a reset count, a restored note), so the boot's start on
+            // the wall clock has to agree too.
+            if (Math.abs(Long.parseLong(parts[2]) - bootWallTime()) > BOOT_SLACK_MS) return false;
             long at = Long.parseLong(parts[1]);
             return at >= 0 && now >= at && now - at < lockAfter().millis;
         } catch (Throwable unreadable) {
