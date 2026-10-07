@@ -246,6 +246,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_block_story_auto_advance", TRUE);
 
     /**
+     * Stop Story auto-advance's second switch: a finished story starts again from the beginning
+     * through Facebook's own restart, instead of holding its last frame. Off until you turn it on.
+     */
+    public static final BooleanSetting LOOP_STORIES =
+            new BooleanSetting("hushfacebook_loop_stories", FALSE);
+
+    /**
      * The batches of viewed story cards the story viewer sends as DirectSeenMutation, which put you
      * on each story's viewer list. Held back, replies and reactions still show you, and stories you
      * viewed keep their unwatched ring.

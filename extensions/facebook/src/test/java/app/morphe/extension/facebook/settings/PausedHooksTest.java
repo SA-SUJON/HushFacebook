@@ -318,7 +318,7 @@ public class PausedHooksTest {
         probes.put(PatchFamily.SPONSORED_STORIES, Collections.singletonList(FeedFilter::hideSponsoredStories));
         // A tray of a friend's bucket, a suggested one and one labelled SUGGESTED keeps only the friend's.
         probes.put(PatchFamily.SUGGESTED_STORIES, Collections.singletonList(SuggestedStoriesForTests::hidesSuggestions));
-        probes.put(PatchFamily.STORY_AUTO_ADVANCE, Collections.singletonList(StoryAdvance::waitForTap));
+        probes.put(PatchFamily.STORY_AUTO_ADVANCE, Arrays.asList(StoryAdvance::waitForTap, StoryAdvance::loop));
         // The story viewer's report of the stories you viewed goes out.
         probes.put(PatchFamily.STORY_SEEN, Collections.singletonList(StorySeen::holdBack));
         probes.put(PatchFamily.SPONSORED_REELS, Arrays.asList(

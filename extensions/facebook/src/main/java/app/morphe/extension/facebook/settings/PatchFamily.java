@@ -67,7 +67,7 @@ public enum PatchFamily {
     SUGGESTED_STORIES(FamilyNames.SUGGESTED_STORIES, "suggestedStories", null,
             Settings.HIDE_SUGGESTED_STORIES, Settings.HIDE_CONTACT_IMPORT_CARD, Settings.HIDE_STORY_PROMPTS),
     STORY_AUTO_ADVANCE(FamilyNames.STORY_AUTO_ADVANCE, "storyAutoAdvance", null,
-            Settings.BLOCK_STORY_AUTO_ADVANCE),
+            Settings.BLOCK_STORY_AUTO_ADVANCE, Settings.LOOP_STORIES),
     STORY_SEEN(FamilyNames.STORY_SEEN, "storySeen", null,
             Settings.VIEW_STORIES_ANONYMOUSLY),
     SPONSORED_REELS(FamilyNames.SPONSORED_REELS, "sponsoredReels",

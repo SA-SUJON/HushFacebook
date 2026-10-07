@@ -885,3 +885,7 @@ The composer stops prompting you to share your posts to Threads too. Your posts 
 No Meta Verified offer after you post, and no Meta Verified label under the names on posts. Posting works as usual.	Kein Meta-Verified-Angebot nach dem Posten und kein Meta-Verified-Label unter den Namen bei Beiträgen. Posten funktioniert wie gewohnt.
 # context: summary of the avatar sticker switch; promotion slots are the cards Facebook uses to suggest its own features
 Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.	Werbung für Avatar-Sticker verschwindet aus Kommentaren und Facebooks Werbeplätzen, ebenso die Aufforderung, einen Avatar zu erstellen. Sticker lassen sich weiterhin senden.
+# context: label of a switch under Stories that replays a finished story; it works together with the Stop Story auto-advance switch
+Loop stories	Stories wiederholen
+# context: summary of the Loop stories switch; "Stop Story auto-advance" is the label of the switch above it, so use its translation
+With Stop Story auto-advance on, a finished story plays again from the start instead of waiting on its last frame. Tap or swipe to move on.	Wenn „Automatisches Weiterspringen bei Stories stoppen“ an ist, startet eine abgeschlossene Story wieder von vorn, statt auf ihrem letzten Bild stehen zu bleiben. Tippe oder wische, um weiterzugehen.

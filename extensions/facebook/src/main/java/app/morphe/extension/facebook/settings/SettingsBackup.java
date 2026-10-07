@@ -128,6 +128,7 @@ public final class SettingsBackup {
             Settings.HIDE_CONTACT_IMPORT_CARD,
             Settings.HIDE_STORY_PROMPTS,
             Settings.BLOCK_STORY_AUTO_ADVANCE,
+            Settings.LOOP_STORIES,
             Settings.VIEW_STORIES_ANONYMOUSLY,
             Settings.HIDE_SPONSORED_REELS,
             Settings.HIDE_SPONSORED_SEARCH_RESULTS,

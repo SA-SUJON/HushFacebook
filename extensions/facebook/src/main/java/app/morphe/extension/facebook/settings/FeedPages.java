@@ -238,6 +238,9 @@ final class FeedPages {
             if (build.contains(PatchFamily.STORY_AUTO_ADVANCE)) {
                 stories.addPreference(toggle(context, Settings.BLOCK_STORY_AUTO_ADVANCE,
                         L10n.t("A finished story stays on screen until you tap or swipe. Turn this off for Facebook's timing.")));
+                stories.addPreference(toggle(context, Settings.LOOP_STORIES,
+                        L10n.t("With Stop Story auto-advance on, a finished story plays again from the start "
+                                + "instead of waiting on its last frame. Tap or swipe to move on.")));
             }
             if (build.contains(PatchFamily.STORY_SEEN)) {
                 stories.addPreference(toggle(context, Settings.VIEW_STORIES_ANONYMOUSLY,

@@ -281,7 +281,7 @@
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: a Story progress-completion guard on Facebook 577 and 580 that leaves manual navigation alone."
+      "changes": "Written for Hushfacebook: a Story progress-completion guard on Facebook 577 and 580 that leaves manual navigation alone. Its Loop stories switch starts a held story again through the restart Facebook's own completion navigator makes, found in 577, 580 and 581 by its shape (the callback's playback environment, a static lookup on it and an interface reset taking a boolean) and called from a static method the patch adds to the callback's class. The idea follows the loopStories option of FroggoMorphePatches' Facebook 573 story playback patch; no code of it is here, since that patch writes down 573's obfuscated names and pauses and resumes around its reset."
     },
     {
       "paths": [
