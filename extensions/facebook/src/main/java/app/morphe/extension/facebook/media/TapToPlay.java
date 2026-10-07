@@ -306,7 +306,12 @@ public final class TapToPlay {
                 failNext = null;
                 throw failure;
             }
-            if (!on()) return true;
+            if (!on()) {
+                // Starts going ahead with the switch off aren't a run of reels the person started.
+                reelRun = false;
+                heldReel = new WeakReference<>(null);
+                return true;
+            }
             HookStatus.bound(FamilyNames.TAP_TO_PLAY, hook);
             return decide(player, trigger instanceof Enum ? ((Enum<?>) trigger).name() : null,
                     SystemClock.uptimeMillis(), path);

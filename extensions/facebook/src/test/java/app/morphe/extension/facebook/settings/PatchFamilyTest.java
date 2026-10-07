@@ -124,6 +124,22 @@ public class PatchFamilyTest {
     }
 
     @Test
+    public void onlyTheFirstReelWaitsDoesNotClaimTapToPlayIsOn() {
+        try {
+            Settings.TAP_TO_PLAY.save(false);
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.save(true);
+            String line = PatchFamily.reportLines(EnumSet.of(PatchFamily.TAP_TO_PLAY), false).get(0);
+            assertTrue(line, line.startsWith(FamilyNames.TAP_TO_PLAY + ": disabled by its switch ("));
+            Settings.TAP_TO_PLAY.save(true);
+            assertTrue(PatchFamily.reportLines(EnumSet.of(PatchFamily.TAP_TO_PLAY), false).get(0)
+                    .startsWith(FamilyNames.TAP_TO_PLAY + ": on ("));
+        } finally {
+            Settings.TAP_TO_PLAY.resetToDefault();
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.resetToDefault();
+        }
+    }
+
+    @Test
     public void marketplaceExtrasDoNotClaimTheDisabledModeIsOn() {
         try {
             Settings.MARKETPLACE_ONLY.save(false);

@@ -710,6 +710,22 @@ public class TapToPlayTest {
         }
     }
 
+    /** A run doesn't outlive Tap to play: a start that goes ahead with the switch off ends it. */
+    @Test
+    public void tapToPlayOffInBetweenEndsTheRun() {
+        Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.save(true);
+        try {
+            playAWaitingReel();
+            Settings.TAP_TO_PLAY.save(false);
+            assertTrue("off, a video starts as Facebook starts it", TapToPlay.allowStart(new Object(), Trigger.BY_AUTOPLAY));
+            Settings.TAP_TO_PLAY.save(true);
+            assertFalse("back on, the reel landed on waits",
+                    TapToPlay.allowStart(new Object(), Trigger.BY_SHORT_FORM_VIDEO_FULLY_VISIBLE));
+        } finally {
+            Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.resetToDefault();
+        }
+    }
+
     /** The control: off, its default, every reel waits after a played one, as before #91. */
     @Test
     public void withTheSwitchOffEveryReelWaits() {
