@@ -384,8 +384,20 @@ public class PatchFamilyTest {
                         + "hushfacebook_block_birthday_notifications=off, hushfacebook_block_highlight_notifications=off, "
                         + "hushfacebook_block_people_you_may_know_notifications=off, "
                         + "hushfacebook_block_nearby_notifications=off, "
-                        + "hushfacebook_block_account_setup_notifications=off)",
+                        + "hushfacebook_block_account_setup_notifications=off, "
+                        + "hushfacebook_block_group_activity_notifications=off, hushfacebook_block_event_notifications=off, "
+                        + "hushfacebook_block_live_video_notifications=off, hushfacebook_block_reaction_notifications=off, "
+                        + "hushfacebook_notification_quiet_hours=off)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.PROMO_NOTIFICATIONS), false).get(0));
+        // Quiet hours only narrows the kinds that are on, so on its own the patch still reads off.
+        Settings.NOTIFICATION_QUIET_HOURS.save(true);
+        assertTrue(PatchFamily.reportLines(EnumSet.of(PatchFamily.PROMO_NOTIFICATIONS), false).get(0)
+                .startsWith("Block promotional notifications: disabled by its switch ("));
+        Settings.BLOCK_EVENT_NOTIFICATIONS.save(true);
+        assertTrue(PatchFamily.reportLines(EnumSet.of(PatchFamily.PROMO_NOTIFICATIONS), false).get(0)
+                .startsWith("Block promotional notifications: on ("));
+        Settings.NOTIFICATION_QUIET_HOURS.resetToDefault();
+        Settings.BLOCK_EVENT_NOTIFICATIONS.resetToDefault();
 
         List<String> paused = PatchFamily.reportLines(build, true);
         assertEquals("Hide sponsored posts: disabled while paused (saved "

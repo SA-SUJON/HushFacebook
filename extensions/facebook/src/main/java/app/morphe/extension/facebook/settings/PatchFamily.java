@@ -388,6 +388,12 @@ public enum PatchFamily {
         // Options cannot enable these families without their main switch.
         if (this == MARKETPLACE_ONLY) anyOn = Settings.MARKETPLACE_ONLY.savedValue();
         if (this == VIDEO_DOWNLOAD) anyOn = Settings.DOWNLOAD_VIDEOS.savedValue();
+        if (this == PROMO_NOTIFICATIONS) {
+            anyOn = false;
+            for (BooleanSetting setting : switches) {
+                if (setting != Settings.NOTIFICATION_QUIET_HOURS) anyOn |= setting.savedValue();
+            }
+        }
         if (this == POST_WORDS) {
             anyOn = Settings.HIDE_POSTS_WITH_WORDS.savedValue() || Settings.HIDE_POSTS_FROM_SOURCES.savedValue();
         }
