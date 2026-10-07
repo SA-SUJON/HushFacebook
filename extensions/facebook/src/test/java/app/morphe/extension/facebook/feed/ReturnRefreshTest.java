@@ -107,6 +107,63 @@ public class ReturnRefreshTest {
     }
 
     /**
+     * A tab switch back to Home, or the feed back from another screen, reaches the hot-start check,
+     * the stale-post executor and the tab's AUTO_REFRESH. With the switch on each keeps the feed, and
+     * switched off or paused each is Facebook's. Inside a return from the background the stale-post
+     * and tab checks get the return's answer without using it up, and the hot-start check goes on to
+     * the warm-start check that decides it.
+     */
+    @Test public void aTabSwitchBackToHomeKeepsTheFeedWithTheSwitchOn() {
+        long now = 1_000_000;
+        assertTrue(ReturnRefresh.askInAppAt(now, ReturnRefresh.HOT_START, false));
+        assertTrue(ReturnRefresh.askInAppAt(now, ReturnRefresh.STALE_POST, true));
+        assertTrue(ReturnRefresh.askInAppAt(now, ReturnRefresh.TAB_AUTO_REFRESH, true));
+
+        // Seven minutes away: the pause worker and the tab follow the return, which its own check decides.
+        ReturnRefresh.uiHidden(1_000);
+        long back = 1_000 + 7 * 60 * 1000;
+        assertTrue("the pause worker", ReturnRefresh.askInAppAt(back, ReturnRefresh.STALE_POST, true));
+        assertFalse("the hot-start check went past the warm-start check",
+                ReturnRefresh.askInAppAt(back, ReturnRefresh.HOT_START, false));
+        assertTrue("the return was used up", ReturnRefresh.askAt(back + 1, ReturnRefresh.WARM_START));
+        assertTrue(ReturnRefresh.askInAppAt(back + 2, ReturnRefresh.TAB_AUTO_REFRESH, true));
+
+        // Eleven minutes away: the return lets Facebook refresh, and so does each check within it.
+        ReturnRefresh.uiHidden(1_000);
+        back = 1_000 + 11 * 60 * 1000;
+        assertFalse(ReturnRefresh.askInAppAt(back, ReturnRefresh.STALE_POST, true));
+        assertFalse(ReturnRefresh.askAt(back + 1, ReturnRefresh.WARM_START));
+        assertFalse(ReturnRefresh.askInAppAt(back + 2, ReturnRefresh.TAB_AUTO_REFRESH, true));
+        // Past the return, a tab switch back to Home is inside the app again.
+        long later = back + ReturnRefresh.SAME_RETURN_MS + 3;
+        assertTrue(ReturnRefresh.askInAppAt(later, ReturnRefresh.HOT_START, false));
+
+        Settings.BLOCK_RETURN_REFRESH.save(false);
+        assertFalse("switch off", ReturnRefresh.askInAppAt(later, ReturnRefresh.STALE_POST, true));
+        assertFalse("switch off", ReturnRefresh.askInAppAt(later, ReturnRefresh.HOT_START, false));
+        Settings.BLOCK_RETURN_REFRESH.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertFalse("paused", ReturnRefresh.askInAppAt(later, ReturnRefresh.TAB_AUTO_REFRESH, true));
+        assertFalse("paused", ReturnRefresh.askInAppAt(later, ReturnRefresh.HOT_START, false));
+    }
+
+    /** The three in-app entries keep the feed and say so in the report, one count each. */
+    @Test public void theInAppEntriesKeepTheFeedAndSaySo() {
+        HookStatus.clear();
+        try {
+            assertTrue(ReturnRefresh.holdHotStart());
+            assertTrue(ReturnRefresh.holdStalePost());
+            assertTrue(ReturnRefresh.holdTabAutoRefresh());
+            String report = String.join("\n", HookStatus.report());
+            assertTrue(report, report.contains(FamilyNames.RETURN_REFRESH + ": invoked 3"));
+            assertTrue(report, report.contains("kept the feed at hot start 1, kept the feed from a stale-post refresh 1, "
+                    + "kept the feed from the tab's auto refresh 1"));
+        } finally {
+            HookStatus.clear();
+        }
+    }
+
+    /**
      * The warm-start check reaches the extension through its own entry, counted in the report
      * beside the resume callback's, and keeps the feed in the same return.
      */

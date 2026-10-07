@@ -40,6 +40,12 @@ class ReturnRefreshFixtureTest {
     private val resetToFeed = "$extension->resetToFeed(Ljava/lang/String;Ljava/lang/String;)V"
     private val keepFeedWhileAway = "$extension->keepFeedWhileAway()Z"
     private val holdAutoScroll = "$extension->holdAutoScroll()Z"
+    private val holdHotStart = "$extension->holdHotStart()Z"
+    private val holdStalePost = "$extension->holdStalePost()Z"
+    private val holdTabAutoRefresh = "$extension->holdTabAutoRefresh()Z"
+
+    /** What the dex files holding the in-app checks' callers load: two kept method names and the pause worker's event. */
+    private val callerTexts = setOf("onSetUserVisibleHint", "refreshForRevisit", "refresh_stale_post_on_pause")
 
     private fun Method.body(): List<Instruction> = implementation!!.instructions.toList()
 
@@ -57,7 +63,8 @@ class ReturnRefreshFixtureTest {
     @Test
     fun `the extension has the entries the patch calls, public and static`() {
         val methods = ExtensionDex.classDef(extension).methods.associateBy(::signature)
-        for (entry in listOf(skip, holdWarmStart, resetToFeed, keepFeedWhileAway, holdAutoScroll)) {
+        for (entry in listOf(skip, holdWarmStart, resetToFeed, keepFeedWhileAway, holdAutoScroll, holdHotStart,
+            holdStalePost, holdTabAutoRefresh)) {
             val method = methods[entry]
             assertTrue("the extension has no $entry", method != null)
             assertTrue("$entry isn't public static",
@@ -123,7 +130,42 @@ class ReturnRefreshFixtureTest {
         val noneAt = decision.body().indexOfFirst { it.call() == none }
         assertEquals("$name: the NONE answer's return", Opcode.RETURN_OBJECT, decision.body()[noneAt + 1].opcode)
 
-        val owners = (controllers + warmOwners + logOwners + teardownOwners + scrollTypes.values).distinctBy { it.type }
+        // Inside the app: the stale-post executor, the hot-start check and NewsFeedTabDataFetch's
+        // dispatch, each the one method of its shape loading its text.
+        val executorOwners = FixtureDex.classesHolding(bundle, STALE_POST_RE_RANK)
+        val executors = executorOwners.flatMap { it.methods.filter(::isStalePostExecutor) }
+        assertEquals("$name: stale-post executors: ${executors.map(::signature)}", 1, executors.size)
+        val hotOwners = FixtureDex.classesHolding(bundle, HOT_START_CHECK)
+        val hotStarts = hotOwners.flatMap { it.methods.filter(::isHotStartCheck) }
+        assertEquals("$name: hot-start checks: ${hotStarts.map(::signature)}", 1, hotStarts.size)
+        val fetchOwners = FixtureDex.classesHolding(bundle, TAB_DATA_FETCH)
+        val fetches = fetchOwners.flatMap { it.methods.filter(::isTabDataFetch) }
+        assertEquals("$name: tab data fetch dispatches: ${fetches.map(::signature)}", 1, fetches.size)
+        val executor = executors.single()
+        val hotStart = hotStarts.single()
+        val fetch = fetches.single()
+        // Throws on a shape the hook can't go into: see tabAutoRefreshCause.
+        val cause = tabAutoRefreshCause(fetch)
+        val causeRegister = (fetch.body()[cause] as OneRegisterInstruction).registerA
+
+        // The tab's visibility change and the worker the feed posts on pause hand the executor their
+        // decision, and the visibility change and the revisit refresh ask the hot-start check.
+        val targets = setOf(signature(executor), signature(hotStart))
+        val callers = FixtureDex.methodsWhere(bundle, { dex -> dex.stringSection.any { it in callerTexts } }) { method ->
+            method.implementation?.instructions?.any { it.call() in targets } == true
+        }
+        fun callersOf(target: Method) = callers.filter { caller -> caller.body().any { it.call() == signature(target) } }
+        assertTrue("$name: no onSetUserVisibleHint hands the executor a decision",
+            callersOf(executor).any { it.name == "onSetUserVisibleHint" })
+        assertTrue("$name: no pause worker hands the executor a decision",
+            callersOf(executor).any { it.name == "run" && holdsString(it, "refresh_stale_post_on_pause") })
+        assertTrue("$name: onSetUserVisibleHint doesn't ask the hot-start check",
+            callersOf(hotStart).any { it.name == "onSetUserVisibleHint" })
+        assertTrue("$name: refreshForRevisit doesn't ask the hot-start check",
+            callersOf(hotStart).any { it.name == "refreshForRevisit" })
+
+        val owners = (controllers + warmOwners + logOwners + teardownOwners + scrollTypes.values + executorOwners +
+            hotOwners + fetchOwners).distinctBy { it.type }
         val context = PatchContexts.of(owners + ExtensionDex.classDef(SETTINGS_STATUS))
         blockReturnRefreshPatch.execute(context)
         fun patched(method: Method) = context.mutableClassDefBy(method.definingClass).methods.single {
@@ -176,5 +218,30 @@ class ReturnRefreshFixtureTest {
         assertEquals("$name: NONE", none, decisionBody[noneAt + 3].call())
         assertEquals("$name: the rest of the decision", decision.body().map { it.opcode },
             decisionBody.drop(3).map { it.opcode })
+
+        // The executor and the hot-start check ask first and, on a yes, do nothing, as Facebook's
+        // own answer does: the hot-start check of 577 answers false.
+        for ((method, entry) in listOf(executor to holdStalePost, hotStart to holdHotStart)) {
+            val body = patched(method).body()
+            val nothing = if (method.returnType == "Z") listOf(Opcode.CONST_4, Opcode.RETURN) else listOf(Opcode.RETURN_VOID)
+            val hook = listOf(Opcode.INVOKE_STATIC, Opcode.MOVE_RESULT, Opcode.IF_EQZ) + nothing
+            assertEquals("$name: ${method.name}'s first call", entry, body[0].call())
+            assertEquals("$name: ${method.name}'s hook", hook, body.take(hook.size).map { it.opcode })
+            assertEquals("$name: the rest of ${method.name}", method.body().map { it.opcode },
+                body.drop(hook.size).map { it.opcode })
+        }
+
+        // The dispatch asks where it loaded the refresh's cause, in that register, and a yes lands
+        // right after the refresh, on the data fetch's own callback.
+        val fetchBody = patched(fetch).body()
+        assertEquals("$name: the dispatch's hook", listOf(Opcode.INVOKE_STATIC, Opcode.MOVE_RESULT, Opcode.IF_NEZ),
+            fetchBody.subList(cause, cause + 3).map { it.opcode })
+        assertEquals("$name: the dispatch's question", holdTabAutoRefresh, fetchBody[cause].call())
+        assertEquals("$name: the dispatch's registers", listOf(causeRegister, causeRegister),
+            listOf(fetchBody[cause + 1], fetchBody[cause + 2]).map { (it as OneRegisterInstruction).registerA })
+        assertTrue("$name: a yes doesn't skip the refresh", cause + 5 in ControlFlow.of(patched(fetch)).normal[cause + 2])
+        assertEquals("$name: the refresh", fetch.body()[cause + 1].call(), fetchBody[cause + 4].call())
+        assertEquals("$name: the rest of the dispatch", fetch.body().map { it.opcode },
+            fetchBody.filterIndexed { index, _ -> index !in cause..cause + 2 }.map { it.opcode })
     }
 }

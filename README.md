@@ -74,7 +74,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `AMOLED black theme` | Makes Facebook's dark mode black, or a dark colour you pick, instead of dark grey. Turn on dark mode in Facebook first. |
 | `Block ad telemetry` | Stops Facebook watching for screenshots of ads and reporting which apps you install for ad attribution. |
 | `Block background ad prefetch` | Stops Facebook downloading ads and its ad model in the background. That saves data and battery. The ads don't take up storage either. |
-| `Block background-return feed refresh` | Keeps your feed position when you return to Facebook within ten minutes, or for any time away with No time limit on. Pull to refresh and a fresh launch still work. |
+| `Block background-return feed refresh` | Keeps your feed position when you return to Facebook within ten minutes, or for any time away with No time limit on, and when you switch back to Home. Pull to refresh and a fresh launch still work. |
 | `Block Instant Games ads` | Games you play in Facebook get no ads. A game that asks for one is told there's none to show, so a rewarded ad gives no reward, and the game carries on. |
 | `Block promotional notifications` | Keeps the kinds of notification you pick off your phone, such as trending videos, memories and birthdays. Each kind has its own switch, and they all start off. Messages, friend requests, comments, mentions and login alerts always come through. |
 | `Block screenshot detection` | Stops Facebook noticing when you take a screenshot or record the screen, in the feed, Reels, chats, games and everywhere else. Its switch starts on, under Privacy. |

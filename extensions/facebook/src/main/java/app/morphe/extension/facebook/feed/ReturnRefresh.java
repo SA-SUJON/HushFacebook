@@ -25,7 +25,12 @@ import app.morphe.extension.shared.settings.Setting;
  * callback, the feed's warm-start check, which NewsFeedFragment's onResume reaches and which
  * refreshes a feed left alone for a few minutes, and NewsFeedFragment's foreground auto-scroll. The
  * first check after the UI was hidden decides, and every check within {@link #SAME_RETURN_MS} of it
- * gets the same answer. Later checks, a tab switch among them, are Facebook's own.
+ * gets the same answer. Later checks of those three are Facebook's own.
+ *
+ * <p>Inside the app, a tab switch back to Home or the feed back from another screen reaches three
+ * more: the feed's hot-start check, its stale-post executor (from the visibility change, and from
+ * the worker it posts on pause) and NewsFeedTabDataFetch's AUTO_REFRESH. Those keep the feed while
+ * the switch is on, and never use a return up ({@link #decideInApp}).
  *
  * <p>While Facebook is away it also tears the feed's stories down once it has been gone as long as
  * the warm-start threshold, and a torn-down feed loads new posts on the return whatever the checks
@@ -38,9 +43,15 @@ public final class ReturnRefresh {
     static final String FEED_RESUME = "feed resume";
     static final String WARM_START = "warm start";
     static final String AUTO_SCROLL = "foreground auto-scroll";
+    static final String HOT_START = "hot start";
+    static final String STALE_POST = "stale-post refresh";
+    static final String TAB_AUTO_REFRESH = "tab auto refresh";
     private static final String KEPT_ON_RESUME = "kept the feed on resume";
     private static final String KEPT_ON_WARM_START = "kept the feed at warm start";
     private static final String KEPT_ON_AUTO_SCROLL = "kept the feed from the foreground auto-scroll";
+    private static final String KEPT_ON_HOT_START = "kept the feed at hot start";
+    private static final String KEPT_ON_STALE_POST = "kept the feed from a stale-post refresh";
+    private static final String KEPT_ON_TAB_AUTO_REFRESH = "kept the feed from the tab's auto refresh";
     private static final String KEPT_WHILE_AWAY = "kept the feed loaded while away";
     /** Prefix for a refusal's count label; one label per fixed reason from refreshBecause()/offBecause(). */
     private static final String LET_FACEBOOK_REFRESH = "let Facebook refresh: ";
@@ -126,6 +137,34 @@ public final class ReturnRefresh {
     }
 
     /**
+     * Called first thing in the feed's hot-start check, which NewsFeedFragment's onSetUserVisibleHint
+     * reaches as the Home tab comes back into view and its refreshForRevisit as the feed comes back
+     * from another screen. True skips the check, Facebook's own answer when it does nothing. In a
+     * return from the background it goes on, to the warm-start check that return's answer comes from.
+     */
+    public static boolean holdHotStart() {
+        return askInApp(HOT_START, KEPT_ON_HOT_START, false);
+    }
+
+    /**
+     * Called first thing where the feed acts on its stale-post decision, a re-rank or a refresh that
+     * clears what's on screen. The worker NewsFeedFragment posts as it pauses hands it one, and so
+     * does its onSetUserVisibleHint. True does nothing, as Facebook does for a decision of no refresh.
+     */
+    public static boolean holdStalePost() {
+        return askInApp(STALE_POST, KEPT_ON_STALE_POST, true);
+    }
+
+    /**
+     * Called right before NewsFeedTabDataFetch forces an AUTO_REFRESH, which it does as the Home tab
+     * comes back once its data is older than Facebook's limit. True goes straight on to the data
+     * fetch's own callback, as Facebook does after the refresh.
+     */
+    public static boolean holdTabAutoRefresh() {
+        return askInApp(TAB_AUTO_REFRESH, KEPT_ON_TAB_AUTO_REFRESH, true);
+    }
+
+    /**
      * Called first thing where Facebook writes down what its reset to feed decided on a return, to
      * log it. It changes nothing: it's there so a debug log says whether that reset ran.
      */
@@ -150,6 +189,57 @@ public final class ReturnRefresh {
             HookStatus.threw(FamilyNames.RETURN_REFRESH, check, failure);
             return false;
         }
+    }
+
+    private static boolean askInApp(String check, String kept, boolean duringReturn) {
+        try {
+            HookStatus.invoked(FamilyNames.RETURN_REFRESH);
+            Decision decision = decideInApp(SystemClock.elapsedRealtime(), check, duringReturn);
+            if (decision.countable) {
+                HookStatus.counted(FamilyNames.RETURN_REFRESH,
+                        decision.hold ? kept : LET_FACEBOOK_REFRESH + decision.reason);
+            }
+            return decision.hold;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.RETURN_REFRESH, check, failure);
+            return false;
+        }
+    }
+
+    static boolean askInAppAt(long now, String check, boolean duringReturn) {
+        return decideInApp(now, check, duringReturn).hold;
+    }
+
+    /**
+     * Decides a check Facebook makes inside the app, a tab switch back to Home or the feed back from
+     * another screen: it keeps the feed while the switch is on. A check while a return from the
+     * background is pending, or within {@link #SAME_RETURN_MS} of its first check, never uses that
+     * return up. With {@code duringReturn} it gets the answer the return gets, and without it Facebook
+     * goes on, to a check of the return's own.
+     */
+    private static Decision decideInApp(long now, String check, boolean duringReturn) {
+        final boolean returning;
+        final String reason;
+        synchronized (ReturnRefresh.class) {
+            if (hiddenAt >= 0) {
+                returning = true;
+                reason = refreshBecause(now, hiddenAt);
+            } else if (decidedAt >= 0 && now >= decidedAt && now - decidedAt <= SAME_RETURN_MS) {
+                returning = true;
+                reason = decidedBecause;
+            } else {
+                returning = false;
+                reason = offBecause();
+            }
+        }
+        if (returning && !duringReturn) {
+            Logger.printDebug(() -> "Return refresh: " + check + " in a return: the warm-start check decides");
+            return new Decision(false, false, null);
+        }
+        boolean hold = reason == null;
+        Logger.printDebug(() -> "Return refresh: " + check + (returning ? " in a return" : " inside the app")
+                + (hold ? ": keeping the feed" : ": Facebook goes ahead, " + reason));
+        return new Decision(hold, true, reason);
     }
 
     static boolean skipAt(long now) {

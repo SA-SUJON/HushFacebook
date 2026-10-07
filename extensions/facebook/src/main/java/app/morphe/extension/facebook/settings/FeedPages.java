@@ -180,7 +180,8 @@ final class FeedPages {
             }
             if (build.contains(PatchFamily.RETURN_REFRESH)) {
                 feed.addPreference(toggle(context, Settings.BLOCK_RETURN_REFRESH,
-                        L10n.t("Returning to Facebook within ten minutes keeps your place. Pull to refresh still works.")));
+                        L10n.t("Returning to Facebook within ten minutes, or switching back to Home, keeps your place. "
+                                + "Pull to refresh still works.")));
                 feed.addPreference(toggle(context, Settings.RETURN_REFRESH_NO_LIMIT,
                         L10n.t("With the switch above on, your place stays however long you're away. Pull to refresh and a fresh start still load new posts.")));
             }

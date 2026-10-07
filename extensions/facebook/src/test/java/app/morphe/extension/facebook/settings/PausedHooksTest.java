@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.widget.FrameLayout;
 
 import com.facebook.common.util.TriState;
@@ -264,7 +265,8 @@ public class PausedHooksTest {
                 () -> FeedGuardForTests.hidesShowcaseReels(Category.SHOWCASE, ShowcaseStoryType.SHOWCASE_SHORT_VIDEO),
                 FeedFilter::hidePreEofReels));
         // The refresh controller's resume callback, the feed's warm-start check and the foreground
-        // auto-scroll, each the first check of a return, and the feed teardown while away.
+        // auto-scroll, each the first check of a return, the feed teardown while away, and the
+        // hot-start check, stale-post executor and tab AUTO_REFRESH a tab switch back to Home reaches.
         probes.put(PatchFamily.RETURN_REFRESH, Arrays.asList(
                 () -> {
                     ReturnRefresh.uiHidden();
@@ -278,7 +280,14 @@ public class PausedHooksTest {
                     ReturnRefresh.uiHidden();
                     return ReturnRefresh.holdAutoScroll();
                 },
-                ReturnRefresh::keepFeedWhileAway));
+                ReturnRefresh::keepFeedWhileAway,
+                () -> {
+                    // Past the return the probes above started, so these are a tab switch inside the app.
+                    SystemClock.sleep(60_000);
+                    return ReturnRefresh.holdHotStart();
+                },
+                ReturnRefresh::holdStalePost,
+                ReturnRefresh::holdTabAutoRefresh));
         // A story Facebook's own detection marked as made with AI, one only its creator labelled as AI,
         // and a reel whose GenAI attribution carries the detected flag, at both levels a page of reels
         // enters.
