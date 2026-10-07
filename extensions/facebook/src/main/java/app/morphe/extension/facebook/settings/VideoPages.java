@@ -130,6 +130,10 @@ final class VideoPages {
             reels.addPreference(toggle(context, Settings.KEEP_REEL_SPEED,
                     L10n.t("A playback speed you pick in a reel's menu stays for the next reels until you pick another "
                             + "or Facebook restarts. Off, every reel starts at normal speed.")));
+            reels.addPreference(toggle(context, Settings.KEEP_VIDEO_SPEED,
+                    L10n.t("A playback speed you pick in a feed or Watch video's gear menu stays for the next videos "
+                            + "until you pick another or Facebook restarts. Reels keep their own speed. It's off by "
+                            + "default because it hasn't been tested on a real account yet.")));
         }
         if (build.contains(PatchFamily.REEL_HOLD)) {
             reels.addPreference(toggle(context, Settings.HOLD_REEL_FOR_2X,

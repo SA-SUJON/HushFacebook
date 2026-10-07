@@ -2974,7 +2974,7 @@
     },
     {
       "name": "Keep the reel speed",
-      "description": "A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts.",
+      "description": "A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. A second switch does the same for feed and Watch videos.",
       "category": "Interface",
       "use": true,
       "dependencies": [

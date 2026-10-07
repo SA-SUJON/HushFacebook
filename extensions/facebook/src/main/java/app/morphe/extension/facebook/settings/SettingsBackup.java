@@ -157,6 +157,7 @@ public final class SettingsBackup {
             Settings.HIDE_READ_RECEIPTS,
             Settings.TURN_OFF_DOUBLE_TAP_LIKE,
             Settings.KEEP_REEL_SPEED,
+            Settings.KEEP_VIDEO_SPEED,
             Settings.HOLD_REEL_FOR_2X,
             Settings.DEFAULT_COMMENT_ORDER,
             Settings.HIDE_META_AI_SUMMARIES,

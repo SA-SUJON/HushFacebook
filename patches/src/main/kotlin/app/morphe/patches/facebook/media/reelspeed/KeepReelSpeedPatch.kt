@@ -44,13 +44,17 @@ internal const val PATCH = "Keep the reel speed"
  * sheet shows no toast, so its pick tells the extension straight after it sets the speed. The
  * extension's stubs are filled with the player's speed setter, its PlayerOrigin getter, its
  * VideoPlayerParams getter and the params' isFbShorts, isSponsored and isLiveNow.
+ *
+ * Keep the video speed, the extension's second switch for this patch, needs nothing more: the same
+ * hooks fire for every FbGrootPlayer, so a gear pick on a feed or Watch video and each later video's
+ * start already reach the extension, which tells reels from other videos by isFbShorts.
  */
 @Suppress("unused")
 val keepReelSpeedPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Keep the reel speed",
     description = "A playback speed you pick in a reel's menu stays for the next reels until you pick another or " +
-        "Facebook restarts.",
+        "Facebook restarts. A second switch does the same for feed and Watch videos.",
     default = true,
 ) {
     category("Interface")

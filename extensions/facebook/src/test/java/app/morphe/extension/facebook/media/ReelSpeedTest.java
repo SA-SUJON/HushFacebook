@@ -39,7 +39,8 @@ import app.morphe.extension.shared.settings.preference.LogBufferManager;
  * and the first start of each later video there gets it when the video is a reel that's neither an
  * ad nor live. A reel readied before the pick gets it when it starts again, the same reel started
  * again keeps whatever it's at, another viewer keeps its own speed, normal speed goes back to
- * Facebook's reset, and off, paused or failing, every reel starts as Facebook starts it.
+ * Facebook's reset, and off, paused or failing, every reel starts as Facebook starts it. Keep the
+ * video speed, the second switch, does the same for feed and Watch videos with one speed for all.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -50,6 +51,8 @@ public class ReelSpeedTest {
     /** Where accounts whose Reels live in the Video tab play them. */
     private static final String VIDEO_TAB = "video_home";
     private static final String IN_FEED = "fb_shorts_native_in_feed_unit";
+    /** A feed video's viewer, for Keep the video speed. */
+    private static final String FEED = "newsfeed";
 
     /** What a player's VideoPlayerParams say about the video it bound. */
     private static final class Video {
@@ -68,6 +71,8 @@ public class ReelSpeedTest {
     private static final Video AD = new Video(true, true, false);
     private static final Video LIVE = new Video(true, false, true);
     private static final Video NOT_A_REEL = new Video(false, false, false);
+    private static final Video VIDEO_AD = new Video(false, true, false);
+    private static final Video LIVE_VIDEO = new Video(false, false, true);
 
     /** Stands in for FbGrootPlayer: its PlayerOrigin's toString, the params of the video it binds and the speeds set on it. */
     private static final class FakePlayers implements ReelSpeed.Player {
@@ -161,6 +166,7 @@ public class ReelSpeedTest {
     public void restore() {
         PauseForTests.resume();
         Settings.KEEP_REEL_SPEED.resetToDefault();
+        Settings.KEEP_VIDEO_SPEED.resetToDefault();
         BaseSettings.DEBUG.resetToDefault();
         LogBufferManager.clearLogBuffer();
         ReelSpeed.forget();
@@ -507,5 +513,139 @@ public class ReelSpeedTest {
         Object reel = new Object();
         pick(reel, 1.5f);
         assertEquals(1f, ReelSpeed.kept(REELS), 0f);
+    }
+
+    // ------------------------------------------------------------------ Keep the video speed
+
+    /**
+     * With Keep the video speed on, a speed picked in a video's gear menu carries to every next
+     * video that isn't a reel, in any feed or Watch viewer. Reels, ads, live videos and stories
+     * start at Facebook's speed.
+     */
+    @Test
+    public void withKeepTheVideoSpeedAGearPickCarriesToTheNextVideos() {
+        Settings.KEEP_VIDEO_SPEED.save(true);
+        Object video = players.player(VIDEO_TAB, NOT_A_REEL);
+        play(video);
+        gearPick(video, 1.5f);
+        assertEquals(1.5f, ReelSpeed.videoKept(), 0f);
+        assertEquals("a video's pick was kept for the tab's reels", 1f, ReelSpeed.kept(VIDEO_TAB), 0f);
+
+        play(players.player(FEED, NOT_A_REEL));
+        play(players.player(VIDEO_TAB + "::watch_feed", NOT_A_REEL));
+        // Pooled players come back for later videos.
+        play(video);
+        play(players.player(REELS));
+        play(players.player(FEED, VIDEO_AD));
+        play(players.player(FEED, LIVE_VIDEO));
+        play(players.player("fb_stories_viewer", NOT_A_REEL));
+        assertEquals(List.of(FEED + " 1.5", VIDEO_TAB + "::watch_feed 1.5", VIDEO_TAB + " 1.5"), players.set);
+        assertEquals(FamilyNames.KEEP_REEL_SPEED + ": invoked 13, 2 found, 0 missing. Counted: "
+                + ReelSpeed.VIDEO_APPLIED + " 3", statusLine());
+    }
+
+    /** Keep the video speed starts off, and off, a gear pick on a video stays with that video. */
+    @Test
+    public void withKeepTheVideoSpeedOffEveryVideoStartsAsFacebookStartsIt() {
+        assertFalse("Keep the video speed starts on", Settings.KEEP_VIDEO_SPEED.get());
+        Object video = players.player(VIDEO_TAB, NOT_A_REEL);
+        play(video);
+        gearPick(video, 1.5f);
+        assertEquals(1f, ReelSpeed.videoKept(), 0f);
+        play(players.player(FEED, NOT_A_REEL));
+        assertEquals(List.of(), players.set);
+
+        Settings.KEEP_VIDEO_SPEED.save(true);
+        gearPick(video, 1.5f);
+        Settings.KEEP_VIDEO_SPEED.save(false);
+        play(players.player(FEED, NOT_A_REEL));
+        assertEquals("a video started while off got the kept speed", List.of(), players.set);
+    }
+
+    /** In the Video tab, where reels and Watch videos share a viewer, each keeps its own speed. */
+    @Test
+    public void reelsAndVideosKeepTheirOwnSpeeds() {
+        Settings.KEEP_VIDEO_SPEED.save(true);
+        Object reel = players.player(VIDEO_TAB);
+        play(reel);
+        gearPick(reel, 2f);
+        Object video = players.player(VIDEO_TAB, NOT_A_REEL);
+        play(video);
+        gearPick(video, 1.25f);
+        assertEquals(2f, ReelSpeed.kept(VIDEO_TAB), 0f);
+        assertEquals(1.25f, ReelSpeed.videoKept(), 0f);
+        play(players.player(VIDEO_TAB));
+        play(players.player(VIDEO_TAB, NOT_A_REEL));
+        assertEquals(List.of(VIDEO_TAB + " 2.0", VIDEO_TAB + " 1.25"), players.set);
+    }
+
+    /** With Keep the reel speed off and Keep the video speed on, reels start as Facebook starts them. */
+    @Test
+    public void withOnlyKeepTheVideoSpeedOnReelsStartAsFacebookStartsThem() {
+        Settings.KEEP_REEL_SPEED.save(false);
+        Settings.KEEP_VIDEO_SPEED.save(true);
+        Object reel = players.player(REELS);
+        play(reel);
+        pick(reel, 2f);
+        gearPick(reel, 2f);
+        assertEquals(1f, ReelSpeed.kept(REELS), 0f);
+        assertEquals("a reel's pick was kept for videos", 1f, ReelSpeed.videoKept(), 0f);
+        Object video = players.player(VIDEO_TAB, NOT_A_REEL);
+        play(video);
+        gearPick(video, 1.5f);
+        play(players.player(REELS));
+        play(players.player(FEED, NOT_A_REEL));
+        assertEquals(List.of(FEED + " 1.5"), players.set);
+    }
+
+    @Test
+    public void normalSpeedInAVideosGearMenuGoesBackToFacebooksSpeed() {
+        Settings.KEEP_VIDEO_SPEED.save(true);
+        Object video = players.player(FEED, NOT_A_REEL);
+        play(video);
+        gearPick(video, 1.5f);
+        Object next = players.player(FEED, NOT_A_REEL);
+        play(next);
+        gearPick(next, 1f);
+        assertEquals(1f, ReelSpeed.videoKept(), 0f);
+        play(players.player(FEED, NOT_A_REEL));
+        assertEquals(List.of(FEED + " 1.5"), players.set);
+    }
+
+    /** A speed picked on a story, in a chat, on an ad or on a live video stays with that video. */
+    @Test
+    public void aVideoSpeedPickedOutsideTheFeedAndWatchIsntKept() {
+        Settings.KEEP_VIDEO_SPEED.save(true);
+        for (Object video : List.of(players.player("fb_stories_viewer", NOT_A_REEL),
+                players.player("messenger_thread", NOT_A_REEL), players.player(FEED, VIDEO_AD),
+                players.player(FEED, LIVE_VIDEO))) {
+            play(video);
+            gearPick(video, 2f);
+            assertEquals(1f, ReelSpeed.videoKept(), 0f);
+        }
+        assertTrue(ReelSpeed.videoViewer("feed_story"));
+        assertTrue(ReelSpeed.videoViewer(VIDEO_TAB + "::watch_feed"));
+        assertFalse(ReelSpeed.videoViewer(null));
+        assertFalse(ReelSpeed.videoViewer("story_viewer"));
+        assertFalse(ReelSpeed.videoViewer("stories_tray"));
+        assertFalse(ReelSpeed.videoViewer("composer_preview"));
+        assertFalse(ReelSpeed.videoViewer("living_room"));
+    }
+
+    @Test
+    public void pausedEveryVideoStartsAsFacebookStartsIt() {
+        Settings.KEEP_VIDEO_SPEED.save(true);
+        Object video = players.player(FEED, NOT_A_REEL);
+        play(video);
+        gearPick(video, 1.5f);
+        for (HushfacebookPause.Reason reason : new HushfacebookPause.Reason[] {
+                HushfacebookPause.Reason.SWITCH, HushfacebookPause.Reason.CRASH_LOOP}) {
+            PauseForTests.pause(reason);
+            play(players.player(FEED, NOT_A_REEL));
+            assertEquals(reason.name(), 0, players.set.size());
+        }
+        PauseForTests.resume();
+        play(players.player(FEED, NOT_A_REEL));
+        assertEquals(List.of(FEED + " 1.5"), players.set);
     }
 }

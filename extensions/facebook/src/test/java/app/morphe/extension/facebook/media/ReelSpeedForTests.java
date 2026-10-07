@@ -9,7 +9,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** What tests outside this package need of Keep the reel speed: one pick and the next reel. */
+/** What tests outside this package need of Keep the reel speed: one pick and the next reel or video. */
 public final class ReelSpeedForTests {
     private ReelSpeedForTests() { }
 
@@ -55,6 +55,55 @@ public final class ReelSpeedForTests {
         try {
             ReelSpeed.speedSet(new Object(), 1.5f);
             ReelSpeed.picked(1.5f);
+            ReelSpeed.started(new Object());
+            return !set.isEmpty();
+        } finally {
+            ReelSpeed.forget();
+        }
+    }
+
+    /**
+     * Picks 1.5x in the gear menu of a feed video, then starts the next feed video. True when the next
+     * video got the picked speed, which takes Keep the video speed on. Leaves nothing kept behind.
+     */
+    public static boolean keepsAPickedVideoSpeed() {
+        ReelSpeed.forget();
+        List<Float> set = new ArrayList<>();
+        Map<Object, Object> params = new IdentityHashMap<>();
+        ReelSpeed.access = new ReelSpeed.Player() {
+            @Override
+            public void setSpeed(Object player, float speed) {
+                set.add(speed);
+            }
+
+            @Override
+            public Object origin(Object player) {
+                return "newsfeed";
+            }
+
+            @Override
+            public Object params(Object player) {
+                return params.computeIfAbsent(player, p -> new Object());
+            }
+
+            @Override
+            public boolean reel(Object videoParams) {
+                return false;
+            }
+
+            @Override
+            public boolean ad(Object videoParams) {
+                return false;
+            }
+
+            @Override
+            public boolean live(Object videoParams) {
+                return false;
+            }
+        };
+        try {
+            ReelSpeed.speedSet(new Object(), 1.5f);
+            ReelSpeed.gearPicked(1.5f);
             ReelSpeed.started(new Object());
             return !set.isEmpty();
         } finally {

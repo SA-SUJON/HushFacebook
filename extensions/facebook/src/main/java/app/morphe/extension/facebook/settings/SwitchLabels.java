@@ -101,6 +101,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_READ_RECEIPTS) return L10n.t("Hide read receipts");
         if (setting == Settings.TURN_OFF_DOUBLE_TAP_LIKE) return L10n.t("Turn off double tap to like");
         if (setting == Settings.KEEP_REEL_SPEED) return L10n.t("Keep the reel speed");
+        if (setting == Settings.KEEP_VIDEO_SPEED) return L10n.t("Keep the video speed");
         if (setting == Settings.HOLD_REEL_FOR_2X) return L10n.t("Hold a reel for 2x");
         if (setting == Settings.DOWNLOAD_REELS) return L10n.t("Download button on reels");
         if (setting == Settings.TAP_TO_PLAY) return L10n.t("Tap to play");

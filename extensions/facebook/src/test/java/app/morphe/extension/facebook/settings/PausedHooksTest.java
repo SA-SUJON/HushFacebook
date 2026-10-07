@@ -410,8 +410,10 @@ public class PausedHooksTest {
                     return ReelHold.release(false);
                 }),
                 ReelHoldForTests::putsBackTheSpeedBeforeAHold));
-        // A speed picked on a reel is set on the next reel the viewer starts.
-        probes.put(PatchFamily.KEEP_REEL_SPEED, Collections.singletonList(ReelSpeedForTests::keepsAPickedSpeed));
+        // A speed picked on a reel is set on the next reel the viewer starts, and one picked on a
+        // feed video on the next feed video.
+        probes.put(PatchFamily.KEEP_REEL_SPEED, Arrays.asList(ReelSpeedForTests::keepsAPickedSpeed,
+                ReelSpeedForTests::keepsAPickedVideoSpeed));
         // A player's start with no tap before it is held, and Facebook's Autoplay setting reads Off.
         probes.put(PatchFamily.TAP_TO_PLAY, Arrays.asList(
                 () -> {

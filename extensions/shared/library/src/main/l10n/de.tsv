@@ -957,3 +957,7 @@ No count on Facebook's app icon. Notifications still come in. A launcher that co
 Turn off auto-translation	Automatische Übersetzung ausschalten
 # context: description of that switch; See translation is the name of Facebook's own link under a post that translates it on request
 Posts and reel captions stay in the language they were written in. Facebook's See translation link stays under them.	Beiträge und Reel-Beschreibungen bleiben in der Sprache, in der sie geschrieben wurden. Der Link „Übersetzung anzeigen“ von Facebook bleibt darunter.
+# context: switch title under Reels and Watch, below Keep the reel speed; it keeps a playback speed picked on a feed or Watch video for the next videos
+Keep the video speed	Video-Geschwindigkeit beibehalten
+# context: description of that switch; the gear menu is the settings button on a video's player, where Playback speed is picked
+A playback speed you pick in a feed or Watch video's gear menu stays for the next videos until you pick another or Facebook restarts. Reels keep their own speed. It's off by default because it hasn't been tested on a real account yet.	Eine Wiedergabegeschwindigkeit, die du im Zahnradmenü eines Feed- oder Watch-Videos wählst, bleibt für die nächsten Videos, bis du eine andere wählst oder Facebook neu startet. Reels behalten ihre eigene Geschwindigkeit. Der Schalter ist standardmäßig aus, weil er noch nicht mit einem echten Konto getestet wurde.
