@@ -65,6 +65,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** **Only the first reel waits**, a switch under Playback below `Tap to play` that starts off. With it on, the reel you land on in Reels still waits for a tap, and the reels you swipe to after you play it start on their own. The feed, Watch and stories keep waiting, and once anything waits again, like the feed trying a video or a reel coming back from another tab, so does the next reel (issue #91).
 * **Facebook:** **Slower speeds**, a switch under Reels and Watch that starts off. A reel's speed menu and the gear menu's Playback speed sheet on feed and Watch videos also offer 0.1x and 0.25x, slower than Facebook's 0.5x, for reading a sign or catching a detail that goes by too fast. The gear sheet writes the new speeds the way it writes its own, like 0,25x in German, and plays the speed you tap whatever language your phone is in. Keep the reel speed and Keep the video speed keep a slow speed you pick like any other (issue #95).
 * **Facebook:** **Facebook's Whitehat settings**, under Pause, backup and diagnostics, opens Facebook's own screen for security researchers when it's on the phone, and the Whitehat page on the web when it isn't.
+* **Facebook:** With Debug logging on, the report's Stories tray line is followed by a count of the other card types the tray kept, by Facebook's own type name, so a report shows which cards Hushfacebook doesn't sort yet. It never reads whose stories they are and doesn't change what the tray shows.
 
 ### Fixed
 
