@@ -141,7 +141,7 @@ final class VideoPages {
             Set<PatchFamily> build) {
         if (build.contains(PatchFamily.TAP_TO_PLAY) || build.contains(PatchFamily.RESUME_LONG_VIDEOS)
                 || build.contains(PatchFamily.PLAYBACK_QUALITY) || build.contains(PatchFamily.PICTURE_IN_PICTURE)
-                || build.contains(PatchFamily.HDR_BRIGHTNESS)) {
+                || build.contains(PatchFamily.HDR_BRIGHTNESS) || build.contains(PatchFamily.PROGRESS_BAR)) {
             PreferenceCategory playback = category(screen, L10n.t("Playback"));
             if (build.contains(PatchFamily.TAP_TO_PLAY)) {
                 playback.addPreference(toggle(context, Settings.TAP_TO_PLAY,
@@ -165,6 +165,11 @@ final class VideoPages {
                 playback.addPreference(toggle(context, Settings.TURN_OFF_HDR_BRIGHTNESS,
                         L10n.t("HDR videos and photos stay at your screen's usual brightness instead of turning it up to "
                                 + "full. They keep their resolution.")));
+            }
+            if (build.contains(PatchFamily.PROGRESS_BAR)) {
+                playback.addPreference(toggle(context, Settings.KEEP_PROGRESS_BAR,
+                        L10n.t("A reel's progress bar stays full size, ready to drag. A full-screen video's controls "
+                                + "stay until you tap.")));
             }
         }
     }

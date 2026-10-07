@@ -788,8 +788,8 @@ public class SettingsNavigationTest {
         recreate();
         assertTrue(contains(Settings.TAP_TO_PLAY.key));
         // Playback: Tap to play, Resume long videos, Default playback quality and its Playback quality list, Picture-in-picture,
-        // Turn off HDR brightness.
-        assertEquals(6, list().getCount());
+        // Turn off HDR brightness, Keep the progress bar.
+        assertEquals(7, list().getCount());
         page.navigation.back();
         findSearch(dialog.getView()).setText("other apps");
         recreate();

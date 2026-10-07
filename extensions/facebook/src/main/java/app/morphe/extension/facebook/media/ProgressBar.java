@@ -1,0 +1,70 @@
+/*
+ * Copyright 2026 Hushfacebook contributors
+ * https://github.com/SysAdminDoc/Hushfacebook
+ */
+package app.morphe.extension.facebook.media;
+
+import app.morphe.extension.facebook.settings.FamilyNames;
+import app.morphe.extension.facebook.settings.Settings;
+import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.diagnostics.HookStatus;
+
+/**
+ * Keeps the progress bar of a video on screen. Two players hide theirs a few seconds in.
+ *
+ * <p>The Reels viewer's bottom bar (FbShortsViewerBottomSeekBarPlugin) has two sizes. Facebook
+ * makes it full size, with the thumb showing and the bar taking drags, when it shows a reel's
+ * controls or while you scrub, and shrinks it to a line 2 dp high with the thumb hidden and drags
+ * turned off when the controls go away or the reel plays on. The patch asks {@link #keepsReelBar}
+ * first in the method that shrinks it, and a yes makes it full size instead, so the bar can be
+ * read and dragged at any time. The time labels stay Facebook's: they show while you scrub.
+ *
+ * <p>A full-screen video's controls (the plugins built on the controls class
+ * FeedFullscreenVideoControlsPlugin extends) set a timer to fade out each time they show or you
+ * touch them. The patch asks {@link #keepsControls} first in the method that sets that timer, and
+ * a yes sets none, so the controls and their progress bar stay until you tap the video, which
+ * hides them as before.
+ *
+ * <p>Off, paused, before the settings are ready, or when anything here fails, both answer no and
+ * Facebook carries on with its own code.
+ */
+public final class ProgressBar {
+    /** Counted under the patch's name each time the reel's bar is kept full size. */
+    static final String REEL_BAR_KEPT = "Reel progress bar kept";
+    /** Counted each time a full-screen video's fade timer isn't set. */
+    static final String CONTROLS_KEPT = "Video controls kept";
+
+    private static final String FAMILY = FamilyNames.PROGRESS_BAR;
+
+    private ProgressBar() {
+    }
+
+    /**
+     * The hook, first thing in the Reels viewer's method that shrinks its progress bar. True makes
+     * the bar full size instead; false lets Facebook shrink it.
+     */
+    public static boolean keepsReelBar() {
+        return keeps("reel progress bar", REEL_BAR_KEPT);
+    }
+
+    /**
+     * The hook, first thing in the method that sets a full-screen video's fade timer. True sets no
+     * timer, so the controls stay; false lets Facebook set it.
+     */
+    public static boolean keepsControls() {
+        return keeps("video controls", CONTROLS_KEPT);
+    }
+
+    private static boolean keeps(String hook, String counted) {
+        try {
+            HookStatus.invoked(FAMILY);
+            if (!Utils.settingsReady() || !Settings.KEEP_PROGRESS_BAR.get()) return false;
+            HookStatus.bound(FAMILY, hook);
+            HookStatus.counted(FAMILY, counted);
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, hook, failure);
+            return false;
+        }
+    }
+}

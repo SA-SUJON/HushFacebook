@@ -482,6 +482,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_turn_off_hdr_brightness", TRUE);
 
     /**
+     * A reel's progress bar stays full size, thumb and all, and a full-screen video's controls stay
+     * until a tap hides them ({@link app.morphe.extension.facebook.media.ProgressBar}). Off by
+     * default. Off or paused, Facebook shrinks the bar and fades the controls as before.
+     */
+    public static final BooleanSetting KEEP_PROGRESS_BAR =
+            new BooleanSetting("hushfacebook_keep_progress_bar", FALSE);
+
+    /**
      * Facebook's own text, React Native screens' included, drawn in the font {@link #FONT_SOURCE}
      * names instead of Meta's Optimistic, at the same weight and slant. A typeface already on
      * screen keeps its font until Facebook restarts.

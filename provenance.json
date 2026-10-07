@@ -712,6 +712,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/ProgressBar.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/progressbar/KeepProgressBarPatch.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook from Facebook 577, 580 and 581, for issue #73: the Reels viewer's bottom progress bar plugin, found by the name it gives itself, is made full size where Facebook would shrink it, and the full-screen video controls' fade timer, in the class FeedFullscreenVideoControlsPlugin extends, isn't set while the switch is on. No Facebook patch source in the ledger describes keeping a progress bar."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/navigation/MarketplaceSellerProfile.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/navigation/sellerprofile/ShowSellerViewProfilePatch.kt"
       ],
