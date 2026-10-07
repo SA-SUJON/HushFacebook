@@ -35,6 +35,9 @@ Every Hushfacebook release, newest first.
 * **Facebook:** New patch, `Following feed on Home`, with a switch under Opening Facebook that starts off. With it on, Home asks Facebook for its Following feed instead of the ranked one. The Feeds tab's filters keep their own feeds.
 * **Facebook:** New patch, `Disable Play Store updates`, which starts off. Google Play stops offering Facebook updates, so you no longer need Morphe Patches as a second source just for that. It's Morphe's own patch with its notice kept, and Facebook still reads its real version (issue #46).
 * **Facebook:** `Block Instant Games ads` has a new switch under it, **Answer rewarded game ads as watched**, which starts off. With it on, a game's rewarded ad counts as watched, so the game gives its reward while no ad is fetched or played. Interstitials and banners still get no ad.
+* **Facebook:** `Default playback quality` gives reels and video stories a quality of their own with **Reels quality** and **Stories quality**, and saves can go into a **Video subfolder** and **Photo subfolder** inside the save folder. Both start as before.
+* **Facebook:** `Hide suggested and promoted posts` also takes rows of suggested shows under **Hide page suggestions and Facebook's own promos**, and posts Facebook files as injected or trending under **Hide "Suggested for you" posts**, as soon as Facebook serves one.
+* **Facebook:** New patch, `Hide tab badges`. **Hide the Home tab badge** and the switches beside it take the dot and count off Home, Friends, Marketplace, Notifications, Menu, Groups or any other tab, and **Hide the app icon count** keeps Facebook's count off its launcher icon. Notifications still come in. Every switch starts off.
 
 ### Fixed
 
