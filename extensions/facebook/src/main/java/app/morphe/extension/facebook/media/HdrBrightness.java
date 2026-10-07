@@ -39,7 +39,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * Display.isHdr} and the two {@code getSupportedHdrTypes} comes here too, and while the switch is
  * on the screen answers as one that shows no HDR: the lift stays off, ExoPlayer takes a Dolby
  * Vision video's fallback track, and the device details Facebook records name no HDR type.
- * Whether a stream labelled HDR is then passed over for its plain twin isn't known (#93). {@code
+ * Whether a stream labelled HDR is then passed over for its plain twin isn't known (#93); with
+ * Debug logging on, {@link PlaybackFormatEvidence} says which one each decoder was set up with. {@code
  * Display.isHdrSdrRatioAvailable} stays Facebook's: the AV1 decoder backs its own lift off only
  * when it can read a low ratio.
  *

@@ -66,6 +66,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** **Slower speeds**, a switch under Reels and Watch that starts off. A reel's speed menu and the gear menu's Playback speed sheet on feed and Watch videos also offer 0.1x and 0.25x, slower than Facebook's 0.5x, for reading a sign or catching a detail that goes by too fast. The gear sheet writes the new speeds the way it writes its own, like 0,25x in German, and plays the speed you tap whatever language your phone is in. Keep the reel speed and Keep the video speed keep a slow speed you pick like any other (issue #95).
 * **Facebook:** **Facebook's Whitehat settings**, under Pause, backup and diagnostics, opens Facebook's own screen for security researchers when it's on the phone, and the Whitehat page on the web when it isn't.
 * **Facebook:** With Debug logging on, the report's Stories tray line is followed by a count of the other card types the tray kept, by Facebook's own type name, so a report shows which cards Hushfacebook doesn't sort yet. It never reads whose stories they are and doesn't change what the tray shows.
+* **Facebook:** With Debug logging on, the diagnostic report says which video formats Facebook's players were set up with: the codec, the size, and whether the picture is SDR or HDR (PQ or HLG), with or without HDR metadata. So a report shows whether a video was really served in HDR, with `Turn off HDR brightness` on or off. It's in every build, and nothing else from the video gets into the report (issues #93 and #66).
 
 ### Fixed
 
