@@ -6,16 +6,20 @@ package app.morphe.extension.facebook.theme;
 
 import androidx.annotation.Nullable;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.facebook.settings.SettingsStatus;
+import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.diagnostics.HookStatus;
 
@@ -31,10 +35,15 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * lightness it had, in light mode and in dark, and keeps its alpha, so a tint stays a tint.
  *
  * <p>The accent's own tones are a tonal ramp of the preset's hue ({@link Preset}): CIE L* in steps
- * of ten at as much chroma as sRGB shows there. Text on a surface is held to 4.5:1 once Facebook has
- * said which theme is on ({@link #TEXT_TOKENS}): lighter than {@link #DARK_TEXT_LIGHTNESS} in dark
- * mode, darker than {@link #LIGHT_TEXT_LIGHTNESS} in light mode. Fills keep Facebook's own
- * lightness, so the label on a button has the contrast Facebook gave it.
+ * of ten at as much chroma as sRGB shows there. Text on a surface ({@link #TEXT_TOKENS}) is held to
+ * 4.5:1 against the cards of the palette Facebook drew it from: lighter than
+ * {@link #DARK_TEXT_LIGHTNESS} from the dark palette, darker than {@link #LIGHT_TEXT_LIGHTNESS} from
+ * the light one. FDS picks the palette per screen, not app-wide (light mode's Video tab is dark), so
+ * the palette comes from the blue Facebook resolved for the token ({@link #darkPalette}), and
+ * Facebook's app-wide dark mode answer only settles the one blue both palettes give a text token.
+ * Mig's dark scheme only answers for dark surfaces, so its text and glyph blues
+ * ({@link #MIG_TEXT_TOKENS}) are held to the dark palette's. Fills keep Facebook's own lightness, so
+ * the label on a button has the contrast Facebook gave it.
  *
  * <p>While the Material You theme is in the build it decides every colour this class would, so this
  * steps aside.
@@ -94,9 +103,27 @@ public final class AccentColor {
     static final String TEXT_TOKENS = "ACCENT;BLUE_LINK;PRIMARY_DEEMPHASIZED_BUTTON_ICON;PRIMARY_DEEMPHASIZED_BUTTON_TEXT;"
             + "REACTION_LIKE;TEXT_INPUT_ACTIVE_TEXT";
 
+    /**
+     * Two constants each of Mig's text colour enum and its glyph colour enum, the same on 577, 580
+     * and 581. A Mig token whose enum has both of a pair is text or an icon; any other is a fill.
+     */
+    static final String MIG_TEXT_TOKENS = "LINK,SECONDARY_EMPHASIZED;DECORATIVE_BLUE,TERTIARY";
+
     private static final Set<String> TOKEN_SET = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(TOKENS.split(";"))));
     private static final Set<String> TEXT_TOKEN_SET =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(TEXT_TOKENS.split(";"))));
+    /** Whether each Mig token enum is text or icons ({@link #MIG_TEXT_TOKENS}), as first seen. */
+    private static final Map<Class<?>, Boolean> MIG_TEXT_ENUMS = new ConcurrentHashMap<>();
+
+    /** The colours only Facebook's dark styles give each token, and the ones its light and dark styles share. */
+    private static final Map<String, int[]> DARK_ONLY = MaterialYouTheme.parseTokens(MaterialYouTheme.FDS_DARK);
+    private static final Map<String, int[]> BOTH = MaterialYouTheme.parseTokens(MaterialYouTheme.FDS_SHARED);
+
+    /**
+     * The L* between the blues Facebook gives text in its light palette (#0866FF, L* 48, at the most)
+     * and in its dark one (#1D85FC, L* 56, at the least), for a blue neither list names.
+     */
+    static final double PALETTE_SPLIT = 52;
 
     /** The surfaces text is held against: light mode's page and white card, and dark mode's lightest card. */
     static final int LIGHT_SURFACE = 0xFFF0F2F5;
@@ -130,14 +157,15 @@ public final class AccentColor {
 
     /**
      * Route one, for Mig: a colour the Mig dark scheme returns. That scheme only answers for a dark
-     * surface, so one of Facebook's opaque blues becomes the accent whatever the token.
+     * surface, so one of Facebook's opaque blues becomes the accent whatever the token, and a text or
+     * glyph one keeps 4.5:1 on the dark palette's cards.
      */
     public static int mig(int color, Object token) {
         HookStatus.invoked(FamilyNames.ACCENT_COLOR);
         if (!Utils.settingsReady() || (color >>> 24) != 0xFF) return color;
         Preset preset = chosen();
         if (preset == null) return color;
-        return mig(color, preset);
+        return mig(color, preset, token);
     }
 
     /** The accent in force, or null for Facebook's own blue: unset, paused, or the Material You theme in charge. */
@@ -151,16 +179,68 @@ public final class AccentColor {
     static int fds(int color, String token, Preset preset, boolean answered, boolean dark) {
         if (preset == Preset.FACEBOOK || !TOKEN_SET.contains(token) || !MaterialYouTheme.isFacebookBlue(color)) return color;
         int themed = palette(preset).sameLightness(TonePalette.ACCENT, color);
-        if (answered && TEXT_TOKEN_SET.contains(token)) themed = withContrast(preset, themed, dark);
-        return themed;
+        if (!TEXT_TOKEN_SET.contains(token)) return themed;
+        Boolean fromDark = darkPalette(token, color, answered, dark);
+        return fromDark == null ? themed : withContrast(preset, themed, fromDark);
     }
 
-    static int mig(int color, Preset preset) {
+    /**
+     * Whether Facebook drew {@code token}'s {@code color} from its dark palette: a colour only its
+     * dark styles give the token is, one its light and dark styles share follows Facebook's dark mode
+     * answer ({@code answered}, {@code dark}), and any other blue goes by its lightness. Null for a
+     * shared colour before Facebook has answered, which then keeps Facebook's own lightness.
+     */
+    @Nullable
+    static Boolean darkPalette(String token, int color, boolean answered, boolean dark) {
+        if (listed(DARK_ONLY.get(token), color)) return true;
+        if (listed(BOTH.get(token), color)) return answered ? dark : null;
+        return TonePalette.lstar(color) >= PALETTE_SPLIT;
+    }
+
+    private static boolean listed(@Nullable int[] colours, int color) {
+        if (colours == null) return false;
+        for (int value : colours) {
+            if ((value & 0xFFFFFF) == (color & 0xFFFFFF)) return true;
+        }
+        return false;
+    }
+
+    static int mig(int color, Preset preset, @Nullable Object token) {
         if (preset == Preset.FACEBOOK || !MaterialYouTheme.isFacebookBlue(color)) return color;
-        return palette(preset).sameLightness(TonePalette.ACCENT, color);
+        int themed = palette(preset).sameLightness(TonePalette.ACCENT, color);
+        return migText(token) ? withContrast(preset, themed, true) : themed;
     }
 
-    /** The accent {@code color}, with its lightness moved only as far as 4.5:1 against the surface of the theme needs. */
+    /**
+     * Whether a Mig {@code token} is text or an icon: its enum holds both constants of one pair in
+     * {@link #MIG_TEXT_TOKENS}. Facebook's build renames the enum's fields, so the constants are read
+     * from the fields of the enum's own type and named by {@link Enum#name}.
+     */
+    static boolean migText(@Nullable Object token) {
+        if (!(token instanceof Enum)) return false;
+        Class<?> type = ((Enum<?>) token).getDeclaringClass();
+        Boolean text = MIG_TEXT_ENUMS.get(type);
+        if (text != null) return text;
+        text = false;
+        try {
+            Set<String> names = new HashSet<>();
+            for (Field field : type.getDeclaredFields()) {
+                if (!Modifier.isStatic(field.getModifiers()) || field.getType() != type) continue;
+                field.setAccessible(true);
+                Object constant = field.get(null);
+                if (constant instanceof Enum) names.add(((Enum<?>) constant).name());
+            }
+            for (String pair : MIG_TEXT_TOKENS.split(";")) {
+                if (names.containsAll(Arrays.asList(pair.split(",")))) text = true;
+            }
+        } catch (ReflectiveOperationException | RuntimeException failure) {
+            Logger.printException(() -> "Accent color: could not read a Mig token's enum", failure);
+        }
+        MIG_TEXT_ENUMS.put(type, text);
+        return text;
+    }
+
+    /** The accent {@code color}, with its lightness moved only as far as 4.5:1 against the cards of the palette needs. */
     static int withContrast(Preset preset, int color, boolean dark) {
         double lightness = TonePalette.lstar(color);
         double held = dark ? Math.max(lightness, DARK_TEXT_LIGHTNESS) : Math.min(lightness, LIGHT_TEXT_LIGHTNESS);

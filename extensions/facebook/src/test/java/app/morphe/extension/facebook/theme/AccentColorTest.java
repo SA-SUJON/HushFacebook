@@ -17,6 +17,7 @@ import org.robolectric.annotation.Config;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import app.morphe.extension.facebook.settings.Settings;
@@ -26,8 +27,9 @@ import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
  * The Accent color rules: a chosen accent replaces Facebook's blues and only them, keeps what
- * lightness and alpha Facebook gave, holds text to 4.5:1, and stock is stock (Facebook blue chosen,
- * a paused Facebook, a start before the settings are ready).
+ * lightness and alpha Facebook gave, holds text to 4.5:1 against the cards of the palette Facebook
+ * drew it from, and stock is stock (Facebook blue chosen, a paused Facebook, a start before the
+ * settings are ready).
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -41,23 +43,104 @@ public class AccentColorTest {
     private static final AccentColor.Preset[] CHOICES = Arrays.stream(AccentColor.Preset.values())
             .filter(preset -> preset != AccentColor.Preset.FACEBOOK).toArray(AccentColor.Preset[]::new);
 
+    /** Light mode's page and white card. */
+    private static final int[] LIGHT_CARDS = {AccentColor.LIGHT_SURFACE, 0xFFFFFFFF};
+
+    /** Dark mode's cards and pages, from FDS_DARK: the lightest card, the surfaces and the washes. */
+    private static final int[] DARK_CARDS = {AccentColor.DARK_SURFACE, 0xFF252728, 0xFF1C1C1D, 0xFF101011};
+
+    /** The blues Facebook's light palette gives text, where a token's dark list doesn't name them. */
+    private static final int[] LIGHT_TEXT_BLUES = {0xFF0866FF, 0xFF0064D1};
+
+    private static final Map<String, int[]> DARK_ONLY = MaterialYouTheme.parseTokens(MaterialYouTheme.FDS_DARK);
+    private static final Map<String, int[]> BOTH = MaterialYouTheme.parseTokens(MaterialYouTheme.FDS_SHARED);
+
+    private static boolean listed(int[] colours, int color) {
+        if (colours == null) return false;
+        for (int value : colours) {
+            if ((value & 0xFFFFFF) == (color & 0xFFFFFF)) return true;
+        }
+        return false;
+    }
+
+    private static void holds(String what, int text, int[] cards) {
+        for (int card : cards) {
+            double ratio = AccentColor.contrast(text, card);
+            assertTrue(what + ": #" + Integer.toHexString(text) + " on #" + Integer.toHexString(card) + " is " + ratio,
+                    ratio >= 4.5);
+        }
+    }
+
     @After
     public void restore() {
         PauseForTests.resume();
         Settings.ACCENT_COLOR.resetToDefault();
     }
 
+    /**
+     * FDS picks light or dark per screen, so the app-wide answer can be wrong for a screen (light
+     * mode's Video tab draws from the dark palette). Every text token's dark-only blues keep 4.5:1
+     * on the dark cards and its light blues on the light cards, whatever the app-wide answer says;
+     * a blue both palettes share follows the answer, and keeps Facebook's lightness before it.
+     */
     @Test
-    public void textOverASurfaceHasFourAndAHalfToOneInBothModesForEveryAccent() {
+    public void textKeepsFourAndAHalfToOneOnTheCardsOfThePaletteItCameFrom() {
+        boolean[] both = {false, true};
+        for (AccentColor.Preset preset : CHOICES) {
+            for (String token : AccentColor.TEXT_TOKENS.split(";")) {
+                int[] darkBlues = DARK_ONLY.get(token);
+                assertTrue(token + " has no dark-only blue", darkBlues != null && darkBlues.length > 0);
+                for (boolean answered : both) {
+                    for (boolean appDark : both) {
+                        String when = preset + " " + token + (answered ? (appDark ? " in dark mode" : " in light mode") : " before the answer");
+                        for (int blue : darkBlues) {
+                            holds(when + ", dark palette's #" + Integer.toHexString(blue),
+                                    AccentColor.fds(blue, token, preset, answered, appDark), DARK_CARDS);
+                        }
+                        for (int blue : LIGHT_TEXT_BLUES) {
+                            if (listed(darkBlues, blue) || listed(BOTH.get(token), blue)) continue;
+                            holds(when + ", light palette's #" + Integer.toHexString(blue),
+                                    AccentColor.fds(blue, token, preset, answered, appDark), LIGHT_CARDS);
+                        }
+                    }
+                }
+                int[] shared = BOTH.get(token);
+                if (shared == null) continue;
+                for (int blue : shared) {
+                    holds(preset + " " + token + " shared #" + Integer.toHexString(blue) + " in dark mode",
+                            AccentColor.fds(blue, token, preset, true, true), DARK_CARDS);
+                    holds(preset + " " + token + " shared #" + Integer.toHexString(blue) + " in light mode",
+                            AccentColor.fds(blue, token, preset, true, false), LIGHT_CARDS);
+                    assertEquals(preset + " " + token + " shared before the answer keeps Facebook's lightness",
+                            TonePalette.lstar(blue), TonePalette.lstar(AccentColor.fds(blue, token, preset, false, false)), 1.0);
+                }
+            }
+        }
+    }
+
+    /** The finding's case: light mode's Video tab resolves BLUE_LINK to its dark #5AA7FF, and it stays light text. */
+    @Test
+    public void aDarkBlueInLightModeStaysLightText() {
+        for (AccentColor.Preset preset : CHOICES) {
+            int text = AccentColor.fds(0xFF5AA7FF, "BLUE_LINK", preset, true, false);
+            assertTrue(preset + " went dark", TonePalette.lstar(text) >= AccentColor.DARK_TEXT_LIGHTNESS - 0.5);
+            holds(preset + " BLUE_LINK on the Video tab", text, DARK_CARDS);
+        }
+    }
+
+    /** Mig's dark scheme: its text and glyph blues keep 4.5:1 on the dark cards, and a button's fill keeps its lightness. */
+    @Test
+    public void migTextAndGlyphBluesHoldContrastAndFillsKeepTheirLightness() {
         for (AccentColor.Preset preset : CHOICES) {
             for (int blue : BLUES) {
-                for (String token : AccentColor.TEXT_TOKENS.split(";")) {
-                    int dark = AccentColor.fds(blue, token, preset, true, true);
-                    int light = AccentColor.fds(blue, token, preset, true, false);
-                    assertTrue(preset + " " + token + " in dark mode",
-                            AccentColor.contrast(dark, AccentColor.DARK_SURFACE) >= 4.5);
-                    assertTrue(preset + " " + token + " in light mode",
-                            AccentColor.contrast(light, AccentColor.LIGHT_SURFACE) >= 4.5);
+                for (Enum<?> text : new Enum<?>[]{MigText.ACTIVE, MigText.LINK, MigGlyph.ACCENT, MigGlyph.DECORATIVE_BLUE}) {
+                    holds(preset + " Mig " + text + " #" + Integer.toHexString(blue), AccentColor.mig(blue, preset, text), DARK_CARDS);
+                }
+                for (Object fill : new Object[]{MigButton.ACTIVE, MigButton.LINK, null, "LINK"}) {
+                    int themed = AccentColor.mig(blue, preset, fill);
+                    assertNotEquals(preset + " left Facebook's blue", blue, themed);
+                    assertEquals(preset + " " + fill + " lightness of " + Integer.toHexString(blue),
+                            TonePalette.lstar(blue), TonePalette.lstar(themed), 1.0);
                 }
             }
         }
@@ -91,9 +174,9 @@ public class AccentColorTest {
         // Facebook blue chosen is stock.
         assertEquals(0xFF0866FF, AccentColor.fds(0xFF0866FF, "ACCENT", AccentColor.Preset.FACEBOOK, true, true));
         // Mig answers only opaque blues.
-        assertEquals(0xFF0866FF, AccentColor.mig(0xFF0866FF, AccentColor.Preset.FACEBOOK));
-        assertNotEquals(0xFF0866FF, AccentColor.mig(0xFF0866FF, preset));
-        assertEquals(0xFF333334, AccentColor.mig(0xFF333334, preset));
+        assertEquals(0xFF0866FF, AccentColor.mig(0xFF0866FF, AccentColor.Preset.FACEBOOK, MigText.LINK));
+        assertNotEquals(0xFF0866FF, AccentColor.mig(0xFF0866FF, preset, null));
+        assertEquals(0xFF333334, AccentColor.mig(0xFF333334, preset, MigText.LINK));
     }
 
     @Test
@@ -149,5 +232,21 @@ public class AccentColorTest {
     /** Stands in for an FDS token: only the constant name matters. */
     enum Token {
         ACCENT
+    }
+
+    /**
+     * Stand in for Mig's text and glyph colour enums, and for another of its colour enums that shares
+     * a name with each but neither pair: only the constant names matter.
+     */
+    enum MigText {
+        ACTIVE, LINK, SECONDARY_EMPHASIZED
+    }
+
+    enum MigGlyph {
+        ACCENT, DECORATIVE_BLUE, TERTIARY
+    }
+
+    enum MigButton {
+        ACTIVE, LINK, TERTIARY
     }
 }
