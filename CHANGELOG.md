@@ -38,6 +38,9 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Default playback quality` gives reels and video stories a quality of their own with **Reels quality** and **Stories quality**, and saves can go into a **Video subfolder** and **Photo subfolder** inside the save folder. Both start as before.
 * **Facebook:** `Hide suggested and promoted posts` also takes rows of suggested shows under **Hide page suggestions and Facebook's own promos**, and posts Facebook files as injected or trending under **Hide "Suggested for you" posts**, as soon as Facebook serves one.
 * **Facebook:** New patch, `Hide tab badges`. **Hide the Home tab badge** and the switches beside it take the dot and count off Home, Friends, Marketplace, Notifications, Menu, Groups or any other tab, and **Hide the app icon count** keeps Facebook's count off its launcher icon. Notifications still come in. Every switch starts off.
+* **Facebook:** `AMOLED black theme`'s **Background colour** takes lighter colours like #5B513F now, with cards and menus stepped to match and secondary text and links lifted so they stay easy to read. (#34)
+* **Facebook:** With `Material You theme` in dark mode, the page under your last post takes the palette too instead of staying Facebook's grey.
+* **Facebook:** `Block background-return feed refresh` now keeps your place when you switch back to Home too, so the feed doesn't re-rank or reload behind your back. The **Keep feed position on return** switch covers it, and pull to refresh still works.
 
 ### Fixed
 
