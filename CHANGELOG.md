@@ -27,6 +27,9 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Tab bar at the bottom` has a second switch under Appearance, **Hide the tab bar while scrolling**. With the bar at the bottom, it slides away as you scroll the feed down and comes back when you scroll up. It turns on the version Facebook already gives some accounts, so the feed keeps its room for the bar. It starts off and needs a restart (issue #84).
 * **Facebook:** New patch, `Keep the progress bar`, with a switch under Playback. A reel's progress bar stays full size, so you can drag it without tapping the reel first, and a full-screen video's controls stay up until you tap (issue #73).
 * **Facebook:** New patch, `Hide Meta AI comment summaries`, with a switch under Comments. Comment sheets open without Meta AI's summary at the top, and posts lose the summary under their buttons.
+* **Facebook:** `Clean up Reels` can open reels and videos in Facebook's own Clean mode, with the buttons down the side hidden. Turn on **Always use Clean mode**, which starts off, and you won't have to pick it from the menu on every reel (issue #75).
+* **Facebook:** In dark mode, `Material You theme` colours the selected tab in the tab bar, its icon and the line over it, with your wallpaper's accent (issue #65).
+* **Facebook:** New patch, `Hide Meta upsells`, with its own section in settings for Meta's other products. Its four switches start off: **Hide Edits promotions**, **Hide Threads cross-posting prompts**, **Hide Meta Verified offers** and **Hide avatar sticker promotions**. They cover the places outside the Menu where Facebook pushes those, like the Reels camera and the sheet after you post.
 
 ### Fixed
 
