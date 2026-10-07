@@ -368,6 +368,14 @@ Chats	Sohbetler
 Hide the Get Messenger card	Messenger'ı Edin kartını gizle
 # context: summary of that switch; Messenger is the app's name and stays as it is
 The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	Sohbetler'in en üstünde Messenger uygulamasını edinmeni isteyen kart, Messenger yüklü olduğu sürece kaybolur. Messenger yoksa kart kalır, böylece onu yine oradan yükleyebilirsin.
+# context: switch title under Chats; the notes tray is the row of friends' notes above the chat list in Chats inside Facebook
+Hide the notes tray	Not satırını gizle
+# context: summary of that switch
+The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.	Facebook içindeki Sohbetlerde, sohbetlerinin üstündeki arkadaş notları satırı kalkar. Sohbetlerin, arama ve yeni mesajlar yerinde kalır.
+# context: switch title under Chats; promotions are the banners Facebook puts at the top of the chat list
+Hide chat list promotions	Sohbet listesindeki tanıtımları gizle
+# context: summary of that switch
+The promotional banners at the top of Chats inside Facebook go, like the one asking you to turn on notifications.	Facebook içindeki Sohbetlerin üstündeki tanıtım afişleri kalkar, bildirimleri açmanı isteyen afiş gibi.
 # context: switch title under Chats; on, Facebook's Messenger icon opens the Messenger app
 Open the Messenger app	Messenger uygulamasını aç
 # context: summary of that switch; Messenger is the app's name, Chats is Facebook's own chat screen as named above

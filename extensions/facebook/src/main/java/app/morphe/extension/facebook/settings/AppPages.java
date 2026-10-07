@@ -38,16 +38,24 @@ final class AppPages {
     private AppPages() {
     }
 
-    /** Chats: the Get Messenger card and the Messenger icon. */
+    /** Chats: the Get Messenger card, the chat list clean-up and the Messenger icon. */
     static void chats(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
-        if (build.contains(PatchFamily.MESSENGER_CARD) || build.contains(PatchFamily.MESSENGER_ICON)
-                || build.contains(PatchFamily.ORIGINAL_CHAT_MEDIA)) {
+        if (build.contains(PatchFamily.MESSENGER_CARD) || build.contains(PatchFamily.CHAT_LIST)
+                || build.contains(PatchFamily.MESSENGER_ICON) || build.contains(PatchFamily.ORIGINAL_CHAT_MEDIA)) {
             PreferenceCategory chats = category(screen, L10n.t("Chats"));
             if (build.contains(PatchFamily.MESSENGER_CARD)) {
                 chats.addPreference(toggle(context, Settings.HIDE_GET_MESSENGER_CARD,
                         L10n.t("The card at the top of Chats that asks you to get the Messenger app goes while Messenger "
                                 + "is installed. Without Messenger it stays, so you can still install it from there.")));
+            }
+            if (build.contains(PatchFamily.CHAT_LIST)) {
+                chats.addPreference(toggle(context, Settings.HIDE_CHAT_NOTES_TRAY,
+                        L10n.t("The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, "
+                                + "search and new messages stay.")));
+                chats.addPreference(toggle(context, Settings.HIDE_CHAT_PROMOTIONS,
+                        L10n.t("The promotional banners at the top of Chats inside Facebook go, like the one asking "
+                                + "you to turn on notifications.")));
             }
             if (build.contains(PatchFamily.MESSENGER_ICON)) {
                 chats.addPreference(toggle(context, Settings.OPEN_MESSENGER_APP,

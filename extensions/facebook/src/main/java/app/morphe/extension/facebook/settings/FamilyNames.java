@@ -84,6 +84,7 @@ public final class FamilyNames {
     public static final String BOTTOM_TAB_BAR = "Tab bar at the bottom";
     public static final String FORCE_DARK_MODE = "Force dark mode";
     public static final String MESSENGER_CARD = "Hide the Get Messenger card";
+    public static final String CHAT_LIST = "Clean up Facebook's chat list";
     public static final String MESSENGER_ICON = "Open Messenger from the top bar";
     public static final String MENU_PROMOTIONS = "Hide Menu promotions";
     public static final String META_UPSELLS = "Hide Meta upsells";

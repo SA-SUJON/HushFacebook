@@ -38,6 +38,7 @@ import app.morphe.extension.facebook.ads.MarketplaceAdFilterForTests;
 import app.morphe.extension.facebook.ads.ProfileAdFilterForTests;
 import app.morphe.extension.facebook.ads.ReelsAdFilter;
 import app.morphe.extension.facebook.ads.SearchAdFilterForTests;
+import app.morphe.extension.facebook.chats.ChatListForTests;
 import app.morphe.extension.facebook.chats.MessengerCardForTests;
 import app.morphe.extension.facebook.chats.MessengerIconForTests;
 import app.morphe.extension.facebook.chats.OriginalChatMediaForTests;
@@ -296,6 +297,8 @@ public class ColdStartHooksTest {
         assertFalse("a list of people open before the context was closed", TagSuggestionsForTests.closesAListLeftOpen());
         assertFalse("a Chats list built before the context lost the Get Messenger card",
                 MessengerCardForTests.hidesWithMessenger());
+        assertFalse("a Chats list built before the context lost its notes tray", ChatListForTests.dropsTheNotesTiles());
+        assertFalse("a Chats list built before the context lost its promotions", ChatListForTests.hidesAPromotion());
         assertFalse("a Messenger icon tapped before the context opened Messenger",
                 MessengerIconForTests.opensMessenger());
         assertFalse("a photo sent before the context went out as the original", OriginalChatMediaForTests.sendsAPhotoAsIs());

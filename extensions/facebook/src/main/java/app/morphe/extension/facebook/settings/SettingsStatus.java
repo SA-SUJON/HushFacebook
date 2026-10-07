@@ -322,6 +322,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean chatListCleanup() {
+        return false;
+    }
+
     public static boolean messengerIcon() {
         return false;
     }

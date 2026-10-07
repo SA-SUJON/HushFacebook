@@ -126,6 +126,8 @@ final class SwitchLabels {
         if (setting == Settings.POST_MENU_PHOTO_SAVE) return L10n.t("Save photo in post menus");
         if (setting == Settings.DOWNLOAD_COMPATIBLE) return L10n.t("Save videos other apps can open");
         if (setting == Settings.HIDE_GET_MESSENGER_CARD) return L10n.t("Hide the Get Messenger card");
+        if (setting == Settings.HIDE_CHAT_NOTES_TRAY) return L10n.t("Hide the notes tray");
+        if (setting == Settings.HIDE_CHAT_PROMOTIONS) return L10n.t("Hide chat list promotions");
         if (setting == Settings.OPEN_MESSENGER_APP) return L10n.t("Open the Messenger app");
         if (setting == Settings.SAVED_SHORTCUT) return L10n.t("Saved shortcut");
         if (setting == Settings.APP_LOCK) return L10n.t("Lock Facebook");

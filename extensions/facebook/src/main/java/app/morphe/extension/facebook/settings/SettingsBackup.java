@@ -233,6 +233,8 @@ public final class SettingsBackup {
             Settings.FORCE_DARK_MODE,
             Settings.HIDE_REEL_PROMPTS,
             Settings.HIDE_GET_MESSENGER_CARD,
+            Settings.HIDE_CHAT_NOTES_TRAY,
+            Settings.HIDE_CHAT_PROMOTIONS,
             Settings.OPEN_MESSENGER_APP,
             Settings.HIDE_MENU_UPGRADES,
             Settings.HIDE_MENU_ALSO_FROM_META,

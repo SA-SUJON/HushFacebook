@@ -648,6 +648,20 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_get_messenger_card", TRUE);
 
     /**
+     * The row of friends' notes and active friends above the chats in Facebook's own Chats. Starts
+     * off. The chats, search and new messages stay.
+     */
+    public static final BooleanSetting HIDE_CHAT_NOTES_TRAY =
+            new BooleanSetting("hushfacebook_hide_chat_notes_tray", FALSE);
+
+    /**
+     * The promotional banners at the top of Facebook's own Chats, like the one asking you to turn
+     * on notifications. Starts off.
+     */
+    public static final BooleanSetting HIDE_CHAT_PROMOTIONS =
+            new BooleanSetting("hushfacebook_hide_chat_promotions", FALSE);
+
+    /**
      * A tap on the Messenger icon at the top of Facebook opens the Messenger app, while it's
      * installed, instead of Facebook's own Chats. Starts off. Without Messenger, Chats opens as it
      * always did.

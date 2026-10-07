@@ -368,6 +368,14 @@ Chats	Chats
 Hide the Get Messenger card	Karte „Messenger holen“ ausblenden
 # context: summary of that switch; Messenger is the app's name and stays as it is
 The card at the top of Chats that asks you to get the Messenger app goes while Messenger is installed. Without Messenger it stays, so you can still install it from there.	Die Karte oben in den Chats, die dich bittet, die Messenger-App zu holen, verschwindet, solange Messenger installiert ist. Ohne Messenger bleibt sie, damit du Messenger weiterhin darüber installieren kannst.
+# context: switch title under Chats; the notes tray is the row of friends' notes above the chat list in Chats inside Facebook
+Hide the notes tray	Notizenleiste ausblenden
+# context: summary of that switch
+The row of friends' notes above your chats in Chats inside Facebook goes. Your chats, search and new messages stay.	Die Reihe mit den Notizen deiner Freunde über deinen Chats in den Chats innerhalb von Facebook verschwindet. Deine Chats, die Suche und neue Nachrichten bleiben.
+# context: switch title under Chats; promotions are the banners Facebook puts at the top of the chat list
+Hide chat list promotions	Hinweisbanner in der Chatliste ausblenden
+# context: summary of that switch
+The promotional banners at the top of Chats inside Facebook go, like the one asking you to turn on notifications.	Die Werbebanner oben in den Chats innerhalb von Facebook verschwinden, zum Beispiel der, der dich bittet, Benachrichtigungen einzuschalten.
 # context: switch title under Chats; on, Facebook's Messenger icon opens the Messenger app
 Open the Messenger app	Messenger-App öffnen
 # context: summary of that switch; Messenger is the app's name, Chats is Facebook's own chat screen as named above
