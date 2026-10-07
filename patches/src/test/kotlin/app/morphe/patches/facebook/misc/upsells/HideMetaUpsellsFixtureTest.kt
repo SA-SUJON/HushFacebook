@@ -97,8 +97,9 @@ class HideMetaUpsellsFixtureTest {
         for ((version, bundles) in declaredBundles()) {
             for (bundle in bundles) {
                 val name = bundle.name
-                val kept = FixtureDex.classes(bundle, setOf(LANDING_SERIALIZER, VERIFIED_SHEET_HANDLER, VERIFIED_LABEL_PLUGIN))
-                assertEquals("$name: kept classes", 3, kept.size)
+                val kept = FixtureDex.classes(bundle,
+                    setOf(LANDING_SERIALIZER, VERIFIED_SHEET_HANDLER, VERIFIED_LABEL_PLUGIN, CAPTION_DEEP_DIVE_PLUGIN))
+                assertEquals("$name: kept classes", 4, kept.size)
 
                 // Edits: both flags, read outside the configuration's own classes too.
                 val fields = editsFlagFields(kept.getValue(LANDING_SERIALIZER))
@@ -244,6 +245,14 @@ class HideMetaUpsellsFixtureTest {
                 }
                 assertEquals("$name: the rest of Create story's builder stays", builder.code().map { it.opcode },
                     built.take(list + 1).map { it.opcode } + built.drop(list + 5).map { it.opcode })
+
+                // The caption deep dive: its getter asks the extension first, and runs as before after that.
+                val deepDive = captionDeepDiveGetter(kept.getValue(CAPTION_DEEP_DIVE_PLUGIN))
+                val dived = patched(deepDive)
+                assertEquals("$name: the caption deep dive getter asks first", HIDES_CAPTION_DEEP_DIVE, dived[0].called())
+                assertEquals("$name: and returns null on a yes", Opcode.RETURN_OBJECT, dived[4].opcode)
+                assertEquals("$name: the getter reads as before otherwise", deepDive.code().map { it.opcode },
+                    dived.drop(5).map { it.opcode })
 
                 // The share sheet's items: in front of every return, the extension and the copy back.
                 val shareList = shareLists.single()
