@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
+import java.text.NumberFormat;
 
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.Logger;
@@ -67,6 +68,11 @@ public final class TextSize {
                 if (scale.fileValue.equals(value)) return scale;
             }
             return null;
+        }
+
+        /** The choice as the phone writes a percentage, such as 85% in English and 85 % in German. */
+        public String label() {
+            return NumberFormat.getPercentInstance().format(percent / 100.0);
         }
     }
 

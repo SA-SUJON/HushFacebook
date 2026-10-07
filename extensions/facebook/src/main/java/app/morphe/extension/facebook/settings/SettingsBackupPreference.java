@@ -562,7 +562,7 @@ public class SettingsBackupPreference extends Preference {
             return L10n.t("Facebook's text will be the size your phone's font size setting gives it.");
         }
         return L10n.f("Facebook's text will be %1$s of the size your phone's font size setting gives it.",
-                scale.percent + "%");
+                scale.label());
     }
 
     /** The sentence that says what quality reels ([reels]) or video stories play at after an import. */

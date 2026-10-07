@@ -15,6 +15,8 @@ import android.app.Application;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 
+import java.util.Locale;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -144,5 +146,21 @@ public class TextSizeTest {
         app.getResources().updateConfiguration(reset, app.getResources().getDisplayMetrics());
         app.onConfigurationChanged(reset);
         assertEquals(phone * 1.15f, scaleOf(app.getResources()), 0.0001f);
+    }
+
+    @Test
+    public void eachChoiceReadsAsThePhoneWritesAPercentage() {
+        Locale before = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.US);
+            assertEquals("85%", TextSize.Scale.P85.label());
+            assertEquals("130%", TextSize.Scale.P130.label());
+            Locale.setDefault(Locale.GERMANY);
+            assertEquals("85 %", TextSize.Scale.P85.label());
+            Locale.setDefault(new Locale("tr", "TR"));
+            assertEquals("%85", TextSize.Scale.P85.label());
+        } finally {
+            Locale.setDefault(before);
+        }
     }
 }

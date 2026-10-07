@@ -1181,7 +1181,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
 
     /** What the list and the sentences about it call [scale]. */
     static String textSizeLabel(TextSize.Scale scale) {
-        return scale == TextSize.Scale.P100 ? L10n.t("As Facebook has it") : scale.percent + "%";
+        return scale == TextSize.Scale.P100 ? L10n.t("As Facebook has it") : scale.label();
     }
 
     /** What a choice does, for the row's summary. */
@@ -1190,7 +1190,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             return L10n.t("Facebook's text is the size your phone's font size setting gives it.");
         }
         return L10n.f("Facebook's text is %1$s of the size your phone's font size setting gives it. "
-                + "Restart Facebook after changing it.", scale.percent + "%");
+                + "Restart Facebook after changing it.", scale.label());
     }
 
     /**
