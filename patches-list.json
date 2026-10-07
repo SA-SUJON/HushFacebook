@@ -1252,7 +1252,7 @@
     },
     {
       "name": "Hide Stories tray",
-      "description": "Adds separate controls for the row of stories at the top of the news feed, Create story included, and the rows of stories Facebook puts between posts.",
+      "description": "Adds separate controls for the row of stories at the top of the news feed, Create story included, and the rows of stories Facebook puts between posts. The composer row at the top of Home gets a switch of its own too.",
       "category": "Feed",
       "use": false,
       "dependencies": [
