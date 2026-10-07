@@ -1538,7 +1538,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         String title = hides ? L10n.t("Words to hide") : L10n.t("Words that keep a post");
         row.setTitle(title);
         row.setDialogTitle(title);
-        row.setDialogMessage(hides
+        row.setDialogMessage((hides
                 ? L10n.f("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just "
                         + "one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters "
                         + "don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
@@ -1546,7 +1546,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 : L10n.f("A post with any of these stays, even when it also has a word to hide. One per line, up "
                         + "to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese "
                         + "character, a kana or a Hangul syllable.", PostWords.MAX_PHRASES, PostWords.MIN_LENGTH,
-                        PostWords.MAX_LENGTH));
+                        PostWords.MAX_LENGTH)) + " " + patternHelp());
         row.setPositiveButtonText(L10n.t("Save"));
         // Android's own Cancel follows the activity's language, as the folder row's did.
         row.setNegativeButtonText(L10n.t("Cancel"));
@@ -1682,12 +1682,29 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 : L10n.f("Both lists together fill %1$d%% of the room they share.", size.percent()));
     }
 
+    /**
+     * The word lists' second paragraph: a line between slashes is a pattern, and how many a list
+     * holds. Both dialogs end with it.
+     */
+    static String patternHelp() {
+        return L10n.f("A line between slashes, like /colou?r/, is a pattern (a regular expression). A list holds up "
+                + "to %1$d, each up to %2$d characters.", PostWords.MAX_PATTERNS, PostWords.MAX_PATTERN_LENGTH);
+    }
+
     /** Why a typed list can't be saved, the same in its dialog and when Save is tapped, or null when it can be. */
     @Nullable
     static String wordsRefusal(PostWords.Size size) {
         if (size.tooMany()) {
             return L10n.f("A list holds up to %1$d phrases, and this one has more. Remove some, then save again.",
                     PostWords.MAX_PHRASES);
+        }
+        if (size.badLine > 0) {
+            return L10n.f("Line %1$d isn't a pattern Hushfacebook can read. Fix it or remove it, then save again.",
+                    size.badLine);
+        }
+        if (size.tooManyPatterns()) {
+            return L10n.f("A list holds up to %1$d patterns, and this one has more. Remove some, then save again.",
+                    PostWords.MAX_PATTERNS);
         }
         if (size.fits()) return null;
         return L10n.f("Both lists together would fill %1$d%% of the room they share. Remove or shorten some "

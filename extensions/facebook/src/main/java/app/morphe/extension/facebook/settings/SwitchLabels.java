@@ -48,6 +48,10 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_POSTS_WITH_WORDS) return L10n.t("Hide posts with words you choose");
         if (setting == Settings.HIDE_POSTS_FROM_SOURCES) return L10n.t("Hide posts from people, Pages and sites");
         if (setting == Settings.POST_WORDS_WHOLE_WORDS) return L10n.t("Match whole words");
+        if (setting == Settings.HIDE_PHOTO_POSTS) return L10n.t("Hide photo posts");
+        if (setting == Settings.HIDE_VIDEO_POSTS) return L10n.t("Hide video posts");
+        if (setting == Settings.HIDE_LINK_POSTS) return L10n.t("Hide link posts");
+        if (setting == Settings.HIDE_BACKGROUND_POSTS) return L10n.t("Hide posts on a colored background");
         if (setting == Settings.HIDE_SPONSORED_STORIES) return L10n.t("Hide sponsored stories");
         if (setting == Settings.HIDE_SUGGESTED_STORIES) return L10n.t("Hide suggested stories");
         if (setting == Settings.HIDE_CONTACT_IMPORT_CARD) return L10n.t("Hide \"Find friends from contacts\"");

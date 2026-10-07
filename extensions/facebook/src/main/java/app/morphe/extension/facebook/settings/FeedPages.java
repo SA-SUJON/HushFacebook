@@ -226,6 +226,15 @@ final class FeedPages {
                         L10n.t("Posts by a person or Page on your list below, or linking to a site on it, and shares "
                                 + "of them. Your list only leaves the phone in a settings file you export.")));
                 feed.addPreference(page.sourcesRow(context));
+                feed.addPreference(toggle(context, Settings.HIDE_PHOTO_POSTS,
+                        L10n.t("Posts that show a photo or an album, and shares of them.")));
+                feed.addPreference(toggle(context, Settings.HIDE_VIDEO_POSTS,
+                        L10n.t("Posts that show a video, and shares of them. Reels in the feed have a switch of their "
+                                + "own.")));
+                feed.addPreference(toggle(context, Settings.HIDE_LINK_POSTS,
+                        L10n.t("Posts that share a link to a website, with its preview card.")));
+                feed.addPreference(toggle(context, Settings.HIDE_BACKGROUND_POSTS,
+                        L10n.t("Short posts Facebook shows as big text on a colored background.")));
             }
         }
     }

@@ -214,6 +214,26 @@ public class Settings extends BaseSettings {
     public static final StringSetting HIDDEN_SOURCES =
             new StringSetting("hushfacebook_hidden_sources", "");
 
+    /**
+     * Feed posts whose attachment Facebook draws as a photo or an album, and shares of them
+     * ({@link app.morphe.extension.facebook.feed.PostTypes}). Off by default, like the three below:
+     * none has been checked on a signed-in feed yet.
+     */
+    public static final BooleanSetting HIDE_PHOTO_POSTS =
+            new BooleanSetting("hushfacebook_hide_photo_posts", FALSE);
+
+    /** Feed posts whose attachment Facebook draws as a video, and shares of them. */
+    public static final BooleanSetting HIDE_VIDEO_POSTS =
+            new BooleanSetting("hushfacebook_hide_video_posts", FALSE);
+
+    /** Feed posts whose attachment Facebook draws as a shared link, and shares of them. */
+    public static final BooleanSetting HIDE_LINK_POSTS =
+            new BooleanSetting("hushfacebook_hide_link_posts", FALSE);
+
+    /** Feed posts written on a colored background, which Facebook draws as large formatted text. */
+    public static final BooleanSetting HIDE_BACKGROUND_POSTS =
+            new BooleanSetting("hushfacebook_hide_background_posts", FALSE);
+
     /** The four story bucket sources that splice ad cards into the story viewer. */
     public static final BooleanSetting HIDE_SPONSORED_STORIES =
             new BooleanSetting("hushfacebook_hide_sponsored_stories", TRUE);

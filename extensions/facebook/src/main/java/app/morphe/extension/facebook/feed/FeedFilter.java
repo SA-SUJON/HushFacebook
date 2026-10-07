@@ -314,7 +314,7 @@ public final class FeedFilter {
                 RecommendationLabel.PATCHED, SettingsStatus.aiDetectedPosts(), GenAiLabel.PATCHED,
                 SettingsStatus.feedReels(), ShowcaseType.PATCHED, SettingsStatus.postWords(), PostText.MESSAGE,
                 PostText.ATTACHED, GenAiLabel.SELF_LABEL_PATCHED, AiCharacterPosts.ATTACHMENTS,
-                AiCharacterPosts.STYLES);
+                AiCharacterPosts.STYLES, PostTypes.READERS);
     }
 
     /** The guard with the sponsored and suggested patch-time flags passed in, and no GenAI rule. */
@@ -406,6 +406,23 @@ public final class FeedFilter {
             StoryFlag.Accessor messageAccessor, StoryFlag.Accessor attachedAccessor,
             StoryFlag.Accessor aiLabelAccessor, @Nullable StoryFlag.Accessor attachmentsAccessor,
             @Nullable AiCharacterPosts.Finder styleFinder) {
+        return hideEdge(category, feedUnit, sponsoredPatched, suggestedPatched, recommendationAccessor, aiPatched,
+                aiAccessor, reelsPatched, showcaseAccessor, wordsPatched, messageAccessor, attachedAccessor,
+                aiLabelAccessor, attachmentsAccessor, styleFinder, null);
+    }
+
+    /**
+     * The guard with the readers of the word filter's kinds of post passed in too, so a test can
+     * stand in for the stubs Hide posts by words fills: the story's attachments, an attachment's
+     * styles and the story's text format. Null readers leave those switches out, as the overloads
+     * above do.
+     */
+    static boolean hideEdge(Object category, Object feedUnit, boolean sponsoredPatched, boolean suggestedPatched,
+            StoryFlag.Accessor recommendationAccessor, boolean aiPatched, StoryFlag.Accessor aiAccessor,
+            boolean reelsPatched, StoryFlag.Accessor showcaseAccessor, boolean wordsPatched,
+            StoryFlag.Accessor messageAccessor, StoryFlag.Accessor attachedAccessor,
+            StoryFlag.Accessor aiLabelAccessor, @Nullable StoryFlag.Accessor attachmentsAccessor,
+            @Nullable AiCharacterPosts.Finder styleFinder, @Nullable PostTypes.Readers typeReaders) {
         boolean trayPatched = storiesTrayInBuild();
         try {
             if (sponsoredPatched) HookStatus.invoked(FamilyNames.SPONSORED_POSTS);
@@ -503,6 +520,9 @@ public final class FeedFilter {
             }
             if (reason == null && wordsPatched) {
                 reason = sourcesReason(feedUnit, PostSources.ACTORS, PostSources.ATTACHMENTS, attachedAccessor);
+            }
+            if (reason == null && wordsPatched && typeReaders != null) {
+                reason = typesReason(feedUnit, typeReaders, attachedAccessor);
             }
             if (reason == null) return false;
 
@@ -729,10 +749,28 @@ public final class FeedFilter {
         }
         PostWords.Verdict verdict = rules.judge(read.texts);
         FeedFilterCounters.sawKind(WORDS_ROUTE, verdict.reason);
-        if (verdict != PostWords.Verdict.HIDE) return null;
+        if (!verdict.hides()) return null;
         FeedFilterCounters.removed(WORDS_ROUTE, 1, verdict.reason);
         PostWords.HIDDEN.incrementAndGet();
         return WORDS_REASON;
+    }
+
+    /**
+     * The kinds of post rule: the kind's name, such as {@link PostTypes#PHOTO}, when the post or
+     * the one it shares is a kind a switch hides, otherwise null. Nothing is read while every one of
+     * the four switches is off, and a post that can't be read stays. Each story it reads is counted
+     * on its route by what the read found.
+     */
+    static String typesReason(Object feedUnit, PostTypes.Readers readers, StoryFlag.Accessor attached) {
+        PostTypes.Wanted wanted = new PostTypes.Wanted(Settings.HIDE_PHOTO_POSTS.get(), Settings.HIDE_VIDEO_POSTS.get(),
+                Settings.HIDE_LINK_POSTS.get(), Settings.HIDE_BACKGROUND_POSTS.get());
+        if (!wanted.any()) return null;
+        FeedFilterCounters.sawList(PostTypes.ROUTE, 1);
+        String kind = PostTypes.read(feedUnit, readers, attached, wanted);
+        FeedFilterCounters.sawKind(PostTypes.ROUTE, kind);
+        if (!wanted.hides(kind)) return null;
+        FeedFilterCounters.removed(PostTypes.ROUTE, 1, kind);
+        return kind;
     }
 
     /**

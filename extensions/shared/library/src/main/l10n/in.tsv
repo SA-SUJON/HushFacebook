@@ -1057,3 +1057,25 @@ Mark as seen	Tandai sudah dilihat
 Marked as seen. Tap again to undo.	Ditandai sudah dilihat. Ketuk lagi untuk membatalkan.
 # context: what TalkBack reads for the eye button once the marked story was sent as seen
 Marked as seen and sent	Ditandai sudah dilihat dan dikirim
+# context: the word lists' dialogs, after their first paragraph: a line between slashes is a regular expression; %1$d is how many a list holds, %2$d the most characters each
+A line between slashes, like /colou?r/, is a pattern (a regular expression). A list holds up to %1$d, each up to %2$d characters.	Baris di antara garis miring, seperti /colou?r/, adalah pola (ekspresi reguler). Daftar memuat hingga %1$d pola, masing-masing hingga %2$d karakter.
+# context: under a word list being edited, and when its Save is refused: a line written between slashes isn't a pattern the app can read; %1$d is the line's number
+Line %1$d isn't a pattern Hushfacebook can read. Fix it or remove it, then save again.	Baris %1$d bukan pola yang bisa dibaca Hushfacebook. Perbaiki atau hapus, lalu simpan lagi.
+# context: under a word list being edited, and when its Save is refused: more patterns than a list holds; %1$d is the most a list holds
+A list holds up to %1$d patterns, and this one has more. Remove some, then save again.	Daftar memuat hingga %1$d pola, dan daftar ini lebih banyak. Hapus beberapa, lalu simpan lagi.
+# context: switch title: hides feed posts whose attachment is a photo or an album
+Hide photo posts	Sembunyikan postingan foto
+# context: switch title: hides feed posts whose attachment is a video
+Hide video posts	Sembunyikan postingan video
+# context: switch title: hides feed posts that share a link to a website
+Hide link posts	Sembunyikan postingan tautan
+# context: switch title: hides short text posts Facebook draws on a colored background
+Hide posts on a colored background	Sembunyikan postingan berlatar warna
+# context: summary of the Hide photo posts switch
+Posts that show a photo or an album, and shares of them.	Postingan yang menampilkan foto atau album, beserta postingan yang membagikannya.
+# context: summary of the Hide video posts switch
+Posts that show a video, and shares of them. Reels in the feed have a switch of their own.	Postingan yang menampilkan video, beserta postingan yang membagikannya. Reels di Kabar Beranda punya tombolnya sendiri.
+# context: summary of the Hide link posts switch
+Posts that share a link to a website, with its preview card.	Postingan yang membagikan tautan ke situs web, dengan kartu pratinjaunya.
+# context: summary of the Hide posts on a colored background switch
+Short posts Facebook shows as big text on a colored background.	Postingan singkat yang ditampilkan Facebook sebagai teks besar di atas latar berwarna.

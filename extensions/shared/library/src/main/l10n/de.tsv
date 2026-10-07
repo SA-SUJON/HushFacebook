@@ -1057,3 +1057,25 @@ Mark as seen	Als gesehen markieren
 Marked as seen. Tap again to undo.	Als gesehen markiert. Tippe erneut, um es rückgängig zu machen.
 # context: what TalkBack reads for the eye button once the marked story was sent as seen
 Marked as seen and sent	Als gesehen markiert und gesendet
+# context: the word lists' dialogs, after their first paragraph: a line between slashes is a regular expression; %1$d is how many a list holds, %2$d the most characters each
+A line between slashes, like /colou?r/, is a pattern (a regular expression). A list holds up to %1$d, each up to %2$d characters.	Eine Zeile zwischen Schrägstrichen, etwa /colou?r/, ist ein Muster (ein regulärer Ausdruck). Eine Liste fasst bis zu %1$d davon, jedes mit bis zu %2$d Zeichen.
+# context: under a word list being edited, and when its Save is refused: a line written between slashes isn't a pattern the app can read; %1$d is the line's number
+Line %1$d isn't a pattern Hushfacebook can read. Fix it or remove it, then save again.	Zeile %1$d ist kein Muster, das Hushfacebook lesen kann. Korrigiere oder entferne sie und speichere dann noch einmal.
+# context: under a word list being edited, and when its Save is refused: more patterns than a list holds; %1$d is the most a list holds
+A list holds up to %1$d patterns, and this one has more. Remove some, then save again.	Eine Liste fasst bis zu %1$d Muster, und diese hat mehr. Entferne einige und speichere dann noch einmal.
+# context: switch title: hides feed posts whose attachment is a photo or an album
+Hide photo posts	Fotobeiträge ausblenden
+# context: switch title: hides feed posts whose attachment is a video
+Hide video posts	Videobeiträge ausblenden
+# context: switch title: hides feed posts that share a link to a website
+Hide link posts	Beiträge mit Links ausblenden
+# context: switch title: hides short text posts Facebook draws on a colored background
+Hide posts on a colored background	Beiträge mit farbigem Hintergrund ausblenden
+# context: summary of the Hide photo posts switch
+Posts that show a photo or an album, and shares of them.	Beiträge mit einem Foto oder Album, auch wenn jemand sie teilt.
+# context: summary of the Hide video posts switch
+Posts that show a video, and shares of them. Reels in the feed have a switch of their own.	Beiträge mit einem Video, auch wenn jemand sie teilt. Reels im Feed haben einen eigenen Schalter.
+# context: summary of the Hide link posts switch
+Posts that share a link to a website, with its preview card.	Beiträge, die einen Link zu einer Website mit Vorschaukarte teilen.
+# context: summary of the Hide posts on a colored background switch
+Short posts Facebook shows as big text on a colored background.	Kurze Beiträge, die Facebook als großen Text auf farbigem Hintergrund zeigt.

@@ -53,7 +53,9 @@ public enum PatchFamily {
             Settings.HIDE_AI_DETECTED_POSTS, Settings.HIDE_AI_LABELLED_POSTS, Settings.HIDE_AI_DETECTED_REELS,
             Settings.HIDE_META_AI_FEED_UNITS, Settings.HIDE_AI_CHARACTER_POSTS),
     POST_WORDS(FamilyNames.POST_WORDS, "postWords", null,
-            Settings.HIDE_POSTS_WITH_WORDS, Settings.POST_WORDS_WHOLE_WORDS, Settings.HIDE_POSTS_FROM_SOURCES),
+            Settings.HIDE_POSTS_WITH_WORDS, Settings.POST_WORDS_WHOLE_WORDS, Settings.HIDE_POSTS_FROM_SOURCES,
+            Settings.HIDE_PHOTO_POSTS, Settings.HIDE_VIDEO_POSTS, Settings.HIDE_LINK_POSTS,
+            Settings.HIDE_BACKGROUND_POSTS),
     POST_PROMPTS(FamilyNames.POST_PROMPTS, "postPrompts", null,
             Settings.HIDE_POST_PROMPTS),
     META_AI_QUESTIONS(FamilyNames.META_AI_QUESTIONS, "metaAiQuestions", null,
@@ -395,7 +397,9 @@ public enum PatchFamily {
             }
         }
         if (this == POST_WORDS) {
-            anyOn = Settings.HIDE_POSTS_WITH_WORDS.savedValue() || Settings.HIDE_POSTS_FROM_SOURCES.savedValue();
+            anyOn = Settings.HIDE_POSTS_WITH_WORDS.savedValue() || Settings.HIDE_POSTS_FROM_SOURCES.savedValue()
+                    || Settings.HIDE_PHOTO_POSTS.savedValue() || Settings.HIDE_VIDEO_POSTS.savedValue()
+                    || Settings.HIDE_LINK_POSTS.savedValue() || Settings.HIDE_BACKGROUND_POSTS.savedValue();
         }
         line.append(paused ? "disabled while paused (saved " : anyOn ? "on (" : "disabled by its switch (");
         for (int i = 0; i < switches.size(); i++) {
