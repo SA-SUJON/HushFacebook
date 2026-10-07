@@ -447,8 +447,9 @@ public class PausedHooksTest {
                 MarketplaceOnlyForTests::hidesHome, MarketplaceOnlyForTests::quietsNotifications,
                 MarketplaceOnlyForTests::skipsFeedPrefetch));
         // A seller's Marketplace page is told its View profile flag is on.
-        probes.put(PatchFamily.SELLER_VIEW_PROFILE, Collections.singletonList(
-                MarketplaceSellerProfileForTests::givesSellersViewProfile));
+        probes.put(PatchFamily.SELLER_VIEW_PROFILE, Arrays.asList(
+                MarketplaceSellerProfileForTests::givesSellersViewProfile,
+                MarketplaceSellerProfileForTests::givesSellersViewProfileById));
         // The tab bar builder is told to leave the Reels tab out.
         // Facebook's push of its Reels launcher shortcut is held back too.
         probes.put(PatchFamily.REELS_TAB, Arrays.asList(ReelsTabForTests::hidesTheTab,

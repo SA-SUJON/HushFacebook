@@ -25,6 +25,10 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Hide affiliate product links` takes the other Shop now cards off reels too, like the one above the creator's name for a product of their own. Facebook sends products tagged on a reel, a creator's storefront and Shop similar as card kinds of their own, and the patch only caught the affiliate one. The diagnostic report counts each card it keeps out by its kind (issue #89).
 * **Facebook:** With `AMOLED theme` on, the Data mode banner that Flex carriers show under the top bar draws on the black page now, not as a dark grey band across it. Facebook paints that strip with a card's colour, and AMOLED had turned it a card's near black. The Buy data button keeps its own step above the black (issue #86).
 
+### Changed
+
+* **Facebook:** `Show View profile on Marketplace sellers` also answers the seller page's flag when it's read by its number instead of its name. Facebook's React Native pages can ask for a flag either way, so a page that switches over keeps the button.
+
 ## 0.7.2 (2026-10-06)
 
 * **Facebook:** This release gathers everything since v0.7.1 and brings 70 patches for Facebook 581.0.0.45.58, up from 60. 580.0.0.51.74 and 577.0.0.50.72 still work, and phones with a 32-bit processor on Android 11 or newer can patch 581 now too. The ten new ones are `Show View profile on Marketplace sellers`, `Turn off HDR brightness`, `Picture-in-picture`, `Turn off screen transitions`, `Turn off haptics`, `Block Instant Games ads`, `Hide tabs`, `Block screenshot detection`, `Allow screenshots` and `Hold back analytics uploads`. Morphe Manager 1.34.0 or newer is required.

@@ -718,7 +718,7 @@
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook from Facebook 577, 580 and 581 and their React Native bundle, for issue #68: a seller's Marketplace page offers View profile only while the experiment flag qe_marketplace_commerce_profile_page:contextual_view_header_enabled reads true, so the config module's getBool and getBoolWithoutLogging ask the extension first, which answers true for that one name while the switch is on. No Facebook code was copied."
+      "changes": "Written for Hushfacebook from Facebook 577, 580 and 581 and their React Native bundle, for issue #68: a seller's Marketplace page offers View profile only while the experiment flag qe_marketplace_commerce_profile_page:contextual_view_header_enabled reads true, so the config module's getBool and getBoolWithoutLogging ask the extension first, which answers true for that one name while the switch is on. The module's four by-id boolean reads ask it too, and it answers true for the same flag's stable id (config key 49154, param key 15 in each build's rn_params.txt). No Facebook code was copied."
     },
     {
       "paths": [
