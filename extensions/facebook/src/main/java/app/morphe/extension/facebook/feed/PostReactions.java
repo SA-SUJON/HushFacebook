@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.shared.diagnostics.HookStatus;
@@ -23,6 +24,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * names, so the patch fills in {@link #feedback} and {@link #reactors}. A post whose count can't be
  * read is never hidden, and the report says why it wasn't. What the report counts is a shape, never
  * the post.
+ *
+ * <p>{@code getCachedInt(int)} and the GraphQLFeedback class are looked up once, not for every
+ * post, and a build without one remembers that it's missing.
  */
 public final class PostReactions {
     /** The route the report counts each post read for its reactions on, while a ceiling is set. */
@@ -49,6 +53,25 @@ public final class PostReactions {
 
     /** The count of a post that couldn't be read. */
     static final long UNREAD = -1;
+
+    /** A lookup's answer for the class or loader it was made for. A null answer is a miss, kept too. */
+    private static final class Found<K, V> {
+        final K key;
+        @Nullable final V value;
+
+        Found(K key, @Nullable V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    /** getCachedInt(int) on the tree model class it was looked up on. */
+    @Nullable private static volatile Found<Class<?>, Method> countReader;
+    /** GraphQLFeedback through the class loader it was looked up with. */
+    @Nullable private static volatile Found<ClassLoader, Class<?>> feedbackType;
+
+    /** How many lookups went to reflection, for tests. */
+    static final AtomicInteger LOOKUPS = new AtomicInteger();
 
     /** What a read found: the count, or {@link #UNREAD} and why. */
     static final class Read {
@@ -103,7 +126,12 @@ public final class PostReactions {
                 return new Read(UNREAD, NOT_PATCHED);
             }
             if (feedbackModel == null) return new Read(0, NO_FEEDBACK);
-            if (!feedbackClass(feedUnit).isInstance(feedbackModel)) return new Read(UNREAD, READ_FAILED);
+            Class<?> feedbackClass = feedbackClass(feedUnit);
+            if (feedbackClass == null) {
+                HookStatus.missingMember(FAMILY, "class", "com.facebook.graphql.model", "GraphQLFeedback");
+                return new Read(UNREAD, READ_FAILED);
+            }
+            if (!feedbackClass.isInstance(feedbackModel)) return new Read(UNREAD, READ_FAILED);
             if (FeedFilter.released(feedbackModel)) return new Read(UNREAD, RELEASED);
             Object reactorsModel = reactors.model(feedbackModel);
             if (reactorsModel == StoryFlag.NOT_PATCHED) {
@@ -125,20 +153,55 @@ public final class PostReactions {
         }
     }
 
-    /** GraphQLFeedback, looked up through the story's own class loader. */
-    private static Class<?> feedbackClass(Object feedUnit) throws ClassNotFoundException {
-        return Class.forName(FEEDBACK_CLASS, false, feedUnit.getClass().getClassLoader());
+    /**
+     * GraphQLFeedback through the story's own class loader, or null when that loader has none.
+     * Looked up once per loader, which is once in Facebook.
+     */
+    @Nullable
+    private static Class<?> feedbackClass(Object feedUnit) {
+        ClassLoader loader = feedUnit.getClass().getClassLoader();
+        Found<ClassLoader, Class<?>> known = feedbackType;
+        if (known == null || known.key != loader) {
+            LOOKUPS.incrementAndGet();
+            Class<?> type;
+            try {
+                type = Class.forName(FEEDBACK_CLASS, false, loader);
+            } catch (ClassNotFoundException | LinkageError | RuntimeException missing) {
+                type = null;
+            }
+            known = new Found<>(loader, type);
+            feedbackType = known;
+        }
+        return known.value;
     }
 
-    /** The kept public {@code getCachedInt(int)} of Facebook's tree models, or null when this build has none. */
+    /**
+     * The kept public {@code getCachedInt(int)} of Facebook's tree models, or null when this build
+     * has none. Looked up once per tree model class, which is once in Facebook.
+     */
     @Nullable
-    private static Method cachedInt(@Nullable Class<?> treeModel) {
+    static Method cachedInt(@Nullable Class<?> treeModel) {
         if (treeModel == null) return null;
-        try {
-            Method method = treeModel.getMethod("getCachedInt", int.class);
-            return method.getReturnType() == int.class ? method : null;
-        } catch (NoSuchMethodException | RuntimeException missing) {
-            return null;
+        Found<Class<?>, Method> known = countReader;
+        if (known == null || known.key != treeModel) {
+            LOOKUPS.incrementAndGet();
+            Method method;
+            try {
+                method = treeModel.getMethod("getCachedInt", int.class);
+                if (method.getReturnType() != int.class) method = null;
+            } catch (NoSuchMethodException | RuntimeException missing) {
+                method = null;
+            }
+            known = new Found<>(treeModel, method);
+            countReader = known;
         }
+        return known.value;
+    }
+
+    /** Forgets both lookups, so the next read makes them again. For tests. */
+    static void forgetLookupsForTests() {
+        countReader = null;
+        feedbackType = null;
+        LOOKUPS.set(0);
     }
 }

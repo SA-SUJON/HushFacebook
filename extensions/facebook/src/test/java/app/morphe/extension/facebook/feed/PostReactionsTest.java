@@ -217,6 +217,35 @@ public class PostReactionsTest {
         assertTrue(route, route.contains("no reactors 1"));
     }
 
+    /**
+     * The count reader and GraphQLFeedback are looked up once rather than for every post, and a
+     * tree model class without the reader is remembered as missing rather than asked again.
+     */
+    @Test
+    public void theCountReaderAndTheFeedbackClassAreLookedUpOnce() {
+        PostReactions.forgetLookupsForTests();
+        try {
+            Stand stand = new Stand();
+            Settings.HIDE_POSTS_OVER_REACTIONS.save(ReactionCeiling.K1);
+            int hidden = 0;
+            for (int i = 0; i < 20; i++) {
+                if (guard(stand.post(i % 2 == 0 ? 2_000 : 10), stand.readers())) hidden++;
+            }
+            assertEquals("the reads stopped working", 10, hidden);
+            assertEquals("one lookup for the reader and one for the feedback class", 2, PostReactions.LOOKUPS.get());
+
+            PostReactions.forgetLookupsForTests();
+            assertNull(PostReactions.cachedInt(Object.class));
+            assertNull(PostReactions.cachedInt(Object.class));
+            assertEquals("a missing reader was looked up again", 1, PostReactions.LOOKUPS.get());
+            assertNotNull(PostReactions.cachedInt(BaseModelWithTree.class));
+            assertNotNull(PostReactions.cachedInt(BaseModelWithTree.class));
+            assertEquals(2, PostReactions.LOOKUPS.get());
+        } finally {
+            PostReactions.forgetLookupsForTests();
+        }
+    }
+
     @Test
     public void pausedFacebookKeepsEveryPost() {
         Stand stand = new Stand();
