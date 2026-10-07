@@ -909,3 +909,25 @@ Couldn't save this post's photos. Try again in a moment.	Die Fotos dieses Beitra
 Answer rewarded game ads as watched	Belohnte Spielwerbung als angesehen melden
 # context: description under that switch
 With Block Instant Games ads on, a game's rewarded ad counts as watched: no ad plays and the game gives its reward. Other game ads still get none.	Wenn Werbung in Instant Games blockieren an ist, gilt eine belohnte Werbung eines Spiels als angesehen: Es läuft keine Werbung und das Spiel gibt dir die Belohnung. Andere Spielwerbung bleibt blockiert.
+# context: title of the list that picks the quality reels start at
+Reels quality	Qualität für Reels
+# context: title of the list that picks the quality video stories start at
+Stories quality	Qualität für Stories
+# context: first choice in the Reels and Stories quality lists: play at the same quality as other videos
+Same as videos	Wie bei Videos
+# context: summary of the Reels quality list when it follows the playback quality row above it
+Reels play at the playback quality above.	Reels laufen in der Wiedergabequalität oben.
+# context: summary of the Stories quality list when it follows the playback quality row above it
+Video stories play at the playback quality above.	Video-Stories laufen in der Wiedergabequalität oben.
+# context: title of the row naming a folder inside the save folder that video saves go in
+Video subfolder	Unterordner für Videos
+# context: title of the row naming a folder inside the save folder that photo saves go in
+Photo subfolder	Unterordner für Fotos
+# context: dialog text of the Video subfolder row
+Choose a folder for videos inside the save folder. Invalid characters become underscores. Leave it blank to keep videos in the save folder itself.	Wähle einen Ordner für Videos im Speicherordner. Ungültige Zeichen werden zu Unterstrichen. Lass das Feld leer, damit Videos direkt im Speicherordner landen.
+# context: dialog text of the Photo subfolder row
+Choose a folder for photos inside the save folder. Invalid characters become underscores. Leave it blank to keep photos in the save folder itself.	Wähle einen Ordner für Fotos im Speicherordner. Ungültige Zeichen werden zu Unterstrichen. Lass das Feld leer, damit Fotos direkt im Speicherordner landen.
+# context: summary of the Video subfolder row; %1$s is a folder path such as Movies/Facebook/Clips
+Videos go to %1$s.	Videos landen in %1$s.
+# context: summary of the Photo subfolder row; %1$s is a folder path such as Pictures/Facebook/Photos
+Photos go to %1$s.	Fotos landen in %1$s.

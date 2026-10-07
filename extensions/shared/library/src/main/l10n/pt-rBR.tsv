@@ -803,3 +803,25 @@ Couldn't save this post's photos. Try again in a moment.	Não foi possível salv
 Answer rewarded game ads as watched	Considerar assistidos os anúncios premiados dos jogos
 # context: description under that switch
 With Block Instant Games ads on, a game's rewarded ad counts as watched: no ad plays and the game gives its reward. Other game ads still get none.	Com Bloquear anúncios do Instant Games ativado, o anúncio premiado de um jogo conta como assistido: nenhum anúncio é exibido e o jogo dá a recompensa. Os outros anúncios de jogos continuam bloqueados.
+# context: title of the list that picks the quality reels start at
+Reels quality	Qualidade dos reels
+# context: title of the list that picks the quality video stories start at
+Stories quality	Qualidade dos stories
+# context: first choice in the Reels and Stories quality lists: play at the same quality as other videos
+Same as videos	Igual aos vídeos
+# context: summary of the Reels quality list when it follows the playback quality row above it
+Reels play at the playback quality above.	Os reels usam a qualidade de reprodução acima.
+# context: summary of the Stories quality list when it follows the playback quality row above it
+Video stories play at the playback quality above.	Os stories em vídeo usam a qualidade de reprodução acima.
+# context: title of the row naming a folder inside the save folder that video saves go in
+Video subfolder	Subpasta de vídeos
+# context: title of the row naming a folder inside the save folder that photo saves go in
+Photo subfolder	Subpasta de fotos
+# context: dialog text of the Video subfolder row
+Choose a folder for videos inside the save folder. Invalid characters become underscores. Leave it blank to keep videos in the save folder itself.	Escolha uma pasta para os vídeos dentro da pasta de destino. Caracteres inválidos são substituídos por sublinhados. Deixe em branco para manter os vídeos na própria pasta de destino.
+# context: dialog text of the Photo subfolder row
+Choose a folder for photos inside the save folder. Invalid characters become underscores. Leave it blank to keep photos in the save folder itself.	Escolha uma pasta para as fotos dentro da pasta de destino. Caracteres inválidos são substituídos por sublinhados. Deixe em branco para manter as fotos na própria pasta de destino.
+# context: summary of the Video subfolder row; %1$s is a folder path such as Movies/Facebook/Clips
+Videos go to %1$s.	Os vídeos vão para %1$s.
+# context: summary of the Photo subfolder row; %1$s is a folder path such as Pictures/Facebook/Photos
+Photos go to %1$s.	As fotos vão para %1$s.

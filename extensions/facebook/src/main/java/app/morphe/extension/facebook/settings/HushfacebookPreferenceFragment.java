@@ -50,6 +50,7 @@ import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostSources;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.HiddenTabs;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
@@ -68,6 +69,8 @@ import app.morphe.extension.facebook.settings.ValueRows.QualityRow;
 import app.morphe.extension.facebook.settings.ValueRows.SaveToRow;
 import app.morphe.extension.facebook.settings.ValueRows.SendAppRow;
 import app.morphe.extension.facebook.settings.ValueRows.StartTabRow;
+import app.morphe.extension.facebook.settings.ValueRows.SubfolderRow;
+import app.morphe.extension.facebook.settings.ValueRows.SurfaceQualityRow;
 import app.morphe.extension.facebook.settings.ValueRows.SourcesRow;
 import app.morphe.extension.facebook.settings.ValueRows.WordsRow;
 import app.morphe.extension.shared.L10n;
@@ -75,6 +78,7 @@ import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.BooleanSetting;
+import app.morphe.extension.shared.settings.EnumSetting;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.Setting;
 import app.morphe.extension.shared.settings.StringSetting;
@@ -724,6 +728,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         FolderRow row = (FolderRow) folder;
         row.setSummary(folderSummary(SaveFolder.sanitize(row.getText())));
         row.setDialogMessage(folderDialogMessage(Settings.SAVE_TO.savedValue()));
+        for (String key : new String[]{Settings.VIDEO_SUBFOLDER.key, Settings.PHOTO_SUBFOLDER.key}) {
+            Preference subfolder = findPreference(key);
+            if (subfolder instanceof SubfolderRow) ((SubfolderRow) subfolder).showSummary();
+        }
     }
 
     /**
@@ -1117,6 +1125,40 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         return row;
     }
 
+    /**
+     * The quality reels ([reels]) or video stories play at: the same as every other video, the
+     * default, or one of the playback qualities, Auto included. Its values are the setting's own
+     * names, as the playback quality's are.
+     */
+    static SurfaceQualityRow surfaceQualityRow(Context context, boolean reels) {
+        EnumSetting<SurfaceQuality> setting = reels ? Settings.REELS_PLAYBACK_QUALITY : Settings.STORIES_PLAYBACK_QUALITY;
+        SurfaceQualityRow row = new SurfaceQualityRow(context, reels);
+        row.setKey(setting.key);
+        String title = reels ? L10n.t("Reels quality") : L10n.t("Stories quality");
+        row.setTitle(title);
+        row.setDialogTitle(title);
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        SurfaceQuality[] choices = SurfaceQuality.values();
+        CharSequence[] entries = new CharSequence[choices.length];
+        CharSequence[] values = new CharSequence[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            PlaybackQuality quality = choices[i].quality;
+            entries[i] = quality == null ? L10n.t("Same as videos") : playbackQualityLabel(quality);
+            values[i] = choices[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(setting.savedValue().name());
+        return row;
+    }
+
+    /** What the Reels ([reels]) or Stories quality row says [choice] does. A quality of their own is named as the list names it. */
+    static String surfaceQualitySummary(SurfaceQuality choice, boolean reels) {
+        if (choice.quality != null) return playbackQualityLabel(choice.quality);
+        return reels ? L10n.t("Reels play at the playback quality above.")
+                : L10n.t("Video stories play at the playback quality above.");
+    }
+
     /** What the list calls [quality]: Auto, as Facebook's own quality menu calls it, and a ceiling by its label. */
     static String playbackQualityLabel(PlaybackQuality quality) {
         switch (quality) {
@@ -1171,6 +1213,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((CommentOrderRow) listPreference).showSummary();
         } else if (listPreference instanceof PlaybackQualityRow) {
             ((PlaybackQualityRow) listPreference).showSummary();
+        } else if (listPreference instanceof SurfaceQualityRow) {
+            ((SurfaceQualityRow) listPreference).showSummary();
         } else {
             super.updateListPreferenceSummary(listPreference, setting);
         }
@@ -1205,6 +1249,47 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             return false;
         });
         return row;
+    }
+
+    /**
+     * The subfolder of the save folder that videos ([video]) or photos go in. What's typed is
+     * cleaned before it's kept, as the save folder is, and nothing left means no subfolder.
+     */
+    static SubfolderRow subfolderRow(Context context, boolean video) {
+        StringSetting setting = video ? Settings.VIDEO_SUBFOLDER : Settings.PHOTO_SUBFOLDER;
+        SubfolderRow row = new SubfolderRow(context, video);
+        row.setKey(setting.key);
+        String title = video ? L10n.t("Video subfolder") : L10n.t("Photo subfolder");
+        row.setTitle(title);
+        row.setDialogTitle(title);
+        row.setDialogMessage(video
+                ? L10n.t("Choose a folder for videos inside the save folder. Invalid characters become underscores. "
+                        + "Leave it blank to keep videos in the save folder itself.")
+                : L10n.t("Choose a folder for photos inside the save folder. Invalid characters become underscores. "
+                        + "Leave it blank to keep photos in the save folder itself."));
+        row.setPositiveButtonText(L10n.t("Save"));
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        EditText field = row.getEditText();
+        field.setSingleLine(true);
+        field.setHint(L10n.t("Folder name"));
+        row.setText(setting.savedValue());
+        row.setOnPreferenceChangeListener((preference, typed) -> {
+            String raw = typed == null ? "" : typed.toString();
+            String clean = SaveFolder.cleanSubfolder(raw);
+            if (clean.equals(raw)) return true;
+            // Keeps the clean name in place of what was typed, as the save folder's row does.
+            ((SubfolderRow) preference).setText(clean);
+            if (!clean.isEmpty()) Utils.showToastShort(L10n.f("Folder set to %1$s.", L10n.isolate(clean)));
+            return false;
+        });
+        return row;
+    }
+
+    /** "Videos go to Movies/Facebook/Clips." for the [subfolder] videos ([video]) or photos go in, or none. */
+    static String subfolderSummary(boolean video, String subfolder) {
+        String path = Settings.SAVE_TO.savedValue().directory(video) + "/"
+                + SaveFolder.within(SaveFolder.sanitize(Settings.SAVE_FOLDER.savedValue()), subfolder);
+        return video ? L10n.f("Videos go to %1$s.", L10n.isolate(path)) : L10n.f("Photos go to %1$s.", L10n.isolate(path));
     }
 
     /** What the folder row's dialog says, naming the top folder [to] puts the folder under. */
@@ -1394,11 +1479,12 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
 
     /**
      * "Videos go to Movies/Clips and photos to Pictures/Clips." for the folder [leaf] under
-     * [to], or "Videos and photos go to Download/Clips." when both go to one top folder.
+     * [to], or "Videos and photos go to Download/Clips." when both go to one folder. A kind with a
+     * subfolder of its own has it on the end.
      */
     static String folderSummary(String leaf, SaveTo to) {
-        String videos = to.directory(true) + "/" + leaf;
-        String photos = to.directory(false) + "/" + leaf;
+        String videos = to.directory(true) + "/" + SaveFolder.within(leaf, SaveFolder.cleanSubfolder(Settings.VIDEO_SUBFOLDER.savedValue()));
+        String photos = to.directory(false) + "/" + SaveFolder.within(leaf, SaveFolder.cleanSubfolder(Settings.PHOTO_SUBFOLDER.savedValue()));
         if (videos.equals(photos)) return L10n.f("Videos and photos go to %1$s.", L10n.isolate(videos));
         return L10n.f("Videos go to %1$s and photos to %2$s.", L10n.isolate(videos), L10n.isolate(photos));
     }

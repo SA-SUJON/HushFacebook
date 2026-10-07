@@ -16,6 +16,7 @@ import app.morphe.extension.facebook.download.SaveFolder;
 import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.settings.BaseSettings;
@@ -881,6 +882,18 @@ public class Settings extends BaseSettings {
             new StringSetting("hushfacebook_save_folder", SaveFolder.DEFAULT);
 
     /**
+     * A folder inside {@link #SAVE_FOLDER} that video saves go in, or empty, the default, for the
+     * save folder itself. {@link SaveFolder#subfolder} cleans it the way the save folder is cleaned,
+     * so it's one folder name, never a path. It isn't a switch.
+     */
+    public static final StringSetting VIDEO_SUBFOLDER =
+            new StringSetting("hushfacebook_video_subfolder", "");
+
+    /** The same as {@link #VIDEO_SUBFOLDER}, for photo saves. */
+    public static final StringSetting PHOTO_SUBFOLDER =
+            new StringSetting("hushfacebook_photo_subfolder", "");
+
+    /**
      * The quality a video save asks for: the best the player streams, a ceiling, or the smallest
      * file. Every save of a story, a reel or a feed video reads it when it starts, and one that
      * finds nothing at or under a ceiling takes the nearest above it. Photos always save whole.
@@ -968,6 +981,18 @@ public class Settings extends BaseSettings {
      */
     public static final EnumSetting<PlaybackQuality> PLAYBACK_QUALITY =
             new EnumSetting<>("hushfacebook_playback_quality", PlaybackQuality.AUTO);
+
+    /**
+     * The quality reels start at while {@link #DEFAULT_PLAYBACK_QUALITY} is on: the same as
+     * {@link #PLAYBACK_QUALITY} until someone picks one of their own, so an update changes nothing on
+     * its own. It isn't a switch, and a paused Facebook picks the quality itself.
+     */
+    public static final EnumSetting<SurfaceQuality> REELS_PLAYBACK_QUALITY =
+            new EnumSetting<>("hushfacebook_reels_playback_quality", SurfaceQuality.SAME);
+
+    /** The quality video stories start at, the way {@link #REELS_PLAYBACK_QUALITY} is the reels'. */
+    public static final EnumSetting<SurfaceQuality> STORIES_PLAYBACK_QUALITY =
+            new EnumSetting<>("hushfacebook_stories_playback_quality", SurfaceQuality.SAME);
 
     /**
      * Where {@link #USE_SYSTEM_FONT} takes its font from: empty for the phone's own, or the name of

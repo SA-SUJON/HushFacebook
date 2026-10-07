@@ -20,6 +20,10 @@ import app.morphe.extension.shared.Utils;
  * the gallery, and a character nobody can see makes two folders that look the same. So the value
  * goes through {@link #sanitize} where it's used, whatever wrote it, and an empty result means
  * {@link #DEFAULT}.
+ *
+ * <p>Videos and photos can each go one folder deeper, into a subfolder of the save folder
+ * ({@link #subfolder}). Each is cleaned by the same rules, and an empty one means no subfolder, so
+ * by default both kinds land side by side as before.
  */
 public final class SaveFolder {
 
@@ -45,6 +49,38 @@ public final class SaveFolder {
         } catch (Throwable t) {
             return DEFAULT;
         }
+    }
+
+    /**
+     * The subfolder of the save folder that a video's ([video]) or a photo's save goes in, or empty
+     * for the save folder itself. Never throws, and never answers anything but a clean name or
+     * nothing.
+     */
+    public static String subfolder(boolean video) {
+        try {
+            if (!Utils.settingsReady()) return "";
+            return cleanSubfolder(video ? Settings.VIDEO_SUBFOLDER.get() : Settings.PHOTO_SUBFOLDER.get());
+        } catch (Throwable t) {
+            return "";
+        }
+    }
+
+    /** {@link #sanitize}'s rules for a subfolder: nothing left is no subfolder rather than {@link #DEFAULT}. */
+    public static String cleanSubfolder(String raw) {
+        return clean(raw, MAX_CODE_POINTS);
+    }
+
+    /**
+     * Where under its top folder a video's ([video]) or a photo's next save goes: the save folder,
+     * then the kind's subfolder when it has one.
+     */
+    public static String path(boolean video) {
+        return within(leaf(), subfolder(video));
+    }
+
+    /** [folder], then [subfolder] inside it when there's one. */
+    public static String within(String folder, String subfolder) {
+        return subfolder.isEmpty() ? folder : folder + "/" + subfolder;
     }
 
     /** Whether [name] is already a folder name this would use exactly as written. */

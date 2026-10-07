@@ -909,3 +909,25 @@ Couldn't save this post's photos. Try again in a moment.	Bu gönderinin fotoğra
 Answer rewarded game ads as watched	Ödüllü oyun reklamlarını izlenmiş say
 # context: description under that switch
 With Block Instant Games ads on, a game's rewarded ad counts as watched: no ad plays and the game gives its reward. Other game ads still get none.	Instant Games reklamlarını engelle açıkken bir oyunun ödüllü reklamı izlenmiş sayılır: reklam oynatılmaz ve oyun ödülünü verir. Diğer oyun reklamları engellenmeye devam eder.
+# context: title of the list that picks the quality reels start at
+Reels quality	Reels kalitesi
+# context: title of the list that picks the quality video stories start at
+Stories quality	Hikaye kalitesi
+# context: first choice in the Reels and Stories quality lists: play at the same quality as other videos
+Same as videos	Videolarla aynı
+# context: summary of the Reels quality list when it follows the playback quality row above it
+Reels play at the playback quality above.	Reels yukarıdaki oynatma kalitesinde oynatılır.
+# context: summary of the Stories quality list when it follows the playback quality row above it
+Video stories play at the playback quality above.	Video hikayeler yukarıdaki oynatma kalitesinde oynatılır.
+# context: title of the row naming a folder inside the save folder that video saves go in
+Video subfolder	Video alt klasörü
+# context: title of the row naming a folder inside the save folder that photo saves go in
+Photo subfolder	Fotoğraf alt klasörü
+# context: dialog text of the Video subfolder row
+Choose a folder for videos inside the save folder. Invalid characters become underscores. Leave it blank to keep videos in the save folder itself.	Kayıt klasörünün içinde videolar için bir klasör seç. Geçersiz karakterler alt çizgiye dönüşür. Videoların doğrudan kayıt klasöründe kalması için boş bırak.
+# context: dialog text of the Photo subfolder row
+Choose a folder for photos inside the save folder. Invalid characters become underscores. Leave it blank to keep photos in the save folder itself.	Kayıt klasörünün içinde fotoğraflar için bir klasör seç. Geçersiz karakterler alt çizgiye dönüşür. Fotoğrafların doğrudan kayıt klasöründe kalması için boş bırak.
+# context: summary of the Video subfolder row; %1$s is a folder path such as Movies/Facebook/Clips
+Videos go to %1$s.	Videolar %1$s klasörüne kaydedilir.
+# context: summary of the Photo subfolder row; %1$s is a folder path such as Pictures/Facebook/Photos
+Photos go to %1$s.	Fotoğraflar %1$s klasörüne kaydedilir.

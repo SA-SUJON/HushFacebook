@@ -129,6 +129,12 @@ public class SettingsBackupTest {
 
     private static Map<String, String> valuesStayOut() {
         Map<String, String> out = new java.util.LinkedHashMap<>();
+        // Not carried yet: a file has no format for them, and the rest of a file stays readable
+        // by an older build. They're the next ones to give one.
+        out.put("hushfacebook_video_subfolder", "a settings file has no format for the subfolders yet.");
+        out.put("hushfacebook_photo_subfolder", "a settings file has no format for the subfolders yet.");
+        out.put("hushfacebook_reels_playback_quality", "a settings file has no format for the Reels quality yet.");
+        out.put("hushfacebook_stories_playback_quality", "a settings file has no format for the Stories quality yet.");
         out.put("hushfacebook_font_source",
                 "it names the font file Use the system font draws in, whose copy only this install holds. A settings "
                         + "file can't carry the font itself, and the name alone would point at nothing on another phone.");

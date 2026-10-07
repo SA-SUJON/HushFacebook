@@ -20,6 +20,8 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.showAllText;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.sourcesSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.startTabSummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.subfolderSummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.surfaceQualitySummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.wordsEditorLine;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.wordsRefusal;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.wordsSummary;
@@ -50,6 +52,7 @@ import app.morphe.extension.facebook.download.SaveTo;
 import app.morphe.extension.facebook.download.SendLink;
 import app.morphe.extension.facebook.feed.PostWords;
 import app.morphe.extension.facebook.media.PlaybackQuality;
+import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.facebook.settings.SettingsRows.RowSemantics;
@@ -78,6 +81,46 @@ final class ValueRows {
         public void setText(String text) {
             super.setText(text);
             setSummary(folderSummary(SaveFolder.sanitize(text)));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its edit dialog takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+            fitAboveKeyboard(getDialog());
+        }
+    }
+
+    /**
+     * The row of the subfolder videos ([video]) or photos go in. Its summary follows its text,
+     * whoever sets it, and names the folder the kind's saves land in.
+     */
+    static final class SubfolderRow extends EditTextPreference {
+        final boolean video;
+
+        SubfolderRow(Context context, boolean video) {
+            super(context);
+            this.video = video;
+        }
+
+        @Override
+        public void setText(String text) {
+            super.setText(text);
+            showSummary();
+        }
+
+        /** Also redone when the save folder or Save to changes, since the path starts with those. */
+        void showSummary() {
+            setSummary(subfolderSummary(video, SaveFolder.cleanSubfolder(getText())));
         }
 
         @Override
@@ -633,6 +676,48 @@ final class ValueRows {
                 if (candidate.name().equals(getValue())) quality = candidate;
             }
             setSummary(playbackQualitySummary(quality));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The Reels ([reels]) or Stories quality's row. Its summary follows its value, whoever sets it,
+     * as the playback quality's does.
+     */
+    static final class SurfaceQualityRow extends ListPreference {
+        final boolean reels;
+
+        SurfaceQualityRow(Context context, boolean reels) {
+            super(context);
+            this.reels = reels;
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            SurfaceQuality choice = SurfaceQuality.SAME;
+            for (SurfaceQuality candidate : SurfaceQuality.values()) {
+                if (candidate.name().equals(getValue())) choice = candidate;
+            }
+            setSummary(surfaceQualitySummary(choice, reels));
         }
 
         @Override

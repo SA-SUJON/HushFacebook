@@ -16,6 +16,8 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.qualityRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.saveToRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.sendAppRow;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.subfolderRow;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.surfaceQualityRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.toggle;
 
 import android.content.Context;
@@ -159,6 +161,8 @@ final class VideoPages {
                 playback.addPreference(toggle(context, Settings.DEFAULT_PLAYBACK_QUALITY,
                         L10n.t("Play videos, reels and stories at the quality below. A quality picked in a video's own menu still wins.")));
                 playback.addPreference(playbackQualityRow(context));
+                playback.addPreference(surfaceQualityRow(context, true));
+                playback.addPreference(surfaceQualityRow(context, false));
             }
             if (build.contains(PatchFamily.PICTURE_IN_PICTURE)) {
                 playback.addPreference(toggle(context, Settings.PICTURE_IN_PICTURE,
@@ -205,6 +209,8 @@ final class VideoPages {
             downloads.addPreference(qualityRow(context));
             downloads.addPreference(saveToRow(context));
             downloads.addPreference(folderRow(context));
+            downloads.addPreference(subfolderRow(context, true));
+            downloads.addPreference(subfolderRow(context, false));
             downloads.addPreference(fileNameRow(context));
             if (build.contains(PatchFamily.PHOTO_DOWNLOAD)) downloads.addPreference(photoNameRow(context));
             // Reels and feed and Watch videos can go to another app as a link (#41). A story can't:

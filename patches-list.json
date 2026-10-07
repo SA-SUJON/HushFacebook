@@ -554,7 +554,7 @@
     },
     {
       "name": "Default playback quality",
-      "description": "Plays videos, reels and video stories at the quality you choose in Hushfacebook's settings, such as Data saver or up to 720p, instead of the one Facebook picks as it plays. A quality you pick in a video's own menu still wins for that video.",
+      "description": "Plays videos, reels and video stories at the quality you choose in Hushfacebook's settings, such as Data saver or up to 720p, instead of the one Facebook picks as it plays. Reels and stories can have a quality of their own. A quality you pick in a video's own menu still wins for that video.",
       "category": "Interface",
       "use": false,
       "dependencies": [

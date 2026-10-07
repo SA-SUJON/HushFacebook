@@ -909,3 +909,25 @@ Couldn't save this post's photos. Try again in a moment.	No se pudieron guardar 
 Answer rewarded game ads as watched	Dar por vistos los anuncios con recompensa de los juegos
 # context: description under that switch
 With Block Instant Games ads on, a game's rewarded ad counts as watched: no ad plays and the game gives its reward. Other game ads still get none.	Con Bloquear anuncios de Instant Games activado, el anuncio con recompensa de un juego cuenta como visto: no se reproduce ningún anuncio y el juego te da la recompensa. Los demás anuncios de juegos siguen bloqueados.
+# context: title of the list that picks the quality reels start at
+Reels quality	Calidad de los reels
+# context: title of the list that picks the quality video stories start at
+Stories quality	Calidad de las historias
+# context: first choice in the Reels and Stories quality lists: play at the same quality as other videos
+Same as videos	Igual que los videos
+# context: summary of the Reels quality list when it follows the playback quality row above it
+Reels play at the playback quality above.	Los reels se reproducen con la calidad de reproducción de arriba.
+# context: summary of the Stories quality list when it follows the playback quality row above it
+Video stories play at the playback quality above.	Las historias en video se reproducen con la calidad de reproducción de arriba.
+# context: title of the row naming a folder inside the save folder that video saves go in
+Video subfolder	Subcarpeta de videos
+# context: title of the row naming a folder inside the save folder that photo saves go in
+Photo subfolder	Subcarpeta de fotos
+# context: dialog text of the Video subfolder row
+Choose a folder for videos inside the save folder. Invalid characters become underscores. Leave it blank to keep videos in the save folder itself.	Elige una carpeta para los videos dentro de la carpeta de guardado. Los caracteres no válidos se convierten en guiones bajos. Déjalo vacío para que los videos queden en la carpeta de guardado.
+# context: dialog text of the Photo subfolder row
+Choose a folder for photos inside the save folder. Invalid characters become underscores. Leave it blank to keep photos in the save folder itself.	Elige una carpeta para las fotos dentro de la carpeta de guardado. Los caracteres no válidos se convierten en guiones bajos. Déjalo vacío para que las fotos queden en la carpeta de guardado.
+# context: summary of the Video subfolder row; %1$s is a folder path such as Movies/Facebook/Clips
+Videos go to %1$s.	Los videos van a %1$s.
+# context: summary of the Photo subfolder row; %1$s is a folder path such as Pictures/Facebook/Photos
+Photos go to %1$s.	Las fotos van a %1$s.
