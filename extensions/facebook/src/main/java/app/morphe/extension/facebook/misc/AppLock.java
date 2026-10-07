@@ -154,7 +154,10 @@ public final class AppLock {
         try {
             if (!Utils.settingsReady()) return;
             if (!Settings.APP_LOCK.get() || !canLock(activity)) {
-                // Nothing to ask with, or nothing asked for: turning the lock on later won't lock this screen.
+                // Nothing to ask with, or nothing asked for: turning the lock on later won't lock this
+                // screen. A lock already up goes too, since with the phone's screen lock gone no check
+                // could ever pass.
+                if (locked) release(null);
                 everUnlocked = true;
                 leftAt = NEVER;
                 return;
@@ -196,6 +199,11 @@ public final class AppLock {
                 return;
             }
             keepFromRecents(activity);
+            if (locked && !canLock(activity)) {
+                // The phone's screen lock was taken away while Facebook was locked: nothing could pass.
+                Logger.printInfo(() -> "App lock: the phone has no screen lock now, so Facebook opens");
+                release(null);
+            }
             if (!locked || activity.isInPictureInPictureMode()) return;
             cover(activity);
             if (!asking && !declined) ask(activity);
@@ -228,7 +236,10 @@ public final class AppLock {
         return cover != null && cover.isShowing();
     }
 
-    /** Whether the phone has a screen lock this could ask for. */
+    /**
+     * Whether the phone has a screen lock this could ask for. Without one Facebook is never covered,
+     * and a cover already up goes, since no check could pass.
+     */
     public static boolean canLock(Context context) {
         KeyguardManager keyguard = context.getSystemService(KeyguardManager.class);
         return keyguard != null && keyguard.isDeviceSecure();
@@ -387,10 +398,16 @@ public final class AppLock {
             unlock.setText(L10n.t("Unlock"));
             // Asks again even while a check may still be on its way: one that never answered mustn't trap Facebook.
             unlock.setOnClickListener(view -> {
+                if (!locked) return;
+                if (!canLock(activity)) {
+                    // No screen lock to ask for any more: asking would fail forever.
+                    release(activity);
+                    return;
+                }
                 declined = false;
                 refusal = null;
                 showReason();
-                if (locked) ask(activity);
+                ask(activity);
             });
             column.addView(unlock);
 

@@ -319,6 +319,48 @@ public class AppLockTest {
         assertTrue(asked.isEmpty());
     }
 
+    /** The phone's screen lock taken away while Facebook is locked: no check could pass, so the cover goes. */
+    @Test
+    public void removingThePhonesScreenLockLetsALockedFacebookGo() {
+        Settings.APP_LOCK.save(true);
+        Activity activity = screen();
+        front(activity);
+        asked.get(0).answer.refused(BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED, "Cancelled");
+        assertTrue(AppLock.covered(activity));
+
+        // Back from Android's settings without the screen lock: the same screen comes to the front.
+        secure(false);
+        AppLock.resumed(activity);
+        ShadowLooper.idleMainLooper();
+        assertFalse("the cover stayed with nothing left to ask for", AppLock.covered(activity));
+        assertFalse(AppLock.covering());
+        assertEquals(1, asked.size());
+
+        // Locked again, then Facebook left and brought back after the screen lock went.
+        secure(true);
+        awayAndBack(activity, Duration.ofMinutes(5));
+        assertTrue(AppLock.covered(activity));
+        assertEquals(2, asked.size());
+        asked.get(1).answer.refused(BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED, "Cancelled");
+        AppLock.stopped(activity);
+        secure(false);
+        ShadowSystemClock.advanceBy(Duration.ofMinutes(5));
+        front(activity);
+        assertFalse("a return without a screen lock stayed covered", AppLock.covered(activity));
+        assertFalse(AppLock.covering());
+
+        // Locked again, and Unlock tapped after the screen lock went.
+        secure(true);
+        awayAndBack(activity, Duration.ofMinutes(5));
+        assertEquals(3, asked.size());
+        asked.get(2).answer.refused(BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED, "Cancelled");
+        secure(false);
+        button(ShadowDialog.getLatestDialog().getWindow().getDecorView()).performClick();
+        ShadowLooper.idleMainLooper();
+        assertFalse("Unlock left Facebook covered with nothing to ask for", AppLock.covering());
+        assertEquals("Unlock asked for a screen lock the phone doesn't have", 3, asked.size());
+    }
+
     /**
      * Each way to pause Hushfacebook is in reach of someone holding the phone, so none of them
      * opens Facebook: a start still covers it and asks, and Lock after keeps the time chosen.
