@@ -48,7 +48,8 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *   <li>The trigger is one only something you did sends: {@link #CONTROLS}.</li>
  *   <li>A tap ended no more than {@link #TAP_WINDOW_MS} ago ({@link TapClock}) and the trigger isn't
  *       one Facebook sends because something came into view or came back ({@link #visibilityDriven}).
- *       BY_AUTOPLAY is let through here, since the Story you tap starts with it.</li>
+ *       BY_AUTOPLAY is let through here, since the Story you tap starts with it, unless a reel's
+ *       player sends it: 581's Reels tab starts the reel it lands on with BY_AUTOPLAY.</li>
  *   <li>A link another app handed Facebook opened a screen no more than {@link #LINK_WINDOW_MS}
  *       ago, the trigger is BY_USER, and nothing else has let a start through or moved on since
  *       ({@link #activityCreated}). Facebook's video player opens a shared video from a browser
@@ -58,8 +59,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *       and Facebook pauses the player on its way in and starts it again in the window, so a start
  *       held there could never be tapped into playing.</li>
  *   <li>With {@link Settings#TAP_TO_PLAY_REELS_AFTER_FIRST} on, the start is a reel coming into
- *       view while a run of reels is going ({@link #noteReelRun}): a tap or a control played the
- *       reel that was waiting, and nothing has been held since.</li>
+ *       view (BY_SHORT_FORM_VIDEO_FULLY_VISIBLE, or BY_AUTOPLAY on a reel's player) while a run of
+ *       reels is going ({@link #noteReelRun}): a tap or a control played the reel that was waiting,
+ *       and nothing has been held since.</li>
  * </ul>
  *
  * <p>Every other start is held, and the player stays where it was, showing its first frame or its
@@ -92,8 +94,11 @@ public final class TapToPlay {
     /** No link waiting: none came, or a BY_USER start took it. */
     private static final long NO_LINK = Long.MIN_VALUE;
 
-    /** The trigger Facebook starts each reel you land on with. */
+    /** The trigger Facebook starts each reel you land on with, before 581. */
     private static final String REEL_IN_VIEW = "BY_SHORT_FORM_VIDEO_FULLY_VISIBLE";
+
+    /** What 581's Reels tab starts each reel you land on with, and the feed a video it scrolls to. */
+    private static final String BY_AUTOPLAY = "BY_AUTOPLAY";
 
     /** What the triggers of a reel's own starts begin with: coming into view, and coming back. */
     private static final String REEL_TRIGGERS = "BY_SHORT_FORM_VIDEO_";
@@ -141,12 +146,34 @@ public final class TapToPlay {
 
     /** The hook, first thing in FbGrootPlayer's play. False, and the play returns at once. */
     public static boolean allowStart(Object player, Object trigger) {
-        return allow(player, trigger, "player start", "");
+        return allow(player, trigger, "player start", "", true);
     }
 
     /** The hook, first thing in the older Rich Video Player's playback controller play. */
     public static boolean allowLegacyStart(Object player, Object trigger) {
-        return allow(player, trigger, "older player start", " (older player)");
+        return allow(player, trigger, "older player start", " (older player)", false);
+    }
+
+    /** Filled in by the patch: FbGrootPlayer's VideoPlayerParams getter. Only a player may be passed. */
+    @Nullable
+    public static Object playerParams(Object player) {
+        return null;
+    }
+
+    /** Filled in by the patch: the field VideoPlayerParams' debug dump reports as isFbShorts. Only params may be passed. */
+    public static boolean fbShorts(Object params) {
+        return false;
+    }
+
+    /**
+     * Whether FbGrootPlayer [player] plays a reel, as its VideoPlayerParams say. False when the patch
+     * couldn't fill the stubs above, and a reel's BY_AUTOPLAY start then counts as any other's.
+     */
+    private static boolean playsReel(Object player) {
+        Object params = playerParams(player);
+        if (params == null) return false;
+        HookStatus.bound(FamilyNames.TAP_TO_PLAY, "reel check");
+        return fbShorts(params);
     }
 
     /** The hook, first thing in each player's pause. A paused player waits for a tap again. */
@@ -298,7 +325,8 @@ public final class TapToPlay {
                 () -> "Tap to play: Reels show their play button until a tap");
     }
 
-    private static boolean allow(Object player, Object trigger, String hook, String path) {
+    /** [groot] says [player] is an FbGrootPlayer, the only player the reel check may be handed. */
+    private static boolean allow(Object player, Object trigger, String hook, String path, boolean groot) {
         try {
             HookStatus.invoked(FamilyNames.TAP_TO_PLAY);
             RuntimeException failure = failNext;
@@ -313,8 +341,9 @@ public final class TapToPlay {
                 return true;
             }
             HookStatus.bound(FamilyNames.TAP_TO_PLAY, hook);
-            return decide(player, trigger instanceof Enum ? ((Enum<?>) trigger).name() : null,
-                    SystemClock.uptimeMillis(), path);
+            String name = trigger instanceof Enum ? ((Enum<?>) trigger).name() : null;
+            boolean autoplayedReel = groot && BY_AUTOPLAY.equals(name) && playsReel(player);
+            return decide(player, name, autoplayedReel, SystemClock.uptimeMillis(), path);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.TAP_TO_PLAY, hook, failure);
             return true;
@@ -325,24 +354,31 @@ public final class TapToPlay {
         return Utils.settingsReady() && Settings.TAP_TO_PLAY.get();
     }
 
-    /** The rule, with the clock passed in. Arms the player when it lets the start through. */
-    static boolean decide(Object player, @Nullable String trigger, long now, String path) {
+    /**
+     * The rule, with the clock passed in. Arms the player when it lets the start through.
+     * [autoplayedReel] says the start is BY_AUTOPLAY on a player that plays a reel ({@link #playsReel}).
+     * Facebook 581's Reels tab starts each reel it lands on that way, so it counts as the reel coming
+     * into view: a tap on the tab doesn't let it through, and a run of reels does (#91).
+     */
+    static boolean decide(Object player, @Nullable String trigger, boolean autoplayedReel, long now, String path) {
         boolean armed = ARMED.armed(player);
         long sinceTap = TapClock.msSinceTap(now);
         boolean control = trigger != null && CONTROLS.contains(trigger);
-        boolean tapped = sinceTap >= 0 && sinceTap <= TAP_WINDOW_MS && !visibilityDriven(trigger);
+        boolean tapped = sinceTap >= 0 && sinceTap <= TAP_WINDOW_MS && !visibilityDriven(trigger) && !autoplayedReel;
         // A tap or a control is the person at work, so a link waiting is no longer what started
         // this. An armed player's own restart leaves it for the player the link opened.
         if (tapped || control) dropLink();
         boolean window = !armed && !control && !tapped && inPictureInPicture();
         boolean linked = !armed && !control && !tapped && !window && BY_USER.equals(trigger) && takeLink(now);
         boolean run = !armed && !control && !tapped && !window && !linked && reelRun
-                && REEL_IN_VIEW.equals(trigger) && Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.get();
+                && (REEL_IN_VIEW.equals(trigger) || autoplayedReel) && Settings.TAP_TO_PLAY_REELS_AFTER_FIRST.get();
         boolean allowed = armed || control || linked || tapped || window || run;
         if (allowed && (!armed || control)) ARMED.arm(player, now);
-        noteReelRun(player, trigger, allowed, tapped || control);
+        noteReelRun(player, autoplayedReel || trigger != null && trigger.startsWith(REEL_TRIGGERS), allowed,
+                tapped || control);
         logDecision(allowed, trigger, sinceTap, armed, linked ? path + " (a link asked for it)"
-                : window ? path + " (in picture-in-picture)" : run ? path + " (a reel after one you played)" : path);
+                : window ? path + " (in picture-in-picture)" : run ? path + " (a reel after one you played)"
+                : autoplayedReel ? path + " (a reel)" : path);
         return allowed;
     }
 
@@ -353,10 +389,10 @@ public final class TapToPlay {
      * trying to start a video, means the person isn't swiping through Reels anymore, so the next
      * reel waits again. Tracked whatever the switch says; only the decision reads it.
      */
-    private static void noteReelRun(Object player, @Nullable String trigger, boolean allowed, boolean yours) {
+    private static void noteReelRun(Object player, boolean reelStart, boolean allowed, boolean yours) {
         if (!allowed) {
             reelRun = false;
-            heldReel = new WeakReference<>(trigger != null && trigger.startsWith(REEL_TRIGGERS) ? player : null);
+            heldReel = new WeakReference<>(reelStart ? player : null);
         } else if (yours && player != null && player == heldReel.get()) {
             reelRun = true;
         }
