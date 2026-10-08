@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,6 +106,25 @@ public class LastScreenTest {
 
         assertEquals(List.of("FrameLayout#content > ImageView (2 views)"),
                 LastScreen.walks(screen.root, WIDTH * LastScreen.ACROSS, HEIGHT * 0.55f));
+    }
+
+    @Test
+    public void eachViewSaysWhatItPaintsBehindItself() {
+        Context context = RuntimeEnvironment.getApplication();
+        Screen screen = new Screen(context);
+        screen.root.setBackgroundColor(0xFF101011);
+        ImageView top = new ImageView(context);
+        top.setBackgroundColor(0x80252728);
+        screen.root.addView(top, new FrameLayout.LayoutParams(WIDTH, HEIGHT));
+        layOut(screen.root);
+
+        assertEquals(List.of("FrameLayout#content {#101011} > ImageView {#80252728} (2 views)"),
+                LastScreen.walks(screen.root, WIDTH * LastScreen.ACROSS, HEIGHT * 0.55f));
+
+        top.setBackground(new GradientDrawable());
+        assertEquals(" {GradientDrawable}", LastScreen.background(top));
+        top.setBackground(null);
+        assertEquals("", LastScreen.background(top));
     }
 
     @Test

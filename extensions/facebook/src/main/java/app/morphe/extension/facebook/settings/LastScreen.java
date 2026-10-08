@@ -6,7 +6,10 @@ package app.morphe.extension.facebook.settings;
 
 import android.app.Activity;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +29,9 @@ import app.morphe.extension.shared.settings.preference.LogBufferManager;
  * with, and each of them counts itself in Hook status. On some accounts the Reels tab counts
  * neither, so its buttons come from something else, and nothing in the app's code says what. Each
  * time a Facebook screen pauses, this follows two points at its right edge from the window's root
- * down to the view under each, and keeps each view's class and resource name. Leave Facebook from
- * a reel and the next report says what draws its buttons. No text or description on the screen is
- * read.
+ * down to the view under each, and keeps each view's class, resource name and background. Leave
+ * Facebook from a reel and the next report says what draws its buttons, or from a sheet and it says
+ * which view paints its colour. No text or description on the screen is read.
  *
  * <p>It's read on the way out rather than when the settings open, because the intent that opens
  * them from the launcher makes Facebook build its screen again, and by then the reel is gone.
@@ -190,9 +193,10 @@ final class LastScreen {
     private static String path(List<Step> steps) {
         StringBuilder text = new StringBuilder();
         for (int i = 0; i < steps.size(); ) {
-            String name = name(steps.get(i).view);
+            String name = name(steps.get(i).view) + background(steps.get(i).view);
             int run = 1;
-            while (i + run < steps.size() && name(steps.get(i + run).view).equals(name)) run++;
+            while (i + run < steps.size()
+                    && (name(steps.get(i + run).view) + background(steps.get(i + run).view)).equals(name)) run++;
             if (text.length() > 0) text.append(" > ");
             text.append(name);
             if (run > 1) text.append(" x").append(run);
@@ -216,10 +220,28 @@ final class LastScreen {
             child.getHitRect(hit);
             String state = child.getVisibility() == View.VISIBLE ? (child.getAlpha() <= 0f ? "clear" : "shown")
                     : child.getVisibility() == View.INVISIBLE ? "invisible" : "gone";
-            text.append(String.format(Locale.ROOT, " %s %s [%d,%d %dx%d]",
-                    name(child), state, hit.left, hit.top, hit.width(), hit.height()));
+            text.append(String.format(Locale.ROOT, " %s%s %s [%d,%d %dx%d]",
+                    name(child), background(child), state, hit.left, hit.top, hit.width(), hit.height()));
         }
         return text.toString();
+    }
+
+    /**
+     * What [view] paints behind itself, after its name: nothing without a background, " {#RRGGBB}"
+     * for a plain colour (#AARRGGBB when it's see-through), and otherwise the drawable's class, a
+     * framework one by its simple name. That's how a report says which view paints a colour a theme
+     * missed (#37).
+     */
+    static String background(View view) {
+        Drawable background = view.getBackground();
+        if (background == null) return "";
+        if (background instanceof ColorDrawable) {
+            int color = ((ColorDrawable) background).getColor();
+            return Color.alpha(color) == 0xFF ? String.format(Locale.ROOT, " {#%06X}", color & 0xFFFFFF)
+                    : String.format(Locale.ROOT, " {#%08X}", color);
+        }
+        String type = background.getClass().getName();
+        return " {" + (type.startsWith("android.graphics.drawable.") ? background.getClass().getSimpleName() : type) + "}";
     }
 
     /** A framework class by its simple name, anything else in full; then the resource name, if the id has one. */
