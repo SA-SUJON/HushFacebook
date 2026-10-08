@@ -428,8 +428,8 @@ public final class MaterialYouTheme {
     /**
      * Gives each view under [root] whose background is a plain colour of the {@link #SURFACES} the
      * palette's neutral at the same lightness, in dark mode and without AMOLED, as
-     * {@link #recolourWindow} does for a window. Litho's views are passed by: their colours come
-     * through the hooks already.
+     * {@link #recolourWindow} does for a window. Litho's hosts are walked too: on 581 the comment
+     * rows draw #252728 with no FDS token reaching {@link #fds}.
      *
      * @return how many views it recoloured
      */
@@ -439,7 +439,6 @@ public final class MaterialYouTheme {
     }
 
     private static int recolourBackgrounds(View view, int depth) {
-        if (view.getClass().getName().startsWith("com.facebook.litho.")) return 0;
         int recoloured = 0;
         Drawable background = view.getBackground();
         if (background instanceof ColorDrawable && isSurface(((ColorDrawable) background).getColor())) {
@@ -456,7 +455,7 @@ public final class MaterialYouTheme {
         return recoloured;
     }
 
-    /** Deeper than the comment sheet's plain views go, so a broken tree can't hold a layout up. */
+    /** Deeper than the comment sheet's views go, so a broken tree can't hold a layout up. */
     private static final int MAX_SHEET_DEPTH = 40;
 
     /**
