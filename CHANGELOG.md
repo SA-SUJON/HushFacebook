@@ -7,6 +7,7 @@ Every Hushfacebook release, newest first.
 ### Added
 
 * **Facebook:** `Comment sheet options` has a fourth switch under Comments, **Hide related groups**. It takes the Related groups list and its Join buttons out from under a group post's comments, and the comments themselves stay. It starts off, and the diagnostic report counts each list it keeps out.
+* **Tooling:** `scripts/phone-smoke.ps1` walks a patched Facebook on a phone through the feed, Watch, Reels, notifications and Marketplace, saves a full diagnostic report from Hushfacebook settings and pulls it. It fails when a hook family reports anything missing, ambiguous or thrown, when a family you name with `-ExpectInvoked` never ran, or when Facebook crashed during the walk. A crash the report kept from before the walk doesn't count. `scripts/test-phone-smoke.ps1` checks the report reading without a phone.
 
 ### Changed
 
