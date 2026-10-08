@@ -186,15 +186,33 @@ public class LastScreenTest {
                 lines);
     }
 
-    /** A group with no children draws what's at the point itself, the way a Litho host can. */
+    /** A group with no children that paints a background draws what's at the point itself. */
     @Test
-    public void aGroupWithNoChildrenEndsTheWalk() {
+    public void aGroupWithNoChildrenAndABackgroundEndsTheWalk() {
+        Context context = RuntimeEnvironment.getApplication();
+        Screen screen = new Screen(context);
+        FrameLayout painted = new FrameLayout(context);
+        painted.setBackgroundColor(0xFF252728);
+        screen.root.addView(painted, new FrameLayout.LayoutParams(WIDTH, HEIGHT));
+        layOut(screen.root);
+
+        assertEquals(List.of("FrameLayout#content > FrameLayout {#252728} (2 views)"),
+                LastScreen.walks(screen.root, WIDTH * LastScreen.ACROSS, HEIGHT * 0.55f));
+    }
+
+    /**
+     * One with no background may draw nothing there, like the empty LithoView 581 lays over the
+     * comment list (#37), so the walk under it is written too.
+     */
+    @Test
+    public void aGroupWithNoChildrenOrBackgroundIsWrittenThenTheWalkGoesOnUnderIt() {
         Context context = RuntimeEnvironment.getApplication();
         Screen screen = new Screen(context);
         screen.root.addView(new FrameLayout(context), new FrameLayout.LayoutParams(WIDTH, HEIGHT));
         layOut(screen.root);
 
-        assertEquals(List.of("FrameLayout#content > FrameLayout (2 views)"),
+        assertEquals(List.of("FrameLayout#content > FrameLayout (2 views)",
+                        "FrameLayout#content > FrameLayout x2 > LinearLayout > ImageView (5 views)"),
                 LastScreen.walks(screen.root, WIDTH * LastScreen.ACROSS, HEIGHT * 0.55f));
     }
 

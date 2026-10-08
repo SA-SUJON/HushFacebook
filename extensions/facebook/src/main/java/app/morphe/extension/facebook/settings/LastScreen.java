@@ -153,8 +153,9 @@ final class LastScreen {
      * <p>A walk that ends in a group whose children all miss the point found a layer that draws
      * nothing there: 580 lays an empty full-window frame over the whole feed. Then the walk goes
      * back up to the nearest view with another child under the point and down again from it, and
-     * that walk comes next, up to {@link #MAX_WALKS}. A group with no children at all ends a walk
-     * for good, since it draws what's there itself.
+     * that walk comes next, up to {@link #MAX_WALKS}. A group with no children ends a walk for good
+     * when it paints a background. Without one it may draw nothing there, like the empty LithoView
+     * 581 lays over the comment list, so the walk under it comes next as well.
      */
     static List<String> walks(View root, float x, float y) {
         List<String> out = new ArrayList<>();
@@ -174,9 +175,11 @@ final class LastScreen {
             }
             boolean deadEnd = steps.size() < MAX_DEPTH && last.view instanceof ViewGroup
                     && ((ViewGroup) last.view).getChildCount() > 0;
+            boolean bare = steps.size() > 1 && steps.size() < MAX_DEPTH && last.view instanceof ViewGroup
+                    && ((ViewGroup) last.view).getChildCount() == 0 && last.view.getBackground() == null;
             out.add(path(steps) + (deadEnd ? children((ViewGroup) last.view,
                     last.x + last.view.getScrollX(), last.y + last.view.getScrollY()) : ""));
-            if (!deadEnd) break;
+            if (!deadEnd && !bare) break;
             steps.remove(steps.size() - 1);
             while (!steps.isEmpty()) {
                 Step back = steps.get(steps.size() - 1);
