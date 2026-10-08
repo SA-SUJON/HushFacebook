@@ -6,6 +6,8 @@ package app.morphe.extension.facebook.feed;
 
 import androidx.annotation.Nullable;
 
+import java.util.regex.Pattern;
+
 import app.morphe.extension.facebook.navigation.FeedsSubtabRoute;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
@@ -49,6 +51,16 @@ public final class FollowingHome {
     /** The member the report names once a request for Home's feed has come through. */
     static final String REQUEST = "Home feed request";
 
+    /**
+     * Counted, followed by the feed type's name, for each request for another feed while the switch
+     * is on. On the S25 (581, 2026-10-08) a cold start's Home matched the Feeds tab's All, while a
+     * pull to refresh showed ranked posts again, so the report says which feed types go out.
+     */
+    static final String LEFT_ALONE = "Request left as ";
+
+    /** A feed type's name as Facebook writes its built-in ones. Anything else is counted unnamed. */
+    private static final Pattern FEED_TYPE_NAME = Pattern.compile("[a-z0-9_]{1,40}");
+
     private static final String FAMILY = FamilyNames.FOLLOWING_HOME;
 
     /** The most recent feed's type, once found. */
@@ -69,7 +81,12 @@ public final class FollowingHome {
     public static Object feedType(@Nullable Object requested) {
         try {
             HookStatus.invoked(FAMILY);
-            if (requested == null || !HOME.equals(requested.toString())) return requested;
+            if (requested == null) return null;
+            String name = requested.toString();
+            if (!HOME.equals(name)) {
+                countLeftAlone(name);
+                return requested;
+            }
             HookStatus.bound(FAMILY, REQUEST);
             if (!Utils.settingsReady() || !Settings.FOLLOWING_FEED_HOME.get()) return requested;
             Object chosen = mostRecentLike(requested);
@@ -87,6 +104,13 @@ public final class FollowingHome {
             HookStatus.threw(FAMILY, "home feed request", failure);
             return requested;
         }
+    }
+
+    /** Counts a request for another feed while the switch is on, under its type's name when it reads like one. */
+    private static void countLeftAlone(@Nullable String name) {
+        if (!Utils.settingsReady() || !Settings.FOLLOWING_FEED_HOME.get()) return;
+        HookStatus.counted(FAMILY, LEFT_ALONE
+                + (name != null && FEED_TYPE_NAME.matcher(name).matches() ? name : "another type"));
     }
 
     /** The most recent feed's type among the constants of [requested]'s class, or null. */
