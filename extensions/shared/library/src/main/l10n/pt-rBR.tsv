@@ -156,9 +156,9 @@ Pause Hushfacebook	Pausar o Hushfacebook
 Posts Facebook files as promotions rather than as ads.	Publicações que o Facebook classifica como promoções, e não como anúncios.
 Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.	Publicações de pessoas e Páginas que você não segue e de grupos dos quais você não participa, inseridas pelo Facebook no seu feed.
 Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.	Publicações que a detecção do próprio Facebook marca como geradas por IA. Uma publicação que apenas o autor marcou como IA continua aparecendo. Esta opção vem desativada por padrão porque ainda não foi testada em um feed real.
-Profiles and some Settings pages open again on this re-signed build.	Perfis e algumas páginas de Configurações voltam a abrir nesta versão com nova assinatura.
-Profiles and some Settings pages won't open	Perfis e algumas páginas de Configurações não vão abrir
-Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.	Aplique os patches novamente com %1$s selecionado. Versões com nova assinatura precisam dele para perfis e algumas páginas de Configurações do Facebook.
+Profiles, photos, posts and some Settings pages open again on this re-signed build.	Perfis, fotos, publicações e algumas páginas de Configurações voltam a abrir nesta versão com nova assinatura.
+Profiles, photos and posts won't open	Perfis, fotos e publicações não vão abrir
+Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.	Aplique os patches novamente com %1$s selecionado. Versões com nova assinatura precisam dele para abrir perfis, fotos, publicações e algumas páginas de Configurações do Facebook.
 Re-signed build fix	Correção para versão com nova assinatura
 Reading the settings file	Lendo o arquivo de configurações
 Reels and Watch	Reels e Watch

@@ -156,9 +156,9 @@ Pause Hushfacebook	Pausar Hushfacebook
 Posts Facebook files as promotions rather than as ads.	Publicaciones que Facebook clasifica como promociones y no como anuncios.
 Posts Facebook slips into your feed from people and pages you don't follow and groups you haven't joined.	Publicaciones de personas y páginas que no sigues y de grupos a los que no te has unido que Facebook mete en tu feed.
 Posts that Facebook's own detection marks as made with AI. A post that only its creator labelled as AI stays. It's off by default because it hasn't been tested on a real feed yet.	Publicaciones que la detección propia de Facebook marca como creadas con IA. Una publicación que solo su autor etiquetó como IA se mantiene. Este interruptor viene desactivado porque todavía no se probó en un feed real.
-Profiles and some Settings pages open again on this re-signed build.	Los perfiles y algunas páginas de Configuración vuelven a abrirse en esta versión firmada de nuevo.
-Profiles and some Settings pages won't open	Los perfiles y algunas páginas de Configuración no se abrirán
-Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.	Vuelve a parchear con %1$s seleccionado. Las versiones firmadas de nuevo lo necesitan para los perfiles y algunas páginas de Configuración de Facebook.
+Profiles, photos, posts and some Settings pages open again on this re-signed build.	Los perfiles, las fotos, las publicaciones y algunas páginas de Configuración vuelven a abrirse en esta versión firmada de nuevo.
+Profiles, photos and posts won't open	Los perfiles, las fotos y las publicaciones no se abrirán
+Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.	Vuelve a parchear con %1$s seleccionado. Las versiones firmadas de nuevo lo necesitan para abrir perfiles, fotos, publicaciones y algunas páginas de Configuración de Facebook.
 Re-signed build fix	Arreglo para la nueva firma
 Reading the settings file	Leyendo el archivo de configuración
 Reels and Watch	Reels y Watch

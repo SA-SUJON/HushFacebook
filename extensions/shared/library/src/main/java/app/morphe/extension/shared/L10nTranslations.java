@@ -1102,8 +1102,8 @@ public final class L10nTranslations {
                 "Seiten");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Bezahlte Anzeigen im Feed. Diese werden aussortiert, bevor Facebook sie einf\u00fcgt, sodass keine L\u00fccke bleibt.");
-        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
-                "W\u00e4hle %1$s aus und patche erneut. Neu signierte Builds brauchen diesen Patch f\u00fcr Profile und einige Facebook-Einstellungsseiten.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.",
+                "W\u00e4hle %1$s aus und patche erneut. Neu signierte Builds brauchen diesen Patch, um Profile, Fotos, Beitr\u00e4ge und einige Facebook-Einstellungsseiten zu \u00f6ffnen.");
         table.put("Pause",
                 "Pausieren");
         table.put("Pause Hushfacebook",
@@ -1187,10 +1187,10 @@ public final class L10nTranslations {
                 "Gesehene Beitr\u00e4ge bleiben %1$s lang ausgeblendet.");
         table.put("Privacy",
                 "Datenschutz");
-        table.put("Profiles and some Settings pages open again on this re-signed build.",
-                "Profile und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
-        table.put("Profiles and some Settings pages won't open",
-                "Profile und einige Einstellungsseiten \u00f6ffnen sich nicht");
+        table.put("Profiles, photos and posts won't open",
+                "Profile, Fotos und Beitr\u00e4ge \u00f6ffnen sich nicht");
+        table.put("Profiles, photos, posts and some Settings pages open again on this re-signed build.",
+                "Profile, Fotos, Beitr\u00e4ge und einige Einstellungsseiten \u00f6ffnen sich in diesem neu signierten Build wieder.");
         table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
                 "Werbung f\u00fcr Avatar-Sticker verschwindet aus Kommentaren und Facebooks Werbepl\u00e4tzen, ebenso die Aufforderung, einen Avatar zu erstellen. Sticker lassen sich weiterhin senden.");
         table.put("Purple",
@@ -2883,8 +2883,8 @@ public final class L10nTranslations {
                 "P\u00e1ginas");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Anuncios pagados en el feed. Se eliminan antes de que Facebook los inserte, as\u00ed que no queda ning\u00fan espacio vac\u00edo.");
-        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
-                "Vuelve a parchear con %1$s seleccionado. Las versiones firmadas de nuevo lo necesitan para los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n de Facebook.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.",
+                "Vuelve a parchear con %1$s seleccionado. Las versiones firmadas de nuevo lo necesitan para abrir perfiles, fotos, publicaciones y algunas p\u00e1ginas de Configuraci\u00f3n de Facebook.");
         table.put("Pause",
                 "Pausar");
         table.put("Pause Hushfacebook",
@@ -2968,10 +2968,10 @@ public final class L10nTranslations {
                 "Las publicaciones que has visto seguir\u00e1n ocultas durante %1$s.");
         table.put("Privacy",
                 "Privacidad");
-        table.put("Profiles and some Settings pages open again on this re-signed build.",
-                "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
-        table.put("Profiles and some Settings pages won't open",
-                "Los perfiles y algunas p\u00e1ginas de Configuraci\u00f3n no se abrir\u00e1n");
+        table.put("Profiles, photos and posts won't open",
+                "Los perfiles, las fotos y las publicaciones no se abrir\u00e1n");
+        table.put("Profiles, photos, posts and some Settings pages open again on this re-signed build.",
+                "Los perfiles, las fotos, las publicaciones y algunas p\u00e1ginas de Configuraci\u00f3n vuelven a abrirse en esta versi\u00f3n firmada de nuevo.");
         table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
                 "Las promociones de stickers de avatar desaparecen de los comentarios y de los espacios promocionales de Facebook, junto con la invitaci\u00f3n a crear un avatar. Los stickers se siguen enviando.");
         table.put("Purple",
@@ -4664,8 +4664,8 @@ public final class L10nTranslations {
                 "Halaman");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Iklan berbayar di Kabar Beranda. Iklannya dibuang sebelum ditambahkan Facebook, jadi tidak meninggalkan ruang kosong.");
-        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
-                "Tambal ulang dengan %1$s dipilih. Build yang ditandatangani ulang membutuhkannya untuk profil dan beberapa halaman Pengaturan Facebook.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.",
+                "Tambal ulang dengan %1$s dipilih. Build yang ditandatangani ulang membutuhkannya untuk membuka profil, foto, postingan, dan beberapa halaman Pengaturan Facebook.");
         table.put("Pause",
                 "Jeda");
         table.put("Pause Hushfacebook",
@@ -4749,10 +4749,10 @@ public final class L10nTranslations {
                 "Kiriman yang sudah kamu lihat akan tetap tersembunyi selama %1$s.");
         table.put("Privacy",
                 "Privasi");
-        table.put("Profiles and some Settings pages open again on this re-signed build.",
-                "Profil dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
-        table.put("Profiles and some Settings pages won't open",
-                "Profil dan beberapa halaman Pengaturan tidak akan terbuka");
+        table.put("Profiles, photos and posts won't open",
+                "Profil, foto, dan postingan tidak akan terbuka");
+        table.put("Profiles, photos, posts and some Settings pages open again on this re-signed build.",
+                "Profil, foto, postingan, dan beberapa halaman Pengaturan dapat dibuka lagi di build yang ditandatangani ulang ini.");
         table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
                 "Promosi stiker avatar hilang dari komentar dan slot promosi Facebook, begitu juga ajakan membuat avatar. Stiker tetap bisa dikirim.");
         table.put("Purple",
@@ -6445,8 +6445,8 @@ public final class L10nTranslations {
                 "P\u00e1ginas");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "An\u00fancios pagos no feed. Eles s\u00e3o removidos antes de o Facebook adicion\u00e1-los, portanto n\u00e3o fica nenhum espa\u00e7o vazio.");
-        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
-                "Aplique os patches novamente com %1$s selecionado. Vers\u00f5es com nova assinatura precisam dele para perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es do Facebook.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.",
+                "Aplique os patches novamente com %1$s selecionado. Vers\u00f5es com nova assinatura precisam dele para abrir perfis, fotos, publica\u00e7\u00f5es e algumas p\u00e1ginas de Configura\u00e7\u00f5es do Facebook.");
         table.put("Pause",
                 "Pausar");
         table.put("Pause Hushfacebook",
@@ -6530,10 +6530,10 @@ public final class L10nTranslations {
                 "As publica\u00e7\u00f5es que voc\u00ea viu ficar\u00e3o ocultas por %1$s.");
         table.put("Privacy",
                 "Privacidade");
-        table.put("Profiles and some Settings pages open again on this re-signed build.",
-                "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o com nova assinatura.");
-        table.put("Profiles and some Settings pages won't open",
-                "Perfis e algumas p\u00e1ginas de Configura\u00e7\u00f5es n\u00e3o v\u00e3o abrir");
+        table.put("Profiles, photos and posts won't open",
+                "Perfis, fotos e publica\u00e7\u00f5es n\u00e3o v\u00e3o abrir");
+        table.put("Profiles, photos, posts and some Settings pages open again on this re-signed build.",
+                "Perfis, fotos, publica\u00e7\u00f5es e algumas p\u00e1ginas de Configura\u00e7\u00f5es voltam a abrir nesta vers\u00e3o com nova assinatura.");
         table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
                 "As promo\u00e7\u00f5es de figurinhas de avatar saem dos coment\u00e1rios e dos espa\u00e7os de promo\u00e7\u00e3o do Facebook, junto com o convite para criar um avatar. As figurinhas continuam sendo enviadas.");
         table.put("Purple",
@@ -8226,8 +8226,8 @@ public final class L10nTranslations {
                 "Sayfalar");
         table.put("Paid ads in the feed. They're dropped before Facebook adds them, so no gap is left.",
                 "Ak\u0131\u015ftaki \u00fccretli reklamlar. Facebook eklemeden \u00f6nce \u00e7\u0131kar\u0131ld\u0131klar\u0131 i\u00e7in yerlerinde bo\u015fluk kalmaz.");
-        table.put("Patch again with %1$s selected. Re-signed builds need it for profiles and some Facebook Settings pages.",
-                "%1$s se\u00e7iliyken yeniden yamala. Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmler profiller ve baz\u0131 Facebook Ayarlar\u0131 sayfalar\u0131 i\u00e7in buna ihtiya\u00e7 duyar.");
+        table.put("Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.",
+                "%1$s se\u00e7iliyken yeniden yamala. Yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmler profilleri, foto\u011fraflar\u0131, g\u00f6nderileri ve baz\u0131 Facebook Ayarlar\u0131 sayfalar\u0131n\u0131 a\u00e7mak i\u00e7in buna ihtiya\u00e7 duyar.");
         table.put("Pause",
                 "Duraklat");
         table.put("Pause Hushfacebook",
@@ -8311,10 +8311,10 @@ public final class L10nTranslations {
                 "G\u00f6rd\u00fc\u011f\u00fcn g\u00f6nderiler %1$s boyunca gizli kalacak.");
         table.put("Privacy",
                 "Gizlilik");
-        table.put("Profiles and some Settings pages open again on this re-signed build.",
-                "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
-        table.put("Profiles and some Settings pages won't open",
-                "Profiller ve baz\u0131 Ayarlar sayfalar\u0131 a\u00e7\u0131lmayacak");
+        table.put("Profiles, photos and posts won't open",
+                "Profiller, foto\u011fraflar ve g\u00f6nderiler a\u00e7\u0131lmayacak");
+        table.put("Profiles, photos, posts and some Settings pages open again on this re-signed build.",
+                "Profiller, foto\u011fraflar, g\u00f6nderiler ve baz\u0131 Ayarlar sayfalar\u0131 bu yeniden imzalanm\u0131\u015f s\u00fcr\u00fcmde tekrar a\u00e7\u0131l\u0131r.");
         table.put("Promotions for avatar stickers leave comments and Facebook's promotion slots, along with the prompt to make an avatar. Stickers still send.",
                 "Avatar \u00e7\u0131kartmas\u0131 tan\u0131t\u0131mlar\u0131 yorumlardan ve Facebook'un tan\u0131t\u0131m alanlar\u0131ndan kalkar, avatar olu\u015fturma daveti de kalkar. \u00c7\u0131kartmalar yine g\u00f6nderilebilir.");
         table.put("Purple",
