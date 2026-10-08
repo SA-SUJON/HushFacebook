@@ -11,13 +11,16 @@ import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Looper;
+import android.view.View;
 import android.view.Window;
+import android.widget.FrameLayout;
 
 import org.junit.After;
 import org.junit.Before;
@@ -801,6 +804,53 @@ public class MaterialYouThemeTest {
         window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
         window.peekDecorView().getViewTreeObserver().dispatchOnPreDraw();
         assertEquals("light mode", 0xFF101011, windowColour(window));
+    }
+
+    /**
+     * The comment sheet is a dialog fragment over the screen, and its comment list sits on a view
+     * with a plain #252728 background (#37). A window the screen opens above its own takes the
+     * palette on such views, then again after each of its layouts; other colours and light mode
+     * keep theirs.
+     */
+    @Test
+    public void aSheetOverTheScreenTakesThePaletteOnItsPlainDarkSurfaces() {
+        Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
+        int themed = palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728);
+        DarkMode.answer(true);
+        Dialog sheet = new Dialog(activity);
+        FrameLayout content = new FrameLayout(activity);
+        View list = plain(activity, 0xFF252728);
+        View light = plain(activity, 0xFFC9CCD1);
+        content.addView(list);
+        content.addView(light);
+        sheet.setContentView(content);
+        sheet.show();
+        View root = sheet.getWindow().getDecorView();
+        root.measure(View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(2000, View.MeasureSpec.EXACTLY));
+        root.layout(0, 0, 1000, 2000);
+
+        MaterialYouTheme.watchWindowsAbove(activity, activity.getWindow().getDecorView());
+        assertEquals("the list's background", themed, ((ColorDrawable) list.getBackground()).getColor());
+        assertEquals("a colour that is no dark surface", 0xFFC9CCD1, ((ColorDrawable) light.getBackground()).getColor());
+
+        View later = plain(activity, 0xFF252728);
+        content.addView(later);
+        root.getViewTreeObserver().dispatchOnGlobalLayout();
+        assertEquals("a view added later, after the next layout", themed, ((ColorDrawable) later.getBackground()).getColor());
+
+        DarkMode.answer(false);
+        View inLightMode = plain(activity, 0xFF252728);
+        content.addView(inLightMode);
+        root.getViewTreeObserver().dispatchOnGlobalLayout();
+        assertEquals("light mode", 0xFF252728, ((ColorDrawable) inLightMode.getBackground()).getColor());
+        sheet.dismiss();
+    }
+
+    private static View plain(Context context, int color) {
+        View view = new View(context);
+        view.setBackgroundColor(color);
+        return view;
     }
 
     private static int windowColour(Window window) {

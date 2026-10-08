@@ -16,6 +16,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 
 import androidx.annotation.NonNull;
@@ -31,6 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
+import app.morphe.extension.facebook.misc.WindowsAbove;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.SettingsStatus;
 import app.morphe.extension.shared.Logger;
@@ -361,17 +364,73 @@ public final class MaterialYouTheme {
      *
      * @return whether the window had a decor to watch
      */
-    static boolean recolourBeforeEachFrame(Window window) {
+    static boolean recolourBeforeEachFrame(Activity activity, Window window) {
         View decor = window.peekDecorView();
         if (decor == null) return false;
         if (FRAMED.add(decor)) {
-            decor.getViewTreeObserver().addOnPreDrawListener(() -> {
+            ViewTreeObserver observer = decor.getViewTreeObserver();
+            observer.addOnPreDrawListener(() -> {
                 recolourWindow(window, SettingsStatus.amoledTheme());
                 return true;
+            });
+            // A sheet or dialog the screen opens takes the focus from its window.
+            observer.addOnWindowFocusChangeListener(focused -> {
+                if (!focused) Utils.runOnMainThread(() -> watchWindowsAbove(activity, decor));
             });
         }
         return true;
     }
+
+    /** The windows of sheets and dialogs that already have {@link #recolourBackgrounds} after each layout. */
+    private static final Set<View> SHEETS = Collections.newSetFromMap(new WeakHashMap<>());
+
+    /**
+     * The comment sheet is a dialog fragment, a window of its own over the screen's, and its comment
+     * list sits on a view whose plain #252728 background no colour hook sees (#37, 581
+     * SimpleUFIPopoverFragment: the list's container under {@code X.9z3}). Each window the activity
+     * has open above its own gets {@link #recolourBackgrounds} now and after each of its layouts.
+     */
+    static void watchWindowsAbove(Activity activity, View decor) {
+        for (View root : WindowsAbove.of(activity, decor, 3)) {
+            if (!SHEETS.add(root)) continue;
+            recolourBackgrounds(root);
+            root.getViewTreeObserver().addOnGlobalLayoutListener(() -> recolourBackgrounds(root));
+        }
+    }
+
+    /**
+     * Gives each view under [root] whose background is a plain colour of the {@link #SURFACES} the
+     * palette's neutral at the same lightness, in dark mode and without AMOLED, as
+     * {@link #recolourWindow} does for a window. Litho's views are passed by: their colours come
+     * through the hooks already.
+     *
+     * @return how many views it recoloured
+     */
+    static int recolourBackgrounds(View root) {
+        if (SettingsStatus.amoledTheme() || !DarkMode.on()) return 0;
+        return recolourBackgrounds(root, 0);
+    }
+
+    private static int recolourBackgrounds(View view, int depth) {
+        if (view.getClass().getName().startsWith("com.facebook.litho.")) return 0;
+        int recoloured = 0;
+        Drawable background = view.getBackground();
+        if (background instanceof ColorDrawable && isSurface(((ColorDrawable) background).getColor())) {
+            recolour(background);
+            recoloured++;
+        }
+        if (view instanceof ViewGroup && depth < MAX_SHEET_DEPTH) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                View child = group.getChildAt(i);
+                if (child != null) recoloured += recolourBackgrounds(child, depth + 1);
+            }
+        }
+        return recoloured;
+    }
+
+    /** Deeper than the comment sheet's plain views go, so a broken tree can't hold a layout up. */
+    private static final int MAX_SHEET_DEPTH = 40;
 
     /**
      * Runs {@link #recolourWindow} for each activity once it's created and each time it resumes, and
@@ -394,8 +453,8 @@ public final class MaterialYouTheme {
             try {
                 Window window = activity.getWindow();
                 recolourWindow(window, SettingsStatus.amoledTheme());
-                if (window != null && !recolourBeforeEachFrame(window) && resumed) {
-                    Utils.runOnMainThread(() -> recolourBeforeEachFrame(window));
+                if (window != null && !recolourBeforeEachFrame(activity, window) && resumed) {
+                    Utils.runOnMainThread(() -> recolourBeforeEachFrame(activity, window));
                 }
             } catch (RuntimeException failure) {
                 Logger.printException(() -> "Material You theme: could not recolour the window", failure);

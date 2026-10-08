@@ -5,8 +5,6 @@
 package app.morphe.extension.facebook.settings;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -14,19 +12,16 @@ import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inspector.WindowInspector;
-
-import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import app.morphe.extension.facebook.misc.WindowsAbove;
 import app.morphe.extension.shared.settings.preference.LogBufferManager;
 
 /**
@@ -87,7 +82,7 @@ final class LastScreen {
 
     /**
      * Reads the activity's window as it pauses, on the main thread, after the windows it has open
-     * above it, top one first ({@link #above}). Never throws.
+     * above it, a sheet or a dialog, top one first ({@link WindowsAbove}). Never throws.
      */
     static void read(Activity activity) {
         long now = SystemClock.elapsedRealtime();
@@ -95,44 +90,14 @@ final class LastScreen {
         List<String> paths = new ArrayList<>();
         try {
             View decor = activity.getWindow().getDecorView();
-            if (Build.VERSION.SDK_INT >= 29) {
-                for (View window : above(activity, decor, WindowInspector.getGlobalWindowViews())) {
-                    for (String path : describe(window)) paths.add("window above: " + path);
-                }
+            for (View window : WindowsAbove.of(activity, decor, MAX_WINDOWS_ABOVE)) {
+                for (String path : describe(window)) paths.add("window above: " + path);
             }
             paths.addAll(describe(decor));
         } catch (Throwable failure) {
             paths.add("could not be read: " + failure.getClass().getSimpleName());
         }
         last = new Reading(screen, paths, now);
-    }
-
-    /**
-     * Of the app's window roots, in the order they were added, the ones [activity] has open above
-     * [decor], top one first, up to {@link #MAX_WINDOWS_ABOVE}: a dialog or a sheet, like the
-     * comment sheet Facebook shows as a dialog fragment (#37). A root counts when it's shown, laid
-     * out and made from the activity's context.
-     */
-    static List<View> above(Activity activity, View decor, List<View> roots) {
-        List<View> out = new ArrayList<>();
-        for (int i = roots.size() - 1; i >= 0 && out.size() < MAX_WINDOWS_ABOVE; i--) {
-            View root = roots.get(i);
-            if (root == decor) break;
-            if (root.getVisibility() == View.VISIBLE && root.getWidth() > 0 && root.getHeight() > 0
-                    && activityOf(root.getContext()) == activity) {
-                out.add(root);
-            }
-        }
-        return out;
-    }
-
-    @Nullable
-    private static Activity activityOf(Context context) {
-        for (int depth = 0; context != null && depth < 10; depth++) {
-            if (context instanceof Activity) return (Activity) context;
-            context = context instanceof ContextWrapper ? ((ContextWrapper) context).getBaseContext() : null;
-        }
-        return null;
     }
 
     /** The section: nothing until a screen has paused, then that screen, how long ago, and its paths. */

@@ -134,26 +134,6 @@ public class LastScreenTest {
 
     /** Facebook shows the comment sheet as a dialog, a window of its own over the screen's (#37). */
     @Test
-    public void theWindowsAScreenOpenedAboveItsOwnAreReadTopOneFirst() {
-        Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
-        View decor = activity.getWindow().getDecorView();
-        View before = shownRoot(new Dialog(activity).getWindow().getDecorView());
-        View sheet = shownRoot(new Dialog(activity).getWindow().getDecorView());
-        View menu = shownRoot(new Dialog(activity).getWindow().getDecorView());
-        View hidden = shownRoot(new Dialog(activity).getWindow().getDecorView());
-        hidden.setVisibility(View.GONE);
-        View notLaidOut = new Dialog(activity).getWindow().getDecorView();
-        View elsewhere = shownRoot(new FrameLayout(RuntimeEnvironment.getApplication()));
-
-        assertEquals(List.of(menu, sheet),
-                LastScreen.above(activity, decor, List.of(before, decor, sheet, menu, hidden, notLaidOut, elsewhere)));
-        View third = shownRoot(new Dialog(activity).getWindow().getDecorView());
-        assertEquals("two at most", List.of(third, menu),
-                LastScreen.above(activity, decor, List.of(decor, sheet, menu, third)));
-        assertTrue(LastScreen.above(activity, decor, List.of(decor)).isEmpty());
-    }
-
-    @Test
     public void aDialogShownOverTheScreenIsWalkedBeforeTheScreen() {
         Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
         layOut(activity.getWindow().getDecorView());
@@ -171,11 +151,6 @@ public class LastScreenTest {
         assertTrue(lines.toString(), lines.get(1).contains("{#252728}"));
         assertTrue(lines.toString(), lines.stream().anyMatch(line -> line.startsWith("right edge 55% down: DecorView")));
         dialog.dismiss();
-    }
-
-    private static View shownRoot(View root) {
-        layOut(root);
-        return root;
     }
 
     @Test
