@@ -1309,7 +1309,7 @@
     },
     {
       "name": "Hide Menu promotions",
-      "description": "Hides the Upgrades and Also from Meta sections of Facebook's Menu. Each has its own switch. Settings, Help and support, your shortcuts and the rest of the Menu stay.",
+      "description": "Hides the Upgrades and Also from Meta sections of Facebook's Menu, and its Muse card. Each has its own switch. Settings, Help and support, your shortcuts and the rest of the Menu stay.",
       "category": "Interface",
       "use": true,
       "dependencies": [

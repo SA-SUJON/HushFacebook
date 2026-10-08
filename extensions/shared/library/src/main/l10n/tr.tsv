@@ -395,6 +395,8 @@ Hide Upgrades	“Yükseltmeler” bölümünü gizle
 The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.	“Yükseltmeler” bölümü ve teklifleri Facebook menüsünden kalkar. Ayarlar, Yardım ve destek ve menünün geri kalanı yerinde kalır.
 # context: switch title under Menu; Also from Meta is the name of a section in Facebook's own Menu
 Hide Also from Meta	“Meta'dan diğerleri” bölümünü gizle
+Hide the Muse card	Muse kartını gizle
+The Muse card, Meta's ad for its AI agent app, leaves the top of Facebook's Menu.	Muse kartı, Meta'nın yapay zekâ asistanı uygulamasının reklamı, Facebook menüsünün üstünden kalkar.
 # context: summary of that switch; the section links to Meta's other apps and shows ads for its devices
 The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.	“Meta'dan diğerleri” bölümü, Meta'nın diğer uygulamalarına giden bağlantıları ve Meta cihazlarının reklamlarıyla birlikte Facebook menüsünden kalkar. Kendi kısayolların yerinde kalır.
 # context: section title for the search settings, named like Facebook's own search

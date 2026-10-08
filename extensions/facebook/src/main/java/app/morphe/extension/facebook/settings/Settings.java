@@ -709,6 +709,13 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_menu_also_from_meta", TRUE);
 
     /**
+     * The Muse card in Facebook's Menu, Meta's ad for its AI agent app, which reads as dismissed
+     * the way Facebook's own Dismiss leaves it.
+     */
+    public static final BooleanSetting HIDE_MENU_MUSE =
+            new BooleanSetting("hushfacebook_hide_menu_muse", TRUE);
+
+    /**
      * Edits outside the Menu: the button and badge in the Reels composer's header, and the Edits
      * pill under feed videos, which the feed's requests stop asking the server for
      * ({@link app.morphe.extension.facebook.misc.MetaUpsells}). Off until it's turned on.

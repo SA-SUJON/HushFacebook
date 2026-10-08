@@ -395,6 +395,8 @@ Hide Upgrades	Ocultar “Mejoras”
 The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.	La sección “Mejoras” y sus ofertas desaparecen del menú de Facebook. Configuración, Ayuda y soporte técnico y el resto del menú se quedan.
 # context: switch title under Menu; Also from Meta is the name of a section in Facebook's own Menu
 Hide Also from Meta	Ocultar “También de Meta”
+Hide the Muse card	Ocultar la tarjeta de Muse
+The Muse card, Meta's ad for its AI agent app, leaves the top of Facebook's Menu.	La tarjeta de Muse, el anuncio de Meta para su app de agente de IA, desaparece de la parte superior del menú de Facebook.
 # context: summary of that switch; the section links to Meta's other apps and shows ads for its devices
 The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.	La sección “También de Meta” desaparece del menú de Facebook, con sus enlaces a las otras apps de Meta y sus anuncios de dispositivos de Meta. Tus propios accesos directos se quedan.
 # context: section title for the search settings, named like Facebook's own search

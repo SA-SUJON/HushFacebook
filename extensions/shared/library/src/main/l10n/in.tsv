@@ -395,6 +395,8 @@ Hide Upgrades	Sembunyikan “Upgrade”
 The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.	Bagian “Upgrade” dan penawarannya hilang dari Menu Facebook. Pengaturan, Bantuan & dukungan, dan bagian Menu lainnya tetap ada.
 # context: switch title under Menu; Also from Meta is the name of a section in Facebook's own Menu
 Hide Also from Meta	Sembunyikan “Juga dari Meta”
+Hide the Muse card	Sembunyikan kartu Muse
+The Muse card, Meta's ad for its AI agent app, leaves the top of Facebook's Menu.	Kartu Muse, iklan Meta untuk aplikasi agen AI-nya, hilang dari bagian atas Menu Facebook.
 # context: summary of that switch; the section links to Meta's other apps and shows ads for its devices
 The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.	Bagian “Juga dari Meta” hilang dari Menu Facebook, beserta tautannya ke aplikasi Meta lainnya dan iklannya untuk perangkat Meta. Pintasanmu sendiri tetap ada.
 # context: section title for the search settings, named like Facebook's own search

@@ -136,6 +136,7 @@ final class SwitchLabels {
         if (setting == Settings.APP_LOCK) return L10n.t("Lock Facebook");
         if (setting == Settings.HIDE_MENU_UPGRADES) return L10n.t("Hide Upgrades");
         if (setting == Settings.HIDE_MENU_ALSO_FROM_META) return L10n.t("Hide Also from Meta");
+        if (setting == Settings.HIDE_MENU_MUSE) return L10n.t("Hide the Muse card");
         if (setting == Settings.HIDE_EDITS_UPSELLS) return L10n.t("Hide Edits promotions");
         if (setting == Settings.HIDE_THREADS_CROSS_POSTING) return L10n.t("Hide Threads cross-posting prompts");
         if (setting == Settings.HIDE_THREADS_SHARE_BUTTON) return L10n.t("Hide Threads in the share sheet");

@@ -395,6 +395,8 @@ Hide Upgrades	„Upgrades“ ausblenden
 The Upgrades section and its offers leave Facebook's Menu. Settings, Help and support and the rest of the Menu stay.	Der Bereich „Upgrades“ mit seinen Angeboten verschwindet aus dem Facebook-Menü. Einstellungen, Hilfe und Support und der Rest des Menüs bleiben.
 # context: switch title under Menu; Also from Meta is the name of a section in Facebook's own Menu
 Hide Also from Meta	„Auch von Meta“ ausblenden
+Hide the Muse card	Muse-Karte ausblenden
+The Muse card, Meta's ad for its AI agent app, leaves the top of Facebook's Menu.	Die Muse-Karte, Metas Werbung für seine KI-Agenten-App, verschwindet oben aus dem Facebook-Menü.
 # context: summary of that switch; the section links to Meta's other apps and shows ads for its devices
 The Also from Meta section leaves Facebook's Menu, with its links to Meta's other apps and its ads for Meta's devices. Your own shortcuts stay.	Der Bereich „Auch von Meta“ verschwindet aus dem Facebook-Menü, mit seinen Links zu Metas anderen Apps und seiner Werbung für Metas Geräte. Deine eigenen Verknüpfungen bleiben.
 # context: section title for the search settings, named like Facebook's own search
