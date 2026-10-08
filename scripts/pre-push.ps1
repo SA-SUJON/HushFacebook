@@ -48,11 +48,12 @@ if ($env:HUSHFACEBOOK_SKIP_PRE_PUSH -eq '1') {
 . (Join-Path $PSScriptRoot 'common.ps1')
 
 # A hook runs with git's own environment. User environment variables set after the shell
-# launched, or set in the user scope only, may be absent. Import the four this script and
+# launched, or set in the user scope only, may be absent. Import the five this script and
 # its suites need from the registry so a gate worktree can find the desktop CLI, the
-# fixture folder, the build governor and the device serial.
+# fixture folder, the build governor, the device serial and the machine's build queue, which
+# the fixture applies wait in (Invoke-HeavyJob).
 foreach ($envName in @('HUSHFACEBOOK_DESKTOP_JAR', 'HUSHFACEBOOK_FIXTURE_DIR',
-        'HUSHFACEBOOK_BUILD_WRAPPER', 'HUSHFACEBOOK_DEVICE_SERIAL')) {
+        'HUSHFACEBOOK_BUILD_WRAPPER', 'HUSHFACEBOOK_DEVICE_SERIAL', 'BUILD_QUEUE_SCRIPT')) {
     if (-not (Test-Path "Env:\$envName")) {
         $regValue = [Environment]::GetEnvironmentVariable($envName, [EnvironmentVariableTarget]::User)
         if ($regValue) { Set-Item -LiteralPath "Env:\$envName" -Value $regValue }

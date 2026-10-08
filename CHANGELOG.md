@@ -12,6 +12,7 @@ Every Hushfacebook release, newest first.
 ### Changed
 
 * **Facebook:** `Restore screens on re-signed builds` says photos and posts need it too, in its description and in the warning settings show when a re-signed build doesn't have it. Leaving it out stops photos and posts from opening, not only profiles, so the old wording made it look safe to skip.
+* **Tooling:** The desktop CLI runs, bundle merges and the resource, register and fingerprint checks now wait for a slot of the machine's build queue when `BUILD_QUEUE_SCRIPT` names one, and run straight away when it doesn't. Before, they started beside whatever builds were running and the queue never saw them.
 
 ### Removed
 
