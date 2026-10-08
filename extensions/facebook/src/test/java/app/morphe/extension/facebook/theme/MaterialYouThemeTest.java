@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.robolectric.Shadows.shadowOf;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
+import android.os.Looper;
 import android.view.Window;
 
 import org.junit.After;
@@ -763,6 +765,41 @@ public class MaterialYouThemeTest {
         DarkMode.answer(false);
         window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
         callbacks.onActivityResumed(activity);
+        assertEquals("light mode", 0xFF101011, windowColour(window));
+    }
+
+    /**
+     * On a cold start the feed's window had #101011 again after both callbacks ran, four starts of
+     * four on 581. From the resume on, the window takes the palette before each frame too, and one
+     * that has no decor yet as it resumes is watched once the framework has made it.
+     */
+    @Test
+    public void aWindowGivenItsDarkBackgroundLaterTakesThePaletteBeforeTheNextFrame() {
+        // Attached but not created, since Robolectric's create() makes the decor already.
+        Activity activity = Robolectric.buildActivity(Activity.class).get();
+        Window window = activity.getWindow();
+        MaterialYouTheme.WindowBackgrounds callbacks = new MaterialYouTheme.WindowBackgrounds();
+        int themed = palette.sameLightness(TonePalette.NEUTRAL, 0xFF101011);
+        DarkMode.answer(true);
+
+        assertEquals("no decor before the resume", null, window.peekDecorView());
+        callbacks.onActivityPostCreated(activity, null);
+        callbacks.onActivityResumed(activity);
+        // What the framework does right after the activity resumes, before the posted watch runs.
+        window.getDecorView();
+        shadowOf(Looper.getMainLooper()).idle();
+
+        window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
+        window.peekDecorView().getViewTreeObserver().dispatchOnPreDraw();
+        assertEquals("before the next frame", themed, windowColour(window));
+        callbacks.onActivityResumed(activity);
+        window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
+        window.peekDecorView().getViewTreeObserver().dispatchOnPreDraw();
+        assertEquals("after another resume", themed, windowColour(window));
+
+        DarkMode.answer(false);
+        window.setBackgroundDrawable(new ColorDrawable(0xFF101011));
+        window.peekDecorView().getViewTreeObserver().dispatchOnPreDraw();
         assertEquals("light mode", 0xFF101011, windowColour(window));
     }
 

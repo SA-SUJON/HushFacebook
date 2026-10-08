@@ -27,7 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.SettingsStatus;
@@ -317,8 +319,8 @@ public final class MaterialYouTheme {
      * value. The framework reads it, so no hook sees it, and some code reads WASH as a plain colour
      * too, so the night style can't move it when no system tone sits that close. Called once the
      * application is created, with the theme in the build: from then on each activity's window
-     * background takes the palette when the activity is created and again as it resumes
-     * ({@link #recolourWindow}).
+     * background takes the palette when the activity is created, as it resumes and before each frame
+     * ({@link #recolourWindow}, {@link #recolourBeforeEachFrame}).
      */
     public static synchronized void watchWindows(Context context) {
         if (windowsWatched || !(context instanceof Application)) return;
@@ -347,22 +349,54 @@ public final class MaterialYouTheme {
         return true;
     }
 
-    /** Runs {@link #recolourWindow} for each activity once it's created and each time it resumes. */
+    /** The decor views that already run {@link #recolourWindow} before each frame. Main thread only. */
+    private static final Set<View> FRAMED = Collections.newSetFromMap(new WeakHashMap<>());
+
+    /**
+     * Runs {@link #recolourWindow} before each frame the window's decor draws, from the first one on.
+     * On a cold start the feed's window kept #101011 after both callbacks ran (four of four on 581),
+     * and only a later resume moved it: its background arrives after the activity resumes, and some
+     * of Facebook's screens set a window's background again later. Until a dark surface shows up
+     * again, each frame costs a type test and a colour compare.
+     *
+     * @return whether the window had a decor to watch
+     */
+    static boolean recolourBeforeEachFrame(Window window) {
+        View decor = window.peekDecorView();
+        if (decor == null) return false;
+        if (FRAMED.add(decor)) {
+            decor.getViewTreeObserver().addOnPreDrawListener(() -> {
+                recolourWindow(window, SettingsStatus.amoledTheme());
+                return true;
+            });
+        }
+        return true;
+    }
+
+    /**
+     * Runs {@link #recolourWindow} for each activity once it's created and each time it resumes, and
+     * from then on before each frame ({@link #recolourBeforeEachFrame}). A window that has no decor
+     * yet as it resumes gets one from the framework right after, so the watch waits a turn for it.
+     */
     static final class WindowBackgrounds implements Application.ActivityLifecycleCallbacks {
         @Override
         public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle state) {
-            recolour(activity);
+            recolour(activity, false);
         }
 
         @Override
         public void onActivityResumed(@NonNull Activity activity) {
-            recolour(activity);
+            recolour(activity, true);
         }
 
-        private static void recolour(Activity activity) {
+        private static void recolour(Activity activity, boolean resumed) {
             HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
             try {
-                recolourWindow(activity.getWindow(), SettingsStatus.amoledTheme());
+                Window window = activity.getWindow();
+                recolourWindow(window, SettingsStatus.amoledTheme());
+                if (window != null && !recolourBeforeEachFrame(window) && resumed) {
+                    Utils.runOnMainThread(() -> recolourBeforeEachFrame(window));
+                }
             } catch (RuntimeException failure) {
                 Logger.printException(() -> "Material You theme: could not recolour the window", failure);
             }
