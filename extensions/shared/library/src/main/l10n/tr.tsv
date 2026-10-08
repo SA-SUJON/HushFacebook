@@ -355,7 +355,7 @@ Facebook will open on %1$s.	Facebook %1$s sekmesinde açılacak.
 # context: switch title under Opening Facebook; Following is Facebook's feed of the friends, Pages and groups you follow, and Home is the tab
 Following feed on Home	Ana Sayfa'da Takip Edilenler akışı
 # context: summary of that switch; the ranked feed is the one Facebook orders for you, and the Feeds tab has its own filters
-Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.	Ana Sayfa, sıralanmış akış yerine Facebook'un Takip Edilenler akışını yükler. Akışlar sekmesinin filtreleri olduğu gibi kalır.
+Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.	Ana Sayfa, takip ettiğin arkadaşların, grupların ve Sayfaların en yeni gönderilerini Akışlar sekmesindeki Tümü gibi yükler. Akışlar sekmesinin filtreleri olduğu gibi kalır.
 Jump to a section	Bir bölüme git
 Go straight to one group of settings. Back returns to where you were.	Doğrudan bir ayar grubuna git. Geri, bulunduğun yere döndürür.
 # context: switch title under Downloads; on, every video save keeps to formats other apps accept

@@ -355,7 +355,7 @@ Facebook will open on %1$s.	Facebook akan terbuka di %1$s.
 # context: switch title under Opening Facebook; Following is Facebook's feed of the friends, Pages and groups you follow, and Home is the tab
 Following feed on Home	Feed Diikuti di Beranda
 # context: summary of that switch; the ranked feed is the one Facebook orders for you, and the Feeds tab has its own filters
-Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.	Beranda memuat feed Diikuti dari Facebook, bukan feed yang diurutkan. Filter di tab Feed tetap seperti semula.
+Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.	Beranda memuat postingan terbaru dari teman, grup, dan Halaman yang Anda ikuti, seperti Semua di tab Feed. Filter di tab Feed tetap seperti semula.
 Jump to a section	Lompat ke bagian
 Go straight to one group of settings. Back returns to where you were.	Langsung ke satu kelompok setelan. Kembali membawamu ke tempat semula.
 # context: switch title under Downloads; on, every video save keeps to formats other apps accept

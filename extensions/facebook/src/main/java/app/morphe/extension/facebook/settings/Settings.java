@@ -907,7 +907,7 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_open_on_chosen_tab", FALSE);
 
     /**
-     * Home asks Facebook for its Following feed where it would ask for the ranked one
+     * Home asks Facebook for its most recent feed where it would ask for the ranked one
      * ({@link app.morphe.extension.facebook.feed.FollowingHome}). Off by default. The Feeds tab's
      * filters keep their own feeds, and a change shows the next time Home loads its feed.
      */

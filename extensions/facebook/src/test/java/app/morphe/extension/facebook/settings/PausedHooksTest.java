@@ -527,7 +527,7 @@ public class PausedHooksTest {
                 PhotoMenuItemForTests::addsAnItem));
         // A start from the launcher icon asks Facebook for the chosen tab.
         probes.put(PatchFamily.START_TAB, Collections.singletonList(StartTabRouteForTests::routes));
-        // Home's request for its feed goes out for the Following feed.
+        // Home's request for its feed goes out for the most recent feed.
         probes.put(PatchFamily.FOLLOWING_HOME, Collections.singletonList(
                 () -> FollowingHome.feedType(com.facebook.api.feedtype.FeedType.TOP_STORIES)
                         != com.facebook.api.feedtype.FeedType.TOP_STORIES));

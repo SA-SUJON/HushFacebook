@@ -81,7 +81,7 @@ final class FeedPages {
             if (build.contains(PatchFamily.FOLLOWING_HOME)) {
                 // Home asks for its feed each time it loads one, so no restart is needed.
                 opening.addPreference(toggle(context, Settings.FOLLOWING_FEED_HOME,
-                        L10n.t("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.")));
+                        L10n.t("Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.")));
             }
         }
     }

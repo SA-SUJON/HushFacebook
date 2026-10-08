@@ -816,8 +816,8 @@ public final class L10nTranslations {
                 "Wenn du ein Reel gedr\u00fcckt h\u00e4ltst, l\u00e4uft es mit doppelter Geschwindigkeit, bis du losl\u00e4sst, statt Facebooks Men\u00fc f\u00fcr langes Dr\u00fccken zu \u00f6ffnen. Die Mehr-Schaltfl\u00e4che des Reels \u00f6ffnet das Men\u00fc weiterhin.");
         table.put("Home",
                 "Startseite");
-        table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
-                "Die Startseite l\u00e4dt den Gefolgt-Feed von Facebook statt des sortierten Feeds. Die Filter im Tab Feeds bleiben, wie sie sind.");
+        table.put("Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.",
+                "Die Startseite l\u00e4dt die neuesten Beitr\u00e4ge von Freunden, Gruppen und Seiten, denen du folgst, wie \u201eAlle\u201c im Tab Feeds. Die Filter im Tab Feeds bleiben, wie sie sind.");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Fortschritt beim Speichern eines Fotos oder Videos, mit einem Button zum Abbrechen");
         table.put("How to block Reels",
@@ -2593,8 +2593,8 @@ public final class L10nTranslations {
                 "Mantener pulsado un reel lo reproduce al doble de velocidad hasta que lo sueltes, en lugar de abrir el men\u00fa de pulsaci\u00f3n larga de Facebook. El bot\u00f3n M\u00e1s del reel sigue abriendo ese men\u00fa.");
         table.put("Home",
                 "Inicio");
-        table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
-                "Inicio carga el feed Siguiendo de Facebook en lugar del feed ordenado. Los filtros de la pesta\u00f1a Feeds no cambian.");
+        table.put("Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.",
+                "Inicio carga las publicaciones m\u00e1s recientes de los amigos, grupos y p\u00e1ginas que sigues, como Todo en la pesta\u00f1a Feeds. Los filtros de la pesta\u00f1a Feeds no cambian.");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "El progreso de la foto o el video que est\u00e1s guardando, con un bot\u00f3n para cancelar");
         table.put("How to block Reels",
@@ -4370,8 +4370,8 @@ public final class L10nTranslations {
                 "Menahan reel memutarnya dengan kecepatan dua kali lipat sampai kamu melepaskannya, sebagai ganti menu tekan lama Facebook. Tombol lainnya pada reel tetap membuka menu itu.");
         table.put("Home",
                 "Beranda");
-        table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
-                "Beranda memuat feed Diikuti dari Facebook, bukan feed yang diurutkan. Filter di tab Feed tetap seperti semula.");
+        table.put("Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.",
+                "Beranda memuat postingan terbaru dari teman, grup, dan Halaman yang Anda ikuti, seperti Semua di tab Feed. Filter di tab Feed tetap seperti semula.");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Progres foto atau video yang sedang Anda simpan, dengan tombol untuk membatalkannya");
         table.put("How to block Reels",
@@ -6147,8 +6147,8 @@ public final class L10nTranslations {
                 "Segurar um reel faz ele tocar no dobro da velocidade at\u00e9 voc\u00ea soltar, no lugar do menu de toque longo do Facebook. O bot\u00e3o Mais do reel ainda abre esse menu.");
         table.put("Home",
                 "P\u00e1gina inicial");
-        table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
-                "A P\u00e1gina inicial carrega o feed Seguindo do Facebook em vez do feed classificado. Os filtros da aba Feeds continuam como est\u00e3o.");
+        table.put("Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.",
+                "A P\u00e1gina inicial carrega as publica\u00e7\u00f5es mais recentes dos amigos, grupos e P\u00e1ginas que voc\u00ea segue, como Tudo na aba Feeds. Os filtros da aba Feeds continuam como est\u00e3o.");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Indica o progresso do salvamento de uma foto ou v\u00eddeo, com um bot\u00e3o para cancel\u00e1-lo");
         table.put("How to block Reels",
@@ -7924,8 +7924,8 @@ public final class L10nTranslations {
                 "Bir reel'e bas\u0131l\u0131 tutmak, b\u0131rakana kadar onu iki kat h\u0131zda oynat\u0131r ve Facebook'un uzun basma men\u00fcs\u00fcn\u00fcn yerini al\u0131r. Reel'in daha fazla d\u00fc\u011fmesi bu men\u00fcy\u00fc a\u00e7maya devam eder.");
         table.put("Home",
                 "Ana Sayfa");
-        table.put("Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.",
-                "Ana Sayfa, s\u0131ralanm\u0131\u015f ak\u0131\u015f yerine Facebook'un Takip Edilenler ak\u0131\u015f\u0131n\u0131 y\u00fckler. Ak\u0131\u015flar sekmesinin filtreleri oldu\u011fu gibi kal\u0131r.");
+        table.put("Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.",
+                "Ana Sayfa, takip etti\u011fin arkada\u015flar\u0131n, gruplar\u0131n ve Sayfalar\u0131n en yeni g\u00f6nderilerini Ak\u0131\u015flar sekmesindeki T\u00fcm\u00fc gibi y\u00fckler. Ak\u0131\u015flar sekmesinin filtreleri oldu\u011fu gibi kal\u0131r.");
         table.put("How far a photo or video you're saving has got, with a button to cancel it",
                 "Kaydetti\u011fin foto\u011fraf veya videonun ilerleme durumu ve iptal etmek i\u00e7in bir d\u00fc\u011fme");
         table.put("How to block Reels",

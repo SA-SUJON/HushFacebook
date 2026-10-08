@@ -342,7 +342,7 @@ Facebook will open on %1$s.	O Facebook vai abrir em %1$s.
 # context: switch title under Opening Facebook; Following is Facebook's feed of the friends, Pages and groups you follow, and Home is the tab
 Following feed on Home	Feed Seguindo na Página inicial
 # context: summary of that switch; the ranked feed is the one Facebook orders for you, and the Feeds tab has its own filters
-Home loads Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are.	A Página inicial carrega o feed Seguindo do Facebook em vez do feed classificado. Os filtros da aba Feeds continuam como estão.
+Home loads the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All. The Feeds tab's filters stay as they are.	A Página inicial carrega as publicações mais recentes dos amigos, grupos e Páginas que você segue, como Tudo na aba Feeds. Os filtros da aba Feeds continuam como estão.
 Jump to a section	Ir para uma seção
 Go straight to one group of settings. Back returns to where you were.	Vá diretamente para um grupo de configurações. Voltar leva você de volta ao ponto em que estava.
 Save videos other apps can open	Salvar vídeos que outros apps conseguem abrir

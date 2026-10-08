@@ -1147,7 +1147,7 @@
     },
     {
       "name": "Following feed on Home",
-      "description": "Has Home load Facebook's Following feed instead of the ranked one. The Feeds tab's filters stay as they are. Its switch starts off, under Opening Facebook.",
+      "description": "Has Home load the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All, instead of the ranked feed. The Feeds tab's filters stay as they are. Its switch starts off, under Opening Facebook.",
       "category": "Feed",
       "use": true,
       "dependencies": [

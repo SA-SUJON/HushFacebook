@@ -29,9 +29,9 @@ import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
- * Following feed on Home: with the switch on, Home's feed type comes back as the Following feed's,
- * counted, while every other feed type, the Feeds tab's filters among them, comes back as it was.
- * Off, paused, or before the settings are ready, Home keeps its own.
+ * Following feed on Home: with the switch on, Home's feed type comes back as the most recent
+ * feed's, counted, while every other feed type, the Feeds tab's filters and the Following feed's
+ * among them, comes back as it was. Off, paused, or before the settings are ready, Home keeps its own.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -58,11 +58,11 @@ public class FollowingHomeTest {
     }
 
     @Test
-    public void onHomeAsksForTheFollowingFeedAndOtherFeedsStay() {
+    public void onHomeAsksForTheMostRecentFeedAndOtherFeedsStay() {
         Settings.FOLLOWING_FEED_HOME.save(true);
-        assertSame("Home kept the ranked feed", FeedType.FOLLOWING_FEED, FollowingHome.feedType(FeedType.TOP_STORIES));
+        assertSame("Home kept the ranked feed", FeedType.MOST_RECENT, FollowingHome.feedType(FeedType.TOP_STORIES));
         assertSame("a second request went out for the ranked feed",
-                FeedType.FOLLOWING_FEED, FollowingHome.feedType(FeedType.TOP_STORIES));
+                FeedType.MOST_RECENT, FollowingHome.feedType(FeedType.TOP_STORIES));
         for (FeedType filter : new FeedType[] {FeedType.FAVORITES, FeedType.MOST_RECENT, FeedType.MOST_RECENT_ALL,
                 FeedType.MOST_RECENT_FRIEND, FeedType.FOLLOWING_FEED}) {
             assertSame("the " + filter + " feed was changed", filter, FollowingHome.feedType(filter));
@@ -75,7 +75,7 @@ public class FollowingHomeTest {
     @Test
     public void offOrPausedHomeKeepsItsOwnFeed() {
         assertFalse("the switch doesn't start off", Settings.FOLLOWING_FEED_HOME.get());
-        assertSame("off, Home asked for the Following feed", FeedType.TOP_STORIES, FollowingHome.feedType(FeedType.TOP_STORIES));
+        assertSame("off, Home asked for the most recent feed", FeedType.TOP_STORIES, FollowingHome.feedType(FeedType.TOP_STORIES));
 
         Settings.FOLLOWING_FEED_HOME.save(true);
         for (HushfacebookPause.Reason reason : new HushfacebookPause.Reason[] {
@@ -92,7 +92,7 @@ public class FollowingHomeTest {
         String line = statusLine();
         assertFalse("a request left to Facebook was counted: " + line, line != null && line.contains("Counted"));
         assertSame("on again after the pause, Home kept the ranked feed",
-                FeedType.FOLLOWING_FEED, FollowingHome.feedType(FeedType.TOP_STORIES));
+                FeedType.MOST_RECENT, FollowingHome.feedType(FeedType.TOP_STORIES));
     }
 
     @Test

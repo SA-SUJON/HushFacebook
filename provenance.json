@@ -82,7 +82,7 @@
       "commit": "319cde236e373ff8feb66fa30e99028e3d9dff6e",
       "via": [],
       "license": "GPL-3.0",
-      "changes": "Rewritten from the Following feed swap on that commit's fix/following-feed-home branch, which changes Home's feed type for the Following feed's at the start of Facebook 573's news feed parameter builder. The hook point is the same: the first instruction of that static builder, whose second parameter is the feed type. 573's obfuscated names aren't carried over. The builder is found in 577, 580 and 581 by the Companion.setPagedNewsfeedParams trace section it opens, the two feed types by the names they keep (top_stories and following_feed), and the swap is made by the extension's FollowingHome behind a switch that starts off, so pausing Hushfacebook or turning the switch off gives Home its ranked feed again. The extension, written here, sits under the feed extension's own rule."
+      "changes": "Rewritten from the Following feed swap on that commit's fix/following-feed-home branch, which changes Home's feed type for the Following feed's at the start of Facebook 573's news feed parameter builder. The hook point is the same: the first instruction of that static builder, whose second parameter is the feed type. 573's obfuscated names aren't carried over. The builder is found in 577, 580 and 581 by the Companion.setPagedNewsfeedParams trace section it opens, the two feed types by the names they keep (top_stories and most_recent), and the swap is made by the extension's FollowingHome behind a switch that starts off, so pausing Hushfacebook or turning the switch off gives Home its ranked feed again. The extension, written here, sits under the feed extension's own rule."
     },
     {
       "paths": [
