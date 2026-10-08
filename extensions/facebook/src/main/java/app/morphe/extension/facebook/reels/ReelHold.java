@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 
+import app.morphe.extension.facebook.menu.MenuLayoutDump;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.facebook.settings.SettingsStatus;
@@ -168,9 +169,13 @@ public final class ReelHold {
         }
     }
 
-    /** After the long-press handler asks Facebook's speed-up flag. Yes while on. */
+    /**
+     * After the long-press handler asks Facebook's speed-up flag. Yes while on. With Debug logging
+     * on, the windows are read a moment later for the long-press menu's Muse share target.
+     */
     public static boolean longPress(boolean facebooks) {
         HookStatus.invoked(FAMILY);
+        MenuLayoutDump.reelLongPressed();
         return on("long press") || facebooks;
     }
 
