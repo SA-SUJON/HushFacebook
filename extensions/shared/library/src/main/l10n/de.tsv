@@ -715,7 +715,7 @@ Holding a reel plays it at double speed until you let go, in place of Facebook's
 # context: label of a switch under Hold a reel for 2x that keeps the hold to the reel's right edge
 Only on the right edge	Nur am rechten Rand
 # context: summary of that switch; the right third is the right-hand third of the reel's width, the long-press menu is Facebook's menu on a long press
-With the switch above on, only a hold on the right third of a reel plays it at double speed. Hold anywhere else and Facebook does what it always does, usually its long-press menu.	Wenn der Schalter oben an ist, läuft ein Reel nur dann mit doppelter Geschwindigkeit, wenn du sein rechtes Drittel gedrückt hältst. Hältst du es woanders gedrückt, macht Facebook, was es immer macht, meist öffnet es sein Menü für langes Drücken.
+With the switch above on, only a hold on the right third of a reel plays it at double speed. Hold anywhere else and Facebook's long-press menu opens.	Wenn der Schalter oben an ist, läuft ein Reel nur dann mit doppelter Geschwindigkeit, wenn du sein rechtes Drittel gedrückt hältst. Hältst du es woanders gedrückt, öffnet sich Facebooks Menü für langes Drücken.
 Default playback quality	Standard-Wiedergabequalität
 Play videos, reels and stories at the quality below. A quality picked in a video's own menu still wins.	Videos, Reels und Storys in der Qualität unten abspielen. Eine im Menü eines Videos gewählte Qualität hat weiter Vorrang.
 Playback quality	Wiedergabequalität

@@ -37,7 +37,7 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *   <li>{@link #anywhere}: the check of whether the press landed on an edge. Yes while the switch
  *       is on, so a hold anywhere on the reel counts. With Only on the right edge on too, yes only
  *       where {@link #edgeTouch}, first in that check, found the press on the reel's right third,
- *       and Facebook's own answer anywhere else.</li>
+ *       and no anywhere else, so the press opens Facebook's long-press menu.</li>
  *   <li>{@link #holdSpeed}: the speed a hold plays at, which the speed-up, the speed the lift puts
  *       back and the 2x label all read. Outside the Video tab Facebook answers a fixed 2x, and where
  *       an account's Reels live in the Video tab it answers a server value, which may say normal
@@ -87,9 +87,6 @@ public final class ReelHold {
 
     /** What {@link #edgeTouch} measured for the edge check running now, until its answer goes out. */
     private static volatile int pressedAt = UNMEASURED;
-
-    /** Facebook's own last answer to the long-press handlers' speed-up flag, so a hold off the right edge gets Facebook's answer. */
-    private static volatile boolean facebooksHold;
 
     /** The hold speed while on, where Facebook's isn't faster than normal. */
     static final double DOUBLE_SPEED = 2.0;
@@ -174,7 +171,6 @@ public final class ReelHold {
     /** After the long-press handler asks Facebook's speed-up flag. Yes while on. */
     public static boolean longPress(boolean facebooks) {
         HookStatus.invoked(FAMILY);
-        facebooksHold = facebooks;
         return on("long press") || facebooks;
     }
 
@@ -277,9 +273,10 @@ public final class ReelHold {
 
     /**
      * After Facebook's check of whether a long press landed on a reel's edge. Yes while on. With Only
-     * on the right edge on too, yes on the reel's right third and Facebook's own answer anywhere else,
-     * which is no unless Facebook gives the account its own hold, so the press opens Facebook's
-     * long-press menu. A press {@link #edgeTouch} couldn't measure counts wherever it landed.
+     * on the right edge on too, yes on the reel's right third and no anywhere else, so the press opens
+     * Facebook's long-press menu. That holds where Facebook gives the account its own hold as well,
+     * whose check says yes on the left edge too: the switch promises the right third only. A press
+     * {@link #edgeTouch} couldn't measure counts wherever it landed.
      */
     public static boolean anywhere(boolean facebooks) {
         HookStatus.invoked(FAMILY);
@@ -287,10 +284,10 @@ public final class ReelHold {
         pressedAt = UNMEASURED;
         if (!on("edge check")) return facebooks;
         if (pressed != OUTSIDE || !rightEdgeOnly()) return true;
-        boolean stock = facebooksHold && facebooks;
         HookStatus.counted(FAMILY, OFF_THE_RIGHT_EDGE);
-        Logger.printDebug(() -> "Reel hold: a long press outside the right third, Facebook's answer " + stock);
-        return stock;
+        Logger.printDebug(() -> "Reel hold: a long press outside the right third goes to the menu, Facebook's answer "
+                + facebooks);
+        return false;
     }
 
     /** Whether Only on the right edge is on. Read only once {@link #on} said yes. A failure reads off. */
@@ -415,7 +412,6 @@ public final class ReelHold {
         heldPlayer = null;
         before = Float.NaN;
         pressedAt = UNMEASURED;
-        facebooksHold = false;
         speeds = PATCHED;
         holdInBuildForTests = null;
         keepInBuildForTests = null;
