@@ -37,7 +37,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * <p>The biggest copy is often bigger than any the model holds. Facebook's own save hands the
  * imageHigh address to the app's image address modifier, which asks Meta's CDN for a bigger size
  * than the address names, up to the most the CDN serves that image at. The patch fills
- * {@link #cdnResized} with that same call, and {@link #saveAddress} asks it for the most.
+ * {@link #cdnResized} with that same call, and {@link #saveAddress} asks it for the most. The CDN
+ * sends that copy as AVIF, which {@link PhotoFormat} turns into a JPEG before it's saved; on
+ * Android 11, which can't read AVIF, the largest copy goes instead.
  */
 public final class PhotoSave {
 
@@ -171,6 +173,11 @@ public final class PhotoSave {
         Object largest = largestImage(photo);
         String fallback = largest == null ? null : PostDetails.string(largest, URI);
         if (!PostDetails.isLiveTree(photo)) return fallback;
+        if (!PhotoFormat.readsAvif()) {
+            Logger.diagnosticDebug(DiagnosticCategory.DOWNLOADS, SOURCE,
+                () -> "Save photo: the CDN sends its bigger copies as AVIF, which this Android can't read, so the largest copy goes");
+            return fallback;
+        }
         String resized = resized(PostDetails.string(PostDetails.tree(photo, IMAGES[0]), URI));
         if (resized == null) {
             Logger.diagnosticDebug(DiagnosticCategory.DOWNLOADS, SOURCE,

@@ -73,6 +73,9 @@ public class PhotoSaveTest {
         // socket opens.
         MediaDownload.policyForTests = new MediaUrlPolicy(host -> new InetAddress[] { InetAddress.getByName("10.9.8.7") });
         MediaDownload.detailsForTests = saved::add;
+        // These cases run at sdk 30 but stand for a phone that reads AVIF, where the CDN's copy is
+        // asked for; the case below covers Android 11's largest copy.
+        PhotoFormat.readsAvifForTests = true;
         HookStatus.clear();
     }
 
@@ -86,6 +89,7 @@ public class PhotoSaveTest {
         MediaDownload.policyForTests = null;
         MediaDownload.detailsForTests = null;
         PhotoSave.resizerForTests = null;
+        PhotoFormat.readsAvifForTests = null;
         HookStatus.clear();
         PauseForTests.resume();
         Settings.DOWNLOAD_PHOTOS.resetToDefault();
@@ -154,6 +158,25 @@ public class PhotoSaveTest {
         TreeJNI unsized = photo().with("imageHigh", new TreeJNI().with("uri", HIGH));
         assertEquals("with no sizes to compare, the CDN's copy goes",
                 HIGH.replace("ctp=s1080x1440", "ctp=s1536x2048"), PhotoSave.saveAddress(unsized));
+    }
+
+    /** The CDN sends its bigger copies as AVIF, and Android 11 reads none, so the largest copy goes. */
+    @Test
+    public void anAndroidThatReadsNoAvifKeepsTheLargestCopy() {
+        int[] calls = new int[1];
+        PhotoSave.resizerForTests = (address, width, height) -> {
+            calls[0]++;
+            return asking(address, width, height);
+        };
+        PhotoFormat.readsAvifForTests = false;
+        TreeJNI photo = photo().with("imageHigh", image(HIGH, 1080, 1440)).with("image", image(MEDIUM, 960, 720));
+        assertEquals(HIGH, PhotoSave.saveAddress(photo));
+        assertEquals("the modifier isn't asked", 0, calls[0]);
+        assertFalse(HookStatus.report().toString().contains(PhotoSave.FULL_SIZE));
+
+        PhotoFormat.readsAvifForTests = null;
+        assertFalse("sdk 30 is Android 11, which reads no AVIF", PhotoFormat.readsAvif());
+        assertEquals(HIGH, PhotoSave.saveAddress(photo));
     }
 
     @Test
