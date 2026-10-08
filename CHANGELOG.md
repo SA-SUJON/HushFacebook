@@ -13,6 +13,7 @@ Every Hushfacebook release, newest first.
 
 * **Facebook:** `Restore screens on re-signed builds` says photos and posts need it too, in its description and in the warning settings show when a re-signed build doesn't have it. Leaving it out stops photos and posts from opening, not only profiles, so the old wording made it look safe to skip.
 * **Tooling:** The desktop CLI runs, bundle merges and the resource, register and fingerprint checks now wait for a slot of the machine's build queue when `BUILD_QUEUE_SCRIPT` names one, and run straight away when it doesn't. Before, they started beside whatever builds were running and the queue never saw them.
+* **Tooling:** The patch tests that read the Facebook fixtures run as their own Gradle task, `:patches:fixtureTest`, with each fixture's path and SHA-256 as its inputs. A change to the fixtures reruns only those tests, and a fixture swapped for another of the same size and date still counts as a change. Each fixture's dex is now read and parsed once per test run rather than once per lookup. `:patches:test` still runs every test, and refuses a run where a fixture test skipped with the fixture folder set.
 
 ### Removed
 
