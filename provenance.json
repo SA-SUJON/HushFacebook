@@ -762,6 +762,15 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/WindowsAbove.java"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: the windows a Facebook screen has open above its own, such as the comment sheet Facebook 581 shows as a dialog fragment, read from Android's WindowInspector for the report's Last screen left lines and Material You's sheet colours."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/Haptics.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/haptics/HapticsAnchors.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/haptics/TurnOffHapticsPatch.kt"
