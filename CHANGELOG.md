@@ -68,7 +68,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** With Debug logging on, the report's Stories tray line is followed by a count of the other card types the tray kept, by Facebook's own type name, so a report shows which cards Hushfacebook doesn't sort yet. It never reads whose stories they are and doesn't change what the tray shows.
 * **Facebook:** With Debug logging on, the diagnostic report says which video formats Facebook's players were set up with: the codec, the size, and whether the picture is SDR or HDR (PQ or HLG), with or without HDR metadata. So a report shows whether a video was really served in HDR, with `Turn off HDR brightness` on or off. It's in every build, and nothing else from the video gets into the report (issues #93 and #66).
 * **Facebook:** With Debug logging on, a Save photo tap writes the sizes of the photo's copies to the report (just the sizes, never the image's address), so a report can show why a save came out smaller than expected.
-* **Facebook:** The report's Last screen left lines now say what each view on the way down paints behind itself (a colour, or the kind of drawable), so a report can show which part of a screen a theme missed.
+* **Facebook:** The report's Last screen left lines now say what each view on the way down paints behind itself (a colour, or the kind of drawable with its fill), so a report can show which part of a screen a theme missed. A sheet or dialog left open over the screen, like the comments, gets read first.
 
 ### Fixed
 
