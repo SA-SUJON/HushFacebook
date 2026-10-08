@@ -5,14 +5,22 @@
 package app.morphe.extension.facebook.settings;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inspector.WindowInspector;
+
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,6 +60,9 @@ final class LastScreen {
     /** Walks written for each point: the first, and the ones under a layer that drew nothing there. */
     private static final int MAX_WALKS = 3;
 
+    /** Windows read above the screen's own, a sheet and a dialog over it, say. */
+    private static final int MAX_WINDOWS_ABOVE = 2;
+
     private static final class Reading {
         final String screen;
         final List<String> paths;
@@ -74,17 +85,54 @@ final class LastScreen {
 
     private LastScreen() {}
 
-    /** Reads the activity's window as it pauses, on the main thread. Never throws. */
+    /**
+     * Reads the activity's window as it pauses, on the main thread, after the windows it has open
+     * above it, top one first ({@link #above}). Never throws.
+     */
     static void read(Activity activity) {
         long now = SystemClock.elapsedRealtime();
         String screen = activity.getClass().getSimpleName();
-        List<String> paths;
+        List<String> paths = new ArrayList<>();
         try {
-            paths = describe(activity.getWindow().getDecorView());
+            View decor = activity.getWindow().getDecorView();
+            if (Build.VERSION.SDK_INT >= 29) {
+                for (View window : above(activity, decor, WindowInspector.getGlobalWindowViews())) {
+                    for (String path : describe(window)) paths.add("window above: " + path);
+                }
+            }
+            paths.addAll(describe(decor));
         } catch (Throwable failure) {
-            paths = Collections.singletonList("could not be read: " + failure.getClass().getSimpleName());
+            paths.add("could not be read: " + failure.getClass().getSimpleName());
         }
         last = new Reading(screen, paths, now);
+    }
+
+    /**
+     * Of the app's window roots, in the order they were added, the ones [activity] has open above
+     * [decor], top one first, up to {@link #MAX_WINDOWS_ABOVE}: a dialog or a sheet, like the
+     * comment sheet Facebook shows as a dialog fragment (#37). A root counts when it's shown, laid
+     * out and made from the activity's context.
+     */
+    static List<View> above(Activity activity, View decor, List<View> roots) {
+        List<View> out = new ArrayList<>();
+        for (int i = roots.size() - 1; i >= 0 && out.size() < MAX_WINDOWS_ABOVE; i--) {
+            View root = roots.get(i);
+            if (root == decor) break;
+            if (root.getVisibility() == View.VISIBLE && root.getWidth() > 0 && root.getHeight() > 0
+                    && activityOf(root.getContext()) == activity) {
+                out.add(root);
+            }
+        }
+        return out;
+    }
+
+    @Nullable
+    private static Activity activityOf(Context context) {
+        for (int depth = 0; context != null && depth < 10; depth++) {
+            if (context instanceof Activity) return (Activity) context;
+            context = context instanceof ContextWrapper ? ((ContextWrapper) context).getBaseContext() : null;
+        }
+        return null;
     }
 
     /** The section: nothing until a screen has paused, then that screen, how long ago, and its paths. */
@@ -229,19 +277,22 @@ final class LastScreen {
     /**
      * What [view] paints behind itself, after its name: nothing without a background, " {#RRGGBB}"
      * for a plain colour (#AARRGGBB when it's see-through), and otherwise the drawable's class, a
-     * framework one by its simple name. That's how a report says which view paints a colour a theme
-     * missed (#37).
+     * framework one by its simple name, with a shape's fill colour. That's how a report says which
+     * view paints a colour a theme missed (#37).
      */
     static String background(View view) {
         Drawable background = view.getBackground();
         if (background == null) return "";
-        if (background instanceof ColorDrawable) {
-            int color = ((ColorDrawable) background).getColor();
-            return Color.alpha(color) == 0xFF ? String.format(Locale.ROOT, " {#%06X}", color & 0xFFFFFF)
-                    : String.format(Locale.ROOT, " {#%08X}", color);
-        }
+        if (background instanceof ColorDrawable) return " {" + colour(((ColorDrawable) background).getColor()) + "}";
         String type = background.getClass().getName();
-        return " {" + (type.startsWith("android.graphics.drawable.") ? background.getClass().getSimpleName() : type) + "}";
+        type = type.startsWith("android.graphics.drawable.") ? background.getClass().getSimpleName() : type;
+        ColorStateList fill = background instanceof GradientDrawable ? ((GradientDrawable) background).getColor() : null;
+        return " {" + type + (fill != null ? " " + colour(fill.getDefaultColor()) : "") + "}";
+    }
+
+    private static String colour(int color) {
+        return Color.alpha(color) == 0xFF ? String.format(Locale.ROOT, "#%06X", color & 0xFFFFFF)
+                : String.format(Locale.ROOT, "#%08X", color);
     }
 
     /** A framework class by its simple name, anything else in full; then the resource name, if the id has one. */

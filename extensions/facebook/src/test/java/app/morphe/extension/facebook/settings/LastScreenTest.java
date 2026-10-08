@@ -9,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.SystemClock;
@@ -123,8 +124,58 @@ public class LastScreenTest {
 
         top.setBackground(new GradientDrawable());
         assertEquals(" {GradientDrawable}", LastScreen.background(top));
+        GradientDrawable sheet = new GradientDrawable();
+        sheet.setColor(0xFF252728);
+        top.setBackground(sheet);
+        assertEquals(" {GradientDrawable #252728}", LastScreen.background(top));
         top.setBackground(null);
         assertEquals("", LastScreen.background(top));
+    }
+
+    /** Facebook shows the comment sheet as a dialog, a window of its own over the screen's (#37). */
+    @Test
+    public void theWindowsAScreenOpenedAboveItsOwnAreReadTopOneFirst() {
+        Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
+        View decor = activity.getWindow().getDecorView();
+        View before = shownRoot(new Dialog(activity).getWindow().getDecorView());
+        View sheet = shownRoot(new Dialog(activity).getWindow().getDecorView());
+        View menu = shownRoot(new Dialog(activity).getWindow().getDecorView());
+        View hidden = shownRoot(new Dialog(activity).getWindow().getDecorView());
+        hidden.setVisibility(View.GONE);
+        View notLaidOut = new Dialog(activity).getWindow().getDecorView();
+        View elsewhere = shownRoot(new FrameLayout(RuntimeEnvironment.getApplication()));
+
+        assertEquals(List.of(menu, sheet),
+                LastScreen.above(activity, decor, List.of(before, decor, sheet, menu, hidden, notLaidOut, elsewhere)));
+        View third = shownRoot(new Dialog(activity).getWindow().getDecorView());
+        assertEquals("two at most", List.of(third, menu),
+                LastScreen.above(activity, decor, List.of(decor, sheet, menu, third)));
+        assertTrue(LastScreen.above(activity, decor, List.of(decor)).isEmpty());
+    }
+
+    @Test
+    public void aDialogShownOverTheScreenIsWalkedBeforeTheScreen() {
+        Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
+        layOut(activity.getWindow().getDecorView());
+        Dialog dialog = new Dialog(activity);
+        FrameLayout content = new FrameLayout(activity);
+        content.setBackgroundColor(0xFF252728);
+        dialog.setContentView(content);
+        dialog.show();
+        layOut(dialog.getWindow().getDecorView());
+
+        LastScreen.read(activity);
+        List<String> lines = LastScreen.report(SystemClock.elapsedRealtime());
+
+        assertTrue(lines.toString(), lines.get(1).startsWith("window above: right edge 55% down: DecorView"));
+        assertTrue(lines.toString(), lines.get(1).contains("{#252728}"));
+        assertTrue(lines.toString(), lines.stream().anyMatch(line -> line.startsWith("right edge 55% down: DecorView")));
+        dialog.dismiss();
+    }
+
+    private static View shownRoot(View root) {
+        layOut(root);
+        return root;
     }
 
     @Test
