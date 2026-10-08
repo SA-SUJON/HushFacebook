@@ -828,6 +828,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/ReelMenuDownload.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/downloads/reel/ReelMoreSheet.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook from Facebook 577, 580 and 581: a Download row in a reel's More sheet, for accounts whose reels lack the sidebar Download any reel puts its button in. The sheet builder is found by the Clear mode row id it holds, the row constructor, click interface and icon wrap by their shapes, and the download icon by the enum constant Facebook's own download row reads; the builder's first call adds the row through a helper that looks up the reel's player and hands it to the same save the sidebar button uses."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/download/ClipboardLink.java"
       ],
       "origin": "original",
