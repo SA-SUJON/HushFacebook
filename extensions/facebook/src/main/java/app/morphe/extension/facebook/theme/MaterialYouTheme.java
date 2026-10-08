@@ -8,12 +8,15 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.ComponentCallbacks;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -429,7 +432,8 @@ public final class MaterialYouTheme {
      * Gives each view under [root] whose background is a plain colour of the {@link #SURFACES} the
      * palette's neutral at the same lightness, in dark mode and without AMOLED, as
      * {@link #recolourWindow} does for a window. Litho's hosts are walked too: on 581 the comment
-     * rows draw #252728 with no FDS token reaching {@link #fds}.
+     * rows draw #252728 with no FDS token reaching {@link #fds}. A shape's flat fill, alone or as a
+     * layer, takes the palette too ({@link #recolourShapes}).
      *
      * @return how many views it recoloured
      */
@@ -444,6 +448,8 @@ public final class MaterialYouTheme {
         if (background instanceof ColorDrawable && isSurface(((ColorDrawable) background).getColor())) {
             recolour(background);
             recoloured++;
+        } else if (recolourShapes(background)) {
+            recoloured++;
         }
         if (view instanceof ViewGroup && depth < MAX_SHEET_DEPTH) {
             ViewGroup group = (ViewGroup) view;
@@ -457,6 +463,57 @@ public final class MaterialYouTheme {
 
     /** Deeper than the comment sheet's views go, so a broken tree can't hold a layout up. */
     private static final int MAX_SHEET_DEPTH = 40;
+
+    /**
+     * Gives a shape's flat fill, or each such fill of a layer list, the palette as a React background
+     * takes it ({@link #darkBackground}): the sheet's comment bar is a 581
+     * SingleLineCommentComposerView whose background is the drawable sutro_top_border, a DIVIDER
+     * #65686C layer under a SURFACE_BACKGROUND #252728 one inset 1dp at the top (#37). The framework
+     * reads both from the theme, so no hook sees them. A gradient or a fill that changes with the
+     * view's state keeps its colours. The drawable's state is copied first, since every view drawn
+     * from the resource shares it.
+     *
+     * @return whether a fill changed
+     */
+    private static boolean recolourShapes(@Nullable Drawable background) {
+        if (background instanceof GradientDrawable) {
+            GradientDrawable shape = (GradientDrawable) background;
+            Integer themed = themedFill(shape);
+            if (themed == null) return false;
+            shape.mutate();
+            shape.setColor(themed);
+            return true;
+        }
+        if (!(background instanceof LayerDrawable)) return false;
+        LayerDrawable layers = (LayerDrawable) background;
+        if (!hasThemedFill(layers)) return false;
+        layers.mutate();
+        for (int i = 0; i < layers.getNumberOfLayers(); i++) {
+            Drawable layer = layers.getDrawable(i);
+            if (!(layer instanceof GradientDrawable)) continue;
+            Integer themed = themedFill((GradientDrawable) layer);
+            if (themed != null) ((GradientDrawable) layer).setColor(themed);
+        }
+        return true;
+    }
+
+    private static boolean hasThemedFill(LayerDrawable layers) {
+        for (int i = 0; i < layers.getNumberOfLayers(); i++) {
+            Drawable layer = layers.getDrawable(i);
+            if (layer instanceof GradientDrawable && themedFill((GradientDrawable) layer) != null) return true;
+        }
+        return false;
+    }
+
+    /** The palette's colour for a shape's flat fill, or null when it keeps its own. */
+    @Nullable
+    private static Integer themedFill(GradientDrawable shape) {
+        ColorStateList fill = shape.getColor();
+        if (fill == null || fill.isStateful()) return null;
+        int color = fill.getDefaultColor();
+        int themed = darkBackground(color);
+        return themed == color ? null : themed;
+    }
 
     /**
      * Runs {@link #recolourWindow} for each activity once it's created and each time it resumes, and
@@ -535,6 +592,14 @@ public final class MaterialYouTheme {
      */
     static int reactBackground(int color) {
         HookStatus.invoked(FamilyNames.MATERIAL_YOU_THEME);
+        return darkBackground(color);
+    }
+
+    /**
+     * {@link #withoutToken}, and once Facebook has said dark mode is on, the palette's neutral at the
+     * same lightness for any grey {@link #FDS_DARK} lists.
+     */
+    private static int darkBackground(int color) {
         int themed = withoutToken(color);
         if (themed != color || !DarkMode.saidOn() || Arrays.binarySearch(DARK_GREYS, color) < 0) return themed;
         return palette().sameLightness(TonePalette.NEUTRAL, color);

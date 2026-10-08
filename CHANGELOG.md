@@ -73,7 +73,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
-* **Facebook:** With `Material You theme` in dark mode, a sheet or dialog that opens over a screen, like the comments, takes the palette on its plain dark gray backgrounds too (issue #37).
+* **Facebook:** With `Material You theme` in dark mode, a sheet or dialog that opens over a screen, like the comments, takes the palette on its plain dark gray backgrounds too, the Write a comment bar and its top border included (issue #37).
 * **Facebook:** `Hide affiliate product links` takes the other Shop now cards off reels too, like the one above the creator's name for a product of their own. Facebook sends products tagged on a reel, a creator's storefront and Shop similar as card kinds of their own, and the patch only caught the affiliate one. The diagnostic report counts each card it keeps out by its kind (issue #89).
 * **Facebook:** With `AMOLED theme` on, the Data mode banner that Flex carriers show under the top bar draws on the black page now, not as a dark grey band across it. Facebook paints that strip with a card's colour, and AMOLED had turned it a card's near black. The Buy data button keeps its own step above the black (issue #86).
 * **Facebook:** `Turn off HDR brightness` also answers no when Facebook checks whether the screen shows HDR. On a screen that shows HLG, that check is what lets Facebook brighten ordinary videos into HDR on Android 14 and newer, and it's also how Facebook picks a Dolby Vision video's HDR track. Until now the patch only held back Facebook's HDR window, which reaches a video drawn on a surface of its own from Android 15 on (issue #93).
