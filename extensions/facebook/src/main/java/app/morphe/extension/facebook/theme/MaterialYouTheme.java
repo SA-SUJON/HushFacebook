@@ -32,13 +32,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import app.morphe.extension.facebook.misc.WindowsAbove;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.SettingsStatus;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.diagnostics.DiagnosticCategory;
 import app.morphe.extension.shared.diagnostics.HookStatus;
+import app.morphe.extension.shared.settings.BaseSettings;
 import app.morphe.extension.shared.settings.preference.LogBufferManager;
 
 /**
@@ -187,7 +190,31 @@ public final class MaterialYouTheme {
                 || (listed(SHARED.get(name), color) && DarkMode.saidOn())) {
             return AmoledTheme.foreground(recolour(palette(), color), name);
         }
+        if (isSurface(color)) noteUnlisted(name, color);
         return color;
+    }
+
+    /** The tokens {@link #noteUnlisted} has written to the log. */
+    private static final Set<String> UNLISTED = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    /** The most tokens written, so a screen full of them can't fill the log. */
+    private static final int MAX_UNLISTED = 40;
+
+    /**
+     * With Debug logging on, writes each token that came with one of the {@link #SURFACES} and was
+     * left alone, once per token: a token Facebook gives the same dark grey in both themes isn't in
+     * {@link #FDS_DARK}, so a report names the token behind a gray the theme missed (#37). Only the
+     * token's name and colour are written.
+     */
+    private static void noteUnlisted(String token, int color) {
+        if (UNLISTED.size() >= MAX_UNLISTED || UNLISTED.contains(token)) return;
+        if (!Utils.settingsReady() || !BaseSettings.DEBUG.get() || !UNLISTED.add(token)) return;
+        Logger.diagnosticDebug(DiagnosticCategory.OTHER, "Material You theme",
+                () -> String.format(Locale.ROOT, "Material You left token %s at #%06X", token, color & 0xFFFFFF));
+    }
+
+    static void forgetUnlistedForTests() {
+        UNLISTED.clear();
     }
 
     private static boolean listed(@Nullable int[] colours, int color) {
