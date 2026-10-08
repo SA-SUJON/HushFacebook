@@ -87,7 +87,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 | `Disable Audience Network` | Stops Facebook serving ads to other apps. Those apps then show their own ads or none, and rewarded ads can fail. |
 | `Disable Play Store updates` | Stops Google Play offering Facebook updates by giving Facebook the highest version number Android allows, while Facebook's own code still reads its real one. It doesn't work on a Root Mount install. Once a Facebook with it is installed, a build without it won't install over it. |
 | `Don't send reel watch history` | Stops sending Facebook the list of reels you've watched. It's used to rank your Reels feed, and nobody else sees it. Reels you've already watched may come back in the feed. |
-| `Download any reel` | Adds a Download button beside every reel. Videos save at the Download quality you set, best by default. |
+| `Download any reel` | Adds a Download button beside every reel, and a Download row to its More sheet. Videos save at the Download quality you set, best by default. |
 | `Download any video` | Adds Download to phone to the menu of videos in the feed and in Watch, below Facebook's own items. Videos save at the Download quality you set, best by default. |
 | `Download any story` | Adds Save to the menu of any story, including stories with music. Videos save at the Download quality you set, best by default. |
 | `Download any photo` | Shows Save photo on every photo you open, even where the poster turned saving off, and saves the biggest size where your downloads go. Its switch is under Downloads. |

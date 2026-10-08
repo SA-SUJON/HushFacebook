@@ -985,7 +985,7 @@
     },
     {
       "name": "Download any reel",
-      "description": "Adds a Download button beside every reel. Videos save at the Download quality you set, best by default.",
+      "description": "Adds a Download button beside every reel, and a Download row to its More sheet. Videos save at the Download quality you set, best by default.",
       "category": "Downloads",
       "use": true,
       "dependencies": [
