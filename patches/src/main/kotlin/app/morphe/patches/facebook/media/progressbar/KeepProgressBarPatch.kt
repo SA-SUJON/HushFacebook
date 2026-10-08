@@ -48,6 +48,11 @@ internal const val SET_ENABLED = "Landroid/view/View;->setEnabled(Z)V"
 internal const val SEND_DELAYED = "Landroid/os/Handler;->sendEmptyMessageDelayed(IJ)Z"
 internal const val REMOVE_MESSAGES = "Landroid/os/Handler;->removeMessages(I)V"
 
+/** The name the newer player's video controls extension gives itself, a kept literal. */
+internal const val CONTROLS_EXTENSION = "VideoControlsExtension"
+internal const val POST_DELAYED = "Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z"
+internal const val REMOVE_CALLBACKS = "Landroid/os/Handler;->removeCallbacksAndMessages(Ljava/lang/Object;)V"
+
 internal const val PROGRESS_BAR = "$EXTENSION_PACKAGE/media/ProgressBar;"
 internal const val KEEPS_REEL_BAR = "$PROGRESS_BAR->keepsReelBar()Z"
 internal const val KEEPS_CONTROLS = "$PROGRESS_BAR->keepsControls()Z"
@@ -84,6 +89,12 @@ internal const val VIEW_GROUP = "Landroid/view/ViewGroup;"
  * The extension goes first there, and while the switch is on no timer is set, so the controls and
  * their bar stay until a tap hides them the way it always has.
  *
+ * The newer player, the one the video viewer's Enter fullscreen landscape mode opens on 577 to 581,
+ * draws its controls with Litho and hides them through an extension named [CONTROLS_EXTENSION]
+ * (581 `LX/RbF;`, 580 `LX/Rp7;`, 577 `LX/SNL;`). Its one method that drops its pending callbacks
+ * and posts a runnable (581 `A0N`) sets the hide 3 seconds after the controls show or are touched,
+ * 10 with accessibility on. The same hook goes first there.
+ *
  * In the default selection with its switch off: it only acts once the switch is turned on.
  */
 @Suppress("unused")
@@ -113,6 +124,10 @@ val keepProgressBarPatch = bytecodePatch(
             ?.let { classDefByOrNull(it) }
             ?: refuse("FeedFullscreenVideoControlsPlugin or the controls class it extends isn't in this APK")
         val timer = fadeTimer(controls)
+        val (extension, hide) = extensionFadeTimer(
+            classDefByStrings(CONTROLS_EXTENSION, StringComparisonType.EQUALS)
+                .filterNot { it.type.startsWith(EXTENSION_CLASSES) },
+        )
 
         mutableClassDefBy(scrubber.type).methods.single { it.sameAs(scrubber.passive) }
             .activeInstead(scrubber)
@@ -121,6 +136,7 @@ val keepProgressBarPatch = bytecodePatch(
                 .fullSizeInstead(plugin.type, sizes.fullSize)
         }
         mutableClassDefBy(controls.type).methods.single { it.sameAs(timer) }.noTimerWhileKept()
+        mutableClassDefBy(extension.type).methods.single { it.sameAs(hide) }.noTimerWhileKept()
         enableStatus("keepProgressBar")
     }
 }
@@ -238,6 +254,21 @@ internal fun fadeTimer(controls: ClassDef): Method {
         refuse("${controls.type}->${timer.name}, its fade timer, is no longer an instance ()V that drops the old timer first")
     }
     return timer
+}
+
+/**
+ * The newer player's controls hide: the one instance `V` method among [holders] (the classes that
+ * load [CONTROLS_EXTENSION]) that drops its pending callbacks and posts a runnable.
+ */
+internal fun extensionFadeTimer(holders: List<ClassDef>): Pair<ClassDef, Method> {
+    val timers = holders.flatMap { holder ->
+        holder.methods.filter {
+            !AccessFlags.STATIC.isSet(it.accessFlags) && it.returnType == "V" && it.calls(POST_DELAYED) &&
+                it.calls(REMOVE_CALLBACKS)
+        }.map { holder to it }
+    }
+    return timers.singleOrNull()
+        ?: refuse("expected one method of the classes loading \"$CONTROLS_EXTENSION\" to post the controls' hide, found ${timers.size}")
 }
 
 /**
