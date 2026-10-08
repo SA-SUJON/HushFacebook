@@ -15,12 +15,14 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Looper;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
@@ -903,6 +905,33 @@ public class MaterialYouThemeTest {
         root.getViewTreeObserver().dispatchOnGlobalLayout();
         assertEquals("light mode", 0xFF252728, fill(inLightMode.getBackground()));
         sheet.dismiss();
+    }
+
+    /**
+     * Litho reads a token's colour from the theme with TypedArray.getColor (581 LX/1Mx;->A04), and
+     * SURFACE_BACKGROUND's night style item keeps #252728, so the comment list's rows drew it (#37).
+     * In dark mode a dark surface read that way takes the palette; light mode and other colours keep
+     * Facebook's.
+     */
+    @Test
+    public void aThemeAttributesDarkSurfaceTakesThePalette() {
+        Context context = RuntimeEnvironment.getApplication();
+        DarkMode.answer(true);
+        TypedArray surface = attribute(context, "#FF252728");
+        assertEquals("dark mode", palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728),
+                MaterialYouTheme.getColor(surface, 0, 0, false));
+        TypedArray light = attribute(context, "#FFC9CCD1");
+        assertEquals("no dark surface", 0xFFC9CCD1, MaterialYouTheme.getColor(light, 0, 0, false));
+
+        DarkMode.answer(false);
+        assertEquals("light mode", 0xFF252728, MaterialYouTheme.getColor(surface, 0, 0, false));
+        surface.recycle();
+        light.recycle();
+    }
+
+    private static TypedArray attribute(Context context, String colour) {
+        AttributeSet set = Robolectric.buildAttributeSet().addAttribute(android.R.attr.textColor, colour).build();
+        return context.obtainStyledAttributes(set, new int[] {android.R.attr.textColor});
     }
 
     private static GradientDrawable filled(int color) {

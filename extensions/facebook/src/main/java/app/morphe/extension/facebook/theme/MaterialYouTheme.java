@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -309,6 +310,20 @@ public final class MaterialYouTheme {
 
     static int getColor(Resources resources, int id, @Nullable Resources.Theme theme, boolean amoled) {
         return withoutToken(amoled ? AmoledTheme.getColor(resources, id, theme) : resources.getColor(id, theme));
+    }
+
+    /**
+     * The same for {@code TypedArray.getColor}, how Litho reads a token's colour from the theme (581
+     * {@code LX/1Mx;->A04}: obtainStyledAttributes, then getColor). Some code reads SURFACE_BACKGROUND
+     * as a plain colour, so its night style item keeps #252728 when no system tone sits close, and
+     * the comment list's rows drew it (issue #37).
+     */
+    public static int getColor(TypedArray array, int index, int fallback) {
+        return getColor(array, index, fallback, SettingsStatus.amoledTheme());
+    }
+
+    static int getColor(TypedArray array, int index, int fallback, boolean amoled) {
+        return withoutToken(amoled ? AmoledTheme.getColor(array, index, fallback) : array.getColor(index, fallback));
     }
 
     /**
