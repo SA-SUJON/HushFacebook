@@ -427,6 +427,8 @@ The comment box loses its GIF and sticker buttons. Typing, photos and posting wo
 Open every reply thread	Alle Antwort-Threads öffnen
 # context: summary of that switch; View replies is the link Facebook shows under a comment that has replies
 Comments show their replies right away, so there's no View replies to tap.	Kommentare zeigen ihre Antworten sofort, ein Tippen auf „Antworten ansehen“ ist nicht nötig.
+Hide related groups	Ähnliche Gruppen ausblenden
+A group post's comments end without the Related groups list and its Join buttons.	Unter den Kommentaren eines Gruppenbeitrags fehlt die Liste „Ähnliche Gruppen“ mit ihren Beitreten-Schaltflächen.
 # context: row title under Comments that opens Facebook's own settings; reaction counts are the numbers next to the reactions on a post
 Hide reaction counts	Anzahl der Reaktionen ausblenden
 # context: summary of that row; Preferences and Reaction preferences are the names Facebook's own settings use

@@ -58,6 +58,13 @@ internal const val GIF_BUTTON =
 internal const val STICKER_BUTTON =
     "com.facebook.feedback.comments.plugins.commentcomposer.attachmentbutton.sticker.StickerAttachmentButtonPlugin"
 
+/** The name the socket under a post's comments gives itself, in the methods that go through its plugins. */
+internal const val BOTTOM_SOCKET = "FeedbackSurfaceBottomContentSocket"
+
+/** The Related groups list under a group post's comments, a kept class name the socket's name table loads. */
+internal const val RELATED_GROUPS =
+    "com.facebook.feedback.comments.plugins.bottomcontent.impl.relatedgroups.RelatedGroupsPlugin"
+
 /** The name the reaction picker's popup logs itself under, in the method that opens it. */
 internal const val DOCK_NAME = "reactions_dock"
 
@@ -79,11 +86,12 @@ private const val OBJECTS = "[Ljava/lang/Object;"
 
 internal const val COMMENT_SHEET_OPTIONS = "$EXTENSION_PACKAGE/comments/CommentSheetOptions;"
 internal const val HOLDS_BUTTON = "$COMMENT_SHEET_OPTIONS->holdsButton(Ljava/lang/String;)Z"
+internal const val HOLDS_BOTTOM_CONTENT = "$COMMENT_SHEET_OPTIONS->holdsBottomContent(Ljava/lang/String;)Z"
 internal const val SKIP_PICKER = "$COMMENT_SHEET_OPTIONS->skipReactionPicker()Z"
 internal const val OPEN_REPLY_THREADS = "$COMMENT_SHEET_OPTIONS->openReplyThreads(Z)Z"
 
 /**
- * Three switches for comments and reactions, all off until turned on.
+ * Four switches for comments and reactions, all off until turned on.
  *
  * Hide GIF and sticker buttons: the comment box draws its buttons through a plugin socket, the one
  * that names itself [BUTTON_SOCKET] in the method going through its plugins (581
@@ -95,6 +103,16 @@ internal const val OPEN_REPLY_THREADS = "$COMMENT_SHEET_OPTIONS->openReplyThread
  * boolean the socket calls with an int last and a switch over the table's numbers. The extension
  * goes first in it with the plugin's name, and while the switch is on the GIF and sticker buttons
  * get a no. Photo, mention and every other button stay.
+ *
+ * Hide related groups: what comes after a post's comments is drawn through another socket, the one
+ * that names itself [BOTTOM_SOCKET] in the two comment surfaces' methods going through its plugins
+ * (581 `LX/Aco;->A0j` and `LX/BIE;->A0j`, 580 `LX/B8E;->A1S` and `LX/BLp;->A1S`, 577 `LX/AeD;->A3Y`
+ * and `LX/BLW;->A3Y`). Its name table (581 `LX/2Ap;->A0p`, 580 `LX/25t;->A0n`, 577 `LX/1xW;->A0p`)
+ * names [RELATED_GROUPS], the Related groups list with its Join buttons that a group post gets
+ * under its comments (#101), and its check (581 `LX/2Ap;->A24`, 580 `LX/25t;->A21`, 577
+ * `LX/1xW;->A20`) sits in the table's class here. It's found the same way as the button check and
+ * hooked the same way: while the switch is on the Related groups plugin gets a no, and the socket
+ * goes on to its next plugin. Comments, the comment box and the other plugins stay.
  *
  * Like only: a long press on Like opens the reaction picker through one method that builds
  * [UFI_DOCK] in a popup and logs [DOCK_NAME] (581 `LX/3FO;->A06`, 580 `LX/333;->A06`, 577
@@ -119,10 +137,11 @@ internal const val OPEN_REPLY_THREADS = "$COMMENT_SHEET_OPTIONS->openReplyThread
 val commentSheetOptionsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Comment sheet options",
-    description = "Adds three switches under Comments, all off to start. Like only stops a long press on Like " +
-        "from opening the reactions, another takes the GIF and sticker buttons out of the comment box, and Open " +
-        "every reply thread shows each comment's replies without a tap on View replies. A row there opens " +
-        "Facebook's own settings, where Reaction preferences can hide reaction counts.",
+    description = "Adds four switches under Comments, all off to start. Like only stops a long press on Like " +
+        "from opening the reactions, another takes the GIF and sticker buttons out of the comment box, Open " +
+        "every reply thread shows each comment's replies without a tap on View replies, and Hide related groups " +
+        "takes the Related groups list out from under a group post's comments. A row there opens Facebook's own " +
+        "settings, where Reaction preferences can hide reaction counts.",
     default = false,
 ) {
     category("Interface")
@@ -136,6 +155,13 @@ val commentSheetOptionsPatch = bytecodePatch(
             holders(GIF_BUTTON),
             holders(BUTTON_SOCKET).flatMap { methodsHolding(it, BUTTON_SOCKET) },
         ) { types -> types.mapNotNull { classDefByOrNull(it) }.associateBy { it.type } }
+        val bottom = bottomSocket(
+            holders(RELATED_GROUPS),
+            holders(BOTTOM_SOCKET).flatMap { methodsHolding(it, BOTTOM_SOCKET) },
+        ) { types -> types.mapNotNull { classDefByOrNull(it) }.associateBy { it.type } }
+        if (bottom.check.descriptor() == buttons.check.descriptor()) {
+            refuse("the comment box and the bottom of the comments lead to one check, ${bottom.check.descriptor()}")
+        }
         val dock = reactionPicker(holders(DOCK_NAME))
         val threads = replyThreads(
             holders(COMMENT_SECTION),
@@ -144,6 +170,8 @@ val commentSheetOptionsPatch = bytecodePatch(
 
         mutableClassDefBy(buttons.check.definingClass).methods.single { it.descriptor() == buttons.check.descriptor() }
             .holdButtons(buttons.table)
+        mutableClassDefBy(bottom.check.definingClass).methods.single { it.descriptor() == bottom.check.descriptor() }
+            .holdButtons(bottom.table, HOLDS_BOTTOM_CONTENT)
         mutableClassDefBy(dock.definingClass).methods.single { it.descriptor() == dock.descriptor() }
             .skipPicker()
         mutableClassDefBy(threads.initialState.definingClass).methods
@@ -167,25 +195,49 @@ private fun calls(method: Method): List<MethodReference> =
 /**
  * The comment box's button socket, from [holders], the classes loading [GIF_BUTTON], and
  * [sockets], the methods loading [BUTTON_SOCKET]. [classes] reads the classes of the types it's
- * given, so the check can be looked at in whichever class holds it.
- *
- * The table is the one name table naming both buttons. The check is the one static boolean method
- * a socket method calls along with the table, with an int last, a switch over the same numbers as
- * the table's and a local register for the hook. Refuses unless there's exactly one of each.
+ * given, so the check can be looked at in whichever class holds it. The table is the one name table
+ * naming both buttons; see [pluginCheck] for the check.
  */
 internal fun buttonSocket(
     holders: List<ClassDef>,
     sockets: List<Method>,
     classes: (Set<String>) -> Map<String, ClassDef>,
+): PluginSocket = pluginCheck(holders, sockets, classes, BUTTON_SOCKET, GIF_BUTTON, STICKER_BUTTON)
+
+/**
+ * The socket under a post's comments, from [holders], the classes loading [RELATED_GROUPS], and
+ * [sockets], the methods loading [BOTTOM_SOCKET]. The table is the one name table naming the
+ * Related groups plugin; see [pluginCheck] for the check, which may share the table's class.
+ */
+internal fun bottomSocket(
+    holders: List<ClassDef>,
+    sockets: List<Method>,
+    classes: (Set<String>) -> Map<String, ClassDef>,
+): PluginSocket = pluginCheck(holders, sockets, classes, BOTTOM_SOCKET, RELATED_GROUPS)
+
+/**
+ * A socket named [socket] whose name table names [plugin], and [alsoNamed] when it's given. The
+ * table is the one static (I)String name table among [holders] loading [plugin]. The check is the
+ * one static boolean method a method of [sockets] calls along with the table, with an int last, a
+ * switch over the same numbers as the table's and a local register for the hook. [classes] reads
+ * the classes the calls name. Refuses unless there's exactly one of each.
+ */
+internal fun pluginCheck(
+    holders: List<ClassDef>,
+    sockets: List<Method>,
+    classes: (Set<String>) -> Map<String, ClassDef>,
+    socket: String,
+    plugin: String,
+    alsoNamed: String? = null,
 ): PluginSocket {
-    val tables = holders.flatMap { methodsHolding(it, GIF_BUTTON) }.filter(::isNameTable).distinctBy { it.descriptor() }
-    val table = tables.singleOrNull() ?: refuse("expected one name table naming $GIF_BUTTON, found ${tables.size}")
-    if (!holdsString(table, STICKER_BUTTON)) refuse("${table.descriptor()} names the GIF button but not $STICKER_BUTTON")
+    val tables = holders.flatMap { methodsHolding(it, plugin) }.filter(::isNameTable).distinctBy { it.descriptor() }
+    val table = tables.singleOrNull() ?: refuse("expected one name table naming $plugin, found ${tables.size}")
+    if (alsoNamed != null && !holdsString(table, alsoNamed)) refuse("${table.descriptor()} names $plugin but not $alsoNamed")
     val numbers = switchKeys(table).singleOrNull() ?: refuse("${table.descriptor()} has more than one switch")
 
     val tableCall = table.descriptor()
-    val callers = sockets.filter { socket -> calls(socket).any { it.descriptor() == tableCall } }
-    if (callers.isEmpty()) refuse("no method naming $BUTTON_SOCKET calls $tableCall")
+    val callers = sockets.filter { method -> calls(method).any { it.descriptor() == tableCall } }
+    if (callers.isEmpty()) refuse("no method naming $socket calls $tableCall")
     val called = callers.flatMap(::calls).filter { call ->
         call.returnType == "Z" && call.parameterTypes.lastOrNull()?.toString() == "I"
     }.associateBy { it.descriptor() }
@@ -194,7 +246,7 @@ internal fun buttonSocket(
         owners[called.getValue(descriptor).definingClass]?.methods?.singleOrNull { it.descriptor() == descriptor }
     }.filter { method -> AccessFlags.STATIC.isSet(method.accessFlags) && numbers in switchKeys(method) }
     val check = checks.singleOrNull() ?: refuse(
-        "expected one check of $tableCall's buttons, found ${checks.size}: ${checks.joinToString { it.descriptor() }}",
+        "expected one check of $tableCall's plugins, found ${checks.size}: ${checks.joinToString { it.descriptor() }}",
     )
     if (check.localRegisterCount() < 1) refuse("${check.descriptor()} has no local register for the hook")
     return PluginSocket(table, check)
@@ -222,18 +274,19 @@ internal fun reactionPicker(holders: List<ClassDef>): Method {
 }
 
 /**
- * First thing in the button check: get the button's name from [table] with the check's own number,
- * ask the extension, and answer no when it holds that button. Otherwise the check runs from its
- * first instruction. The number is the last register, so the calls take it as a range.
+ * First thing in a socket's check: get the plugin's name from [table] with the check's own number,
+ * ask the extension ([hook], a static (String)Z), and answer no when it holds that plugin. Otherwise
+ * the check runs from its first instruction. The number is the last register, so the calls take it
+ * as a range.
  */
-internal fun MutableMethod.holdButtons(table: Method) {
+internal fun MutableMethod.holdButtons(table: Method, hook: String = HOLDS_BUTTON) {
     val number = implementation!!.registerCount - 1
     addInstructionsWithLabels(
         0,
         """
             invoke-static/range { v$number .. v$number }, ${table.descriptor()}
             move-result-object v0
-            invoke-static { v0 }, $HOLDS_BUTTON
+            invoke-static { v0 }, $hook
             move-result v0
             if-eqz v0, :check
             const/4 v0, 0x0

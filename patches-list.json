@@ -608,7 +608,7 @@
     },
     {
       "name": "Comment sheet options",
-      "description": "Adds three switches under Comments, all off to start. Like only stops a long press on Like from opening the reactions, another takes the GIF and sticker buttons out of the comment box, and Open every reply thread shows each comment's replies without a tap on View replies. A row there opens Facebook's own settings, where Reaction preferences can hide reaction counts.",
+      "description": "Adds four switches under Comments, all off to start. Like only stops a long press on Like from opening the reactions, another takes the GIF and sticker buttons out of the comment box, Open every reply thread shows each comment's replies without a tap on View replies, and Hide related groups takes the Related groups list out from under a group post's comments. A row there opens Facebook's own settings, where Reaction preferences can hide reaction counts.",
       "category": "Interface",
       "use": false,
       "dependencies": [

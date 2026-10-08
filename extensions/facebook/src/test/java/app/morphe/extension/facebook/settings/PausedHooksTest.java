@@ -564,13 +564,15 @@ public class PausedHooksTest {
         probes.put(PatchFamily.META_AI_SUMMARIES, Arrays.asList(
                 () -> MetaAiSummaries.holds(MetaAiSummaries.SHEET_SUMMARY),
                 () -> MetaAiSummaries.holds(MetaAiSummaries.POST_SUMMARY)));
-        // The comment box's check answers no for its GIF and sticker buttons, and a long press on
-        // Like returns before the reaction picker opens.
+        // The comment box's check answers no for its GIF and sticker buttons, a long press on Like
+        // returns before the reaction picker opens, a comment starts with its replies open, and the
+        // check under a post's comments answers no for Related groups.
         probes.put(PatchFamily.COMMENT_SHEET_OPTIONS, Arrays.asList(
                 () -> CommentSheetOptions.holdsButton(CommentSheetOptions.GIF_BUTTON),
                 () -> CommentSheetOptions.holdsButton(CommentSheetOptions.STICKER_BUTTON),
                 CommentSheetOptions::skipReactionPicker,
-                () -> CommentSheetOptions.openReplyThreads(false)));
+                () -> CommentSheetOptions.openReplyThreads(false),
+                () -> CommentSheetOptions.holdsBottomContent(CommentSheetOptions.RELATED_GROUPS)));
         // A word without @ in a post or comment box looks nobody up, and a list of people left open
         // by an earlier @ is closed.
         probes.put(PatchFamily.TAG_SUGGESTIONS, Arrays.asList(

@@ -427,6 +427,8 @@ The comment box loses its GIF and sticker buttons. Typing, photos and posting wo
 Open every reply thread	Tüm yanıt dizilerini aç
 # context: summary of that switch; View replies is the link Facebook shows under a comment that has replies
 Comments show their replies right away, so there's no View replies to tap.	Yorumlar yanıtlarını hemen gösterir, Yanıtları gör'e dokunman gerekmez.
+Hide related groups	İlgili grupları gizle
+A group post's comments end without the Related groups list and its Join buttons.	Bir grup gönderisinin yorumları, İlgili gruplar listesi ve Katıl düğmeleri olmadan biter.
 # context: row title under Comments that opens Facebook's own settings; reaction counts are the numbers next to the reactions on a post
 Hide reaction counts	Tepki sayılarını gizle
 # context: summary of that row; Preferences and Reaction preferences are the names Facebook's own settings use
