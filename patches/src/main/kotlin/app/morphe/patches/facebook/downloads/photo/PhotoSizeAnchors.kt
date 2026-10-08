@@ -27,15 +27,15 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
  * Where Facebook's own Save photo asks Meta's CDN for a bigger copy of the photo, on 577, 580 and
  * 581.
  *
- * Its save (`subscribeToEncodedImage`, a name Redex keeps, 581 `LX/8pP;`, 580 `LX/8pY;`, 577
- * `LX/8RE;`) takes the photo's imageHigh address and, behind a MobileConfig flag, hands it to the
- * app's image address modifier (581 `LX/3PI;->A00`, an `LX/3ib;`) with resize options (581
- * `LX/1g7;`: a scale type, a fetch tier, and a width and height from MobileConfig). The live
- * modifier, SmartFetchUriModifier (581 `LX/3PE;`), rewrites the address's `ctp`, the size it asks
- * the CDN for, toward the box it's given and never past its `cstp`, the most the CDN serves that
- * image at. On the S22 (581, 2026-10-07) that's how Facebook's save got a NASA photo at 1536x2048
- * where the model's largest copy was 1080x1440. Where the app runs the no-op modifier instead, the
- * address comes back as it was, and so does Facebook's save.
+ * Its save (`subscribeToEncodedImage`, a name Redex keeps, 581 `LX/8pP;`) takes the photo's
+ * imageHigh address and, behind a MobileConfig flag, hands it to the app's image address modifier
+ * (581 `LX/3PI;->A00`, an `LX/3ib;`) with resize options (581 `LX/1g7;`: a scale type, a fetch
+ * tier, and a width and height from MobileConfig). The live modifier, SmartFetchUriModifier (581
+ * `LX/3PE;`), rewrites the address's `ctp`, the size it asks the CDN for, toward the box it's given
+ * and never past its `cstp`, the most the CDN serves that image at. On the S22 (581, 2026-10-07)
+ * that's how Facebook's save got a NASA photo at 1536x2048 where the model's largest copy was
+ * 1080x1440. Where the app runs the no-op modifier instead, the address comes back as it was, and
+ * so does Facebook's save.
  *
  * The call is found by its shape: the one interface call in the save taking an address and an
  * options object and answering an address, the modifier read from a static field right before

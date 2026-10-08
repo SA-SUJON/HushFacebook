@@ -36,9 +36,9 @@ import org.junit.Test
  * the extension's stub calls. Reads the fixture bundles from HUSHFACEBOOK_FIXTURE_DIR and skips
  * without it.
  *
- * Read 2026-10-08: the save is 581 `LX/8pP;`, 580 `LX/8pY;` and 577 `LX/8RE;`, the modifier 581
- * `LX/3PI;->A00:LX/3ib;`, 580 `LX/1Ol;->A00:LX/3mK;` and 577 `LX/1Ue;->A00:LX/3qR;`. Only the kept
- * name and the call's shape are used here.
+ * Read 2026-10-08: the save is 581 `LX/8pP;` and 577 `LX/8RE;`, the modifier 581
+ * `LX/3PI;->A00:LX/3ib;` and 577 `LX/1Ue;->A00:LX/3qR;`. Only the kept name and the call's shape
+ * are used here.
  */
 class PhotoSizeFixtureTest {
     private val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()

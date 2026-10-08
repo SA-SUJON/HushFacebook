@@ -57,13 +57,12 @@ internal const val FEED_TYPE_ASKED = "$FOLLOWING_HOME->feedType(Ljava/lang/Objec
  *
  * Facebook's NewsFeedQueryParamsPreparer builds every news feed request's parameters, and one of
  * its static helpers, handed the feed type second, sets the query's feed style from it:
- * MOST_RECENT_FEED_DEFAULT for the most recent feed types, FAVORITES_FEED and the rest for the Feeds
- * tab's other filters, FOLLOWING_FEED for the Following feed's type, and Home's own ordering for
- * Home's. It's the one method that opens the
- * "Companion.setPagedNewsfeedParams" trace section (581 `LX/1bb;->A02`, 580 `LX/1SU;->A02`, 577
- * `LX/3JX;->A02`), and the preparer's prepare method is its one caller. Every later read of the feed
- * type in it, the call it ends on included, reads the parameter, so a feed type put there first is
- * the one the whole request is built for.
+ * MOST_RECENT_FEED_DEFAULT for the most recent feed types, FAVORITES_FEED and the rest for the
+ * Feeds tab's other filters, FOLLOWING_FEED for the Following feed's type, and Home's own ordering
+ * for Home's. It's the one method that opens the "Companion.setPagedNewsfeedParams" trace section
+ * (581 `LX/1bb;->A02`), and the preparer's prepare method is its one caller. Every later read of
+ * the feed type in it, the call it ends on included, reads the parameter, so a feed type put there
+ * first is the one the whole request is built for.
  *
  * The patch hands the parameter to the extension's FollowingHome first thing and keeps its answer
  * there. While the switch is on, Home's feed type ("top_stories") comes back as the most recent

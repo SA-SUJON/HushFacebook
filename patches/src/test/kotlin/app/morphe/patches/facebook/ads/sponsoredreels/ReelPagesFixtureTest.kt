@@ -40,8 +40,6 @@ class ReelPagesFixtureTest {
     /** Registers and the page's register of the page insert, the announcement and the controller's page method. */
     private val expected = mapOf(
         AppCompatibilities.FACEBOOK_TARGET_VERSION to listOf(6 to 5, 7 to 6, 13 to 12),
-        AppCompatibilities.FACEBOOK_PREVIOUS_VERSION to listOf(6 to 5, 7 to 6, 11 to 10),
-        AppCompatibilities.FACEBOOK_ORIGINAL_VERSION to listOf(6 to 5, 7 to 6, 15 to 14),
     )
 
     private fun MutableMethod.assertFilteredAtTop(where: String, page: Int, at: Int) {
@@ -105,8 +103,6 @@ class ReelPagesFixtureTest {
     /** Registers and the item's register of the one-item insert, then the static append's, null where a build has none. */
     private val inserts = mapOf(
         AppCompatibilities.FACEBOOK_TARGET_VERSION to listOf(8 to 6, 4 to 3),
-        AppCompatibilities.FACEBOOK_PREVIOUS_VERSION to listOf(8 to 6, 4 to 3),
-        AppCompatibilities.FACEBOOK_ORIGINAL_VERSION to listOf(8 to 6, null),
     )
 
     /** The one-item drop at [at]: the item copied into a one-item list in v0, the filter's answer asked if empty. */

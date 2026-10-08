@@ -3,7 +3,7 @@
     Exercise the release and gate scripts: patch target and report, receipts, release facts,
     pre-push routing, the changelog, d8 and Java resolution, split bundles and the shared helpers.
 .DESCRIPTION
-    Ported from Hushfeed's suite on 2026-09-25 and held to Facebook's facts: two declared builds,
+    Ported from Hushfeed's suite on 2026-09-25 and held to Facebook's facts: one declared build,
     both of Meta's signers, and .apkm split bundles. The pre-push hook runs it for changes under
     scripts/ or assets/, and for README.md, patches-list.json or patches/build.gradle.kts. A
     missing suite stops the push.
@@ -64,14 +64,15 @@ foreach ($field in @('patch_sources', 'selected_patches')) {
 
 # --- patch-target.ps1 ------------------------------------------------------------------------
 #
-# Facebook ships a build a week, so the catalog declares the build the bundle was last proved on
-# and keeps the one before it. Both come back newest first, by number and not by text, and every
-# patch has to declare the same builds: a build only some patches declare is one the bundle can't
-# fully patch, and the release scripts would take it for a declared target.
+# Facebook ships a build a week, and the catalog declares only the newest stable one, the build
+# the bundle was last proved on: a newer stable build replaces it in the same release. Several
+# declared builds still come back newest first, by number and not by text (the cases below), and
+# every patch has to declare the same builds: a build only some patches declare is one the bundle
+# can't fully patch, and the release scripts would take it for a declared target.
 $catalog = Get-Content -LiteralPath (Join-Path $Root 'patches-list.json') -Raw | ConvertFrom-Json
 $target = Get-PatchTarget -PatchList $catalog
 Assert-True ($target.PackageName -eq 'com.facebook.katana') 'The catalog package was not resolved.'
-Assert-True (@($target.PackageVersions).Count -ge 2 -and $target.PackageVersion -eq $target.PackageVersions[0]) `
+Assert-True (@($target.PackageVersions).Count -eq 1 -and $target.PackageVersion -eq $target.PackageVersions[0]) `
     "The catalog's declared Facebook builds were not read: $($target.PackageVersions -join ', ')"
 foreach ($patch in @($catalog.patches)) {
     Assert-True (((@($patch.compatiblePackages.'com.facebook.katana') | Sort-Object) -join ',') -eq
@@ -80,8 +81,8 @@ foreach ($patch in @($catalog.patches)) {
 }
 # And the version code each build is pinned to. APKMirror lists several arm64 builds of one Facebook
 # version, each with its own dex, so a name alone doesn't say which of them the patches were proved
-# on. A receipt counted another 580 build (vc 475019283 beside the declared 475019344) as an
-# unforced run of the declared one.
+# on. A receipt once counted another arm64 build of a declared version (vc 475019283 beside the
+# declared 475019344, both Facebook 580) as an unforced run of the declared one.
 foreach ($version in @($target.PackageVersions)) {
     $pinned = @($catalog.patches[0].compatibility | Where-Object { $_.packageName -eq 'com.facebook.katana' } |
         ForEach-Object { @($_.targets) } | Where-Object { $_.version -eq $version } |
@@ -4122,11 +4123,13 @@ try {
             [int]$Schema = (Get-ReleaseReceiptSchemaVersion)) {
         $targets = @(for ($i = 0; $i -lt $Builds.Count; $i++) {
             # Each build at the version code the catalog pins it to, as a run of the declared build.
+            # A build the catalog doesn't declare is recorded as the builder records it, forced.
             $code = @(@($releaseTarget.PackageVersionCodes[$Builds[$i]]) + @("47500000$i") | Where-Object { $_ })[0]
+            $forced = -not (Test-DeclaredBuild -Target $releaseTarget -VersionName $Builds[$i] -VersionCode $code)
             [ordered]@{
                 source        = [ordered]@{ file = "facebook-$($Builds[$i])-arm64-v8a.apkm"
                     package = $releaseTarget.PackageName; versionName = $Builds[$i]; versionCode = $code
-                    sha256 = ([string]'ABCDEF'[$i % 6] * 64); forced = $false }
+                    sha256 = ([string]'ABCDEF'[$i % 6] * 64); forced = $forced }
                 patches       = @($releaseNames | ForEach-Object { [ordered]@{ name = $_; applied = $true; reason = $null } })
                 manifestDelta = $approvedDelta
             }
@@ -4183,14 +4186,16 @@ try {
         Set-Content -LiteralPath $releaseIndexPath -Encoding UTF8 -NoNewline -Value $releaseIndexText
     }
 
-    # A run of the newest build alone, the receipt a release that skipped the older fixture would
-    # write. Refused, naming the build it never ran.
-    Save-ReleaseReceipt -Builds @($releaseTarget.PackageVersions[0])
-    $unproved = @($releaseTarget.PackageVersions | Select-Object -Skip 1)
-    Assert-True ($unproved.Count -gt 0) 'The catalog declares one build, so the case below would prove nothing.'
+    # A receipt missing a run of a declared build, the one a release that skipped a fixture would
+    # write. Refused, naming the build it never ran. The catalog declares one build, so the
+    # receipt's only run is a forced one of the build before it; with several, it runs the others.
+    $unproved = @($releaseTarget.PackageVersions | Select-Object -Last 1)
+    $ranInstead = @($releaseTarget.PackageVersions | Where-Object { $_ -ne $unproved[0] })
+    if ($ranInstead.Count -eq 0) { $ranInstead = @('580.0.0.51.74') }
+    Save-ReleaseReceipt -Builds $ranInstead
     Assert-Throws { Invoke-ReleaseCheck } ("*No target in the receipt is the declared $($releaseTarget.PackageName) " +
             "$($unproved -join ', ') patched without -f*") `
-        'The release check accepted a receipt with no run of an older declared build.'
+        'The release check accepted a receipt with no run of a declared build.'
 
     # build-release-receipt.ps1 itself, on the same root. Stand-ins take the tools' places: a JDK
     # that answers -version, plays MergeSplits.java (the merged APK, and a note beside it naming
@@ -4562,10 +4567,12 @@ try {
     Assert-True (@(Get-ChildItem -LiteralPath (Join-Path $releaseRoot 'verify-work') -Directory -Filter 'verify-*').Count -eq 0) `
         'verify-all-patches.ps1 left a run folder behind.'
 
-    # The newest build alone, or beside the undeclared one, is not enough for a receipt: the older
-    # declared build has no run. The builder says so before it patches anything. It used to patch
-    # every fixture first, which for Facebook unpacks gigabytes, and then refuse its own receipt.
-    foreach ($partial in @(@($releaseTarget.PackageVersion), @($releaseTarget.PackageVersion, $newerBuild))) {
+    # Fixtures missing a declared build are not enough for a receipt: that build has no run. An
+    # undeclared build alone, or beside every other declared one, is refused before anything is
+    # patched. The builder used to patch every fixture first, which for Facebook unpacks
+    # gigabytes, and then refuse its own receipt.
+    $declaredOthers = @($releaseTarget.PackageVersions | Where-Object { $unproved -notcontains $_ })
+    foreach ($partial in @(@($newerBuild), @($declaredOthers + @($newerBuild)))) {
         Assert-Throws { Invoke-ReceiptBuilder -Fixtures @($partial | ForEach-Object { $fixturePaths[$_] }) } `
             "*No fixture is the declared $($releaseTarget.PackageName) $($unproved -join ', ')*Nothing was patched*" `
             "build-release-receipt.ps1 went ahead with fixtures of $($partial -join ', ') only."

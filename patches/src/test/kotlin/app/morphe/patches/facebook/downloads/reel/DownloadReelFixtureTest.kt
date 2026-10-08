@@ -46,8 +46,6 @@ class DownloadReelFixtureTest {
     /** The story's local, v3 and up, on each declared build. */
     private val storyLocal = mapOf(
         AppCompatibilities.FACEBOOK_TARGET_VERSION to 3,
-        AppCompatibilities.FACEBOOK_PREVIOUS_VERSION to 3,
-        AppCompatibilities.FACEBOOK_ORIGINAL_VERSION to 3,
     )
 
     private fun callsButtonFactory(method: Method) = method.implementation?.instructions?.any { instruction ->

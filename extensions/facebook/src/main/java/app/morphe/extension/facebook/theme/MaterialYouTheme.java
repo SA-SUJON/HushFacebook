@@ -327,14 +327,13 @@ public final class MaterialYouTheme {
     }
 
     /**
-     * A colour resource read as a drawable with {@code Context.getDrawable}. Litho resolves a token's
-     * theme attribute to the resource it points at and asks for its drawable (581 {@code LX/2b3;->A05},
-     * 580 {@code LX/2Z3;->A05}, 577 {@code LX/23p;->A05}), so the feed's composer row is a plain
-     * drawable of SURFACE_BACKGROUND's #252728 (issue #37). Facebook keeps that colour only in its
-     * default configuration, and the night style can't move a token some code reads as a plain colour
-     * when no system tone sits close to it. A colour drawable of one of the {@link #SURFACES} takes
-     * the palette here, as a colour read with {@code getColor} does; any other drawable comes back as
-     * it was.
+     * A colour resource read as a drawable with {@code Context.getDrawable}. Litho resolves a
+     * token's theme attribute to the resource it points at and asks for its drawable (581 {@code
+     * LX/2b3;->A05}), so the feed's composer row is a plain drawable of SURFACE_BACKGROUND's
+     * #252728 (issue #37). Facebook keeps that colour only in its default configuration, and the
+     * night style can't move a token some code reads as a plain colour when no system tone sits
+     * close to it. A colour drawable of one of the {@link #SURFACES} takes the palette here, as a
+     * colour read with {@code getColor} does; any other drawable comes back as it was.
      */
     public static Drawable getDrawable(Context context, int id) {
         return recolour(context.getDrawable(id));
@@ -362,13 +361,13 @@ public final class MaterialYouTheme {
     /**
      * The page under the feed's last unit in dark mode. It's the window's own background, which the
      * framework draws from the activity theme's {@code android:windowBackground}: Facebook's main
-     * theme points it at {@code ?attr/WASH} (581 attribute 0x7f040633, 580 0x7f040632, 577
-     * 0x7f040635), and the dark FDS style gives WASH its #101011 colour resource, which has no night
-     * value. The framework reads it, so no hook sees it, and some code reads WASH as a plain colour
-     * too, so the night style can't move it when no system tone sits that close. Called once the
-     * application is created, with the theme in the build: from then on each activity's window
-     * background takes the palette when the activity is created, as it resumes and before each frame
-     * ({@link #recolourWindow}, {@link #recolourBeforeEachFrame}).
+     * theme points it at {@code ?attr/WASH} (581 attribute 0x7f040633), and the dark FDS style
+     * gives WASH its #101011 colour resource, which has no night value. The framework reads it, so
+     * no hook sees it, and some code reads WASH as a plain colour too, so the night style can't
+     * move it when no system tone sits that close. Called once the application is created, with the
+     * theme in the build: from then on each activity's window background takes the palette when the
+     * activity is created, as it resumes and before each frame ({@link #recolourWindow}, {@link
+     * #recolourBeforeEachFrame}).
      */
     public static synchronized void watchWindows(Context context) {
         if (windowsWatched || !(context instanceof Application)) return;

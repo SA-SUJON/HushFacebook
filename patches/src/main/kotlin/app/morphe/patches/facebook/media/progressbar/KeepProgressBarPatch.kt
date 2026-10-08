@@ -89,26 +89,25 @@ internal const val VIEW_GROUP = "Landroid/view/ViewGroup;"
  * instead and returns.
  *
  * A full-screen video's controls are a plugin built on one class, the superclass of the kept
- * [FULLSCREEN_CONTROLS] (581 `LX/ReC;`, 580 `LX/RuU;`, 577 `LX/SHr;`), which also carries Orion,
- * live and Watch and more controls. Its one method that calls [SEND_DELAYED] (581 `A16`) sets the
- * timer whose message fades the controls out, each time they show and each time they're touched.
- * The extension goes first there, and while the switch is on no timer is set, so the controls and
- * their bar stay until a tap hides them the way it always has.
+ * [FULLSCREEN_CONTROLS] (581 `LX/ReC;`), which also carries Orion, live and Watch and more
+ * controls. Its one method that calls [SEND_DELAYED] (581 `A16`) sets the timer whose message fades
+ * the controls out, each time they show and each time they're touched. The extension goes first
+ * there, and while the switch is on no timer is set, so the controls and their bar stay until a tap
+ * hides them the way it always has.
  *
  * The newer Litho player hides its controls through an extension named [CONTROLS_EXTENSION] (581
- * `LX/RbF;`, 580 `LX/Rp7;`, 577 `LX/SNL;`). Its one method that drops its pending callbacks and
- * posts a runnable (581 `A0N`) sets the hide 3 seconds after the controls are touched, 10 with
- * accessibility on. The same hook goes first there.
+ * `LX/RbF;`). Its one method that drops its pending callbacks and posts a runnable (581 `A0N`) sets
+ * the hide 3 seconds after the controls are touched, 10 with accessibility on. The same hook goes
+ * first there.
  *
  * The player the video viewer's Enter fullscreen landscape mode opens on 577 to 581 runs on the
  * Reels controls component instead, whose updater traces [PLAYER_CONTROL_UPDATE] (581
- * `LX/87v;->Don`). A controller built with that updater's interface (581 `LX/87w;`, 580 `LX/88Q;`,
- * 577 `LX/9b8;`) shows the controls on a tap and posts its hide runnable (581 `LX/87x;`, 580
- * `LX/88R;`, 577 `LX/9b9;`), whose `run()` asks the controller to hide them about 3 seconds later.
- * On the S25 (581, 2026-10-08) a stack trace of that hide went from this `run()` through the
- * controller to the updater, and none of the hooks above ran in that player. So the same hook goes
- * first in this `run()`. A tap still hides the controls, as the tap handler calls the controller's
- * hide itself.
+ * `LX/87v;->Don`). A controller built with that updater's interface (581 `LX/87w;`) shows the
+ * controls on a tap and posts its hide runnable (581 `LX/87x;`), whose `run()` asks the controller
+ * to hide them about 3 seconds later. On the S25 (581, 2026-10-08) a stack trace of that hide went
+ * from this `run()` through the controller to the updater, and none of the hooks above ran in that
+ * player. So the same hook goes first in this `run()`. A tap still hides the controls, as the tap
+ * handler calls the controller's hide itself.
  *
  * In the default selection with its switch off: it only acts once the switch is turned on.
  */

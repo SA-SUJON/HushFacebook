@@ -94,42 +94,38 @@ internal const val OPEN_REPLY_THREADS = "$COMMENT_SHEET_OPTIONS->openReplyThread
  * Four switches for comments and reactions, all off until turned on.
  *
  * Hide GIF and sticker buttons: the comment box draws its buttons through a plugin socket, the one
- * that names itself [BUTTON_SOCKET] in the method going through its plugins (581
- * `LX/A4X;->A0I`, 580 `LX/AXw;->A02`, 577 `LX/AbP;->A02`). A static (I)String name table turns a
- * plugin's number into its class name (581 `LX/A4X;->A0J`, 580 `LX/AXw;->A03`, 577
- * `LX/AbP;->A03`), and a static check that the socket calls with the plugin's number last decides
- * whether the button shows (581 `LX/2Ap;->A25`, 580 `LX/25t;->A22`, 577 `LX/1xW;->A21`). Unlike the
- * comment summaries' sockets, the check sits in another class, so it's found as the one static
- * boolean the socket calls with an int last and a switch over the table's numbers. The extension
- * goes first in it with the plugin's name, and while the switch is on the GIF and sticker buttons
- * get a no. Photo, mention and every other button stay.
+ * that names itself [BUTTON_SOCKET] in the method going through its plugins (581 `LX/A4X;->A0I`). A
+ * static (I)String name table turns a plugin's number into its class name (581 `LX/A4X;->A0J`), and
+ * a static check that the socket calls with the plugin's number last decides whether the button
+ * shows (581 `LX/2Ap;->A25`). Unlike the comment summaries' sockets, the check sits in another
+ * class, so it's found as the one static boolean the socket calls with an int last and a switch
+ * over the table's numbers. The extension goes first in it with the plugin's name, and while the
+ * switch is on the GIF and sticker buttons get a no. Photo, mention and every other button stay.
  *
  * Hide related groups: what comes after a post's comments is drawn through another socket, the one
  * that names itself [BOTTOM_SOCKET] in the two comment surfaces' methods going through its plugins
  * (581 `LX/Aco;->A0j` and `LX/BIE;->A0j`, 580 `LX/B8E;->A1S` and `LX/BLp;->A1S`, 577 `LX/AeD;->A3Y`
- * and `LX/BLW;->A3Y`). Its name table (581 `LX/2Ap;->A0p`, 580 `LX/25t;->A0n`, 577 `LX/1xW;->A0p`)
- * names [RELATED_GROUPS], the Related groups list with its Join buttons that a group post gets
- * under its comments (#101), and its check (581 `LX/2Ap;->A24`, 580 `LX/25t;->A21`, 577
- * `LX/1xW;->A20`) sits in the table's class here. It's found the same way as the button check and
- * hooked the same way: while the switch is on the Related groups plugin gets a no, and the socket
- * goes on to its next plugin. Comments, the comment box and the other plugins stay.
+ * and `LX/BLW;->A3Y`). Its name table (581 `LX/2Ap;->A0p`) names [RELATED_GROUPS], the Related
+ * groups list with its Join buttons that a group post gets under its comments (#101), and its check
+ * (581 `LX/2Ap;->A24`) sits in the table's class here. It's found the same way as the button check
+ * and hooked the same way: while the switch is on the Related groups plugin gets a no, and the
+ * socket goes on to its next plugin. Comments, the comment box and the other plugins stay.
  *
  * Like only: a long press on Like opens the reaction picker through one method that builds
- * [UFI_DOCK] in a popup and logs [DOCK_NAME] (581 `LX/3FO;->A06`, 580 `LX/333;->A06`, 577
- * `LX/34y;->A06`, each an instance (View, View)V method). The extension goes first there, and while
- * the switch is on the method returns before anything opens, so a tap on Like still likes.
+ * [UFI_DOCK] in a popup and logs [DOCK_NAME] (581 `LX/3FO;->A06`, each an instance (View, View)V
+ * method). The extension goes first there, and while the switch is on the method returns before
+ * anything opens, so a tap on Like still likes.
  *
  * Open every reply thread: the comment section, which names itself [COMMENT_SECTION] in its
- * constructor (581 `LX/AeN`, 580 `LX/B9p`, 577 `LX/Afk`), keeps whether its reply thread is open in
- * a boolean of its state class (581 `LX/AeO;->A06`, 580 `LX/B9u;->A06`, 577 `LX/Afl;->A06`). Its
- * initial-state method writes it false (581 `A0n`, 580 `A1W`, 577 `A3j`), a tap on View replies
- * sends the [EXPAND_REPLIES] update that sets it true, and the method drawing the comment's
+ * constructor (581 `LX/AeN`), keeps whether its reply thread is open in a boolean of its state
+ * class (581 `LX/AeO;->A06`). Its initial-state method writes it false (581 `A0n`), a tap on View
+ * replies sends the [EXPAND_REPLIES] update that sets it true, and the method drawing the comment's
  * children reads it: open draws the ExpandedReplySection, which loads the thread through its own
- * paginated replies list, and closed draws the CollapsedReplySection with the View replies row.
- * The flag is found through the update: the number the update is built with picks the arm of the
+ * paginated replies list, and closed draws the CollapsedReplySection with the View replies row. The
+ * flag is found through the update: the number the update is built with picks the arm of the
  * state's update switch, and that arm's first boolean write is the flag. Just before the
- * initial-state method returns, the extension is handed the flag and its answer is written back,
- * so with the switch on every comment starts the way a tap on View replies leaves it.
+ * initial-state method returns, the extension is handed the flag and its answer is written back, so
+ * with the switch on every comment starts the way a tap on View replies leaves it.
  *
  * Off in the default selection.
  */

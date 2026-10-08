@@ -22,13 +22,13 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
  * Where the Muse card in Facebook's Menu reads whether it was dismissed, on 577, 580 and 581.
  *
  * The card ("Meet Muse, your personal AI agent.", with Get app and Dismiss) is a Menu bookmark
- * carrying a Native Templates promotion, drawn by Litho's BookmarkFolderItemComponent (581 `8hX`,
- * 580 `8hb`, 577 `8oR`). It doesn't pass through the Menu's group sections, so the section hooks
- * can't reach it. Its render (581 `A1A`, 580 `A1F`, 577 `A1N`) asks a helper (581
- * `6um.A02(8h9, 9aA, Z)Z`) whether Dismiss was tapped for this bookmark lately, a time Facebook
- * keeps in its preferences per bookmark id. When the answer differs from the component's state,
- * the render sets that state, `updateState:BookmarkFolderItemComponent.updateNtContentDismissed`,
- * and a dismissed card draws nothing.
+ * carrying a Native Templates promotion, drawn by Litho's BookmarkFolderItemComponent (581 `8hX`).
+ * It doesn't pass through the Menu's group sections, so the section hooks can't reach it. Its
+ * render (581 `A1A`) asks a helper (581 `6um.A02(8h9, 9aA, Z)Z`) whether Dismiss was tapped for
+ * this bookmark lately, a time Facebook keeps in its preferences per bookmark id. When the answer
+ * differs from the component's state, the render sets that state,
+ * `updateState:BookmarkFolderItemComponent.updateNtContentDismissed`, and a dismissed card draws
+ * nothing.
  *
  * The component is a Redex name, so it's found by that kept state-update string, its render as
  * the instance method loading it that hands back a component, and the read by its shape: the one
