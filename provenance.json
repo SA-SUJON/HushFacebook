@@ -630,7 +630,7 @@
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: hiding posts you've already seen. Facebook's viewport logger saves a post's seen state in ViewportLoggingHandler.persistSeenState(session, feedUnit) once the post has left the screen after a counted view. The method keeps its name and its VPVDLOGGING trace string, and it reads the unit's id through the kept getCacheId interface method, which together find it once in 577, 580 and 581. The patch hands the unit to the extension's SeenPosts on a range call at the method's first instruction, so the post's own register is passed even past v15. The extension remembers a hash of the id, and the shared feed guard drops a remembered post on a later load."
+      "changes": "Written for Hushfacebook: hiding posts you've already seen. Facebook's viewport logger saves a post's seen state in ViewportLoggingHandler.persistSeenState(session, feedUnit) once the post has left the screen after a counted view. The method keeps its name and its VPVDLOGGING trace string, and it reads the unit's id through the kept getCacheId interface method, which together find it once in 577, 580 and 581. Its one caller, the dwell runnable traced VPVDLOGGING.ViewportLoggingHandler.logFeedUnitDurationInternal, skips that call on the News Feed itself (native_newsfeed, friendly_feed and the most recent tab), so the patch hands the unit to the extension's SeenPosts in the runnable instead, on a range call right after the 250 ms dwell check and before that surface check. The extension remembers a hash of the id, and the shared feed guard drops a remembered post on a later load."
     },
     {
       "paths": [
