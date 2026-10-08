@@ -94,7 +94,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** With Debug logging on, opening Menu writes the parts of its layout that mention Muse or Get app to the log, so an exported report shows what the Muse card is made of. Only what's on screen is read, a parent component's own text is left out, and it stops once the card turns up.
 * **Facebook:** With Debug logging on, a long press on a reel does the same for every window Facebook shows a moment later, so a report also shows what the long-press menu's share row is made of, where Muse is listed first.
 * **Facebook:** With Debug logging and `Resume long videos` on, the log says where each reel was as it started, how long it is and where Facebook asked it to start, to help track down reels whose seekbar shows time gone before they play (issue #90).
-* The README's list of patches that are off by default names all 32 again, `Hide Meta upsells`, `Hide read receipts` and `Hide typing indicator` included, and its notes on switches that start off no longer repeat themselves.
+* **Facebook:** The README's list of patches that are off by default names all 32 again, `Hide Meta upsells`, `Hide read receipts` and `Hide typing indicator` included, and its notes on switches that start off no longer repeat themselves.
 
 ## 0.7.2 (2026-10-06)
 
