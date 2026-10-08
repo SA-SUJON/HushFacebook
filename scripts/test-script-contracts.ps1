@@ -3310,6 +3310,85 @@ try {
             Remove-Item -LiteralPath $passLog, $quickFails, $passStub -Force -ErrorAction SilentlyContinue
         }
 
+        # The fixtures, patched with the release bundle when the patch sources or the version move,
+        # each passing run kept in patches/build/fixture-apply/<fixture file> for the receipt, and
+        # an earlier push's kept runs cleared first. The build stub leaves a release bundle behind
+        # only when buildAndroid is asked for, and the verify stub logs what it's handed and keeps
+        # a stamp the way a passing run does.
+        $applyLog = Join-Path $hookRoot 'apply-ran.txt'
+        $applyBuildLog = Join-Path $hookRoot 'apply-build.txt'
+        $applyFixtures = Join-Path $hookRoot 'apply-fixtures'
+        $applyJar = Join-Path $hookRoot 'apply-cli.jar'
+        $applyBuild = Join-Path $hookRoot 'apply-build.ps1'
+        $keptRoot = Join-Path $hookRoot 'patches/build/fixture-apply'
+        $releaseBundle = Join-Path $hookRoot 'patches/build/release/patches-9.9.9.mpp'
+        $applyFiles = @('gradle.properties', 'patches-list.json', 'scripts/verify-all-patches.ps1') |
+            ForEach-Object { Join-Path $hookRoot $_ }
+        $applySaved = @{ Fixtures = $env:HUSHFACEBOOK_FIXTURE_DIR; Jar = $env:HUSHFACEBOOK_DESKTOP_JAR }
+        try {
+            New-Item -ItemType Directory -Path $applyFixtures -Force | Out-Null
+            foreach ($name in @('facebook-581.0.0.45.58-arm64.apkm', 'facebook-581.0.0.45.58-armv7.apkm', 'facebook-580.0.0.51.74.apkm')) {
+                Set-Content -LiteralPath (Join-Path $applyFixtures $name) -Value 'fixture' -Encoding ASCII
+            }
+            Set-Content -LiteralPath $applyJar -Value 'cli' -Encoding ASCII
+            Set-Content -LiteralPath $applyFiles[0] -Value 'version = 9.9.9' -Encoding ASCII
+            Set-Content -LiteralPath $applyFiles[1] -Encoding UTF8 -Value ('{"patches":[{"name":"A","compatibility":' +
+                '[{"packageName":"com.facebook.katana","targets":[{"version":"581.0.0.45.58"}]}]}]}')
+            Set-Content -LiteralPath $applyFiles[2] -Encoding UTF8 -Value @(
+                'param([string]$Apk, [string]$DesktopJar, [string]$WorkDir, [string]$Bundle, [string]$KeepIn)',
+                "Add-Content -LiteralPath '$applyLog' -Value (""apk="" + (Split-Path -Leaf `$Apk) + "" bundle=`$Bundle keep=`$KeepIn"")",
+                'New-Item -ItemType Directory -Force -Path $KeepIn | Out-Null',
+                'Set-Content -LiteralPath (Join-Path $KeepIn ''stamp.json'') -Value ''kept''',
+                'exit 0')
+            Set-Content -LiteralPath $applyBuild -Encoding UTF8 -Value @(
+                'param([string]$ProjectDir, [string[]]$Tasks)',
+                "Add-Content -LiteralPath '$applyBuildLog' -Value (' ' + (`$Tasks -join ' ') + ' ')",
+                "if (`$Tasks -contains ':patches:buildAndroid') {",
+                "    New-Item -ItemType Directory -Force -Path (Split-Path -Parent '$releaseBundle') | Out-Null",
+                "    Set-Content -LiteralPath '$releaseBundle' -Value 'release bundle'",
+                '}',
+                'exit 0')
+            $env:HUSHFACEBOOK_BUILD_WRAPPER = $applyBuild
+            $env:HUSHFACEBOOK_FIXTURE_DIR = $applyFixtures
+            $env:HUSHFACEBOOK_DESKTOP_JAR = $applyJar
+            foreach ($moved in @('gradle.properties', 'patches/src/main/kotlin/app/morphe/Any.kt')) {
+                Remove-Item -LiteralPath $applyLog, $applyBuildLog -Force -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath (Join-Path $hookRoot 'patches') -Recurse -Force -ErrorAction SilentlyContinue
+                New-Item -ItemType Directory -Path (Join-Path $keptRoot 'stale.apkm') -Force | Out-Null
+                Set-Content -LiteralPath (Join-Path $keptRoot 'stale.apkm/stamp.json') -Value 'stale' -Encoding ASCII
+                & $prePushScript -Root $hookRoot -ChangedPaths @($moved) 6> $null
+                $builds = @(Get-Content -LiteralPath $applyBuildLog -ErrorAction SilentlyContinue)
+                Assert-True ($builds.Count -eq 2 -and $builds[0] -notlike '* :patches:buildAndroid *' -and
+                    $builds[1] -like '* :patches:buildAndroid *') `
+                    "A push of $moved did not build the release bundle in the full pass alone: $($builds -join ' | ')"
+                $applied = @(Get-Content -LiteralPath $applyLog -ErrorAction SilentlyContinue | Sort-Object)
+                $declared = @('facebook-581.0.0.45.58-arm64.apkm', 'facebook-581.0.0.45.58-armv7.apkm')
+                $rightRuns = @(for ($at = 0; $at -lt $applied.Count; $at++) {
+                    $run = [regex]::Match($applied[$at], '^apk=(?<apk>\S+) bundle=(?<bundle>.+) keep=(?<keep>.+)$')
+                    if ($run.Success -and $at -lt $declared.Count -and $run.Groups['apk'].Value -eq $declared[$at] -and
+                        [IO.Path]::GetFullPath($run.Groups['bundle'].Value) -ieq [IO.Path]::GetFullPath($releaseBundle) -and
+                        [IO.Path]::GetFullPath($run.Groups['keep'].Value) -ieq
+                            [IO.Path]::GetFullPath((Join-Path $keptRoot $declared[$at]))) { $at }
+                })
+                Assert-True ($applied.Count -eq 2 -and $rightRuns.Count -eq 2) `
+                    "A push of $moved did not patch each declared fixture with the release bundle and keep it: $($applied -join ' | ')"
+                Assert-True (-not (Test-Path -LiteralPath (Join-Path $keptRoot 'stale.apkm'))) `
+                    "A push of $moved left an earlier push's kept run beside the new ones."
+            }
+            # Anything else builds no release bundle and patches nothing.
+            Remove-Item -LiteralPath $applyLog, $applyBuildLog -Force -ErrorAction SilentlyContinue
+            & $prePushScript -Root $hookRoot -ChangedPaths @('extensions/facebook/src/main/java/Any.java') 6> $null
+            Assert-True (-not (Test-Path -LiteralPath $applyLog) -and
+                @(Get-Content -LiteralPath $applyBuildLog | Where-Object { $_ -like '* :patches:buildAndroid *' }).Count -eq 0) `
+                'An extension-only push built the release bundle or patched the fixtures.'
+        } finally {
+            $env:HUSHFACEBOOK_FIXTURE_DIR = $applySaved.Fixtures
+            $env:HUSHFACEBOOK_DESKTOP_JAR = $applySaved.Jar
+            $env:HUSHFACEBOOK_BUILD_WRAPPER = $wrapperStub
+            Remove-Item -LiteralPath (@($applyLog, $applyBuildLog, $applyJar, $applyBuild) + $applyFiles) -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $applyFixtures, (Join-Path $hookRoot 'patches') -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
         # The gate builds what is pushed, not what happens to be in the working tree. A stub build
         # fails on any tree whose marker says broken, and records the tree it was handed.
         $gateRepo = Join-Path ([System.IO.Path]::GetTempPath()) ("hushfacebook-gate-" + [guid]::NewGuid().ToString('N'))
@@ -4604,7 +4683,8 @@ try {
     # above, and what the builder says is kept in $builderSaid, warnings included.
     $builderSaid = ''
     function Invoke-ReceiptBuilder([string[]]$Fixtures, [string]$Bundle,
-            [string]$WorkDir = (Join-Path $releaseRoot 'work'), [string]$DesktopJar = $stubJar, [switch]$SkipAdvisoryCheck) {
+            [string]$WorkDir = (Join-Path $releaseRoot 'work'), [string]$DesktopJar = $stubJar, [switch]$SkipAdvisoryCheck,
+            [string]$AppliedDir) {
         Remove-Item -LiteralPath $javaLog, $mergeLog -Force -ErrorAction SilentlyContinue
         $saved = @{}
         foreach ($variable in @(Get-ChildItem Env: | Where-Object { $_.Name -like 'GIT_*' })) {
@@ -4618,6 +4698,7 @@ try {
                 Java = $stubJava; Aapt2 = $stubAapt2 }
             if ($Bundle) { $arguments['Bundle'] = $Bundle }
             if ($SkipAdvisoryCheck) { $arguments['SkipAdvisoryCheck'] = $true }
+            if ($AppliedDir) { $arguments['AppliedDir'] = $AppliedDir }
             $script:builderSaid = @(& (Join-Path $PSScriptRoot 'build-release-receipt.ps1') @arguments 3>&1 6>&1 |
                 ForEach-Object { "$_" }) -join "`n"
             if ($LASTEXITCODE -ne 0) { throw "build-release-receipt.ps1 exited $LASTEXITCODE." }
@@ -4723,12 +4804,15 @@ try {
     Set-Content -LiteralPath (Join-Path $tools 'apksigner.bat') -Encoding ASCII -Value @(
         '@echo off', "echo Signer #1 certificate SHA-256 digest: $($releaseSigner[0])", 'exit /b 0')
     $verifyAllScript = Join-Path $PSScriptRoot 'verify-all-patches.ps1'
-    function Invoke-VerifyAll([string]$Apk) {
+    function Invoke-VerifyAll([string]$Apk, [string]$KeepIn, [switch]$Force) {
         Remove-Item -LiteralPath $javaLog, $mergeLog, $resourceStock -Force -ErrorAction SilentlyContinue
         $global:LASTEXITCODE = 0
+        $keep = @{}
+        if ($KeepIn) { $keep['KeepIn'] = $KeepIn }
+        if ($Force) { $keep['Force'] = $true }
         $said = @(& $verifyAllScript -Apk $Apk -DesktopJar $stubJar -WorkDir (Join-Path $releaseRoot 'verify-work') `
             -Bundle $releaseBundle -PatchList (Join-Path $releaseRepo 'patches-list.json') -Java $stubJava `
-            -Aapt2 $stubAapt2 3>&1 6>&1 | ForEach-Object { "$_" }) -join "`n"
+            -Aapt2 $stubAapt2 @keep 3>&1 6>&1 | ForEach-Object { "$_" }) -join "`n"
         if ($LASTEXITCODE -ne 0) { throw "verify-all-patches.ps1 exited $LASTEXITCODE`: $said" }
         return $said
     }
@@ -4782,6 +4866,93 @@ try {
     }
     Assert-True (@(Get-ChildItem -LiteralPath (Join-Path $releaseRoot 'verify-work') -Directory -Filter 'verify-*').Count -eq 0) `
         'verify-all-patches.ps1 left a run folder behind.'
+
+    # Kept runs. verify-all-patches.ps1 -KeepIn keeps a passing run of each fixture with a stamp
+    # naming what it patched with, and build-release-receipt.ps1 -AppliedDir reads a kept run whose
+    # stamp names its own bundle, APK, patch list and CLI instead of patching that fixture again.
+    # The checks run on what was kept, so the receipt comes out as a fresh one does. The stand-in
+    # aapt2 reads a patched APK's manifest from the .xmltree file the stand-in CLI writes beside its
+    # output, which a keep doesn't carry, so each case puts it back beside the kept APK.
+    $appliedRoot = Join-Path $releaseRoot 'fixture-apply'
+    $null = @(Read-QueueLog)
+    Invoke-ReceiptBuilder -Fixtures $allFixtures
+    $freshTargets = (Get-Content -LiteralPath $releaseReceipt -Raw | ConvertFrom-Json).targets | ConvertTo-Json -Depth 12
+    $listHash = Get-Sha256Hex -Path (Join-Path $releaseRepo 'patches-list.json')
+    foreach ($build in $builtBuilds) {
+        $fixture = $fixturePaths[$build]
+        $keptDir = Join-Path $appliedRoot (Split-Path -Leaf $fixture)
+        $forcedHere = $releaseTarget.PackageVersions -notcontains $build
+        $said = Invoke-VerifyAll -Apk $fixture -KeepIn $keptDir -Force:$forcedHere
+        Assert-True ($said -like "*kept this run for the release receipt in $keptDir*") "verify-all-patches.ps1 did not keep its run of ${build}: $said"
+        $keptNames = @(Get-ChildItem -LiteralPath $keptDir -File | ForEach-Object { $_.Name } | Sort-Object)
+        Assert-True (($keptNames -join ',') -eq 'patched.apk,result.json,stamp.json,stock-merged.apk') `
+            "The kept run of $build is not the patched APK, the report, the merge and the stamp: $($keptNames -join ', ')"
+        $stamp = Get-Content -LiteralPath (Join-Path $keptDir 'stamp.json') -Raw | ConvertFrom-Json
+        Assert-True ($stamp.bundleSha256 -ceq (Get-Sha256Hex -Path $releaseBundle) -and $stamp.apkSha256 -ceq (Get-Sha256Hex -Path $fixture) -and
+            $stamp.patchListSha256 -ceq $listHash -and $stamp.desktopJarSha256 -ceq (Get-Sha256Hex -Path $stubJar) -and
+            $stamp.versionName -ceq $build -and $stamp.forced -eq $forcedHere -and $stamp.merged -eq $true) `
+            "The kept run of $build is stamped with something else than what it patched: $($stamp | ConvertTo-Json -Compress)"
+        Copy-Item -LiteralPath "$fixture.patched.txt" -Destination (Join-Path $keptDir 'patched.apk.xmltree')
+    }
+    function Get-KeptHashes {
+        @(Get-ChildItem -LiteralPath $appliedRoot -File -Recurse | Sort-Object FullName |
+            ForEach-Object { "$($_.FullName)=$(Get-Sha256Hex -Path $_.FullName)" }) -join "`n"
+    }
+    $keptBefore = Get-KeptHashes
+    $null = @(Read-QueueLog)
+    Invoke-ReceiptBuilder -Fixtures $allFixtures -AppliedDir $appliedRoot
+    Assert-True (-not (Test-Path -LiteralPath $javaLog) -and -not (Test-Path -LiteralPath $mergeLog)) `
+        "The receipt patched or merged a fixture whose kept run matched: $(@(Get-Content -LiteralPath $javaLog -ErrorAction SilentlyContinue) -join '; ')"
+    Assert-True (@([regex]::Matches($builderSaid, "reading the gate's run of")).Count -eq $builtBuilds.Count) `
+        "The receipt did not say it read each kept run: $builderSaid"
+    Assert-True (((Get-Content -LiteralPath $releaseReceipt -Raw | ConvertFrom-Json).targets | ConvertTo-Json -Depth 12) -ceq $freshTargets) `
+        'The receipt read from kept runs differs from the one fresh runs gave.'
+    Assert-True ((Get-KeptHashes) -ceq $keptBefore) 'The receipt changed the kept runs it read.'
+
+    # A kept run that doesn't match is patched again, that fixture alone: a stamp naming another
+    # bundle, one gone, and one that says a split bundle wasn't merged.
+    $declaredFixture = $fixturePaths[$releaseTarget.PackageVersion]
+    $declaredStamp = Join-Path $appliedRoot "$(Split-Path -Leaf $declaredFixture)/stamp.json"
+    $stampText = [System.IO.File]::ReadAllText($declaredStamp)
+    $staleStamps = @(
+        @{ Name = 'another bundle'; Text = $stampText.Replace((Get-Sha256Hex -Path $releaseBundle), ('0' * 64)); Said = '*made with another bundle*' },
+        @{ Name = 'no stamp'; Text = $null; Said = '*kept no run of*' },
+        @{ Name = 'no merge'; Text = ($stampText -replace '"merged":\s*true', '"merged": false'); Said = '*made with another bundle*' })
+    foreach ($stale in $staleStamps) {
+        if ($null -eq $stale.Text) { Remove-Item -LiteralPath $declaredStamp -Force }
+        else {
+            Assert-True ($stale.Text -cne $stampText) "The '$($stale.Name)' stamp case changed nothing."
+            [System.IO.File]::WriteAllText($declaredStamp, $stale.Text)
+        }
+        try {
+            Invoke-ReceiptBuilder -Fixtures $allFixtures -AppliedDir $appliedRoot
+            Assert-True ((@(Get-Content -LiteralPath $javaLog) -join "`n") -eq "patch $declaredFixture merged forced=0" -and
+                $builderSaid -like $stale.Said) `
+                "With $($stale.Name) the receipt did not patch that fixture alone: $(@(Get-Content -LiteralPath $javaLog -ErrorAction SilentlyContinue) -join '; ')"
+        } finally {
+            [System.IO.File]::WriteAllText($declaredStamp, $stampText)
+        }
+    }
+
+    # A run that fails leaves no stamp behind, and a keep folder holding anything else is left alone.
+    $declaredKept = Split-Path -Parent $declaredStamp
+    Remove-Item -LiteralPath (Join-Path $declaredKept 'patched.apk.xmltree') -Force
+    Set-Content -LiteralPath (Join-Path $tools 'merge-fails.txt') -Value 'on' -Encoding ASCII
+    try {
+        Assert-Throws { Invoke-VerifyAll -Apk $declaredFixture -KeepIn $declaredKept } '*Could not merge*' `
+            'verify-all-patches.ps1 went ahead with a merge that failed.'
+    } finally {
+        Remove-Item -LiteralPath (Join-Path $tools 'merge-fails.txt') -Force
+    }
+    Assert-True (-not (Test-Path -LiteralPath $declaredStamp)) 'A failed run left the stamp of the run before it to be read.'
+    $foreignKeep = Join-Path $appliedRoot 'not-a-keep'
+    New-Item -ItemType Directory -Path $foreignKeep -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $foreignKeep 'notes.txt') -Value 'mine' -Encoding ASCII
+    Assert-Throws { Invoke-VerifyAll -Apk $declaredFixture -KeepIn $foreignKeep } '*as well as a kept run*' `
+        'verify-all-patches.ps1 emptied a keep folder that holds something else.'
+    Assert-True ((Test-Path -LiteralPath (Join-Path $foreignKeep 'notes.txt')) -and -not (Test-Path -LiteralPath $javaLog)) `
+        'verify-all-patches.ps1 touched a keep folder holding something else, or patched first.'
+    Remove-Item -LiteralPath $appliedRoot -Recurse -Force
 
     # Fixtures missing a declared build are not enough for a receipt: that build has no run. An
     # undeclared build alone, or beside every other declared one, is refused before anything is
@@ -5702,10 +5873,8 @@ foreach ($script in @(Get-ChildItem -LiteralPath $PSScriptRoot -Filter '*.ps1' -
             continue
         }
         if ($trimmed.StartsWith('#')) { continue }
-        # One reader is meant: the push gate's fixture step patches Facebook with the jar its own
-        # Gradle run has just written there, which is the code being pushed, and publishes nothing.
-        # The desktop CLI loads the plain jar as it is. Every release script still reads build/release.
-        if ($script.Name -eq 'pre-push.ps1' -and $trimmed -like '$bundle = Join-Path $GateRoot "patches/build/libs/*') { continue }
+        # The push gate's fixture step included: it patches with the release bundle, so the runs it
+        # keeps are runs of the bundle a receipt names.
         if ($trimmed -match 'build[\\/]+libs') { $libsReaders.Add("$($script.Name):$number") }
     }
 }

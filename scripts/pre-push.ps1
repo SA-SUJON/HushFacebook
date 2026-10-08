@@ -512,6 +512,13 @@ try {
     # 581's Htc badge writer). The runtime tests run each patch on the classes its own fixture test
     # picks, and caught that only because the one test happened to read the call back.
     $touchesInjectedCode = @($paths | Where-Object { $_ -like 'patches/src/main/*' }).Count -gt 0
+    # A release's source commit moves the version, and its push is the last gate before the
+    # bundle is cut from that commit. The fixtures are patched with the release bundle then too,
+    # and each passing run is kept for build-release-receipt.ps1 -AppliedDir, so a release patches
+    # each fixture once rather than once here and again for its receipt.
+    $touchesVersion = @($paths | Where-Object { $_ -eq 'gradle.properties' }).Count -gt 0
+    $appliesFixtures = $touchesInjectedCode -or $touchesVersion
+    $touchesCode = $touchesCode -or $appliesFixtures
     $resourceTableCheckPaths = @(
         'scripts/MergeSplits.java',
         'scripts/ResourceTableCheck.java',
@@ -721,28 +728,34 @@ try {
         # Dependency overrides need the actual settings and UTP classpaths before the smoke
         # check. Ordinary payload edits retain the smaller test/lint gate.
         if ($touchesToolingClasspaths) { $tasks += ':patches:releaseTooling' }
-        # The bundle the fixtures are patched with below: the jar in build/libs, which the desktop
-        # CLI loads as it is. The patch tests rerun it anyway; named here, it's there whatever they do.
-        if ($touchesInjectedCode) { $tasks += ':patches:jar' }
+        # The bundle the fixtures are patched with below: the release bundle buildAndroid copies to
+        # build/release, the one a release publishes, so the receipt can read the runs kept here.
+        # build/libs is no use for that: :patches:test rewrites it with the plain jar.
+        if ($appliesFixtures) { $tasks += ':patches:buildAndroid' }
         # Everything but the tests that read the Facebook fixtures runs first, so a slip in a quick
         # test or a lint stops the push in minutes rather than after the fixture scans. The full
         # run after it finds those tasks up to date. The selection check waits for the full run,
         # since it reads both partitions' results and a fresh gate worktree has no fixture results.
-        $quickTasks = @($tasks | Where-Object { $_ -ne ':patches:jar' }) +
+        $quickTasks = @($tasks | Where-Object { $_ -ne ':patches:buildAndroid' }) +
             @('-x', ':patches:fixtureTest', '-x', ':patches:verifyPatchTestSelection')
 
         # Each declared Facebook build the fixture folder holds, patched with every patch in the
-        # bundle the build above left in patches/build/libs and put through verify-all-patches.ps1:
-        # the CLI's report, the manifest delta and the resource table, then the injected code against
-        # Meta's, where a move-result that follows no invoke or filled-new-array fails naming its
-        # class and method. The fixtures and the CLI aren't in the repository, so without them this
-        # says it didn't run, as the fixture tests skip.
+        # release bundle the build above left in patches/build/release and put through
+        # verify-all-patches.ps1: the CLI's report, the manifest delta and the resource table, then
+        # the injected code against Meta's, where a move-result that follows no invoke or
+        # filled-new-array fails naming its class and method. Each passing run is kept in
+        # patches/build/fixture-apply/<fixture file> for build-release-receipt.ps1 -AppliedDir, and
+        # the runs an earlier push kept go first: their stamps name another bundle anyway. The
+        # fixtures and the CLI aren't in the repository, so without them this says it didn't run,
+        # as the fixture tests skip.
         function Invoke-PatchedFixtureCheck([string]$GateRoot) {
+            $kept = Join-Path $GateRoot 'patches/build/fixture-apply'
+            if (Test-Path -LiteralPath $kept) { Remove-GeneratedPath -Path $kept -Root $GateRoot }
             $fixtureDir = $env:HUSHFACEBOOK_FIXTURE_DIR
             $desktopJar = Resolve-DesktopCli -Root $GateRoot
             if (-not $fixtureDir -or -not $desktopJar) {
-                Write-Step ('patch sources changed, but HUSHFACEBOOK_FIXTURE_DIR or the Morphe desktop CLI is not set, ' +
-                    'so the bundle was not applied to the Facebook fixtures')
+                Write-Step ('the patch sources or the version changed, but HUSHFACEBOOK_FIXTURE_DIR or the Morphe ' +
+                    'desktop CLI is not set, so the bundle was not applied to the Facebook fixtures')
                 return
             }
             if (-not (Test-Path -LiteralPath $fixtureDir -PathType Container)) {
@@ -751,9 +764,9 @@ try {
             if (-not (Test-Path -LiteralPath (Join-Path $GateRoot 'scripts/verify-all-patches.ps1') -PathType Leaf)) {
                 throw 'scripts/verify-all-patches.ps1 is missing from the commit being pushed. The gate expects it, so the push stops.'
             }
-            $bundle = Join-Path $GateRoot "patches/build/libs/patches-$(Get-BundleVersion -Root $GateRoot).mpp"
+            $bundle = Get-ReleaseBundlePath -Root $GateRoot
             if (-not (Test-Path -LiteralPath $bundle -PathType Leaf)) {
-                throw "The runtime test build left no bundle at $bundle to apply to the fixtures."
+                throw "The runtime test build left no release bundle at $bundle to apply to the fixtures."
             }
             $catalog = Get-Content -LiteralPath (Join-Path $GateRoot 'patches-list.json') -Raw | ConvertFrom-Json
             $versions = @($catalog.patches | ForEach-Object { $_.compatibility } |
@@ -775,7 +788,8 @@ try {
                     Write-Step "applying every patch to $($fixture.Name) and checking what it injected"
                     $global:LASTEXITCODE = 0
                     Invoke-CommitScript -Script (Join-Path $GateRoot 'scripts/verify-all-patches.ps1') -Arguments @{
-                        Apk = $fixture.FullName; DesktopJar = $desktopJar; WorkDir = (Join-Path $work $fixture.BaseName); Bundle = $bundle }
+                        Apk = $fixture.FullName; DesktopJar = $desktopJar; WorkDir = (Join-Path $work $fixture.BaseName); Bundle = $bundle
+                        KeepIn = (Join-Path $kept $fixture.Name) }
                     if ($LASTEXITCODE -ne 0) { $failed += $fixture.Name }
                 }
             }
@@ -835,7 +849,7 @@ try {
                     }
                     if ($LASTEXITCODE -ne 0) { throw 'The tooling classpath compatibility check did not pass.' }
                 }
-                if ($touchesInjectedCode) { Invoke-PatchedFixtureCheck -GateRoot $gateRoot }
+                if ($appliesFixtures) { Invoke-PatchedFixtureCheck -GateRoot $gateRoot }
                 } finally {
                     if ($gateRoot -eq $Root) { Assert-TreeUnchanged 'the runtime test build' }
                 }
