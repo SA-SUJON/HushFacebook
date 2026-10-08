@@ -2,7 +2,9 @@
 
 Every Hushfacebook release, newest first.
 
-## Unreleased
+## 0.8.0 (2026-10-08)
+
+* **Facebook:** This release gathers everything since v0.7.2 and brings 85 patches for Facebook 581.0.0.45.58, up from 70. 580.0.0.51.74 and 577.0.0.50.72 still work. The fifteen new ones are `Hide read receipts`, `Hide typing indicator`, `Send chat photos and videos at original quality`, `Clean up Facebook's chat list`, `Download any photo`, `Following feed on Home`, `Hide seen posts`, `Comment sheet options`, `Hide Meta AI comment summaries`, `Hide Meta upsells`, `Hide tab badges`, `Accent color`, `Keep the progress bar`, `Turn off auto-translation` and `Disable Play Store updates`. Morphe Manager 1.34.0 or newer is required.
 
 ### Added
 
