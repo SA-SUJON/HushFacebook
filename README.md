@@ -18,7 +18,7 @@
 
 Hushfacebook is a Morphe patch bundle for Android that takes the clutter out of Facebook and puts useful controls back in your hands.
 
-The latest release is [v0.7.2](https://github.com/SysAdminDoc/Hushfacebook/releases/tag/v0.7.2), with 70 patches. It includes all changes since v0.7.1, among them View profile on every Marketplace seller, picture-in-picture for Reels, a switch for each tab in Hide tabs and support for 581's 32-bit build, as the [changelog](CHANGELOG.md) describes.
+The latest release is [v0.8.0](https://github.com/SysAdminDoc/Hushfacebook/releases/tag/v0.8.0), with 85 patches. It includes all changes since v0.7.2, among them chat privacy switches like Hide read receipts and Hide typing indicator, Download any photo, Following feed on Home and a Download row in every reel's More sheet, as the [changelog](CHANGELOG.md) describes.
 
 [Add to Morphe](https://morphe.software/add-source?github=SysAdminDoc%2FHushfacebook) | [Download a release](https://github.com/SysAdminDoc/Hushfacebook/releases/latest) | [Browse the patches](#patches)
 
