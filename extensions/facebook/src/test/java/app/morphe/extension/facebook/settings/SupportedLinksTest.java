@@ -383,8 +383,8 @@ public class SupportedLinksTest {
         PreferenceGroup links = show(true).findPreference(KEY).getParent();
         Preference explanation = links.getPreference(links.getPreferenceCount() - 1);
         assertFalse(explanation.isSelectable());
-        assertTrue(String.valueOf(explanation.getSummary()), String.valueOf(explanation.getSummary())
-                .contains("doesn't restore"));
+        assertEquals("Android can't verify a patched Facebook for Facebook links. Selecting the addresses yourself "
+                + "sends those links here. Your other link settings stay.", String.valueOf(explanation.getSummary()));
     }
 
     /**

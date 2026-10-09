@@ -47,6 +47,8 @@ public class StorySeenTest {
         StorySeenForTests.reset();
         // The patch is in Morphe Manager's default selection with its switch off; these tests run with it on.
         Settings.VIEW_STORIES_ANONYMOUSLY.save(true);
+        FeedFilterCounters.clear();
+        HookStatus.clear();
     }
 
     @After
