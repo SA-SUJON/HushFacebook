@@ -33,10 +33,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 @Suppress("unused")
 val hideMetaUpsellsPatch = bytecodePatch(
     name = "Hide Meta upsells",
-    description = "Hides the pushes for Edits, Threads cross-posting, Meta Verified, avatar stickers and Meta " +
-        "AI's Imagine outside the Menu, such as the Edits button in the Reels composer and the offer sheet after " +
-        "you post. Each has its own switch under Meta's other products in Hushfacebook settings, and they all " +
-        "start off.",
+    description = "Hides Meta's pushes for its other products, such as Edits, Threads cross-posting, Meta " +
+        "Verified, avatar stickers and Meta AI's Imagine, so you see fewer sales pitches. Starts off. Turn on " +
+        "the parts you want in Hushfacebook settings > Meta's other products.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

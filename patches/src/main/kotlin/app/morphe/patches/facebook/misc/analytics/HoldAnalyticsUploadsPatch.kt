@@ -29,9 +29,9 @@ import com.android.tools.smali.dexlib2.iface.Method
 val holdAnalyticsUploadsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hold back analytics uploads",
-    description = "Stops Facebook uploading its app analytics in the background and skips its on-device learning " +
-        "jobs. Its switch is under Privacy in Hushfacebook settings and starts off. Restart Facebook after " +
-        "changing it.",
+    description = "Stops Facebook sending its usage reports in the background and skips the learning jobs it " +
+        "runs on your phone, so less about how you use the app leaves it. Starts off. Turn it on in Hushfacebook " +
+        "settings > Privacy, then restart Facebook.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)

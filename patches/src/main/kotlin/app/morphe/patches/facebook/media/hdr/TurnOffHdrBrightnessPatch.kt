@@ -63,9 +63,9 @@ internal const val OWN_CAPABILITY_HDR_TYPES = "$HDR_BRIGHTNESS->getSupportedHdrT
 val turnOffHdrBrightnessPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Turn off HDR brightness",
-    description = "Keeps HDR videos and photos from turning your screen up to full brightness. They play at the " +
-        "same resolution, in the screen's usual range. Its switch is under Playback in Hushfacebook settings and " +
-        "starts off.",
+    description = "Stops HDR videos and photos from turning your screen up to full brightness, which can be " +
+        "harsh in the dark. They keep their resolution. Starts off. Turn it on in Hushfacebook settings > " +
+        "Playback.",
 ) {
     category("Playback")
     dependsOn(settingsPatch, facebookExtensionPatch)

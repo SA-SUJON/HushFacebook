@@ -50,8 +50,8 @@ val downloadPhotoPatch = bytecodePatch(
     // The README table check reads this literal; PHOTO_PATCH carries the same text for the messages.
     name = "Download any photo",
     description = "Shows Save photo on every photo you open, even where the poster turned saving off, and saves " +
-        "the biggest size where your downloads go. Its switch is under Downloads in Hushfacebook settings and " +
-        "starts on.",
+        "the largest size so you get the best copy. On by default. Turn it off in Hushfacebook settings > " +
+        "Downloads.",
     default = true,
 ) {
     category("Downloads")

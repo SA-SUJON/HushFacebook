@@ -58,9 +58,9 @@ internal const val HOME_COMPOSER = 2
 @Suppress("unused")
 val hideStoriesTrayPatch = bytecodePatch(
     name = "Hide Stories tray",
-    description = "Adds separate switches for the row of stories at the top of the news feed, Create story " +
-        "included, and the rows of stories Facebook puts between posts, plus one for the composer row at the top " +
-        "of Home. They're under News feed in Hushfacebook settings and all start off.",
+    description = "Hides the row of stories at the top of the feed, the stories between posts, or the \"What's " +
+        "on your mind?\" row at the top of Home, so you reach posts sooner. Starts off. Turn on the parts you " +
+        "want in Hushfacebook settings > News feed.",
 ) {
     category("Stories")
     dependsOn(settingsPatch, feedFilterHookPatch)

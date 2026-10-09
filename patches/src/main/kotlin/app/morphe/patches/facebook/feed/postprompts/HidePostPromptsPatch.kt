@@ -45,8 +45,8 @@ val hidePostPromptsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hide post prompts",
     description = "Removes the strip Facebook adds to some posts, like \"Are you interested in this post?\", " +
-        "\"Show less\", who recently commented, or follow and chat suggestions, with no gap left behind. The post " +
-        "stays. Its switch is under News feed in Hushfacebook settings and starts on.",
+        "\"Show less\" or follow suggestions, so posts look less cluttered. No gap is left. On by default. Turn " +
+        "it off in Hushfacebook settings > News feed.",
 ) {
     category("Feed")
     dependsOn(settingsPatch)

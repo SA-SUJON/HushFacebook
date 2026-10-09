@@ -43,9 +43,9 @@ import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 val turnOffDoubleTapLikePatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Turn off double tap to like",
-    description = "Stops a double tap on a reel or a video from liking it, and the heart doesn't show. A single " +
-        "tap still plays or pauses, and the Like button still likes. Its switch is under Reels and Watch in " +
-        "Hushfacebook settings and starts off.",
+    description = "Stops a double tap on a reel or video from liking it, so you don't like things by accident. A " +
+        "single tap still plays or pauses, and the Like button still works. Starts off. Turn it on in " +
+        "Hushfacebook settings > Reels and Watch.",
 ) {
     category("Reels")
     dependsOn(settingsPatch)

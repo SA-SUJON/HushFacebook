@@ -25,9 +25,8 @@ internal const val ACCENT_FDS = "$ACCENT->fds(ILjava/lang/Object;)I"
 val accentColorPatch = bytecodePatch(
     // The README table check reads this literal.
     name = "Accent color",
-    description = "Lets you swap Facebook's blue on links, buttons, switches and the selected tab for another " +
-        "color. Pick one under Appearance in Hushfacebook settings. It starts on Facebook's own blue, so nothing " +
-        "changes until you pick another.",
+    description = "Swaps Facebook's blue on links, buttons, switches and the selected tab for a color you like " +
+        "better. Nothing changes until you pick one. Pick a color in Hushfacebook settings > Appearance.",
 ) {
     category("Theme")
     dependsOn(settingsPatch)

@@ -45,9 +45,9 @@ import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstructio
 val openOnChosenTabPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Open on a chosen tab",
-    description = "Opens Facebook on the tab you pick when you start it from its icon. It's Marketplace unless " +
-        "you change it. Notifications and links still open where they lead. Its switch and the tab list are under " +
-        "Opening Facebook in Hushfacebook settings, and the switch starts off.",
+    description = "Opens Facebook on the tab you pick when you start it from its icon, so you can skip the feed. " +
+        "It's Marketplace unless you change it. Starts off. Turn it on in Hushfacebook settings > Opening " +
+        "Facebook.",
 ) {
     category("Navigation")
     dependsOn(settingsPatch)

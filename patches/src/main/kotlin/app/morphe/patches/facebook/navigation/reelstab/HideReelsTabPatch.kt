@@ -29,10 +29,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 @Suppress("unused")
 val hideReelsTabPatch = bytecodePatch(
     name = "Hide the Reels tab",
-    description = "Takes the Reels tab, which some accounts call Video, off the tab bar, and its shortcut out of " +
-        "the long-press menu of Facebook's icon. Reel links and the reels in your feed still open. Its switch is " +
-        "under Reels and Watch in Hushfacebook settings and starts off, and a change shows once Facebook " +
-        "restarts. Facebook's own Hide in its tab bar settings keeps working.",
+    description = "Takes the Reels tab, called Video on some accounts, off the tab bar, so Reels isn't one tap " +
+        "away. Reels in your feed and reel links still open. Starts off. Turn it on in Hushfacebook settings > " +
+        "Reels and Watch, then restart Facebook.",
 ) {
     category("Navigation")
     dependsOn(settingsPatch, tabBarFilterPatch, tabLinksPatch)

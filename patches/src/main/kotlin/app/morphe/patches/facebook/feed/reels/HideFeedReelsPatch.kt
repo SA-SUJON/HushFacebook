@@ -75,9 +75,9 @@ internal const val HIDE_PRE_EOF_REELS = "$EXTENSION_PACKAGE/feed/FeedFilter;->hi
 @Suppress("unused")
 val hideFeedReelsPatch = bytecodePatch(
     name = "Hide Reels in the feed",
-    description = "Removes the rows of reels between posts in the news feed, and the reels Facebook adds where " +
-        "your feed ends. A reel a friend posts stays. Its switch is under News feed in Hushfacebook settings and " +
-        "starts off.",
+    description = "Removes the rows of reels between posts and the reels Facebook adds where your feed ends, so " +
+        "the feed sticks to posts. A reel a friend posts stays. Starts off. Turn it on in Hushfacebook settings " +
+        "> News feed.",
 ) {
     category("Feed")
     dependsOn(settingsPatch)

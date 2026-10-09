@@ -28,9 +28,9 @@ import com.android.tools.smali.dexlib2.iface.Field
 @Suppress("unused")
 val tagSuggestionsOnlyAfterAtPatch = bytecodePatch(
     name = "Tag suggestions only after @",
-    description = "Stops Facebook offering people to tag while you type ordinary words in posts and comments. " +
-        "Typing @ still brings up the list. Photo tags and your text aren't touched. Its switch is under Writing " +
-        "in Hushfacebook settings and starts off.",
+    description = "Stops Facebook offering people to tag while you type ordinary words in posts and comments, so " +
+        "names don't pop up in your way. Typing @ still brings up the list. Starts off. Turn it on in " +
+        "Hushfacebook settings > Writing.",
 ) {
     category("Comments")
     dependsOn(settingsPatch)

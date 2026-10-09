@@ -24,9 +24,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 @Suppress("unused")
 val shareSheetItemsPatch = bytecodePatch(
     name = "Share sheet items",
-    description = "Lets you hide items from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link. Pick " +
-        "them under Links in Hushfacebook settings. Nothing is hidden until you do, and the rest keep Facebook's " +
-        "order.",
+    description = "Lets you hide items you never use from Facebook's share sheet, such as WhatsApp, Meta AI or " +
+        "Copy link, so the ones you want are easier to reach. Nothing is hidden until you pick. Choose them in " +
+        "Hushfacebook settings > Links.",
 ) {
     category("Interface")
     dependsOn(settingsPatch, facebookExtensionPatch, shareSheetHookPatch)

@@ -23,9 +23,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 val hideReadReceiptsPatch = bytecodePatch(
     // The README table check reads this literal; READ_RECEIPTS_PATCH carries the same text for the messages.
     name = "Hide read receipts",
-    description = "People you chat with in a chat that opens inside Facebook don't see that you've read their " +
-        "messages. The chat can stay unread on this phone, and replying may still show you've read it. Its switch " +
-        "is under Privacy in Hushfacebook settings and starts off.",
+    description = "People you chat with in chats that open inside Facebook don't see that you've read their " +
+        "messages, so you can read now and reply later. Replying may still show you've read it. Starts off. Turn " +
+        "it on in Hushfacebook settings > Privacy.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)

@@ -77,7 +77,8 @@ val hideMetaAiCommentSummariesPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hide Meta AI comment summaries",
     description = "Removes Meta AI's summary of the comments from the top of the comment sheet and from under " +
-        "posts. The comments stay. Its switch is under Comments in Hushfacebook settings and starts off.",
+        "posts, so you read what people actually wrote. Starts off. Turn it on in Hushfacebook settings > " +
+        "Comments.",
     default = true,
 ) {
     category("Comments")

@@ -165,10 +165,9 @@ internal const val HOME_FLAG_ALLOWED = "$PICTURE_IN_PICTURE->homeFlagAllowed(Z)Z
 val pictureInPicturePatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Picture-in-picture",
-    description = "A reel playing in the Reels tab, or a video playing in the Video tab or Facebook's full-screen " +
-        "Watch viewer, keeps going in a small window when you leave Facebook, through the picture-in-picture " +
-        "Facebook already has for them. Needs Android 12 or later. Its switch is under Playback in Hushfacebook " +
-        "settings and starts off.",
+    description = "Keeps reels and videos from the Reels and Video tabs, or full screen, playing in a small " +
+        "window when you leave Facebook, so you can watch while using another app. Needs Android 12 or later. " +
+        "Starts off. Turn it on in Hushfacebook settings > Playback.",
 ) {
     category("Playback")
     dependsOn(settingsPatch)

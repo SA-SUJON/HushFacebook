@@ -28,9 +28,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 val dontSendReelWatchHistoryPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Don't send reel watch history",
-    description = "Stops sending Facebook the list of reels you've watched. It's used to rank your Reels feed, " +
-        "and nobody else sees it. Reels you've already watched may come back in the feed. Its switch is under " +
-        "Reels and Watch in Hushfacebook settings and starts off.",
+    description = "Stops sending Facebook the list of reels you've watched, so it learns less about what you " +
+        "watch. Reels you've already seen may come back. Starts off. Turn it on in Hushfacebook settings > Reels " +
+        "and Watch.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch)

@@ -58,10 +58,9 @@ private const val PATCH = "Clean up Reels"
 @Suppress("unused")
 val cleanUpReelsPatch = bytecodePatch(
     name = "Clean up Reels",
-    description = "Hides the Follow button on reels and the comment and reaction previews under them. Buttons " +
-        "such as Remix, Use template, Add yours and Stars can go too, and so can the Threads cards Facebook puts " +
-        "between reels. Reels and videos can also open in Facebook's Clean mode. Each part has its own switch " +
-        "under Reels and Watch in Hushfacebook settings, and they all start off.",
+    description = "Hides clutter on reels, such as the Follow button, comment previews, Remix and Use template " +
+        "buttons and Threads cards between reels, so more of the video shows. Starts off. Turn on the parts you " +
+        "want in Hushfacebook settings > Reels and Watch.",
 ) {
     category("Reels")
     dependsOn(settingsPatch)

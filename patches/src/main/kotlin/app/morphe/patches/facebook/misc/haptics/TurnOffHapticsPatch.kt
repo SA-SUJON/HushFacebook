@@ -23,8 +23,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 val turnOffHapticsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Turn off haptics",
-    description = "Stops the short vibrations Facebook plays on its own taps and gestures. The keyboard and your " +
-        "phone's own haptics stay. Its switch is under Appearance in Hushfacebook settings and starts off.",
+    description = "Stops the short vibrations Facebook plays when you tap and swipe in it, if you find them " +
+        "distracting. Your keyboard and your phone's own vibrations stay. Starts off. Turn it on in Hushfacebook " +
+        "settings > Appearance.",
 ) {
     category("Interface")
     dependsOn(settingsPatch, facebookExtensionPatch)

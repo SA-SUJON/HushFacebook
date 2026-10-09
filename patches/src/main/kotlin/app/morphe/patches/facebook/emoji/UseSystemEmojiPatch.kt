@@ -43,10 +43,9 @@ internal const val SKIP_REMOTE_EMOJI = "$EXTENSION_PACKAGE/emoji/SystemEmoji;->s
 val useSystemEmojiPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Use the phone's emoji",
-    description = "Draws emoji with your phone's own emoji font instead of Meta's, so the ones in posts, comments " +
-        "and chats look like the ones on your keyboard, big chat emoji included. Reactions and stickers stay as " +
-        "they are. Its switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after " +
-        "changing it.",
+    description = "Draws emoji with your phone's own emoji font instead of Meta's, so emoji in posts, comments " +
+        "and chats match your keyboard. Reactions and stickers stay as they are. Starts off. Turn it on in " +
+        "Hushfacebook settings > Appearance, then restart Facebook.",
 ) {
     category("Theme")
     dependsOn(settingsPatch)

@@ -30,7 +30,8 @@ val blockScreenshotDetectionPatch = bytecodePatch(
     // The README table check reads this literal; DETECTION_PATCH carries the same text for the messages.
     name = "Block screenshot detection",
     description = "Stops Facebook noticing when you take a screenshot or record the screen, in the feed, Reels, " +
-        "chats, games and everywhere else. Its switch is under Privacy in Hushfacebook settings and starts off.",
+        "chats and everywhere else, so it can't react to it. Starts off. Turn it on in Hushfacebook settings > " +
+        "Privacy.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)

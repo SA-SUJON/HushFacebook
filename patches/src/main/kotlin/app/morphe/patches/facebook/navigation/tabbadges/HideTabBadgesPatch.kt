@@ -57,9 +57,9 @@ internal const val BADGER_SUFFIX = "LauncherBadgesInterface"
 val hideTabBadgesPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hide tab badges",
-    description = "Takes the dot and count off the tabs you pick, and Facebook's count off its app icon. " +
-        "Notifications still come in, and the Notifications tab still lists them. The switches are under " +
-        "Appearance in Hushfacebook settings and all start off.",
+    description = "Takes the dot and count off the tabs you pick, and Facebook's count off its app icon, so the " +
+        "app nags you less. Notifications still arrive and still show in the Notifications tab. Starts off. Turn " +
+        "on the ones you want in Hushfacebook settings > Appearance.",
 ) {
     category("Navigation")
     dependsOn(settingsPatch)

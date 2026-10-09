@@ -86,9 +86,9 @@ internal val reelLiftGuardPatch = bytecodePatch {
 val holdReelFor2xPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hold a reel for 2x",
-    description = "Holding a reel plays it at double speed until you let go. The hold takes the place of " +
-        "Facebook's long-press menu, which the reel's more button still opens. Its switch is under Reels and " +
-        "Watch in Hushfacebook settings and starts off.",
+    description = "Hold a reel to play it at double speed, and let go to go back to normal. Handy for skimming. " +
+        "The reel's more button still opens Facebook's long-press menu. Starts off. Turn it on in Hushfacebook " +
+        "settings > Reels and Watch.",
 ) {
     category("Playback")
     dependsOn(settingsPatch, reelLiftGuardPatch)

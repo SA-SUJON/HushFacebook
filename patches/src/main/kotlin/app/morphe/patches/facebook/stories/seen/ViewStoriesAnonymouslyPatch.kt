@@ -37,9 +37,9 @@ import com.android.tools.smali.dexlib2.iface.Method
 val viewStoriesAnonymouslyPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "View stories anonymously",
-    description = "Keeps you off the viewer list of the stories you watch, because Facebook isn't told which ones " +
-        "you've seen. Replying or reacting still shows you, and stories you've watched keep the ring that marks " +
-        "them as new. Its switch is under Stories in Hushfacebook settings and starts off.",
+    description = "Keeps you off the viewer list of stories you watch, because Facebook isn't told which ones " +
+        "you've seen. Replying or reacting still shows you, and watched stories still look new. Starts off. Turn " +
+        "it on in Hushfacebook settings > Stories.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)

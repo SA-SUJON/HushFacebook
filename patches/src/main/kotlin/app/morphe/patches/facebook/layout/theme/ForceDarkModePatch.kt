@@ -22,9 +22,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 val forceDarkModePatch = bytecodePatch(
     // The README table check reads this literal.
     name = "Force dark mode",
-    description = "Keeps Facebook in dark mode whatever its own setting says, for tablets where Facebook's " +
-        "settings have no Dark mode. Its switch is under Appearance in Hushfacebook settings and starts off. " +
-        "Restart Facebook after you turn it on.",
+    description = "Keeps Facebook in dark mode whatever its own setting says. Useful on tablets, where " +
+        "Facebook's settings have no Dark mode. Starts off. Turn it on in Hushfacebook settings > Appearance, " +
+        "then restart Facebook.",
 ) {
     category("Theme")
     dependsOn(settingsPatch, facebookExtensionPatch)

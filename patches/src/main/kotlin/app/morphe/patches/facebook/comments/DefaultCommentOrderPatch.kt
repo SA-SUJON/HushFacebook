@@ -29,9 +29,8 @@ import app.morphe.util.findMutableMethodOf
 val defaultCommentOrderPatch = bytecodePatch(
     name = "Default comment order",
     description = "Opens comments in the order you choose, Most relevant, Newest or All comments, instead of the " +
-        "one Facebook picks. An order you pick in a post's comments stays for that post, and links to a comment " +
-        "still open on it. Turn on its switch and pick an order under Comments in Hushfacebook settings. The " +
-        "switch starts off.",
+        "one Facebook picks. Handy if you always want the newest first. Starts off. Turn it on and pick an order " +
+        "in Hushfacebook settings > Comments.",
 ) {
     category("Comments")
     dependsOn(settingsPatch)

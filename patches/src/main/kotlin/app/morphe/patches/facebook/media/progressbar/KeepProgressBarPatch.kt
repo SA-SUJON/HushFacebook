@@ -115,9 +115,9 @@ internal const val VIEW_GROUP = "Landroid/view/ViewGroup;"
 val keepProgressBarPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Keep the progress bar",
-    description = "Keeps the progress bar of reels at full size, so you can drag it without tapping first, and " +
-        "keeps a full-screen video's controls on screen until you tap. Its switch is under Playback in " +
-        "Hushfacebook settings and starts off.",
+    description = "Keeps a reel's progress bar full size, so you can drag it without tapping first, and keeps a " +
+        "full-screen video's controls on screen until you tap. Starts off. Turn it on in Hushfacebook settings > " +
+        "Playback.",
     default = true,
 ) {
     category("Playback")

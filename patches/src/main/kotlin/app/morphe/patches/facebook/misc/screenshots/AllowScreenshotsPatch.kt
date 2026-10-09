@@ -23,8 +23,8 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 val allowScreenshotsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Allow screenshots",
-    description = "Lets you take screenshots and record the screen on the pages Facebook blocks them on. Its " +
-        "switch is under Privacy in Hushfacebook settings and starts off.",
+    description = "Lets you take screenshots and screen recordings on the pages where Facebook blocks them, so " +
+        "you can keep a copy of what's on screen. Starts off. Turn it on in Hushfacebook settings > Privacy.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)

@@ -22,8 +22,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 val originalChatMediaPatch = bytecodePatch(
     // The README table check reads this literal; ORIGINAL_MEDIA_PATCH carries the same text for the messages.
     name = "Send chat photos and videos at original quality",
-    description = "Photos and videos you send from a chat that opens inside Facebook go out as the originals " +
-        "instead of Facebook's smaller copies. Its switch is under Chats in Hushfacebook settings and starts off.",
+    description = "Photos and videos you send from chats that open inside Facebook go out as the originals " +
+        "instead of smaller copies, so they arrive sharp. Very large files are still shrunk. Starts off. Turn it " +
+        "on in Hushfacebook settings > Chats.",
 ) {
     category("Chats")
     dependsOn(settingsPatch)

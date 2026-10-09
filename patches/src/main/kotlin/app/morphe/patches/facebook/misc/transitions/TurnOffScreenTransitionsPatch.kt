@@ -29,9 +29,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 val turnOffScreenTransitionsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Turn off screen transitions",
-    description = "Shows Facebook's tabs, the tab strips inside its screens, its Menu and the screens that open " +
-        "over it at once, without the slide between them. Swiping and animations inside a page stay. Its switch " +
-        "is under Appearance in Hushfacebook settings and starts off.",
+    description = "Shows Facebook's tabs, Menu and new screens at once, without the slide between them, so the " +
+        "app feels quicker. Swipes and animations inside a page stay. Starts off. Turn it on in Hushfacebook " +
+        "settings > Appearance.",
 ) {
     category("Interface")
     dependsOn(settingsPatch, facebookExtensionPatch)

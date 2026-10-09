@@ -84,8 +84,8 @@ val hideFeedsHeaderPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hide the Feeds header",
     description = "Takes the title row and the All, Favorites, Friends, Groups and Pages filters off the top of " +
-        "the Feeds tab, so it opens on its posts. Its switch is under News feed in Hushfacebook settings and " +
-        "starts off. Restart Facebook after you turn it on.",
+        "the Feeds tab, so it opens straight on posts. Starts off. Turn it on in Hushfacebook settings > News " +
+        "feed, then restart Facebook.",
 ) {
     category("Feed")
     dependsOn(settingsPatch)

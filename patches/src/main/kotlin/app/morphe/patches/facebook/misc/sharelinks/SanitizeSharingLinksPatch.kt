@@ -38,9 +38,9 @@ private const val SANITIZE =
 @Suppress("unused")
 val sanitizeSharingLinksPatch = bytecodePatch(
     name = "Sanitize sharing links",
-    description = "Takes Facebook's tracking tags, such as mibextid, off the links you share or copy. The post or " +
-        "reel a link opens stays the same. A facebook.com/share/ link is made for one share, so Facebook can " +
-        "still trace it back to you. Its switch is under Links in Hushfacebook settings and starts on.",
+    description = "Takes Facebook's tracking tags off links you share or copy, so you share a clean link. A " +
+        "facebook.com/share/ link is made for one share, so Facebook can still trace that kind back to you. On " +
+        "by default. Turn it off in Hushfacebook settings > Links.",
     default = true,
 ) {
     category("Privacy")

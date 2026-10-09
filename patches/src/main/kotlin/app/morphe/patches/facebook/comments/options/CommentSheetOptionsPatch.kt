@@ -133,11 +133,9 @@ internal const val OPEN_REPLY_THREADS = "$COMMENT_SHEET_OPTIONS->openReplyThread
 val commentSheetOptionsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Comment sheet options",
-    description = "Adds four switches under Comments in Hushfacebook settings, all off to start. Like only stops " +
-        "a long press on Like from opening the reactions, another takes the GIF and sticker buttons out of the " +
-        "comment box, Open every reply thread shows each comment's replies without a tap on View replies, and " +
-        "Hide related groups takes the Related groups list out from under a group post's comments. A row there " +
-        "opens Facebook's own settings, where Reaction preferences can hide reaction counts.",
+    description = "Small fixes for comments. Stop a long press on Like from opening reactions, hide the GIF and " +
+        "sticker buttons, show every reply without tapping View replies, and hide Related groups under group " +
+        "posts. Starts off. Turn on the parts you want in Hushfacebook settings > Comments.",
 ) {
     category("Comments")
     dependsOn(settingsPatch, facebookExtensionPatch)

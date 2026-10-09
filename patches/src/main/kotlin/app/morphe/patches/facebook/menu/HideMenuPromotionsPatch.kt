@@ -39,9 +39,9 @@ internal const val MUSE_DISMISSED = "$EXTENSION_PACKAGE/menu/MuseCard;->dismisse
 @Suppress("unused")
 val hideMenuPromotionsPatch = bytecodePatch(
     name = "Hide Menu promotions",
-    description = "Hides the Upgrades and Also from Meta sections of Facebook's Menu, and its Muse card. " +
-        "Settings, Help and support, your shortcuts and the rest of the Menu stay. Each has its own switch under " +
-        "Menu in Hushfacebook settings, and they start on.",
+    description = "Hides the Upgrades and Also from Meta sections and the Muse card in Facebook's Menu, so the " +
+        "Menu has fewer ads for Meta's products. Settings, Help and your shortcuts stay. On by default. Turn it " +
+        "off in Hushfacebook settings > Menu.",
     default = true,
 ) {
     category("Interface")

@@ -49,8 +49,8 @@ internal const val KEEP = "$REEL_PROMPTS->keep(I)Z"
 val hideReelPromptsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hide reel interest prompts",
-    description = "Removes the \"Are you interested in this reel?\" prompt from reels. The reel plays as usual. " +
-        "Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
+    description = "Removes the \"Are you interested in this reel?\" prompt, so reels play without the " +
+        "interruption. On by default. Turn it off in Hushfacebook settings > Reels and Watch.",
 ) {
     category("Reels")
     dependsOn(settingsPatch)

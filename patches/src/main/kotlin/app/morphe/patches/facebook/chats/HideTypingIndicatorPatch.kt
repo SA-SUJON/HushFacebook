@@ -24,9 +24,9 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 val hideTypingIndicatorPatch = bytecodePatch(
     // The README table check reads this literal; TYPING_PATCH carries the same text for the messages.
     name = "Hide typing indicator",
-    description = "Others don't see that you're typing, in chats that open inside Facebook and in comment boxes. " +
-        "What you write sends as usual. Its two switches are under Privacy in Hushfacebook settings and start " +
-        "off.",
+    description = "Others don't see that you're typing, in chats that open inside Facebook and in comment boxes, " +
+        "so you can write without anyone watching. Your messages send as usual. Starts off. Turn on the parts " +
+        "you want in Hushfacebook settings > Privacy.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)

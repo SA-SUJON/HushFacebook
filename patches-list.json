@@ -6,7 +6,7 @@
   "patches": [
     {
       "name": "AMOLED black theme",
-      "description": "Makes Facebook's dark mode black, or a dark colour you pick, instead of dark grey. Turn on dark mode in Facebook first. There's no switch, since the colour goes in when you patch, and changing it means patching again. It isn't selected by default, so turn on Expert mode in Morphe Manager to pick it.",
+      "description": "Makes Facebook's dark mode black, or a dark color you pick, instead of dark gray, which can save battery on OLED screens. Turn on dark mode in Facebook first. It isn't selected by default because undoing it means patching again. Turn on Expert mode in Manager to pick it.",
       "category": "Theme",
       "use": false,
       "dependencies": [
@@ -44,8 +44,8 @@
       "options": [
         {
           "key": "backgroundColour",
-          "title": "Background colour",
-          "description": "The colour dark mode's backgrounds take, as #RRGGBB. Cards and inputs take a lighter step of it. Leave it blank for black. Greys up to #3A3A3A keep Facebook's own text. A little lighter, up to about #535353 for a grey, gets smaller steps and lighter grey text so it stays readable. Anything lighter is refused.",
+          "title": "Background color",
+          "description": "The color dark mode's backgrounds use, as #RRGGBB, like #0D1117. Leave it blank for black. Cards and inputs get a slightly lighter shade. Grays up to about #535353 work, and lighter colors are refused so text stays readable.",
           "required": false,
           "type": "kotlin.String",
           "default": "#000000",
@@ -55,7 +55,7 @@
     },
     {
       "name": "Accent color",
-      "description": "Lets you swap Facebook's blue on links, buttons, switches and the selected tab for another color. Pick one under Appearance in Hushfacebook settings. It starts on Facebook's own blue, so nothing changes until you pick another.",
+      "description": "Swaps Facebook's blue on links, buttons, switches and the selected tab for a color you like better. Nothing changes until you pick one. Pick a color in Hushfacebook settings > Appearance.",
       "category": "Theme",
       "use": true,
       "dependencies": [
@@ -93,7 +93,7 @@
     },
     {
       "name": "Allow screenshots",
-      "description": "Lets you take screenshots and record the screen on the pages Facebook blocks them on. Its switch is under Privacy in Hushfacebook settings and starts off.",
+      "description": "Lets you take screenshots and screen recordings on the pages where Facebook blocks them, so you can keep a copy of what's on screen. Starts off. Turn it on in Hushfacebook settings > Privacy.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
@@ -131,7 +131,7 @@
     },
     {
       "name": "Block Instant Games ads",
-      "description": "Games you play in Facebook get no ads. A game that asks for one is told there's none to show, so a rewarded ad gives no reward, and the game carries on. Its switch is under Menu in Hushfacebook settings and starts on.",
+      "description": "Games you play inside Facebook show no ads, so you can keep playing without breaks. A rewarded ad gives no reward unless you also turn on the switch that counts it as watched. On by default. Turn it off in Hushfacebook settings > Menu.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -169,7 +169,7 @@
     },
     {
       "name": "Block ad telemetry",
-      "description": "Stops Facebook watching for screenshots of ads and reporting which apps you install for ad attribution. It has no switch and works as soon as you patch.",
+      "description": "Stops Facebook watching for screenshots of ads and reporting which apps you install after seeing ads, so less of what you do feeds its ad tracking. Works as soon as you patch it in, with no switch.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
@@ -207,7 +207,7 @@
     },
     {
       "name": "Block background ad prefetch",
-      "description": "Stops Facebook downloading ads and its ad model in the background. That saves data and battery. The ads don't take up storage either. It has no switch and works as soon as you patch.",
+      "description": "Stops Facebook downloading ads and ad data in the background before you ever see them, which saves mobile data and battery. Works as soon as you patch it in, with no switch.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -245,7 +245,7 @@
     },
     {
       "name": "Block background-return feed refresh",
-      "description": "Keeps your feed position when you return to Facebook within ten minutes, or for any time away with No time limit on, and when you switch back to Home. Pull to refresh and a fresh launch still work. Its switch, Keep feed position on return, is under News feed in Hushfacebook settings and starts off.",
+      "description": "Keeps your place in the feed when you come back to Facebook within ten minutes, or any time with No time limit on, so you don't lose what you were reading. Starts off. Turn it on in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -282,7 +282,7 @@
     },
     {
       "name": "Block promotional notifications",
-      "description": "Keeps the kinds of notification you pick off your phone, such as trending videos, memories and birthdays. Each kind has its own switch under Notifications in Hushfacebook settings, and they all start off. Quiet hours can limit them to the night, or to any hours you pick. Messages, friend requests, comments, mentions and login alerts always come through.",
+      "description": "Blocks the kinds of notification you pick, such as trending videos, memories and birthdays, so you get fewer pings you don't care about. Messages, friend requests, comments and login alerts always come through. Starts off. Turn on the kinds you want in Hushfacebook settings > Notifications.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -319,7 +319,7 @@
     },
     {
       "name": "Block screenshot detection",
-      "description": "Stops Facebook noticing when you take a screenshot or record the screen, in the feed, Reels, chats, games and everywhere else. Its switch is under Privacy in Hushfacebook settings and starts off.",
+      "description": "Stops Facebook noticing when you take a screenshot or record the screen, in the feed, Reels, chats and everywhere else, so it can't react to it. Starts off. Turn it on in Hushfacebook settings > Privacy.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
@@ -357,7 +357,7 @@
     },
     {
       "name": "Clean up Facebook's chat list",
-      "description": "Two switches for Chats inside Facebook, both under Chats in Hushfacebook settings and off until you turn them on. One empties the list behind the row above your chats, so friends' notes and who's active go, and your own note tile may go too. The other takes out the promotional banners at the top of Chats, like the one asking you to turn on notifications. Your chats, search and new messages stay.",
+      "description": "Tidies Chats inside Facebook. One switch empties the row of notes and who's active above your chats, and another removes promotional banners like the one asking you to turn on notifications. Your chats stay. Starts off. Turn on the parts you want in Hushfacebook settings > Chats.",
       "category": "Chats",
       "use": true,
       "dependencies": [
@@ -394,7 +394,7 @@
     },
     {
       "name": "Clean up Reels",
-      "description": "Hides the Follow button on reels and the comment and reaction previews under them. Buttons such as Remix, Use template, Add yours and Stars can go too, and so can the Threads cards Facebook puts between reels. Reels and videos can also open in Facebook's Clean mode. Each part has its own switch under Reels and Watch in Hushfacebook settings, and they all start off.",
+      "description": "Hides clutter on reels, such as the Follow button, comment previews, Remix and Use template buttons and Threads cards between reels, so more of the video shows. Starts off. Turn on the parts you want in Hushfacebook settings > Reels and Watch.",
       "category": "Reels",
       "use": true,
       "dependencies": [
@@ -432,7 +432,7 @@
     },
     {
       "name": "Comment sheet options",
-      "description": "Adds four switches under Comments in Hushfacebook settings, all off to start. Like only stops a long press on Like from opening the reactions, another takes the GIF and sticker buttons out of the comment box, Open every reply thread shows each comment's replies without a tap on View replies, and Hide related groups takes the Related groups list out from under a group post's comments. A row there opens Facebook's own settings, where Reaction preferences can hide reaction counts.",
+      "description": "Small fixes for comments. Stop a long press on Like from opening reactions, hide the GIF and sticker buttons, show every reply without tapping View replies, and hide Related groups under group posts. Starts off. Turn on the parts you want in Hushfacebook settings > Comments.",
       "category": "Comments",
       "use": true,
       "dependencies": [
@@ -470,7 +470,7 @@
     },
     {
       "name": "Default comment order",
-      "description": "Opens comments in the order you choose, Most relevant, Newest or All comments, instead of the one Facebook picks. An order you pick in a post's comments stays for that post, and links to a comment still open on it. Turn on its switch and pick an order under Comments in Hushfacebook settings. The switch starts off.",
+      "description": "Opens comments in the order you choose, Most relevant, Newest or All comments, instead of the one Facebook picks. Handy if you always want the newest first. Starts off. Turn it on and pick an order in Hushfacebook settings > Comments.",
       "category": "Comments",
       "use": true,
       "dependencies": [
@@ -507,7 +507,7 @@
     },
     {
       "name": "Default playback quality",
-      "description": "Plays videos, reels and video stories at the quality you choose, such as Data saver or up to 720p, instead of the one Facebook picks as it plays. Reels and stories can have a quality of their own. A quality you pick in a video's own menu still wins for that video. Turn on its switch and pick a quality under Playback in Hushfacebook settings. The switch starts off.",
+      "description": "Plays videos, reels and video stories at the quality you choose, such as Data saver or up to 720p, instead of what Facebook picks. Lower saves data, higher looks sharper. Starts off. Turn it on and pick a quality in Hushfacebook settings > Playback.",
       "category": "Playback",
       "use": true,
       "dependencies": [
@@ -544,7 +544,7 @@
     },
     {
       "name": "Disable Audience Network",
-      "description": "Stops Facebook serving ads to other apps. Those apps then show their own ads or none, and rewarded ads can fail. It has no switch and works as soon as you patch.",
+      "description": "Stops Facebook serving its ads inside other apps on your phone. Those apps show their own ads or none, and their rewarded ads may fail. Works as soon as you patch it in, with no switch.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -583,7 +583,7 @@
     },
     {
       "name": "Disable Play Store updates",
-      "description": "Stops Google Play offering Facebook updates by giving Facebook the highest version number Android allows, while Facebook's own code still reads its real one. It has no switch, and it doesn't work on a Root Mount install. Once a Facebook with it is installed, a build without it won't install over it. It isn't selected by default, so turn on Expert mode in Morphe Manager to pick it.",
+      "description": "Stops Google Play offering Facebook updates, which a patched app can't take anyway. It isn't selected by default because once it's installed, a build without it can't install over it. It doesn't work on a Root Mount install. Turn on Expert mode in Manager to pick it.",
       "category": "Fixes",
       "use": false,
       "dependencies": [
@@ -622,7 +622,7 @@
     },
     {
       "name": "Don't send reel watch history",
-      "description": "Stops sending Facebook the list of reels you've watched. It's used to rank your Reels feed, and nobody else sees it. Reels you've already watched may come back in the feed. Its switch is under Reels and Watch in Hushfacebook settings and starts off.",
+      "description": "Stops sending Facebook the list of reels you've watched, so it learns less about what you watch. Reels you've already seen may come back. Starts off. Turn it on in Hushfacebook settings > Reels and Watch.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
@@ -659,7 +659,7 @@
     },
     {
       "name": "Download any photo",
-      "description": "Shows Save photo on every photo you open, even where the poster turned saving off, and saves the biggest size where your downloads go. Its switch is under Downloads in Hushfacebook settings and starts on.",
+      "description": "Shows Save photo on every photo you open, even where the poster turned saving off, and saves the largest size so you get the best copy. On by default. Turn it off in Hushfacebook settings > Downloads.",
       "category": "Downloads",
       "use": true,
       "dependencies": [
@@ -697,7 +697,7 @@
     },
     {
       "name": "Download any reel",
-      "description": "Adds a Download button beside every reel, and a Download row to its More sheet. Videos save at the Download quality you set, best by default. Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
+      "description": "Adds a Download button beside every reel and a Download row to its More menu, so you can keep reels on your phone. Videos save at the quality you set, best by default. On by default. Turn it off in Hushfacebook settings > Reels and Watch.",
       "category": "Downloads",
       "use": true,
       "dependencies": [
@@ -735,7 +735,7 @@
     },
     {
       "name": "Download any story",
-      "description": "Adds Save to the menu of any story, including stories with music. Videos save at the Download quality you set, best by default. Its switch is under Stories in Hushfacebook settings and starts on.",
+      "description": "Adds Save to the menu of any story, including stories with music, so you can keep the ones you like. Videos save at the quality you set, best by default. On by default. Turn it off in Hushfacebook settings > Stories.",
       "category": "Downloads",
       "use": true,
       "dependencies": [
@@ -773,7 +773,7 @@
     },
     {
       "name": "Download any video",
-      "description": "Adds Download to phone to the menu of videos in the feed and in Watch, below Facebook's own items. Videos save at the Download quality you set, best by default. Its switch is under Downloads in Hushfacebook settings and starts off.",
+      "description": "Adds Download to phone to the menu of videos in the feed and in Watch, so you can save them to watch later. Videos save at the quality you set, best by default. Starts off. Turn it on in Hushfacebook settings > Downloads.",
       "category": "Downloads",
       "use": true,
       "dependencies": [
@@ -811,7 +811,7 @@
     },
     {
       "name": "Following feed on Home",
-      "description": "Has Home load the newest posts from the friends, groups and Pages you follow, like the Feeds tab's All, instead of the ranked feed. The Feeds tab's filters stay as they are. Its switch is under Opening Facebook in Hushfacebook settings and starts off.",
+      "description": "Makes Home show the newest posts from the friends, groups and Pages you follow instead of Facebook's ranked feed, so you see what they posted rather than what Facebook picks. Starts off. Turn it on in Hushfacebook settings > Opening Facebook.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -849,7 +849,7 @@
     },
     {
       "name": "Force dark mode",
-      "description": "Keeps Facebook in dark mode whatever its own setting says, for tablets where Facebook's settings have no Dark mode. Its switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after you turn it on.",
+      "description": "Keeps Facebook in dark mode whatever its own setting says. Useful on tablets, where Facebook's settings have no Dark mode. Starts off. Turn it on in Hushfacebook settings > Appearance, then restart Facebook.",
       "category": "Theme",
       "use": true,
       "dependencies": [
@@ -887,7 +887,7 @@
     },
     {
       "name": "Hide AI-detected posts",
-      "description": "Removes feed posts that Facebook's own detection marked as made with AI, and the reels and Watch videos it flagged the same way. A third switch also removes posts their creator labelled as AI, a fourth takes out the Meta AI cards Facebook adds between posts, and a fifth removes posts featuring Meta's AI characters. They're under News feed in Hushfacebook settings, with the reels one under Reels and Watch. The Meta AI cards switch starts on, and the others start off.",
+      "description": "Removes posts and reels Facebook marked as made with AI, posts creators labeled as AI, posts with Meta's AI characters and Meta AI cards in the feed. Only the Meta AI cards switch starts on. Change them in Hushfacebook settings > News feed and Reels and Watch.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -925,7 +925,7 @@
     },
     {
       "name": "Hide Menu promotions",
-      "description": "Hides the Upgrades and Also from Meta sections of Facebook's Menu, and its Muse card. Settings, Help and support, your shortcuts and the rest of the Menu stay. Each has its own switch under Menu in Hushfacebook settings, and they start on.",
+      "description": "Hides the Upgrades and Also from Meta sections and the Muse card in Facebook's Menu, so the Menu has fewer ads for Meta's products. Settings, Help and your shortcuts stay. On by default. Turn it off in Hushfacebook settings > Menu.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -962,7 +962,7 @@
     },
     {
       "name": "Hide Meta AI comment summaries",
-      "description": "Removes Meta AI's summary of the comments from the top of the comment sheet and from under posts. The comments stay. Its switch is under Comments in Hushfacebook settings and starts off.",
+      "description": "Removes Meta AI's summary of the comments from the top of the comment sheet and from under posts, so you read what people actually wrote. Starts off. Turn it on in Hushfacebook settings > Comments.",
       "category": "Comments",
       "use": true,
       "dependencies": [
@@ -1000,7 +1000,7 @@
     },
     {
       "name": "Hide Meta AI in search",
-      "description": "Removes the Meta AI answer and the Ask Meta AI prompts Facebook adds to search results, and stops search suggestions from opening Meta AI by themselves. People, groups, pages and posts stay, and the Meta AI button still works. Its switch is under Search in Hushfacebook settings and starts on.",
+      "description": "Removes the Meta AI answer and Ask Meta AI prompts from search results, and stops suggestions from sending your search to Meta AI. You get plain results for people, groups, Pages and posts. On by default. Turn it off in Hushfacebook settings > Search.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -1037,7 +1037,7 @@
     },
     {
       "name": "Hide Meta AI questions under posts",
-      "description": "Removes the row of Meta AI questions Facebook adds under some posts. The post, its link card and its buttons stay. Its switch is under News feed in Hushfacebook settings and starts on.",
+      "description": "Removes the row of Meta AI questions Facebook adds under some posts, for a cleaner feed. The post and its buttons stay. On by default. Turn it off in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -1074,7 +1074,7 @@
     },
     {
       "name": "Hide Meta upsells",
-      "description": "Hides the pushes for Edits, Threads cross-posting, Meta Verified, avatar stickers and Meta AI's Imagine outside the Menu, such as the Edits button in the Reels composer and the offer sheet after you post. Each has its own switch under Meta's other products in Hushfacebook settings, and they all start off.",
+      "description": "Hides Meta's pushes for its other products, such as Edits, Threads cross-posting, Meta Verified, avatar stickers and Meta AI's Imagine, so you see fewer sales pitches. Starts off. Turn on the parts you want in Hushfacebook settings > Meta's other products.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -1112,7 +1112,7 @@
     },
     {
       "name": "Hide Reels in the feed",
-      "description": "Removes the rows of reels between posts in the news feed, and the reels Facebook adds where your feed ends. A reel a friend posts stays. Its switch is under News feed in Hushfacebook settings and starts off.",
+      "description": "Removes the rows of reels between posts and the reels Facebook adds where your feed ends, so the feed sticks to posts. A reel a friend posts stays. Starts off. Turn it on in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -1150,7 +1150,7 @@
     },
     {
       "name": "Hide Stories tray",
-      "description": "Adds separate switches for the row of stories at the top of the news feed, Create story included, and the rows of stories Facebook puts between posts, plus one for the composer row at the top of Home. They're under News feed in Hushfacebook settings and all start off.",
+      "description": "Hides the row of stories at the top of the feed, the stories between posts, or the \"What's on your mind?\" row at the top of Home, so you reach posts sooner. Starts off. Turn on the parts you want in Hushfacebook settings > News feed.",
       "category": "Stories",
       "use": true,
       "dependencies": [
@@ -1188,7 +1188,7 @@
     },
     {
       "name": "Hide affiliate product links",
-      "description": "Removes the product cards of affiliate shop links from reels, feed posts and the comment sheet, plus the Shop now cards reels get for tagged products, a creator's storefront and Shop similar. The \"Commission eligible\" label stays. Its switch is under News feed in Hushfacebook settings and starts on.",
+      "description": "Removes the shopping cards that affiliate links add to reels, feed posts and comments, plus Shop now cards on reels, so you see fewer sales pitches while you scroll. On by default. Turn it off in Hushfacebook settings > News feed.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -1225,7 +1225,7 @@
     },
     {
       "name": "Hide post prompts",
-      "description": "Removes the strip Facebook adds to some posts, like \"Are you interested in this post?\", \"Show less\", who recently commented, or follow and chat suggestions, with no gap left behind. The post stays. Its switch is under News feed in Hushfacebook settings and starts on.",
+      "description": "Removes the strip Facebook adds to some posts, like \"Are you interested in this post?\", \"Show less\" or follow suggestions, so posts look less cluttered. No gap is left. On by default. Turn it off in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -1262,7 +1262,7 @@
     },
     {
       "name": "Hide posts by words",
-      "description": "Hides feed posts whose text matches a word or pattern you list, unless it also matches your keep list. It also hides posts from people, Pages and sites you list, and, each with its own switch, photo, video, link and colored background posts. Hushfacebook never sends your lists anywhere. The switches start off, so turn one on and fill in its list under News feed in Hushfacebook settings.",
+      "description": "Hides feed posts with words you list, or from people, Pages or sites you list, so you skip topics you're tired of. Photo, video, link and colored background posts can go too. Starts off. Turn it on in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -1300,7 +1300,7 @@
     },
     {
       "name": "Hide read receipts",
-      "description": "People you chat with in a chat that opens inside Facebook don't see that you've read their messages. The chat can stay unread on this phone, and replying may still show you've read it. Its switch is under Privacy in Hushfacebook settings and starts off.",
+      "description": "People you chat with in chats that open inside Facebook don't see that you've read their messages, so you can read now and reply later. Replying may still show you've read it. Starts off. Turn it on in Hushfacebook settings > Privacy.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
@@ -1338,7 +1338,7 @@
     },
     {
       "name": "Hide reel interest prompts",
-      "description": "Removes the \"Are you interested in this reel?\" prompt from reels. The reel plays as usual. Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
+      "description": "Removes the \"Are you interested in this reel?\" prompt, so reels play without the interruption. On by default. Turn it off in Hushfacebook settings > Reels and Watch.",
       "category": "Reels",
       "use": true,
       "dependencies": [
@@ -1375,7 +1375,7 @@
     },
     {
       "name": "Hide seen posts",
-      "description": "Keeps posts you've already scrolled past out of the feed when it loads again, for 1, 3, 7 or 30 days. The list stays on your phone. Its switch is under News feed in Hushfacebook settings and starts off.",
+      "description": "Keeps posts you've already scrolled past out of the feed when it loads again, for 1, 3, 7 or 30 days, so you see something new. The list stays on your phone. Starts off. Turn it on in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -1413,7 +1413,7 @@
     },
     {
       "name": "Hide sponsored Marketplace listings",
-      "description": "Removes the ads and boosted listings from Marketplace's feed and search results. The feed's request asks Facebook to leave them out and the requests that fetch only ads don't go out. Ads that come back among search results are taken out before Marketplace shows them, and a video ad that reaches the feed anyway isn't drawn. The listings people post stay. Its switch is under Marketplace in Hushfacebook settings and starts on.",
+      "description": "Removes ads and boosted listings from Marketplace's feed and search results, so you see more of what people are selling. Listings people post stay. On by default. Turn it off in Hushfacebook settings > Marketplace.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -1451,7 +1451,7 @@
     },
     {
       "name": "Hide sponsored posts",
-      "description": "Removes sponsored and promoted posts from the news feed, with no gap left behind, and keeps the floating ad button off an ad's comments. Its two switches are under News feed in Hushfacebook settings and start on.",
+      "description": "Removes sponsored and promoted posts from the news feed, with no gap left behind, so you see fewer ads. It also keeps the floating ad button off an ad's comments. On by default. Turn it off in Hushfacebook settings > News feed.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -1489,7 +1489,7 @@
     },
     {
       "name": "Hide sponsored profile posts",
-      "description": "Removes the ads between the posts on someone's profile or a Page. The profile's own posts stay. Its switch is under News feed in Hushfacebook settings and starts on.",
+      "description": "Removes the ads between posts on someone's profile or a Page, so you only see what they posted. On by default. Turn it off in Hushfacebook settings > News feed.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -1527,7 +1527,7 @@
     },
     {
       "name": "Hide sponsored reels",
-      "description": "Removes ads from Reels and Watch, including product banners over a reel and ads inside a video. Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
+      "description": "Removes ads from Reels and Watch, including product banners over reels and ads in the middle of videos, so you can watch without interruptions. On by default. Turn it off in Hushfacebook settings > Reels and Watch.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -1565,7 +1565,7 @@
     },
     {
       "name": "Hide sponsored search results",
-      "description": "Removes the ads from Facebook's search results, the sponsored posts and ad cards between the people, pages and posts you searched for. Its switch is under Search in Hushfacebook settings and starts on.",
+      "description": "Removes the ads from Facebook's search results, so you see the people, Pages and posts you searched for. On by default. Turn it off in Hushfacebook settings > Search.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -1603,7 +1603,7 @@
     },
     {
       "name": "Hide sponsored stories",
-      "description": "Removes ad cards from the story viewer, so swiping through stories only shows stories people posted. Its switch is under Stories in Hushfacebook settings and starts on.",
+      "description": "Removes ad cards from the story viewer, so swiping through stories shows only what people posted. On by default. Turn it off in Hushfacebook settings > Stories.",
       "category": "Ads",
       "use": true,
       "dependencies": [
@@ -1641,7 +1641,7 @@
     },
     {
       "name": "Hide suggested and promoted posts",
-      "description": "Removes what Facebook adds to the feed besides ads: \"Suggested for you\" posts, \"People you may know\", suggested groups, \"Stories you might like\", \"Pages you may like\" and its own upsells. In-feed surveys go too, and so does the \"People you may know\" row on your own profile. Each kind has its own switch under News feed in Hushfacebook settings. Those start on, and the switches for memories, friend requests and friends' locations between posts start off.",
+      "description": "Removes what Facebook adds to the feed besides ads, like \"Suggested for you\" posts, \"People you may know\" and suggested groups, so you see more from people you follow. Most of its switches are on by default. Change them in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -1679,7 +1679,7 @@
     },
     {
       "name": "Hide suggested stories",
-      "description": "Removes the stories Facebook suggests from people and Pages you don't follow, the ones marked Suggested in the Stories tray, and the tray's Find friends from contacts card. With Hide suggested and promoted posts in the build too, the tray's People you may know cards go as well. Your friends' stories, the Pages you follow and Create story stay. Its switches are under Stories in Hushfacebook settings, and the two for suggested stories and the contacts card start on.",
+      "description": "Removes stories Facebook suggests from people and Pages you don't follow, and the \"Find friends from contacts\" card, so the Stories tray sticks to people you know. On by default. Turn it off in Hushfacebook settings > Stories.",
       "category": "Stories",
       "use": true,
       "dependencies": [
@@ -1717,7 +1717,7 @@
     },
     {
       "name": "Hide tab badges",
-      "description": "Takes the dot and count off the tabs you pick, and Facebook's count off its app icon. Notifications still come in, and the Notifications tab still lists them. The switches are under Appearance in Hushfacebook settings and all start off.",
+      "description": "Takes the dot and count off the tabs you pick, and Facebook's count off its app icon, so the app nags you less. Notifications still arrive and still show in the Notifications tab. Starts off. Turn on the ones you want in Hushfacebook settings > Appearance.",
       "category": "Navigation",
       "use": true,
       "dependencies": [
@@ -1755,7 +1755,7 @@
     },
     {
       "name": "Hide tabs",
-      "description": "Takes the tabs you pick off the tab bar: Feeds, Friends, Marketplace, Groups, Gaming or Events, and Dating, Professional dashboard, Saved, Ad Center, Create, Explore or Jobs where Facebook gives you one. Each page stays in the Menu. The switches are under Appearance in Hushfacebook settings and all start off, and a change shows once Facebook restarts.",
+      "description": "Takes the tabs you pick off the tab bar, such as Friends, Marketplace, Groups, Gaming or Events, so the bar only has what you use. Each page stays in the Menu. Starts off. Turn on the ones you want in Hushfacebook settings > Appearance, then restart Facebook.",
       "category": "Navigation",
       "use": true,
       "dependencies": [
@@ -1793,7 +1793,7 @@
     },
     {
       "name": "Hide the Feeds header",
-      "description": "Takes the title row and the All, Favorites, Friends, Groups and Pages filters off the top of the Feeds tab, so it opens on its posts. Its switch is under News feed in Hushfacebook settings and starts off. Restart Facebook after you turn it on.",
+      "description": "Takes the title row and the All, Favorites, Friends, Groups and Pages filters off the top of the Feeds tab, so it opens straight on posts. Starts off. Turn it on in Hushfacebook settings > News feed, then restart Facebook.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -1830,7 +1830,7 @@
     },
     {
       "name": "Hide the Get Messenger card",
-      "description": "Hides the \"Get the Messenger app\" card at the top of Chats while Messenger is installed. Facebook only counts a Messenger signed with its own key, so a re-signed Facebook shows the card even with Messenger right there. Without Messenger the card stays. Its switch is under Chats in Hushfacebook settings and starts on.",
+      "description": "Hides the \"Get the Messenger app\" card at the top of Chats when Messenger is already installed. A patched Facebook may not see that Messenger is there, so it keeps showing the card. On by default. Turn it off in Hushfacebook settings > Chats.",
       "category": "Chats",
       "use": true,
       "dependencies": [
@@ -1867,7 +1867,7 @@
     },
     {
       "name": "Hide the Reels tab",
-      "description": "Takes the Reels tab, which some accounts call Video, off the tab bar, and its shortcut out of the long-press menu of Facebook's icon. Reel links and the reels in your feed still open. Its switch is under Reels and Watch in Hushfacebook settings and starts off, and a change shows once Facebook restarts. Facebook's own Hide in its tab bar settings keeps working.",
+      "description": "Takes the Reels tab, called Video on some accounts, off the tab bar, so Reels isn't one tap away. Reels in your feed and reel links still open. Starts off. Turn it on in Hushfacebook settings > Reels and Watch, then restart Facebook.",
       "category": "Navigation",
       "use": true,
       "dependencies": [
@@ -1905,7 +1905,7 @@
     },
     {
       "name": "Hide the Reels tab dot",
-      "description": "Takes the new-item dot and count off the Reels tab, which some accounts call Video. Every other tab keeps its own. Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
+      "description": "Takes the new-item dot and count off the Reels tab, called Video on some accounts, so it stops calling for your attention. Other tabs keep theirs. On by default. Turn it off in Hushfacebook settings > Reels and Watch.",
       "category": "Navigation",
       "use": true,
       "dependencies": [
@@ -1943,7 +1943,7 @@
     },
     {
       "name": "Hide typing indicator",
-      "description": "Others don't see that you're typing, in chats that open inside Facebook and in comment boxes. What you write sends as usual. Its two switches are under Privacy in Hushfacebook settings and start off.",
+      "description": "Others don't see that you're typing, in chats that open inside Facebook and in comment boxes, so you can write without anyone watching. Your messages send as usual. Starts off. Turn on the parts you want in Hushfacebook settings > Privacy.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
@@ -1981,7 +1981,7 @@
     },
     {
       "name": "Hold a reel for 2x",
-      "description": "Holding a reel plays it at double speed until you let go. The hold takes the place of Facebook's long-press menu, which the reel's more button still opens. Its switch is under Reels and Watch in Hushfacebook settings and starts off.",
+      "description": "Hold a reel to play it at double speed, and let go to go back to normal. Handy for skimming. The reel's more button still opens Facebook's long-press menu. Starts off. Turn it on in Hushfacebook settings > Reels and Watch.",
       "category": "Playback",
       "use": true,
       "dependencies": [
@@ -2019,7 +2019,7 @@
     },
     {
       "name": "Hold back analytics uploads",
-      "description": "Stops Facebook uploading its app analytics in the background and skips its on-device learning jobs. Its switch is under Privacy in Hushfacebook settings and starts off. Restart Facebook after changing it.",
+      "description": "Stops Facebook sending its usage reports in the background and skips the learning jobs it runs on your phone, so less about how you use the app leaves it. Starts off. Turn it on in Hushfacebook settings > Privacy, then restart Facebook.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
@@ -2057,7 +2057,7 @@
     },
     {
       "name": "Hushfacebook in the Menu",
-      "description": "Adds a Hushfacebook settings row to Facebook's Menu, at the end of Settings and privacy, with a Saved row above it while the Saved shortcut switch is on. The logo long press and the launcher shortcut still open the settings too. It has no switch of its own.",
+      "description": "Adds a Hushfacebook settings row to Facebook's Menu, at the end of Settings and privacy, so the settings are easy to find. A Saved row joins it while the Saved shortcut switch is on. Works as soon as you patch it in, with no switch.",
       "category": "Settings",
       "use": true,
       "dependencies": [
@@ -2094,7 +2094,7 @@
     },
     {
       "name": "Hushfacebook settings",
-      "description": "Adds Hushfacebook settings to Facebook. Long-press the Facebook logo at the top of your feed, or Facebook's launcher icon, to turn features on or off, pause Hushfacebook, save your switches to a file or load them, and export diagnostics. The switches are grouped by part of Facebook, like News feed, Reels and Watch, and Privacy. The licenses are there too.",
+      "description": "Adds Hushfacebook settings to Facebook, where you turn features on or off, pause Hushfacebook and back up your choices. To open them, long-press the Facebook logo at the top of your feed or Facebook's app icon. Other patches need it, so keep it selected.",
       "category": "Settings",
       "use": true,
       "dependencies": [
@@ -2131,7 +2131,7 @@
     },
     {
       "name": "Install beside Meta's apps",
-      "description": "Lets the official Messenger, Facebook Lite, Business Suite and Workplace install beside the patched Facebook. Facebook shares two permissions with them, and Android lets only one signing key own a permission, so this patch renames Facebook's. A Root Mount install doesn't need it. It has no switch.",
+      "description": "Lets the official Messenger, Facebook Lite, Business Suite and Workplace install next to your patched Facebook. Without it, Android refuses them because they share two permissions with Facebook. Root Mount installs don't need it. Works as soon as you patch it in, with no switch.",
       "category": "Fixes",
       "use": true,
       "dependencies": [
@@ -2170,7 +2170,7 @@
     },
     {
       "name": "Keep post dates",
-      "description": "Keeps the date under the poster's name. Facebook's newer post header can swap that line for rotating details a moment after a post shows, and on some phones the line goes blank. With this on, the line stays put. Its switch is under News feed in Hushfacebook settings and starts on.",
+      "description": "Keeps the date under the poster's name, so you can always tell how old a post is. Facebook's newer header can swap it for rotating details, and on some phones the line goes blank. On by default. Turn it off in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -2207,7 +2207,7 @@
     },
     {
       "name": "Keep the progress bar",
-      "description": "Keeps the progress bar of reels at full size, so you can drag it without tapping first, and keeps a full-screen video's controls on screen until you tap. Its switch is under Playback in Hushfacebook settings and starts off.",
+      "description": "Keeps a reel's progress bar full size, so you can drag it without tapping first, and keeps a full-screen video's controls on screen until you tap. Starts off. Turn it on in Hushfacebook settings > Playback.",
       "category": "Playback",
       "use": true,
       "dependencies": [
@@ -2245,7 +2245,7 @@
     },
     {
       "name": "Keep the reel speed",
-      "description": "A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. A second switch does the same for feed and Watch videos. Both are under Reels and Watch in Hushfacebook settings. The reel one starts on and the video one starts off.",
+      "description": "A speed you pick in a reel's menu stays for the next reels until Facebook restarts, so you don't set it every time. On by default. A second switch for feed and Watch videos starts off. Both are in Hushfacebook settings > Reels and Watch.",
       "category": "Playback",
       "use": true,
       "dependencies": [
@@ -2283,7 +2283,7 @@
     },
     {
       "name": "Marketplace only",
-      "description": "Leaves only Marketplace, Notifications and your profile or Menu in the tab bar, and opens Facebook on Marketplace. Home with the news feed, Video, Friends, Feeds, Groups, Gaming and Events go. Notifications and links still open where they lead. Its switch is under Opening Facebook in Hushfacebook settings and starts off.",
+      "description": "Turns Facebook into a Marketplace app for buying and selling without the feed. The tab bar keeps only Marketplace, Notifications and your profile or Menu, and Facebook opens on Marketplace. Starts off. Turn it on in Hushfacebook settings > Opening Facebook, then restart Facebook.",
       "category": "Navigation",
       "use": true,
       "dependencies": [
@@ -2324,7 +2324,7 @@
     },
     {
       "name": "Material You theme",
-      "description": "Gives Facebook's dark mode the colours of your wallpaper on Android 12 and newer, and a fixed blue palette on Android 11. Light mode stays as it is. Turn on dark mode in Facebook first. There's no switch, since the colours go in when you patch. It isn't selected by default, so turn on Expert mode in Morphe Manager to pick it.",
+      "description": "Gives Facebook's dark mode the colors of your wallpaper on Android 12 and newer, so it matches your phone. Turn on dark mode in Facebook first. It isn't selected by default because undoing it means patching again. Turn on Expert mode in Manager to pick it.",
       "category": "Theme",
       "use": false,
       "dependencies": [
@@ -2363,7 +2363,7 @@
     },
     {
       "name": "Open Messenger from the top bar",
-      "description": "Lets the Messenger icon at the top of Facebook open the Messenger app instead of Facebook's own Chats. Without Messenger installed, Chats opens as before, and a long press on the icon still does what Facebook does with it. Its switch is under Chats in Hushfacebook settings and starts off.",
+      "description": "Makes the Messenger icon at the top of Facebook open the Messenger app instead of Facebook's own Chats, if you'd rather chat in Messenger. Without Messenger installed, Chats opens as before. Starts off. Turn it on in Hushfacebook settings > Chats.",
       "category": "Chats",
       "use": true,
       "dependencies": [
@@ -2400,7 +2400,7 @@
     },
     {
       "name": "Open links in external browser",
-      "description": "Opens web links in your default browser instead of Facebook's in-app browser, without Facebook's click tracker or the fbclid tag it adds. Facebook pages still open in the app. Its switch is under Links in Hushfacebook settings and starts on.",
+      "description": "Opens web links in your own browser instead of Facebook's built-in one, without Facebook tracking the click. Facebook pages still open in the app. On by default. Turn it off in Hushfacebook settings > Links.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -2438,7 +2438,7 @@
     },
     {
       "name": "Open on a chosen tab",
-      "description": "Opens Facebook on the tab you pick when you start it from its icon. It's Marketplace unless you change it. Notifications and links still open where they lead. Its switch and the tab list are under Opening Facebook in Hushfacebook settings, and the switch starts off.",
+      "description": "Opens Facebook on the tab you pick when you start it from its icon, so you can skip the feed. It's Marketplace unless you change it. Starts off. Turn it on in Hushfacebook settings > Opening Facebook.",
       "category": "Navigation",
       "use": true,
       "dependencies": [
@@ -2475,7 +2475,7 @@
     },
     {
       "name": "Picture-in-picture",
-      "description": "A reel playing in the Reels tab, or a video playing in the Video tab or Facebook's full-screen Watch viewer, keeps going in a small window when you leave Facebook, through the picture-in-picture Facebook already has for them. Needs Android 12 or later. Its switch is under Playback in Hushfacebook settings and starts off.",
+      "description": "Keeps reels and videos from the Reels and Video tabs, or full screen, playing in a small window when you leave Facebook, so you can watch while using another app. Needs Android 12 or later. Starts off. Turn it on in Hushfacebook settings > Playback.",
       "category": "Playback",
       "use": true,
       "dependencies": [
@@ -2512,7 +2512,7 @@
     },
     {
       "name": "Restore screens on re-signed builds",
-      "description": "Makes profiles, photos, posts and some Settings pages open again on a re-signed build, and lets a Messenger, Messenger Lite or Facebook Lite you patch with this build's own key sign in through it, the same as the real Meta app would. A Root Mount install doesn't need this patch. It has no switch.",
+      "description": "Fixes profiles, photos, posts and some Settings pages that won't open on a patched Facebook, and lets a Messenger or Facebook Lite patched in the same Manager sign in through it. Root Mount installs don't need it. Works as soon as you patch it in, with no switch.",
       "category": "Fixes",
       "use": true,
       "dependencies": [
@@ -2550,7 +2550,7 @@
     },
     {
       "name": "Resume long videos",
-      "description": "A video longer than two minutes that you left partway picks up where you left it the next time it plays, in the feed or full screen. Short reels, live videos and ads start as usual. Its switch is under Playback in Hushfacebook settings and starts off.",
+      "description": "A video longer than two minutes picks up where you left off the next time it plays, in the feed or full screen, so you don't lose your place. Reels, live videos and ads start as usual. Starts off. Turn it on in Hushfacebook settings > Playback.",
       "category": "Playback",
       "use": true,
       "dependencies": [
@@ -2587,7 +2587,7 @@
     },
     {
       "name": "Sanitize sharing links",
-      "description": "Takes Facebook's tracking tags, such as mibextid, off the links you share or copy. The post or reel a link opens stays the same. A facebook.com/share/ link is made for one share, so Facebook can still trace it back to you. Its switch is under Links in Hushfacebook settings and starts on.",
+      "description": "Takes Facebook's tracking tags off links you share or copy, so you share a clean link. A facebook.com/share/ link is made for one share, so Facebook can still trace that kind back to you. On by default. Turn it off in Hushfacebook settings > Links.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
@@ -2625,7 +2625,7 @@
     },
     {
       "name": "Send chat photos and videos at original quality",
-      "description": "Photos and videos you send from a chat that opens inside Facebook go out as the originals instead of Facebook's smaller copies. Its switch is under Chats in Hushfacebook settings and starts off.",
+      "description": "Photos and videos you send from chats that open inside Facebook go out as the originals instead of smaller copies, so they arrive sharp. Very large files are still shrunk. Starts off. Turn it on in Hushfacebook settings > Chats.",
       "category": "Chats",
       "use": true,
       "dependencies": [
@@ -2662,7 +2662,7 @@
     },
     {
       "name": "Share sheet items",
-      "description": "Lets you hide items from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link. Pick them under Links in Hushfacebook settings. Nothing is hidden until you do, and the rest keep Facebook's order.",
+      "description": "Lets you hide items you never use from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link, so the ones you want are easier to reach. Nothing is hidden until you pick. Choose them in Hushfacebook settings > Links.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -2700,7 +2700,7 @@
     },
     {
       "name": "Show View profile on Marketplace sellers",
-      "description": "Every seller's page in Marketplace gets View profile, which opens the seller's regular Facebook profile so you can check who you're buying from. Facebook shows that button to only some accounts. Its switch is under Marketplace in Hushfacebook settings and starts on.",
+      "description": "Adds View profile to every seller's Marketplace page. It opens their regular Facebook profile, so you can check who you're buying from. Facebook shows that button to only some accounts. On by default. Turn it off in Hushfacebook settings > Marketplace.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -2738,7 +2738,7 @@
     },
     {
       "name": "Start on x86 devices",
-      "description": "Keeps Facebook from crashing or freezing as it starts on an x86 device that runs its arm code through a translator, such as an emulator or an x86 Chromebook, by skipping the one start-up step that breaks there. Phones and tablets with arm chips start as before. It has no switch.",
+      "description": "Stops Facebook crashing or freezing at start on x86 devices, such as computer emulators and x86 Chromebooks. Most phones and tablets don't need it, and it doesn't change how they start. Works as soon as you patch it in, with no switch.",
       "category": "Fixes",
       "use": true,
       "dependencies": [
@@ -2776,7 +2776,7 @@
     },
     {
       "name": "Stop Story auto-advance",
-      "description": "Keeps each story on screen until you tap or swipe. Its switch is under Stories in Hushfacebook settings and starts off. A second switch there plays a finished story again from the start.",
+      "description": "Keeps each story on screen until you tap or swipe, so you can take your time with it. A second switch replays a finished story from the start. Starts off. Turn it on in Hushfacebook settings > Stories.",
       "category": "Stories",
       "use": true,
       "dependencies": [
@@ -2813,7 +2813,7 @@
     },
     {
       "name": "Stop update prompts",
-      "description": "Stops Facebook's own update prompts on a patched build, which can't install Meta's updates anyway. Meta App Manager's update promotions and the push message that has it look for an update go, and so do chat promotions aimed at older versions. Its switch is under Updates in Hushfacebook settings and starts on.",
+      "description": "Stops Facebook asking you to update, since a patched app can't install Meta's updates anyway. Meta App Manager's update prompts and chat prompts aimed at older versions go too. On by default. Turn it off in Hushfacebook settings > Updates.",
       "category": "Fixes",
       "use": true,
       "dependencies": [
@@ -2850,7 +2850,7 @@
     },
     {
       "name": "Tab bar at the bottom",
-      "description": "Moves Facebook's tab bar to the bottom of the screen on accounts that have it at the top. Its switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after you turn it on. A second switch there lets the bar at the bottom slide away while you scroll down.",
+      "description": "Moves Facebook's tab bar to the bottom of the screen on accounts that have it at the top, where it's easier to reach. A second switch lets it slide away as you scroll. Starts off. Turn it on in Hushfacebook settings > Appearance, then restart Facebook.",
       "category": "Navigation",
       "use": true,
       "dependencies": [
@@ -2888,7 +2888,7 @@
     },
     {
       "name": "Tag suggestions only after @",
-      "description": "Stops Facebook offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list. Photo tags and your text aren't touched. Its switch is under Writing in Hushfacebook settings and starts off.",
+      "description": "Stops Facebook offering people to tag while you type ordinary words in posts and comments, so names don't pop up in your way. Typing @ still brings up the list. Starts off. Turn it on in Hushfacebook settings > Writing.",
       "category": "Comments",
       "use": true,
       "dependencies": [
@@ -2925,7 +2925,7 @@
     },
     {
       "name": "Tap to play",
-      "description": "Videos, reels, stories and music wait for your tap instead of starting by themselves. A tap plays as usual. Its switch is under Playback in Hushfacebook settings and starts off. While it's on, Facebook's own Autoplay setting reads Off.",
+      "description": "Videos, reels, stories and music wait for your tap instead of starting by themselves, so nothing plays until you want it to. Starts off. Turn it on in Hushfacebook settings > Playback.",
       "category": "Playback",
       "use": true,
       "dependencies": [
@@ -2962,7 +2962,7 @@
     },
     {
       "name": "Turn off HDR brightness",
-      "description": "Keeps HDR videos and photos from turning your screen up to full brightness. They play at the same resolution, in the screen's usual range. Its switch is under Playback in Hushfacebook settings and starts off.",
+      "description": "Stops HDR videos and photos from turning your screen up to full brightness, which can be harsh in the dark. They keep their resolution. Starts off. Turn it on in Hushfacebook settings > Playback.",
       "category": "Playback",
       "use": true,
       "dependencies": [
@@ -3000,7 +3000,7 @@
     },
     {
       "name": "Turn off auto-translation",
-      "description": "Shows posts and reel captions in the language they were written in, instead of Facebook's automatic translation. Facebook's See translation link stays under each one. Its switch is under News feed in Hushfacebook settings and starts off.",
+      "description": "Shows posts and reel captions in the language they were written in, instead of Facebook's automatic translation, so you read people's own words. See translation still works. Starts off. Turn it on in Hushfacebook settings > News feed.",
       "category": "Feed",
       "use": true,
       "dependencies": [
@@ -3037,7 +3037,7 @@
     },
     {
       "name": "Turn off double tap to like",
-      "description": "Stops a double tap on a reel or a video from liking it, and the heart doesn't show. A single tap still plays or pauses, and the Like button still likes. Its switch is under Reels and Watch in Hushfacebook settings and starts off.",
+      "description": "Stops a double tap on a reel or video from liking it, so you don't like things by accident. A single tap still plays or pauses, and the Like button still works. Starts off. Turn it on in Hushfacebook settings > Reels and Watch.",
       "category": "Reels",
       "use": true,
       "dependencies": [
@@ -3074,7 +3074,7 @@
     },
     {
       "name": "Turn off haptics",
-      "description": "Stops the short vibrations Facebook plays on its own taps and gestures. The keyboard and your phone's own haptics stay. Its switch is under Appearance in Hushfacebook settings and starts off.",
+      "description": "Stops the short vibrations Facebook plays when you tap and swipe in it, if you find them distracting. Your keyboard and your phone's own vibrations stay. Starts off. Turn it on in Hushfacebook settings > Appearance.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -3112,7 +3112,7 @@
     },
     {
       "name": "Turn off screen transitions",
-      "description": "Shows Facebook's tabs, the tab strips inside its screens, its Menu and the screens that open over it at once, without the slide between them. Swiping and animations inside a page stay. Its switch is under Appearance in Hushfacebook settings and starts off.",
+      "description": "Shows Facebook's tabs, Menu and new screens at once, without the slide between them, so the app feels quicker. Swipes and animations inside a page stay. Starts off. Turn it on in Hushfacebook settings > Appearance.",
       "category": "Interface",
       "use": true,
       "dependencies": [
@@ -3150,7 +3150,7 @@
     },
     {
       "name": "Use the phone's emoji",
-      "description": "Draws emoji with your phone's own emoji font instead of Meta's, so the ones in posts, comments and chats look like the ones on your keyboard, big chat emoji included. Reactions and stickers stay as they are. Its switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after changing it.",
+      "description": "Draws emoji with your phone's own emoji font instead of Meta's, so emoji in posts, comments and chats match your keyboard. Reactions and stickers stay as they are. Starts off. Turn it on in Hushfacebook settings > Appearance, then restart Facebook.",
       "category": "Theme",
       "use": true,
       "dependencies": [
@@ -3187,7 +3187,7 @@
     },
     {
       "name": "Use the system font",
-      "description": "Draws Facebook's own text in your phone's font instead of Meta's Optimistic typeface, or in a TrueType or OpenType file you pick. Icons and emoji keep their fonts, and so does the text you put on a story. Its switch and the font file row are under Appearance in Hushfacebook settings, and the switch starts off. Restart Facebook after changing the font.",
+      "description": "Draws Facebook's text in your phone's font instead of Meta's, or in a font file you pick, so Facebook matches the rest of your phone. Icons and emoji keep their own. Starts off. Turn it on in Hushfacebook settings > Appearance, then restart Facebook.",
       "category": "Theme",
       "use": true,
       "dependencies": [
@@ -3224,7 +3224,7 @@
     },
     {
       "name": "View stories anonymously",
-      "description": "Keeps you off the viewer list of the stories you watch, because Facebook isn't told which ones you've seen. Replying or reacting still shows you, and stories you've watched keep the ring that marks them as new. Its switch is under Stories in Hushfacebook settings and starts off.",
+      "description": "Keeps you off the viewer list of stories you watch, because Facebook isn't told which ones you've seen. Replying or reacting still shows you, and watched stories still look new. Starts off. Turn it on in Hushfacebook settings > Stories.",
       "category": "Privacy",
       "use": true,
       "dependencies": [
