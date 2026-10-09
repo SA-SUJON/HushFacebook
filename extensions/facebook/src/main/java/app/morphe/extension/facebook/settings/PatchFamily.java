@@ -80,7 +80,7 @@ public enum PatchFamily {
     STORY_SEEN(FamilyNames.STORY_SEEN, "storySeen", null,
             Settings.VIEW_STORIES_ANONYMOUSLY, Settings.MARK_STORIES_SEEN),
     SPONSORED_REELS(FamilyNames.SPONSORED_REELS, "sponsoredReels",
-            "the part of the Reels ad block patched into the app",
+            "the part of the Reels ad blocking built in when you patched",
             Settings.HIDE_SPONSORED_REELS),
     SPONSORED_SEARCH(FamilyNames.SPONSORED_SEARCH, "sponsoredSearch", null,
             Settings.HIDE_SPONSORED_SEARCH_RESULTS),
@@ -220,7 +220,7 @@ public enum PatchFamily {
     // A manifest can't be switched at run time: the permissions are renamed in the APK, and Facebook's
     // code has to keep using the names this install holds whether or not Hushfacebook is paused.
     INSTALL_BESIDE_META_APPS(FamilyNames.INSTALL_BESIDE_META_APPS, "installBesideMetaApps",
-            "the rename of the shared permissions"),
+            "the new names for shared permissions"),
     // The version code is in the manifest, and Facebook's reads of it have to keep answering the
     // real one whether or not Hushfacebook is paused.
     PLAY_STORE_UPDATES(FamilyNames.PLAY_STORE_UPDATES, "playStoreUpdates", "the version number Google Play sees"),

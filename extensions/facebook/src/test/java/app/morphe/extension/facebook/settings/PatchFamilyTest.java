@@ -342,11 +342,11 @@ public class PatchFamilyTest {
                 PatchFamily.VIDEO_DOWNLOAD)));
         // Alone, a family's text is followed by "It was set", so a text naming several parts still
         // has to be one thing. 4a7bba9 made the Reels one plural and this sentence stopped reading.
-        assertEquals("The part of the Reels ad block patched into the app (" + L10n.isolate("Hide sponsored reels")
+        assertEquals("The part of the Reels ad blocking built in when you patched (" + L10n.isolate("Hide sponsored reels")
                         + "). It was set when you patched, so Pause can't turn it off. To rule it out, patch again "
                         + "and leave out that patch.",
                 PatchFamily.staysWhilePausedSummary(EnumSet.of(PatchFamily.SPONSORED_REELS)));
-        assertEquals("The part of the Reels ad block patched into the app (" + L10n.isolate("Hide sponsored reels")
+        assertEquals("The part of the Reels ad blocking built in when you patched (" + L10n.isolate("Hide sponsored reels")
                         + ") and the block on reports of ad screenshots and app installs ("
                         + L10n.isolate("Block ad telemetry") + "). They were set "
                         + "when you patched, so Pause can't turn them off. To rule one out, patch again and leave out "
@@ -374,7 +374,7 @@ public class PatchFamilyTest {
         assertEquals(Arrays.asList(
                 "Hide sponsored posts: on (hushfacebook_hide_sponsored_posts=on, hushfacebook_hide_promoted_posts=off)",
                 "Hide sponsored reels: on (hushfacebook_hide_sponsored_reels=on); stays in while paused: "
-                        + "the part of the Reels ad block patched into the app",
+                        + "the part of the Reels ad blocking built in when you patched",
                 "Block background ad prefetch: no switch, stays in while paused: the block on downloading ads in "
                         + "the background",
                 "not in this build: Hide suggested and promoted posts, Hide Stories tray, Hide Reels in the feed, "
@@ -479,7 +479,7 @@ public class PatchFamilyTest {
                 + "hushfacebook_hide_sponsored_posts=on, hushfacebook_hide_promoted_posts=off)", paused.get(0));
         assertEquals("Hide sponsored reels: disabled while paused (saved "
                 + "hushfacebook_hide_sponsored_reels=on); stays in while paused: the part of the Reels ad "
-                + "block patched into the app",
+                + "blocking built in when you patched",
                 paused.get(1));
         assertEquals("a patch with no switch reads the same paused", running.get(2), paused.get(2));
         assertEquals(running.get(3), paused.get(3));

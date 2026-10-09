@@ -788,10 +788,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     /** The AMOLED row under Patched: black, or the Background colour the patch was given (issue #34). */
     static String amoledSummary(int background) {
         if (background == Color.BLACK) {
-            return L10n.t("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.");
+            return L10n.t("Dark mode uses black instead of dark gray. Turn on dark mode in Facebook to see it.");
         }
         String colour = String.format(Locale.ROOT, "#%06X", background & 0xFFFFFF);
-        return L10n.f("Dark mode draws %1$s instead of dark grey. Turn on dark mode in Facebook to see it.",
+        return L10n.f("Dark mode uses %1$s instead of dark gray. Turn on dark mode in Facebook to see it.",
                 L10n.isolate(colour));
     }
 
@@ -1237,8 +1237,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (scale == TextSize.Scale.P100) {
             return L10n.t("Facebook's text is the size your phone's font size setting gives it.");
         }
-        return L10n.f("Facebook's text is %1$s of the size your phone's font size setting gives it. "
-                + "Restart Facebook after changing it.", scale.label());
+        return L10n.f("Facebook's text is %1$s of the size your phone's font size setting gives it. Restart Facebook to "
+                + "see the change.", scale.label());
     }
 
     /**
@@ -1336,8 +1336,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (accent == AccentColor.Preset.FACEBOOK) {
             return L10n.t("Links, buttons, switches and the selected tab keep Facebook's blue.");
         }
-        return L10n.f("Links, buttons, switches and the selected tab are %1$s where Facebook uses its blue. "
-                + "Restart Facebook after changing it. The Material You theme, when it's in, takes over.",
+        return L10n.f("Links, buttons, switches and the selected tab use %1$s instead of Facebook's blue. Restart Facebook "
+                + "to see the change. If the Material You theme is added, it takes over.",
                 accentLabel(accent));
     }
 

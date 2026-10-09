@@ -148,8 +148,8 @@ public class HushfacebookPreferenceFragmentTest {
             }
             assertTrue("Debug logging is drawn above the Pause row", indexOfKey(rows, BaseSettings.DEBUG.key) > pause);
             assertTrue(String.valueOf(rows.get(pause).getSummary()),
-                    String.valueOf(rows.get(pause).getSummary()).contains("every switch but Debug logging and "
-                            + "Lock Facebook acts as if it were off. Changes made when you patched stay in"));
+                    String.valueOf(rows.get(pause).getSummary()).contains("switches act as if off, except "
+                            + "Debug logging and Lock Facebook. Your choices stay saved."));
         }
     }
 
@@ -170,7 +170,7 @@ public class HushfacebookPreferenceFragmentTest {
             Preference sound = rows.get(at);
             assertEquals("Save Facebook's notification sound", String.valueOf(sound.getTitle()));
             assertTrue("the row's tap acts at once, so it goes without a chevron", ((SettingsRows.Row) sound).actsOnTap());
-            assertTrue(String.valueOf(sound.getSummary()).contains("for a category that Android set to None"));
+            assertTrue(String.valueOf(sound.getSummary()).contains("for categories set to None"));
             assertEquals(-1, indexOfKey(rows, Settings.BLOCK_ACCOUNT_SETUP_NOTIFICATIONS.key));
 
             ShadowToast.reset();
@@ -231,14 +231,14 @@ public class HushfacebookPreferenceFragmentTest {
             List<Preference> rows = rowsOf(controller);
             int tray = indexOfKey(rows, Settings.HIDE_TOP_STORIES_TRAY.key);
             assertTrue("the Stories tray row is missing", tray >= 0);
-            assertEquals("The row of stories at the top of the feed, Create story included. "
+            assertEquals("Hides the row of stories at the top of the feed, including Create story. "
                     + "A change shows the next time you pull down to refresh.",
                     String.valueOf(rows.get(tray).getSummary()));
             int between = indexOfKey(rows, Settings.HIDE_STORIES_BETWEEN_POSTS.key);
             assertEquals("the between-post Stories switch isn't immediately after the tray switch", tray + 1, between);
             assertEquals("Hide Stories between posts", String.valueOf(rows.get(between).getTitle()));
-            assertEquals("Rows, large tiles and viewers of Stories between posts, starting with the next "
-                    + "feed Facebook loads. The top Stories tray has its own switch.",
+            assertEquals("Hides Stories shown between posts, from the next time the feed loads. The Stories tray at the top "
+                    + "has its own switch.",
                     String.valueOf(rows.get(between).getSummary()));
         }
     }
@@ -258,10 +258,9 @@ public class HushfacebookPreferenceFragmentTest {
             assertTrue("the sponsored reels row is missing", sponsored >= 0);
             assertTrue("the AI reels row is missing", ai >= 0);
             assertTrue(String.valueOf(rows.get(sponsored).getSummary()), String.valueOf(rows.get(sponsored).getSummary())
-                    .startsWith("Ads inside Reels, starting with the next batch Facebook loads. "));
+                    .startsWith("Hides ads in Reels, starting with the next batch Facebook loads. "));
             assertTrue(String.valueOf(rows.get(ai).getSummary()), String.valueOf(rows.get(ai).getSummary())
-                    .startsWith("Reels and Watch videos that Facebook's own detection marks as made with AI, "
-                            + "starting with the next batch Facebook loads. "));
+                    .startsWith("Hides reels and Watch videos that Facebook marks as made with AI. "));
         }
     }
 
@@ -280,7 +279,7 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals("the AI label row isn't right below the detection row", detected + 1, labelled);
             assertEquals("Also hide posts labelled as AI", String.valueOf(rows.get(labelled).getTitle()));
             assertTrue(String.valueOf(rows.get(labelled).getSummary()), String.valueOf(rows.get(labelled).getSummary())
-                    .contains("with this on, both kinds go."));
+                    .contains("not just the ones Facebook detects itself."));
         }
     }
 
@@ -299,7 +298,7 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals("the AI character row isn't right below the Meta AI cards row", cards + 1, characters);
             assertEquals("Hide AI character posts", String.valueOf(rows.get(characters).getTitle()));
             assertTrue(String.valueOf(rows.get(characters).getSummary()), String.valueOf(rows.get(characters)
-                    .getSummary()).contains("It's off by default"));
+                    .getSummary()).contains("so it starts off"));
         }
     }
 
@@ -869,8 +868,8 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse(((SwitchPreference) row).isChecked());
                 assertEquals(indexOfKey(rows, Settings.DOWNLOAD_QUALITY.key) - 1, compatible);
                 assertEquals("Save videos other apps can open", String.valueOf(row.getTitle()));
-                assertEquals("For WhatsApp, video editors such as CapCut and InShot, or a gallery or player that plays saves "
-                        + "without sound. May lower quality.",
+                assertEquals("Fixes saved videos that play without sound in WhatsApp, video editors such as CapCut and InShot, or "
+                        + "some galleries and players. May lower quality.",
                         String.valueOf(row.getSummary()));
             }
         }
@@ -1495,10 +1494,10 @@ public class HushfacebookPreferenceFragmentTest {
     /** Issue #34: the AMOLED row under Patched names the Background colour the patch was given. */
     @Test
     public void theAmoledRowNamesAPickedBackgroundColour() {
-        assertEquals("Dark mode draws black instead of dark grey. Turn on dark mode in Facebook to see it.",
+        assertEquals("Dark mode uses black instead of dark gray. Turn on dark mode in Facebook to see it.",
                 HushfacebookPreferenceFragment.amoledSummary(Color.BLACK));
-        assertEquals("Dark mode draws " + L10n.isolate("#0D1117")
-                        + " instead of dark grey. Turn on dark mode in Facebook to see it.",
+        assertEquals("Dark mode uses " + L10n.isolate("#0D1117")
+                        + " instead of dark gray. Turn on dark mode in Facebook to see it.",
                 HushfacebookPreferenceFragment.amoledSummary(0xFF0D1117));
     }
 }
