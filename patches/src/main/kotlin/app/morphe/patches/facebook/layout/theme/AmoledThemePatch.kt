@@ -184,9 +184,9 @@ internal fun backgroundProblem(value: String?): String? {
     val looksLikeAColour = (hex.length == 6 || hex.length == 8) && hex.all { it.isDigit() || it.lowercaseChar() in 'a'..'f' }
     return when {
         !looksLikeAColour && hex.isNotEmpty() ->
-            "Background color \"$value\" isn't a color. Type it as #RRGGBB, like #0D1117, or leave it blank for black."
+            "Background color \"$value\" isn't a color. Type it as a six-digit color code (#RRGGBB), like #0D1117, or leave it blank for black."
         parsedBackground(value) == null ->
-            "Background color $value is see-through. Type a solid #RRGGBB color, like #0D1117."
+            "Background color $value is see-through. Type a solid six-digit color code (#RRGGBB), like #0D1117."
         backgroundColour(value) == null ->
             "Background color $value is too light for Facebook's text to stay readable. Pick a darker color. " +
                 "Grays up to about $LIGHTEST_ADMITTED_GREY work."
@@ -416,7 +416,7 @@ val amoledThemePatch = bytecodePatch(
         key = "backgroundColour",
         default = "#000000",
         title = "Background color",
-        description = "The color dark mode's backgrounds use, as #RRGGBB, like #0D1117. Leave it blank for " +
+        description = "The color dark mode's backgrounds use, as a six-digit color code (#RRGGBB), like #0D1117. Leave it blank for " +
             "black. Cards and inputs get a slightly lighter shade. Grays up to about $LIGHTEST_ADMITTED_GREY " +
             "work, and lighter colors are refused so text stays readable.",
         required = false,

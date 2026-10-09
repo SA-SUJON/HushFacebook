@@ -45,7 +45,7 @@
         {
           "key": "backgroundColour",
           "title": "Background color",
-          "description": "The color dark mode's backgrounds use, as #RRGGBB, like #0D1117. Leave it blank for black. Cards and inputs get a slightly lighter shade. Grays up to about #535353 work, and lighter colors are refused so text stays readable.",
+          "description": "The color dark mode's backgrounds use, as a six-digit color code (#RRGGBB), like #0D1117. Leave it blank for black. Cards and inputs get a slightly lighter shade. Grays up to about #535353 work, and lighter colors are refused so text stays readable.",
           "required": false,
           "type": "kotlin.String",
           "default": "#000000",
