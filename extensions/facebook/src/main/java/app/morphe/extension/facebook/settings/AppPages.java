@@ -12,6 +12,7 @@ import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragm
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.lockAfterRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.toggle;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -20,9 +21,12 @@ import android.preference.SwitchPreference;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import app.morphe.extension.facebook.misc.AppLock;
+import app.morphe.extension.facebook.misc.ShareSheetItems;
 import app.morphe.extension.facebook.notifications.NotificationSound;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Utils;
@@ -278,12 +282,64 @@ final class AppPages {
                     L10n.t("Takes tracking tags such as mibextid off the links you share or copy. A "
                             + "facebook.com/share/ link is made for one share, so Facebook can still trace it back to you.")));
         }
+        if (build.contains(PatchFamily.SHARE_SHEET_ITEMS)) links.addPreference(shareItemsRow(context));
         links.addPreference(page.supportedLinksRow(context));
         for (Preference holder : page.linkHolderRows(context)) links.addPreference(holder);
         links.addPreference(info(context, L10n.t("Selecting links by hand"),
                 L10n.t("Android checks Facebook's links against Meta's signing key, which a re-signed build doesn't have. "
                         + "Selecting the addresses sends their links here again. It doesn't restore Meta's verification, "
                         + "and your other link settings stay as they are.")));
+    }
+
+    /** Share sheet items' row: the items it keeps out, picked from a list of checkboxes. */
+    static Preference shareItemsRow(Context context) {
+        SettingsRows.Row row = new SettingsRows.Row(context);
+        row.setKey(SHARE_ITEMS_ROW);
+        row.setTitle(L10n.t("Share sheet items to hide"));
+        row.setPersistent(false);
+        row.setSummary(shareItemsSummary(ShareSheetItems.hidden()));
+        row.setOnPreferenceClickListener(p -> {
+            showShareItems(context, row);
+            return true;
+        });
+        return row;
+    }
+
+    /** The row's key, for the settings search. No setting is behind it. */
+    static final String SHARE_ITEMS_ROW = "action_share_sheet_items";
+
+    /** The row's summary: the items kept out, by the names the list gives them, or none. */
+    static String shareItemsSummary(Set<String> hidden) {
+        if (hidden.isEmpty()) return L10n.t("None. The share sheet shows everything Facebook offers.");
+        List<String> names = new ArrayList<>();
+        for (String type : hidden) names.add(ShareSheetItems.label(type));
+        return L10n.f("Hidden: %s", L10n.join(names));
+    }
+
+    /** The list: every item it knows, ticked when it's kept out. Save keeps the ticks. */
+    private static void showShareItems(Context context, Preference row) {
+        List<String> types = ShareSheetItems.choices();
+        Set<String> hidden = ShareSheetItems.hidden();
+        String[] names = new String[types.size()];
+        boolean[] ticked = new boolean[types.size()];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = ShareSheetItems.label(types.get(i));
+            ticked[i] = hidden.contains(types.get(i));
+        }
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle(L10n.t("Hide from the share sheet"))
+                .setMultiChoiceItems(names, ticked, (shown, which, isTicked) -> ticked[which] = isTicked)
+                .setPositiveButton(L10n.t("Save"), (shown, which) -> {
+                    List<String> picked = new ArrayList<>();
+                    for (int i = 0; i < ticked.length; i++) {
+                        if (ticked[i]) picked.add(types.get(i));
+                    }
+                    ShareSheetItems.hide(picked);
+                    row.setSummary(shareItemsSummary(ShareSheetItems.hidden()));
+                })
+                .setNegativeButton(L10n.t("Cancel"), null)
+                .show();
+        ScreenColors.dialog(dialog);
     }
 
     /**

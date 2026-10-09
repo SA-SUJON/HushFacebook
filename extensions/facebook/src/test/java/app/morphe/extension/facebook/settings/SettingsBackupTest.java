@@ -137,6 +137,11 @@ public class SettingsBackupTest {
         out.put("hushfacebook_font_source",
                 "it names the font file Use the system font draws in, whose copy only this install holds. A settings "
                         + "file can't carry the font itself, and the name alone would point at nothing on another phone.");
+        out.put("hushfacebook_hidden_share_items",
+                "it's a list of Facebook's share item type names, and a settings file has no format for one yet. "
+                        + "Carrying it is on the roadmap.");
+        out.put("hushfacebook_seen_share_items",
+                "it records the share items this install's Facebook offered, which the hook writes, not a choice.");
         return Collections.unmodifiableMap(out);
     }
 

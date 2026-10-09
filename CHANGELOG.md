@@ -7,6 +7,7 @@ Every Hushfacebook release, newest first.
 ### Added
 
 * **Facebook:** `Comment sheet options` has a fourth switch under Comments, **Hide related groups**. It takes the Related groups list and its Join buttons out from under a group post's comments, and the comments themselves stay. It starts off, and the diagnostic report counts each list it keeps out.
+* **Facebook:** `Share sheet items` is a new patch, off in Morphe Manager's default selection. It lets you hide items from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link. Tap **Share sheet items to hide** under Links and tick what you don't want. The list starts with the items Facebook has offered on your phone and then common ones. The rest keep Facebook's order, and pausing Hushfacebook brings everything back. It shares one hook with the Threads switch in `Hide Meta upsells`, so both can be in the same build. The idea comes from icysymmetra's TikTok patches.
 * **Tooling:** `scripts/phone-smoke.ps1` walks a patched Facebook on a phone through the feed, Watch, Reels, notifications and Marketplace, saves a full diagnostic report from Hushfacebook settings and pulls it. It fails when a hook family reports anything missing, ambiguous or thrown, when a family you name with `-ExpectInvoked` never ran, or when Facebook crashed during the walk. A crash the report kept from before the walk doesn't count. `scripts/test-phone-smoke.ps1` checks the report reading without a phone.
 
 ### Changed

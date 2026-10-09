@@ -291,8 +291,8 @@ internal fun BytecodePatchContext.hideMetaUpsells() {
     val composerImagine = enumConstant(enumNaming(COMPOSER_CAPABILITIES), COMPOSER_IMAGINE)
     val storyImagine = enumConstant(enumNaming(STORY_TOOLS_NAMES), STORY_IMAGINE)
 
-    // The share sheet's Threads button: its item type, and Guava's copy the hook hands back through.
-    val shareThreads = enumConstant(enumNaming(SHARE_ITEM_TYPES), SHARE_TO_THREADS)
+    // Guava's copy Create story's tools hand back through. The share sheet's Threads button is
+    // shareSheetHookPatch's, a dependency, which finds its own.
     val immutableList = classDefByOrNull(IMMUTABLE_LIST) ?: refuse("this Facebook build has no $IMMUTABLE_LIST")
     if (!definesImmutableCopy(immutableList)) refuse("$IMMUTABLE_LIST has no copyOf(Collection) here")
 
@@ -304,7 +304,6 @@ internal fun BytecodePatchContext.hideMetaUpsells() {
     val labelAskers = mutableListOf<Pair<String, Method>>()
     val imagineAskers = mutableListOf<Pair<String, Method>>()
     val storyBuilders = mutableListOf<Pair<String, Method>>()
-    val shareLists = mutableListOf<Pair<String, Method>>()
     classDefForEach { classDef ->
         if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@classDefForEach
         for (method in classDef.methods) {
@@ -312,14 +311,11 @@ internal fun BytecodePatchContext.hideMetaUpsells() {
             if (verifiedLabelAsks(method, label).isNotEmpty()) labelAskers += classDef.type to method
             if (capabilityAsks(method, composerImagine).isNotEmpty()) imagineAskers += classDef.type to method
             if (storyToolList(method, storyImagine) != null) storyBuilders += classDef.type to method
-            if (isShareItemList(method, shareThreads)) shareLists += classDef.type to method
         }
     }
     if (imagineAskers.isEmpty()) refuse("nothing asks the composer's capabilities about $COMPOSER_IMAGINE")
     val storyBuilder = storyBuilders.singleOrNull()
         ?: refuse("expected one Create story tile builder reading $storyImagine, found ${storyBuilders.map { it.first }}")
-    val shareList = shareLists.singleOrNull()
-        ?: refuse("expected one share sheet item list reading $shareThreads, found ${shareLists.map { it.first }}")
     if (flagReaders.none { !it.first.startsWith(LANDING_CONFIG.removeSuffix(";")) }) {
         refuse("nothing outside $LANDING_CONFIG reads the Edits flags")
     }
@@ -372,7 +368,4 @@ internal fun BytecodePatchContext.hideMetaUpsells() {
     }
     val builder = mutableClassDefBy(storyBuilder.first).findMutableMethodOf(storyBuilder.second)
     builder.filterStoryTools(storyToolList(builder, storyImagine)!!)
-
-    // Threads in the share sheet: every list of item types the sheet gets.
-    mutableClassDefBy(shareList.first).findMutableMethodOf(shareList.second).filterShareTargets()
 }

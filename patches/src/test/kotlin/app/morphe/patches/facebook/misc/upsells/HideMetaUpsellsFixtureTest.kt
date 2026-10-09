@@ -11,6 +11,7 @@ import app.morphe.patches.facebook.comments.summaries.descriptor
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.methodsHolding
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
+import app.morphe.patches.facebook.misc.sharesheet.shareSheetHookPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -34,8 +35,8 @@ import java.io.File
  * upsell components, Imagine's three (the post call-to-action selector's check, every question the
  * composer asks about its Imagine capability and Create story's tile builder) and the method that
  * picks the share sheet's items, with Guava's ImmutableList.copyOf beside it. Then the whole
- * patch on those classes: each hook where it belongs, on the anchor's own register, and nothing
- * else moved. Reads the fixture bundles from
+ * patch on those classes, with shareSheetHookPatch, its dependency, run first: each hook where it
+ * belongs, on the anchor's own register, and nothing else moved. Reads the fixture bundles from
  * HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
 class HideMetaUpsellsFixtureTest {
@@ -180,6 +181,8 @@ class HideMetaUpsellsFixtureTest {
                     composerEnums + storyEnums + shareEnums + immutableList +
                     ExtensionDex.classDef(SETTINGS_STATUS)).associateBy { it.type }.values
                 val context = PatchContexts.of(pool)
+                // execute() runs only the patch it's called on, so the shared share sheet hook goes first.
+                shareSheetHookPatch.execute(context)
                 hideMetaUpsellsPatch.execute(context)
                 fun patched(method: Method) = context.mutableClassDefBy(method.definingClass).method(method).code()
 

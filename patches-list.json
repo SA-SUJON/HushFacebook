@@ -2661,6 +2661,44 @@
       "options": []
     },
     {
+      "name": "Share sheet items",
+      "description": "Lets you hide items from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link. Pick them under Links in Hushfacebook settings. The rest keep Facebook's order.",
+      "category": "Interface",
+      "use": false,
+      "dependencies": [
+        "BytecodePatch",
+        "Hushfacebook settings"
+      ],
+      "compatiblePackages": {
+        "com.facebook.katana": [
+          "581.0.0.45.58"
+        ]
+      },
+      "compatibility": [
+        {
+          "name": "Facebook",
+          "packageName": "com.facebook.katana",
+          "description": null,
+          "appIconColor": 550655,
+          "signatures": [
+            "911d604446084ca7f4760b775bfc160fa8702441240a7258645d7a72c4312d27",
+            "e3f9e1e0cf99d0e56a055ba65e241b3399f7cea524326b0cdd6ec1327ed0fdc1"
+          ],
+          "targets": [
+            {
+              "version": "581.0.0.45.58",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 475215365,
+                "ARMEABI_V7A": 475215364
+              }
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Show View profile on Marketplace sellers",
       "description": "Every seller's page in Marketplace gets View profile, which opens the seller's regular Facebook profile so you can check who you're buying from. Facebook shows that button to only some accounts. Its switch starts on, under Marketplace.",
       "category": "Interface",

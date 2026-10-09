@@ -8,6 +8,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.settings.settingsPatch
+import app.morphe.patches.facebook.misc.sharesheet.shareSheetHookPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 
 /**
@@ -22,6 +23,7 @@ import app.morphe.patches.shared.compat.AppCompatibilities
  *
  * Every anchor is a kept class name, an enum constant's name or a literal (see
  * MetaUpsellAnchors.kt, ImagineAnchors.kt and ShareSheetAnchors.kt), and every one is required.
+ * The share sheet's hook is shareSheetHookPatch, shared with Share sheet items.
  * The hooks ask the extension, which answers Facebook's own way until the settings are ready, while
  * paused, and whenever it fails.
  *
@@ -38,6 +40,7 @@ val hideMetaUpsellsPatch = bytecodePatch(
     category("Interface")
     dependsOn(settingsPatch)
     dependsOn(facebookExtensionPatch)
+    dependsOn(shareSheetHookPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {

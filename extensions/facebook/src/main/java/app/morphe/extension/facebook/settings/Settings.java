@@ -740,6 +740,20 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_threads_share_button", FALSE);
 
     /**
+     * The share sheet items Share sheet items keeps out, as the item enum's constant names separated
+     * by commas. Empty, every sheet is Facebook's own.
+     */
+    public static final StringSetting HIDDEN_SHARE_ITEMS =
+            new StringSetting("hushfacebook_hidden_share_items", "");
+
+    /**
+     * The share sheet item types Facebook has offered on this install, in the order they first
+     * came, so the list of items to hide shows real ones. Written by the hook, never by a person.
+     */
+    public static final StringSetting SEEN_SHARE_ITEMS =
+            new StringSetting("hushfacebook_seen_share_items", "");
+
+    /**
      * The Meta Verified offer sheet after you post, and the Meta Verified label under some posts'
      * headers. Off until it's turned on.
      */
