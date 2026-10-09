@@ -91,6 +91,36 @@ public class ScreenshotsTest {
                 .contains(FamilyNames.SCREENSHOTS + ": invoked"));
     }
 
+    /** A secure flag the window got earlier comes out on its next flags call, whatever that call asks. */
+    @Test
+    public void anEarlierSecureFlagComesOutOnTheNextCall() {
+        Window added = window();
+        added.addFlags(SECURE);
+        Screenshots.addFlags(added, KEEP_ON);
+        assertEquals(KEEP_ON, flags(added) & (SECURE | KEEP_ON));
+        Window set = window();
+        set.addFlags(SECURE | KEEP_ON);
+        Screenshots.setFlags(set, 0, KEEP_ON);
+        assertEquals(0, flags(set) & (SECURE | KEEP_ON));
+        assertEquals(Screenshots.ROUTE + ": 2 lists, 2 items, 2 removed. Last reason: earlier secure flag."
+                + " Removed: earlier secure flag 2", counterLine());
+    }
+
+    /** Off or paused, an earlier secure flag stays and isn't counted. */
+    @Test
+    public void offOrPausedAnEarlierSecureFlagStays() {
+        Settings.ALLOW_SCREENSHOTS.save(false);
+        Window off = window();
+        off.addFlags(SECURE);
+        Screenshots.addFlags(off, KEEP_ON);
+        assertEquals(SECURE | KEEP_ON, flags(off) & (SECURE | KEEP_ON));
+        Settings.ALLOW_SCREENSHOTS.resetToDefault();
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        Screenshots.setFlags(off, 0, KEEP_ON);
+        assertEquals(SECURE, flags(off) & (SECURE | KEEP_ON));
+        assertNull(counterLine());
+    }
+
     @Test
     public void offOrPausedTheWindowStaysSecure() {
         Settings.ALLOW_SCREENSHOTS.save(false);
