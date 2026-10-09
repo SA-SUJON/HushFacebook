@@ -68,6 +68,8 @@ Neither path can be tried against a real block until the check reaches sideloads
 
 ## Patches
 
+For the source layout, Facebook 581 stock baseline, patch lifecycle, and patch workflow, see [Contributing](CONTRIBUTING.md).
+
 | Patch | What it does |
 |---|---|
 | `Accent color` | Swaps Facebook's blue on links, buttons, switches and the selected tab for a color you like better. Nothing changes until you pick one. Pick a color in Hushfacebook settings > Appearance. |
