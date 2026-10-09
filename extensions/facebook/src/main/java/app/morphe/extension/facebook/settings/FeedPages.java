@@ -219,8 +219,8 @@ final class FeedPages {
             }
             if (build.contains(PatchFamily.POST_WORDS)) {
                 feed.addPreference(toggle(context, Settings.HIDE_POSTS_WITH_WORDS,
-                        L10n.t("Hides posts containing a word or phrase from your list below. A word on your keep list overrides "
-                                + "it. Your words stay on this phone unless you export them.")));
+                        L10n.t("Hides posts containing a word or phrase from your list below. Words that keep a post win over it. "
+                                + "Your words stay on this phone unless you export them.")));
                 feed.addPreference(page.wordsRow(context, Settings.HIDDEN_WORDS, true));
                 feed.addPreference(page.wordsRow(context, Settings.KEPT_WORDS, false));
                 feed.addPreference(toggle(context, Settings.POST_WORDS_WHOLE_WORDS,

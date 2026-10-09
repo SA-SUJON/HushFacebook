@@ -43,7 +43,7 @@ final class SwitchLabels {
         if (setting == Settings.BLOCK_RETURN_REFRESH) return L10n.t("Keep feed position on return");
         if (setting == Settings.RETURN_REFRESH_NO_LIMIT) return L10n.t("No time limit");
         if (setting == Settings.HIDE_AI_DETECTED_POSTS) return L10n.t("Hide AI-detected posts");
-        if (setting == Settings.HIDE_AI_LABELLED_POSTS) return L10n.t("Also hide posts labelled as AI");
+        if (setting == Settings.HIDE_AI_LABELLED_POSTS) return L10n.t("Also hide posts labeled as AI");
         if (setting == Settings.HIDE_META_AI_FEED_UNITS) return L10n.t("Hide Meta AI in the feed");
         if (setting == Settings.HIDE_AI_CHARACTER_POSTS) return L10n.t("Hide AI character posts");
         if (setting == Settings.HIDE_POSTS_WITH_WORDS) return L10n.t("Hide posts with words you choose");

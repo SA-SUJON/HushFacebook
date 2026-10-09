@@ -71,8 +71,8 @@ public class SupportedLinksTest {
     /** The report's last lines on a phone without Meta App Manager, Messenger or Instagram, as Robolectric's is. */
     private static final List<String> ABSENT = Arrays.asList("meta_app_manager: absent", "messenger: absent", "instagram: absent");
     private static final String APP_MANAGER_KEY = "action_app_manager_links";
-    private static final String APP_MANAGER_SUMMARY = "Meta App Manager can keep Facebook's web addresses for itself, "
-            + "so their links skip this app. Tap and turn off Open supported links there, then check Supported links above.";
+    private static final String APP_MANAGER_SUMMARY = "Meta App Manager can claim Facebook's web addresses for itself, so their links skip this app. Tap, "
+            + "turn off Open supported links there, then recheck Supported links above.";
 
     private ActivityController<Activity> controller;
     /** What the fake service answers, or throws. */
@@ -556,7 +556,7 @@ public class SupportedLinksTest {
         assertEquals("facebook.com links open here now.",
                 String.valueOf(page.findPreference("action_instagram_links").getSummary()));
         assertTrue(String.valueOf(page.findPreference("action_messenger_links").getSummary())
-                .startsWith("Messenger can keep facebook.com and m.me links"));
+                .startsWith("Messenger can claim facebook.com and m.me links"));
         answer = state(true, facebookHosts(SELECTED, SELECTED, SELECTED, SELECTED, SELECTED, NONE));
         controller.pause().resume();
         assertEquals("facebook.com and m.me links open here now.",

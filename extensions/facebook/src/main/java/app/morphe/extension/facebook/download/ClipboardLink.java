@@ -448,11 +448,11 @@ public final class ClipboardLink {
                     }
                 });
             })) {
-                Feedback.show(application, L10n.t(application, "Download failed"), true);
+                Feedback.show(application, L10n.t(application, "Download failed. Try again in a moment."), true);
             }
         } catch (Throwable failure) {
             Logger.diagnosticError(DiagnosticCategory.DOWNLOADS, SOURCE, () -> "could not start a copied link's save", failure);
-            Feedback.show(application, L10n.t(application, "Download failed"), true);
+            Feedback.show(application, L10n.t(application, "Download failed. Try again in a moment."), true);
         }
     }
 
@@ -507,7 +507,7 @@ public final class ClipboardLink {
             from.startActivity(view);
         } catch (Throwable failure) {
             Logger.diagnosticError(DiagnosticCategory.DOWNLOADS, SOURCE, () -> "could not open a copied link", failure);
-            Feedback.show(application, L10n.t(application, "Download failed"), true);
+            Feedback.show(application, L10n.t(application, "Download failed. Try again in a moment."), true);
         }
     }
 

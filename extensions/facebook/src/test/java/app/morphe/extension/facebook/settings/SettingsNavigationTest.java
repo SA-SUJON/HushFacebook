@@ -711,7 +711,7 @@ public class SettingsNavigationTest {
         Preference row = (Preference) list().getItemAtPosition(1);
         assertEquals("Profiles, photos and posts won't open", String.valueOf(row.getTitle()));
         assertEquals("Patch again with " + L10n.isolate("Restore screens on re-signed builds")
-                + " selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.",
+                + " selected. A patched Facebook needs it to open profiles, photos, posts and some of Facebook's Settings pages.",
                 String.valueOf(row.getSummary()));
         assertFalse(list().getAdapter().isEnabled(1));
     }

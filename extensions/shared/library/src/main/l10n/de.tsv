@@ -53,7 +53,7 @@ Diagnostic data put back.	Diagnosedaten wiederhergestellt.
 Diagnostic report copied to the clipboard.	Diagnosebericht in die Zwischenablage kopiert.
 Download	Download
 Download button on reels	Download-Button bei Reels
-Download failed	Download fehlgeschlagen
+Download failed. Try again in a moment.	Download fehlgeschlagen. Versuche es gleich noch einmal.
 Download feed and Watch videos	Videos aus Feed und Watch herunterladen
 Save any photo	Jedes Foto speichern
 Shows Save photo on every photo you open, even where saving is turned off, and saves the biggest size. Off or paused, Facebook decides again.	Zeigt Foto speichern bei jedem Foto, das du öffnest, auch wenn das Speichern ausgeschaltet ist, und speichert die größte Größe. Bei Aus oder Pause entscheidet wieder Facebook.
@@ -76,14 +76,14 @@ Try Facebook without Hushfacebook. From the next start, switches act as if off, 
 Hides Stories shown between posts, from the next time the feed loads. The Stories tray at the top has its own switch.	Blendet Stories zwischen Beiträgen aus, ab dem nächsten Laden des Feeds. Die Stories-Leiste oben hat einen eigenen Schalter.
 Open	Öffnen
 Photo saved	Foto gespeichert
-Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Einstellungen exportiert. Die App, in der die Datei liegt, ließ Hushfacebook sie nicht zurücklesen, daher wurde sie nicht geprüft.
+Settings exported. Hushfacebook couldn't read the file back to check it.	Einstellungen exportiert. Hushfacebook konnte die Datei nicht zur Kontrolle zurücklesen.
 Share	Teilen
 That saved file is no longer available.	Die gespeicherte Datei ist nicht mehr verfügbar.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	Die App, in der die Datei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Es wurde nichts geändert.
 The app holding the last settings file still hasn't answered. Try again later.	Die App mit der letzten Einstellungsdatei hat noch immer nicht geantwortet. Versuche es später noch einmal.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Die App, in der die Einstellungsdatei liegt, braucht zu lange, deshalb wartet Hushfacebook nicht mehr. Sie kann das Speichern noch abschließen, also prüfe die Datei, bevor du dich darauf verlässt.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	Die Datei %1$s ließ sich nicht entfernen. Lösche sie aus %2$s und tippe dann noch einmal auf Fortsetzen.
-The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	Die Einstellungsdatei wurde gespeichert, liest sich aber nicht so zurück, wie sie geschrieben wurde. Speichere sie noch einmal als neue Datei.
+The settings file was saved, but it doesn't match what Hushfacebook wrote. Save it again as a new file.	Die Einstellungsdatei wurde gespeichert, stimmt aber nicht mit dem überein, was Hushfacebook geschrieben hat. Speichere sie erneut als neue Datei.
 There's no app here that can open or share this saved file.	Keine App kann diese gespeicherte Datei öffnen oder teilen.
 # context: line at the top of a settings page while paused; Lock Facebook keeps working while paused
 Until you resume, every switch but Debug logging and Lock Facebook acts as if it were off. Changes made when you patched stay in.	Bis zum Fortsetzen verhält sich jeder Schalter außer der Debug-Protokollierung und „Facebook sperren“, als wäre er aus. Was beim Patchen festgelegt wurde, bleibt aktiv.
@@ -104,14 +104,14 @@ Draws Facebook's text in your phone's font, or in a font file you choose below. 
 Font file	Schriftdatei
 Use your phone's font	Schriftart des Handys verwenden
 Stops using the font file and goes back to your phone's font.	Verwendet die Schriftdatei nicht mehr und kehrt zur Schriftart deines Handys zurück.
-None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.	Keine gewählt, deshalb wird die Schriftart deines Handys verwendet. Wähle eine TrueType- oder OpenType-Datei mit bis zu %1$d MB.
+None chosen, so your phone's font is used. Choose a .ttf or .otf font file of up to %1$d MB.	Keine gewählt, daher wird die Schrift deines Telefons verwendet. Wähle eine .ttf- oder .otf-Schriftdatei mit bis zu %1$d MB.
 Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.	Hushfacebooks Kopie von %1$s fehlt, deshalb wird die Schriftart deines Handys verwendet. Wähle die Datei noch einmal.
 Using %1$s. Choose another file to replace it.	%1$s wird verwendet. Wähle eine andere Datei, um sie zu ersetzen.
 Copying the font file	Schriftdatei wird kopiert
 Font set to %1$s. Restart Facebook to see it.	Schriftart auf %1$s gesetzt. Starte Facebook neu, um sie zu sehen.
-That isn't a TrueType or OpenType font file. Your font didn't change.	Das ist keine TrueType- oder OpenType-Schriftdatei. Deine Schriftart wurde nicht geändert.
+That isn't a .ttf or .otf font file. Your font didn't change.	Das ist keine .ttf- oder .otf-Schriftdatei. Deine Schrift hat sich nicht geändert.
 That font file is over %1$d MB. Your font didn't change.	Diese Schriftdatei ist größer als %1$d MB. Deine Schriftart wurde nicht geändert.
-Android couldn't draw with that font file. Your font didn't change.	Android konnte mit dieser Schriftdatei nicht zeichnen. Deine Schriftart wurde nicht geändert.
+Android couldn't use that font file. Your font didn't change.	Android konnte diese Schriftdatei nicht verwenden. Deine Schrift hat sich nicht geändert.
 Couldn't save a copy of that font. Check that the phone has room, then try again.	Eine Kopie dieser Schriftart ließ sich nicht speichern. Prüfe, ob auf dem Handy Platz ist, und versuche es noch einmal.
 Couldn't open that file. Your font didn't change.	Diese Datei ließ sich nicht öffnen. Deine Schriftart wurde nicht geändert.
 Back to your phone's font. Restart Facebook to see it.	Zurück zur Schriftart deines Handys. Starte Facebook neu, um sie zu sehen.
@@ -158,7 +158,7 @@ Hides posts Facebook adds from people and Pages you don't follow and groups you 
 Hides posts that Facebook's own detection marks as made with AI. Posts only their creator labeled stay. Untested on a real feed, so it starts off.	Blendet Beiträge aus, die Facebook selbst als mit KI erstellt erkennt. Beiträge, die nur der Urheber so gekennzeichnet hat, bleiben. Auf einem echten Feed noch nicht getestet, daher startet es ausgeschaltet.
 On a patched Facebook, profiles, photos, posts and some Settings pages wouldn't open. This fixes that.	Auf einem gepatchten Facebook würden sich Profile, Fotos, Beiträge und manche Einstellungsseiten nicht öffnen. Das behebt es.
 Profiles, photos and posts won't open	Profile, Fotos und Beiträge öffnen sich nicht
-Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.	Wähle %1$s aus und patche erneut. Neu signierte Builds brauchen diesen Patch, um Profile, Fotos, Beiträge und einige Facebook-Einstellungsseiten zu öffnen.
+Patch again with %1$s selected. A patched Facebook needs it to open profiles, photos, posts and some of Facebook's Settings pages.	Patche erneut mit ausgewähltem %1$s. Ein gepatchtes Facebook braucht ihn, um Profile, Fotos, Beiträge und manche Facebook-Einstellungsseiten zu öffnen.
 Profiles and posts work again	Profile und Beiträge funktionieren wieder
 Reading the settings file	Einstellungsdatei wird gelesen
 Reels and Watch	Reels und Watch
@@ -186,14 +186,14 @@ Not in this build. To block this, choose the %1$s patch in Morphe Manager and pa
 Remove tracking from shared links	Tracking aus geteilten Links entfernen
 Retry	Erneut versuchen
 Save any story	Jede Story speichern
-Save cancelled	Speichern abgebrochen
+Save canceled	Speichern abgebrochen
 Save folder	Speicherordner
 Save full report	Vollständigen Bericht speichern
 Saved to %1$s	Gespeichert unter %1$s
 Saved to the gallery	In der Galerie gespeichert
 Saved to %1$s in lower quality than on Facebook	Gespeichert unter %1$s, in geringerer Qualität als auf Facebook
 Saved to the gallery in lower quality than on Facebook	In der Galerie gespeichert, in geringerer Qualität als auf Facebook
-Saved. Restart Facebook to apply this change.	Gespeichert. Starte Facebook neu, um diese Änderung zu übernehmen.
+Saved. Restart Facebook to see the change.	Gespeichert. Starte Facebook neu, um die Änderung zu sehen.
 Saves your switches and download choices to a file, to back up or copy to another phone. Pause, Debug logging and the update check aren't included.	Speichert deine Schalter und Download-Auswahl in einer Datei, zur Sicherung oder für ein anderes Telefon. Pause, Debug-Protokollierung und die Update-Prüfung sind nicht enthalten.
 # The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.
 Check for new Hushfacebook releases	Nach neuen Hushfacebook-Versionen suchen
@@ -208,8 +208,8 @@ Video saved	Video gespeichert
 You have the newest Hushfacebook release.	Du hast die neueste Version von Hushfacebook.
 The newest Hushfacebook release is %1$s.	Die neueste Version von Hushfacebook ist %1$s.
 Couldn't reach GitHub. Try again later.	GitHub war nicht erreichbar. Versuche es später noch einmal.
-GitHub is turning away checks from this network for now. Try again later.	GitHub weist Anfragen aus diesem Netz gerade ab. Versuche es später noch einmal.
-GitHub's answer couldn't be used. Try again later.	Mit der Antwort von GitHub ließ sich nichts anfangen. Versuche es später noch einmal.
+GitHub is limiting requests from this network right now. Try again later.	GitHub schränkt Anfragen aus diesem Netzwerk gerade ein. Versuche es später noch einmal.
+GitHub sent a reply Hushfacebook couldn't understand. Try again later.	GitHub hat eine Antwort geschickt, die Hushfacebook nicht verstehen konnte. Versuche es später noch einmal.
 Saves will go to a folder named %1$s.	Was du speicherst, landet dann in einem Ordner namens %1$s.
 Saving a photo	Foto wird gespeichert
 Saving a video	Video wird gespeichert
@@ -229,7 +229,7 @@ Removes tracking tags like mibextid from links you share or copy. A facebook.com
 Tap to turn it back on.	Zum Wiedereinschalten tippen.
 That file is too large to be a settings file. Nothing was changed.	Diese Datei ist zu groß für eine Einstellungsdatei. Es wurde nichts geändert.
 That file isn't readable text, so it may have been damaged on the way. Nothing was changed.	Diese Datei ist kein lesbarer Text, sie wurde also womöglich bei der Übertragung beschädigt. Es wurde nichts geändert.
-That file lists a setting twice, so there's no telling which value to use. Nothing was changed.	Diese Datei führt eine Einstellung zweimal auf, daher ist unklar, welcher Wert gilt. Es wurde nichts geändert.
+That file lists a setting twice, so Hushfacebook can't tell which value to use. Nothing was changed.	Diese Datei führt eine Einstellung doppelt auf, daher kann Hushfacebook nicht erkennen, welcher Wert gilt. Es wurde nichts geändert.
 That isn't a Hushfacebook settings file. Nothing was changed.	Das ist keine Hushfacebook-Einstellungsdatei. Es wurde nichts geändert.
 That settings file holds a value Hushfacebook can't read. Nothing was changed.	Diese Einstellungsdatei enthält einen Wert, den Hushfacebook nicht lesen kann. Es wurde nichts geändert.
 # context: a settings file refused on import: its word lists, beside one it leaves as it is, take more than the room the two lists share
@@ -548,7 +548,7 @@ Hide posts with words you choose	Beiträge mit Wörtern deiner Wahl ausblenden
 Hide posts from people, Pages and sites	Beiträge von Personen, Seiten und Websites ausblenden
 Hides posts by people or Pages on your list below, or linking to sites on it, including shares. Your list stays on this phone unless you export it.	Blendet Beiträge von Personen oder Seiten aus deiner Liste unten aus, oder mit Links zu Websites darauf, auch geteilte. Deine Liste bleibt auf diesem Telefon, außer du exportierst sie.
 People, Pages and sites to hide	Personen, Seiten und Websites zum Ausblenden
-One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, or a site like example.com, which takes its subdomains too. Capital letters don't matter. A Facebook link works when it has the id in it.	Ein Eintrag pro Zeile, bis zu %1$d: ein Name, wie Facebook ihn zeigt, eine Profil- oder Seiten-ID oder eine Website wie example.com, die auch ihre Subdomains umfasst. Groß- und Kleinschreibung spielt keine Rolle. Ein Facebook-Link funktioniert, wenn die ID darin steht.
+One per line, up to %1$d: a name as Facebook shows it, a profile or Page ID, or a site like example.com, which also covers addresses like m.example.com. Capital letters don't matter. A Facebook link works when it has the ID in it.	Eines pro Zeile, bis zu %1$d: ein Name, wie Facebook ihn zeigt, eine Profil- oder Seiten-ID oder eine Website wie example.com, die auch Adressen wie m.example.com abdeckt. Groß- und Kleinschreibung spielt keine Rolle. Ein Facebook-Link funktioniert, wenn die ID darin steht.
 One name, id or site per line	Ein Name, eine ID oder eine Website pro Zeile
 %1$d line was left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d Zeile wurde weggelassen. Eine Zeile fasst bis zu %2$d Zeichen, die Liste bis zu %3$d Zeilen, und ein doppelter Eintrag zählt einmal.
 %1$d lines were left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d Zeilen wurden weggelassen. Eine Zeile fasst bis zu %2$d Zeichen, die Liste bis zu %3$d Zeilen, und ein doppelter Eintrag zählt einmal.
@@ -559,21 +559,21 @@ Your list of people, Pages and sites to hide will be empty.	Deine Liste der Pers
 Your list of people, Pages and sites to hide will hold %1$d entry.	Deine Liste der Personen, Seiten und Websites zum Ausblenden enthält dann %1$d Eintrag.
 Your list of people, Pages and sites to hide will hold %1$d entries.	Deine Liste der Personen, Seiten und Websites zum Ausblenden enthält dann %1$d Einträge.
 # context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes
-Hides posts containing a word or phrase from your list below. A word on your keep list overrides it. Your words stay on this phone unless you export them.	Blendet Beiträge aus, die ein Wort oder eine Wendung aus deiner Liste unten enthalten. Ein Wort auf deiner Behalten-Liste hat Vorrang. Deine Wörter bleiben auf diesem Telefon, außer du exportierst sie.
+Hides posts containing a word or phrase from your list below. Words that keep a post win over it. Your words stay on this phone unless you export them.	Blendet Beiträge aus, die ein Wort oder eine Wendung aus deiner Liste unten enthalten. „Wörter, die einen Beitrag behalten“ haben Vorrang. Deine Wörter bleiben auf diesem Telefon, außer du exportierst sie.
 # context: title of the row and dialog holding the list of words and phrases that hide a post
 Words to hide	Wörter zum Ausblenden
 # context: title of the row and dialog holding the list of words and phrases that keep a post even when it has a word to hide
 Words that keep a post	Wörter, bei denen ein Beitrag bleibt
 # context: message of the Words to hide dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
-One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.	Ein Wort oder eine Wortfolge pro Zeile, bis zu %1$d, jeweils %2$d bis %3$d Zeichen lang, oder nur eins bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe. Groß- und Kleinschreibung spielt keine Rolle, und eine Wortfolge passt überall im Text eines Beitrags, auch mitten in längeren Wörtern.
+One word or phrase per line, up to %1$d lines, each %2$d to %3$d characters long. A single emoji or Chinese, Japanese or Korean character is enough on its own. Capital letters don't matter, and a phrase matches anywhere in a post's text, even inside longer words.	Ein Wort oder eine Wendung pro Zeile, bis zu %1$d Zeilen, jeweils %2$d bis %3$d Zeichen lang. Ein einzelnes Emoji oder chinesisches, japanisches oder koreanisches Zeichen reicht allein aus. Groß- und Kleinschreibung spielt keine Rolle, und eine Wendung passt überall im Text eines Beitrags, auch innerhalb längerer Wörter.
 # context: message of the Words that keep a post dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
-A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable.	Ein Beitrag mit einem dieser Wörter bleibt, auch wenn er ein Wort zum Ausblenden enthält. Eins pro Zeile, bis zu %1$d, jeweils %2$d bis %3$d Zeichen lang, oder nur eins bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe.
+A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d lines, each %2$d to %3$d characters long. A single emoji or Chinese, Japanese or Korean character is enough on its own.	Ein Beitrag mit einem dieser Wörter bleibt, auch wenn er ein auszublendendes Wort enthält. Eines pro Zeile, bis zu %1$d Zeilen, jeweils %2$d bis %3$d Zeichen lang. Ein einzelnes Emoji oder chinesisches, japanisches oder koreanisches Zeichen reicht allein aus.
 # context: hint in the empty text box of both word list dialogs
 One word or phrase per line	Ein Wort oder eine Wortfolge pro Zeile
 # context: toast after saving a word list, one line left out; %2$d and %3$d are the shortest and longest phrase in characters
-%1$d line was left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts once.	%1$d Zeile wurde weggelassen. Eine Wortfolge braucht %2$d bis %3$d Zeichen, bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe nur eins. Eine doppelte zählt einmal.
+%1$d line was left out. A phrase needs %2$d to %3$d characters, but a single emoji or Chinese, Japanese or Korean character is enough. One given twice counts once.	%1$d Zeile wurde weggelassen. Eine Wendung braucht %2$d bis %3$d Zeichen, ein einzelnes Emoji oder chinesisches, japanisches oder koreanisches Zeichen genügt aber. Ein doppelter Eintrag zählt einmal.
 # context: toast after saving a word list, several lines left out; %2$d and %3$d are the shortest and longest phrase in characters
-%1$d lines were left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts once.	%1$d Zeilen wurden weggelassen. Eine Wortfolge braucht %2$d bis %3$d Zeichen, bei einem Emoji, einem chinesischen Schriftzeichen, einem Kana oder einer Hangul-Silbe nur eins. Eine doppelte zählt einmal.
+%1$d lines were left out. A phrase needs %2$d to %3$d characters, but a single emoji or Chinese, Japanese or Korean character is enough. One given twice counts once.	%1$d Zeilen wurden weggelassen. Eine Wendung braucht %2$d bis %3$d Zeichen, ein einzelnes Emoji oder chinesisches, japanisches oder koreanisches Zeichen genügt aber. Ein doppelter Eintrag zählt einmal.
 # context: summary of the Words to hide row while it's empty
 No words yet, so no post is hidden.	Noch keine Wörter, also wird kein Beitrag ausgeblendet.
 # context: summary of the Words that keep a post row while it's empty
@@ -615,7 +615,7 @@ Resume long videos	Lange Videos fortsetzen
 # context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
 Videos over two minutes pick up where you left off. Drag the bar to start elsewhere. Short reels, live videos and ads start as usual.	Videos über zwei Minuten machen dort weiter, wo du aufgehört hast. Ziehe die Leiste, um woanders zu beginnen. Kurze Reels, Live-Videos und Werbung starten wie gewohnt.
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
-Also hide posts labelled as AI	Auch als KI gekennzeichnete Beiträge ausblenden
+Also hide posts labeled as AI	Auch als KI gekennzeichnete Beiträge ausblenden
 Hide Meta AI in the feed	Meta AI im Feed ausblenden
 Hides Meta AI cards between posts and cards promoting the Vibes app. People's posts stay, whatever they say about AI.	Blendet Meta-AI-Karten zwischen Beiträgen und Karten für die Vibes-App aus. Beiträge von Personen bleiben, egal was sie über KI sagen.
 Hide AI character posts	Beiträge mit KI-Figuren ausblenden
@@ -683,7 +683,7 @@ Meta App Manager	Meta App Manager
 # context: that row once Facebook's web addresses go to this app
 Facebook's web addresses open here now.	Die Webadressen von Facebook öffnen sich jetzt hier.
 # context: that row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
-Meta App Manager can keep Facebook's web addresses for itself, so their links skip this app. Tap and turn off Open supported links there, then check Supported links above.	Meta App Manager kann die Webadressen von Facebook für sich behalten, dann überspringen ihre Links diese App. Tippe und schalte dort „Unterstützte Links öffnen“ aus, dann prüfe „Unterstützte Links“ oben.
+Meta App Manager can claim Facebook's web addresses for itself, so their links skip this app. Tap, turn off Open supported links there, then recheck Supported links above.	Meta App Manager kann Facebooks Webadressen für sich beanspruchen, sodass deren Links diese App überspringen. Tippe, schalte dort „Unterstützte Links öffnen“ aus und prüfe dann oben noch einmal „Unterstützte Links“.
 # context: message when Android's page for Meta App Manager doesn't open; "Open by default" is Android's page name
 Meta App Manager's settings didn't open. Find it in Android's app list with system apps shown, then Open by default.	Die Einstellungen von Meta App Manager ließen sich nicht öffnen. Suche die App in der App-Liste von Android mit eingeblendeten System-Apps, dann „Standardmäßig öffnen“.
 # context: title of a row under Links; Messenger is the name of Meta's app, keep it as is
@@ -691,9 +691,9 @@ Messenger	Messenger
 # context: title of a row under Links; Instagram is the name of Meta's app, keep it as is
 Instagram	Instagram
 # context: the Messenger row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
-Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.	Messenger kann facebook.com- und m.me-Links für sich behalten, dann schalten sich ihre Schalter für diese App wieder aus. Tippe und schalte dort „Unterstützte Links öffnen“ aus, dann prüfe „Unterstützte Links“ oben.
+Messenger can claim facebook.com and m.me links for itself, which turns this app's link switches back off. Tap, turn off Open supported links there, then recheck Supported links above.	Messenger kann facebook.com- und m.me-Links für sich beanspruchen, wodurch die Link-Schalter dieser App wieder ausgehen. Tippe, schalte dort „Unterstützte Links öffnen“ aus und prüfe dann oben noch einmal „Unterstützte Links“.
 # context: the Instagram row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
-Instagram can keep facebook.com links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.	Instagram kann facebook.com-Links für sich behalten, dann schalten sich ihre Schalter für diese App wieder aus. Tippe und schalte dort „Unterstützte Links öffnen“ aus, dann prüfe „Unterstützte Links“ oben.
+Instagram can claim facebook.com links for itself, which turns this app's link switches back off. Tap, turn off Open supported links there, then recheck Supported links above.	Instagram kann facebook.com-Links für sich beanspruchen, wodurch die Link-Schalter dieser App wieder ausgehen. Tippe, schalte dort „Unterstützte Links öffnen“ aus und prüfe dann oben noch einmal „Unterstützte Links“.
 # context: message when Android's page for Messenger doesn't open; "App info" and "Open by default" are Android's page names
 Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.	Die Einstellungen von Messenger ließen sich nicht öffnen. Öffne die App-Info über das Messenger-Symbol, dann „Standardmäßig öffnen“.
 # context: message when Android's page for Instagram doesn't open; "App info" and "Open by default" are Android's page names
@@ -703,7 +703,7 @@ facebook.com and m.me links open here now.	facebook.com- und m.me-Links öffnen 
 # context: the Instagram row's description once its addresses open in this app; keep facebook.com as is
 facebook.com links open here now.	facebook.com-Links öffnen sich jetzt hier.
 # context: message when a save starts and its notification can't show (Facebook's notifications or the saves channel are off); Downloads is the settings section that lists running saves, each with its own Cancel
-Saving... Cancel: Downloads in Hushfacebook.	Wird gespeichert … Abbrechen: Downloads in Hushfacebook.
+Saving... To cancel, open Downloads in Hushfacebook settings.	Wird gespeichert … Zum Abbrechen öffne Downloads in den Hushfacebook-Einstellungen.
 # context: switch title under Reels and Watch; on, a double tap on a reel or a video doesn't like it
 Turn off double tap to like	Doppeltippen zum Liken ausschalten
 # context: summary of that switch; Like is the name of Facebook's own button, as Facebook shows it in this language
@@ -769,11 +769,11 @@ Test the Messenger link	Messenger-Verbindung testen
 # context: summary of that row; Debug logging is the switch's name as this table gives it
 Checks now whether Facebook can reach Messenger, the way it does at startup, and shows each result. Appears while Debug logging is on.	Prüft jetzt, ob Facebook Messenger erreichen kann, so wie beim Start, und zeigt jedes Ergebnis. Erscheint, solange das Debug-Protokollierung an ist.
 # context: toast when the test can't begin
-The Messenger link test couldn't start.	Der Test der Messenger-Verbindung konnte nicht starten.
+The Messenger link test couldn't start. Try again.	Der Messenger-Link-Test konnte nicht starten. Versuche es noch einmal.
 # context: toast on a build without the test
 This build can't run the Messenger link test.	Dieser Build kann den Test der Messenger-Verbindung nicht ausführen.
 # context: toast when Facebook has no signed-in account
-No signed-in account to test with.	Kein angemeldetes Konto für den Test.
+No signed-in account to test with. Sign in to Facebook and try again.	Kein angemeldetes Konto zum Testen. Melde dich bei Facebook an und versuche es erneut.
 # context: toast with the test's result; each placeholder is one of: answered, no answer, failed (...)
 Opt-out read: %1$s. Triggered read: %2$s.	Opt-out-Abfrage: %1$s. Auslöser-Abfrage: %2$s.
 # context: a read's result in that toast
@@ -812,13 +812,13 @@ Not in this build: %1$s. Morphe Manager selects it by default. Patch again with 
 # context: that row's summary once opened, several patches missing; the placeholder is their English names joined as a list
 Not in this build: %1$s. Morphe Manager selects them by default. Patch again with them selected to get what they do.	Nicht in diesem Build: %1$s. Morphe Manager wählt diese Patches standardmäßig aus. Wähle sie aus und patche erneut, um zu bekommen, was sie tun.
 # context: Toast at the end of a video save whose file uses a codec WhatsApp and some video editors can't open (AV1, VP9, HEVC or xHE-AAC). A notification with a button to the fix is showing too. Keep it short: Android shows two lines at most.
-Saved, but WhatsApp and some editors may refuse it	Gespeichert, aber WhatsApp und manche Editoren lehnen es eventuell ab
+Saved, but WhatsApp and some editors may not accept it	Gespeichert, aber WhatsApp und manche Editoren nehmen es evtl. nicht an
 # context: Toast at the end of a video save whose file WhatsApp may not open, when no notification can be shown. Downloads is the section of Hushfacebook settings with the fix. Two lines at most.
-Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.	Gespeichert, aber WhatsApp lehnt es eventuell ab. Abhilfe: Downloads in Hushfacebook.
+Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.	Gespeichert, aber WhatsApp nimmt es evtl. nicht an. Lösung: Downloads in den Hushfacebook-Einstellungen.
 # context: Second line of the notification after such a save. %1$s is the switch's name, Save videos other apps can open. They: WhatsApp and the editors.
-Turn on %1$s to save videos they all play.	Schalte %1$s ein, um Videos zu speichern, die alle abspielen können.
+Turn on %1$s to save videos that WhatsApp and these editors accept.	Schalte %1$s ein, um Videos zu speichern, die WhatsApp und diese Editoren annehmen.
 # context: Title of the notification after a video save whose file uses a codec WhatsApp and some video editors can't open.
-WhatsApp and some editors may refuse this video	WhatsApp und manche Editoren lehnen dieses Video eventuell ab
+WhatsApp and some editors may not accept this video	WhatsApp und manche Editoren nehmen dieses Video evtl. nicht an
 # context: Button on that notification. It opens Hushfacebook settings at the switch Save videos other apps can open.
 Open the setting	Einstellung öffnen
 # context: switch title under News feed; the prompts are the strip Facebook puts under some posts, such as "Are you interested in this post?"
@@ -872,11 +872,11 @@ Reels, videos and stories save to this phone.	Reels, Videos und Storys werden au
 # context: Settings row title: the app links are sent to
 App to send to	Ziel-App
 # context: Dialog message of the send-to app row; %1$s and %2$s are package names
-The package name of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.	Der Paketname der App, die die Links bekommt, etwa %1$s für YTDLnis oder %2$s für Seal. Leer lassen, um jedes Mal eine App zu wählen.
+The ID of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.	Die ID der App, die die Links bekommt, etwa %1$s für YTDLnis oder %2$s für Seal. Leer lassen, um jedes Mal eine App zu wählen.
 # context: Hint in the send-to app field
-Package name	Paketname
+App ID	App-ID
 # context: Toast when what was typed in the send-to app row isn't a package name; %1$s is what was typed
-%1$s isn't a package name, so the app stays as it was.	%1$s ist kein Paketname, die App bleibt unverändert.
+%1$s isn't a valid app ID, so the app stays as it was.	%1$s ist keine gültige App-ID, daher bleibt die App wie zuvor.
 # context: Summary of the send-to app row with no app named
 Android asks which app each time.	Android fragt jedes Mal nach der App.
 # context: Summary of the send-to app row; %1$s is the package name
@@ -1077,7 +1077,7 @@ Marked as seen. Tap again to undo.	Als gesehen markiert. Tippe erneut, um es rü
 # context: what TalkBack reads for the eye button once the marked story was sent as seen
 Marked as seen and sent	Als gesehen markiert und gesendet
 # context: the word lists' dialogs, after their first paragraph: a line between slashes is a regular expression; %1$d is how many a list holds, %2$d the most characters each
-A line between slashes, like /colou?r/, is a pattern (a regular expression). A list holds up to %1$d, each up to %2$d characters.	Eine Zeile zwischen Schrägstrichen, etwa /colou?r/, ist ein Muster (ein regulärer Ausdruck). Eine Liste fasst bis zu %1$d davon, jedes mit bis zu %2$d Zeichen.
+A line between slashes, like /gr[ae]y/, is a pattern that can match several spellings (a regular expression). A list holds up to %1$d, each up to %2$d characters.	Eine Zeile zwischen Schrägstrichen, etwa /gr[ae]y/, ist ein Muster, das mehrere Schreibweisen treffen kann (ein regulärer Ausdruck). Eine Liste fasst bis zu %1$d, jedes bis zu %2$d Zeichen.
 # context: under a word list being edited, and when its Save is refused: a line written between slashes isn't a pattern the app can read; %1$d is the line's number
 Line %1$d isn't a pattern Hushfacebook can read. Fix it or remove it, then save again.	Zeile %1$d ist kein Muster, das Hushfacebook lesen kann. Korrigiere oder entferne sie und speichere dann noch einmal.
 # context: under a word list being edited, and when its Save is refused: more patterns than a list holds; %1$d is the most a list holds
@@ -1173,7 +1173,7 @@ Links, buttons, switches and the selected tab use %1$s instead of Facebook's blu
 # context: what a settings import changes: Facebook goes back to its own blue
 Facebook will keep its own blue.	Facebook behält sein eigenes Blau.
 # context: what a settings import changes; %1$s is a color name such as Teal
-With Accent color in the build, Facebook's blue will be %1$s.	Mit Akzentfarbe im Build wird das Blau von Facebook %1$s.
+If your patched Facebook includes Accent color, Facebook's blue will be %1$s.	Wenn dein gepatchtes Facebook Akzentfarbe enthält, wird Facebooks Blau zu %1$s.
 # context: switch title under Chats; photos and videos sent from a chat inside Facebook go out as the originals
 Send photos and videos at original quality	Fotos und Videos in Originalqualität senden
 # context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again; a video with a location tag is shrunk by Facebook, which drops the tag
@@ -1249,7 +1249,7 @@ Posts you've seen will stay hidden for %1$s.	Gesehene Beiträge bleiben %1$s lan
 # context: settings row under Pause, backup and diagnostics that opens Facebook's own Whitehat screen; Whitehat is Facebook's name for its security researcher program, keep it
 Facebook's Whitehat settings	Facebooks Whitehat-Einstellungen
 # context: summary of that row when Facebook's screen is on the phone
-Facebook's own screen for security research, where it can trust certificates you installed and send its traffic through a proxy. Hushfacebook doesn't change anything there.	Facebooks eigener Bildschirm für Sicherheitsforschung, auf dem es von dir installierten Zertifikaten vertrauen und seinen Datenverkehr über einen Proxy leiten kann. Hushfacebook ändert dort nichts.
+Facebook's own screen for security testing. It can make Facebook trust security certificates you installed, or send its data through a proxy (a go-between server). Hushfacebook doesn't change anything there.	Facebooks eigener Bildschirm für Sicherheitstests. Er kann Facebook dazu bringen, von dir installierten Sicherheitszertifikaten zu vertrauen oder seine Daten über einen Proxy (einen Zwischenserver) zu schicken. Hushfacebook ändert dort nichts.
 # context: summary of that row when Facebook hasn't downloaded the screen, so the row opens a web page
 Facebook hasn't downloaded this screen to this phone, so a tap opens the Whitehat page on the web instead.	Facebook hat diesen Bildschirm nicht auf dieses Handy geladen. Ein Tippen öffnet deshalb die Whitehat-Seite im Web.
 # context: toast when the Facebook version has no such screen

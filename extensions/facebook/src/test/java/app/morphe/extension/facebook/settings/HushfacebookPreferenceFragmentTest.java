@@ -277,7 +277,7 @@ public class HushfacebookPreferenceFragmentTest {
             int labelled = indexOfKey(rows, Settings.HIDE_AI_LABELLED_POSTS.key);
             assertTrue("the AI-detected posts row is missing", detected >= 0);
             assertEquals("the AI label row isn't right below the detection row", detected + 1, labelled);
-            assertEquals("Also hide posts labelled as AI", String.valueOf(rows.get(labelled).getTitle()));
+            assertEquals("Also hide posts labeled as AI", String.valueOf(rows.get(labelled).getTitle()));
             assertTrue(String.valueOf(rows.get(labelled).getSummary()), String.valueOf(rows.get(labelled).getSummary())
                     .contains("not just the ones Facebook detects itself."));
         }
@@ -586,7 +586,7 @@ public class HushfacebookPreferenceFragmentTest {
             assertFalse("something that isn't a package name was kept", ok.onPreferenceChange(app, "seal --exec"));
             ShadowLooper.idleMainLooper();
             assertEquals(SendLink.SEAL, Settings.SEND_TO_APP.savedValue());
-            assertEquals(L10n.isolate("seal --exec") + " isn't a package name, so the app stays as it was.",
+            assertEquals(L10n.isolate("seal --exec") + " isn't a valid app ID, so the app stays as it was.",
                     ShadowToast.getTextOfLatestToast());
 
             assertTrue("a clean name was changed", ok.onPreferenceChange(app, SendLink.YTDLNIS));
@@ -635,9 +635,8 @@ public class HushfacebookPreferenceFragmentTest {
             assertEquals("spoiler\ngiveaway now", hide.getText());
             assertEquals("spoiler\ngiveaway now", Settings.HIDDEN_WORDS.savedValue());
             assertEquals("2 words or phrases.", String.valueOf(hide.getSummary()));
-            assertLeftOut("Words to hide", "2 lines were left out. A phrase needs 2 to 60 characters, or just one "
-                    + "for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
-                    + "once.");
+            assertLeftOut("Words to hide", "2 lines were left out. A phrase needs 2 to 60 characters, but a single "
+                    + "emoji or Chinese, Japanese or Korean character is enough. One given twice counts once.");
 
             ShadowAlertDialog.reset();
             assertTrue("a clean list was changed", ok.onPreferenceChange(hide, "spoiler"));
@@ -651,9 +650,8 @@ public class HushfacebookPreferenceFragmentTest {
             ShadowLooper.idleMainLooper();
             assertEquals("my team", Settings.KEPT_WORDS.savedValue());
             assertEquals("1 word or phrase.", String.valueOf(keep.getSummary()));
-            assertLeftOut("Words that keep a post", "1 line was left out. A phrase needs 2 to 60 characters, or just "
-                    + "one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
-                    + "once.");
+            assertLeftOut("Words that keep a post", "1 line was left out. A phrase needs 2 to 60 characters, but a single "
+                    + "emoji or Chinese, Japanese or Korean character is enough. One given twice counts once.");
         }
 
         PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS);

@@ -525,8 +525,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (build.contains(PatchFamily.RESTORE_TRUST)) return null;
         if (FamilySignatureTrust.thisBuildCarriesMetaKey(context)) return null;
         Preference row = info(context, L10n.t("Profiles, photos and posts won't open"),
-                L10n.f("Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts "
-                        + "and some Facebook Settings pages.", L10n.isolate(FamilyNames.RESTORE_TRUST)));
+                L10n.f("Patch again with %1$s selected. A patched Facebook needs it to open profiles, photos, posts and "
+                        + "some of Facebook's Settings pages.", L10n.isolate(FamilyNames.RESTORE_TRUST)));
         row.setKey(MISSING_RESTORE_TRUST);
         return row;
     }
@@ -1724,20 +1724,20 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setKey(Settings.SEND_TO_APP.key);
         row.setTitle(L10n.t("App to send to"));
         row.setDialogTitle(L10n.t("App to send to"));
-        row.setDialogMessage(L10n.f("The package name of the app that gets the links, such as %1$s for YTDLnis or "
-                + "%2$s for Seal. Leave it blank to pick an app each time.",
+        row.setDialogMessage(L10n.f("The ID of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to "
+                + "pick an app each time.",
                 L10n.isolate(SendLink.YTDLNIS), L10n.isolate(SendLink.SEAL)));
         row.setPositiveButtonText(L10n.t("Save"));
         row.setNegativeButtonText(L10n.t("Cancel"));
         EditText field = row.getEditText();
         field.setSingleLine(true);
-        field.setHint(L10n.t("Package name"));
+        field.setHint(L10n.t("App ID"));
         row.setText(Settings.SEND_TO_APP.savedValue());
         row.setOnPreferenceChangeListener((preference, typed) -> {
             String raw = typed == null ? "" : typed.toString();
             String clean = raw.trim();
             if (!clean.isEmpty() && SendLink.targetPackage(clean) == null) {
-                Utils.showToastShort(L10n.f("%1$s isn't a package name, so the app stays as it was.",
+                Utils.showToastShort(L10n.f("%1$s isn't a valid app ID, so the app stays as it was.",
                         L10n.isolate(clean)));
                 return false;
             }
@@ -1787,13 +1787,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setTitle(title);
         row.setDialogTitle(title);
         row.setDialogMessage((hides
-                ? L10n.f("One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just "
-                        + "one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters "
-                        + "don't matter, and a phrase matches anywhere in a post's text, inside longer words too.",
+                ? L10n.f("One word or phrase per line, up to %1$d lines, each %2$d to %3$d characters long. A single emoji or "
+                        + "Chinese, Japanese or Korean character is enough on its own. Capital letters don't matter, and a "
+                        + "phrase matches anywhere in a post's text, even inside longer words.",
                         PostWords.MAX_PHRASES, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH)
-                : L10n.f("A post with any of these stays, even when it also has a word to hide. One per line, up "
-                        + "to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese "
-                        + "character, a kana or a Hangul syllable.", PostWords.MAX_PHRASES, PostWords.MIN_LENGTH,
+                : L10n.f("A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d "
+                        + "lines, each %2$d to %3$d characters long. A single emoji or Chinese, Japanese or Korean character "
+                        + "is enough on its own.", PostWords.MAX_PHRASES, PostWords.MIN_LENGTH,
                         PostWords.MAX_LENGTH)) + " " + patternHelp());
         row.setPositiveButtonText(L10n.t("Save"));
         // Android's own Cancel follows the activity's language, as the folder row's did.
@@ -1836,11 +1836,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
                 // reasons run past that, most of all at a large text size.
                 // Too many phrases never get here: Save refuses those with the dialog still open.
                 String why = L10n.quantity(leftOut,
-                        "%1$d line was left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, "
-                                + "a Chinese character, a kana or a Hangul syllable. One given twice counts once.",
-                        "%1$d lines were left out. A phrase needs %2$d to %3$d characters, or just one for an "
-                                + "emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts "
-                                + "once.",
+                        "%1$d line was left out. A phrase needs %2$d to %3$d characters, but a single emoji or Chinese, "
+                                + "Japanese or Korean character is enough. One given twice counts once.",
+                        "%1$d lines were left out. A phrase needs %2$d to %3$d characters, but a single emoji or Chinese, "
+                                + "Japanese or Korean character is enough. One given twice counts once.",
                         leftOut, PostWords.MIN_LENGTH, PostWords.MAX_LENGTH);
                 show(new AlertDialog.Builder(preference.getContext())
                         .setTitle(title)
@@ -1864,9 +1863,9 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         String title = L10n.t("People, Pages and sites to hide");
         row.setTitle(title);
         row.setDialogTitle(title);
-        row.setDialogMessage(L10n.f("One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, "
-                + "or a site like example.com, which takes its subdomains too. Capital letters don't matter. "
-                + "A Facebook link works when it has the id in it.",
+        row.setDialogMessage(L10n.f("One per line, up to %1$d: a name as Facebook shows it, a profile or Page ID, or a site like "
+                + "example.com, which also covers addresses like m.example.com. Capital letters don't matter. A "
+                + "Facebook link works when it has the ID in it.",
                 PostSources.MAX_RULES));
         row.setPositiveButtonText(L10n.t("Save"));
         row.setNegativeButtonText(L10n.t("Cancel"));
@@ -1986,8 +1985,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * holds. Both dialogs end with it.
      */
     static String patternHelp() {
-        return L10n.f("A line between slashes, like /colou?r/, is a pattern (a regular expression). A list holds up "
-                + "to %1$d, each up to %2$d characters.", PostWords.MAX_PATTERNS, PostWords.MAX_PATTERN_LENGTH);
+        return L10n.f("A line between slashes, like /gr[ae]y/, is a pattern that can match several spellings (a regular "
+                + "expression). A list holds up to %1$d, each up to %2$d characters.", PostWords.MAX_PATTERNS, PostWords.MAX_PATTERN_LENGTH);
     }
 
     /** Why a typed list can't be saved, the same in its dialog and when Save is tapped, or null when it can be. */

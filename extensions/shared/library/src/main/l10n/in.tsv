@@ -53,7 +53,7 @@ Diagnostic data put back.	Data diagnostik dikembalikan.
 Diagnostic report copied to the clipboard.	Laporan diagnostik disalin ke papan klip.
 Download	Unduh
 Download button on reels	Tombol Unduh di Reels
-Download failed	Unduhan gagal
+Download failed. Try again in a moment.	Unduhan gagal. Coba lagi sebentar lagi.
 Download feed and Watch videos	Unduh video dari Kabar Beranda dan Watch
 Save any photo	Simpan foto apa pun
 Shows Save photo on every photo you open, even where saving is turned off, and saves the biggest size. Off or paused, Facebook decides again.	Menampilkan Simpan foto di setiap foto yang kamu buka, bahkan jika penyimpanan dimatikan, dan menyimpan ukuran terbesar. Saat mati atau dijeda, Facebook yang menentukan lagi.
@@ -76,14 +76,14 @@ Try Facebook without Hushfacebook. From the next start, switches act as if off, 
 Hides Stories shown between posts, from the next time the feed loads. The Stories tray at the top has its own switch.	Menyembunyikan Cerita yang muncul di antara postingan, mulai saat feed dimuat berikutnya. Baris Cerita di atas punya sakelar sendiri.
 Open	Buka
 Photo saved	Foto tersimpan
-Settings exported. The app holding the file wouldn't let Hushfacebook read it back, so it wasn't checked.	Pengaturan diekspor. Aplikasi yang menyimpan file itu tidak mengizinkan Hushfacebook membacanya kembali, jadi file itu tidak diperiksa.
+Settings exported. Hushfacebook couldn't read the file back to check it.	Pengaturan diekspor. Hushfacebook tidak bisa membaca ulang file itu untuk memeriksanya.
 Share	Bagikan
 That saved file is no longer available.	File yang disimpan itu tidak tersedia lagi.
 The app holding that file is taking too long, so Hushfacebook stopped waiting. Nothing was changed.	Aplikasi yang menyimpan file itu terlalu lama, jadi Hushfacebook berhenti menunggu. Tidak ada yang diubah.
 The app holding the last settings file still hasn't answered. Try again later.	Aplikasi yang menyimpan file pengaturan terakhir masih belum merespons. Coba lagi nanti.
 The app holding the settings file is taking too long, so Hushfacebook stopped waiting. That app may still finish saving it, so check the file before you rely on it.	Aplikasi yang menyimpan file pengaturan terlalu lama, jadi Hushfacebook berhenti menunggu. Aplikasi itu mungkin masih menyelesaikan penyimpanannya, jadi periksa file itu sebelum mengandalkannya.
 The file %1$s couldn't be removed. Delete it from %2$s, then tap Resume again.	File %1$s tidak dapat dihapus. Hapus file itu dari %2$s, lalu ketuk Lanjutkan lagi.
-The settings file was saved, but it doesn't read back as what was written. Save it again as a new file.	File pengaturan sudah disimpan, tetapi isinya saat dibaca kembali tidak sama dengan yang ditulis. Simpan lagi sebagai file baru.
+The settings file was saved, but it doesn't match what Hushfacebook wrote. Save it again as a new file.	File pengaturan tersimpan, tetapi tidak sama dengan yang ditulis Hushfacebook. Simpan lagi sebagai file baru.
 There's no app here that can open or share this saved file.	Tidak ada aplikasi yang bisa membuka atau membagikan file yang disimpan ini.
 # context: line at the top of a settings page while paused; Lock Facebook keeps working while paused
 Until you resume, every switch but Debug logging and Lock Facebook acts as if it were off. Changes made when you patched stay in.	Sampai Anda melanjutkan, semua sakelar kecuali Pencatatan debug dan “Kunci Facebook” dianggap nonaktif. Yang diatur saat Anda menambal tetap aktif.
@@ -104,14 +104,14 @@ Draws Facebook's text in your phone's font, or in a font file you choose below. 
 Font file	File font
 Use your phone's font	Gunakan font ponsel
 Stops using the font file and goes back to your phone's font.	Berhenti memakai file font dan kembali ke font ponsel Anda.
-None chosen, so your phone's font is used. Choose a TrueType or OpenType file of up to %1$d MB.	Belum ada yang dipilih, jadi font ponsel Anda yang dipakai. Pilih file TrueType atau OpenType hingga %1$d MB.
+None chosen, so your phone's font is used. Choose a .ttf or .otf font file of up to %1$d MB.	Belum ada yang dipilih, jadi font ponsel dipakai. Pilih file font .ttf atau .otf sampai %1$d MB.
 Hushfacebook's copy of %1$s is gone, so your phone's font is used. Choose the file again.	Salinan %1$s milik Hushfacebook sudah tidak ada, jadi font ponsel Anda yang dipakai. Pilih file itu lagi.
 Using %1$s. Choose another file to replace it.	Memakai %1$s. Pilih file lain untuk menggantinya.
 Copying the font file	Menyalin file font
 Font set to %1$s. Restart Facebook to see it.	Font diatur menjadi %1$s. Mulai ulang Facebook untuk melihatnya.
-That isn't a TrueType or OpenType font file. Your font didn't change.	Itu bukan file font TrueType atau OpenType. Font Anda tidak berubah.
+That isn't a .ttf or .otf font file. Your font didn't change.	Itu bukan file font .ttf atau .otf. Font kamu tidak berubah.
 That font file is over %1$d MB. Your font didn't change.	File font itu lebih dari %1$d MB. Font Anda tidak berubah.
-Android couldn't draw with that font file. Your font didn't change.	Android tidak dapat menggambar dengan file font itu. Font Anda tidak berubah.
+Android couldn't use that font file. Your font didn't change.	Android tidak bisa memakai file font itu. Font kamu tidak berubah.
 Couldn't save a copy of that font. Check that the phone has room, then try again.	Salinan font itu tidak dapat disimpan. Pastikan ponsel masih punya ruang, lalu coba lagi.
 Couldn't open that file. Your font didn't change.	File itu tidak dapat dibuka. Font Anda tidak berubah.
 Back to your phone's font. Restart Facebook to see it.	Kembali ke font ponsel Anda. Mulai ulang Facebook untuk melihatnya.
@@ -158,7 +158,7 @@ Hides posts Facebook adds from people and Pages you don't follow and groups you 
 Hides posts that Facebook's own detection marks as made with AI. Posts only their creator labeled stay. Untested on a real feed, so it starts off.	Menyembunyikan postingan yang oleh deteksi Facebook ditandai sebagai buatan AI. Postingan yang hanya ditandai pembuatnya tetap ada. Belum diuji di feed sungguhan, jadi awalnya mati.
 On a patched Facebook, profiles, photos, posts and some Settings pages wouldn't open. This fixes that.	Di Facebook yang sudah dipatch, profil, foto, postingan, dan beberapa halaman Pengaturan tidak akan terbuka. Ini memperbaikinya.
 Profiles, photos and posts won't open	Profil, foto, dan postingan tidak akan terbuka
-Patch again with %1$s selected. Re-signed builds need it to open profiles, photos, posts and some Facebook Settings pages.	Tambal ulang dengan %1$s dipilih. Build yang ditandatangani ulang membutuhkannya untuk membuka profil, foto, postingan, dan beberapa halaman Pengaturan Facebook.
+Patch again with %1$s selected. A patched Facebook needs it to open profiles, photos, posts and some of Facebook's Settings pages.	Patch ulang dengan %1$s dipilih. Facebook yang sudah dipatch memerlukannya untuk membuka profil, foto, postingan, dan beberapa halaman Pengaturan Facebook.
 Profiles and posts work again	Profil dan postingan berfungsi lagi
 Reading the settings file	Membaca file pengaturan
 Reels and Watch	Reels dan Watch
@@ -186,14 +186,14 @@ Not in this build. To block this, choose the %1$s patch in Morphe Manager and pa
 Remove tracking from shared links	Hapus pelacakan dari tautan yang dibagikan
 Retry	Coba lagi
 Save any story	Simpan cerita apa pun
-Save cancelled	Penyimpanan dibatalkan
+Save canceled	Penyimpanan dibatalkan
 Save folder	Folder simpan
 Save full report	Simpan laporan lengkap
 Saved to %1$s	Disimpan ke %1$s
 Saved to the gallery	Disimpan ke galeri
 Saved to %1$s in lower quality than on Facebook	Disimpan ke %1$s dengan kualitas lebih rendah daripada di Facebook
 Saved to the gallery in lower quality than on Facebook	Disimpan ke galeri dengan kualitas lebih rendah daripada di Facebook
-Saved. Restart Facebook to apply this change.	Tersimpan. Mulai ulang Facebook untuk menerapkan perubahan ini.
+Saved. Restart Facebook to see the change.	Tersimpan. Mulai ulang Facebook untuk melihat perubahannya.
 Saves your switches and download choices to a file, to back up or copy to another phone. Pause, Debug logging and the update check aren't included.	Menyimpan sakelar dan pilihan unduhan kamu ke sebuah file, untuk cadangan atau dipindah ke ponsel lain. Jeda, Pencatatan debug, dan pengecekan pembaruan tidak termasuk.
 # The release check: its switch and Check now row under Updates, the status card's line about a newer release, and what a failed try says.
 Check for new Hushfacebook releases	Periksa rilis Hushfacebook baru
@@ -208,8 +208,8 @@ Video saved	Video tersimpan
 You have the newest Hushfacebook release.	Anda sudah memakai rilis Hushfacebook terbaru.
 The newest Hushfacebook release is %1$s.	Rilis Hushfacebook terbaru adalah %1$s.
 Couldn't reach GitHub. Try again later.	GitHub tidak dapat dihubungi. Coba lagi nanti.
-GitHub is turning away checks from this network for now. Try again later.	GitHub sedang menolak pemeriksaan dari jaringan ini. Coba lagi nanti.
-GitHub's answer couldn't be used. Try again later.	Jawaban GitHub tidak dapat digunakan. Coba lagi nanti.
+GitHub is limiting requests from this network right now. Try again later.	GitHub sedang membatasi permintaan dari jaringan ini. Coba lagi nanti.
+GitHub sent a reply Hushfacebook couldn't understand. Try again later.	GitHub mengirim balasan yang tidak bisa dipahami Hushfacebook. Coba lagi nanti.
 Saves will go to a folder named %1$s.	Semua yang Anda simpan akan masuk ke folder bernama %1$s.
 Saving a photo	Menyimpan foto
 Saving a video	Menyimpan video
@@ -229,7 +229,7 @@ Removes tracking tags like mibextid from links you share or copy. A facebook.com
 Tap to turn it back on.	Ketuk untuk mengaktifkan Hushfacebook lagi.
 That file is too large to be a settings file. Nothing was changed.	File itu terlalu besar untuk sebuah file pengaturan. Tidak ada yang diubah.
 That file isn't readable text, so it may have been damaged on the way. Nothing was changed.	File itu bukan teks yang dapat dibaca, jadi mungkin rusak saat ditransfer. Tidak ada yang diubah.
-That file lists a setting twice, so there's no telling which value to use. Nothing was changed.	File itu mencantumkan satu pengaturan dua kali, jadi tidak jelas nilai mana yang harus dipakai. Tidak ada yang diubah.
+That file lists a setting twice, so Hushfacebook can't tell which value to use. Nothing was changed.	File itu mencantumkan satu pengaturan dua kali, jadi Hushfacebook tidak tahu nilai mana yang dipakai. Tidak ada yang diubah.
 That isn't a Hushfacebook settings file. Nothing was changed.	Itu bukan file pengaturan Hushfacebook. Tidak ada yang diubah.
 That settings file holds a value Hushfacebook can't read. Nothing was changed.	File pengaturan itu memuat nilai yang tidak dapat dibaca Hushfacebook. Tidak ada yang diubah.
 # context: a settings file refused on import: its word lists, beside one it leaves as it is, take more than the room the two lists share
@@ -548,7 +548,7 @@ Hide posts with words you choose	Sembunyikan postingan dengan kata pilihan Anda
 Hide posts from people, Pages and sites	Sembunyikan postingan dari orang, Halaman, dan situs
 Hides posts by people or Pages on your list below, or linking to sites on it, including shares. Your list stays on this phone unless you export it.	Menyembunyikan postingan dari orang atau Halaman di daftarmu di bawah, atau yang menautkan ke situs di dalamnya, termasuk yang dibagikan ulang. Daftarmu tetap di ponsel ini kecuali kamu mengekspornya.
 People, Pages and sites to hide	Orang, Halaman, dan situs yang disembunyikan
-One per line, up to %1$d: a name as Facebook shows it, a profile or Page id, or a site like example.com, which takes its subdomains too. Capital letters don't matter. A Facebook link works when it has the id in it.	Satu per baris, hingga %1$d: nama seperti yang ditampilkan Facebook, ID profil atau Halaman, atau situs seperti example.com, termasuk subdomainnya. Huruf besar tidak berpengaruh. Tautan Facebook berfungsi jika memuat id-nya.
+One per line, up to %1$d: a name as Facebook shows it, a profile or Page ID, or a site like example.com, which also covers addresses like m.example.com. Capital letters don't matter. A Facebook link works when it has the ID in it.	Satu per baris, hingga %1$d: nama seperti yang ditampilkan Facebook, ID profil atau Halaman, atau situs seperti example.com, yang juga mencakup alamat seperti m.example.com. Huruf besar tidak berpengaruh. Tautan Facebook berfungsi jika memuat ID-nya.
 One name, id or site per line	Satu nama, ID, atau situs per baris
 %1$d line was left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d baris dihilangkan. Satu baris memuat hingga %2$d karakter, daftar hingga %3$d baris, dan yang ditulis dua kali dihitung sekali.
 %1$d lines were left out. A line holds up to %2$d characters, the list up to %3$d lines, and one given twice counts once.	%1$d baris dihilangkan. Satu baris memuat hingga %2$d karakter, daftar hingga %3$d baris, dan yang ditulis dua kali dihitung sekali.
@@ -559,21 +559,21 @@ Your list of people, Pages and sites to hide will be empty.	Daftar orang, Halama
 Your list of people, Pages and sites to hide will hold %1$d entry.	Daftar orang, Halaman, dan situs yang kamu sembunyikan akan berisi %1$d entri.
 Your list of people, Pages and sites to hide will hold %1$d entries.	Daftar orang, Halaman, dan situs yang kamu sembunyikan akan berisi %1$d entri.
 # context: summary of that switch; the keep list is the second list under it, and a settings file is the one Export settings writes
-Hides posts containing a word or phrase from your list below. A word on your keep list overrides it. Your words stay on this phone unless you export them.	Menyembunyikan postingan yang berisi kata atau frasa dari daftarmu di bawah. Kata di daftar yang dipertahankan lebih diutamakan. Kata-katamu tetap di ponsel ini kecuali kamu mengekspornya.
+Hides posts containing a word or phrase from your list below. Words that keep a post win over it. Your words stay on this phone unless you export them.	Menyembunyikan postingan yang berisi kata atau frasa dari daftarmu di bawah. Kata yang mempertahankan postingan lebih diutamakan. Kata-katamu tetap di ponsel ini kecuali kamu mengekspornya.
 # context: title of the row and dialog holding the list of words and phrases that hide a post
 Words to hide	Kata untuk disembunyikan
 # context: title of the row and dialog holding the list of words and phrases that keep a post even when it has a word to hide
 Words that keep a post	Kata yang mempertahankan postingan
 # context: message of the Words to hide dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
-One word or phrase per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. Capital letters don't matter, and a phrase matches anywhere in a post's text, inside longer words too.	Satu kata atau frasa per baris, hingga %1$d, masing-masing %2$d sampai %3$d karakter, atau cukup satu untuk emoji, aksara Tionghoa, kana, atau suku kata Hangul. Huruf besar dan kecil tidak berpengaruh, dan frasa cocok di mana saja dalam teks postingan, termasuk di dalam kata yang lebih panjang.
+One word or phrase per line, up to %1$d lines, each %2$d to %3$d characters long. A single emoji or Chinese, Japanese or Korean character is enough on its own. Capital letters don't matter, and a phrase matches anywhere in a post's text, even inside longer words.	Satu kata atau frasa per baris, hingga %1$d baris, masing-masing %2$d sampai %3$d karakter. Satu emoji atau satu karakter Tionghoa, Jepang, atau Korea sudah cukup. Huruf besar tidak berpengaruh, dan frasa cocok di bagian mana pun teks postingan, bahkan di dalam kata yang lebih panjang.
 # context: message of the Words that keep a post dialog; %1$d is how many phrases a list holds (50), %2$d and %3$d the shortest and longest phrase in characters (2 and 60)
-A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d, each %2$d to %3$d characters long, or just one for an emoji, a Chinese character, a kana or a Hangul syllable.	Postingan dengan salah satu kata ini tetap ada, meskipun juga berisi kata untuk disembunyikan. Satu per baris, hingga %1$d, masing-masing %2$d sampai %3$d karakter, atau cukup satu untuk emoji, aksara Tionghoa, kana, atau suku kata Hangul.
+A post with any of these stays, even when it also has a word to hide. One per line, up to %1$d lines, each %2$d to %3$d characters long. A single emoji or Chinese, Japanese or Korean character is enough on its own.	Postingan yang berisi salah satu kata ini tetap ada, meski juga berisi kata yang disembunyikan. Satu per baris, hingga %1$d baris, masing-masing %2$d sampai %3$d karakter. Satu emoji atau satu karakter Tionghoa, Jepang, atau Korea sudah cukup.
 # context: hint in the empty text box of both word list dialogs
 One word or phrase per line	Satu kata atau frasa per baris
 # context: toast after saving a word list, one line left out; %2$d and %3$d are the shortest and longest phrase in characters
-%1$d line was left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts once.	%1$d baris tidak disertakan. Frasa perlu %2$d sampai %3$d karakter, atau cukup satu untuk emoji, aksara Tionghoa, kana, atau suku kata Hangul. Frasa yang ditulis dua kali dihitung sekali.
+%1$d line was left out. A phrase needs %2$d to %3$d characters, but a single emoji or Chinese, Japanese or Korean character is enough. One given twice counts once.	%1$d baris dilewati. Frasa harus %2$d sampai %3$d karakter, tetapi satu emoji atau satu karakter Tionghoa, Jepang, atau Korea sudah cukup. Yang muncul dua kali dihitung sekali.
 # context: toast after saving a word list, several lines left out; %2$d and %3$d are the shortest and longest phrase in characters
-%1$d lines were left out. A phrase needs %2$d to %3$d characters, or just one for an emoji, a Chinese character, a kana or a Hangul syllable. One given twice counts once.	%1$d baris tidak disertakan. Frasa perlu %2$d sampai %3$d karakter, atau cukup satu untuk emoji, aksara Tionghoa, kana, atau suku kata Hangul. Frasa yang ditulis dua kali dihitung sekali.
+%1$d lines were left out. A phrase needs %2$d to %3$d characters, but a single emoji or Chinese, Japanese or Korean character is enough. One given twice counts once.	%1$d baris dilewati. Frasa harus %2$d sampai %3$d karakter, tetapi satu emoji atau satu karakter Tionghoa, Jepang, atau Korea sudah cukup. Yang muncul dua kali dihitung sekali.
 # context: summary of the Words to hide row while it's empty
 No words yet, so no post is hidden.	Belum ada kata, jadi tidak ada postingan yang disembunyikan.
 # context: summary of the Words that keep a post row while it's empty
@@ -615,7 +615,7 @@ Resume long videos	Lanjutkan video panjang
 # context: summary of that switch; the seek bar is the bar under a video you drag to move through it; Reels is Facebook's name for its short videos
 Videos over two minutes pick up where you left off. Drag the bar to start elsewhere. Short reels, live videos and ads start as usual.	Video yang lebih dari dua menit dilanjutkan dari tempat kamu berhenti. Geser bilahnya untuk mulai dari tempat lain. Reel pendek, video langsung, dan iklan dimulai seperti biasa.
 # context: switch title under News feed, right below Hide AI-detected posts; on, posts their creator labelled as AI go too
-Also hide posts labelled as AI	Sembunyikan juga postingan berlabel AI
+Also hide posts labeled as AI	Sembunyikan juga postingan berlabel AI
 Hide Meta AI in the feed	Sembunyikan Meta AI di feed
 Hides Meta AI cards between posts and cards promoting the Vibes app. People's posts stay, whatever they say about AI.	Menyembunyikan kartu Meta AI di antara postingan dan kartu yang mempromosikan aplikasi Vibes. Postingan orang tetap ada, apa pun yang mereka katakan tentang AI.
 Hide AI character posts	Sembunyikan postingan karakter AI
@@ -683,7 +683,7 @@ Meta App Manager	Meta App Manager
 # context: that row once Facebook's web addresses go to this app
 Facebook's web addresses open here now.	Alamat web Facebook kini terbuka di sini.
 # context: that row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
-Meta App Manager can keep Facebook's web addresses for itself, so their links skip this app. Tap and turn off Open supported links there, then check Supported links above.	Meta App Manager bisa mengambil alamat web Facebook untuk dirinya sendiri, sehingga tautannya melewati aplikasi ini. Ketuk dan nonaktifkan “Buka link yang didukung” di sana, lalu periksa Tautan yang didukung di atas.
+Meta App Manager can claim Facebook's web addresses for itself, so their links skip this app. Tap, turn off Open supported links there, then recheck Supported links above.	Meta App Manager bisa mengambil alih alamat web Facebook, sehingga tautannya melewati aplikasi ini. Ketuk, matikan Buka tautan yang didukung di sana, lalu periksa lagi Tautan yang didukung di atas.
 # context: message when Android's page for Meta App Manager doesn't open; "Open by default" is Android's page name
 Meta App Manager's settings didn't open. Find it in Android's app list with system apps shown, then Open by default.	Pengaturan Meta App Manager tidak terbuka. Cari di daftar aplikasi Android dengan aplikasi sistem ditampilkan, lalu Buka secara default.
 # context: title of a row under Links; Messenger is the name of Meta's app, keep it as is
@@ -691,9 +691,9 @@ Messenger	Messenger
 # context: title of a row under Links; Instagram is the name of Meta's app, keep it as is
 Instagram	Instagram
 # context: the Messenger row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
-Messenger can keep facebook.com and m.me links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.	Messenger bisa mengambil tautan facebook.com dan m.me untuk dirinya sendiri, sehingga tombolnya untuk aplikasi ini mati lagi dengan sendirinya. Ketuk dan nonaktifkan “Buka link yang didukung” di sana, lalu periksa Tautan yang didukung di atas.
+Messenger can claim facebook.com and m.me links for itself, which turns this app's link switches back off. Tap, turn off Open supported links there, then recheck Supported links above.	Messenger bisa mengambil alih tautan facebook.com dan m.me, sehingga sakelar tautan aplikasi ini mati lagi. Ketuk, matikan Buka tautan yang didukung di sana, lalu periksa lagi Tautan yang didukung di atas.
 # context: the Instagram row's description; "Open supported links" is Android's own switch, "Supported links" is the row above
-Instagram can keep facebook.com links for itself, so their switches for this app turn themselves back off. Tap and turn off Open supported links there, then check Supported links above.	Instagram bisa mengambil tautan facebook.com untuk dirinya sendiri, sehingga tombolnya untuk aplikasi ini mati lagi dengan sendirinya. Ketuk dan nonaktifkan “Buka link yang didukung” di sana, lalu periksa Tautan yang didukung di atas.
+Instagram can claim facebook.com links for itself, which turns this app's link switches back off. Tap, turn off Open supported links there, then recheck Supported links above.	Instagram bisa mengambil alih tautan facebook.com, sehingga sakelar tautan aplikasi ini mati lagi. Ketuk, matikan Buka tautan yang didukung di sana, lalu periksa lagi Tautan yang didukung di atas.
 # context: message when Android's page for Messenger doesn't open; "App info" and "Open by default" are Android's page names
 Messenger's settings didn't open. Open App info from Messenger's icon, then Open by default.	Pengaturan Messenger tidak terbuka. Buka Info aplikasi dari ikon Messenger, lalu Buka secara default.
 # context: message when Android's page for Instagram doesn't open; "App info" and "Open by default" are Android's page names
@@ -703,7 +703,7 @@ facebook.com and m.me links open here now.	Tautan facebook.com dan m.me kini ter
 # context: the Instagram row's description once its addresses open in this app; keep facebook.com as is
 facebook.com links open here now.	Tautan facebook.com kini terbuka di sini.
 # context: message when a save starts and its notification can't show (Facebook's notifications or the saves channel are off); Downloads is the settings section that lists running saves, each with its own Cancel
-Saving... Cancel: Downloads in Hushfacebook.	Menyimpan... Batal: Unduhan di Hushfacebook.
+Saving... To cancel, open Downloads in Hushfacebook settings.	Menyimpan… Untuk membatalkan, buka Unduhan di pengaturan Hushfacebook.
 # context: switch title under Reels and Watch; on, a double tap on a reel or a video doesn't like it
 Turn off double tap to like	Matikan ketuk dua kali untuk menyukai
 # context: summary of that switch; Like is the name of Facebook's own button, as Facebook shows it in this language
@@ -769,11 +769,11 @@ Test the Messenger link	Uji koneksi Messenger
 # context: summary of that row; Debug logging is the switch's name as this table gives it
 Checks now whether Facebook can reach Messenger, the way it does at startup, and shows each result. Appears while Debug logging is on.	Memeriksa sekarang apakah Facebook bisa menghubungi Messenger, seperti saat dibuka, dan menampilkan setiap hasilnya. Muncul selama Pencatatan debug menyala.
 # context: toast when the test can't begin
-The Messenger link test couldn't start.	Uji koneksi Messenger tidak dapat dimulai.
+The Messenger link test couldn't start. Try again.	Uji tautan Messenger tidak bisa dimulai. Coba lagi.
 # context: toast on a build without the test
 This build can't run the Messenger link test.	Build ini tidak dapat menjalankan uji koneksi Messenger.
 # context: toast when Facebook has no signed-in account
-No signed-in account to test with.	Tidak ada akun yang masuk untuk diuji.
+No signed-in account to test with. Sign in to Facebook and try again.	Tidak ada akun yang masuk untuk diuji. Masuk ke Facebook lalu coba lagi.
 # context: toast with the test's result; each placeholder is one of: answered, no answer, failed (...)
 Opt-out read: %1$s. Triggered read: %2$s.	Pembacaan penolakan: %1$s. Pembacaan pemicu: %2$s.
 # context: a read's result in that toast
@@ -812,13 +812,13 @@ Not in this build: %1$s. Morphe Manager selects it by default. Patch again with 
 # context: that row's summary once opened, several patches missing; the placeholder is their English names joined as a list
 Not in this build: %1$s. Morphe Manager selects them by default. Patch again with them selected to get what they do.	Tidak ada di build ini: %1$s. Morphe Manager memilihnya secara default. Pilih tambalan itu lalu tambal ulang untuk mendapatkan fungsinya.
 # context: Toast at the end of a video save whose file uses a codec WhatsApp and some video editors can't open (AV1, VP9, HEVC or xHE-AAC). A notification with a button to the fix is showing too. Keep it short: Android shows two lines at most.
-Saved, but WhatsApp and some editors may refuse it	Disimpan, tetapi WhatsApp dan beberapa editor mungkin menolaknya
+Saved, but WhatsApp and some editors may not accept it	Tersimpan, tetapi WhatsApp dan beberapa editor mungkin tidak menerimanya
 # context: Toast at the end of a video save whose file WhatsApp may not open, when no notification can be shown. Downloads is the section of Hushfacebook settings with the fix. Two lines at most.
-Saved, but WhatsApp may refuse it. Fix: Downloads in Hushfacebook.	Disimpan, tetapi WhatsApp mungkin menolaknya. Solusi: Unduhan di Hushfacebook.
+Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.	Tersimpan, tetapi WhatsApp mungkin tidak menerimanya. Solusi: Unduhan di pengaturan Hushfacebook.
 # context: Second line of the notification after such a save. %1$s is the switch's name, Save videos other apps can open. They: WhatsApp and the editors.
-Turn on %1$s to save videos they all play.	Aktifkan %1$s untuk menyimpan video yang bisa diputar semuanya.
+Turn on %1$s to save videos that WhatsApp and these editors accept.	Nyalakan %1$s untuk menyimpan video yang diterima WhatsApp dan editor-editor ini.
 # context: Title of the notification after a video save whose file uses a codec WhatsApp and some video editors can't open.
-WhatsApp and some editors may refuse this video	WhatsApp dan beberapa editor mungkin menolak video ini
+WhatsApp and some editors may not accept this video	WhatsApp dan beberapa editor mungkin tidak menerima video ini
 # context: Button on that notification. It opens Hushfacebook settings at the switch Save videos other apps can open.
 Open the setting	Buka pengaturan
 # context: switch title under News feed; the prompts are the strip Facebook puts under some posts, such as "Are you interested in this post?"
@@ -872,11 +872,11 @@ Reels, videos and stories save to this phone.	Reel, video, dan cerita disimpan d
 # context: Settings row title: the app links are sent to
 App to send to	Aplikasi tujuan
 # context: Dialog message of the send-to app row; %1$s and %2$s are package names
-The package name of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.	Nama paket aplikasi yang menerima tautan, misalnya %1$s untuk YTDLnis atau %2$s untuk Seal. Biarkan kosong untuk memilih aplikasi setiap kali.
+The ID of the app that gets the links, such as %1$s for YTDLnis or %2$s for Seal. Leave it blank to pick an app each time.	ID aplikasi yang menerima tautan, seperti %1$s untuk YTDLnis atau %2$s untuk Seal. Kosongkan untuk memilih aplikasi setiap kali.
 # context: Hint in the send-to app field
-Package name	Nama paket
+App ID	ID aplikasi
 # context: Toast when what was typed in the send-to app row isn't a package name; %1$s is what was typed
-%1$s isn't a package name, so the app stays as it was.	%1$s bukan nama paket, jadi aplikasinya tetap.
+%1$s isn't a valid app ID, so the app stays as it was.	%1$s bukan ID aplikasi yang valid, jadi aplikasi tetap seperti semula.
 # context: Summary of the send-to app row with no app named
 Android asks which app each time.	Android menanyakan aplikasi setiap kali.
 # context: Summary of the send-to app row; %1$s is the package name
@@ -1077,7 +1077,7 @@ Marked as seen. Tap again to undo.	Ditandai sudah dilihat. Ketuk lagi untuk memb
 # context: what TalkBack reads for the eye button once the marked story was sent as seen
 Marked as seen and sent	Ditandai sudah dilihat dan dikirim
 # context: the word lists' dialogs, after their first paragraph: a line between slashes is a regular expression; %1$d is how many a list holds, %2$d the most characters each
-A line between slashes, like /colou?r/, is a pattern (a regular expression). A list holds up to %1$d, each up to %2$d characters.	Baris di antara garis miring, seperti /colou?r/, adalah pola (ekspresi reguler). Daftar memuat hingga %1$d pola, masing-masing hingga %2$d karakter.
+A line between slashes, like /gr[ae]y/, is a pattern that can match several spellings (a regular expression). A list holds up to %1$d, each up to %2$d characters.	Baris di antara garis miring, seperti /gr[ae]y/, adalah pola yang bisa cocok dengan beberapa ejaan (ekspresi reguler). Satu daftar memuat hingga %1$d, masing-masing hingga %2$d karakter.
 # context: under a word list being edited, and when its Save is refused: a line written between slashes isn't a pattern the app can read; %1$d is the line's number
 Line %1$d isn't a pattern Hushfacebook can read. Fix it or remove it, then save again.	Baris %1$d bukan pola yang bisa dibaca Hushfacebook. Perbaiki atau hapus, lalu simpan lagi.
 # context: under a word list being edited, and when its Save is refused: more patterns than a list holds; %1$d is the most a list holds
@@ -1173,7 +1173,7 @@ Links, buttons, switches and the selected tab use %1$s instead of Facebook's blu
 # context: what a settings import changes: Facebook goes back to its own blue
 Facebook will keep its own blue.	Facebook akan tetap memakai birunya sendiri.
 # context: what a settings import changes; %1$s is a color name such as Teal
-With Accent color in the build, Facebook's blue will be %1$s.	Dengan Warna aksen di build, biru Facebook akan menjadi %1$s.
+If your patched Facebook includes Accent color, Facebook's blue will be %1$s.	Jika Facebook yang kamu patch menyertakan Warna aksen, biru Facebook akan menjadi %1$s.
 # context: switch title under Chats; photos and videos sent from a chat inside Facebook go out as the originals
 Send photos and videos at original quality	Kirim foto dan video dalam kualitas asli
 # context: description of that switch; the 20 and 25 MB limits are where Facebook's own shrinking takes over again; a video with a location tag is shrunk by Facebook, which drops the tag
@@ -1249,7 +1249,7 @@ Posts you've seen will stay hidden for %1$s.	Kiriman yang sudah kamu lihat akan 
 # context: settings row under Pause, backup and diagnostics that opens Facebook's own Whitehat screen; Whitehat is Facebook's name for its security researcher program, keep it
 Facebook's Whitehat settings	Pengaturan Whitehat Facebook
 # context: summary of that row when Facebook's screen is on the phone
-Facebook's own screen for security research, where it can trust certificates you installed and send its traffic through a proxy. Hushfacebook doesn't change anything there.	Layar Facebook sendiri untuk riset keamanan, tempat Facebook bisa memercayai sertifikat yang Anda pasang dan mengirim lalu lintasnya lewat proxy. Hushfacebook tidak mengubah apa pun di sana.
+Facebook's own screen for security testing. It can make Facebook trust security certificates you installed, or send its data through a proxy (a go-between server). Hushfacebook doesn't change anything there.	Layar milik Facebook untuk pengujian keamanan. Layar ini bisa membuat Facebook memercayai sertifikat keamanan yang kamu pasang, atau mengirim datanya lewat proksi (server perantara). Hushfacebook tidak mengubah apa pun di sana.
 # context: summary of that row when Facebook hasn't downloaded the screen, so the row opens a web page
 Facebook hasn't downloaded this screen to this phone, so a tap opens the Whitehat page on the web instead.	Facebook belum mengunduh layar ini ke ponsel ini, jadi ketukan akan membuka halaman Whitehat di web.
 # context: toast when the Facebook version has no such screen

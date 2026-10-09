@@ -259,15 +259,14 @@ public class SettingsBackupPreference extends Preference {
             back = read(resolver, uri, run);
         } catch (SettingsBackup.Rejected refused) {
             if (refused.reason == SettingsBackup.Reason.UNREADABLE) {
-                return L10n.t("Settings exported. The app holding the file wouldn't let Hushfacebook read it back, "
-                        + "so it wasn't checked.");
+                return L10n.t("Settings exported. Hushfacebook couldn't read the file back to check it.");
             }
             back = null;
         }
         if (new String(bytes, StandardCharsets.UTF_8).equals(back)) return L10n.t("Settings exported.");
         Logger.printInfo(() -> "Settings export read back differently");
-        return L10n.t("The settings file was saved, but it doesn't read back as what was written. "
-                + "Save it again as a new file.");
+        return L10n.t("The settings file was saved, but it doesn't match what Hushfacebook wrote. Save it again as a new "
+                + "file.");
     }
 
     private static void readForPreview(HushfacebookPreferenceFragment page, Uri uri) {
@@ -315,7 +314,7 @@ public class SettingsBackupPreference extends Preference {
             case DAMAGED:
                 return L10n.t("That settings file is damaged or only partly downloaded. Nothing was changed.");
             case DUPLICATE:
-                return L10n.t("That file lists a setting twice, so there's no telling which value to use. Nothing was changed.");
+                return L10n.t("That file lists a setting twice, so Hushfacebook can't tell which value to use. Nothing was changed.");
             case FORMAT:
                 return L10n.t("That isn't a Hushfacebook settings file. Nothing was changed.");
             case SCHEMA:
@@ -565,7 +564,7 @@ public class SettingsBackupPreference extends Preference {
     /** The sentence that says which accent color Facebook will have after an import. */
     static String accentSentence(AccentColor.Preset accent) {
         if (accent == AccentColor.Preset.FACEBOOK) return L10n.t("Facebook will keep its own blue.");
-        return L10n.f("With Accent color in the build, Facebook's blue will be %1$s.",
+        return L10n.f("If your patched Facebook includes Accent color, Facebook's blue will be %1$s.",
                 HushfacebookPreferenceFragment.accentLabel(accent));
     }
 
