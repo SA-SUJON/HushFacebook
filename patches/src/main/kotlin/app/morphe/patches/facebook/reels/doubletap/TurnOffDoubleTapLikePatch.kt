@@ -47,7 +47,7 @@ val turnOffDoubleTapLikePatch = bytecodePatch(
         "tap still plays or pauses, and the Like button still likes. Its switch is under Reels and Watch in " +
         "Hushfacebook settings and starts off.",
 ) {
-    category("Interface")
+    category("Reels")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

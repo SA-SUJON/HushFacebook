@@ -61,7 +61,7 @@ val hideTabBadgesPatch = bytecodePatch(
         "Notifications still come in, and the Notifications tab still lists them. The switches are under " +
         "Appearance in Hushfacebook settings and all start off.",
 ) {
-    category("Interface")
+    category("Navigation")
     dependsOn(settingsPatch)
     dependsOn(jewelCountHookPatch)
     compatibleWith(*AppCompatibilities.facebook())

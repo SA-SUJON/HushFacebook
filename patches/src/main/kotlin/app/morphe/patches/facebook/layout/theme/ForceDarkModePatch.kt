@@ -26,7 +26,7 @@ val forceDarkModePatch = bytecodePatch(
         "settings have no Dark mode. Its switch is under Appearance in Hushfacebook settings and starts off. " +
         "Restart Facebook after you turn it on.",
 ) {
-    category("Interface")
+    category("Theme")
     dependsOn(settingsPatch, facebookExtensionPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

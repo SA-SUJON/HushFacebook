@@ -25,7 +25,7 @@ val originalChatMediaPatch = bytecodePatch(
     description = "Photos and videos you send from a chat that opens inside Facebook go out as the originals " +
         "instead of Facebook's smaller copies. Its switch is under Chats in Hushfacebook settings and starts off.",
 ) {
-    category("Interface")
+    category("Chats")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

@@ -45,7 +45,7 @@ val cleanUpChatListPatch = bytecodePatch(
         "stay.",
     default = true,
 ) {
-    category("Interface")
+    category("Chats")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

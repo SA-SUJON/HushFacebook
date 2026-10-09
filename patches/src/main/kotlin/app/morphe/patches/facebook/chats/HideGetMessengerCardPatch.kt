@@ -34,7 +34,7 @@ val hideGetMessengerCardPatch = bytecodePatch(
         "settings and starts on.",
     default = true,
 ) {
-    category("Interface")
+    category("Chats")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

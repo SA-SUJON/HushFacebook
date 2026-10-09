@@ -51,7 +51,7 @@ val hideTabsPatch = bytecodePatch(
         "and all start off, and a change shows once Facebook restarts.",
     default = true,
 ) {
-    category("Interface")
+    category("Navigation")
     dependsOn(settingsPatch, tabBarFilterPatch, tabLinksPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

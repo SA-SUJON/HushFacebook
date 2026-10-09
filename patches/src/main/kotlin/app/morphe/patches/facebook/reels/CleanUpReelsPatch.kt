@@ -63,7 +63,7 @@ val cleanUpReelsPatch = bytecodePatch(
         "between reels. Reels and videos can also open in Facebook's Clean mode. Each part has its own switch " +
         "under Reels and Watch in Hushfacebook settings, and they all start off.",
 ) {
-    category("Interface")
+    category("Reels")
     dependsOn(settingsPatch)
     dependsOn(facebookExtensionPatch)
     compatibleWith(*AppCompatibilities.facebook())

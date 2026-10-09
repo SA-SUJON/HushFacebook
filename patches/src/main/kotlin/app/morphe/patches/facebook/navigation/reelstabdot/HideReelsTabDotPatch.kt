@@ -61,7 +61,7 @@ val hideReelsTabDotPatch = bytecodePatch(
     description = "Takes the new-item dot and count off the Reels tab, which some accounts call Video. Every " +
         "other tab keeps its own. Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
 ) {
-    category("Interface")
+    category("Navigation")
     dependsOn(settingsPatch)
     dependsOn(jewelCountHookPatch)
     compatibleWith(*AppCompatibilities.facebook())

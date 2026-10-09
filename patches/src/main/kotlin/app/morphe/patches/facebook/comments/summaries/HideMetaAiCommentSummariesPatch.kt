@@ -80,7 +80,7 @@ val hideMetaAiCommentSummariesPatch = bytecodePatch(
         "posts. The comments stay. Its switch is under Comments in Hushfacebook settings and starts off.",
     default = true,
 ) {
-    category("Feed")
+    category("Comments")
     dependsOn(settingsPatch, facebookExtensionPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

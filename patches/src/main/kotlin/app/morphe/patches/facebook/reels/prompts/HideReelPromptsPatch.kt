@@ -52,7 +52,7 @@ val hideReelPromptsPatch = bytecodePatch(
     description = "Removes the \"Are you interested in this reel?\" prompt from reels. The reel plays as usual. " +
         "Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
 ) {
-    category("Interface")
+    category("Reels")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

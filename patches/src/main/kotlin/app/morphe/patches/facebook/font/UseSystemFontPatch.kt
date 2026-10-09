@@ -69,7 +69,7 @@ val useSystemFontPatch = bytecodePatch(
         "story. Its switch and the font file row are under Appearance in Hushfacebook settings, and the switch " +
         "starts off. Restart Facebook after changing the font.",
 ) {
-    category("Interface")
+    category("Theme")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

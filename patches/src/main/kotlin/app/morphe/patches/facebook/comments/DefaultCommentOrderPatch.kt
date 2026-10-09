@@ -33,7 +33,7 @@ val defaultCommentOrderPatch = bytecodePatch(
         "still open on it. Turn on its switch and pick an order under Comments in Hushfacebook settings. The " +
         "switch starts off.",
 ) {
-    category("Interface")
+    category("Comments")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

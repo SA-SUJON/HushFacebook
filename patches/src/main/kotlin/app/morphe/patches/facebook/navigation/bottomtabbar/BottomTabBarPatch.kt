@@ -59,7 +59,7 @@ val bottomTabBarPatch = bytecodePatch(
         "switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after you turn it " +
         "on. A second switch there lets the bar at the bottom slide away while you scroll down.",
 ) {
-    category("Interface")
+    category("Navigation")
     // The second switch: Facebook's own scroll-away for the bar at the bottom, in TabBarScrollAwayPatch.kt.
     dependsOn(settingsPatch, tabBarScrollAwayPatch)
     compatibleWith(*AppCompatibilities.facebook())

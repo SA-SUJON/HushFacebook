@@ -35,7 +35,7 @@ val marketplaceOnlyPatch = bytecodePatch(
         "settings and starts off.",
     default = true,
 ) {
-    category("Interface")
+    category("Navigation")
     dependsOn(settingsPatch, openOnChosenTabPatch, hushfacebookInTheMenuPatch,
         blockPromotionalNotificationsPatch, marketplaceFeedPrefetchPatch, tabBarFilterPatch)
     compatibleWith(*AppCompatibilities.facebook())

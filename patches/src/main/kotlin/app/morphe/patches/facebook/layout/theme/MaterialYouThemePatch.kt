@@ -309,7 +309,7 @@ val materialYouThemePatch = bytecodePatch(
         "Morphe Manager to pick it.",
     default = false,
 ) {
-    category("Interface")
+    category("Theme")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

@@ -69,7 +69,7 @@ val keepReelSpeedPatch = bytecodePatch(
         "Watch in Hushfacebook settings. The reel one starts on and the video one starts off.",
     default = true,
 ) {
-    category("Interface")
+    category("Playback")
     // The guard keeps a tap from undoing a picked speed on accounts Facebook gives its own hold.
     dependsOn(settingsPatch, reelLiftGuardPatch)
     compatibleWith(*AppCompatibilities.facebook())

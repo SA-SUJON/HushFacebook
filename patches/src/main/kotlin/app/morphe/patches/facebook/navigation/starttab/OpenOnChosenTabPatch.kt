@@ -49,7 +49,7 @@ val openOnChosenTabPatch = bytecodePatch(
         "you change it. Notifications and links still open where they lead. Its switch and the tab list are under " +
         "Opening Facebook in Hushfacebook settings, and the switch starts off.",
 ) {
-    category("Interface")
+    category("Navigation")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

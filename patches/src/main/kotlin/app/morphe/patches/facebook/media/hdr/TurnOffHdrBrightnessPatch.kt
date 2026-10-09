@@ -67,7 +67,7 @@ val turnOffHdrBrightnessPatch = bytecodePatch(
         "same resolution, in the screen's usual range. Its switch is under Playback in Hushfacebook settings and " +
         "starts off.",
 ) {
-    category("Interface")
+    category("Playback")
     dependsOn(settingsPatch, facebookExtensionPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

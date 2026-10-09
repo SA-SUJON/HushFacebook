@@ -48,7 +48,7 @@ val openMessengerFromTopBarPatch = bytecodePatch(
         "what Facebook does with it. Its switch is under Chats in Hushfacebook settings and starts off.",
     default = true,
 ) {
-    category("Interface")
+    category("Chats")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

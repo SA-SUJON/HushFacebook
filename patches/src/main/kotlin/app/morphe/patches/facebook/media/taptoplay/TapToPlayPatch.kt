@@ -54,7 +54,7 @@ val tapToPlayPatch = bytecodePatch(
         "plays as usual. Its switch is under Playback in Hushfacebook settings and starts off. While it's on, " +
         "Facebook's own Autoplay setting reads Off.",
 ) {
-    category("Interface")
+    category("Playback")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

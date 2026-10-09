@@ -62,7 +62,7 @@ val hideStoriesTrayPatch = bytecodePatch(
         "included, and the rows of stories Facebook puts between posts, plus one for the composer row at the top " +
         "of Home. They're under News feed in Hushfacebook settings and all start off.",
 ) {
-    category("Feed")
+    category("Stories")
     dependsOn(settingsPatch, feedFilterHookPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

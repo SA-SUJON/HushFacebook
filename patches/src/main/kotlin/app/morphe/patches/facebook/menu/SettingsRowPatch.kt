@@ -53,7 +53,7 @@ val hushfacebookInTheMenuPatch = bytecodePatch(
         "shortcut still open the settings too. It has no switch of its own.",
     default = true,
 ) {
-    category("Interface")
+    category("Settings")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

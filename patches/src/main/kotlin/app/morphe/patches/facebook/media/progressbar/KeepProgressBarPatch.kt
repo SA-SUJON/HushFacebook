@@ -120,7 +120,7 @@ val keepProgressBarPatch = bytecodePatch(
         "Hushfacebook settings and starts off.",
     default = true,
 ) {
-    category("Interface")
+    category("Playback")
     dependsOn(settingsPatch, facebookExtensionPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

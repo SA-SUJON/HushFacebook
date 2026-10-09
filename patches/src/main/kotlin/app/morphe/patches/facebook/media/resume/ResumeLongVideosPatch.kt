@@ -40,7 +40,7 @@ val resumeLongVideosPatch = bytecodePatch(
         "under Playback in Hushfacebook settings and starts off.",
     default = true,
 ) {
-    category("Interface")
+    category("Playback")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

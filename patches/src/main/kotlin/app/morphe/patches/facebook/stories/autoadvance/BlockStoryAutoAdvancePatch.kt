@@ -58,7 +58,7 @@ val blockStoryAutoAdvancePatch = bytecodePatch(
     description = "Keeps each story on screen until you tap or swipe. Its switch is under Stories in Hushfacebook " +
         "settings and starts off. A second switch there plays a finished story again from the start.",
 ) {
-    category("Interface")
+    category("Stories")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

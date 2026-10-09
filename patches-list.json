@@ -7,7 +7,7 @@
     {
       "name": "AMOLED black theme",
       "description": "Makes Facebook's dark mode black, or a dark colour you pick, instead of dark grey. Turn on dark mode in Facebook first. There's no switch, since the colour goes in when you patch, and changing it means patching again. It isn't selected by default, so turn on Expert mode in Morphe Manager to pick it.",
-      "category": "Interface",
+      "category": "Theme",
       "use": false,
       "dependencies": [
         "BytecodePatch",
@@ -56,7 +56,7 @@
     {
       "name": "Accent color",
       "description": "Lets you swap Facebook's blue on links, buttons, switches and the selected tab for another color. Pick one under Appearance in Hushfacebook settings. It starts on Facebook's own blue, so nothing changes until you pick another.",
-      "category": "Interface",
+      "category": "Theme",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -358,7 +358,7 @@
     {
       "name": "Clean up Facebook's chat list",
       "description": "Two switches for Chats inside Facebook, both under Chats in Hushfacebook settings and off until you turn them on. One empties the list behind the row above your chats, so friends' notes and who's active go, and your own note tile may go too. The other takes out the promotional banners at the top of Chats, like the one asking you to turn on notifications. Your chats, search and new messages stay.",
-      "category": "Interface",
+      "category": "Chats",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -395,7 +395,7 @@
     {
       "name": "Clean up Reels",
       "description": "Hides the Follow button on reels and the comment and reaction previews under them. Buttons such as Remix, Use template, Add yours and Stars can go too, and so can the Threads cards Facebook puts between reels. Reels and videos can also open in Facebook's Clean mode. Each part has its own switch under Reels and Watch in Hushfacebook settings, and they all start off.",
-      "category": "Interface",
+      "category": "Reels",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -433,7 +433,7 @@
     {
       "name": "Comment sheet options",
       "description": "Adds four switches under Comments in Hushfacebook settings, all off to start. Like only stops a long press on Like from opening the reactions, another takes the GIF and sticker buttons out of the comment box, Open every reply thread shows each comment's replies without a tap on View replies, and Hide related groups takes the Related groups list out from under a group post's comments. A row there opens Facebook's own settings, where Reaction preferences can hide reaction counts.",
-      "category": "Interface",
+      "category": "Comments",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -471,7 +471,7 @@
     {
       "name": "Default comment order",
       "description": "Opens comments in the order you choose, Most relevant, Newest or All comments, instead of the one Facebook picks. An order you pick in a post's comments stays for that post, and links to a comment still open on it. Turn on its switch and pick an order under Comments in Hushfacebook settings. The switch starts off.",
-      "category": "Interface",
+      "category": "Comments",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -508,7 +508,7 @@
     {
       "name": "Default playback quality",
       "description": "Plays videos, reels and video stories at the quality you choose, such as Data saver or up to 720p, instead of the one Facebook picks as it plays. Reels and stories can have a quality of their own. A quality you pick in a video's own menu still wins for that video. Turn on its switch and pick a quality under Playback in Hushfacebook settings. The switch starts off.",
-      "category": "Interface",
+      "category": "Playback",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -850,7 +850,7 @@
     {
       "name": "Force dark mode",
       "description": "Keeps Facebook in dark mode whatever its own setting says, for tablets where Facebook's settings have no Dark mode. Its switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after you turn it on.",
-      "category": "Interface",
+      "category": "Theme",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -963,7 +963,7 @@
     {
       "name": "Hide Meta AI comment summaries",
       "description": "Removes Meta AI's summary of the comments from the top of the comment sheet and from under posts. The comments stay. Its switch is under Comments in Hushfacebook settings and starts off.",
-      "category": "Feed",
+      "category": "Comments",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -1151,7 +1151,7 @@
     {
       "name": "Hide Stories tray",
       "description": "Adds separate switches for the row of stories at the top of the news feed, Create story included, and the rows of stories Facebook puts between posts, plus one for the composer row at the top of Home. They're under News feed in Hushfacebook settings and all start off.",
-      "category": "Feed",
+      "category": "Stories",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -1339,7 +1339,7 @@
     {
       "name": "Hide reel interest prompts",
       "description": "Removes the \"Are you interested in this reel?\" prompt from reels. The reel plays as usual. Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
-      "category": "Interface",
+      "category": "Reels",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -1680,7 +1680,7 @@
     {
       "name": "Hide suggested stories",
       "description": "Removes the stories Facebook suggests from people and Pages you don't follow, the ones marked Suggested in the Stories tray, and the tray's Find friends from contacts card. With Hide suggested and promoted posts in the build too, the tray's People you may know cards go as well. Your friends' stories, the Pages you follow and Create story stay. Its switches are under Stories in Hushfacebook settings, and the two for suggested stories and the contacts card start on.",
-      "category": "Feed",
+      "category": "Stories",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -1718,7 +1718,7 @@
     {
       "name": "Hide tab badges",
       "description": "Takes the dot and count off the tabs you pick, and Facebook's count off its app icon. Notifications still come in, and the Notifications tab still lists them. The switches are under Appearance in Hushfacebook settings and all start off.",
-      "category": "Interface",
+      "category": "Navigation",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -1756,7 +1756,7 @@
     {
       "name": "Hide tabs",
       "description": "Takes the tabs you pick off the tab bar: Feeds, Friends, Marketplace, Groups, Gaming or Events, and Dating, Professional dashboard, Saved, Ad Center, Create, Explore or Jobs where Facebook gives you one. Each page stays in the Menu. The switches are under Appearance in Hushfacebook settings and all start off, and a change shows once Facebook restarts.",
-      "category": "Interface",
+      "category": "Navigation",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -1831,7 +1831,7 @@
     {
       "name": "Hide the Get Messenger card",
       "description": "Hides the \"Get the Messenger app\" card at the top of Chats while Messenger is installed. Facebook only counts a Messenger signed with its own key, so a re-signed Facebook shows the card even with Messenger right there. Without Messenger the card stays. Its switch is under Chats in Hushfacebook settings and starts on.",
-      "category": "Interface",
+      "category": "Chats",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -1868,7 +1868,7 @@
     {
       "name": "Hide the Reels tab",
       "description": "Takes the Reels tab, which some accounts call Video, off the tab bar, and its shortcut out of the long-press menu of Facebook's icon. Reel links and the reels in your feed still open. Its switch is under Reels and Watch in Hushfacebook settings and starts off, and a change shows once Facebook restarts. Facebook's own Hide in its tab bar settings keeps working.",
-      "category": "Interface",
+      "category": "Navigation",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -1906,7 +1906,7 @@
     {
       "name": "Hide the Reels tab dot",
       "description": "Takes the new-item dot and count off the Reels tab, which some accounts call Video. Every other tab keeps its own. Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
-      "category": "Interface",
+      "category": "Navigation",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -1982,7 +1982,7 @@
     {
       "name": "Hold a reel for 2x",
       "description": "Holding a reel plays it at double speed until you let go. The hold takes the place of Facebook's long-press menu, which the reel's more button still opens. Its switch is under Reels and Watch in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Playback",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -2058,7 +2058,7 @@
     {
       "name": "Hushfacebook in the Menu",
       "description": "Adds a Hushfacebook settings row to Facebook's Menu, at the end of Settings and privacy, with a Saved row above it while the Saved shortcut switch is on. The logo long press and the launcher shortcut still open the settings too. It has no switch of its own.",
-      "category": "Interface",
+      "category": "Settings",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2208,7 +2208,7 @@
     {
       "name": "Keep the progress bar",
       "description": "Keeps the progress bar of reels at full size, so you can drag it without tapping first, and keeps a full-screen video's controls on screen until you tap. Its switch is under Playback in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Playback",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -2246,7 +2246,7 @@
     {
       "name": "Keep the reel speed",
       "description": "A playback speed you pick in a reel's menu stays for the next reels until you pick another or Facebook restarts. A second switch does the same for feed and Watch videos. Both are under Reels and Watch in Hushfacebook settings. The reel one starts on and the video one starts off.",
-      "category": "Interface",
+      "category": "Playback",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -2284,7 +2284,7 @@
     {
       "name": "Marketplace only",
       "description": "Leaves only Marketplace, Notifications and your profile or Menu in the tab bar, and opens Facebook on Marketplace. Home with the news feed, Video, Friends, Feeds, Groups, Gaming and Events go. Notifications and links still open where they lead. Its switch is under Opening Facebook in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Navigation",
       "use": true,
       "dependencies": [
         "Block promotional notifications",
@@ -2325,7 +2325,7 @@
     {
       "name": "Material You theme",
       "description": "Gives Facebook's dark mode the colours of your wallpaper on Android 12 and newer, and a fixed blue palette on Android 11. Light mode stays as it is. Turn on dark mode in Facebook first. There's no switch, since the colours go in when you patch. It isn't selected by default, so turn on Expert mode in Morphe Manager to pick it.",
-      "category": "Interface",
+      "category": "Theme",
       "use": false,
       "dependencies": [
         "BytecodePatch",
@@ -2364,7 +2364,7 @@
     {
       "name": "Open Messenger from the top bar",
       "description": "Lets the Messenger icon at the top of Facebook open the Messenger app instead of Facebook's own Chats. Without Messenger installed, Chats opens as before, and a long press on the icon still does what Facebook does with it. Its switch is under Chats in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Chats",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2439,7 +2439,7 @@
     {
       "name": "Open on a chosen tab",
       "description": "Opens Facebook on the tab you pick when you start it from its icon. It's Marketplace unless you change it. Notifications and links still open where they lead. Its switch and the tab list are under Opening Facebook in Hushfacebook settings, and the switch starts off.",
-      "category": "Interface",
+      "category": "Navigation",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2476,7 +2476,7 @@
     {
       "name": "Picture-in-picture",
       "description": "A reel playing in the Reels tab, or a video playing in the Video tab or Facebook's full-screen Watch viewer, keeps going in a small window when you leave Facebook, through the picture-in-picture Facebook already has for them. Needs Android 12 or later. Its switch is under Playback in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Playback",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2551,7 +2551,7 @@
     {
       "name": "Resume long videos",
       "description": "A video longer than two minutes that you left partway picks up where you left it the next time it plays, in the feed or full screen. Short reels, live videos and ads start as usual. Its switch is under Playback in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Playback",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2626,7 +2626,7 @@
     {
       "name": "Send chat photos and videos at original quality",
       "description": "Photos and videos you send from a chat that opens inside Facebook go out as the originals instead of Facebook's smaller copies. Its switch is under Chats in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Chats",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2777,7 +2777,7 @@
     {
       "name": "Stop Story auto-advance",
       "description": "Keeps each story on screen until you tap or swipe. Its switch is under Stories in Hushfacebook settings and starts off. A second switch there plays a finished story again from the start.",
-      "category": "Interface",
+      "category": "Stories",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2851,7 +2851,7 @@
     {
       "name": "Tab bar at the bottom",
       "description": "Moves Facebook's tab bar to the bottom of the screen on accounts that have it at the top. Its switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after you turn it on. A second switch there lets the bar at the bottom slide away while you scroll down.",
-      "category": "Interface",
+      "category": "Navigation",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -2889,7 +2889,7 @@
     {
       "name": "Tag suggestions only after @",
       "description": "Stops Facebook offering people to tag while you type ordinary words in posts and comments. Typing @ still brings up the list. Photo tags and your text aren't touched. Its switch is under Writing in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Comments",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2926,7 +2926,7 @@
     {
       "name": "Tap to play",
       "description": "Videos, reels, stories and music wait for your tap instead of starting by themselves. A tap plays as usual. Its switch is under Playback in Hushfacebook settings and starts off. While it's on, Facebook's own Autoplay setting reads Off.",
-      "category": "Interface",
+      "category": "Playback",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -2963,7 +2963,7 @@
     {
       "name": "Turn off HDR brightness",
       "description": "Keeps HDR videos and photos from turning your screen up to full brightness. They play at the same resolution, in the screen's usual range. Its switch is under Playback in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Playback",
       "use": true,
       "dependencies": [
         "BytecodePatch",
@@ -3038,7 +3038,7 @@
     {
       "name": "Turn off double tap to like",
       "description": "Stops a double tap on a reel or a video from liking it, and the heart doesn't show. A single tap still plays or pauses, and the Like button still likes. Its switch is under Reels and Watch in Hushfacebook settings and starts off.",
-      "category": "Interface",
+      "category": "Reels",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -3151,7 +3151,7 @@
     {
       "name": "Use the phone's emoji",
       "description": "Draws emoji with your phone's own emoji font instead of Meta's, so the ones in posts, comments and chats look like the ones on your keyboard, big chat emoji included. Reactions and stickers stay as they are. Its switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after changing it.",
-      "category": "Interface",
+      "category": "Theme",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"
@@ -3188,7 +3188,7 @@
     {
       "name": "Use the system font",
       "description": "Draws Facebook's own text in your phone's font instead of Meta's Optimistic typeface, or in a TrueType or OpenType file you pick. Icons and emoji keep their fonts, and so does the text you put on a story. Its switch and the font file row are under Appearance in Hushfacebook settings, and the switch starts off. Restart Facebook after changing the font.",
-      "category": "Interface",
+      "category": "Theme",
       "use": true,
       "dependencies": [
         "Hushfacebook settings"

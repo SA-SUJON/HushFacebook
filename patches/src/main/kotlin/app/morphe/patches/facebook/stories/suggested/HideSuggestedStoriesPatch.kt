@@ -78,7 +78,7 @@ val hideSuggestedStoriesPatch = bytecodePatch(
         "the two for suggested stories and the contacts card start on.",
     default = true,
 ) {
-    category("Feed")
+    category("Stories")
     dependsOn(settingsPatch)
     dependsOn(facebookExtensionPatch)
     compatibleWith(*AppCompatibilities.facebook())

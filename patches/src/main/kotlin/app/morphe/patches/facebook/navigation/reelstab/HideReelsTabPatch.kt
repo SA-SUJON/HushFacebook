@@ -34,7 +34,7 @@ val hideReelsTabPatch = bytecodePatch(
         "under Reels and Watch in Hushfacebook settings and starts off, and a change shows once Facebook " +
         "restarts. Facebook's own Hide in its tab bar settings keeps working.",
 ) {
-    category("Interface")
+    category("Navigation")
     dependsOn(settingsPatch, tabBarFilterPatch, tabLinksPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

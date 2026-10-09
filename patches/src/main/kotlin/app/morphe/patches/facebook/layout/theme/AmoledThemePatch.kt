@@ -407,7 +407,7 @@ val amoledThemePatch = bytecodePatch(
         "means patching again. It isn't selected by default, so turn on Expert mode in Morphe Manager to pick it.",
     default = false,
 ) {
-    category("Interface")
+    category("Theme")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

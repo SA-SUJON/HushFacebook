@@ -48,7 +48,7 @@ val useSystemEmojiPatch = bytecodePatch(
         "they are. Its switch is under Appearance in Hushfacebook settings and starts off. Restart Facebook after " +
         "changing it.",
 ) {
-    category("Interface")
+    category("Theme")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

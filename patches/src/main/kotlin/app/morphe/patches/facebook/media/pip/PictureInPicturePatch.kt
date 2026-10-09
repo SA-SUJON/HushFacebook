@@ -170,7 +170,7 @@ val pictureInPicturePatch = bytecodePatch(
         "Facebook already has for them. Needs Android 12 or later. Its switch is under Playback in Hushfacebook " +
         "settings and starts off.",
 ) {
-    category("Interface")
+    category("Playback")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

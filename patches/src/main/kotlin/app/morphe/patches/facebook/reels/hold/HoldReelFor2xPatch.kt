@@ -90,7 +90,7 @@ val holdReelFor2xPatch = bytecodePatch(
         "Facebook's long-press menu, which the reel's more button still opens. Its switch is under Reels and " +
         "Watch in Hushfacebook settings and starts off.",
 ) {
-    category("Interface")
+    category("Playback")
     dependsOn(settingsPatch, reelLiftGuardPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

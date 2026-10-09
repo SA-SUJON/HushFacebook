@@ -139,7 +139,7 @@ val commentSheetOptionsPatch = bytecodePatch(
         "Hide related groups takes the Related groups list out from under a group post's comments. A row there " +
         "opens Facebook's own settings, where Reaction preferences can hide reaction counts.",
 ) {
-    category("Interface")
+    category("Comments")
     dependsOn(settingsPatch, facebookExtensionPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

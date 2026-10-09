@@ -29,7 +29,7 @@ val accentColorPatch = bytecodePatch(
         "color. Pick one under Appearance in Hushfacebook settings. It starts on Facebook's own blue, so nothing " +
         "changes until you pick another.",
 ) {
-    category("Interface")
+    category("Theme")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

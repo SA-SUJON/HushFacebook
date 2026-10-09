@@ -32,7 +32,7 @@ val tagSuggestionsOnlyAfterAtPatch = bytecodePatch(
         "Typing @ still brings up the list. Photo tags and your text aren't touched. Its switch is under Writing " +
         "in Hushfacebook settings and starts off.",
 ) {
-    category("Interface")
+    category("Comments")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 

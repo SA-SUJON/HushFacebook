@@ -45,7 +45,7 @@ val defaultPlaybackQualityPatch = bytecodePatch(
         "A quality you pick in a video's own menu still wins for that video. Turn on its switch and pick a " +
         "quality under Playback in Hushfacebook settings. The switch starts off.",
 ) {
-    category("Interface")
+    category("Playback")
     dependsOn(settingsPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
