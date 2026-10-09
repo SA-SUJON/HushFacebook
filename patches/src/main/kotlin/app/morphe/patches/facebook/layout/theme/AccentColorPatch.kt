@@ -26,8 +26,8 @@ val accentColorPatch = bytecodePatch(
     // The README table check reads this literal.
     name = "Accent color",
     description = "Lets you swap Facebook's blue on links, buttons, switches and the selected tab for another " +
-        "color, picked under Appearance. It starts on Facebook's own blue, so turn it on and pick one.",
-    default = false,
+        "color. Pick one under Appearance in Hushfacebook settings. It starts on Facebook's own blue, so nothing " +
+        "changes until you pick another.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

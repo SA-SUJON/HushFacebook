@@ -33,17 +33,17 @@ internal const val PATCH = "Default playback quality"
  * QualityAnchors.kt for how Facebook's player applies a quality, and the extension's QualityChoice
  * for when it keeps Facebook's own.
  *
- * Off in the default selection. Picked, its switch starts on and the quality starts as Facebook's
- * own, so nothing changes until a quality is chosen.
+ * In the default selection with its switch off and the quality as Facebook's own, so nothing
+ * changes until the switch is turned on and a quality is chosen.
  */
 @Suppress("unused")
 val defaultPlaybackQualityPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Default playback quality",
-    description = "Plays videos, reels and video stories at the quality you choose in Hushfacebook's settings, " +
-        "such as Data saver or up to 720p, instead of the one Facebook picks as it plays. Reels and stories can " +
-        "have a quality of their own. A quality you pick in a video's own menu still wins for that video.",
-    default = false,
+    description = "Plays videos, reels and video stories at the quality you choose, such as Data saver or up to " +
+        "720p, instead of the one Facebook picks as it plays. Reels and stories can have a quality of their own. " +
+        "A quality you pick in a video's own menu still wins for that video. Turn on its switch and pick a " +
+        "quality under Playback in Hushfacebook settings. The switch starts off.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

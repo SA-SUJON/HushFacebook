@@ -143,8 +143,9 @@ internal fun MutableMethod.readRealVersionCode(): Int {
 val disablePlayStoreUpdatesPatch = bytecodePatch(
     name = "Disable Play Store updates",
     description = "Stops Google Play offering Facebook updates by giving Facebook the highest version number " +
-        "Android allows, while Facebook's own code still reads its real one. It doesn't work on a Root Mount " +
-        "install. Once a Facebook with it is installed, a build without it won't install over it.",
+        "Android allows, while Facebook's own code still reads its real one. It has no switch, and it doesn't " +
+        "work on a Root Mount install. Once a Facebook with it is installed, a build without it won't install " +
+        "over it. It isn't selected by default, so turn on Expert mode in Morphe Manager to pick it.",
     default = false,
 ) {
     category("Fixes")

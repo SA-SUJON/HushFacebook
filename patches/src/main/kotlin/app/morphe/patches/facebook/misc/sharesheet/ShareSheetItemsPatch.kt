@@ -18,14 +18,15 @@ import app.morphe.patches.shared.compat.AppCompatibilities
  * The idea is icysymmetra/tiktok-patches-for-morphe's Share sheet modification, which does the same
  * for TikTok's share sheet.
  *
- * Off by default: nobody has seen it on a signed-in account yet.
+ * In the default selection, but it changes nothing until it's turned on in Hushfacebook settings:
+ * nobody has seen it on a signed-in account yet.
  */
 @Suppress("unused")
 val shareSheetItemsPatch = bytecodePatch(
     name = "Share sheet items",
     description = "Lets you hide items from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link. Pick " +
-        "them under Links in Hushfacebook settings. The rest keep Facebook's order.",
-    default = false,
+        "them under Links in Hushfacebook settings. Nothing is hidden until you do, and the rest keep Facebook's " +
+        "order.",
 ) {
     category("Interface")
     dependsOn(settingsPatch, facebookExtensionPatch, shareSheetHookPatch)

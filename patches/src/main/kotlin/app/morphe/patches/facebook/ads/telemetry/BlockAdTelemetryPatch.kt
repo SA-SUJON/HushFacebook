@@ -32,8 +32,8 @@ internal val AD_TELEMETRY = listOf(
 @Suppress("unused")
 val blockAdTelemetryPatch = bytecodePatch(
     name = "Block ad telemetry",
-    description = "Stops Facebook watching for screenshots of ads and reporting which apps you " +
-        "install for ad attribution.",
+    description = "Stops Facebook watching for screenshots of ads and reporting which apps you install for ad " +
+        "attribution. It has no switch and works as soon as you patch.",
     default = true,
 ) {
     category("Privacy")

@@ -483,8 +483,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     /**
      * Under the card when this build lacks a patch Morphe Manager selects by default, or null when
      * it has them all. A patch left out is the usual answer to "ads still show" (#29, #35). A tap
-     * opens and closes the list of names, which runs to thirty for a build patched with one
-     * patch picked.
+     * opens and closes the list of names, which runs past eighty for a build patched with one
+     * patch picked, and lists the patches that joined the selection for a build made before they did.
      */
     @Nullable
     private static Preference missingDefaultsRow(Context context, Set<PatchFamily> build) {

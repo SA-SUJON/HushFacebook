@@ -71,10 +71,11 @@ internal class TrayBuckets(
 @Suppress("unused")
 val hideSuggestedStoriesPatch = bytecodePatch(
     name = "Hide suggested stories",
-    description = "Removes the stories Facebook suggests from people and Pages you don't follow, the ones " +
-        "marked Suggested in the Stories tray, and the tray's Find friends from contacts card. With Hide " +
-        "suggested and promoted posts in the build too, the tray's People you may know cards go as well. Your " +
-        "friends' stories, the Pages you follow and Create story stay.",
+    description = "Removes the stories Facebook suggests from people and Pages you don't follow, the ones marked " +
+        "Suggested in the Stories tray, and the tray's Find friends from contacts card. With Hide suggested and " +
+        "promoted posts in the build too, the tray's People you may know cards go as well. Your friends' stories, " +
+        "the Pages you follow and Create story stay. Its switches are under Stories in Hushfacebook settings, and " +
+        "the two for suggested stories and the contacts card start on.",
     default = true,
 ) {
     category("Feed")

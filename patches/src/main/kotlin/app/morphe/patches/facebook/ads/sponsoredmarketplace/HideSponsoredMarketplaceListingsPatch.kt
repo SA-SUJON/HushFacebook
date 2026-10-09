@@ -37,10 +37,11 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 @Suppress("unused")
 val hideSponsoredMarketplaceListingsPatch = bytecodePatch(
     name = "Hide sponsored Marketplace listings",
-    description = "Removes the ads and boosted listings from Marketplace's feed and search results. The feed's request " +
-        "asks Facebook to leave them out and the requests that fetch only ads don't go out. Ads that come back among " +
-        "search results are taken out before Marketplace shows them, and a video ad that reaches the feed anyway " +
-        "isn't drawn. The listings people post stay.",
+    description = "Removes the ads and boosted listings from Marketplace's feed and search results. The feed's " +
+        "request asks Facebook to leave them out and the requests that fetch only ads don't go out. Ads that come " +
+        "back among search results are taken out before Marketplace shows them, and a video ad that reaches the " +
+        "feed anyway isn't drawn. The listings people post stay. Its switch is under Marketplace in Hushfacebook " +
+        "settings and starts on.",
     default = true,
 ) {
     category("Ads")

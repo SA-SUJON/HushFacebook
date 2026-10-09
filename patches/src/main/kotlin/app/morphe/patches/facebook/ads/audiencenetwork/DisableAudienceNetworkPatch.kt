@@ -71,8 +71,8 @@ internal fun disableAudienceNetwork(manifest: Document) {
 @Suppress("unused")
 val disableAudienceNetworkPatch = bytecodePatch(
     name = "Disable Audience Network",
-    description = "Stops Facebook serving ads to other apps. Those apps then show their own ads " +
-        "or none, and rewarded ads can fail.",
+    description = "Stops Facebook serving ads to other apps. Those apps then show their own ads or none, and " +
+        "rewarded ads can fail. It has no switch and works as soon as you patch.",
     default = true,
 ) {
     category("Ads")

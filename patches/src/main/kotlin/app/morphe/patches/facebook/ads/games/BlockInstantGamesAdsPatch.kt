@@ -23,7 +23,8 @@ import app.morphe.util.findMutableMethodOf
 val blockInstantGamesAdsPatch = bytecodePatch(
     name = "Block Instant Games ads",
     description = "Games you play in Facebook get no ads. A game that asks for one is told there's none to show, " +
-        "so a rewarded ad gives no reward, and the game carries on.",
+        "so a rewarded ad gives no reward, and the game carries on. Its switch is under Menu in Hushfacebook " +
+        "settings and starts on.",
     default = true,
 ) {
     category("Ads")

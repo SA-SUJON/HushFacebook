@@ -83,8 +83,9 @@ private const val CONTEXT = "Landroid/content/Context;"
 val hideFeedsHeaderPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hide the Feeds header",
-    description = "Takes the title row and the All, Favorites, Friends, Groups and Pages filters off the top of the " +
-        "Feeds tab, so it opens on its posts. Its switch starts off, so turn it on under News feed and restart Facebook.",
+    description = "Takes the title row and the All, Favorites, Friends, Groups and Pages filters off the top of " +
+        "the Feeds tab, so it opens on its posts. Its switch is under News feed in Hushfacebook settings and " +
+        "starts off. Restart Facebook after you turn it on.",
 ) {
     category("Feed")
     dependsOn(settingsPatch)

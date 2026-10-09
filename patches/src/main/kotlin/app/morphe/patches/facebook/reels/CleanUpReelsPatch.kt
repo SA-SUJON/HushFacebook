@@ -52,16 +52,16 @@ private const val PATCH = "Clean up Reels"
  * that quietly does nothing. The hooks ask the extension, which answers Facebook's own path until
  * the settings are ready, while paused, and whenever it fails.
  *
- * Off by default: nobody has seen it on a signed-in Reels feed yet.
+ * In the default selection, but it changes nothing until it's turned on in Hushfacebook settings:
+ * nobody has seen it on a signed-in Reels feed yet.
  */
 @Suppress("unused")
 val cleanUpReelsPatch = bytecodePatch(
     name = "Clean up Reels",
-    description = "Hides the Follow button on reels and the comment and reaction previews under them. " +
-        "Buttons such as Remix, Use template, Add yours and Stars go too, and so can the Threads cards " +
-        "Facebook puts between reels. Reels and videos can also open in Facebook's Clean mode. " +
-        "Each part has its own switch.",
-    default = false,
+    description = "Hides the Follow button on reels and the comment and reaction previews under them. Buttons " +
+        "such as Remix, Use template, Add yours and Stars can go too, and so can the Threads cards Facebook puts " +
+        "between reels. Reels and videos can also open in Facebook's Clean mode. Each part has its own switch " +
+        "under Reels and Watch in Hushfacebook settings, and they all start off.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

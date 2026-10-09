@@ -23,7 +23,8 @@ val forceDarkModePatch = bytecodePatch(
     // The README table check reads this literal.
     name = "Force dark mode",
     description = "Keeps Facebook in dark mode whatever its own setting says, for tablets where Facebook's " +
-        "settings have no Dark mode. Its switch starts off, so turn it on under Appearance and restart Facebook.",
+        "settings have no Dark mode. Its switch is under Appearance in Hushfacebook settings and starts off. " +
+        "Restart Facebook after you turn it on.",
 ) {
     category("Interface")
     dependsOn(settingsPatch, facebookExtensionPatch)

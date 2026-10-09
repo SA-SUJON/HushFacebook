@@ -50,7 +50,7 @@ val hideMetaAiInSearchPatch = bytecodePatch(
     name = "Hide Meta AI in search",
     description = "Removes the Meta AI answer and the Ask Meta AI prompts Facebook adds to search results, and " +
         "stops search suggestions from opening Meta AI by themselves. People, groups, pages and posts stay, and " +
-        "the Meta AI button still works.",
+        "the Meta AI button still works. Its switch is under Search in Hushfacebook settings and starts on.",
     default = true,
 ) {
     category("Interface")

@@ -22,16 +22,16 @@ import com.android.tools.smali.dexlib2.iface.Method
  * Every anchor has to be found once: a half-applied patch would leave one sender running while the
  * switch says it's held, so a missing one stops the patch naming all of them.
  *
- * Off in the default selection: it trades Facebook's record of how the app is used for less
- * background traffic, which is a choice to make, not a fix. Picked, its switch starts on.
+ * In the default selection with its switch off: it trades Facebook's record of how the app is used
+ * for less background traffic, which is a choice to make, not a fix.
  */
 @Suppress("unused")
 val holdAnalyticsUploadsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hold back analytics uploads",
-    description = "Stops Facebook uploading its app analytics in the background and skips its on-device " +
-        "learning jobs. Its switch starts on, under Privacy. Restart Facebook after changing it.",
-    default = false,
+    description = "Stops Facebook uploading its app analytics in the background and skips its on-device learning " +
+        "jobs. Its switch is under Privacy in Hushfacebook settings and starts off. Restart Facebook after " +
+        "changing it.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)

@@ -27,15 +27,16 @@ import app.morphe.patches.shared.compat.AppCompatibilities
  * The hooks ask the extension, which answers Facebook's own way until the settings are ready, while
  * paused, and whenever it fails.
  *
- * Off by default: nobody has seen it on a signed-in account yet.
+ * In the default selection, but it changes nothing until it's turned on in Hushfacebook settings:
+ * nobody has seen it on a signed-in account yet.
  */
 @Suppress("unused")
 val hideMetaUpsellsPatch = bytecodePatch(
     name = "Hide Meta upsells",
-    description = "Hides the pushes for Edits, Threads cross-posting, Meta Verified, avatar stickers and Meta AI's " +
-        "Imagine outside the Menu, such as the Edits button in the Reels composer and the offer sheet after you post. " +
-        "Each has its own switch.",
-    default = false,
+    description = "Hides the pushes for Edits, Threads cross-posting, Meta Verified, avatar stickers and Meta " +
+        "AI's Imagine outside the Menu, such as the Edits button in the Reels composer and the offer sheet after " +
+        "you post. Each has its own switch under Meta's other products in Hushfacebook settings, and they all " +
+        "start off.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

@@ -60,7 +60,7 @@ val hidePostsByWordsPatch = bytecodePatch(
     description = "Hides feed posts whose text matches a word or pattern you list, unless it also matches your " +
         "keep list. It also hides posts from people, Pages and sites you list, and, each with its own switch, " +
         "photo, video, link and colored background posts. Hushfacebook never sends your lists anywhere. The " +
-        "switches start off, so turn one on and fill in its list in Hushfacebook's settings.",
+        "switches start off, so turn one on and fill in its list under News feed in Hushfacebook settings.",
     default = true,
 ) {
     category("Feed")

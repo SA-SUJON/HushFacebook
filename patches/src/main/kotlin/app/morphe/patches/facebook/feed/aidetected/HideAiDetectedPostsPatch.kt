@@ -82,11 +82,11 @@ private const val PATCH = "Hide AI-detected posts"
 @Suppress("unused")
 val hideAiDetectedPostsPatch = bytecodePatch(
     name = "Hide AI-detected posts",
-    description = "Removes feed posts that Facebook's own detection marked as made with AI, and the reels " +
-        "and Watch videos it flagged the same way. A third switch also removes posts their creator " +
-        "labelled as AI, a fourth takes out the Meta AI cards Facebook adds between posts, and a fifth " +
-        "removes posts featuring Meta's AI characters. The Meta AI cards switch starts on. The others start " +
-        "off, so turn them on in Hushfacebook's settings.",
+    description = "Removes feed posts that Facebook's own detection marked as made with AI, and the reels and " +
+        "Watch videos it flagged the same way. A third switch also removes posts their creator labelled as AI, a " +
+        "fourth takes out the Meta AI cards Facebook adds between posts, and a fifth removes posts featuring " +
+        "Meta's AI characters. They're under News feed in Hushfacebook settings, with the reels one under Reels " +
+        "and Watch. The Meta AI cards switch starts on, and the others start off.",
     default = true,
 ) {
     category("Feed")

@@ -80,7 +80,7 @@ val showSellerViewProfilePatch = bytecodePatch(
     name = "Show View profile on Marketplace sellers",
     description = "Every seller's page in Marketplace gets View profile, which opens the seller's regular " +
         "Facebook profile so you can check who you're buying from. Facebook shows that button to only some " +
-        "accounts. Its switch starts on, under Marketplace.",
+        "accounts. Its switch is under Marketplace in Hushfacebook settings and starts on.",
     default = true,
 ) {
     category("Interface")

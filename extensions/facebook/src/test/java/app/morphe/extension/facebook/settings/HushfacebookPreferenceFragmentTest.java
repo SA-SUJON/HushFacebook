@@ -1005,13 +1005,14 @@ public class HushfacebookPreferenceFragmentTest {
     public void aChosenReelsTabSaysItOpensHomeWhileHideTheReelsTabIsOn() {
         PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.START_TAB, PatchFamily.REELS_TAB);
         Settings.START_TAB.save(StartTab.VIDEO);
+        Settings.HIDE_REELS_TAB.save(true);
         try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
             HushfacebookPreferenceFragment page = new HushfacebookPreferenceFragment();
             controller.get().getFragmentManager().beginTransaction().add(android.R.id.content, page).commitNow();
             SwitchPreference hide = (SwitchPreference) page.findPreference(Settings.HIDE_REELS_TAB.key);
             assertEquals("Hide the Reels tab", String.valueOf(hide.getTitle()));
             assertEquals("Reels and Watch", String.valueOf(hide.getParent().getTitle()));
-            assertTrue("picking the patch is the choice", hide.isChecked());
+            assertTrue("the row doesn't show the switch on", hide.isChecked());
             Preference start = page.findPreference(Settings.START_TAB.key);
             assertEquals("Facebook opens on Home while Hide the Reels tab is on, since Video is off the tab bar. "
                     + "Your choice stays saved.", String.valueOf(start.getSummary()));

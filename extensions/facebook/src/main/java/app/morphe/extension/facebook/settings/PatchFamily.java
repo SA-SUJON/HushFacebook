@@ -277,20 +277,21 @@ public enum PatchFamily {
             EnumSet.of(STORY_DOWNLOAD, REEL_DOWNLOAD, VIDEO_DOWNLOAD, PHOTO_DOWNLOAD));
 
     /**
+     * The patches Morphe Manager leaves out of its default selection. Each one goes in when you
+     * patch with no switch to leave Facebook as it ships: the two themes rewrite dark mode's colours,
+     * and Disable Play Store updates raises the version number, which a Root Mount install can't
+     * take and every later build has to keep. Everything else is in the default selection, with any
+     * switch a patch brought in from this list starting off.
+     */
+    private static final EnumSet<PatchFamily> OPT_IN = EnumSet.of(AMOLED_THEME, MATERIAL_YOU_THEME, PLAY_STORE_UPDATES);
+
+    /**
      * The patches Morphe Manager selects by default. One of them left out is the usual answer to a
      * report of ads or suggestions that still show (#29, #35), so the overview and the report name
      * the ones a build lacks. PatchFamilyTest holds this to the "use" flags in patches-list.json, so
-     * a new default patch fails it until it's listed here.
+     * a new patch fails it until patches-list.json and {@link #OPT_IN} agree on it.
      */
-    static final Set<PatchFamily> DEFAULT_SELECTION = Collections.unmodifiableSet(EnumSet.of(
-            SPONSORED_POSTS, SUGGESTED_POSTS, AI_DETECTED_POSTS, POST_WORDS, POST_PROMPTS, META_AI_QUESTIONS,
-            POST_DATES, AUTO_TRANSLATION, FEEDS_HEADER, SPONSORED_STORIES, SUGGESTED_STORIES, REEL_PROMPTS,
-            SPONSORED_REELS, SPONSORED_SEARCH, SPONSORED_PROFILE_POSTS, SPONSORED_MARKETPLACE, GAME_ADS, AFFILIATE_LINKS,
-            KEEP_REEL_SPEED, META_AI_SUMMARIES,
-            RESUME_LONG_VIDEOS, PROGRESS_BAR, EXTERNAL_BROWSER, SANITIZE_SHARING_LINKS, UPDATE_PROMPTS, STORY_DOWNLOAD,
-            REEL_DOWNLOAD, PHOTO_DOWNLOAD, FOLLOWING_HOME, MARKETPLACE_ONLY, SELLER_VIEW_PROFILE, REELS_TAB_DOT, TAB_BADGES, HIDDEN_TABS, BOTTOM_TAB_BAR, FORCE_DARK_MODE, MESSENGER_CARD, CHAT_LIST, MESSENGER_ICON, ORIGINAL_CHAT_MEDIA, MENU_PROMOTIONS,
-            META_AI_SEARCH, PROMO_NOTIFICATIONS, AD_PREFETCH, AD_TELEMETRY, AUDIENCE_NETWORK, RESTORE_TRUST,
-            TRANSLATED_START, INSTALL_BESIDE_META_APPS, MENU_SETTINGS_ROW));
+    static final Set<PatchFamily> DEFAULT_SELECTION = Collections.unmodifiableSet(EnumSet.complementOf(OPT_IN));
 
     /** The families a test says this build carries, instead of asking {@link SettingsStatus}. */
     @Nullable

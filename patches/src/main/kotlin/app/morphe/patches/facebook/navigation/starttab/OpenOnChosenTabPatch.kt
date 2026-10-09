@@ -38,17 +38,16 @@ import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstructio
  * Three more go in the Feeds tab, so a start sent there can open on a chosen filter: see
  * FeedsSubtabAnchors.kt.
  *
- * Off in the default selection: it changes where Facebook opens, which is a choice to make. Picked,
- * its switch still starts off and the tab starts as Marketplace.
+ * In the default selection with its switch off and the tab as Marketplace: it changes where
+ * Facebook opens, which is a choice to make.
  */
 @Suppress("unused")
 val openOnChosenTabPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Open on a chosen tab",
-    description = "Opens Facebook on the tab you pick in Hushfacebook's settings when you start it from its icon. " +
-        "It's Marketplace unless you change it. Notifications and links still open where they lead. " +
-        "Its switch starts off, so turn it on under Opening Facebook.",
-    default = false,
+    description = "Opens Facebook on the tab you pick when you start it from its icon. It's Marketplace unless " +
+        "you change it. Notifications and links still open where they lead. Its switch and the tab list are under " +
+        "Opening Facebook in Hushfacebook settings, and the switch starts off.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

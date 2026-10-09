@@ -28,10 +28,10 @@ import com.android.tools.smali.dexlib2.iface.Method
  * tells the button which card is on screen. A third hook, where Facebook's story controllers make a card the
  * active one, keeps the button on that card.
  *
- * Off in the default selection, since it changes what other people see, and stories you've viewed
- * keep their unwatched ring: Facebook greys a ring only once the server has taken the report, and
- * a tray reloaded from the server still lists them as unwatched. Picked, its switch starts on and
- * the button's starts off.
+ * In the default selection with its switch and the button's both off, since it changes what other
+ * people see, and stories you've viewed keep their unwatched ring: Facebook greys a ring only once
+ * the server has taken the report, and a tray reloaded from the server still lists them as
+ * unwatched.
  */
 @Suppress("unused")
 val viewStoriesAnonymouslyPatch = bytecodePatch(
@@ -39,8 +39,7 @@ val viewStoriesAnonymouslyPatch = bytecodePatch(
     name = "View stories anonymously",
     description = "Keeps you off the viewer list of the stories you watch, because Facebook isn't told which ones " +
         "you've seen. Replying or reacting still shows you, and stories you've watched keep the ring that marks " +
-        "them as new.",
-    default = false,
+        "them as new. Its switch is under Stories in Hushfacebook settings and starts off.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)

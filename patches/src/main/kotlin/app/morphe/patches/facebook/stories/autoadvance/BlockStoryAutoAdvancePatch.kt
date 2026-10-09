@@ -55,8 +55,8 @@ internal const val LOOP_HELPER = "hushfacebookLoopStory"
 @Suppress("unused")
 val blockStoryAutoAdvancePatch = bytecodePatch(
     name = "Stop Story auto-advance",
-    description = "Keeps each Story on screen until you tap or swipe. Turn the switch off for Facebook's timing.",
-    default = false,
+    description = "Keeps each story on screen until you tap or swipe. Its switch is under Stories in Hushfacebook " +
+        "settings and starts off. A second switch there plays a finished story again from the start.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

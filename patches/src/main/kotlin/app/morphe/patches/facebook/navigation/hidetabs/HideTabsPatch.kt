@@ -45,9 +45,10 @@ internal val HIDEABLE_TABS = mapOf(
 @Suppress("unused")
 val hideTabsPatch = bytecodePatch(
     name = "Hide tabs",
-    description = "Takes the tabs you pick off the tab bar: Feeds, Friends, Marketplace, Groups, Gaming or Events, " +
-        "and Dating, Professional dashboard, Saved, Ad Center, Create, Explore or Jobs where Facebook gives you one. " +
-        "Each page stays in the Menu. Every switch starts off, and a change shows once Facebook restarts.",
+    description = "Takes the tabs you pick off the tab bar: Feeds, Friends, Marketplace, Groups, Gaming or " +
+        "Events, and Dating, Professional dashboard, Saved, Ad Center, Create, Explore or Jobs where Facebook " +
+        "gives you one. Each page stays in the Menu. The switches are under Appearance in Hushfacebook settings " +
+        "and all start off, and a change shows once Facebook restarts.",
     default = true,
 ) {
     category("Interface")

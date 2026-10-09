@@ -106,9 +106,9 @@ public class SettingsNavigationTest {
 
     @Test public void categoryClickChangesOnlyTheSettingWhoseRowWasTapped() {
         assertTrue(page.navigation.open(page.findPreference(Settings.TAP_TO_PLAY.key)));
-        assertTrue(Settings.TAP_TO_PLAY.savedValue());
-        tap(Settings.TAP_TO_PLAY.key);
         assertFalse(Settings.TAP_TO_PLAY.savedValue());
+        tap(Settings.TAP_TO_PLAY.key);
+        assertTrue(Settings.TAP_TO_PLAY.savedValue());
         assertFalse(Settings.DOWNLOAD_COMPATIBLE.savedValue());
     }
 
@@ -873,7 +873,7 @@ public class SettingsNavigationTest {
         View toggle = list().getChildAt(position(Settings.TAP_TO_PLAY.key) - list().getFirstVisiblePosition());
         assertEquals(android.widget.Switch.class.getName(), toggle.createAccessibilityNodeInfo().getClassName());
         assertTrue(toggle.performAccessibilityAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK, null));
-        assertFalse(Settings.TAP_TO_PLAY.savedValue());
+        assertTrue(Settings.TAP_TO_PLAY.savedValue());
     }
 
     /** All pages are rendered with the same viewport as the design reference. */

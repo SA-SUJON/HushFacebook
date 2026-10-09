@@ -159,7 +159,7 @@ internal const val HOME_FLAG_ALLOWED = "$PICTURE_IN_PICTURE->homeFlagAllowed(Z)Z
  * Facebook's own code then arms the window for the video on screen, and the rest here treats that
  * arming like any other: a paused video is held by the pause hook.
  *
- * Off in the default selection: it changes what leaving Facebook does. Picked, its switch starts on.
+ * In the default selection with its switch off: it changes what leaving Facebook does.
  */
 @Suppress("unused")
 val pictureInPicturePatch = bytecodePatch(
@@ -167,8 +167,8 @@ val pictureInPicturePatch = bytecodePatch(
     name = "Picture-in-picture",
     description = "A reel playing in the Reels tab, or a video playing in the Video tab or Facebook's full-screen " +
         "Watch viewer, keeps going in a small window when you leave Facebook, through the picture-in-picture " +
-        "Facebook already has for them. Needs Android 12 or later.",
-    default = false,
+        "Facebook already has for them. Needs Android 12 or later. Its switch is under Playback in Hushfacebook " +
+        "settings and starts off.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

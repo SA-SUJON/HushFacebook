@@ -58,8 +58,8 @@ internal val jewelCountHookPatch = bytecodePatch {
 val hideReelsTabDotPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hide the Reels tab dot",
-    description = "Takes the new-item dot and count off the Reels tab, which some accounts call Video. " +
-        "Every other tab keeps its own.",
+    description = "Takes the new-item dot and count off the Reels tab, which some accounts call Video. Every " +
+        "other tab keeps its own. Its switch is under Reels and Watch in Hushfacebook settings and starts on.",
 ) {
     category("Interface")
     dependsOn(settingsPatch)

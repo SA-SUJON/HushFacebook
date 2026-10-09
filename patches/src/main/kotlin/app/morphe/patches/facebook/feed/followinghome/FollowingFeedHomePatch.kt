@@ -77,9 +77,9 @@ internal const val FEED_TYPE_ASKED = "$FOLLOWING_HOME->feedType(Ljava/lang/Objec
 val followingFeedHomePatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Following feed on Home",
-    description = "Has Home load the newest posts from the friends, groups and Pages you follow, like the Feeds tab's " +
-        "All, instead of the ranked feed. The Feeds tab's filters stay as they are. Its switch starts off, under " +
-        "Opening Facebook.",
+    description = "Has Home load the newest posts from the friends, groups and Pages you follow, like the Feeds " +
+        "tab's All, instead of the ranked feed. The Feeds tab's filters stay as they are. Its switch is under " +
+        "Opening Facebook in Hushfacebook settings and starts off.",
     default = true,
 ) {
     category("Feed")

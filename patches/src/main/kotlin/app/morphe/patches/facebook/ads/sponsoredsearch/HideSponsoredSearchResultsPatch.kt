@@ -49,7 +49,8 @@ internal class SearchPages(
 val hideSponsoredSearchResultsPatch = bytecodePatch(
     name = "Hide sponsored search results",
     description = "Removes the ads from Facebook's search results, the sponsored posts and ad cards between the " +
-        "people, pages and posts you searched for.",
+        "people, pages and posts you searched for. Its switch is under Search in Hushfacebook settings and starts " +
+        "on.",
     default = true,
 ) {
     category("Ads")

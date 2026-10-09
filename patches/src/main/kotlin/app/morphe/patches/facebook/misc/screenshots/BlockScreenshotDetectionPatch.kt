@@ -23,15 +23,14 @@ import app.morphe.util.extendsClass
  * stops. The Android 14 and 15 calls are each sent on their own, and a build without them is
  * noted in the patch log.
  *
- * Off in the default selection, like the rest of Privacy. Picked, its switch starts on.
+ * In the default selection with its switch off, so nothing changes until it's turned on.
  */
 @Suppress("unused")
 val blockScreenshotDetectionPatch = bytecodePatch(
     // The README table check reads this literal; DETECTION_PATCH carries the same text for the messages.
     name = "Block screenshot detection",
     description = "Stops Facebook noticing when you take a screenshot or record the screen, in the feed, Reels, " +
-        "chats, games and everywhere else. Its switch starts on, under Privacy.",
-    default = false,
+        "chats, games and everywhere else. Its switch is under Privacy in Hushfacebook settings and starts off.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)
