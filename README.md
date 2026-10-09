@@ -68,7 +68,7 @@ Neither path can be tried against a real block until the check reaches sideloads
 
 ## Patches
 
-For the source layout, Facebook 581 stock baseline, patch lifecycle, and patch workflow, see [Contributing](CONTRIBUTING.md).
+For the source layout, patch workflow, and Facebook 581 audit, see [Contributing](CONTRIBUTING.md). The audit covers ad delivery, tracking boundaries, stock screens, network observations and background activity.
 
 | Patch | What it does |
 |---|---|
