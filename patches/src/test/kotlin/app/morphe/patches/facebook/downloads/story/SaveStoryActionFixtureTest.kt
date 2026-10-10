@@ -21,9 +21,9 @@ import org.junit.Test
 /**
  * Download any story's save action, found in every Facebook build the bundle declares the way the
  * patch finds it: one method among the types the story viewer's "More" menu creates reports
- * "save_story_attempted" (a literal on 577 and 580, a string table entry on 581), its class holds
+ * "save_story_attempted" (a literal on 577 and 580, a string table entry since 581), its class holds
  * one context and one story, and one menu method creates it. The control is the same search
- * without the menu: on 581 the composer's InspirationSaveButtonController names the event in a
+ * without the menu: since 581 the composer's InspirationSaveButtonController names the event in a
  * method of the same shape, which is why the search starts at the menu. Reads the fixture bundles
  * from HUSHFACEBOOK_FIXTURE_DIR and skips without it.
  */
@@ -60,12 +60,13 @@ class SaveStoryActionFixtureTest {
         assertEquals("a declared build went unchecked: $checked", versions.toSet(), checked.keys)
     }
 
-    /** The control: on 581 a method the menu doesn't create has the action's shape and names the event too. */
+    /** The control: on each declared build a method the menu doesn't create has the action's shape and names the event too. */
     @Test
-    fun `on 581 the composer's save button names the event in the same shape, outside the menu's types`() {
-        val version = "581.0.0.45.58"
-        if (version !in AppCompatibilities.facebook().single().targets.mapNotNull { it.version }) return
-        for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+    fun `the composer's save button names the event in the same shape, outside the menu's types`() {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }
+        val bundles = versions.flatMap { version -> Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") } }
+        assertTrue("no declared build's fixture to check the control on", bundles.isNotEmpty())
+        for (bundle in bundles) {
             val composer = "Lcom/facebook/inspiration/saving/InspirationSaveButtonController;"
             val owner = FixtureDex.classes(bundle, setOf(composer)).getValue(composer)
             val tables = FixtureDex.classes(bundle, tableTypes(listOf(owner)))
