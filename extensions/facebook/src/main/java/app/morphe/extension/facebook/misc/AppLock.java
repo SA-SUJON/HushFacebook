@@ -1068,9 +1068,15 @@ public final class AppLock {
             title.setTextColor(Color.WHITE);
             title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
             title.setGravity(Gravity.CENTER);
+            title.setAccessibilityHeading(true);
             column.addView(title);
+            // The window's name is what a screen reader speaks when the cover comes up; without one
+            // it said the app's name, and nothing told a blind person Facebook had locked.
+            setTitle(title.getText());
 
             reason = new TextView(activity);
+            // A refused check changes this line (too many attempts, cancelled): say so when it does.
+            reason.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
             reason.setTextColor(0xFFB0B3B8);
             reason.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             reason.setGravity(Gravity.CENTER);

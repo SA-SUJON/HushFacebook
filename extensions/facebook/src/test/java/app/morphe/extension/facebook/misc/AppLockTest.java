@@ -25,6 +25,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import org.junit.After;
 import org.junit.Before;
@@ -187,6 +188,36 @@ public class AppLockTest {
         asked.get(0).answer.unlocked();
         assertFalse(AppLock.covered(activity));
         assertFalse(AppLock.covering());
+    }
+
+    /** The cover's text for a screen reader: a window name, a heading, and the reason read out when it changes. */
+    @Test
+    public void theCoverIsNamedAndItsReasonIsSpokenWhenItChanges() {
+        Settings.APP_LOCK.save(true);
+        Activity activity = screen();
+        front(activity);
+        Dialog cover = ShadowDialog.getLatestDialog();
+        assertEquals("Facebook is locked", String.valueOf(cover.getWindow().getAttributes().getTitle()));
+        List<TextView> texts = new ArrayList<>();
+        texts(cover.getWindow().getDecorView(), texts);
+        TextView heading = null;
+        TextView reason = null;
+        for (TextView text : texts) {
+            if (text instanceof Button) continue;
+            if ("Facebook is locked".contentEquals(text.getText())) heading = text;
+            else reason = text;
+        }
+        assertNotNull(heading);
+        assertTrue("the title isn't a heading", heading.isAccessibilityHeading());
+        assertNotNull(reason);
+        assertEquals(View.ACCESSIBILITY_LIVE_REGION_POLITE, reason.getAccessibilityLiveRegion());
+    }
+
+    private static void texts(View view, List<TextView> into) {
+        if (view instanceof TextView) into.add((TextView) view);
+        if (!(view instanceof ViewGroup)) return;
+        ViewGroup group = (ViewGroup) view;
+        for (int i = 0; i < group.getChildCount(); i++) texts(group.getChildAt(i), into);
     }
 
     @Test
