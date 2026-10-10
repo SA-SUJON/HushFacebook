@@ -1,6 +1,7 @@
 <# Exercise phone-smoke.ps1's report reading on hand-written reports, without a phone. #>
 [CmdletBinding()]
-param()
+# The push gate hands every suite -Root. These checks read only the reports written below.
+param([string]$Root)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'phone-smoke.ps1')
 

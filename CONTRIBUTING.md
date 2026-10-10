@@ -405,6 +405,8 @@ The checks that matter before a release:
 
 A release goes out in two commits. The first carries the new version with `patches-bundle.json` still naming the previous release. The bundle is built from that exact commit and published with its SBOM and its receipt, all three listed in `SHA256SUMS.txt`, and the second commit points `patches-bundle.json` at it. Pushing that second commit downloads all three back from the release and holds each to what your checkout built and checked, the receipt byte for byte. Morphe Manager reads only `patches-bundle.json`, so a release isn't out until that second commit is pushed.
 
+`scripts/release/release.ps1` walks through all of that one stage at a time: `source` (with `-Summary`, a file holding the release's one-paragraph summary), `preflight`, `bundle`, `publish` (with `-Checked`, the What was checked paragraph) and `index` (with `-ReadmeSummary` and `-BundleSummary`). Commit after `source`, push after `preflight` so the full gate runs, and commit and push again after `index`. Each stage refuses to run until the one before it is done, so you can fix a failure and run just that stage again. The text steps run `tools/release_text.py`, and `py -3.13 -I -m unittest discover -s tools -p "test_*.py"` runs its tests.
+
 ## Settings for your machine
 
 Nothing in the repository points at a folder or a phone on anybody's machine. These variables do that instead, and none of them has a default:
