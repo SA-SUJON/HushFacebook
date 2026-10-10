@@ -74,7 +74,7 @@ class ReelLoopFixtureTest {
                 // check Facebook makes before it lets a video loop again.
                 val branch = code[read.at + 1]
                 assertTrue("$name: the loop flag doesn't decide a branch straight away",
-                    branch.opcode.name.startsWith("IF_") && (
+                    branch.opcode.name.startsWith("if-") && (
                         (branch as OneRegisterInstruction).registerA == read.answer ||
                             (branch as? TwoRegisterInstruction)?.registerB == read.answer))
                 val excessive = reportedFlag(params, "shouldPreventExcessiveLooping")
