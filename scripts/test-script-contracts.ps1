@@ -3338,13 +3338,13 @@ try {
         $applySaved = @{ Fixtures = $env:HUSHFACEBOOK_FIXTURE_DIR; Jar = $env:HUSHFACEBOOK_DESKTOP_JAR }
         try {
             New-Item -ItemType Directory -Path $applyFixtures -Force | Out-Null
-            foreach ($name in @('facebook-581.0.0.45.58-arm64.apkm', 'facebook-581.0.0.45.58-armv7.apkm', 'facebook-580.0.0.51.74.apkm')) {
+            foreach ($name in @('facebook-582.0.0.50.54-arm64.apkm', 'facebook-582.0.0.50.54-armv7.apkm', 'facebook-580.0.0.51.74.apkm')) {
                 Set-Content -LiteralPath (Join-Path $applyFixtures $name) -Value 'fixture' -Encoding ASCII
             }
             Set-Content -LiteralPath $applyJar -Value 'cli' -Encoding ASCII
             Set-Content -LiteralPath $applyFiles[0] -Value 'version = 9.9.9' -Encoding ASCII
             Set-Content -LiteralPath $applyFiles[1] -Encoding UTF8 -Value ('{"patches":[{"name":"A","compatibility":' +
-                '[{"packageName":"com.facebook.katana","targets":[{"version":"581.0.0.45.58"}]}]}]}')
+                '[{"packageName":"com.facebook.katana","targets":[{"version":"582.0.0.50.54"}]}]}]}')
             Set-Content -LiteralPath $applyFiles[2] -Encoding UTF8 -Value @(
                 'param([string]$Apk, [string]$DesktopJar, [string]$WorkDir, [string]$Bundle, [string]$KeepIn)',
                 "Add-Content -LiteralPath '$applyLog' -Value (""apk="" + (Split-Path -Leaf `$Apk) + "" bundle=`$Bundle keep=`$KeepIn"")",
@@ -3373,7 +3373,7 @@ try {
                     $builds[1] -like '* :patches:buildAndroid *') `
                     "A push of $moved did not build the release bundle in the full pass alone: $($builds -join ' | ')"
                 $applied = @(Get-Content -LiteralPath $applyLog -ErrorAction SilentlyContinue | Sort-Object)
-                $declared = @('facebook-581.0.0.45.58-arm64.apkm', 'facebook-581.0.0.45.58-armv7.apkm')
+                $declared = @('facebook-582.0.0.50.54-arm64.apkm', 'facebook-582.0.0.50.54-armv7.apkm')
                 $rightRuns = @(for ($at = 0; $at -lt $applied.Count; $at++) {
                     $run = [regex]::Match($applied[$at], '^apk=(?<apk>\S+) bundle=(?<bundle>.+) keep=(?<keep>.+)$')
                     if ($run.Success -and $at -lt $declared.Count -and $run.Groups['apk'].Value -eq $declared[$at] -and
@@ -5920,7 +5920,7 @@ try {
     Set-Content -LiteralPath (Join-Path $flowRepo 'CHANGELOG.md') -Value '# Changelog' -Encoding ASCII
     Set-Content -LiteralPath (Join-Path $flowRepo '.gitignore') -Value @('build/', 'patches/build/', 'extensions/facebook/build/',
         'release-receipt-*.json') -Encoding ASCII
-    $flowTarget = '{"packageName":"com.facebook.katana","targets":[{"version":"581.0.0.45.58"}]}'
+    $flowTarget = '{"packageName":"com.facebook.katana","targets":[{"version":"582.0.0.50.54"}]}'
     Set-Content -LiteralPath (Join-Path $flowRepo 'patches-list.json') -Encoding ASCII -Value (
         '{"patches":[{"name":"A","compatibility":[' + $flowTarget + ']},{"name":"B","compatibility":[' + $flowTarget + ']}]}')
     $logLiteral = $flowLog.Replace("'", "''")
@@ -5982,7 +5982,7 @@ try {
             if ($flowTamper) { Set-Content -LiteralPath (Join-Path $into $flowTamper) -Value 'tampered' -Encoding ASCII }
         }
         if ($what -eq 'release view') { '2026-10-09T21:03:04Z' }
-        if ($what -eq 'repo view') { 'Hushfacebook v1.2.2: 1 patches for Facebook 581.0.0.45.58 with Morphe.' }
+        if ($what -eq 'repo view') { 'Hushfacebook v1.2.2: 1 patches for Facebook 582.0.0.50.54 with Morphe.' }
     }
     & git init --quiet --bare $flowOrigin
     & git -C $flowRepo init --quiet --initial-branch=main
@@ -6093,10 +6093,10 @@ try {
     $flowFixtures = Join-Path $releaseFlow 'fixtures'
     New-Item -ItemType Directory -Force -Path $flowFixtures | Out-Null
     $env:HUSHFACEBOOK_FIXTURE_DIR = $flowFixtures
-    Assert-Throws { & $flowScript -Stage bundle -Version 1.2.3 6> $null 3> $null } '*no fixture of Facebook 581.0.0.45.58*' `
+    Assert-Throws { & $flowScript -Stage bundle -Version 1.2.3 6> $null 3> $null } '*no fixture of Facebook 582.0.0.50.54*' `
         'The bundle stage cut a receipt without a fixture of the declared build.'
     Assert-True (@(Read-FlowLog).Count -eq 1) 'The bundle stage went past a declared build with no fixture.'
-    foreach ($abi in 'arm64-v8a', 'armeabi-v7a') { Set-Content -LiteralPath (Join-Path $flowFixtures "facebook-581.0.0.45.58-$abi.apkm") -Value $abi }
+    foreach ($abi in 'arm64-v8a', 'armeabi-v7a') { Set-Content -LiteralPath (Join-Path $flowFixtures "facebook-582.0.0.50.54-$abi.apkm") -Value $abi }
     Set-Content -LiteralPath (Join-Path $flowFixtures 'facebook-580.0.0.51.74-arm64-v8a.apkm') -Value 'undeclared'
 
     # Bundle builds once, hands the receipt every declared build's fixtures and the gate's kept
@@ -6104,7 +6104,7 @@ try {
     & $flowScript -Stage bundle -Version 1.2.3 6> $null 3> $null
     $flow = @(Read-FlowLog)
     Assert-True ($flow.Count -eq 2 -and $flow[0] -like 'gradle * tasks= :patches:buildAndroid ' -and
-        $flow[1] -like ('receipt fixtures=facebook-581.0.0.45.58-arm64-v8a.apkm,facebook-581.0.0.45.58-armeabi-v7a.apkm ' +
+        $flow[1] -like ('receipt fixtures=facebook-582.0.0.50.54-arm64-v8a.apkm,facebook-582.0.0.50.54-armeabi-v7a.apkm ' +
             'bundle=patches-1.2.3.mpp applied=*/repo/patches/build/fixture-apply')) `
         "The bundle stage did not build and cut the receipt over the declared fixtures: $($flow -join ' | ')"
     $sums = @(Get-Content -LiteralPath (Join-Path $flowAssets 'SHA256SUMS.txt'))
@@ -6154,7 +6154,7 @@ try {
     Assert-True ($flow.Count -eq 4 -and $flow[0] -eq 'gh release view v1.2.3 -R SysAdminDoc/HushFacebook --json publishedAt --jq .publishedAt' -and
         $flow[1] -like 'py * index --version 1.2.3 --created 2026-10-09T21:03:04 --bundle-summary * --readme-summary * --runtime 2 --patch 4' -and
         $flow[2] -like 'gh repo view *' -and
-        $flow[3] -eq 'gh repo edit SysAdminDoc/HushFacebook --description Hushfacebook v1.2.3: 2 patches for Facebook 581.0.0.45.58 with Morphe.') `
+        $flow[3] -eq 'gh repo edit SysAdminDoc/HushFacebook --description Hushfacebook v1.2.3: 2 patches for Facebook 582.0.0.50.54 with Morphe.') `
         "Index did not read the release, write the index and update the description: $($flow -join ' | ')"
     Assert-True (Test-Path -LiteralPath (Join-Path $flowRepo 'release-receipt-1.2.3.json') -PathType Leaf) `
         'Index did not put the receipt back where the facts check reads it.'
