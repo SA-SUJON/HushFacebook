@@ -7,6 +7,7 @@ package app.morphe.patches.facebook.menu
 import app.morphe.Fixtures
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.media.taptoplay.isEnumNaming
 import app.morphe.patches.facebook.misc.extension.freeLocalsAt
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -69,6 +70,19 @@ class MenuSectionsFixtureTest {
     private fun built(method: Method): Set<String> = created(method) + method.instructionList()
         .filter { it.opcode.name.startsWith("invoke-") }
         .map { ((it as ReferenceInstruction).reference as MethodReference).returnType }
+
+    /** The classes of the no-argument static calls [method] makes. */
+    private fun noArgumentStatics(method: Method): List<String> = method.instructionList()
+        .filter { it.opcode == Opcode.INVOKE_STATIC || it.opcode == Opcode.INVOKE_STATIC_RANGE }
+        .map { (it as ReferenceInstruction).reference as MethodReference }
+        .filter { it.parameterTypes.isEmpty() }
+        .map { it.definingClass }
+
+    private fun calls(instruction: Any, method: Method): Boolean =
+        ((instruction as? ReferenceInstruction)?.reference as? MethodReference)?.let {
+            it.definingClass == method.definingClass && it.name == method.name &&
+                it.parameterTypes.map(Any::toString) == method.parameterTypes.map(Any::toString)
+        } == true
 
     private fun staticReads(method: Method): Set<String> = method.instructionList()
         .filter { it.opcode == Opcode.SGET_OBJECT }
@@ -191,9 +205,22 @@ class MenuSectionsFixtureTest {
                 val enum = classes.getValue(nativeRead.type)
 
                 // Both hand their children back through the same list, which the hooks build empty.
-                val nativeList = childrenList(native)
+                // 582 makes it through a static factory, so the sections' no-argument statics come along.
+                val factories = FixtureDex.classes(bundle, (noArgumentStatics(native) + noArgumentStatics(server)).toSet())
+                val factory: (MethodReference) -> Method? = { call -> factories[call.definingClass]?.let { resolveStatic(it, call) } }
+                val nativeList = childrenList(native, factory)
                 assertNotNull("${bundle.name}: the native section's children list", nativeList)
-                assertEquals("${bundle.name}: the two sections' children lists", nativeList, childrenList(server))
+                assertEquals("${bundle.name}: the two sections' children lists", nativeList, childrenList(server, factory))
+
+                // 582's native section (LX/cTm;) hands its build to a singleton's method (LX/cTw;->A01),
+                // so the section the root builds is the one class calling it.
+                val nativeSection = if (native.parameterTypes.size == 1) native.definingClass else {
+                    val callers = FixtureDex.methodsWhere(bundle, { dex ->
+                        dex.methodSection.any { it.definingClass == native.definingClass && it.name == native.name }
+                    }) { method -> method.instructionList().any { calls(it, native) } }.map { it.definingClass }.toSet()
+                    assertEquals("${bundle.name}: classes handing their build to ${native.definingClass}", 1, callers.size)
+                    callers.single()
+                }
 
                 // A local no higher than v15 is free where each hook goes.
                 for ((method, read) in listOf(native to nativeRead, server to serverRead)) {
@@ -217,7 +244,7 @@ class MenuSectionsFixtureTest {
                     val constant = constants[group] ?: throw AssertionError("${bundle.name}: ${enum.type} has no $group")
                     assertTrue("${bundle.name}: \"$key\"'s method doesn't read $group", constant in staticReads(adder))
                     assertTrue("${bundle.name}: \"$key\"'s method doesn't build both sections",
-                        built(adder).containsAll(setOf(native.definingClass, server.definingClass)))
+                        built(adder).containsAll(setOf(nativeSection, server.definingClass)))
                 }
                 checked += version
             }
