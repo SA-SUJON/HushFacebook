@@ -189,13 +189,16 @@ class MessengerIconFixtureTest {
                 val tapCode = tap.implementation!!.instructions.toList()
                 val at = tapCode.indexOfFirst { it.call?.let(::key) == key(handlerCalls.single()) }
                 val receiver = if (tapCode[at].opcode.name.startsWith("invoke-static")) 0 else 1
-                // Back through plain moves between locals to where the flag came in.
+                // Back through plain moves to where the flag came in. Redex reuses parameter registers
+                // as locals (582's tap moves v23 into v15 first), so a move's source is followed to
+                // wherever it was last written, and the walk stops at a register nothing wrote.
                 var before = at
                 var handed = lastWrite(tapCode, before, argument(tapCode[at], BUTTON_LONG_PRESS + receiver))
-                while (handed is TwoRegisterInstruction && handed.opcode.name.startsWith("move") && handed.registerB < locals(tap)) {
+                while (handed is TwoRegisterInstruction && handed.opcode.name.startsWith("move")) {
                     val move: Instruction = handed
+                    val source = handed.registerB
                     before = tapCode.subList(0, before).indexOfLast { it === move }
-                    handed = lastWrite(tapCode, before, handed.registerB)
+                    handed = lastWrite(tapCode, before, source) ?: break
                 }
                 val tapFlag = locals(tap) + TAP_LONG_PRESS
                 assertTrue("$name: the tap hands the handler $handed, not its long press v$tapFlag",
