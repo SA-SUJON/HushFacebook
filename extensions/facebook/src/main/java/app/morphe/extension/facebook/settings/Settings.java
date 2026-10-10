@@ -753,6 +753,14 @@ public class Settings extends BaseSettings {
             new StringSetting("hushfacebook_seen_share_items", "");
 
     /**
+     * The share sheet's Send to group button, which makes a new group chat of the people picked,
+     * and its new-group row, header icon and search button. Send separately stays. Off until it's
+     * turned on.
+     */
+    public static final BooleanSetting HIDE_SHARE_GROUP_BUTTONS =
+            new BooleanSetting("hushfacebook_hide_share_group_buttons", FALSE);
+
+    /**
      * The Meta Verified offer sheet after you post, and the Meta Verified label under some posts'
      * headers. Off until it's turned on.
      */

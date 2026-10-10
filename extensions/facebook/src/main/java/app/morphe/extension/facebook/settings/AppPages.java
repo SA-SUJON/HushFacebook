@@ -274,7 +274,12 @@ final class AppPages {
                     L10n.t("Removes tracking tags like mibextid from links you share or copy. A facebook.com/share/ link is "
                             + "unique to each share, so Facebook can still trace it.")));
         }
-        if (build.contains(PatchFamily.SHARE_SHEET_ITEMS)) links.addPreference(shareItemsRow(context));
+        if (build.contains(PatchFamily.SHARE_SHEET_ITEMS)) {
+            links.addPreference(shareItemsRow(context));
+            links.addPreference(toggle(context, Settings.HIDE_SHARE_GROUP_BUTTONS,
+                    L10n.t("Takes away Send to group when you pick two or more people, and the share sheet's own ways to start "
+                            + "a new group, so nothing you share makes a group chat by accident. Send separately stays.")));
+        }
         links.addPreference(page.supportedLinksRow(context));
         for (Preference holder : page.linkHolderRows(context)) links.addPreference(holder);
         links.addPreference(info(context, L10n.t("Choose which links open here"),

@@ -165,6 +165,7 @@ final class SwitchLabels {
         if (setting == Settings.NOTIFICATION_QUIET_HOURS) return L10n.t("Quiet hours");
         if (setting == Settings.OPEN_LINKS_EXTERNALLY) return L10n.t("Open links in your browser");
         if (setting == Settings.SANITIZE_SHARING_LINKS) return L10n.t("Remove tracking from shared links");
+        if (setting == Settings.HIDE_SHARE_GROUP_BUTTONS) return L10n.t("Hide group buttons in the share sheet");
         if (setting == Settings.STOP_UPDATE_PROMPTS) return L10n.t("Stop update prompts");
         if (setting == Settings.CHECK_FOR_RELEASES) return L10n.t("Check for new Hushfacebook releases");
         if (setting == Settings.USE_SYSTEM_FONT) return L10n.t("Use the system font");

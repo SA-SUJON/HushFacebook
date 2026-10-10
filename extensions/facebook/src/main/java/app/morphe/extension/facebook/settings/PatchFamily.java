@@ -185,7 +185,8 @@ public enum PatchFamily {
             Settings.HIDE_EDITS_UPSELLS, Settings.HIDE_THREADS_CROSS_POSTING, Settings.HIDE_THREADS_SHARE_BUTTON,
             Settings.HIDE_META_VERIFIED_UPSELLS, Settings.HIDE_AVATAR_UPSELLS, Settings.HIDE_META_AI_IMAGINE,
             Settings.HIDE_META_AI_POST_BUTTONS),
-    SHARE_SHEET_ITEMS(FamilyNames.SHARE_SHEET_ITEMS, "shareSheetItems", Settings.HIDDEN_SHARE_ITEMS),
+    SHARE_SHEET_ITEMS(FamilyNames.SHARE_SHEET_ITEMS, "shareSheetItems", Settings.HIDDEN_SHARE_ITEMS,
+            new BooleanSetting[]{Settings.HIDE_SHARE_GROUP_BUTTONS}),
     META_AI_SEARCH(FamilyNames.META_AI_SEARCH, "metaAiSearch", null,
             Settings.HIDE_META_AI_IN_SEARCH),
     ANALYTICS_UPLOADS(FamilyNames.ANALYTICS_UPLOADS, "analyticsUploads", null,
@@ -307,10 +308,18 @@ public enum PatchFamily {
     }
 
     PatchFamily(String patchName, String statusMethod, Setting<?> choice) {
+        this(patchName, statusMethod, choice, new BooleanSetting[0]);
+    }
+
+    /**
+     * A family set by its list that also has switches. The switches come as an array, not varargs,
+     * so a call passing null as its third argument still picks the constructor for switches alone.
+     */
+    PatchFamily(String patchName, String statusMethod, Setting<?> choice, BooleanSetting[] switches) {
         this.patchName = patchName;
         this.statusMethod = statusMethod;
         this.staysWhilePaused = null;
-        this.switches = Collections.emptyList();
+        this.switches = Collections.unmodifiableList(Arrays.asList(switches.clone()));
         this.choice = choice;
     }
 
@@ -408,12 +417,16 @@ public enum PatchFamily {
 
     /**
      * "on", "disabled by its switch" or "disabled while paused", then the saved switches. A
-     * family with independent switches is on while either is. Options need their main switch.
+     * family with independent switches is on while either is. Options need their main switch. A
+     * family set by its list says so, with its switches saved beside the list.
      */
     private String reportLine(boolean paused) {
         StringBuilder line = new StringBuilder(patchName).append(": ");
         if (choice != null) {
-            String saved = choice.key + "=" + choice.savedValue();
+            StringBuilder saved = new StringBuilder(choice.key).append('=').append(choice.savedValue());
+            for (BooleanSetting setting : switches) {
+                saved.append(", ").append(setting.key).append(setting.savedValue() ? "=on" : "=off");
+            }
             return line.append(paused ? "disabled while paused (saved " + saved + ")" : "set by its list (" + saved + ")")
                     .toString();
         }

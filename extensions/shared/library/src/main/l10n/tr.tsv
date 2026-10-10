@@ -1328,3 +1328,7 @@ Reels you've already seen may come back.	Daha önce izlediğiniz reeller geri ge
 Blocked since you patched. There's no switch for it.	Yamaladığından beri engelli. Bunun için anahtar yok.
 # context: summary of a line in that list with a switch; %1$s is the switch's name, %2$s the settings page it's on
 Its switch is %1$s, in %2$s.	Anahtarı %1$s, %2$s bölümünde.
+# context: switch title under Links in Hushfacebook settings, next to Share sheet items to hide
+Hide group buttons in the share sheet	Paylaşırken grup düğmelerini gizle
+# context: that switch's summary. Send to group and Send separately are the buttons Facebook's share sheet shows when two or more people are picked
+Takes away Send to group when you pick two or more people, and the share sheet's own ways to start a new group, so nothing you share makes a group chat by accident. Send separately stays.	İki veya daha fazla kişi seçtiğinde “Gruba gönder” seçeneğini ve paylaşırken yeni grup başlatma yollarını kaldırır, böylece paylaştığın hiçbir şey yanlışlıkla grup sohbeti oluşturmaz. “Ayrı ayrı gönder” kalır.

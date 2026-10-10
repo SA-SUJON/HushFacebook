@@ -430,6 +430,15 @@ public class PatchFamilyTest {
                         + "hushfacebook_hide_reel_social_footer=off, hushfacebook_hide_reel_threads_cards=off, "
                         + "hushfacebook_reel_clean_mode=off)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.REEL_DECLUTTER), false).get(0));
+        // Share sheet items is set by its list, and its group switch is saved beside it.
+        Settings.HIDE_SHARE_GROUP_BUTTONS.save(true);
+        assertEquals("Share sheet items: set by its list (hushfacebook_hidden_share_items=, "
+                        + "hushfacebook_hide_share_group_buttons=on)",
+                PatchFamily.reportLines(EnumSet.of(PatchFamily.SHARE_SHEET_ITEMS), false).get(0));
+        assertEquals("Share sheet items: disabled while paused (saved hushfacebook_hidden_share_items=, "
+                        + "hushfacebook_hide_share_group_buttons=on)",
+                PatchFamily.reportLines(EnumSet.of(PatchFamily.SHARE_SHEET_ITEMS), true).get(0));
+        Settings.HIDE_SHARE_GROUP_BUTTONS.resetToDefault();
         // The reel button has a switch now, so the report says what it's set to.
         assertEquals("Download any reel: on (hushfacebook_download_reels=on)",
                 PatchFamily.reportLines(EnumSet.of(PatchFamily.REEL_DOWNLOAD), false).get(0));

@@ -2662,7 +2662,7 @@
     },
     {
       "name": "Share sheet items",
-      "description": "Lets you hide items you never use from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link, so the ones you want are easier to reach. Nothing is hidden until you pick. Choose them in Hushfacebook settings > Links.",
+      "description": "Lets you hide items you never use from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link, so the ones you want are easier to reach. Nothing is hidden until you pick. Choose them in Hushfacebook settings > Links, where a switch that starts off also takes away the buttons that send to the people you picked as a new group chat.",
       "category": "Interface",
       "use": true,
       "dependencies": [

@@ -206,12 +206,13 @@
     {
       "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ShareSheetItems.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/ShareSheetGroups.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/sharesheet/**"
       ],
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook from Facebook 581: Share sheet items, the idea of the Share sheet modification patch in icysymmetra/tiktok-patches-for-morphe with none of its TikTok code. Every list of share sheet item types the item picker returns goes through the extension, which takes out the types picked under Links and keeps the rest in Facebook's order, and remembers the types it has seen so the list can offer them. The hook is its own nameless patch, which Hide Meta upsells uses for its Threads switch too."
+      "changes": "Written for Hushfacebook from Facebook 581: Share sheet items, the idea of the Share sheet modification patch in icysymmetra/tiktok-patches-for-morphe with none of its TikTok code. Every list of share sheet item types the item picker returns goes through the extension, which takes out the types picked under Links and keeps the rest in Facebook's order, and remembers the types it has seen so the list can offer them. The hook is its own nameless patch, which Hide Meta upsells uses for its Threads switch too. Its group switch, the idea of HushGram's Hide group buttons on the share sheet, hands the share sheet footer's Send to group FDSButton to the extension where its guards meet, and the boolean in front of each GROUP_PLUS new-group entry in the sheet's body and search row, so the switch leaves the footer without the button and answers each entry off."
     },
     {
       "paths": [

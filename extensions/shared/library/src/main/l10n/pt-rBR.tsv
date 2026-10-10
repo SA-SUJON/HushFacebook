@@ -1222,3 +1222,7 @@ Reels you've already seen may come back.	Reels que você já viu podem voltar.
 Blocked since you patched. There's no switch for it.	Bloqueado desde que você aplicou os patches. Não há opção para isso.
 # context: summary of a line in that list with a switch; %1$s is the switch's name, %2$s the settings page it's on
 Its switch is %1$s, in %2$s.	A opção é %1$s, em %2$s.
+# context: switch title under Links in Hushfacebook settings, next to Share sheet items to hide
+Hide group buttons in the share sheet	Ocultar os botões de grupo ao compartilhar
+# context: that switch's summary. Send to group and Send separately are the buttons Facebook's share sheet shows when two or more people are picked
+Takes away Send to group when you pick two or more people, and the share sheet's own ways to start a new group, so nothing you share makes a group chat by accident. Send separately stays.	Remove “Enviar para o grupo” quando você escolhe duas ou mais pessoas, e as opções de criar um grupo novo ao compartilhar, para que nada do que você compartilha crie uma conversa em grupo sem querer. “Enviar separadamente” continua.
