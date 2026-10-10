@@ -150,6 +150,7 @@ public class ShareSheetItemsTest {
         assertEquals("Copy link", ShareSheetItems.label("COPY_LINK"));
         assertEquals("WhatsApp", ShareSheetItems.label("SEND_IN_WHATSAPP"));
         assertEquals("WhatsApp", ShareSheetItems.label("OFF_PLATFORM_WHATSAPP"));
+        assertEquals("Muse", ShareSheetItems.label("SHARE_TO_HATCH"));
         assertEquals("Share to cowatch", ShareSheetItems.label("SHARE_TO_COWATCH"));
     }
 }
