@@ -10,6 +10,8 @@ import app.morphe.PatchContexts
 import app.morphe.patches.facebook.comments.summaries.descriptor
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.namesString
+import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.misc.upsells.enumConstant
 import app.morphe.patches.facebook.misc.upsells.isEnumNaming
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -49,10 +51,20 @@ class ShareSheetGroupsFixtureTest {
             it.parameterTypes.map(CharSequence::toString) == like.parameterTypes.map(CharSequence::toString)
     }
 
-    private fun renders(bundle: File, anchor: String, wanted: (Method) -> Boolean = { true }) =
-        FixtureDex.classesHolding(bundle, anchor).flatMap { owner ->
+    /** The renders loading [anchor] that [wanted] takes, as a literal or from a string table holding it (582's footer). */
+    private fun renders(bundle: File, anchor: String, wanted: (Method) -> Boolean = { true }): List<Pair<ClassDef, Method>> {
+        val holders = FixtureDex.classesHolding(bundle, anchor)
+        val direct = holders.flatMap { owner ->
             owner.methods.filter { it.name == "render" && holdsString(it, anchor) && wanted(it) }.map { owner to it }
         }
+        val tables = holders.associateBy { it.type }
+        val resolve: (MethodReference) -> Method? = { call -> tables[call.definingClass]?.let { resolveStatic(it, call) } }
+        val asked = FixtureDex.methodsWhere(bundle, { dex -> dex.methodSection.any { it.definingClass in tables } }) {
+            it.name == "render" && !holdsString(it, anchor) && namesString(it, anchor, resolve) && wanted(it)
+        }
+        val owners = FixtureDex.classes(bundle, asked.map { it.definingClass }.toSet())
+        return direct + asked.map { owners.getValue(it.definingClass) to it }
+    }
 
     /** The code offset of each instruction in [code]. */
     private fun offsets(code: List<Instruction>): IntArray {
@@ -83,12 +95,12 @@ class ShareSheetGroupsFixtureTest {
                 fun Instruction.buildsButton() = called()?.startsWith("$FDS_BUTTON-><init>(") == true
                 assertEquals("$name: the footer builds two FDSButtons, Send to group then send", 2,
                     footerCode.count { it.buildsButton() })
-                if (version == "581.0.0.45.58") {
-                    // Positive control: 581 loads its "Send to group" label, string 0x7f1443a2 in
-                    // assets/strings/default.frsc, a few instructions before the first FDSButton.
+                if (version == "582.0.0.50.54") {
+                    // Positive control: 582 loads its "Send to group" label, string 0x7f144406 in the
+                    // English pack it unpacks to app_strings, a few instructions before the first FDSButton.
                     val built = footerCode.indexOfFirst { it.buildsButton() }
                     assertTrue("$name: the first FDSButton isn't the one labelled Send to group",
-                        footerCode.subList(0, built).takeLast(40).any { (it as? NarrowLiteralInstruction)?.narrowLiteral == 0x7f1443a2 })
+                        footerCode.subList(0, built).takeLast(40).any { (it as? NarrowLiteralInstruction)?.narrowLiteral == 0x7f144406 })
                 }
 
                 val bodies = renders(bundle, SHARE_BODY_ANCHOR)
@@ -104,7 +116,9 @@ class ShareSheetGroupsFixtureTest {
                 assertEquals("$name: the search row's guard is its own field", Opcode.IGET_BOOLEAN,
                     search.code()[searchGuards.single().insertAt - 1].opcode)
 
-                val pool = (icons + footerClass + bodyClass + searchClass).associateBy { it.type }.values
+                // The footer anchor's holders too, since 582's footer asks one of them, a string table, for it.
+                val pool = (icons + footerClass + bodyClass + searchClass + FixtureDex.classesHolding(bundle, SHARE_FOOTER_ANCHOR))
+                    .associateBy { it.type }.values
                 val context = PatchContexts.of(pool)
                 shareSheetGroupsPatch.execute(context)
 

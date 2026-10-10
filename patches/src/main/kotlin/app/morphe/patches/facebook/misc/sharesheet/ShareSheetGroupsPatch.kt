@@ -10,7 +10,7 @@ import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.facebook.ads.affiliate.writesRegister
-import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.methodsNaming
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.upsells.enumConstant
@@ -139,11 +139,12 @@ internal fun BytecodePatchContext.hookShareSheetGroups() {
     }
 }
 
-/** The one `render` that loads [anchor] and that [wanted] keeps. */
+/**
+ * The one render naming [anchor] that [wanted] takes, loading it or, as on 582 (`LX/mDc;->A00`),
+ * asking a string table for it ([methodsNaming]).
+ */
 private fun BytecodePatchContext.singleRender(anchor: String, wanted: (Method) -> Boolean): Method {
-    val renders = classDefByStrings(anchor, StringComparisonType.EQUALS)
-        .filterNot { it.type.startsWith(EXTENSION_PACKAGE) }.distinctBy { it.type }
-        .flatMap { owner -> owner.methods.filter { it.name == RENDER && holdsString(it, anchor) && wanted(it) } }
+    val renders = methodsNaming(anchor) { it.name == RENDER && wanted(it) }
     return renders.singleOrNull() ?: refuse("expected one render loading \"$anchor\", found ${renders.size}")
 }
 
