@@ -1018,8 +1018,13 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
      * What a start does with [tab], for the row's summary. Facebook opens Home for a tab the
      * account's tab bar hasn't got, so the summary says so rather than promise the tab. A Reels tab
      * Hide the Reels tab keeps off the bar is asked for as Home, and the summary says that instead.
+     * Feeds is the exception: off the bar, for either reason, its own page opens over Home
+     * (StartTabRoute's openFeedsPage).
      */
     static String startTabSummary(StartTab tab) {
+        if (tab == StartTab.FEEDS) {
+            return L10n.t("Facebook opens on Feeds. If your tab bar doesn't have it, the Feeds page opens over Home.");
+        }
         if (tab == StartTab.VIDEO && Settings.HIDE_REELS_TAB.savedValue() && PatchFamily.REELS_TAB.inBuild()) {
             return L10n.t("Facebook opens on Home while Hide the Reels tab is on, since Video is off the tab bar. "
                     + "Your choice stays saved.");

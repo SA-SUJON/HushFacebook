@@ -350,6 +350,8 @@ Notifications	Notificaciones
 Menu	Menú
 # context: summary of the tab list; %1$s is one of the tab names above
 Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.	Facebook se abre en %1$s. Si tu barra de pestañas no la tiene, Facebook se abre en Inicio.
+# context: summary of the tab list when Feeds is picked; off the tab bar, Feeds opens as its own page over Home
+Facebook opens on Feeds. If your tab bar doesn't have it, the Feeds page opens over Home.	Facebook se abre en Feeds. Si tu barra de pestañas no la tiene, la página de Feeds se abre sobre Inicio.
 # context: a sentence in the settings import preview and its toast; %1$s is a tab name
 Facebook will open on %1$s.	Facebook se abrirá en %1$s.
 # context: switch title under Opening Facebook; Following is Facebook's feed of the friends, Pages and groups you follow, and Home is the tab

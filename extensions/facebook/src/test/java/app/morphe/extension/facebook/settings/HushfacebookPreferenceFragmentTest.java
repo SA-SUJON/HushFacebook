@@ -30,6 +30,7 @@ import app.morphe.extension.facebook.feed.SeenPostsForTests;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.navigation.FeedsSubtab;
+import app.morphe.extension.facebook.navigation.HiddenTabs;
 import app.morphe.extension.facebook.navigation.StartTab;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -1036,6 +1037,26 @@ public class HushfacebookPreferenceFragmentTest {
         PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.START_TAB);
         assertEquals("Facebook opens on Video. If your tab bar doesn't have it, Facebook opens on Home.",
                 HushfacebookPreferenceFragment.startTabSummary(StartTab.VIDEO));
+    }
+
+    /** Feeds off the bar, the account's or kept off by Hide tabs, opens as its own page over Home. */
+    @Test public void aStartOnFeedsSaysItsPageOpensOffTheBar() {
+        String feeds = "Facebook opens on Feeds. If your tab bar doesn't have it, the Feeds page opens over Home.";
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.START_TAB);
+        assertEquals(feeds, HushfacebookPreferenceFragment.startTabSummary(StartTab.FEEDS));
+        assertEquals(Settings.HIDE_FEEDS_TAB, HiddenTabs.Tab.forStart(StartTab.FEEDS).setting());
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.START_TAB, PatchFamily.HIDDEN_TABS);
+        Settings.HIDE_FEEDS_TAB.save(true);
+        try {
+            assertEquals(feeds, HushfacebookPreferenceFragment.startTabSummary(StartTab.FEEDS));
+            // Any other tab Hide tabs keeps off the bar still opens Home.
+            Settings.HIDE_FRIENDS_TAB.save(true);
+            assertEquals("Facebook opens on Home while Hide tabs keeps Friends off the tab bar. Your choice stays saved.",
+                    HushfacebookPreferenceFragment.startTabSummary(StartTab.FRIENDS));
+        } finally {
+            Settings.HIDE_FEEDS_TAB.resetToDefault();
+            Settings.HIDE_FRIENDS_TAB.resetToDefault();
+        }
     }
 
     /**
