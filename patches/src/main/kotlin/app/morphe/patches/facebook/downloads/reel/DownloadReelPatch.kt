@@ -175,16 +175,7 @@ val downloadReelPatch = bytecodePatch(
                     otherRenders += classDef.type to method
                 }
 
-                // The name alone is in a dozen places: state helpers, lambdas, update calls. The
-                // one wanted is the method that both names the sidebar and builds a button, which
-                // is the call taking four handlers.
-                val namesSidebar = list.any { it.stringReference() == SIDEBAR }
-                val buildsButton = list.any { instruction ->
-                    instruction.methodReference()?.parameterTypes
-                        ?.count { it.toString() == FUNCTION1 } == 4
-                }
-
-                if (namesSidebar && buildsButton) sidebars += classDef.type to method.name
+                if (isSidebarBuilder(method)) sidebars += classDef.type to method.name
             }
         }
 
@@ -754,6 +745,22 @@ private fun handlers(hd: String, sd: String, manifest: String) = (0..6).joinToSt
         invoke-direct/range { v20 .. v28 }, $HANDLER-><init>($OBJECT${CONTEXT}Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IZ$OBJECT)V
         move-object/from16 v${8 + slot}, v20
     """
+}
+
+/**
+ * Whether [method] is the reel sidebar's builder. The name alone is in a dozen places: state
+ * helpers, lambdas, update calls. The one wanted both names the sidebar and builds a button, the
+ * call taking the session and four handlers. 582 merges a lambda naming the sidebar with one
+ * building an FDSBottomSheet (four handlers, no session first) into LX/VrR;->invoke, so the
+ * session is what tells the button apart.
+ */
+internal fun isSidebarBuilder(method: Method): Boolean {
+    val list = method.instructions()
+    return list.any { it.stringReference() == SIDEBAR } && list.any { instruction ->
+        instruction.methodReference()?.parameterTypes?.let { parameters ->
+            parameters.count { it.toString() == FUNCTION1 } == 4 && parameters.firstOrNull()?.toString() == FB_USER_SESSION
+        } == true
+    }
 }
 
 /** The local a call argument was copied from, so adding to it adds to the same object. */
