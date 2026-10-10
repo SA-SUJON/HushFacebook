@@ -724,6 +724,30 @@ public class HushfacebookPreferenceFragmentTest {
     }
 
     /**
+     * Share sheet items to hide opens a list of checkboxes over the page's window like the dialogs
+     * above, and it was the one the page didn't track: a rotation left it up as a leaked window.
+     */
+    @Test
+    public void theShareSheetListClosesWhenTheViewGoes() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SHARE_SHEET_ITEMS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            List<Preference> rows = rowsOf(controller);
+            Preference items = rows.get(indexOfKey(rows, AppPages.SHARE_ITEMS_ROW));
+            ShadowAlertDialog.reset();
+            items.getOnPreferenceClickListener().onPreferenceClick(items);
+            AlertDialog list = ShadowAlertDialog.getLatestAlertDialog();
+            assertNotNull("the row opened nothing", list);
+            assertTrue(list.isShowing());
+            assertEquals("Hide from the share sheet", String.valueOf(Shadows.shadowOf(list).getTitle()));
+
+            controller.recreate();
+            ShadowLooper.idleMainLooper();
+
+            assertFalse("the share sheet list outlived the page", list.isShowing());
+        }
+    }
+
+    /**
      * A Save on a word list can land as the activity goes. The button's click and the edit
      * dialog's close are posted one after the other, and when the activity's end comes between
      * them, it closes the dialog itself, which still counts as Save. The list's listener then runs

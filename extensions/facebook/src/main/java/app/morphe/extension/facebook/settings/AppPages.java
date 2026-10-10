@@ -278,7 +278,7 @@ final class AppPages {
                             + "instead of a facebook.com/share/ link made for that one share.")));
         }
         if (build.contains(PatchFamily.SHARE_SHEET_ITEMS)) {
-            links.addPreference(shareItemsRow(context));
+            links.addPreference(shareItemsRow(page, context));
             links.addPreference(toggle(context, Settings.HIDE_SHARE_GROUP_BUTTONS,
                     L10n.t("Takes away Send to group when you pick two or more people, and the share sheet's own ways to start "
                             + "a new group, so nothing you share makes a group chat by accident. Send separately stays.")));
@@ -291,14 +291,14 @@ final class AppPages {
     }
 
     /** Share sheet items' row: the items it keeps out, picked from a list of checkboxes. */
-    static Preference shareItemsRow(Context context) {
+    static Preference shareItemsRow(HushfacebookPreferenceFragment page, Context context) {
         SettingsRows.Row row = new SettingsRows.Row(context);
         row.setKey(SHARE_ITEMS_ROW);
         row.setTitle(L10n.t("Share sheet items to hide"));
         row.setPersistent(false);
         row.setSummary(shareItemsSummary(ShareSheetItems.hidden()));
         row.setOnPreferenceClickListener(p -> {
-            showShareItems(context, row);
+            showShareItems(page, context, row);
             return true;
         });
         return row;
@@ -316,7 +316,7 @@ final class AppPages {
     }
 
     /** The list: every item it knows, ticked when it's kept out. Save keeps the ticks. */
-    private static void showShareItems(Context context, Preference row) {
+    private static void showShareItems(HushfacebookPreferenceFragment page, Context context, Preference row) {
         List<String> types = ShareSheetItems.choices();
         Set<String> hidden = ShareSheetItems.hidden();
         String[] names = new String[types.size()];
@@ -325,7 +325,8 @@ final class AppPages {
             names[i] = ShareSheetItems.label(types.get(i));
             ticked[i] = hidden.contains(types.get(i));
         }
-        AlertDialog dialog = new AlertDialog.Builder(context)
+        // Through the page, so it closes with the page's view and takes the screen's colors.
+        page.show(new AlertDialog.Builder(context)
                 .setTitle(L10n.t("Hide from the share sheet"))
                 .setMultiChoiceItems(names, ticked, (shown, which, isTicked) -> ticked[which] = isTicked)
                 .setPositiveButton(L10n.t("Save"), (shown, which) -> {
@@ -336,9 +337,7 @@ final class AppPages {
                     ShareSheetItems.hide(picked);
                     row.setSummary(shareItemsSummary(ShareSheetItems.hidden()));
                 })
-                .setNegativeButton(L10n.t("Cancel"), null)
-                .show();
-        ScreenColors.dialog(dialog);
+                .setNegativeButton(L10n.t("Cancel"), null));
     }
 
     /**
