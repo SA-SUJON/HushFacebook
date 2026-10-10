@@ -16,19 +16,30 @@ import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 
+import androidx.annotation.Nullable;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.lang.ref.WeakReference;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.shared.L10n;
+import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 
 /**
  * Local file actions from a completed notification. They enter through the existing launcher
  * activity, so Android 12's notification restrictions never require a receiver to start a screen.
  * A tap is consumed before Facebook reads the intent. It can be delivered to a resumed screen
- * for at most 30 seconds; no file list or durable handle is written by this class.
+ * for at most 30 seconds; no file list or durable handle is written by this class. The one thing it
+ * keeps is a random key each button carries, so a request another app sends is never taken for a tap.
  *
  * <p>While Facebook is locked ({@link AppLock#covering}) nothing opens or shares: a tap waits, with
  * the same 30 seconds, and is delivered once the lock's check passes. If the lock outlasts that,
@@ -38,9 +49,16 @@ public final class SavedFileActions {
     static final String TAG = "hushfacebook-completed:";
     static final String OPEN = "app.morphe.extension.facebook.OPEN_SAVED_FILE";
     static final String SHARE = "app.morphe.extension.facebook.SHARE_SAVED_FILE";
+    /** The extra a button's intent carries this install's key in. */
+    static final String KEY = "app.morphe.extension.facebook.SAVED_FILE_KEY";
+    /** Where the key is kept, in storage Android never backs up, so it survives a process restart. */
+    static final String KEY_FILE = "hushfacebook-saved-file-key";
+    private static final int KEY_BYTES = 16;
     private static final long LIFETIME_MS = 30_000;
     private static final AtomicReference<Request> pending = new AtomicReference<>();
     private static volatile WeakReference<Activity> resumed = new WeakReference<>(null);
+    @Nullable
+    private static volatile String key;
 
     private SavedFileActions() { }
 
@@ -49,18 +67,105 @@ public final class SavedFileActions {
                 .setClassName(application.getPackageName(), "com.facebook.katana.LoginActivity")
                 .setDataAndType(uri, mime)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Facebook's launcher activity is open to every app, so a tap proves it came from this
+        // install's own button by carrying its key. Extras stay out of PendingIntent identity.
+        entry.putExtra(KEY, key(application));
         // Data and action participate in PendingIntent identity; extras alone do not.
         return PendingIntent.getActivity(application, 0, entry,
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    /** Called by the existing activity intent hooks, including after a process restart. */
+    /**
+     * Called by the existing activity intent hooks, including after a process restart. Only an
+     * intent carrying this install's key is a tap: another app can send the same action and a
+     * guessed gallery address to any exported Facebook screen, and that's left as it came.
+     */
     public static void receive(Intent intent) {
         if (intent == null || (!OPEN.equals(intent.getAction()) && !SHARE.equals(intent.getAction()))) return;
+        if (!fromOwnButton(intent)) {
+            Logger.printInfo(() -> "Saved file actions: an open or share request without this install's key was ignored");
+            return;
+        }
         Request request = new Request(intent.getData(), intent.getType(), SHARE.equals(intent.getAction()));
         intent.setAction(Intent.ACTION_MAIN).setDataAndType(null, null);
         intent.setClipData(null);
+        intent.removeExtra(KEY);
         pending.set(request);
+    }
+
+    /** Whether [intent] carries this install's key. Any doubt, a key that can't be read included, is no. */
+    private static boolean fromOwnButton(Intent intent) {
+        String given = intent.getStringExtra(KEY);
+        Context context = Utils.getContext();
+        if (given == null || context == null) return false;
+        String own = key(context);
+        return MessageDigest.isEqual(given.getBytes(StandardCharsets.US_ASCII), own.getBytes(StandardCharsets.US_ASCII));
+    }
+
+    /**
+     * This install's key: random, made once and kept in no-backup storage. When it can't be read or
+     * kept, a new one serves until the process ends, so buttons made meanwhile still work.
+     */
+    static String key(Context context) {
+        String known = key;
+        if (known != null) return known;
+        synchronized (SavedFileActions.class) {
+            if (key != null) return key;
+            File file = new File(context.getNoBackupFilesDir(), KEY_FILE);
+            String kept = readKey(file);
+            if (kept == null) {
+                byte[] random = new byte[KEY_BYTES];
+                new SecureRandom().nextBytes(random);
+                StringBuilder hex = new StringBuilder(KEY_BYTES * 2);
+                for (byte b : random) hex.append(String.format(Locale.ROOT, "%02x", b & 0xff));
+                kept = hex.toString();
+                writeKey(file, kept);
+            }
+            key = kept;
+            return kept;
+        }
+    }
+
+    @Nullable
+    private static String readKey(File file) {
+        if (!file.isFile() || file.length() != KEY_BYTES * 2) return null;
+        try (FileInputStream in = new FileInputStream(file)) {
+            byte[] bytes = new byte[KEY_BYTES * 2];
+            int read = 0;
+            while (read < bytes.length) {
+                int count = in.read(bytes, read, bytes.length - read);
+                if (count < 0) return null;
+                read += count;
+            }
+            String text = new String(bytes, StandardCharsets.US_ASCII);
+            return text.matches("[0-9a-f]{" + (KEY_BYTES * 2) + "}") ? text : null;
+        } catch (Exception failure) {
+            return null;
+        }
+    }
+
+    private static void writeKey(File file, String value) {
+        File part = new File(file.getPath() + ".part");
+        try {
+            try (FileOutputStream out = new FileOutputStream(part)) {
+                out.write(value.getBytes(StandardCharsets.US_ASCII));
+            }
+            //noinspection ResultOfMethodCallIgnored
+            file.delete();
+            if (!part.renameTo(file)) {
+                //noinspection ResultOfMethodCallIgnored
+                part.delete();
+            }
+        } catch (Exception failure) {
+            //noinspection ResultOfMethodCallIgnored
+            part.delete();
+            Logger.printException(() -> "Saved file actions: could not keep the key; buttons work until Facebook restarts", failure);
+        }
+    }
+
+    /** Forgets the key read into memory, as a process restart does. For tests. */
+    static void forgetKey() {
+        key = null;
     }
 
     /** The launcher may hand over to another Facebook activity, so delivery waits for resume. */

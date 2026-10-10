@@ -85,6 +85,9 @@ public class CompletedSaveActionsTest {
         watcher = CompletedEntryForTests.watcher();
         ((Application) context).registerActivityLifecycleCallbacks(watcher);
         LogBufferManager.clearLogBuffer();
+        // Each test starts as a fresh process would, so a key kept in memory from an earlier test's
+        // storage never stands in for this one's.
+        SavedFileActions.forgetKey();
     }
 
     @After public void tearDown() throws Exception {
@@ -417,6 +420,40 @@ public class CompletedSaveActionsTest {
             controller.start().resume();
             settle();
             assertNull(shadowOf(controller.get()).getNextStartedActivity());
+        }
+    }
+
+    /**
+     * Facebook's launcher activity is exported, so any app can send the buttons' action with a
+     * guessed address of a file Facebook saved. Without the button's key nothing opens or shares,
+     * and the intent reaches Facebook as it came. The real button still works after a restart.
+     */
+    @Test public void aRequestFromAnotherAppOpensAndSharesNothing() throws Exception {
+        Notification note = save(true, "video/mp4");
+        for (int action = 0; action < 2; action++) {
+            Intent real = entry(note, action);
+            assertNotNull("the button carries no key", real.getStringExtra(SavedFileActions.KEY));
+            Intent forged = new Intent(real.getAction()).setComponent(real.getComponent())
+                    .setDataAndType(real.getData(), real.getType());
+            Intent guessed = new Intent(forged).putExtra(SavedFileActions.KEY, "00000000000000000000000000000000");
+            for (Intent request : new Intent[]{forged, guessed}) {
+                try (ActivityController<Activity> controller = receive(request)) {
+                    assertNull("another app's request reached a file handler",
+                            shadowOf(controller.get()).getNextStartedActivity());
+                    assertEquals(real.getAction(), controller.get().getIntent().getAction());
+                }
+            }
+            // A process restart reads the same key back, so the notification's own tap still works.
+            SavedFileActions.forgetKey();
+            try (ActivityController<Activity> controller = receive(real)) {
+                Intent launched = shadowOf(controller.get()).getNextStartedActivity();
+                assertNotNull("the notification's own tap stopped working after a restart", launched);
+                Intent target = action == 0 ? launched : launched.getParcelableExtra(Intent.EXTRA_INTENT);
+                assertEquals(gallery.uris.get(0), action == 0 ? target.getData()
+                        : target.getParcelableExtra(Intent.EXTRA_STREAM));
+                assertNull("the key was left for Facebook to read",
+                        controller.get().getIntent().getStringExtra(SavedFileActions.KEY));
+            }
         }
     }
 
