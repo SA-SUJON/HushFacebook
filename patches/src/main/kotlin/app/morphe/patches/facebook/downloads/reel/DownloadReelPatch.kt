@@ -471,7 +471,9 @@ val downloadReelPatch = bytecodePatch(
         // so it is proved rather than trusted: an earlier version of this patch read `p0` here,
         // which is live nowhere near the end of this method, and the app died with a VerifyError
         // on every reel. A build that fails with a message below is the same fault found early.
-        // The story takes a fourth local, found the same way.
+        // The story goes to the helper in its own argument register when that's v15 or below, as
+        // in 582, whose assembly arguments start at v3 and fill every local up to v19. Otherwise it
+        // takes a fourth local, found the same way.
         val injectAt = assemblyIndex - 3
         val reads = listOf(
             argumentRegister(FB_USER_SESSION),
@@ -481,8 +483,10 @@ val downloadReelPatch = bytecodePatch(
             sourceRegister,
             markerRegister,
         )
-        val storyScratch = sidebar.storyScratchRegister(injectAt, reads)
-        sidebar.requireSidebarBlockFits(injectAt, assemblyIndex, SIDEBAR_BLOCK_SCRATCH + storyScratch, reads)
+        val story = argumentRegister(storyType)
+        val storyScratch = sidebar.storyScratchRegister(injectAt, reads, story)
+        val borrowed = if (storyScratch == story) SIDEBAR_BLOCK_SCRATCH else SIDEBAR_BLOCK_SCRATCH + storyScratch
+        sidebar.requireSidebarBlockFits(injectAt, assemblyIndex, borrowed, reads)
 
         // The switch is asked first, every time a reel's sidebar is built. Off, paused, or before the
         // settings are ready, the branch goes straight to the instruction the block was put in
@@ -495,7 +499,7 @@ val downloadReelPatch = bytecodePatch(
                 session = argumentRegister(FB_USER_SESSION),
                 scoped = argumentRegister(scopedType),
                 player = playerRegister,
-                story = argumentRegister(storyType),
+                story = story,
                 storyScratch = storyScratch,
                 helper = "$sidebarClass->$HELPER($FB_USER_SESSION$scopedType${playerField.type}$OBJECT)${factory.returnType}",
                 buttons = sourceRegister,
@@ -537,11 +541,14 @@ val downloadReelPatch = bytecodePatch(
 internal val SIDEBAR_BLOCK_SCRATCH = listOf(0, 1, 2)
 
 /**
- * The local the block borrows for the reel's story in front of instruction [index]: the lowest one
- * above v2, and v15 or below since the helper call names it, that nothing reads from [index] on and
- * that isn't one of [reads], the registers the block reads.
+ * The register the helper call names for the reel's story, which sits in [story] at instruction
+ * [index]. The helper call names its registers in four bits, so it's [story] itself when that's
+ * above v2 and v15 or below: the call only reads it, and the block writes nothing there. Otherwise
+ * it's the local the block borrows for a copy: the lowest one above v2, and v15 or below, that
+ * nothing reads from [index] on and that isn't one of [reads], the registers the block reads.
  */
-internal fun Method.storyScratchRegister(index: Int, reads: Collection<Int>): Int {
+internal fun Method.storyScratchRegister(index: Int, reads: Collection<Int>, story: Int): Int {
+    if (story in SIDEBAR_BLOCK_SCRATCH.size until 16) return story
     val live = liveAcrossInjection(index)
     return (SIDEBAR_BLOCK_SCRATCH.size until minOf(localRegisterCount(), 16))
         .firstOrNull { it !in live && it !in reads }
@@ -590,7 +597,8 @@ private fun writtenRegisters(instruction: Instruction): Set<Int> {
  * What goes in front of the sidebar assembly: ask the switch, then build the button through the
  * helper and add it to the list of buttons, and its marker to the list of markers. Each number is
  * the register that holds that value at the insertion point; v0 to v2 are free there, and so is
- * [storyScratch], a fourth local for the story.
+ * [storyScratch], a fourth local for the story, unless it's [story] itself, which is then named
+ * as it is and not copied.
  *
  * Both adds go through [LIST_ADD], an interface call, so they verify whatever List the builder
  * hands the assembly.
@@ -613,7 +621,7 @@ internal fun sidebarButtonBlock(
     move-object/from16 v0, v$session
     move-object/from16 v1, v$scoped
     move-object/from16 v2, v$player
-    move-object/from16 v$storyScratch, v$story
+    ${if (storyScratch == story) "" else "move-object/from16 v$storyScratch, v$story"}
     invoke-static { v0, v1, v2, v$storyScratch }, $helper
     move-result-object v1
     move-object/from16 v0, v$buttons
