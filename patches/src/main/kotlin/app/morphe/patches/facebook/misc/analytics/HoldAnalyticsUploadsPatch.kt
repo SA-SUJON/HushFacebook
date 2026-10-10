@@ -17,7 +17,8 @@ import com.android.tools.smali.dexlib2.iface.Method
 
 /**
  * Holds back Facebook's own analytics uploads: the XAnalytics event uploader and the Papaya
- * on-device learning jobs. See AnalyticsUploadAnchors.kt for where each hook goes.
+ * on-device learning jobs. See AnalyticsUploadAnchors.kt for where each hook goes. A second switch
+ * holds back the camera roll cloud processing and its media count reports (CameraRollAnchors.kt).
  *
  * Every anchor has to be found once: a half-applied patch would leave one sender running while the
  * switch says it's held, so a missing one stops the patch naming all of them.
@@ -30,8 +31,9 @@ val holdAnalyticsUploadsPatch = bytecodePatch(
     // The README table check reads this literal; PATCH carries the same text for the messages.
     name = "Hold back analytics uploads",
     description = "Stops Facebook sending its usage reports in the background and skips the learning jobs it " +
-        "runs on your phone, so less about how you use the app leaves it. Starts off. Turn it on in Hushfacebook " +
-        "settings > Privacy, then restart Facebook.",
+        "runs on your phone, so less about how you use the app leaves it. A second switch holds back the camera " +
+        "roll processing that uploads your photos and details about them for sharing suggestions. Both start off. " +
+        "Turn them on in Hushfacebook settings > Privacy, then restart Facebook.",
 ) {
     category("Privacy")
     dependsOn(settingsPatch, facebookExtensionPatch)
@@ -56,6 +58,18 @@ val holdAnalyticsUploadsPatch = bytecodePatch(
             classDefByOrNull(APP_JOB_HANDLER)?.let { kickOffUploads(it) { type -> classDefByOrNull(type) } }.orEmpty(),
         )
         val resume = one("XAnalytics' uploader resume", classDefByOrNull(LOW_PRIORITY_INIT)?.let(::resumeUploads).orEmpty())
+        val processing = one(
+            "the camera roll processing check",
+            classDefByOrNull(RUN_PIPELINE)?.let(::processingCheck)?.let { call ->
+                classDefByOrNull(call.definingClass)?.methods?.filter { isProcessingCheck(it, call) }
+            }.orEmpty(),
+        )
+        val mediaCount = one(
+            "the media count job's kill switch",
+            classDefByOrNull(MEDIA_COUNT_JOB)?.methods?.mapNotNull { method ->
+                mediaCountSwitch(method) { type -> classDefByOrNull(type) }?.let { method to it }
+            }.orEmpty(),
+        )
         if (missing.isNotEmpty()) {
             throw PatchException(
                 "$PATCH: could not find " + missing.joinToString("; ") +
@@ -65,6 +79,8 @@ val holdAnalyticsUploadsPatch = bytecodePatch(
         mutable(jobStart!!).passPapayaGate(gate!!)
         mutable(kickOff!!.first).skipUploadWhenHeld(kickOff.second, KICK_OFF_UPLOAD)
         mutable(resume!!.first).skipUploadWhenHeld(resume.second, RESUME_UPLOADING)
+        mutable(processing!!).holdProcessingFirst()
+        mutable(mediaCount!!.first).passMediaCountSwitch(mediaCount.second)
         enableStatus("analyticsUploads")
     }
 }

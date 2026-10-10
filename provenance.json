@@ -741,13 +741,15 @@
     {
       "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/AnalyticsUploads.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/CameraRollProcessing.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/analytics/AnalyticsUploadAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/analytics/CameraRollAnchors.kt",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/analytics/HoldAnalyticsUploadsPatch.kt"
       ],
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: Hold back analytics uploads, found in Facebook 577, 580 and 581 by names Facebook keeps. A check goes just before the one kickOffUpload() call, in the run() of the runnable the kept NativeXAnalyticsAppJobHandler schedules every three minutes, and the one resumeUploading(String) call, in the kept NativeXAnalyticsLowPriorityInit, and skips the call on a yes. The Papaya job's start, the most derived onStartJob along the kept FBPapayaJobService's superclasses, passes the answer of its config gate through the extension, so a held job takes Facebook's own off path."
+      "changes": "Written for Hushfacebook: Hold back analytics uploads, found in Facebook 577, 580 and 581 by names Facebook keeps. A check goes just before the one kickOffUpload() call, in the run() of the runnable the kept NativeXAnalyticsAppJobHandler schedules every three minutes, and the one resumeUploading(String) call, in the kept NativeXAnalyticsLowPriorityInit, and skips the call on a yes. The Papaya job's start, the most derived onStartJob along the kept FBPapayaJobService's superclasses, passes the answer of its config gate through the extension, so a held job takes Facebook's own off path. The camera roll switch, found in Facebook 582: a check goes first in the static (FbUserSession)Z config check the kept PipelineManager$runPipeline$2 calls next to its adv_pro_app_job_disabled reason, and answers it false on a yes; the kept MediaCountUploadAppJob's first config read, the kill switch whose branch cancels the MediaCountUploadWorker work, passes its answer through the extension."
     },
     {
       "paths": [

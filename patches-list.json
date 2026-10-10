@@ -2019,7 +2019,7 @@
     },
     {
       "name": "Hold back analytics uploads",
-      "description": "Stops Facebook sending its usage reports in the background and skips the learning jobs it runs on your phone, so less about how you use the app leaves it. Starts off. Turn it on in Hushfacebook settings > Privacy, then restart Facebook.",
+      "description": "Stops Facebook sending its usage reports in the background and skips the learning jobs it runs on your phone, so less about how you use the app leaves it. A second switch holds back the camera roll processing that uploads your photos and details about them for sharing suggestions. Both start off. Turn them on in Hushfacebook settings > Privacy, then restart Facebook.",
       "category": "Privacy",
       "use": true,
       "dependencies": [

@@ -310,6 +310,10 @@ Hides reels and Watch videos that Facebook marks as made with AI. Ones only thei
 Don't send reel watch history	Não enviar o histórico de Reels assistidos
 Hold back analytics uploads	Segurar envios de análises
 Stops Facebook sending usage statistics in the background and running its on-phone learning tasks. Restart Facebook to see the change.	O Facebook deixa de enviar estatísticas de uso em segundo plano e de executar suas tarefas de aprendizado no celular. Reinicie o Facebook para ver a mudança.
+# context: switch title under Privacy; camera roll means the photos and videos saved on the phone, and sharing suggestions is Facebook's own feature name, so use Facebook's wording in your language if you know it
+Hold back camera roll processing	Segurar o processamento do rolo da câmera
+# context: description of that switch; the report is a count of the photos and videos on the phone
+Stops the camera roll processing behind sharing suggestions, which goes through your photos and videos and uploads photos and details about them, and stops the report of how many you have. Restart Facebook to see the change.	Para o processamento do rolo da câmera usado nas sugestões de compartilhamento, que percorre suas fotos e vídeos e envia fotos e detalhes sobre elas, e o relatório de quantas você tem. Reinicie o Facebook para ver a mudança.
 # context: switch title under Privacy; link history is Facebook's own name for its list of links you opened in its built-in browser, so use Facebook's wording in your language if you know it
 Stop link history in Facebook's browser	Parar o histórico de links no navegador do Facebook
 # context: description of that switch; Facebook's own browser is the one built into the app

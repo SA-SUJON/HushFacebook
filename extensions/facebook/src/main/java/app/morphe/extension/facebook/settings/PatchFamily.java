@@ -190,7 +190,7 @@ public enum PatchFamily {
     META_AI_SEARCH(FamilyNames.META_AI_SEARCH, "metaAiSearch", null,
             Settings.HIDE_META_AI_IN_SEARCH),
     ANALYTICS_UPLOADS(FamilyNames.ANALYTICS_UPLOADS, "analyticsUploads", null,
-            Settings.HOLD_ANALYTICS_UPLOADS),
+            Settings.HOLD_ANALYTICS_UPLOADS, Settings.HOLD_CAMERA_ROLL_PROCESSING),
     SCREENSHOTS(FamilyNames.SCREENSHOTS, "allowScreenshots", null,
             Settings.ALLOW_SCREENSHOTS),
     SCREENSHOT_DETECTION(FamilyNames.SCREENSHOT_DETECTION, "screenshotDetection", null,

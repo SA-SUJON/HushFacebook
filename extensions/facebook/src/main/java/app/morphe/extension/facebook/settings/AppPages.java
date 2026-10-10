@@ -367,6 +367,11 @@ final class AppPages {
             privacy.addPreference(toggle(context, Settings.HOLD_ANALYTICS_UPLOADS,
                     L10n.t("Stops Facebook sending usage statistics in the background and running its on-phone learning tasks. "
                             + "Restart Facebook to see the change.")));
+            // Facebook cancels the work it scheduled the next time it asks, which a restart brings about.
+            privacy.addPreference(toggle(context, Settings.HOLD_CAMERA_ROLL_PROCESSING,
+                    L10n.t("Stops the camera roll processing behind sharing suggestions, which goes through your photos "
+                            + "and videos and uploads photos and details about them, and stops the report of how many you "
+                            + "have. Restart Facebook to see the change.")));
         }
         if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {
             privacy.addPreference(toggle(context, Settings.HOLD_LINK_HISTORY,

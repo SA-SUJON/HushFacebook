@@ -420,6 +420,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hold_analytics_uploads", FALSE, true);
 
     /**
+     * Facebook's camera roll cloud processing and its media count reports
+     * ({@link app.morphe.extension.facebook.misc.CameraRollProcessing}). Starts off. Facebook
+     * cancels the work it scheduled the next time it checks, which a restart brings about.
+     */
+    public static final BooleanSetting HOLD_CAMERA_ROLL_PROCESSING =
+            new BooleanSetting("hushfacebook_hold_camera_roll_processing", FALSE, true);
+
+    /**
      * Screenshots of the screens Facebook marks secure ({@link app.morphe.extension.facebook.misc.Screenshots}).
      * Starts off. A screen takes it when it's next opened.
      */

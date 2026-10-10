@@ -7,6 +7,7 @@ Every Hushfacebook release, newest first.
 ### Added
 
 * **Facebook:** **Stop link history in Facebook's browser**, a new switch under Privacy that comes with Open links in external browser and starts on. Links that still open in Facebook's own browser, like Facebook's pages or any link on a phone with no other browser, aren't recorded for your link history or sent to Facebook as pages you visited. The browser just never builds its two link recorders, which is what it does when Facebook turns the feature off. Login, checkout and autofill keep working, and your Enhanced browsing setting stays as it is.
+* **Facebook:** **Hold back camera roll processing**, a second switch in Hold back analytics uploads under Privacy, which starts off. The processing behind camera roll sharing suggestions goes through your photos and videos, runs Facebook's models on them and uploads photos with what it found, and another job tells Facebook how many photos and videos you have. Facebook 582 has no setting on the phone for either one, only a server answer the app asks in one place. With the switch on that answer is no, so Facebook cancels the work it scheduled, and the count job is cancelled too. Photos you pick to post go another way and never ask it.
 
 ### Fixed
 

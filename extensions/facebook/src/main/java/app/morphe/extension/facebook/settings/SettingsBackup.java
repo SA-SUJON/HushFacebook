@@ -167,6 +167,7 @@ public final class SettingsBackup {
             Settings.PLAY_REELS_ONCE,
             Settings.DONT_SEND_REEL_WATCH_HISTORY,
             Settings.HOLD_ANALYTICS_UPLOADS,
+            Settings.HOLD_CAMERA_ROLL_PROCESSING,
             Settings.ALLOW_SCREENSHOTS,
             Settings.TURN_OFF_HAPTICS,
             Settings.TURN_OFF_SCREEN_TRANSITIONS,
