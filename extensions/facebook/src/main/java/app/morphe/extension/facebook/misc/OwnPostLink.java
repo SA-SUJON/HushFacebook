@@ -53,7 +53,8 @@ public final class OwnPostLink {
             if (!isWebLink(ownLink)) return shareLink;
             HookStatus.counted(FAMILY, OWN_LINK_GIVEN);
             logOnce();
-            return ownLink;
+            // The own address of a reel comes with Copy link's labels, which the cleaner takes out.
+            return Settings.SANITIZE_SHARING_LINKS.get() ? LinkCleaner.clean(ownLink) : ownLink;
         } catch (Throwable failure) {
             HookStatus.threw(FAMILY, "share link", failure);
             return shareLink;

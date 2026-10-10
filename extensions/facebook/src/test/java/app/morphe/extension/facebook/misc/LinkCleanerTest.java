@@ -78,6 +78,15 @@ public class LinkCleanerTest {
         untouched("https://example.org/?ref=share");
     }
 
+    /** 582's Copy link on a reel adds the same s and fs on every reel; other values stay. */
+    @Test
+    public void aCopiedReelLosesCopyLinksLabels() {
+        cleansTo("https://www.facebook.com/reel/1735740627541004/", "https://www.facebook.com/reel/1735740627541004/?s=yWDuG2&fs=e");
+        untouched("https://www.facebook.com/search/top/?q=garden&s=1");
+        untouched("https://www.facebook.com/reel/1/?fs=x");
+        untouched("https://example.org/?s=yWDuG2&fs=e");
+    }
+
     /** The legacy Open Graph keys Facebook put on outside links. */
     @Test
     public void theOpenGraphKeysGoFromAnyLink() {

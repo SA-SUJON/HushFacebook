@@ -67,6 +67,20 @@ public class OwnPostLinkTest {
         assertTrue(line, line.contains(OwnPostLink.OWN_LINK_GIVEN + " 1"));
     }
 
+    /** A reel's own address comes with Copy link's labels, which go while Sanitize sharing links is on. */
+    @Test
+    public void aReelsOwnLinkLosesCopyLinksLabels() {
+        Settings.SHARE_POST_OWN_LINK.save(true);
+        String reel = "https://www.facebook.com/reel/1735740627541004/?s=yWDuG2&fs=e";
+        assertEquals("https://www.facebook.com/reel/1735740627541004/", OwnPostLink.shareLink(SHARE, reel));
+        Settings.SANITIZE_SHARING_LINKS.save(false);
+        try {
+            assertSame(reel, OwnPostLink.shareLink(SHARE, reel));
+        } finally {
+            Settings.SANITIZE_SHARING_LINKS.resetToDefault();
+        }
+    }
+
     @Test
     public void onWithoutAShareLinkFacebooksAnswerStays() {
         Settings.SHARE_POST_OWN_LINK.save(true);

@@ -62,8 +62,10 @@ public final class LinkCleaner {
     /**
      * Pairs taken out of Facebook's own links only with exactly this value. The app adds
      * ref=share to some stories' links, and ref with another value can carry what a link opens.
+     * 582's Copy link on a reel adds s=yWDuG2 and fs=e, the same on every reel and account, so
+     * they only say the link was copied; s and fs with other values are left alone.
      */
-    private static final Set<String> FACEBOOK_PAIRS = keys("ref=share");
+    private static final Set<String> FACEBOOK_PAIRS = keys("ref=share", "s=yWDuG2", "fs=e");
 
     /** Keys Facebook numbers, such as {@code __cft__[0]}, taken out of its own links. */
     private static final Pattern FACEBOOK_NUMBERED = Pattern.compile("__(?:cft|xts)__\\[\\d+\\]");

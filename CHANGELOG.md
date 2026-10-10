@@ -10,6 +10,8 @@ Every Hushfacebook release, newest first.
 * **Facebook:** When a piece of Hushfacebook fails to load, Facebook keeps running. An error like that at app start or while opening a screen used to close Facebook every time, and pausing Hushfacebook didn't help.
 * **Facebook:** The **Share sheet items to hide** list closes with the settings page when you rotate the phone or Facebook closes the screen. It used to stay up over a window that was already gone, and it now follows the page's colors too.
 * **Facebook:** On a Facebook build that reads the loop setting in a way the reel hook can't use, the play reels once switch is refused while patching. Before, that build's reel player would fail to load.
+* **Facebook:** **Share sheet items to hide** calls Facebook's Muse item Muse. It showed up as "Share to hatch", Facebook's name for it inside the app.
+* **Facebook:** A reel's link from Copy link loses the `s=yWDuG2&fs=e` Facebook 582 adds to every copied reel, as long as Sanitize sharing links is on. Those two only say the link was copied.
 * **Accessibility:** The Lock Facebook cover tells a screen reader that Facebook is locked, marks its heading, and reads the reason line out when it changes.
 * **Tooling:** The release's index step now moves the Facebook build in the repository description along with the version and patch count. After the 582 port it had left the description on 581, and the release facts check refused the index push until it was set by hand.
 
