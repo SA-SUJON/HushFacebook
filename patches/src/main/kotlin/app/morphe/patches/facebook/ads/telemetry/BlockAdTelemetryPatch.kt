@@ -63,9 +63,9 @@ internal val AD_ID_SENDERS = listOf(
 @Suppress("unused")
 val blockAdTelemetryPatch = bytecodePatch(
     name = "Block ad telemetry",
-    description = "Stops Facebook watching for screenshots of ads, reporting which apps you install after " +
-        "seeing ads, and sending your phone's advertising ID, so less of what you do feeds its ad tracking. Works " +
-        "as soon as you patch it in, with no switch.",
+    description = "Stops Facebook watching for screenshots of ads and reporting which apps you install after " +
+        "seeing ads, and stops several of the ways it sends your phone's advertising ID, so less of what you do " +
+        "feeds its ad tracking. Works as soon as you patch it in, with no switch.",
     default = true,
 ) {
     category("Privacy")
@@ -105,8 +105,11 @@ internal fun BytecodePatchContext.stopSenderOrReason(marker: String): String? {
     }
     val sender = senders.singleOrNull()
         ?: return "${senders.size} void methods hold \"$marker\", expected 1, so that send keeps running"
-    mutableClassDefBy(sender.definingClass).methods.single {
-        it.name == sender.name && it.parameterTypes.map(Any::toString) == sender.parameterTypes.map(Any::toString)
-    }.returnEarly()
+    val mutable = mutableClassDefBy(sender.definingClass).methods.filter {
+        it.name == sender.name && it.returnType == sender.returnType &&
+            it.parameterTypes.map(Any::toString) == sender.parameterTypes.map(Any::toString)
+    }
+    mutable.singleOrNull()?.returnEarly()
+        ?: return "${sender.definingClass}->${sender.name} matched ${mutable.size} methods to change, so that send keeps running"
     return null
 }

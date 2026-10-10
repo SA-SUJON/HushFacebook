@@ -210,7 +210,7 @@ The useful distinction is between less ad content on screen and less data sent t
 
 ### Patch opportunities
 
-1. Finish the advertising ID senders. Block ad telemetry stops six of them on 582 (see [Advertising ID senders on 582](#advertising-id-senders-on-582)), but the install event at the login screen, the attribution content provider and the sign-in parameters still carry the ID. Don't present the patch as removing the identifier everywhere.
+1. Finish the advertising ID senders. Block ad telemetry stops six targets on 582: three that send the ID itself, the registration of ad views and clicks with Android's measurement, and two Privacy Sandbox jobs (see [Advertising ID senders on 582](#advertising-id-senders-on-582)), but the install event at the login screen, the attribution content provider and the sign-in parameters still carry the ID. Don't present the patch as removing the identifier everywhere.
 2. Recheck impression measurement and ad visual-quality paths when studying ad telemetry. Keep the logger's return and retry semantics intact. The current patch comments explain why the obvious impression logger is unsafe to neuter.
 3. Keep a versioned surface map for new server-delivered ad and promotion types. Use sanitized model names, categories, query tracking names, and counter reasons. Don't log post text, user IDs, ad IDs, or full GraphQL responses to diagnose a miss.
 4. Consider a single user-facing ad controls map that links each surface to its existing switch. Keep placement hiding, background downloads, telemetry, and Audience Network distinct because they have different effects and currently different runtime controls.
