@@ -1031,8 +1031,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         }
         HiddenTabs.Tab hidden = HiddenTabs.Tab.forStart(tab);
         if (hidden != null && hidden.setting().savedValue() && PatchFamily.HIDDEN_TABS.inBuild()) {
-            return L10n.f("Facebook opens on Home while Hide tabs keeps %1$s off the tab bar. Your choice stays saved.",
-                    tabLabel(tab));
+            return L10n.f("Facebook opens on Home while %1$s is on, since %2$s is off the tab bar. Your choice stays saved.",
+                    SwitchLabels.title(hidden.setting()), tabLabel(tab));
         }
         return L10n.f("Facebook opens on %1$s. If your tab bar doesn't have it, Facebook opens on Home.",
                 tabLabel(tab));

@@ -694,7 +694,7 @@ Hide the Create tab	Ocultar a aba Criar
 Hide the Explore tab	Ocultar a aba Explorar
 Hide the Jobs tab	Ocultar a aba Empregos
 Removes this tab from the tab bar. Its page is still in the Menu. Restart Facebook to see the change.	Remove esta aba da barra de abas. A página dela continua no Menu. Reinicie o Facebook para ver a mudança.
-Facebook opens on Home while Hide tabs keeps %1$s off the tab bar. Your choice stays saved.	O Facebook abre no Início enquanto Ocultar abas mantém %1$s fora da barra de abas. Sua escolha continua salva.
+Facebook opens on Home while %1$s is on, since %2$s is off the tab bar. Your choice stays saved.	O Facebook abre na Página inicial enquanto “%1$s” estiver ativado, porque %2$s fica fora da barra de abas. Sua escolha é mantida.
 # context: summary of that switch; Video is Facebook's name for the tab on some accounts
 No dot or new count on the Reels tab, called Video on some accounts. Other tabs keep theirs.	Sem ponto nem contagem de novidades na aba Reels, chamada Vídeo em algumas contas. As outras abas mantêm os seus.
 # context: title of the overview row under the status card when the build lacks one patch Morphe Manager selects by default

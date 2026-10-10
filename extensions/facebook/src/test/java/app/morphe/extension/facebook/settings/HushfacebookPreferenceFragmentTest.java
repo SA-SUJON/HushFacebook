@@ -1073,9 +1073,9 @@ public class HushfacebookPreferenceFragmentTest {
         Settings.HIDE_FEEDS_TAB.save(true);
         try {
             assertEquals(feeds, HushfacebookPreferenceFragment.startTabSummary(StartTab.FEEDS));
-            // Any other tab Hide tabs keeps off the bar still opens Home.
+            // Any other tab Hide the Friends tab and its kin keep off the bar still opens Home.
             Settings.HIDE_FRIENDS_TAB.save(true);
-            assertEquals("Facebook opens on Home while Hide tabs keeps Friends off the tab bar. Your choice stays saved.",
+            assertEquals("Facebook opens on Home while Hide the Friends tab is on, since Friends is off the tab bar. Your choice stays saved.",
                     HushfacebookPreferenceFragment.startTabSummary(StartTab.FRIENDS));
         } finally {
             Settings.HIDE_FEEDS_TAB.resetToDefault();
