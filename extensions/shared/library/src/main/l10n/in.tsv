@@ -140,7 +140,7 @@ Import	Impor
 Import settings	Impor pengaturan
 Importing settings	Mengimpor pengaturan
 Licenses	Lisensi
-Link expired. Reopen the item and try again	Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi
+Link expired. Reopen the item and try again.	Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi.
 Links	Tautan
 Privacy	Privasi
 Material You theme	Tema Material You
@@ -246,7 +246,7 @@ The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back
 the part of the Reels ad blocking built in when you patched	bagian pemblokiran iklan Reels yang dipasang saat kamu mem-patch
 the re-signed build fix	perbaikan build yang ditandatangani ulang
 the start-up fix for x86 devices	perbaikan saat mulai untuk perangkat x86
-the recoloured dark mode	mode gelap yang diwarnai ulang
+the recolored dark mode	mode gelap yang diwarnai ulang
 Hides friend suggestions between posts and on your own profile.	Menyembunyikan saran teman di antara postingan dan di profilmu sendiri.
 Hides the row of stories at the top of the feed, including Create story.	Menyembunyikan baris cerita di bagian atas feed, termasuk Buat cerita.
 Hides rows of reels between posts, and the reels Facebook adds where your feed ends.	Menyembunyikan baris reel di antara postingan, dan reel yang ditambahkan Facebook di akhir feed kamu.
@@ -816,7 +816,7 @@ Not in this build: %1$s. Morphe Manager selects them by default. Patch again wit
 # context: Toast at the end of a video save whose file uses a codec WhatsApp and some video editors can't open (AV1, VP9, HEVC or xHE-AAC). A notification with a button to the fix is showing too. Keep it short: Android shows two lines at most.
 Saved, but WhatsApp and some editors may not accept it	Tersimpan, tetapi WhatsApp dan beberapa editor mungkin tidak menerimanya
 # context: Toast at the end of a video save whose file WhatsApp may not open, when no notification can be shown. Downloads is the section of Hushfacebook settings with the fix. Two lines at most.
-Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.	Tersimpan, tetapi WhatsApp mungkin tidak menerimanya. Solusi: Unduhan di pengaturan Hushfacebook.
+Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.	Tersimpan, tetapi WhatsApp mungkin tidak menerimanya. Buka Unduhan di pengaturan Hushfacebook untuk memperbaikinya.
 # context: Second line of the notification after such a save. %1$s is the switch's name, Save videos other apps can open. They: WhatsApp and the editors.
 Turn on %1$s to save videos that WhatsApp and these editors accept.	Nyalakan %1$s untuk menyimpan video yang diterima WhatsApp dan editor-editor ini.
 # context: Title of the notification after a video save whose file uses a codec WhatsApp and some video editors can't open.

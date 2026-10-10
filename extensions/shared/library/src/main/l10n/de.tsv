@@ -140,7 +140,7 @@ Import	Importieren
 Import settings	Einstellungen importieren
 Importing settings	Einstellungen werden importiert
 Licenses	Lizenzen
-Link expired. Reopen the item and try again	Link abgelaufen. Öffne den Inhalt neu und versuche es noch einmal
+Link expired. Reopen the item and try again.	Link abgelaufen. Öffne den Inhalt neu und versuche es noch einmal.
 Links	Links
 Privacy	Datenschutz
 Material You theme	Material-You-Design
@@ -246,7 +246,7 @@ The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back
 the part of the Reels ad blocking built in when you patched	der beim Patchen eingebaute Teil der Reels-Werbeblockade
 the re-signed build fix	der Fix für neu signierte Builds
 the start-up fix for x86 devices	der Startfix für x86-Geräte
-the recoloured dark mode	die Umfärbung des Dunkelmodus
+the recolored dark mode	die Umfärbung des Dunkelmodus
 Hides friend suggestions between posts and on your own profile.	Blendet Freundschaftsvorschläge zwischen Beiträgen und auf deinem eigenen Profil aus.
 Hides the row of stories at the top of the feed, including Create story.	Blendet die Reihe mit Stories oben im Feed aus, einschließlich Story erstellen.
 Hides rows of reels between posts, and the reels Facebook adds where your feed ends.	Blendet Reihen mit Reels zwischen Beiträgen aus, ebenso die Reels, die Facebook am Ende deines Feeds anhängt.
@@ -816,7 +816,7 @@ Not in this build: %1$s. Morphe Manager selects them by default. Patch again wit
 # context: Toast at the end of a video save whose file uses a codec WhatsApp and some video editors can't open (AV1, VP9, HEVC or xHE-AAC). A notification with a button to the fix is showing too. Keep it short: Android shows two lines at most.
 Saved, but WhatsApp and some editors may not accept it	Gespeichert, aber WhatsApp und manche Editoren nehmen es evtl. nicht an
 # context: Toast at the end of a video save whose file WhatsApp may not open, when no notification can be shown. Downloads is the section of Hushfacebook settings with the fix. Two lines at most.
-Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.	Gespeichert, aber WhatsApp nimmt es evtl. nicht an. Lösung: Downloads in den Hushfacebook-Einstellungen.
+Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.	Gespeichert, aber WhatsApp nimmt es evtl. nicht an. Öffne Downloads in den Hushfacebook-Einstellungen, um das zu beheben.
 # context: Second line of the notification after such a save. %1$s is the switch's name, Save videos other apps can open. They: WhatsApp and the editors.
 Turn on %1$s to save videos that WhatsApp and these editors accept.	Schalte %1$s ein, um Videos zu speichern, die WhatsApp und diese Editoren annehmen.
 # context: Title of the notification after a video save whose file uses a codec WhatsApp and some video editors can't open.

@@ -1040,8 +1040,8 @@ public final class L10nTranslations {
                 "Zeile %1$d ist kein Muster, das Hushfacebook lesen kann. Korrigiere oder entferne sie und speichere dann noch einmal.");
         table.put("Link copied",
                 "Link kopiert");
-        table.put("Link expired. Reopen the item and try again",
-                "Link abgelaufen. \u00d6ffne den Inhalt neu und versuche es noch einmal");
+        table.put("Link expired. Reopen the item and try again.",
+                "Link abgelaufen. \u00d6ffne den Inhalt neu und versuche es noch einmal.");
         table.put("Links",
                 "Links");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -1442,8 +1442,8 @@ public final class L10nTranslations {
                 "Gespeicherte Videos hei\u00dfen dann %1$s.");
         table.put("Saved, but WhatsApp and some editors may not accept it",
                 "Gespeichert, aber WhatsApp und manche Editoren nehmen es evtl. nicht an");
-        table.put("Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.",
-                "Gespeichert, aber WhatsApp nimmt es evtl. nicht an. L\u00f6sung: Downloads in den Hushfacebook-Einstellungen.");
+        table.put("Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.",
+                "Gespeichert, aber WhatsApp nimmt es evtl. nicht an. \u00d6ffne Downloads in den Hushfacebook-Einstellungen, um das zu beheben.");
         table.put("Saved. Restart Facebook to see the change.",
                 "Gespeichert. Starte Facebook neu, um die \u00c4nderung zu sehen.");
         table.put("Saves will go to a folder named %1$s.",
@@ -1916,7 +1916,7 @@ public final class L10nTranslations {
                 "der beim Patchen eingebaute Teil der Reels-Werbeblockade");
         table.put("the re-signed build fix",
                 "der Fix f\u00fcr neu signierte Builds");
-        table.put("the recoloured dark mode",
+        table.put("the recolored dark mode",
                 "die Umf\u00e4rbung des Dunkelmodus");
         table.put("the settings row in Facebook's Menu",
                 "die Einstellungszeile im Facebook-Men\u00fc");
@@ -2923,8 +2923,8 @@ public final class L10nTranslations {
                 "La l\u00ednea %1$d no es un patr\u00f3n que Hushfacebook pueda leer. Corr\u00edgela o qu\u00edtala y vuelve a guardar.");
         table.put("Link copied",
                 "Enlace copiado");
-        table.put("Link expired. Reopen the item and try again",
-                "El enlace expir\u00f3. Vuelve a abrir el contenido e int\u00e9ntalo de nuevo");
+        table.put("Link expired. Reopen the item and try again.",
+                "El enlace expir\u00f3. Vuelve a abrir el contenido e int\u00e9ntalo de nuevo.");
         table.put("Links",
                 "Enlaces");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -3325,8 +3325,8 @@ public final class L10nTranslations {
                 "Los videos guardados se llamar\u00e1n %1$s.");
         table.put("Saved, but WhatsApp and some editors may not accept it",
                 "Guardado, pero WhatsApp y algunos editores podr\u00edan no aceptarlo");
-        table.put("Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.",
-                "Guardado, pero WhatsApp podr\u00eda no aceptarlo. Soluci\u00f3n: Descargas en los ajustes de Hushfacebook.");
+        table.put("Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.",
+                "Guardado, pero WhatsApp podr\u00eda no aceptarlo. Abre Descargas en los ajustes de Hushfacebook para solucionarlo.");
         table.put("Saved. Restart Facebook to see the change.",
                 "Guardado. Reinicia Facebook para ver el cambio.");
         table.put("Saves will go to a folder named %1$s.",
@@ -3799,7 +3799,7 @@ public final class L10nTranslations {
                 "la parte del bloqueo de anuncios de Reels que se incorpor\u00f3 al parchear");
         table.put("the re-signed build fix",
                 "el arreglo para la nueva firma");
-        table.put("the recoloured dark mode",
+        table.put("the recolored dark mode",
                 "el cambio de colores del modo oscuro");
         table.put("the settings row in Facebook's Menu",
                 "la fila de configuraci\u00f3n en el men\u00fa de Facebook");
@@ -4806,8 +4806,8 @@ public final class L10nTranslations {
                 "Baris %1$d bukan pola yang bisa dibaca Hushfacebook. Perbaiki atau hapus, lalu simpan lagi.");
         table.put("Link copied",
                 "Tautan disalin");
-        table.put("Link expired. Reopen the item and try again",
-                "Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi");
+        table.put("Link expired. Reopen the item and try again.",
+                "Tautan kedaluwarsa. Buka ulang kontennya lalu coba lagi.");
         table.put("Links",
                 "Tautan");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -5208,8 +5208,8 @@ public final class L10nTranslations {
                 "Video yang disimpan akan diberi nama %1$s.");
         table.put("Saved, but WhatsApp and some editors may not accept it",
                 "Tersimpan, tetapi WhatsApp dan beberapa editor mungkin tidak menerimanya");
-        table.put("Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.",
-                "Tersimpan, tetapi WhatsApp mungkin tidak menerimanya. Solusi: Unduhan di pengaturan Hushfacebook.");
+        table.put("Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.",
+                "Tersimpan, tetapi WhatsApp mungkin tidak menerimanya. Buka Unduhan di pengaturan Hushfacebook untuk memperbaikinya.");
         table.put("Saved. Restart Facebook to see the change.",
                 "Tersimpan. Mulai ulang Facebook untuk melihat perubahannya.");
         table.put("Saves will go to a folder named %1$s.",
@@ -5682,7 +5682,7 @@ public final class L10nTranslations {
                 "bagian pemblokiran iklan Reels yang dipasang saat kamu mem-patch");
         table.put("the re-signed build fix",
                 "perbaikan build yang ditandatangani ulang");
-        table.put("the recoloured dark mode",
+        table.put("the recolored dark mode",
                 "mode gelap yang diwarnai ulang");
         table.put("the settings row in Facebook's Menu",
                 "baris pengaturan di Menu Facebook");
@@ -6689,8 +6689,8 @@ public final class L10nTranslations {
                 "A linha %1$d n\u00e3o \u00e9 um padr\u00e3o que o Hushfacebook consegue ler. Corrija ou remova a linha e salve de novo.");
         table.put("Link copied",
                 "Link copiado");
-        table.put("Link expired. Reopen the item and try again",
-                "Link expirado. Reabra o item e tente novamente");
+        table.put("Link expired. Reopen the item and try again.",
+                "Link expirado. Reabra o item e tente novamente.");
         table.put("Links",
                 "Links");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -7091,8 +7091,8 @@ public final class L10nTranslations {
                 "Os v\u00eddeos salvos ser\u00e3o nomeados como %1$s.");
         table.put("Saved, but WhatsApp and some editors may not accept it",
                 "Salvo, mas o WhatsApp e alguns editores podem n\u00e3o aceitar");
-        table.put("Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.",
-                "Salvo, mas o WhatsApp pode n\u00e3o aceitar. Solu\u00e7\u00e3o: Downloads nas configura\u00e7\u00f5es do Hushfacebook.");
+        table.put("Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.",
+                "Salvo, mas o WhatsApp pode n\u00e3o aceitar. Abra Downloads nas configura\u00e7\u00f5es do Hushfacebook para corrigir.");
         table.put("Saved. Restart Facebook to see the change.",
                 "Salvo. Reinicie o Facebook para ver a mudan\u00e7a.");
         table.put("Saves will go to a folder named %1$s.",
@@ -7565,7 +7565,7 @@ public final class L10nTranslations {
                 "a parte do bloqueio de an\u00fancios dos Reels inclu\u00edda ao aplicar o patch");
         table.put("the re-signed build fix",
                 "a corre\u00e7\u00e3o para vers\u00e3o reassinada");
-        table.put("the recoloured dark mode",
+        table.put("the recolored dark mode",
                 "a nova colora\u00e7\u00e3o do modo escuro");
         table.put("the settings row in Facebook's Menu",
                 "a linha de configura\u00e7\u00f5es no Menu do Facebook");
@@ -8572,8 +8572,8 @@ public final class L10nTranslations {
                 "%1$d. sat\u0131r Hushfacebook'un okuyabildi\u011fi bir kal\u0131p de\u011fil. D\u00fczelt ya da sil, sonra yeniden kaydet.");
         table.put("Link copied",
                 "Ba\u011flant\u0131 kopyaland\u0131");
-        table.put("Link expired. Reopen the item and try again",
-                "Ba\u011flant\u0131n\u0131n s\u00fcresi doldu. \u00d6\u011feyi yeniden a\u00e7\u0131p tekrar dene");
+        table.put("Link expired. Reopen the item and try again.",
+                "Ba\u011flant\u0131n\u0131n s\u00fcresi doldu. \u00d6\u011feyi yeniden a\u00e7\u0131p tekrar dene.");
         table.put("Links",
                 "Ba\u011flant\u0131lar");
         table.put("Links go to %1$s. When it isn't installed, Android asks which app.",
@@ -8974,8 +8974,8 @@ public final class L10nTranslations {
                 "Kaydedilen videolar\u0131n ad\u0131 %1$s olacak.");
         table.put("Saved, but WhatsApp and some editors may not accept it",
                 "Kaydedildi ama WhatsApp ve baz\u0131 d\u00fczenleyiciler kabul etmeyebilir");
-        table.put("Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.",
-                "Kaydedildi ama WhatsApp kabul etmeyebilir. \u00c7\u00f6z\u00fcm: Hushfacebook ayarlar\u0131nda \u0130ndirmeler.");
+        table.put("Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.",
+                "Kaydedildi ama WhatsApp kabul etmeyebilir. D\u00fczeltmek i\u00e7in Hushfacebook ayarlar\u0131nda \u0130ndirmeler'i a\u00e7.");
         table.put("Saved. Restart Facebook to see the change.",
                 "Kaydedildi. De\u011fi\u015fikli\u011fi g\u00f6rmek i\u00e7in Facebook'u yeniden ba\u015flat\u0131n.");
         table.put("Saves will go to a folder named %1$s.",
@@ -9448,7 +9448,7 @@ public final class L10nTranslations {
                 "Reels reklam engellemenin yama s\u0131ras\u0131nda eklenen k\u0131sm\u0131");
         table.put("the re-signed build fix",
                 "yeniden imzalanm\u0131\u015f s\u00fcr\u00fcm d\u00fczeltmesi");
-        table.put("the recoloured dark mode",
+        table.put("the recolored dark mode",
                 "yeniden renklendirilmi\u015f karanl\u0131k mod");
         table.put("the settings row in Facebook's Menu",
                 "Facebook men\u00fcs\u00fcndeki ayarlar sat\u0131r\u0131");

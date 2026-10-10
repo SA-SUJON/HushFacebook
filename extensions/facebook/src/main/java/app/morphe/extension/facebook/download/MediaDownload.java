@@ -1016,7 +1016,7 @@ public final class MediaDownload {
                     ? L10n.t(application, "Saved to the gallery")
                     : L10n.f(application, "Saved to %1$s", L10n.isolate(location));
             case EXPIRED:
-                return L10n.t(application, "Link expired. Reopen the item and try again");
+                return L10n.t(application, "Link expired. Reopen the item and try again.");
             case REFUSED:
                 return L10n.t(application, "Not saved: that isn't a Facebook photo or video");
             case TOO_LARGE:
@@ -1037,7 +1037,7 @@ public final class MediaDownload {
     static String refusedMessage(Context application, boolean notified) {
         return notified
             ? L10n.t(application, "Saved, but WhatsApp and some editors may not accept it")
-            : L10n.t(application, "Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.");
+            : L10n.t(application, "Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.");
     }
 
     /**

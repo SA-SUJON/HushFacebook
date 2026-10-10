@@ -140,7 +140,7 @@ Import	İçe aktar
 Import settings	Ayarları içe aktar
 Importing settings	Ayarlar içe aktarılıyor
 Licenses	Lisanslar
-Link expired. Reopen the item and try again	Bağlantının süresi doldu. Öğeyi yeniden açıp tekrar dene
+Link expired. Reopen the item and try again.	Bağlantının süresi doldu. Öğeyi yeniden açıp tekrar dene.
 Links	Bağlantılar
 Privacy	Gizlilik
 Material You theme	Material You teması
@@ -246,7 +246,7 @@ The file %1$s couldn't be removed. Delete it from %2$s to turn Hushfacebook back
 the part of the Reels ad blocking built in when you patched	Reels reklam engellemenin yama sırasında eklenen kısmı
 the re-signed build fix	yeniden imzalanmış sürüm düzeltmesi
 the start-up fix for x86 devices	x86 cihazlar için açılış düzeltmesi
-the recoloured dark mode	yeniden renklendirilmiş karanlık mod
+the recolored dark mode	yeniden renklendirilmiş karanlık mod
 Hides friend suggestions between posts and on your own profile.	Gönderilerin arasındaki ve kendi profilinizdeki arkadaş önerilerini gizler.
 Hides the row of stories at the top of the feed, including Create story.	Akışın üstündeki hikaye satırını, Hikaye oluştur dahil, gizler.
 Hides rows of reels between posts, and the reels Facebook adds where your feed ends.	Gönderilerin arasındaki reel satırlarını ve Facebook'un akışınızın sonuna eklediği reelleri gizler.
@@ -816,7 +816,7 @@ Not in this build: %1$s. Morphe Manager selects them by default. Patch again wit
 # context: Toast at the end of a video save whose file uses a codec WhatsApp and some video editors can't open (AV1, VP9, HEVC or xHE-AAC). A notification with a button to the fix is showing too. Keep it short: Android shows two lines at most.
 Saved, but WhatsApp and some editors may not accept it	Kaydedildi ama WhatsApp ve bazı düzenleyiciler kabul etmeyebilir
 # context: Toast at the end of a video save whose file WhatsApp may not open, when no notification can be shown. Downloads is the section of Hushfacebook settings with the fix. Two lines at most.
-Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.	Kaydedildi ama WhatsApp kabul etmeyebilir. Çözüm: Hushfacebook ayarlarında İndirmeler.
+Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.	Kaydedildi ama WhatsApp kabul etmeyebilir. Düzeltmek için Hushfacebook ayarlarında İndirmeler'i aç.
 # context: Second line of the notification after such a save. %1$s is the switch's name, Save videos other apps can open. They: WhatsApp and the editors.
 Turn on %1$s to save videos that WhatsApp and these editors accept.	WhatsApp ve bu düzenleyicilerin kabul ettiği videoları kaydetmek için %1$s seçeneğini açın.
 # context: Title of the notification after a video save whose file uses a codec WhatsApp and some video editors can't open.

@@ -56,7 +56,7 @@ public class RefusedFormatTest {
     @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
 
     private static final String REFUSED = "Saved, but WhatsApp and some editors may not accept it";
-    private static final String NOWHERE_TO_TAP = "Saved, but WhatsApp may not accept it. Fix: Downloads in Hushfacebook settings.";
+    private static final String NOWHERE_TO_TAP = "Saved, but WhatsApp may not accept it. Open Downloads in Hushfacebook settings to fix that.";
 
     private LocalServer server;
     private String origin;
