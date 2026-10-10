@@ -114,6 +114,8 @@ internal fun copyLabelSites(method: Method): List<Int> {
     return code.indices
         .filter { code[it].constString() == COPY_LABEL_END_KEY && appendsLabelBefore(code, it) }
         .mapNotNull { stringResultAfter(code, it) }
+        // Two labels close together can end in the same string; it gets cleaned once.
+        .distinct()
 }
 
 /** A `const-string "s"` and a Uri.Builder append among the three instructions before [at]. */
