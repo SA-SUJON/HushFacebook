@@ -98,7 +98,13 @@ public final class SavedFileActions {
         String given = intent.getStringExtra(KEY);
         Context context = Utils.getContext();
         if (given == null || context == null) return false;
-        String own = key(context);
+        if (same(given, key(context))) return true;
+        // Another Facebook process can keep its own key after this one read it, and its buttons carry that one.
+        String kept = readKey(new File(context.getNoBackupFilesDir(), KEY_FILE));
+        return kept != null && same(given, kept);
+    }
+
+    private static boolean same(String given, String own) {
         return MessageDigest.isEqual(given.getBytes(StandardCharsets.US_ASCII), own.getBytes(StandardCharsets.US_ASCII));
     }
 
@@ -120,6 +126,9 @@ public final class SavedFileActions {
                 for (byte b : random) hex.append(String.format(Locale.ROOT, "%02x", b & 0xff));
                 kept = hex.toString();
                 writeKey(file, kept);
+                // A process that made its key at the same moment may have written last; both then use that one.
+                String written = readKey(file);
+                if (written != null) kept = written;
             }
             key = kept;
             return kept;

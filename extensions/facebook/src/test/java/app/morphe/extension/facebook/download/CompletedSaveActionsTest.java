@@ -457,6 +457,23 @@ public class CompletedSaveActionsTest {
         }
     }
 
+    /** A button another Facebook process made carries the key that process kept, which this one never read. */
+    @Test public void aKeyAnotherProcessKeptStillOpens() throws Exception {
+        Notification note = save(true, "video/mp4");
+        Intent real = entry(note, 0);
+        String other = "0123456789abcdef0123456789abcdef";
+        assertNotEquals(other, real.getStringExtra(SavedFileActions.KEY));
+        Files.write(new File(context.getNoBackupFilesDir(), SavedFileActions.KEY_FILE).toPath(),
+                other.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+        Intent fromOther = new Intent(real).putExtra(SavedFileActions.KEY, other);
+        for (Intent tap : new Intent[]{fromOther, real}) {
+            try (ActivityController<Activity> controller = receive(tap)) {
+                assertNotNull("a tap on a button with a kept key opened nothing",
+                        shadowOf(controller.get()).getNextStartedActivity());
+            }
+        }
+    }
+
     @Test public void indexedMimeChangesUseTheGallerysCurrentTypeAtTheTap() throws Exception {
         Notification note = save(true, "video/mp4");
         gallery.rows.get(1L).put(MediaStore.MediaColumns.MIME_TYPE, "video/webm");
