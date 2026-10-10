@@ -218,8 +218,8 @@ try {
                 Write-Warning (("Preflight took {0:N1} minutes, past its five-minute budget. A quick check that " +
                     'got slow belongs in the gate, not here.') -f $minutes)
             }
-            Step ("preflight passed in {0:N1} minutes. The notes draft is in $assets. Push the source commit; its " +
-                "pre-push gate runs the fixture tests, then run -Stage bundle" -f $minutes)
+            Step (("preflight passed in {0:N1} minutes. The notes draft is in {1}. Push the source commit; its " +
+                'pre-push gate runs the fixture tests, then run -Stage bundle') -f $minutes, $assets)
         }
         'bundle' {
             $head = Assert-PushedHead
