@@ -376,13 +376,17 @@ public class SupportedLinksTest {
         assertEquals(sanitize, Settings.SANITIZE_SHARING_LINKS.get());
     }
 
-    /** The row says that selecting addresses sends links here without making the build verified. */
+    /**
+     * The last row says why Android won't verify a patched build, what selecting the addresses does
+     * instead, and that the other link settings stay (theLinkSwitchesStayAsTheyAre holds it to that).
+     */
     @Test
-    public void theScreenExplainsWhatSelectingDoesntRestore() throws Exception {
+    public void theScreenExplainsWhyAndroidWontVerifyThisBuild() throws Exception {
         answer = state(true, hosts(NONE, NONE));
         PreferenceGroup links = show(true).findPreference(KEY).getParent();
         Preference explanation = links.getPreference(links.getPreferenceCount() - 1);
         assertFalse(explanation.isSelectable());
+        assertEquals("Choose which links open here", String.valueOf(explanation.getTitle()));
         assertEquals("Android can't verify a patched Facebook for Facebook links. Selecting the addresses yourself "
                 + "sends those links here. Your other link settings stay.", String.valueOf(explanation.getSummary()));
     }
