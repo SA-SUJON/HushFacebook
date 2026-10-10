@@ -368,6 +368,11 @@ final class AppPages {
                     L10n.t("Stops Facebook sending usage statistics in the background and running its on-phone learning tasks. "
                             + "Restart Facebook to see the change.")));
         }
+        if (build.contains(PatchFamily.EXTERNAL_BROWSER)) {
+            privacy.addPreference(toggle(context, Settings.HOLD_LINK_HISTORY,
+                    L10n.t("Links that open in Facebook's own browser aren't recorded for your link history or sent to "
+                            + "Facebook as pages you visited. Applies to the next link you open.")));
+        }
         if (build.contains(PatchFamily.SCREENSHOT_DETECTION)) {
             privacy.addPreference(toggle(context, Settings.BLOCK_SCREENSHOT_DETECTION,
                     L10n.t("Facebook can't tell when you take a screenshot or record your screen, so it can't react.")));

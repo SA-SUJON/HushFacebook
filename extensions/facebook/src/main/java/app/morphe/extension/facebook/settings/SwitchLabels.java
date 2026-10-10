@@ -166,6 +166,7 @@ final class SwitchLabels {
         if (setting == Settings.BLOCK_REACTION_NOTIFICATIONS) return L10n.t("Block reaction notifications");
         if (setting == Settings.NOTIFICATION_QUIET_HOURS) return L10n.t("Quiet hours");
         if (setting == Settings.OPEN_LINKS_EXTERNALLY) return L10n.t("Open links in your browser");
+        if (setting == Settings.HOLD_LINK_HISTORY) return L10n.t("Stop link history in Facebook's browser");
         if (setting == Settings.SANITIZE_SHARING_LINKS) return L10n.t("Remove tracking from shared links");
         if (setting == Settings.SHARE_POST_OWN_LINK) return L10n.t("Share the post's own link");
         if (setting == Settings.HIDE_SHARE_GROUP_BUTTONS) return L10n.t("Hide group buttons in the share sheet");

@@ -666,6 +666,15 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting OPEN_LINKS_EXTERNALLY =
             new BooleanSetting("hushfacebook_open_links_externally", TRUE);
 
+    /**
+     * Facebook's own browser builds neither of its link history writers
+     * ({@link app.morphe.extension.facebook.misc.LinkHistory}), so a link that opens in it isn't
+     * recorded for your link history or sent as a navigation event. On by default. A change applies
+     * to the next link opened.
+     */
+    public static final BooleanSetting HOLD_LINK_HISTORY =
+            new BooleanSetting("hushfacebook_hold_link_history", TRUE);
+
     /** The tracking keys come off the links Facebook hands out when someone shares. */
     public static final BooleanSetting SANITIZE_SHARING_LINKS =
             new BooleanSetting("hushfacebook_sanitize_sharing_links", TRUE);

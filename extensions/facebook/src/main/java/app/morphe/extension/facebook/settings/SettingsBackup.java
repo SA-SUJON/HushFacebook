@@ -198,6 +198,7 @@ public final class SettingsBackup {
             Settings.USE_SYSTEM_FONT,
             Settings.USE_SYSTEM_EMOJI,
             Settings.OPEN_LINKS_EXTERNALLY,
+            Settings.HOLD_LINK_HISTORY,
             Settings.SANITIZE_SHARING_LINKS,
             Settings.SHARE_POST_OWN_LINK,
             Settings.HIDE_SHARE_GROUP_BUTTONS,

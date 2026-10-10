@@ -317,6 +317,10 @@ Hides reels and Watch videos that Facebook marks as made with AI. Ones only thei
 Don't send reel watch history	Reel-Wiedergabeverlauf nicht senden
 Hold back analytics uploads	Analyse-Uploads zurückhalten
 Stops Facebook sending usage statistics in the background and running its on-phone learning tasks. Restart Facebook to see the change.	Facebook sendet im Hintergrund keine Nutzungsstatistiken mehr und führt seine Lernaufgaben auf dem Telefon nicht mehr aus. Starte Facebook neu, um die Änderung zu sehen.
+# context: switch title under Privacy; link history is Facebook's own name for its list of links you opened in its built-in browser, so use Facebook's wording in your language if you know it
+Stop link history in Facebook's browser	Linkverlauf in Facebooks Browser stoppen
+# context: description of that switch; Facebook's own browser is the one built into the app
+Links that open in Facebook's own browser aren't recorded for your link history or sent to Facebook as pages you visited. Applies to the next link you open.	Links, die sich in Facebooks eigenem Browser öffnen, landen nicht in deinem Linkverlauf und werden Facebook nicht als besuchte Seiten gemeldet. Gilt ab dem nächsten Link, den du öffnest.
 Allow screenshots	Bildschirmfotos erlauben
 Lets you take screenshots and screen recordings on pages where Facebook blocks them. Reopen a page that's already open.	Du kannst Screenshots und Bildschirmaufnahmen auf Seiten machen, auf denen Facebook sie sperrt. Öffne eine bereits offene Seite erneut.
 Block screenshot detection	Bildschirmfoto-Erkennung blockieren

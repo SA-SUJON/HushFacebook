@@ -317,6 +317,10 @@ Hides reels and Watch videos that Facebook marks as made with AI. Ones only thei
 Don't send reel watch history	Reels izleme geçmişini gönderme
 Hold back analytics uploads	Analiz yüklemelerini beklet
 Stops Facebook sending usage statistics in the background and running its on-phone learning tasks. Restart Facebook to see the change.	Facebook arka planda kullanım istatistiklerini göndermeyi ve telefonda öğrenme görevlerini çalıştırmayı bırakır. Değişikliği görmek için Facebook'u yeniden başlatın.
+# context: switch title under Privacy; link history is Facebook's own name for its list of links you opened in its built-in browser, so use Facebook's wording in your language if you know it
+Stop link history in Facebook's browser	Facebook tarayıcısında bağlantı geçmişini durdur
+# context: description of that switch; Facebook's own browser is the one built into the app
+Links that open in Facebook's own browser aren't recorded for your link history or sent to Facebook as pages you visited. Applies to the next link you open.	Facebook'un kendi tarayıcısında açılan bağlantılar bağlantı geçmişinize kaydedilmez ve Facebook'a ziyaret ettiğiniz sayfalar olarak gönderilmez. Açtığınız bir sonraki bağlantıdan itibaren geçerlidir.
 Allow screenshots	Ekran görüntülerine izin ver
 Lets you take screenshots and screen recordings on pages where Facebook blocks them. Reopen a page that's already open.	Facebook'un engellediği sayfalarda ekran görüntüsü ve ekran kaydı almanızı sağlar. Zaten açık olan bir sayfayı yeniden açın.
 Block screenshot detection	Ekran görüntüsü algılamayı engelle

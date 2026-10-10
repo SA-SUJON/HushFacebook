@@ -135,7 +135,7 @@ public enum PatchFamily {
     SCREEN_TRANSITIONS(FamilyNames.SCREEN_TRANSITIONS, "turnOffScreenTransitions", null,
             Settings.TURN_OFF_SCREEN_TRANSITIONS),
     EXTERNAL_BROWSER(FamilyNames.EXTERNAL_BROWSER, "externalBrowser", null,
-            Settings.OPEN_LINKS_EXTERNALLY),
+            Settings.OPEN_LINKS_EXTERNALLY, Settings.HOLD_LINK_HISTORY),
     SANITIZE_SHARING_LINKS(FamilyNames.SANITIZE_SHARING_LINKS, "sanitizeSharingLinks", null,
             Settings.SANITIZE_SHARING_LINKS, Settings.SHARE_POST_OWN_LINK),
     UPDATE_PROMPTS(FamilyNames.UPDATE_PROMPTS, "updatePrompts", null,

@@ -317,6 +317,10 @@ Hides reels and Watch videos that Facebook marks as made with AI. Ones only thei
 Don't send reel watch history	Jangan kirim riwayat tontonan reel
 Hold back analytics uploads	Tahan unggahan analitik
 Stops Facebook sending usage statistics in the background and running its on-phone learning tasks. Restart Facebook to see the change.	Facebook berhenti mengirim statistik penggunaan di latar belakang dan menjalankan tugas pembelajarannya di ponsel. Mulai ulang Facebook untuk melihat perubahannya.
+# context: switch title under Privacy; link history is Facebook's own name for its list of links you opened in its built-in browser, so use Facebook's wording in your language if you know it
+Stop link history in Facebook's browser	Hentikan riwayat tautan di browser Facebook
+# context: description of that switch; Facebook's own browser is the one built into the app
+Links that open in Facebook's own browser aren't recorded for your link history or sent to Facebook as pages you visited. Applies to the next link you open.	Tautan yang terbuka di browser bawaan Facebook tidak dicatat di riwayat tautan Anda dan tidak dikirim ke Facebook sebagai halaman yang Anda kunjungi. Berlaku untuk tautan berikutnya yang Anda buka.
 Allow screenshots	Izinkan tangkapan layar
 Lets you take screenshots and screen recordings on pages where Facebook blocks them. Reopen a page that's already open.	Memungkinkan tangkapan layar dan rekaman layar di halaman yang diblokir Facebook. Buka ulang halaman yang sudah terbuka.
 Block screenshot detection	Blokir deteksi tangkapan layar

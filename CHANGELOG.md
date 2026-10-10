@@ -4,6 +4,10 @@ Every Hushfacebook release, newest first.
 
 ## Unreleased
 
+### Added
+
+* **Facebook:** **Stop link history in Facebook's browser**, a new switch under Privacy that comes with Open links in external browser and starts on. Links that still open in Facebook's own browser, like Facebook's pages or any link on a phone with no other browser, aren't recorded for your link history or sent to Facebook as pages you visited. The browser just never builds its two link recorders, which is what it does when Facebook turns the feature off. Login, checkout and autofill keep working, and your Enhanced browsing setting stays as it is.
+
 ### Fixed
 
 * **Facebook:** Open and Share on a finished save only answer their own buttons now. Another app on the phone could send Facebook the same request with a guessed file address and get it to open or share a video or photo Facebook had saved, with no tap from you.
