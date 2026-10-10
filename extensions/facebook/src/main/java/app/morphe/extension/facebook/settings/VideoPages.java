@@ -114,6 +114,10 @@ final class VideoPages {
             reels.addPreference(toggle(context, Settings.REEL_CLEAN_MODE,
                     L10n.t("Opens reels and videos in Facebook's Clean mode, which hides the buttons down the side. You can "
                             + "still leave Clean mode as usual. Untested on a real account, so it starts off.")));
+            reels.addPreference(toggle(context, Settings.PLAY_REELS_ONCE,
+                    L10n.t("A reel stops on its last frame instead of starting over. Tap it to watch again, or swipe to "
+                            + "the next one. Feed videos and stories aren't changed. Untested on a real account, so it "
+                            + "starts off.")));
         }
         if (build.contains(PatchFamily.REEL_WATCH_HISTORY)) {
             reels.addPreference(toggle(context, Settings.DONT_SEND_REEL_WATCH_HISTORY,

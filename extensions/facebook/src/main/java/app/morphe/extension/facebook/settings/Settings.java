@@ -396,6 +396,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_reel_clean_mode", FALSE);
 
     /**
+     * A reel stops on its last frame instead of starting over, so a tap plays it again and a swipe
+     * moves on. Feed videos, stories and every other video play as Facebook has them. Off until
+     * it's turned on, since nobody has seen it on a phone yet.
+     */
+    public static final BooleanSetting PLAY_REELS_ONCE =
+            new BooleanSetting("hushfacebook_play_reels_once", FALSE);
+
+    /**
      * The batches of watched reels the Reels viewer sends as FbShortsSeenStateMutation: only their
      * ids, the record Facebook ranks the Reels feed with, which nobody else sees. Held back, reels
      * already watched may come back in the feed.

@@ -83,7 +83,7 @@ For the source layout, patch workflow, and Facebook 581 audit, see [Contributing
 | `Block screenshot detection` | Stops Facebook noticing when you take a screenshot or record the screen, in the feed, Reels, chats and everywhere else, so it can't react to it. Starts off. Turn it on in Hushfacebook settings > Privacy. |
 | `Hide typing indicator` | Others don't see that you're typing, in chats that open inside Facebook and in comment boxes, so you can write without anyone watching. Your messages send as usual. Starts off. Turn on the parts you want in Hushfacebook settings > Privacy. |
 | `Hide read receipts` | People you chat with in chats that open inside Facebook don't see that you've read their messages, so you can read now and reply later. Replying may still show you've read it. Starts off. Turn it on in Hushfacebook settings > Privacy. |
-| `Clean up Reels` | Hides clutter on reels, such as the Follow button, comment previews, Remix and Use template buttons and Threads cards between reels, so more of the video shows. Starts off. Turn on the parts you want in Hushfacebook settings > Reels and Watch. |
+| `Clean up Reels` | Hides clutter on reels, such as the Follow button, comment previews, Remix and Use template buttons and Threads cards between reels, so more of the video shows, and can play each reel once instead of over and over. Starts off. Turn on the parts you want in Hushfacebook settings > Reels and Watch. |
 | `Default playback quality` | Plays videos, reels and video stories at the quality you choose, such as Data saver or up to 720p, instead of what Facebook picks. Lower saves data, higher looks sharper. Starts off. Turn it on and pick a quality in Hushfacebook settings > Playback. |
 | `Default comment order` | Opens comments in the order you choose, Most relevant, Newest or All comments, instead of the one Facebook picks. Handy if you always want the newest first. Starts off. Turn it on and pick an order in Hushfacebook settings > Comments. |
 | `Disable Audience Network` | Stops Facebook serving its ads inside other apps on your phone. Those apps show their own ads or none, and their rewarded ads may fail. Works as soon as you patch it in, with no switch. |
@@ -352,7 +352,7 @@ Reels turn up in four places, and no one switch covers them all. The Reels and W
 | Hide sponsored Marketplace listings | Off. Ads and boosted listings come back to Marketplace's feed and search results. |
 | Show View profile on Marketplace sellers | Off. A seller's page shows View profile only when Facebook gives it to your account. |
 | Hide affiliate product links | Off. Product and shop cards come back on reels, under feed posts and in the comment sheet. |
-| Clean up Reels | Off. Reels look the way Facebook draws them. |
+| Clean up Reels | Off. Reels look the way Facebook draws them, and they start over at their end again. |
 | Don't send reel watch history | Off. Facebook gets the list of reels you watch again. |
 | Turn off double tap to like | Off. A double tap likes reels and videos again. |
 | Turn off haptics | Off. Facebook's taps and gestures vibrate again. |

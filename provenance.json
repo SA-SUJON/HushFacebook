@@ -367,7 +367,7 @@
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: the Reels viewer clean-up, which drops the chips under a reel by their GraphQL type, answers Facebook's own Follow check and its config for removing the Following button, and skips the footer's hot comment and friends' reaction queries, each behind its own switch, with the hooks found in Facebook 577 and 580 by kept literals and Redex names."
+      "changes": "Written for Hushfacebook: the Reels viewer clean-up, which drops the chips under a reel by their GraphQL type, answers Facebook's own Follow check and its config for removing the Following button, and skips the footer's hot comment and friends' reaction queries, each behind its own switch, with the hooks found in Facebook 577 and 580 by kept literals and Redex names. Also a switch that plays each reel once, answering the shouldLoopVideo read in FbGrootPlayer's end-of-video step, found in Facebook 581 by its completion log string and VideoPlayerParams' debug dump, with no for a reel."
     },
     {
       "paths": [

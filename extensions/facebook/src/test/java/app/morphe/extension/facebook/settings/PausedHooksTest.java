@@ -115,6 +115,7 @@ import app.morphe.extension.facebook.reels.ReelHold;
 import app.morphe.extension.facebook.reels.ReelHoldForTests;
 import app.morphe.extension.facebook.reels.ReelCleanMode;
 import app.morphe.extension.facebook.reels.ReelDeclutter;
+import app.morphe.extension.facebook.reels.ReelLoopForTests;
 import app.morphe.extension.facebook.reels.ReelMidCardsForTests;
 import app.morphe.extension.facebook.reels.ReelPrompts;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
@@ -432,7 +433,8 @@ public class PausedHooksTest {
                 ReelDeclutter::skipHotComment,
                 ReelDeclutter::skipSocialBubbles,
                 ReelMidCardsForTests::dropsAThreadsCard,
-                () -> ReelCleanMode.startClean(false)));
+                () -> ReelCleanMode.startClean(false),
+                ReelLoopForTests::stopsAReel));
         // A reel that would get the interest prompt is answered as one that doesn't.
         probes.put(PatchFamily.REEL_PROMPTS, Collections.singletonList(() -> !ReelPrompts.keep(true)));
         // The Reels batcher's send of the reels you watched never reaches its executor.

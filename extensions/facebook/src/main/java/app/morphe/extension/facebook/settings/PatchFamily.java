@@ -94,7 +94,7 @@ public enum PatchFamily {
             Settings.HIDE_AFFILIATE_LINKS),
     REEL_DECLUTTER(FamilyNames.REEL_DECLUTTER, "reelDeclutter", null,
             Settings.HIDE_REEL_CHIPS, Settings.HIDE_REEL_FOLLOW_BUTTON, Settings.HIDE_REEL_SOCIAL_FOOTER,
-            Settings.HIDE_REEL_THREADS_CARDS, Settings.REEL_CLEAN_MODE),
+            Settings.HIDE_REEL_THREADS_CARDS, Settings.REEL_CLEAN_MODE, Settings.PLAY_REELS_ONCE),
     REEL_PROMPTS(FamilyNames.REEL_PROMPTS, "reelPrompts", null,
             Settings.HIDE_REEL_PROMPTS),
     REEL_WATCH_HISTORY(FamilyNames.REEL_WATCH_HISTORY, "reelWatchHistory", null,

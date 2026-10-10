@@ -848,6 +848,10 @@ Hides the "What's on your mind?" row at the top of Home. The create button in th
 Always use Clean mode	Sempre usar o modo limpo
 # context: summary of that switch; "the usual way" means Facebook's own way out of Clean mode
 Opens reels and videos in Facebook's Clean mode, which hides the buttons down the side. You can still leave Clean mode as usual. Untested on a real account, so it starts off.	Abre reels e vídeos no modo limpo do Facebook, que esconde os botões da lateral. Você ainda pode sair do modo limpo como de costume. Ainda não testado em uma conta real, por isso começa desligado.
+# context: switch title under Reels and Watch, part of Clean up Reels; each reel plays to its end one time and stops there instead of starting over
+Play reels once	Reproduzir reels uma vez
+# context: summary of that switch; "last frame" is the final picture of the video, which stays on screen
+A reel stops on its last frame instead of starting over. Tap it to watch again, or swipe to the next one. Feed videos and stories aren't changed. Untested on a real account, so it starts off.	Um reel para no último quadro em vez de recomeçar. Toque nele para assistir de novo ou deslize para o próximo. Vídeos do feed e stories não mudam. Ainda não testado em uma conta real, por isso começa desligado.
 # context: settings section title on the App page, above the switches of Hide Meta upsells; Meta is the company
 Meta's other products	Outros produtos da Meta
 # context: switch title; Edits is Meta's video editing app, keep its name

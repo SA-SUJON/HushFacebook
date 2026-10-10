@@ -44,8 +44,10 @@ private const val PATCH = "Clean up Reels"
  * the chips under a reel that prompt you to make something or promote something, the Follow button
  * in the author row (with the Following button an author you already follow gets there), and the
  * comment and friends' reaction previews in the footer. A fourth switch, off until it's turned on,
- * takes the "Threads you might like" card out from between reels (see ReelMidCards.kt), and a fifth,
- * also off, starts reels and videos in Facebook's own Clean mode (see ReelCleanMode.kt).
+ * takes the "Threads you might like" card out from between reels (see ReelMidCards.kt), a fifth,
+ * also off, starts reels and videos in Facebook's own Clean mode (see ReelCleanMode.kt), and a
+ * sixth, also off, plays each reel once instead of starting it over at its end (see ReelLoop.kt,
+ * whose hook is reelLoopPatch's).
  *
  * Every anchor is a kept name or literal (see ReelAnchors.kt), and every one of them is required: a
  * build where one can't be found stops the patch with what's missing, rather than shipping a switch
@@ -59,12 +61,12 @@ private const val PATCH = "Clean up Reels"
 val cleanUpReelsPatch = bytecodePatch(
     name = "Clean up Reels",
     description = "Hides clutter on reels, such as the Follow button, comment previews, Remix and Use template " +
-        "buttons and Threads cards between reels, so more of the video shows. Starts off. Turn on the parts you " +
-        "want in Hushfacebook settings > Reels and Watch.",
+        "buttons and Threads cards between reels, so more of the video shows, and can play each reel once " +
+        "instead of over and over. Starts off. Turn on the parts you want in Hushfacebook settings > Reels and Watch.",
 ) {
     category("Reels")
     dependsOn(settingsPatch)
-    dependsOn(facebookExtensionPatch)
+    dependsOn(facebookExtensionPatch, reelLoopPatch)
     compatibleWith(*AppCompatibilities.facebook())
 
     execute {
