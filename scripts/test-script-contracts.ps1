@@ -5915,14 +5915,16 @@ try {
     $flowTamper = $null
     New-Item -ItemType Directory -Path (Join-Path $flowRepo 'scripts/release') -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'common.ps1') -Destination (Join-Path $flowRepo 'scripts')
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'patch-target.ps1') -Destination (Join-Path $flowRepo 'scripts')
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'release/release.ps1') -Destination (Join-Path $flowRepo 'scripts/release')
     Set-Content -LiteralPath (Join-Path $flowRepo 'gradle.properties') -Value 'version = 1.2.3' -Encoding ASCII
     Set-Content -LiteralPath (Join-Path $flowRepo 'CHANGELOG.md') -Value '# Changelog' -Encoding ASCII
     Set-Content -LiteralPath (Join-Path $flowRepo '.gitignore') -Value @('build/', 'patches/build/', 'extensions/facebook/build/',
         'release-receipt-*.json') -Encoding ASCII
-    $flowTarget = '{"packageName":"com.facebook.katana","targets":[{"version":"582.0.0.50.54"}]}'
+    $flowTarget = '"compatiblePackages":{"com.facebook.katana":["582.0.0.50.54"]},' +
+        '"compatibility":[{"packageName":"com.facebook.katana","targets":[{"version":"582.0.0.50.54"}]}]'
     Set-Content -LiteralPath (Join-Path $flowRepo 'patches-list.json') -Encoding ASCII -Value (
-        '{"patches":[{"name":"A","compatibility":[' + $flowTarget + ']},{"name":"B","compatibility":[' + $flowTarget + ']}]}')
+        '{"patches":[{"name":"A",' + $flowTarget + '},{"name":"B",' + $flowTarget + '}]}')
     $logLiteral = $flowLog.Replace("'", "''")
     $failLiteral = $flowFails.Replace("'", "''")
     # The receipt names the commit it saw, as the real one does, and the bundle stage copies it.
@@ -5982,7 +5984,7 @@ try {
             if ($flowTamper) { Set-Content -LiteralPath (Join-Path $into $flowTamper) -Value 'tampered' -Encoding ASCII }
         }
         if ($what -eq 'release view') { '2026-10-09T21:03:04Z' }
-        if ($what -eq 'repo view') { 'Hushfacebook v1.2.2: 1 patches for Facebook 582.0.0.50.54 with Morphe.' }
+        if ($what -eq 'repo view') { 'Hushfacebook v1.2.2: 1 patches for Facebook 581.0.0.45.58 with Morphe.' }
     }
     & git init --quiet --bare $flowOrigin
     & git -C $flowRepo init --quiet --initial-branch=main

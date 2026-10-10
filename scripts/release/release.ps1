@@ -56,6 +56,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 . (Join-Path $root 'scripts/common.ps1')
+. (Join-Path $root 'scripts/patch-target.ps1')
 
 $tag = "v$Version"
 $assets = Join-Path $root "build/release-assets/$Version"
@@ -323,8 +324,12 @@ try {
             Copy-Item -LiteralPath (Join-Path $assets $receiptName) -Destination (Join-Path $root $receiptName) -Force
 
             $description = [string](& gh repo view $Repository --json description --jq .description)
-            $count = @((Get-Content -LiteralPath (Join-Path $root 'patches-list.json') -Raw | ConvertFrom-Json).patches).Count
-            $updated = $description.Trim() -replace 'Hushfacebook v\d+\.\d+\.\d+', "Hushfacebook v$Version" -replace '\b\d+ patches\b', "$count patches"
+            $catalog = Get-Content -LiteralPath (Join-Path $root 'patches-list.json') -Raw | ConvertFrom-Json
+            $count = @($catalog.patches).Count
+            # The build moves with the catalog too, or a port leaves the description on the old one.
+            $build = (Get-PatchTarget -PatchList $catalog).PackageVersion
+            $updated = $description.Trim() -replace 'Hushfacebook v\d+\.\d+\.\d+', "Hushfacebook v$Version" -replace '\b\d+ patches\b', "$count patches" `
+                -replace '\bFacebook \d+(?:\.\d+)+', "Facebook $build"
             if ($updated -ne $description.Trim()) { Invoke-Native 'The repository description' { & gh repo edit $Repository --description $updated } }
             Step ("index points at $tag ($runtime runtime tests, $patch patch tests). Commit it as " +
                 "'chore(release): point Manager to the verified $Version bundle' and push")
