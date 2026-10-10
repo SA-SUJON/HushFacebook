@@ -102,7 +102,8 @@ final class StartsOffNote {
      * Whether Hushfacebook first started on this install at [firstStart], before the APK running
      * now went in at [installedAt]: an earlier build ran here and kept its settings. A fresh
      * install's first start comes after its APK went in, and a time Android won't give says no. A
-     * Root Mount install keeps the stock APK's time, so it says no there too.
+     * Root Mount install reports the stock APK's time, so a patch mounted over the same stock
+     * build says no, and the note shows only once the stock app itself updates.
      */
     static boolean updated(long firstStart, long installedAt) {
         return firstStart > 0 && installedAt > 0 && firstStart < installedAt;
