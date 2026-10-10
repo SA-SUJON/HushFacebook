@@ -12,6 +12,10 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Share sheet items` is a new patch. It lets you hide items from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link. Nothing is hidden until you tap **Share sheet items to hide** under Links and tick what you don't want. The list starts with the items Facebook has offered on your phone and then common ones. The rest keep Facebook's order, and pausing Hushfacebook brings everything back. It shares one hook with the Threads switch in `Hide Meta upsells`, so both can be in the same build. The idea comes from icysymmetra's TikTok patches.
 * **Tooling:** `scripts/phone-smoke.ps1` walks a patched Facebook on a phone through the feed, Watch, Reels, notifications and Marketplace, saves a full diagnostic report from Hushfacebook settings and pulls it. It fails when a hook family reports anything missing, ambiguous or thrown, when a family you name with `-ExpectInvoked` never ran, or when Facebook crashed during the walk. A crash the report kept from before the walk doesn't count. `scripts/test-phone-smoke.ps1` checks the report reading without a phone.
 
+### Fixed
+
+* **Facebook:** `Open links in external browser` sends out links written in capitals, like a Page post's HTTPS://SHOP.EXAMPLE. Android reads the start of a link letter for letter, so your browser didn't recognize it, and the link opened in Facebook's own browser with a "No external browser took the link" message. Links that an app on your phone claims, a video site's for example, now reach that app even when they're written in capitals.
+
 ### Changed
 
 * **Tooling:** Settings tests now match the current patch list, switch defaults and supported-link explanation. Story privacy tests clear shared diagnostic counters before each case so an earlier test can't change their results.
