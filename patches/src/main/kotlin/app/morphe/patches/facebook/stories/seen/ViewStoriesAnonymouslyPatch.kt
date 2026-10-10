@@ -9,13 +9,16 @@ import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
+import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 /**
  * Keeps the stories you view from being reported, which is what puts you on their viewer lists.
@@ -60,11 +63,14 @@ val viewStoriesAnonymouslyPatch = bytecodePatch(
         if (!hasSendShape(sender)) {
             throw PatchException("$PATCH: the sender doesn't take a callback and ${SENDER_SHAPE.joinToString("")}")
         }
-        val helper = seenHelper(
-            classDefByStrings(SEEN_HELPER_LITERAL, StringComparisonType.EQUALS)
-                .filterNot { it.type.startsWith(EXTENSION_PACKAGE) }.distinctBy { it.type },
-            sender,
-        )
+        // The helper's literal can sit in a string table (582's armeabi-v7a build), so the sender's
+        // callers are where it's looked for.
+        val callers = mutableListOf<ClassDef>()
+        classDefForEach { classDef ->
+            if (!classDef.type.startsWith(EXTENSION_PACKAGE) && callsSender(classDef, sender)) callers += classDef
+        }
+        val tables = { call: MethodReference -> classDefByOrNull(call.definingClass)?.let { resolveStatic(it, call) } }
+        val helper = seenHelper(callers, sender, tables)
         val card = cardSeen(helper)
         val storyCard = classDefByOrNull(STORY_CARD) ?: throw PatchException("$PATCH: this Facebook build has no $STORY_CARD")
         if (storyCard.methods.none { "${it.definingClass}->${it.name}()${it.returnType}" == CARD_ID && it.parameterTypes.isEmpty() }) {
