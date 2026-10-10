@@ -60,7 +60,7 @@ public final class ShareSheetItems {
      */
     static final List<String> COMMON = Collections.unmodifiableList(Arrays.asList(
             "SHARE_NOW", "SEND_AS_MESSAGE", "ADD_TO_STORY", "SHARE_TO_GROUP", "SHARE_TO_PAGE", "COPY_LINK",
-            "SHARE_TO_HATCH", "SHARE_TO_META_AI", "SHARE_TO_THREADS", "SEND_IN_WHATSAPP", "SEND_IN_WHATSAPP_STATUS",
+            "SHARE_TO_META_AI", "SHARE_TO_THREADS", "SEND_IN_WHATSAPP", "SEND_IN_WHATSAPP_STATUS",
             "SEND_IN_INSTAGRAM_DIRECT", "SHARE_TO_INSTAGRAM_STORY", "SEND_IN_SMS", "SHARE_TO_SNAPCHAT",
             "SEND_IN_TWITTER", "SHARE_TO_TELEGRAM", "SHARE_TO_DISCORD", "SHARE_TO_REDDIT"));
 
