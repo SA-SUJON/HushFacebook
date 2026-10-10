@@ -25,6 +25,7 @@ import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.iface.ClassDef
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 /** The extension class that reads the feed's flag, and its accessor this patch fills in. */
 internal const val GEN_AI_LABEL = "$EXTENSION_PACKAGE/feed/GenAiLabel;"
@@ -180,8 +181,18 @@ private fun BytecodePatchContext.hideAiCharacterPosts(story: ClassDef) {
 /** The Reels and Watch side: the finder stub, and the page filters at both levels a page enters. */
 private fun BytecodePatchContext.hideReels() {
     val holders = classDefByStrings(TRANSPARENCY_ATTRIBUTION, StringComparisonType.EQUALS)
-        .flatMap { methodsHolding(it, TRANSPARENCY_ATTRIBUTION) }
-    val found = attributionFinder(holders)
+        .flatMap { methodsHolding(it, TRANSPARENCY_ATTRIBUTION) }.toMutableList()
+    // A string table holding the literal can hand it to the finder instead (582's armeabi-v7a
+    // build does), so the methods asking one for it are holders too.
+    val entries = tableEntries(holders.filter(::isStringTable), TRANSPARENCY_ATTRIBUTION)
+    val resolve = { call: MethodReference -> classDefByOrNull(call.definingClass)?.let { resolveStatic(it, call) } }
+    if (entries.isNotEmpty()) {
+        classDefForEach { classDef ->
+            if (classDef.type.startsWith(EXTENSION_CLASSES)) return@classDefForEach
+            classDef.methods.filterTo(holders) { asksTableFor(it, entries) }
+        }
+    }
+    val found = attributionFinder(holders, resolve = resolve)
     val finder = found.call ?: throw PatchException("$PATCH: ${found.problem}")
     val finderMethod = classDefByOrNull(finder.definingClass)?.let { resolveStatic(it, finder) }
         ?: throw PatchException("$PATCH: ${finder.definingClass} declares no static ${finder.name} the literal is handed to")

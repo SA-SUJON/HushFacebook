@@ -90,6 +90,20 @@ private fun tableString(table: Method, index: Int): String? {
     return byAddress[target]?.string()
 }
 
+/**
+ * Every index a string table method answers [literal] for, read from its first switch in one pass.
+ * A table holds thousands of entries, so a search over every caller reads it once this way rather
+ * than once per call.
+ */
+internal fun tableIndices(table: Method, literal: String): Set<Int> {
+    val byAddress = addressed(table)
+    val (switchAddress, switch) = byAddress.entries.firstOrNull {
+        it.value.opcode == Opcode.SPARSE_SWITCH || it.value.opcode == Opcode.PACKED_SWITCH
+    } ?: return emptySet()
+    val payload = byAddress[switchAddress + (switch as OffsetInstruction).codeOffset] as? SwitchPayload ?: return emptySet()
+    return payload.switchElements.filter { byAddress[switchAddress + it.offset]?.string() == literal }.mapTo(HashSet()) { it.key }
+}
+
 private val INT_CONSTANTS = setOf(Opcode.CONST, Opcode.CONST_4, Opcode.CONST_16, Opcode.CONST_HIGH16)
 
 /** Whether [instruction] calls something shaped like a string table: a static `(I)Ljava/lang/String;`. */
@@ -117,6 +131,16 @@ internal fun tableStringsAsked(method: Method, resolve: (MethodReference) -> Met
  * straight after an int constant loaded into the register it takes. Null for anything else.
  */
 internal fun tableStringAt(code: List<Instruction>, index: Int, resolve: (MethodReference) -> Method?): String? {
+    val key = tableIndexAt(code, index) ?: return null
+    return resolve(code[index].methodCall()!!)?.let { tableString(it, key) }
+}
+
+/**
+ * The index the instruction at [index] of [code] asks a string table for: the int constant loaded
+ * straight before a call to a static `(I)Ljava/lang/String;`, into the register it takes. Null
+ * for anything else.
+ */
+internal fun tableIndexAt(code: List<Instruction>, index: Int): Int? {
     val instruction = code.getOrNull(index) ?: return null
     if (!isStringTableCall(instruction)) return null
     val register = when (instruction) {
@@ -128,7 +152,7 @@ internal fun tableStringAt(code: List<Instruction>, index: Int, resolve: (Method
     if (load == null || load.opcode !in INT_CONSTANTS || (load as OneRegisterInstruction).registerA != register) {
         return null
     }
-    return resolve(instruction.methodCall()!!)?.let { tableString(it, (load as NarrowLiteralInstruction).narrowLiteral) }
+    return (load as NarrowLiteralInstruction).narrowLiteral
 }
 
 /** Whether [method] holds [literal] or asks a string table for it ([tableStringsAsked]). */
