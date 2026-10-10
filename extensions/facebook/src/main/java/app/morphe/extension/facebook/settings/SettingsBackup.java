@@ -137,6 +137,7 @@ public final class SettingsBackup {
             Settings.HIDE_LINK_POSTS,
             Settings.HIDE_BACKGROUND_POSTS,
             Settings.HIDE_POST_PROMPTS,
+            Settings.HIDE_POST_FOLLOW_LINK,
             Settings.HIDE_SEEN_POSTS,
             Settings.HIDE_META_AI_QUESTIONS,
             Settings.KEEP_POST_DATES,

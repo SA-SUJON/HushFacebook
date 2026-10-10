@@ -171,6 +171,9 @@ final class FeedPages {
                 feed.addPreference(toggle(context, Settings.HIDE_POST_PROMPTS,
                         L10n.t("Hides the strip on some posts, like \"Are you interested in this post?\" or who recently commented, "
                                 + "plus follow and chat suggestions there. The post stays.")));
+                feed.addPreference(toggle(context, Settings.HIDE_POST_FOLLOW_LINK,
+                        L10n.t("Hides the \"Follow\" link next to the name on posts from Pages and people you don't follow. "
+                                + "Tapping the name still opens the profile. A change shows on the posts drawn after it.")));
             }
             if (build.contains(PatchFamily.SEEN_POSTS)) {
                 seenPosts(feed, context);

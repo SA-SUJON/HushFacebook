@@ -1105,6 +1105,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_post_prompts", TRUE);
 
     /**
+     * The "Follow" link after the name in the header of posts from Pages and people you don't follow
+     * goes ({@link app.morphe.extension.facebook.feed.PostPrompts#showFollowLink}). Off by default.
+     * A change shows on the posts drawn after it.
+     */
+    public static final BooleanSetting HIDE_POST_FOLLOW_LINK =
+            new BooleanSetting("hushfacebook_hide_post_follow_link", FALSE);
+
+    /**
      * Posts you've already scrolled past stay out of the feed on later loads
      * ({@link app.morphe.extension.facebook.feed.SeenPosts}). Off by default: it remembers which
      * posts you saw, on the phone only. Posts already on screen are never touched, and a change

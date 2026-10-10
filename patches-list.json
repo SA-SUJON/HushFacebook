@@ -1225,7 +1225,7 @@
     },
     {
       "name": "Hide post prompts",
-      "description": "Removes the strip Facebook adds to some posts, like \"Are you interested in this post?\", \"Show less\" or follow suggestions, so posts look less cluttered. No gap is left. On by default. Turn it off in Hushfacebook settings > News feed.",
+      "description": "Removes the strip Facebook adds to some posts, like \"Are you interested in this post?\", \"Show less\" or follow suggestions, so posts look less cluttered. No gap is left. On by default. Turn it off in Hushfacebook settings > News feed. A second switch there, Hide the Follow link on posts, starts off.",
       "category": "Feed",
       "use": true,
       "dependencies": [

@@ -353,8 +353,11 @@ public class PausedHooksTest {
                         FeedGuardForTests.postText("Big SPOILER inside")),
                 () -> FeedGuardForTests.hidesPhotoPost(Category.ORGANIC),
                 () -> FeedGuardForTests.hidesPopularPost(Category.ORGANIC)));
-        // A story with a bumper is answered as one without, so no strip is drawn and no room kept.
-        probes.put(PatchFamily.POST_PROMPTS, Collections.singletonList(() -> !PostPrompts.keep(true)));
+        // A story with a bumper is answered as one without, so no strip is drawn and no room kept, and a
+        // header whose title plugin would add "Follow" is told it has nothing to add.
+        probes.put(PatchFamily.POST_PROMPTS, Arrays.asList(
+                () -> !PostPrompts.keep(true),
+                () -> !PostPrompts.showFollowLink(true)));
         // A post the store remembers is dropped by the feed guard while the switch is on.
         probes.put(PatchFamily.SEEN_POSTS, Collections.singletonList(SeenPostsForTests::hidesARememberedPost));
         // The pill socket's yes for Meta AI's questions is answered as a no, so it draws no row for

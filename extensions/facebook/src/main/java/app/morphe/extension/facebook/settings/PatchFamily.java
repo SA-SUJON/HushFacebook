@@ -60,7 +60,7 @@ public enum PatchFamily {
             Settings.HIDE_PHOTO_POSTS, Settings.HIDE_VIDEO_POSTS, Settings.HIDE_LINK_POSTS,
             Settings.HIDE_BACKGROUND_POSTS),
     POST_PROMPTS(FamilyNames.POST_PROMPTS, "postPrompts", null,
-            Settings.HIDE_POST_PROMPTS),
+            Settings.HIDE_POST_PROMPTS, Settings.HIDE_POST_FOLLOW_LINK),
     SEEN_POSTS(FamilyNames.SEEN_POSTS, "seenPosts", null,
             Settings.HIDE_SEEN_POSTS),
     META_AI_QUESTIONS(FamilyNames.META_AI_QUESTIONS, "metaAiQuestions", null,
