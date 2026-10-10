@@ -399,4 +399,44 @@ class CleanUpReelsShapesTest {
         assertEquals(Opcode.RETURN_VOID, body[3].opcode)
         assertEquals(Opcode.SGET_OBJECT, body[4].opcode)
     }
+
+    private val loopFlag = com.android.tools.smali.dexlib2.immutable.reference.ImmutableFieldReference(
+        "Lfixture/Params;", "shouldLoop", "Z",
+    )
+
+    private val loopFlagName = "Lfixture/Params;->shouldLoop:Z"
+
+    /** An end-of-video step reading the loop flag with [read], then branching on it. */
+    private fun videoComplete(read: String) = method(
+        "complete", listOf("Lfixture/Params;"), "V", 8, static = true,
+        """
+            move-object v5, p0
+            $read
+            if-eqz v0, :done
+            :done
+            return-void
+        """,
+    )
+
+    /**
+     * Play reels once hands the extension the loop flag and the params from the registers they're in
+     * right after the read. A read that lands the flag on the params' own register leaves no params
+     * to hand over, and the hook would pass the flag as the params' object, which ART refuses when
+     * it verifies Facebook's player class. That build is refused at patch time instead.
+     */
+    @Test
+    fun `a loop flag read over the params' register stops Play reels once`() {
+        val separate = loopReads(videoComplete("iget-boolean v0, v5, $loopFlagName"), loopFlag).single()
+        assertEquals(listOf(0, 5), listOf(separate.answer, separate.params))
+        assertNull("581's read, the flag in v0 and the params in v5", loopHookRefusal(separate))
+
+        val over = loopReads(videoComplete("iget-boolean v5, v5, $loopFlagName\nmove v0, v5"), loopFlag).single()
+        assertEquals(listOf(5, 5), listOf(over.answer, over.params))
+        val refusal = loopHookRefusal(over)
+        assertNotNull("the flag read over the params was hooked", refusal)
+        assertTrue(refusal!!, refusal.contains("v5"))
+
+        assertNotNull("the flag above v15", loopHookRefusal(LoopRead(1, 16, 5)))
+        assertNotNull("the params above v15", loopHookRefusal(LoopRead(1, 0, 16)))
+    }
 }

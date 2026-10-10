@@ -107,6 +107,21 @@ internal fun reportedFlag(params: ClassDef, name: String): FieldReference? {
     return if (field.definingClass == params.type && AccessFlags.PUBLIC.isSet(declared.accessFlags)) field else null
 }
 
+/**
+ * Why the hook can't go after [read], or null when it can. It hands the extension the flag and the
+ * params from the registers they're in straight after the read, so both have to be below v16, and
+ * the read can't have landed the flag on the register the params were in: `iget-boolean v5, v5`
+ * leaves no params to hand over, and passing the flag as the params' object is a VerifyError that
+ * stops Facebook's player class from loading at all.
+ */
+internal fun loopHookRefusal(read: LoopRead): String? = when {
+    read.answer > 15 || read.params > 15 ->
+        "the loop flag is in v${read.answer} and the params in v${read.params}; the hook needs both below v16"
+    read.answer == read.params ->
+        "the loop flag is read into v${read.answer}, the register that held the params, so the hook can't hand them over"
+    else -> null
+}
+
 /** The methods of [holders] holding the completion string. */
 internal fun videoCompletes(holders: List<ClassDef>): List<Method> =
     holders.flatMap { it.methods }.filter { holdsString(it, VIDEO_COMPLETE_ANCHOR) }
@@ -128,9 +143,7 @@ internal fun BytecodePatchContext.hookReelLoops() {
     val reads = loopReads(complete, loop)
     val read = reads.singleOrNull()
         ?: refuse("expected one read of $SHOULD_LOOP_VIDEO in ${complete.definingClass}->${complete.name}, found ${reads.size}")
-    if (read.answer > 15 || read.params > 15) {
-        refuse("the loop flag is in v${read.answer} and the params in v${read.params}; the hook needs both below v16")
-    }
+    loopHookRefusal(read)?.let(::refuse)
 
     if (classDefByOrNull(REEL_LOOP) == null) refuse("the extension has no $REEL_LOOP")
     val stub = mutableClassDefBy(REEL_LOOP).methods.singleOrNull {
