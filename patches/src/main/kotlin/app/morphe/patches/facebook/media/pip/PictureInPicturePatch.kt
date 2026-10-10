@@ -566,17 +566,11 @@ internal fun BytecodePatchContext.applyViewerId(opening: Method) {
     )
 }
 
-/** Whether [call] is a MobileConfig boolean read: a static (Object, long) -> boolean call on Facebook's reader. */
-internal fun isConfigRead(instruction: Instruction): Boolean {
-    val call = (instruction as? ReferenceInstruction)?.reference as? MethodReference ?: return false
-    return instruction.opcode == Opcode.INVOKE_STATIC && call.definingClass == PIP_MOBILE_CONFIG && call.returnType == "Z" &&
-        call.parameterList() == listOf("Ljava/lang/Object;", "J")
-}
-
 /**
  * Where the Watch topic feed's onResume asks its picture-in-picture flag: the index of the
  * move-result of the last MobileConfig boolean read before its call of [check], when an if-eqz
- * follows it. Changes nothing.
+ * follows it. 581 read it through the reader's static (Object, long) helper, 582 calls the
+ * reader's (long) method on the context itself, so either form counts. Changes nothing.
  */
 internal fun topicFlagAt(onResume: Method, check: Method): Int {
     val code = onResume.implementation?.instructions?.toList().orEmpty()
@@ -586,7 +580,7 @@ internal fun topicFlagAt(onResume: Method, check: Method): Int {
             call.name == check.name && call.parameterList() == listOf(ACTIVITY) && call.returnType == "Z"
     }
     if (asked < 0) return -1
-    val read = (asked - 1 downTo 0).firstOrNull { isConfigRead(code[it]) } ?: return -1
+    val read = (asked - 1 downTo 0).firstOrNull { isFlagRead(code[it]) } ?: return -1
     val result = code.getOrNull(read + 1)
     if (result?.opcode != Opcode.MOVE_RESULT || code.getOrNull(read + 2)?.opcode != Opcode.IF_EQZ) return -1
     return read + 1
