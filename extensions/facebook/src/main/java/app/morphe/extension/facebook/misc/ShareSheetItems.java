@@ -48,6 +48,13 @@ public final class ShareSheetItems {
     static final int SEEN_LIMIT = 150;
 
     /**
+     * The longest the list of types to keep out gets, in chars, each one byte in a settings file.
+     * Room for every one of Facebook's ninety-odd types, and little enough that a settings file
+     * holding it beside full word and sources lists still fits.
+     */
+    public static final int MAX_HIDDEN_CHARS = 2048;
+
+    /**
      * The types the list offers before Facebook has shown a sheet, in the order a sheet usually has
      * them. Each is a constant of 581's item enum.
      */
@@ -126,7 +133,33 @@ public final class ShareSheetItems {
 
     /** Saves [types] as the ones to keep out, dropping anything that isn't a type. */
     public static void hide(Collection<String> types) {
-        Settings.HIDDEN_SHARE_ITEMS.save(join(parse(join(types))));
+        Settings.HIDDEN_SHARE_ITEMS.save(clean(join(types)));
+    }
+
+    /**
+     * [saved] as the list of types to keep out is stored: each type once, in order, as far as
+     * {@link #MAX_HIDDEN_CHARS} reaches. A type this build doesn't name is kept like any other, so
+     * the items of a newer Facebook come through a settings file.
+     */
+    public static String clean(@Nullable String saved) {
+        StringBuilder list = new StringBuilder();
+        for (String type : parse(saved)) {
+            int length = list.length() == 0 ? type.length() : list.length() + 1 + type.length();
+            if (length > MAX_HIDDEN_CHARS) break;
+            if (list.length() > 0) list.append(',');
+            list.append(type);
+        }
+        return list.toString();
+    }
+
+    /** Whether [list] is a list of types to keep out exactly as {@link #clean} stores it. */
+    public static boolean isClean(@Nullable String list) {
+        return list != null && list.equals(clean(list));
+    }
+
+    /** How many types [list] names. */
+    public static int count(@Nullable String list) {
+        return parse(list).size();
     }
 
     /**

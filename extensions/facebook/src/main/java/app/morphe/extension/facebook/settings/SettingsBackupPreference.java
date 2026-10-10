@@ -54,6 +54,7 @@ import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.notifications.QuietHour;
 import app.morphe.extension.facebook.misc.AppLock;
+import app.morphe.extension.facebook.misc.ShareSheetItems;
 import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.feed.ReactionCeiling;
 import app.morphe.extension.facebook.theme.AccentColor;
@@ -387,6 +388,7 @@ public class SettingsBackupPreference extends Preference {
                     snapshot.storiesQualityChange(), snapshot.quietFromChange(), snapshot.quietUntilChange(),
                     snapshot.lockAfterChange(), snapshot.textSizeChange(), snapshot.accentChange()));
             if (snapshot.ceilingChange() != null) parts.add(ceilingSentence(snapshot.ceilingChange()));
+            if (snapshot.shareItemsChange() != null) parts.add(shareItemsSentence(snapshot.shareItemsChange()));
             if (snapshot.seenKeep != null && snapshot.changes().containsKey(SettingsBackup.SEEN_KEEP)) {
                 parts.add(L10n.f("Posts you've seen will stay hidden for %1$s.",
                         HushfacebookPreferenceFragment.seenKeepLabel(snapshot.seenKeep)));
@@ -644,6 +646,14 @@ public class SettingsBackupPreference extends Preference {
                 "Your list of people, Pages and sites to hide will hold %1$d entries.", rules);
     }
 
+    /** The sentence that says how many share sheet items will be hidden after an import. */
+    static String shareItemsSentence(String list) {
+        int items = ShareSheetItems.count(list);
+        if (items == 0) return L10n.t("Your list of share sheet items to hide will be empty.");
+        return L10n.quantity(items, "Your list of share sheet items to hide will hold %1$d item.",
+                "Your list of share sheet items to hide will hold %1$d items.", items);
+    }
+
     /** A sentence for each setting that isn't a switch an import changes, with no word list among them. */
     static List<String> valueSentences(@Nullable String folder, @Nullable DownloadQuality quality,
                                        @Nullable String fileName, @Nullable StartTab start,
@@ -852,7 +862,8 @@ public class SettingsBackupPreference extends Preference {
                     snapshot.videoSubfolderChange(), snapshot.photoSubfolderChange(), snapshot.reelsQualityChange(),
                     snapshot.storiesQualityChange(), snapshot.quietFromChange(), snapshot.quietUntilChange(),
                     snapshot.lockAfterChange(), snapshot.textSizeChange(), snapshot.accentChange())
-                    + (snapshot.ceilingChange() == null ? "" : " " + ceilingSentence(snapshot.ceilingChange()));
+                    + (snapshot.ceilingChange() == null ? "" : " " + ceilingSentence(snapshot.ceilingChange()))
+                    + (snapshot.shareItemsChange() == null ? "" : " " + shareItemsSentence(snapshot.shareItemsChange()));
             accepted = Utils.runOnBackgroundThread(() -> {
                 try {
                     SettingsBackup.apply(snapshot);

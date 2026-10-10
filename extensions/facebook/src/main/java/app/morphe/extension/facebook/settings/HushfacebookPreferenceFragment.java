@@ -55,6 +55,7 @@ import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.SurfaceQuality;
 import app.morphe.extension.facebook.misc.AppLock;
+import app.morphe.extension.facebook.misc.ShareSheetItems;
 import app.morphe.extension.facebook.misc.TextSize;
 import app.morphe.extension.facebook.theme.AccentColor;
 import app.morphe.extension.facebook.navigation.HiddenTabs;
@@ -741,6 +742,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         super.updateUIToSettingValues();
         showMarketplaceSettings();
         showSaveFolder();
+        showShareItemsSummary();
+    }
+
+    /** No setting is behind the share sheet row's key, so its summary is redone here after an import. */
+    private void showShareItemsSummary() {
+        if (getPreferenceScreen() == null) return;
+        Preference row = findPreference(AppPages.SHARE_ITEMS_ROW);
+        if (row != null) row.setSummary(AppPages.shareItemsSummary(ShareSheetItems.hidden()));
     }
 
     /**

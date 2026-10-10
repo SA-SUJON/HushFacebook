@@ -44,7 +44,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildDe() {
-        Map<String, String> table = new HashMap<>(1748);
+        Map<String, String> table = new HashMap<>(1754);
         fillDe0(table);
         fillDe1(table);
         fillDe2(table);
@@ -1808,6 +1808,12 @@ public final class L10nTranslations {
                 "Deine Liste der Personen, Seiten und Websites zum Ausblenden enth\u00e4lt dann %1$d Eintr\u00e4ge.");
         table.put("Your list of people, Pages and sites to hide will hold %1$d entry.",
                 "Deine Liste der Personen, Seiten und Websites zum Ausblenden enth\u00e4lt dann %1$d Eintrag.");
+        table.put("Your list of share sheet items to hide will be empty.",
+                "Deine Liste der beim Teilen ausgeblendeten Eintr\u00e4ge ist dann leer.");
+        table.put("Your list of share sheet items to hide will hold %1$d item.",
+                "Deine Liste der beim Teilen ausgeblendeten Eintr\u00e4ge enth\u00e4lt dann %1$d Eintrag.");
+        table.put("Your list of share sheet items to hide will hold %1$d items.",
+                "Deine Liste der beim Teilen ausgeblendeten Eintr\u00e4ge enth\u00e4lt dann %1$d Eintr\u00e4ge.");
         table.put("Your list of words that keep a post will be empty.",
                 "Deine Liste der W\u00f6rter, bei denen ein Beitrag bleibt, ist dann leer.");
         table.put("Your list of words that keep a post will hold %1$d word or phrase.",
@@ -1857,7 +1863,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildEs() {
-        Map<String, String> table = new HashMap<>(1748);
+        Map<String, String> table = new HashMap<>(1754);
         fillEs0(table);
         fillEs1(table);
         fillEs2(table);
@@ -3621,6 +3627,12 @@ public final class L10nTranslations {
                 "Tu lista de personas, p\u00e1ginas y sitios que ocultar tendr\u00e1 %1$d entradas.");
         table.put("Your list of people, Pages and sites to hide will hold %1$d entry.",
                 "Tu lista de personas, p\u00e1ginas y sitios que ocultar tendr\u00e1 %1$d entrada.");
+        table.put("Your list of share sheet items to hide will be empty.",
+                "Tu lista de opciones que ocultar al compartir quedar\u00e1 vac\u00eda.");
+        table.put("Your list of share sheet items to hide will hold %1$d item.",
+                "Tu lista de opciones que ocultar al compartir tendr\u00e1 %1$d opci\u00f3n.");
+        table.put("Your list of share sheet items to hide will hold %1$d items.",
+                "Tu lista de opciones que ocultar al compartir tendr\u00e1 %1$d opciones.");
         table.put("Your list of words that keep a post will be empty.",
                 "Tu lista de palabras que mantienen una publicaci\u00f3n quedar\u00e1 vac\u00eda.");
         table.put("Your list of words that keep a post will hold %1$d word or phrase.",
@@ -3670,7 +3682,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildIn() {
-        Map<String, String> table = new HashMap<>(1748);
+        Map<String, String> table = new HashMap<>(1754);
         fillIn0(table);
         fillIn1(table);
         fillIn2(table);
@@ -5434,6 +5446,12 @@ public final class L10nTranslations {
                 "Daftar orang, Halaman, dan situs yang kamu sembunyikan akan berisi %1$d entri.");
         table.put("Your list of people, Pages and sites to hide will hold %1$d entry.",
                 "Daftar orang, Halaman, dan situs yang kamu sembunyikan akan berisi %1$d entri.");
+        table.put("Your list of share sheet items to hide will be empty.",
+                "Daftar item yang disembunyikan saat berbagi akan kosong.");
+        table.put("Your list of share sheet items to hide will hold %1$d item.",
+                "Daftar item yang disembunyikan saat berbagi akan berisi %1$d item.");
+        table.put("Your list of share sheet items to hide will hold %1$d items.",
+                "Daftar item yang disembunyikan saat berbagi akan berisi %1$d item.");
         table.put("Your list of words that keep a post will be empty.",
                 "Daftar kata yang mempertahankan postingan akan kosong.");
         table.put("Your list of words that keep a post will hold %1$d word or phrase.",
@@ -5483,7 +5501,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildPt_rBR() {
-        Map<String, String> table = new HashMap<>(1748);
+        Map<String, String> table = new HashMap<>(1754);
         fillPt_rBR0(table);
         fillPt_rBR1(table);
         fillPt_rBR2(table);
@@ -7247,6 +7265,12 @@ public final class L10nTranslations {
                 "Sua lista de pessoas, P\u00e1ginas e sites para ocultar ter\u00e1 %1$d itens.");
         table.put("Your list of people, Pages and sites to hide will hold %1$d entry.",
                 "Sua lista de pessoas, P\u00e1ginas e sites para ocultar ter\u00e1 %1$d item.");
+        table.put("Your list of share sheet items to hide will be empty.",
+                "Sua lista de itens ocultos ao compartilhar ficar\u00e1 vazia.");
+        table.put("Your list of share sheet items to hide will hold %1$d item.",
+                "Sua lista de itens ocultos ao compartilhar ter\u00e1 %1$d item.");
+        table.put("Your list of share sheet items to hide will hold %1$d items.",
+                "Sua lista de itens ocultos ao compartilhar ter\u00e1 %1$d itens.");
         table.put("Your list of words that keep a post will be empty.",
                 "Sua lista de palavras que mant\u00eam uma publica\u00e7\u00e3o ficar\u00e1 vazia.");
         table.put("Your list of words that keep a post will hold %1$d word or phrase.",
@@ -7296,7 +7320,7 @@ public final class L10nTranslations {
     }
 
     private static Map<String, String> buildTr() {
-        Map<String, String> table = new HashMap<>(1748);
+        Map<String, String> table = new HashMap<>(1754);
         fillTr0(table);
         fillTr1(table);
         fillTr2(table);
@@ -9060,6 +9084,12 @@ public final class L10nTranslations {
                 "Gizlenecek ki\u015filer, sayfalar ve siteler listende %1$d kay\u0131t olacak.");
         table.put("Your list of people, Pages and sites to hide will hold %1$d entry.",
                 "Gizlenecek ki\u015filer, sayfalar ve siteler listende %1$d kay\u0131t olacak.");
+        table.put("Your list of share sheet items to hide will be empty.",
+                "Payla\u015f\u0131rken gizlenecek \u00f6\u011feler listen bo\u015f olacak.");
+        table.put("Your list of share sheet items to hide will hold %1$d item.",
+                "Payla\u015f\u0131rken gizlenecek \u00f6\u011feler listende %1$d \u00f6\u011fe olacak.");
+        table.put("Your list of share sheet items to hide will hold %1$d items.",
+                "Payla\u015f\u0131rken gizlenecek \u00f6\u011feler listende %1$d \u00f6\u011fe olacak.");
         table.put("Your list of words that keep a post will be empty.",
                 "G\u00f6nderiyi tutan kelimeler listen bo\u015f olacak.");
         table.put("Your list of words that keep a post will hold %1$d word or phrase.",

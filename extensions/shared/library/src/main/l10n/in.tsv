@@ -1280,3 +1280,9 @@ After this update, a switch you had on may be off now. Tap to see which.	Setelah
 Now off: %1$s. Turn it back on in its section if you want it. Tap again to hide this note.	Kini mati: %1$s. Nyalakan lagi di bagiannya jika kamu mau. Ketuk lagi untuk menyembunyikan catatan ini.
 # context: that note's summary once opened, several switches; the placeholder is their titles joined as a list
 Now off: %1$s. Turn back on the ones you want in their sections. Tap again to hide this note.	Kini mati: %1$s. Nyalakan lagi yang kamu mau di bagiannya masing-masing. Ketuk lagi untuk menyembunyikan catatan ini.
+# context: import preview and toast when a settings file empties the list picked under Share sheet items to hide
+Your list of share sheet items to hide will be empty.	Daftar item yang disembunyikan saat berbagi akan kosong.
+# context: import preview and toast, one share sheet item will be in that list after the import
+Your list of share sheet items to hide will hold %1$d item.	Daftar item yang disembunyikan saat berbagi akan berisi %1$d item.
+# context: the same with several share sheet items
+Your list of share sheet items to hide will hold %1$d items.	Daftar item yang disembunyikan saat berbagi akan berisi %1$d item.

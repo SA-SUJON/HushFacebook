@@ -1174,3 +1174,9 @@ After this update, a switch you had on may be off now. Tap to see which.	Depois 
 Now off: %1$s. Turn it back on in its section if you want it. Tap again to hide this note.	Agora desligada: %1$s. Ative de novo na seção dela se quiser. Toque de novo para ocultar este aviso.
 # context: that note's summary once opened, several switches; the placeholder is their titles joined as a list
 Now off: %1$s. Turn back on the ones you want in their sections. Tap again to hide this note.	Agora desligadas: %1$s. Ative de novo as que quiser nas seções delas. Toque de novo para ocultar este aviso.
+# context: import preview and toast when a settings file empties the list picked under Share sheet items to hide
+Your list of share sheet items to hide will be empty.	Sua lista de itens ocultos ao compartilhar ficará vazia.
+# context: import preview and toast, one share sheet item will be in that list after the import
+Your list of share sheet items to hide will hold %1$d item.	Sua lista de itens ocultos ao compartilhar terá %1$d item.
+# context: the same with several share sheet items
+Your list of share sheet items to hide will hold %1$d items.	Sua lista de itens ocultos ao compartilhar terá %1$d itens.
