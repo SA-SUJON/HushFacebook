@@ -28,7 +28,7 @@ import org.junit.Test
 
 /**
  * The anchors of Hushfacebook in the Menu on every declared Facebook build: the native group
- * section builds one row list, from a builder that makes row items; one tap handler takes that row
+ * section makes row items and stores one finished row list it reads back; one tap handler takes that row
  * item and picks by its id; two loggers take it too; the item has one full constructor storing
  * each argument, the id last, and Facebook's own rows pass their address first.
  */
@@ -89,22 +89,17 @@ class SettingsRowFixtureTest {
                 }) { isRowTap(it, table) }
                 assertEquals("${bundle.name}: native Menu group sections", 1, natives.size)
                 assertEquals("${bundle.name}: Menu row tap handlers", 1, taps.size)
-                val builds = rowListBuilds(natives.single())
-                assertEquals("${bundle.name}: row lists the native section builds", 1, builds.size)
-                val build = builds.single()
+                val native = natives.single()
+                val stores = settingsListStores(native)
+                assertEquals("${bundle.name}: finished row lists the native section stores", 1, stores.size)
                 val tap = taps.single()
                 val item = rowItemType(tap)
 
-                val classes = FixtureDex.classes(bundle, setOf(item, build.definingClass, tap.definingClass))
+                val classes = FixtureDex.classes(bundle, setOf(item, tap.definingClass))
                 val itemClass = classes.getValue(item)
-                val builder = classes.getValue(build.definingClass).methods.single {
-                    it.name == build.name && it.parameterTypes.map(Any::toString) == build.parameterTypes.map(Any::toString)
-                }
-                assertTrue("${bundle.name}: the row list builder makes no $item", builder.instructionList().any {
+                assertTrue("${bundle.name}: the native section makes no $item", native.instructionList().any {
                     it.opcode == Opcode.NEW_INSTANCE && ((it as ReferenceInstruction).reference as TypeReference).type == item
                 })
-                assertTrue("${bundle.name}: the row list builder hands back nothing",
-                    builder.instructionList().any { it.opcode == Opcode.RETURN_OBJECT })
 
                 // The item: one full constructor storing every argument, the id last.
                 val constructor = fullConstructor(itemClass)
