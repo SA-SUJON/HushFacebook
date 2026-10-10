@@ -6,7 +6,8 @@ package app.morphe.patches.facebook.menu
 
 import app.morphe.Fixtures
 import app.morphe.patches.facebook.feed.FixtureDex
-import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.namesString
+import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.Opcode
@@ -32,6 +33,11 @@ import org.junit.Test
  * each argument, the id last, and Facebook's own rows pass their address first.
  */
 class SettingsRowFixtureTest {
+    /** How many row loggers each declared build's tap class has, by ABI. 582's 32-bit build dropped both. */
+    private val loggerCount = mapOf(
+        "582.0.0.50.54" to mapOf("arm64-v8a" to 2, "armeabi-v7a" to 0),
+    )
+
     private fun Method.instructionList() = implementation?.instructions?.toList().orEmpty()
 
     /** The argument registers of an invoke, in order. */
@@ -67,17 +73,20 @@ class SettingsRowFixtureTest {
         for (version in versions) {
             for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
                 val natives = mutableListOf<Method>()
-                val taps = mutableListOf<Method>()
                 FixtureDex.forEach(bundle) { dex ->
-                    val strings = dex.stringSection.toSet()
-                    if (NATIVE_SECTION_KEY !in strings && ROW_TAP_TRACE !in strings) return@forEach
+                    if (NATIVE_SECTION_KEY !in dex.stringSection.toSet()) return@forEach
                     for (classDef in dex.classes) {
                         for (method in classDef.methods) {
                             if (isNativeSectionChildren(method)) natives += ImmutableMethod.of(method)
-                            if (isRowTap(method)) taps += ImmutableMethod.of(method)
                         }
                     }
                 }
+                // 582 asks a string table for the trace, so a tap's dex can hold no copy of it.
+                val tables = FixtureDex.classesHolding(bundle, ROW_TAP_TRACE).associateBy { it.type }
+                val table: (MethodReference) -> Method? = { call -> tables[call.definingClass]?.let { resolveStatic(it, call) } }
+                val taps = FixtureDex.methodsWhere(bundle, { dex ->
+                    ROW_TAP_TRACE in dex.stringSection || dex.methodSection.any { it.definingClass in tables }
+                }) { isRowTap(it, table) }
                 assertEquals("${bundle.name}: native Menu group sections", 1, natives.size)
                 assertEquals("${bundle.name}: Menu row tap handlers", 1, taps.size)
                 val builds = rowListBuilds(natives.single())
@@ -123,14 +132,15 @@ class SettingsRowFixtureTest {
                 assertTrue("${bundle.name}: no row built with a web address first: $addresses",
                     addresses.any { it.startsWith("https://www.facebook.com/") })
 
-                // The tap handler picks by the row's id, and two loggers of its class take the row.
+                // The tap handler picks by the row's id, and the loggers of its class take the row.
                 assertTrue("${bundle.name}: the tap handler never reads the row's id", tap.instructionList().any {
                     it.opcode == Opcode.IGET_WIDE && ((it as ReferenceInstruction).reference as FieldReference).name == id.name
                 })
                 val owner = classes.getValue(tap.definingClass)
                 val ownerTap = owner.methods.single { it.name == tap.name && it.parameterTypes.size == tap.parameterTypes.size }
                 val loggers = rowLoggers(owner, ownerTap, item)
-                assertEquals("${bundle.name}: row loggers", 2, loggers.size)
+                val abi = bundle.name.substringAfter("-$version-").substringBefore(".apkm")
+                assertEquals("${bundle.name}: row loggers", loggerCount[version]?.get(abi), loggers.size)
                 for (method in loggers + ownerTap) {
                     assertTrue("${bundle.name}: ${method.name} has ${method.localRegisterCount()} locals",
                         method.localRegisterCount() >= 3)
@@ -140,7 +150,7 @@ class SettingsRowFixtureTest {
                         it.opcode == Opcode.IGET_WIDE && ((it as ReferenceInstruction).reference as FieldReference).name == id.name
                     }
                 })
-                assertTrue(holdsString(tap, ROW_TAP_TRACE))
+                assertTrue(namesString(tap, ROW_TAP_TRACE, table))
                 checked += version
             }
         }

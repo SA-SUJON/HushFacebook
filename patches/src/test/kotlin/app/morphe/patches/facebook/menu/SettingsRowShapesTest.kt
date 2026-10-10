@@ -104,15 +104,29 @@ class SettingsRowShapesTest {
     @Test
     fun `the row list build takes the session, a list and a flag, and hands back an ImmutableList`() {
         val good = ImmutableMethodReference(helper, "A08", listOf(USER_SESSION, "Ljava/util/List;", "Z"), IMMUTABLE_LIST)
-        assertTrue(isRowListBuild(good))
-        assertFalse(isRowListBuild(ImmutableMethodReference(helper, "A05", listOf(USER_SESSION), IMMUTABLE_LIST)))
+        assertTrue(isRowListBuild(good, static = false))
+        assertFalse("the virtual shape called statically", isRowListBuild(good, static = true))
+        assertFalse(isRowListBuild(ImmutableMethodReference(helper, "A05", listOf(USER_SESSION), IMMUTABLE_LIST), static = false))
         assertFalse(isRowListBuild(ImmutableMethodReference(helper, "A08", listOf(USER_SESSION, "Ljava/util/List;", "Z"),
-            "Ljava/util/List;")))
+            "Ljava/util/List;"), static = false))
         val native = method(helper, "A1S", listOf("Lfixture/Context;"), "Lfixture/Children;", 3, listOf(
             ImmutableInstruction35c(Opcode.INVOKE_VIRTUAL, 4, 0, 1, 1, 1, 0, good),
             ImmutableInstruction35c(Opcode.INVOKE_VIRTUAL, 4, 0, 1, 1, 1, 0, good),
         ))
         assertEquals("a second call to the same build is one build", listOf("A08"), rowListBuilds(native).map { it.name })
+    }
+
+    @Test
+    fun `582's row list build is static and takes the list alone`() {
+        val build = ImmutableMethodReference(helper, "A02", listOf("Ljava/util/List;"), IMMUTABLE_LIST)
+        assertTrue(isRowListBuild(build, static = true))
+        assertFalse("the list alone, called virtually", isRowListBuild(build, static = false))
+        val native = method(helper, "A01", listOf("Lfixture/Context;"), "Lfixture/Children;", 3, listOf(
+            ImmutableInstruction35c(Opcode.INVOKE_STATIC, 1, 0, 0, 0, 0, 0, build),
+            ImmutableInstruction35c(Opcode.INVOKE_STATIC, 1, 1, 0, 0, 0, 0, build),
+            ImmutableInstruction35c(Opcode.INVOKE_VIRTUAL, 2, 0, 1, 0, 0, 0, build),
+        ))
+        assertEquals("two static calls are one build, the virtual one none", listOf("A02"), rowListBuilds(native).map { it.name })
     }
 
     private fun tap(

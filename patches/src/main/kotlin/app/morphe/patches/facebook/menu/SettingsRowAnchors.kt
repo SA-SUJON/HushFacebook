@@ -4,7 +4,7 @@
  */
 package app.morphe.patches.facebook.menu
 
-import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.namesString
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -16,7 +16,7 @@ import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 /**
- * Where a row in Facebook's Menu comes from, for the Hushfacebook row, on the 577 and 580 builds.
+ * Where a row in Facebook's Menu comes from, for the Hushfacebook row, on the 577 to 582 builds.
  *
  * The Menu's Settings and privacy group (see MenuSectionAnchors.kt for the groups) is drawn by the
  * native group section from a list of plain row items: a title, the address a tap opens, the
@@ -27,9 +27,10 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  * row with no server behind it is made.
  *
  * A tap on a row goes to one static handler taking the view, the user session, the row's helpers
- * and the row item, which loads the `bookmarks_menu` trace and picks what to open by the row's id.
- * Two more static methods of the same class take the row item: they log the row being seen, by its
- * id. The item class and every member are Redex names (`9KG` on 580, `8oK` on 577, which has one
+ * and the row item, which loads the `bookmarks_menu` trace (582 asks the `LX/6zX;` string table for
+ * it) and picks what to open by the row's id. Two more static methods of the same class take the
+ * row item: they log the row being seen, by its id (582's 32-bit build has dropped both). The item
+ * class and every member are Redex names (`cTt` on 582, `9KG` on 580, `8oK` on 577, which has one
  * icon resource where 580 has two), so they're found by these shapes and by the trace.
  */
 internal const val ROW_PATCH = "Hushfacebook in the Menu"
@@ -50,28 +51,41 @@ private const val STRING = "Ljava/lang/String;"
 private fun Method.parameters(): List<String> = parameterTypes.map { it.toString() }
 private fun Method.isStatic() = AccessFlags.STATIC.isSet(accessFlags)
 
-/** The call in the native group section that builds a group's row list from the server's. */
-internal fun isRowListBuild(call: MethodReference): Boolean =
-    call.returnType == IMMUTABLE_LIST &&
-        call.parameterTypes.map { it.toString() } == listOf(USER_SESSION, "Ljava/util/List;", "Z")
+/**
+ * The call in the native group section that builds a group's row list from the server's: a
+ * virtual one taking the user session, the list and a flag up to 581, and on 582 a static one
+ * (`LX/cTu;->A02`) taking the list alone. The patch checks the builder makes row items.
+ */
+internal fun isRowListBuild(call: MethodReference, static: Boolean): Boolean =
+    call.returnType == IMMUTABLE_LIST && call.parameterTypes.map { it.toString() } ==
+        if (static) listOf("Ljava/util/List;") else listOf(USER_SESSION, "Ljava/util/List;", "Z")
+
+private val VIRTUAL_INVOKES = setOf(Opcode.INVOKE_VIRTUAL, Opcode.INVOKE_VIRTUAL_RANGE)
+private val STATIC_INVOKES = setOf(Opcode.INVOKE_STATIC, Opcode.INVOKE_STATIC_RANGE)
 
 /** The row list builds [method] calls. The patch wants exactly one. */
 internal fun rowListBuilds(method: Method): List<MethodReference> =
     method.implementation?.instructions?.toList().orEmpty()
-        .filter { it.opcode == Opcode.INVOKE_VIRTUAL || it.opcode == Opcode.INVOKE_VIRTUAL_RANGE }
-        .mapNotNull { (it as ReferenceInstruction).reference as? MethodReference }
-        .filter(::isRowListBuild)
+        .filter { it.opcode in VIRTUAL_INVOKES || it.opcode in STATIC_INVOKES }
+        .mapNotNull { instruction ->
+            ((instruction as ReferenceInstruction).reference as? MethodReference)
+                ?.takeIf { isRowListBuild(it, instruction.opcode in STATIC_INVOKES) }
+        }
         .distinctBy { "${it.definingClass}->${it.name}" }
 
 /**
- * The Menu row tap handler: static, returning nothing, taking the view, the user session and four
- * more, and loading [ROW_TAP_TRACE]. Its fourth argument is the row item.
+ * The Menu row tap handler: shaped like one ([isRowTapShape]) and naming [ROW_TAP_TRACE], loading
+ * it or, as on 582, asking a string table [resolve] finds for it ([namesString]).
  */
-internal fun isRowTap(method: Method): Boolean {
+internal fun isRowTap(method: Method, resolve: (MethodReference) -> Method? = { null }): Boolean =
+    isRowTapShape(method) && namesString(method, ROW_TAP_TRACE, resolve)
+
+/** Static, returning nothing, taking the view, the user session and four more. Its fourth argument is the row item. */
+internal fun isRowTapShape(method: Method): Boolean {
     val parameters = method.parameters()
     return method.implementation != null && method.isStatic() && method.returnType == "V" &&
         parameters.size == 6 && parameters[0] == VIEW && parameters[1] == USER_SESSION &&
-        parameters[3].startsWith("L") && holdsString(method, ROW_TAP_TRACE)
+        parameters[3].startsWith("L")
 }
 
 /** The row item type [tap] takes. */

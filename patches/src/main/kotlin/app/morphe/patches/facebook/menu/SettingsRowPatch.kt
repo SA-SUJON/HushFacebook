@@ -15,6 +15,7 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMutable
 import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
+import app.morphe.patches.facebook.feed.methodsNaming
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.parameterRegister
@@ -68,9 +69,7 @@ val hushfacebookInTheMenuPatch = bytecodePatch(
             "$ROW_PATCH: expected ${native.definingClass}->${native.name} to build one row list, found ${builds.size}",
         )
 
-        val taps = classDefByStrings(ROW_TAP_TRACE, StringComparisonType.EQUALS)
-            .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
-            .flatMap { classDef -> classDef.methods.filter(::isRowTap) }
+        val taps = methodsNaming(ROW_TAP_TRACE, ::isRowTapShape)
         val tap = taps.singleOrNull()
             ?: throw PatchException("$ROW_PATCH: expected one Menu row tap handler loading \"$ROW_TAP_TRACE\", found ${taps.size}")
         val item = rowItemType(tap)
@@ -95,8 +94,8 @@ val hushfacebookInTheMenuPatch = bytecodePatch(
         addRowHelpers(item, constructor, fields, id)
 
         val owner = mutableClassDefBy(tap.definingClass)
+        // 582's 32-bit build has dropped both loggers, so there may be none to hook.
         val loggers = rowLoggers(owner, tap, item)
-        if (loggers.isEmpty()) throw PatchException("$ROW_PATCH: ${tap.definingClass} has no row logger taking $item")
         val tapMethod = owner.findMutableMethodOf(tap)
         tapMethod.skipRow(tapMethod.parameterTypes.indexOfFirst { it.toString() == item }, id, tapToo = true)
         loggers.forEach { logger ->
