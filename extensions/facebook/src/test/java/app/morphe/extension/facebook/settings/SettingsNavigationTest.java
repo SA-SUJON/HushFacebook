@@ -10,6 +10,7 @@ import static org.robolectric.Shadows.shadowOf;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.Signature;
@@ -91,7 +92,7 @@ public class SettingsNavigationTest {
 
     @Test public void homeAndEveryCategoryAreReachableWithoutRemovingTheModel() {
         assertNotNull(page.navigation);
-        assertEquals(9, list().getCount());
+        assertEquals(10, list().getCount());
         assertEquals(21, page.sections().size());
         int total = page.getPreferenceScreen().getRootAdapter().getCount();
         for (Preference section : page.sections()) {
@@ -102,7 +103,40 @@ public class SettingsNavigationTest {
             assertTrue(page.navigation.back());
             while (page.navigation.back()) { }
         }
-        assertEquals(9, list().getCount());
+        assertEquals(10, list().getCount());
+    }
+
+    /**
+     * The home page ends with Support Hushfacebook, under More settings. A tap opens the Ko-fi page
+     * in a browser of its own, and with no browser a tip names the address and Facebook keeps running.
+     */
+    @Test public void theHomePageEndsWithSupportWhichOpensKoFi() {
+        Map<String, Object> before = savedValues();
+        int last = list().getCount() - 1;
+        Preference row = (Preference) list().getItemAtPosition(last);
+        assertEquals(HushfacebookPages.SUPPORT, row.getKey());
+        assertEquals("Support Hushfacebook", String.valueOf(row.getTitle()));
+        assertEquals("Buy me a coffee on Ko-fi", String.valueOf(row.getSummary()));
+        assertEquals("More settings", String.valueOf(((Preference) list().getItemAtPosition(last - 1)).getTitle()));
+        assertTrue(list().getAdapter().isEnabled(last));
+
+        tap(HushfacebookPages.SUPPORT);
+        Intent started = shadowOf(controller.get()).getNextStartedActivity();
+        assertNotNull("nothing opened", started);
+        assertEquals(Intent.ACTION_VIEW, started.getAction());
+        assertEquals("https://ko-fi.com/X8K126YVER", started.getDataString());
+        assertTrue(started.hasCategory(Intent.CATEGORY_BROWSABLE));
+        assertTrue("the page would open inside Facebook's task",
+                (started.getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0);
+        assertNull(started.getComponent());
+        assertEquals("the tap left the home page", last + 1, list().getCount());
+
+        shadowOf(RuntimeEnvironment.getApplication()).checkActivities(true);
+        tap(HushfacebookPages.SUPPORT);
+        assertEquals("No app on this phone can open the link. The address is " + L10n.isolate("ko-fi.com/X8K126YVER") + ".",
+                ShadowToast.getTextOfLatestToast());
+        assertFalse(controller.get().isFinishing());
+        assertEquals(before, savedValues());
     }
 
     @Test public void categoryClickChangesOnlyTheSettingWhoseRowWasTapped() {
@@ -455,7 +489,7 @@ public class SettingsNavigationTest {
         assertEquals("No matching settings", ((Preference) list().getItemAtPosition(0)).getTitle());
         assertTrue(page.navigation.back());
         assertEquals("", search.getText().toString());
-        assertEquals(9, list().getCount());
+        assertEquals(10, list().getCount());
     }
 
     @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -524,7 +558,7 @@ public class SettingsNavigationTest {
             assertTrue(clear.isClickable());
             assertTrue(clear.performClick());
             assertEquals("", search.getText().toString());
-            assertEquals(9, list().getCount());
+            assertEquals(10, list().getCount());
             android.app.Dialog shown = dialog.getDialog();
             assertTrue(back.performClick());
             assertFalse(shown.isShowing());
@@ -658,7 +692,7 @@ public class SettingsNavigationTest {
 
     /**
      * A build that lacks default patches says how many under the card, and a tap opens and closes
-     * their names. Every default patch in, the row isn't there (the nine rows of the first test).
+     * their names. Every default patch in, the row isn't there (the ten rows of the first test).
      */
     @Test public void theOverviewNamesTheDefaultPatchesABuildLacks() {
         assertFalse(contains(HushfacebookPreferenceFragment.MISSING_DEFAULTS));
@@ -672,7 +706,7 @@ public class SettingsNavigationTest {
         page = page(dialog);
         Map<String, Object> before = savedValues();
 
-        assertEquals(10, list().getCount());
+        assertEquals(11, list().getCount());
         assertEquals(1, position(HushfacebookPreferenceFragment.MISSING_DEFAULTS));
         Preference row = (Preference) list().getItemAtPosition(1);
         assertEquals("1 default patch isn't in this build", String.valueOf(row.getTitle()));
@@ -706,7 +740,7 @@ public class SettingsNavigationTest {
         dialog = SettingsL10nTest.show(controller.get());
         page = page(dialog);
 
-        assertEquals(10, list().getCount());
+        assertEquals(11, list().getCount());
         assertEquals(1, position(HushfacebookPreferenceFragment.MISSING_RESTORE_TRUST));
         assertFalse(contains(HushfacebookPreferenceFragment.MISSING_DEFAULTS));
         Preference row = (Preference) list().getItemAtPosition(1);
@@ -727,7 +761,7 @@ public class SettingsNavigationTest {
         dialog = SettingsL10nTest.show(controller.get());
         page = page(dialog);
 
-        assertEquals(11, list().getCount());
+        assertEquals(12, list().getCount());
         assertEquals(1, position(HushfacebookPreferenceFragment.MISSING_RESTORE_TRUST));
         assertEquals(2, position(HushfacebookPreferenceFragment.MISSING_DEFAULTS));
         Preference defaults = (Preference) list().getItemAtPosition(2);
@@ -748,7 +782,7 @@ public class SettingsNavigationTest {
         dialog = SettingsL10nTest.show(controller.get());
         page = page(dialog);
 
-        assertEquals(9, list().getCount());
+        assertEquals(10, list().getCount());
         assertFalse(contains(HushfacebookPreferenceFragment.MISSING_RESTORE_TRUST));
         assertFalse(contains(HushfacebookPreferenceFragment.MISSING_DEFAULTS));
     }
@@ -943,12 +977,12 @@ public class SettingsNavigationTest {
         page.navigation.open(page.findPreference(Settings.TAP_TO_PLAY.key));
         SettingsL10nTest.backOf(dialog).performClick();
         assertTrue(dialog.getDialog().isShowing());
-        assertEquals(9, list().getCount());
+        assertEquals(10, list().getCount());
         page.navigation.navigate("About");
         dialog.getDialog().onBackPressed();
         assertEquals(15, list().getCount());
         dialog.getDialog().onBackPressed();
-        assertEquals(9, list().getCount());
+        assertEquals(10, list().getCount());
         dialog.getDialog().onBackPressed();
         ShadowLooper.idleMainLooper();
         assertFalse(controller.get().isFinishing());

@@ -51,6 +51,8 @@ final class SettingsNavigation extends BaseAdapter {
     private final List<Preference> visible = new ArrayList<>();
     private final Preference browse;
     private final Preference more;
+    /** The home page's last row, which opens Hushfacebook's Ko-fi page in a browser. */
+    private final Preference support;
     private final Preference empty;
     /** The line a category or search page starts with while a pause or a restart applies to it. */
     private final Preference pageStatus;
@@ -107,6 +109,9 @@ final class SettingsNavigation extends BaseAdapter {
         browse.setTitle(L10n.t("Browse settings"));
         more = link(context, L10n.t("More settings"), L10n.t("Additional Facebook preferences"), SettingsIcons.SETTINGS);
         more.setOnPreferenceClickListener(ignored -> { navigate(MORE); return true; });
+        support = link(context, L10n.t("Support Hushfacebook"), L10n.t("Buy me a coffee on Ko-fi"), SettingsIcons.OPENING);
+        support.setKey(HushfacebookPages.SUPPORT);
+        support.setOnPreferenceClickListener(row -> { HushfacebookPages.openSupport(row.getContext()); return true; });
         empty = new SettingsRows.Row(context);
         empty.setTitle(L10n.t("No matching settings"));
         empty.setSummary(L10n.t("Try a different word or clear the search."));
@@ -302,6 +307,7 @@ final class SettingsNavigation extends BaseAdapter {
             visible.add(browse);
             for (Section section : sections) if (section.primary) visible.add(section.link);
             visible.add(more);
+            visible.add(support);
         }
         if (terms.isEmpty()) host.showResults(-1);
         notifyDataSetChanged();
@@ -482,7 +488,7 @@ final class SettingsNavigation extends BaseAdapter {
     private int dp(int value) { return Math.round(value * screen.getContext().getResources().getDisplayMetrics().density); }
 
     private Object group(Preference item) {
-        if (item == more || item == browse || item == screen.getPreference(0)) return item;
+        if (item == more || item == support || item == browse || item == screen.getPreference(0)) return item;
         if (item.getParent() != null) return item.getParent();
         return sections;
     }

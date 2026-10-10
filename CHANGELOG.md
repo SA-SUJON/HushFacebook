@@ -12,6 +12,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** `Share sheet items` is a new patch. It lets you hide items from Facebook's share sheet, such as WhatsApp, Meta AI or Copy link. Nothing is hidden until you tap **Share sheet items to hide** under Links and tick what you don't want. The list starts with the items Facebook has offered on your phone and then common ones. The rest keep Facebook's order, and pausing Hushfacebook brings everything back. It shares one hook with the Threads switch in `Hide Meta upsells`, so both can be in the same build. The idea comes from icysymmetra's TikTok patches.
 * **Facebook:** After an update, the settings page names the switches that now start off, so you can turn back on the ones you used.
 * **Facebook:** Export settings now carries your Share sheet items picks, including item types this version doesn't name, and the import preview says how many it will hide.
+* **Facebook:** The settings home page ends with Support Hushfacebook, which opens the Ko-fi page in your browser.
 * **Tooling:** `scripts/phone-smoke.ps1` walks a patched Facebook on a phone through the feed, Watch, Reels, notifications and Marketplace, saves a full diagnostic report from Hushfacebook settings and pulls it. It fails when a hook family reports anything missing, ambiguous or thrown, when a family you name with `-ExpectInvoked` never ran, or when Facebook crashed during the walk. A crash the report kept from before the walk doesn't count. `scripts/test-phone-smoke.ps1` checks the report reading without a phone.
 
 ### Fixed

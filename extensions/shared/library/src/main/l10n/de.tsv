@@ -1286,3 +1286,7 @@ Your list of share sheet items to hide will be empty.	Deine Liste der beim Teile
 Your list of share sheet items to hide will hold %1$d item.	Deine Liste der beim Teilen ausgeblendeten Einträge enthält dann %1$d Eintrag.
 # context: the same with several share sheet items
 Your list of share sheet items to hide will hold %1$d items.	Deine Liste der beim Teilen ausgeblendeten Einträge enthält dann %1$d Einträge.
+# context: title of the last row on the settings home page; a tap opens the maintainer's Ko-fi page in a browser
+Support Hushfacebook	Hushfacebook unterstützen
+# context: that row's summary; Ko-fi is a tipping site's name and stays as it is
+Buy me a coffee on Ko-fi	Spendier mir einen Kaffee auf Ko-fi

@@ -1180,3 +1180,7 @@ Your list of share sheet items to hide will be empty.	Sua lista de itens ocultos
 Your list of share sheet items to hide will hold %1$d item.	Sua lista de itens ocultos ao compartilhar terá %1$d item.
 # context: the same with several share sheet items
 Your list of share sheet items to hide will hold %1$d items.	Sua lista de itens ocultos ao compartilhar terá %1$d itens.
+# context: title of the last row on the settings home page; a tap opens the maintainer's Ko-fi page in a browser
+Support Hushfacebook	Apoie o Hushfacebook
+# context: that row's summary; Ko-fi is a tipping site's name and stays as it is
+Buy me a coffee on Ko-fi	Me pague um café no Ko-fi

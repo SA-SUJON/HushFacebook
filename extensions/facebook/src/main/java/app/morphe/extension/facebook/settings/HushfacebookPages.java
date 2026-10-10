@@ -300,6 +300,31 @@ final class HushfacebookPages {
         about.addPreference(mark(licenses, SettingsIcons.LICENSE));
     }
 
+    /** Where Support Hushfacebook goes: the maintainer's Ko-fi page. */
+    static final String SUPPORT_URL = "https://ko-fi.com/X8K126YVER";
+
+    /** The key of Support Hushfacebook, the settings home page's last row. */
+    static final String SUPPORT = "action_support_hushfacebook";
+
+    /** The Ko-fi page, for a browser, in a task of its own so it never opens inside Facebook's. */
+    static Intent supportIntent() {
+        return new Intent(Intent.ACTION_VIEW, Uri.parse(SUPPORT_URL))
+                .addCategory(Intent.CATEGORY_BROWSABLE)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
+    /** Opens the Ko-fi page, or says no app here can, as Source code and issues does. */
+    static void openSupport(Context context) {
+        try {
+            context.startActivity(supportIntent());
+        } catch (ActivityNotFoundException | SecurityException missing) {
+            // No browser, or none switched on. Uncaught, Android's exception closed Facebook.
+            Logger.printInfo(() -> "No app opened the support link");
+            Utils.showToastLong(L10n.f("No app on this phone can open the link. The address is %1$s.",
+                    L10n.isolate(SUPPORT_URL.substring(SUPPORT_URL.indexOf("://") + 3))));
+        }
+    }
+
     /**
      * The notice itself stays in English, as the licence texts it carries are: a translation of
      * the GPL is not the licence.
