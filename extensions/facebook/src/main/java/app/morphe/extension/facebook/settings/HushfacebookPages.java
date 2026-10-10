@@ -303,6 +303,9 @@ final class HushfacebookPages {
     /** Where Support Hushfacebook goes: the maintainer's Ko-fi page. */
     static final String SUPPORT_URL = "https://ko-fi.com/X8K126YVER";
 
+    /** SUPPORT_URL without its scheme, for the toast. Worked out here, so no literal sits in the L10n call. */
+    static final String SUPPORT_ADDRESS = SUPPORT_URL.substring(SUPPORT_URL.indexOf("://") + 3);
+
     /** The key of Support Hushfacebook, the settings home page's last row. */
     static final String SUPPORT = "action_support_hushfacebook";
 
@@ -321,7 +324,7 @@ final class HushfacebookPages {
             // No browser, or none switched on. Uncaught, Android's exception closed Facebook.
             Logger.printInfo(() -> "No app opened the support link");
             Utils.showToastLong(L10n.f("No app on this phone can open the link. The address is %1$s.",
-                    L10n.isolate(SUPPORT_URL.substring(SUPPORT_URL.indexOf("://") + 3))));
+                    L10n.isolate(SUPPORT_ADDRESS)));
         }
     }
 
