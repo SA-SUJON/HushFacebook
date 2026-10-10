@@ -21,6 +21,7 @@ Every Hushfacebook release, newest first.
 
 * **Facebook:** The README tells people who patched in Manager's Expert mode before how to pick up the patches that are new to the default selection, since Manager keeps an Expert selection as it was.
 * **Facebook:** Clearer wording in a few places. The Tab to open on summary names the switch you'd actually turn off (Hide the Friends tab) instead of the patch name. The save toast for a video WhatsApp may refuse says to open Downloads in Hushfacebook settings to fix it. One save toast got its missing period, and the Pause list spells "recolored" like the rest of the app.
+* **Facebook:** The **Messenger** and **Instagram** rows under Links say what to pick on newer Android, where that app's Open by default page offers **In the app** and **In your browser** instead of an **Open supported links** switch. Picking **In your browser** for the official Messenger frees facebook.com and www.facebook.com, so they stay selected for Hushfacebook (issue #111).
 
 ## 0.9.0 (2026-10-10)
 
