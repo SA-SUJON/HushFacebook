@@ -19,6 +19,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -337,6 +338,35 @@ public final class MaterialYouTheme {
      */
     public static Drawable getDrawable(Context context, int id) {
         return recolour(context.getDrawable(id));
+    }
+
+    /**
+     * The same read through {@code Resources}: androidx's {@code ResourcesCompat} and a Litho lookup
+     * that holds no {@code Context} ask a resource for its drawable this way, and a colour resource
+     * comes back as a ColorDrawable of its colour. Same answer as {@link #getDrawable(Context, int)}.
+     */
+    @SuppressWarnings("deprecation")
+    public static Drawable getDrawable(Resources resources, int id) {
+        return recolour(resources.getDrawable(id));
+    }
+
+    /** The same for {@code Resources.getDrawable(int, Theme)}. */
+    public static Drawable getDrawable(Resources resources, int id, @Nullable Resources.Theme theme) {
+        return recolour(resources.getDrawable(id, theme));
+    }
+
+    /**
+     * A theme attribute read as {@code TypedValue.data}, after {@code Theme.resolveAttribute}. Some
+     * code takes the colour that way (581's {@code LX/2pM;->A00}, which the comment sheet's action
+     * text and, it seems, its rows ask), and a night style item for a token can't move when no system
+     * tone sits close to it: SURFACE_BACKGROUND keeps #252728 (issue #37). The patch sends each read
+     * here with the whole value. Only a colour moves, so a dimension, a flag or a reference comes
+     * back as it was, and the colour goes the way {@link #withoutToken} sends any other.
+     */
+    public static int colourData(TypedValue value) {
+        int data = value.data;
+        if (value.type < TypedValue.TYPE_FIRST_COLOR_INT || value.type > TypedValue.TYPE_LAST_COLOR_INT) return data;
+        return withoutToken(data);
     }
 
     /**

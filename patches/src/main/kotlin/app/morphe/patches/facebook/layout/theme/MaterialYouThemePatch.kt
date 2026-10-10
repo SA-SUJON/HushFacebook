@@ -4,6 +4,7 @@
  */
 package app.morphe.patches.facebook.layout.theme
 
+import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.BytecodePatchContext
@@ -22,6 +23,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Document
@@ -47,6 +49,21 @@ private const val MIG = "$MATERIAL_YOU->mig(ILjava/lang/Object;)I"
 internal const val CONTEXT_GET_DRAWABLE = "Landroid/content/Context;->getDrawable(I)Landroid/graphics/drawable/Drawable;"
 
 /**
+ * The same read through `Resources`, which androidx's `ResourcesCompat` and a Litho resource lookup that
+ * doesn't go through a `Context` use. A colour resource comes back as a ColorDrawable of its colour,
+ * so these answer through the same stand-in as [CONTEXT_GET_DRAWABLE].
+ */
+internal const val RESOURCES_GET_DRAWABLE = "Landroid/content/res/Resources;->getDrawable(I)Landroid/graphics/drawable/Drawable;"
+internal const val RESOURCES_GET_THEMED_DRAWABLE =
+    "Landroid/content/res/Resources;->getDrawable(ILandroid/content/res/Resources\$Theme;)Landroid/graphics/drawable/Drawable;"
+
+/** A theme attribute's value read as `TypedValue.data`, which none of the colour calls above see (issue #37). */
+internal const val TYPED_VALUE_DATA = "Landroid/util/TypedValue;->data:I"
+
+/** What a data read becomes: the value, whole, so the extension can see its type. */
+internal const val COLOUR_DATA = "$MATERIAL_YOU->colourData(Landroid/util/TypedValue;)I"
+
+/**
  * Where Material You sends each framework colour call, route four's `Color.parseColor`, the reads
  * of a colour resource and a theme attribute's `TypedArray.getColor`, and each of AMOLED's stand-ins
  * for them when AMOLED went first. Litho reads a token's attribute that last way (581
@@ -56,7 +73,8 @@ internal const val CONTEXT_GET_DRAWABLE = "Landroid/content/Context;->getDrawabl
 internal val YOU_COLOUR_CALLS: Map<String, String> =
     listOf(PARSE_COLOR, CONTEXT_GET_COLOR, RESOURCES_GET_COLOR, RESOURCES_GET_THEMED_COLOR, TYPED_ARRAY_GET_COLOR).flatMap { framework ->
         listOf(framework, AMOLED_COLOUR_CALLS.getValue(framework)).map { it to standIn(MATERIAL_YOU, framework) }
-    }.toMap() + (CONTEXT_GET_DRAWABLE to standIn(MATERIAL_YOU, CONTEXT_GET_DRAWABLE))
+    }.toMap() + listOf(CONTEXT_GET_DRAWABLE, RESOURCES_GET_DRAWABLE, RESOURCES_GET_THEMED_DRAWABLE)
+        .associateWith { standIn(MATERIAL_YOU, it) }
 
 /** The status bar: the colour and FDS's dark check. Runs AMOLED's own first when AMOLED is in the build. */
 internal const val STATUS_BAR_YOU = "$MATERIAL_YOU->statusBar(IZ)I"
@@ -362,6 +380,10 @@ val materialYouThemePatch = bytecodePatch(
             "No call to TypedArray.getColor found, so the comment list's rows would stay grey"
         }
 
+        // The comment list's rows (issue #37): a theme attribute resolved into a TypedValue and read as
+        // its `data`, which SURFACE_BACKGROUND's night item (#252728) reaches without a colour call.
+        check(readColourData() > 0) { "No TypedValue.data read found, so rows that read a theme colour that way would stay grey" }
+
         // Route three. AMOLED, when it went first, has blackened all but one of these, which is why
         // finding none is fine then.
         val read = readSurfaceLiterals()
@@ -395,6 +417,38 @@ internal fun BytecodePatchContext.readSurfaceLiterals(): Int {
     return owners.sumOf { type ->
         mutableClassDefByOrNull(type)?.methods?.sumOf { if (handsToBar(it)) 0 else it.readSurfaceFields() } ?: 0
     }
+}
+
+/**
+ * Every `iget vA, vB, TypedValue.data` in the app becomes `colourData(vB)` into vA, so a theme
+ * attribute read as a plain colour takes the palette like the colour calls do. The extension looks
+ * at the value's type and only answers for a colour. The TypedValue register is read before the
+ * result is written, so `iget v0, v0` stays right. `iget` only names registers up to v15, which is
+ * all the short call form takes too. Answers how many it replaced.
+ */
+internal fun BytecodePatchContext.readColourData(): Int {
+    val owners = mutableSetOf<String>()
+    classDefForEach { classDef ->
+        if (classDef.type.startsWith(EXTENSION_PACKAGE)) return@classDefForEach
+        if (classDef.methods.any { method -> method.implementation?.instructions?.any { it.isColourDataRead() } == true }) {
+            owners += classDef.type
+        }
+    }
+    return owners.sumOf { type -> mutableClassDefByOrNull(type)?.methods?.sumOf { it.readColourData() } ?: 0 }
+}
+
+private fun Instruction.isColourDataRead(): Boolean =
+    opcode == Opcode.IGET && referenceText() == TYPED_VALUE_DATA
+
+/** [readColourData] for one method. */
+internal fun MutableMethod.readColourData(): Int {
+    val sites = (implementation ?: return 0).instructions.withIndex().filter { it.value.isColourDataRead() }
+        .map { it.index to it.value as TwoRegisterInstruction }
+    sites.asReversed().forEach { (index, read) ->
+        replaceInstruction(index, "invoke-static { v${read.registerB} }, $COLOUR_DATA")
+        addInstruction(index + 1, "move-result v${read.registerA}")
+    }
+    return sites.size
 }
 
 private fun Instruction.referenceText(): String? = (this as? ReferenceInstruction)?.reference?.toString()

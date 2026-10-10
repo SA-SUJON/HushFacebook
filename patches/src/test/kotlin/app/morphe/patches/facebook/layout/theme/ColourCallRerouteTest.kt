@@ -107,6 +107,32 @@ class ColourCallRerouteTest {
         assertEquals(expected, alone.calls())
     }
 
+    /** Resources.getDrawable, plain and with a theme, goes to the same stand-in with the Resources in front. */
+    @Test
+    fun `a drawable read through Resources goes to Material You, on the same registers`() {
+        val smali = """
+            invoke-virtual { v1, v2 }, $RESOURCES_GET_DRAWABLE
+            move-result-object v0
+            invoke-virtual { v1, v2, v3 }, $RESOURCES_GET_THEMED_DRAWABLE
+            move-result-object v0
+            return-void
+        """
+        val you = "Lapp/morphe/extension/facebook/theme/MaterialYouTheme;"
+        val drawable = "Landroid/graphics/drawable/Drawable;"
+        val method = method(4, smali)
+        val counts = YOU_COLOUR_CALLS.keys.associateWith { 0 }.toMutableMap()
+        method.rerouteColourCalls(YOU_COLOUR_CALLS, counts)
+        assertEquals(
+            listOf(
+                Triple(Opcode.INVOKE_STATIC, "$you->getDrawable(Landroid/content/res/Resources;I)$drawable", listOf(1, 2)),
+                Triple(Opcode.INVOKE_STATIC, "$you->getDrawable(Landroid/content/res/Resources;I${theme})$drawable", listOf(1, 2, 3)),
+            ),
+            method.calls(),
+        )
+        assertEquals(1, counts.getValue(RESOURCES_GET_DRAWABLE))
+        assertEquals(1, counts.getValue(RESOURCES_GET_THEMED_DRAWABLE))
+    }
+
     /**
      * A colour resource read as a drawable, the way Litho draws the feed's composer row (issue #37),
      * goes to Material You's stand-in on the same registers, with AMOLED in the build or not: AMOLED
