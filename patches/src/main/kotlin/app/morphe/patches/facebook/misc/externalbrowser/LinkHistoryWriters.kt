@@ -12,8 +12,12 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.patches.facebook.misc.extension.requireLocals
 import app.morphe.util.findMutableMethodOf
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
@@ -40,12 +44,30 @@ internal val LINK_HISTORY_WRITERS = listOf(
 
 internal const val HOLD_LINK_HISTORY = "Lapp/morphe/extension/facebook/misc/LinkHistory;->hold()Z"
 
-/** Whether [method] is a factory of [writer]: a method outside it that creates one and answers an object. */
-internal fun isWriterFactory(method: Method, writer: String): Boolean =
-    method.definingClass != writer && method.returnType.startsWith("L") &&
-        method.implementation?.instructions?.any {
-            it.opcode == Opcode.NEW_INSTANCE && ((it as ReferenceInstruction).reference as TypeReference).type == writer
-        } == true
+/**
+ * Whether [method] is a factory of [writer]: an instance method outside it that takes one parameter
+ * (the browser's launch state), creates the writer, and can answer null on its own, which is what
+ * makes the hook's null an answer its callers already handle.
+ */
+internal fun isWriterFactory(method: Method, writer: String): Boolean {
+    if (method.definingClass == writer || !method.returnType.startsWith("L") || method.parameterTypes.size != 1 ||
+        AccessFlags.STATIC.isSet(method.accessFlags)
+    ) {
+        return false
+    }
+    val code = method.implementation?.instructions?.toList() ?: return false
+    val creates = code.any {
+        it.opcode == Opcode.NEW_INSTANCE && ((it as ReferenceInstruction).reference as TypeReference).type == writer
+    }
+    return creates && answersNull(code)
+}
+
+/** Whether [code] returns a register it loaded with 0. */
+private fun answersNull(code: List<Instruction>): Boolean {
+    val nulls = code.filter { it.opcode == Opcode.CONST_4 && (it as NarrowLiteralInstruction).narrowLiteral == 0 }
+        .map { (it as OneRegisterInstruction).registerA }.toSet()
+    return code.any { it.opcode == Opcode.RETURN_OBJECT && (it as OneRegisterInstruction).registerA in nulls }
+}
 
 /**
  * The one factory of each writer in [LINK_HISTORY_WRITERS], found in one walk over the app. None, or

@@ -164,6 +164,16 @@
     },
     {
       "paths": [
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/LinkHistory.java",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/misc/externalbrowser/LinkHistoryWriters.kt"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: a switch that keeps Facebook's own browser from building its two link history writers, hooked first in the factory of each kept writer class in Facebook 582, where a yes takes the factory's own null."
+    },
+    {
+      "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/TranslatedStart.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/translatedstart/**"
       ],
