@@ -105,28 +105,32 @@ class MaterialYouTokenFixtureTest {
          * helper there. 581 has the same 18 calls under other names (looked at 2026-10-02): `Cuj.A02`,
          * `FMh.A00`, `c0D.A0K`, `emC.EwX` (whose six calls ask `gZV.A00`, a dimension read like
          * `gi9.A00`), `epS.DA9`, `fjh.A04`, `fmc`'s constructor and `fmc.A0f`, and Mapbox's three.
+         * 582 has the same 18 calls with the same signatures, each within four instructions of where
+         * 581 had it (2026-10-10): `CM1.A02`, `ksB.A00`, `9MV.A0Q`, `S2K.EzN`, `S47.DCV`, `U0q.A04`,
+         * `U3I`'s constructor and `U3I.A0f`, and Mapbox's three.
          */
         val UNRESOLVED = mapOf(
-            "581.0.0.45.58" to setOf(
-                "LX/Cuj;->A02(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/Integer;@88",
-                "LX/FMh;->A00(Landroid/content/Context;Lcom/facebook/react/bridge/ReadableMap;)Landroid/graphics/drawable/Drawable;@20",
-                "LX/c0D;->A0K(Ljava/lang/Integer;)V@16",
-                "LX/emC;->EwX(LX/gmM;)V@151",
-                "LX/emC;->EwX(LX/gmM;)V@165",
-                "LX/emC;->EwX(LX/gmM;)V@50",
-                "LX/emC;->EwX(LX/gmM;)V@63",
-                "LX/emC;->EwX(LX/gmM;)V@75",
-                "LX/emC;->EwX(LX/gmM;)V@78",
-                "LX/epS;->DA9(LX/l99;I)V@168",
-                "LX/epS;->DA9(LX/l99;I)V@224",
-                "LX/epS;->DA9(LX/l99;I)V@32",
-                "LX/fjh;->A04(LX/fjh;LX/fs6;)V@9",
-                "LX/fmc;-><init>(Landroid/content/Context;)V@111",
-                "LX/fmc;->A0f()V@35",
+            "582.0.0.50.54" to setOf(
+                "LX/9MV;->A0Q(Ljava/lang/Integer;)V@16",
+                "LX/CM1;->A02(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/Integer;@88",
+                "LX/S2K;->EzN(LX/UrJ;)V@155",
+                "LX/S2K;->EzN(LX/UrJ;)V@169",
+                "LX/S2K;->EzN(LX/UrJ;)V@54",
+                "LX/S2K;->EzN(LX/UrJ;)V@67",
+                "LX/S2K;->EzN(LX/UrJ;)V@79",
+                "LX/S2K;->EzN(LX/UrJ;)V@82",
+                "LX/S47;->DCV(LX/6CH;I)V@169",
+                "LX/S47;->DCV(LX/6CH;I)V@226",
+                "LX/S47;->DCV(LX/6CH;I)V@32",
+                "LX/U0q;->A04(LX/U0q;LX/U6D;)V@9",
+                "LX/U3I;-><init>(Landroid/content/Context;)V@114",
+                "LX/U3I;->A0f()V@35",
+                "LX/ksB;->A00(Landroid/content/Context;Lcom/facebook/react/bridge/ReadableMap;)Landroid/graphics/drawable/Drawable;@20",
                 "Lcom/mapbox/mapboxsdk/utils/ColorUtils;->getAccentColor(Landroid/content/Context;)I@13",
                 "Lcom/mapbox/mapboxsdk/utils/ColorUtils;->getPrimaryColor(Landroid/content/Context;)I@13",
                 "Lcom/mapbox/mapboxsdk/utils/ColorUtils;->getPrimaryDarkColor(Landroid/content/Context;)I@13",
             ),
+        ),
         )
     }
 

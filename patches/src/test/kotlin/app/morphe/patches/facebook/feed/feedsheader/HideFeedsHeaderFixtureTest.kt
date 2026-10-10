@@ -36,12 +36,12 @@ import java.io.File
 class HideFeedsHeaderFixtureTest {
     /** Each declared build's container type, the controller's type, and the controller's register. */
     private val expected = mapOf(
-        "581.0.0.45.58" to Triple("LX/3vh;", "LX/a5t;", 5),
+        "582.0.0.50.54" to Triple("LX/22S;", "LX/eOR;", 5),
     )
 
     /** Each declared build's container controller and the runnable it posts with whether the filters show. */
     private val room = mapOf(
-        "581.0.0.45.58" to ("LX/asB;" to "LX/b6e;"),
+        "582.0.0.50.54" to ("LX/fBx;" to "LX/fU7;"),
     )
 
     private val frameInit = "Landroid/widget/FrameLayout;-><init>(Landroid/content/Context;)V"
