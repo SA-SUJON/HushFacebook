@@ -12,8 +12,14 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.handleTargets
+import app.morphe.patches.facebook.misc.extension.patchLog
+import app.morphe.patcher.StringComparisonType
+import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.facebook.misc.settings.settingsPatch
+import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.util.returnEarly
+import com.android.tools.smali.dexlib2.iface.Method
 
 private const val PATCH = "Block ad telemetry"
 
@@ -29,12 +35,37 @@ internal val AD_TELEMETRY = listOf(
     "Lcom/facebook/feed/platformads/AppInstallService;",
 )
 
+/**
+ * Jobs that report the advertising ID or check Android's ad measurement, mapped on 582 (2026-10-10).
+ * Each keeps its name and has only void methods, so neutering stops the job outright:
+ * LatStatusJob posts the ID with its limit-tracking flag to /attributions, PrivacySandboxCapabilities-
+ * Checker logs Android's measurement status, and TestPACustomAudienceAppJob joins a test custom
+ * audience on Android's ad services.
+ */
+internal val AD_ID_JOBS = listOf(
+    "Lcom/facebook/attribution/LatStatusJob;",
+    "Lcom/facebook/privacysandbox/PrivacySandboxCapabilitiesChecker;",
+    "Lcom/facebook/privacysandbox/protectedaudience/TestPACustomAudienceAppJob;",
+)
+
+/**
+ * Strings that each mark the one void method sending an identifier, which returns at once: the
+ * advertising ID to Facebook as a GraphQL mutation, the advertising ID, App Manager id and device
+ * id in a launch event, and an ad view or click registered with Android's attribution. The method
+ * names are Redex's, so the strings find them.
+ */
+internal val AD_ID_SENDERS = listOf(
+    "ReportAdvertiserIDMutation",
+    "fb4a_launch_custom_data",
+    "https://www.facebook.com/privacy_sandbox/mobile/register/source?tracking_data=",
+)
+
 @Suppress("unused")
 val blockAdTelemetryPatch = bytecodePatch(
     name = "Block ad telemetry",
-    description = "Stops Facebook watching for screenshots of ads and reporting which apps you install after " +
-        "seeing ads, so less of what you do feeds its ad tracking. Works as soon as you patch it in, with no " +
-        "switch.",
+    description = "Stops Facebook watching for screenshots of ads, reporting which apps you install after " +
+        "seeing ads, and sending your phone's advertising ID, so less of what you do feeds its ad tracking. Works " +
+        "as soon as you patch it in, with no switch.",
     default = true,
 ) {
     category("Privacy")
@@ -55,6 +86,27 @@ val blockAdTelemetryPatch = bytecodePatch(
     execute {
         handleTargets(PATCH, "ad telemetry classes", AD_TELEMETRY) { neuterOrReason(it) }
 
+        // The advertising ID reporting is extra: a build without one of these still gets the
+        // classes above, so a missing one is an info line rather than a warning.
+        AD_ID_JOBS.forEach { type -> neuterOrReason(type)?.let { patchLog.info("$PATCH: $it.") } }
+        AD_ID_SENDERS.forEach { marker -> stopSenderOrReason(marker)?.let { patchLog.info("$PATCH: $it.") } }
+
         enableStatus("adTelemetry")
     }
+}
+
+/** Whether [method] is a sender [marker] picks: a void method loading exactly that string. */
+internal fun isAdIdSender(method: Method, marker: String) = method.returnType == "V" && holdsString(method, marker)
+
+/** Null once the one void method holding exactly [marker] returns at once, or why nothing changed. */
+internal fun BytecodePatchContext.stopSenderOrReason(marker: String): String? {
+    val senders = classDefByStrings(marker, StringComparisonType.EQUALS).flatMap { classDef ->
+        classDef.methods.filter { isAdIdSender(it, marker) }
+    }
+    val sender = senders.singleOrNull()
+        ?: return "${senders.size} void methods hold \"$marker\", expected 1, so that send keeps running"
+    mutableClassDefBy(sender.definingClass).methods.single {
+        it.name == sender.name && it.parameterTypes.map(Any::toString) == sender.parameterTypes.map(Any::toString)
+    }.returnEarly()
+    return null
 }
