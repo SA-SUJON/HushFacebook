@@ -2,7 +2,9 @@
 
 Every Hushfacebook release, newest first.
 
-## Unreleased
+## 0.9.0 (2026-10-09)
+
+* **Facebook:** This release gathers everything since v0.8.0 and brings 86 patches for Facebook 581.0.0.45.58, up from 85. The new one is `Share sheet items`, which takes the items you pick off Facebook's share sheet. Morphe Manager's default selection now holds every patch but three, and after an update the settings page tells you which switches start off now. New switches hide the share sheet's Send to group buttons, share a post's own link instead of a /share/ link, play reels once and hide the Follow link on posts. Morphe Manager 1.34.0 or newer is required.
 
 ### Added
 
