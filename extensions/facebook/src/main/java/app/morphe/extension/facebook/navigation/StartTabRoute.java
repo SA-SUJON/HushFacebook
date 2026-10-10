@@ -50,9 +50,12 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *
  * <p>Feeds has a page of its own, the one the Menu's Feeds row opens when the tab bar has no Feeds
  * tab. So a start that chose Feeds, on a bar without it, opens that page over Home once Facebook
- * has built the main screen, through Facebook's own link for it, {@link #FEEDS_PAGE_LINK}, and Back
- * comes back to Home. It's skipped when the screen has moved on from Home or isn't in front by
- * then. The chosen filter is asked for there too, through {@link FeedsSubtabRoute}.
+ * has built the main screen, on the screen Facebook keeps for pages that aren't tabs, the way the
+ * Menu's Feeds row starts it, and Back comes back to Home. It's skipped when the screen has moved on
+ * from Home or isn't in front by then. The chosen filter is asked for there too, through
+ * {@link FeedsSubtabRoute}. Facebook's own links for the page can't be used for it: on 582 its link
+ * map hands both {@code fb://feeds} and {@code fb://recent_feed} Home's launch link, so Facebook
+ * switches to Home instead of opening the page.
  *
  * <p>On a cold start Facebook's own start-up would still drop the request twice. It replaces the
  * intent of a start another app sent, a launcher included, with a copy that keeps no tab, and its
@@ -100,11 +103,23 @@ public final class StartTabRoute {
     static final int LANDING_ATTEMPTS = 6;
 
     /**
-     * Facebook's link for its Feeds page. Its link map sends {@code fb://feeds?source=...} to the
-     * fragment the Feeds tab shows, and with no Feeds tab on the bar that opens on a screen of its
-     * own. The source names the way in for Facebook's logging; the Menu's Feeds row is a bookmark.
+     * Facebook's link for its Feeds page, which the page's intent carries as its data. The intent
+     * names {@link #PAGE_SCREEN} itself, so Facebook's link map never reads it. The source names the
+     * way in for Facebook's logging; the Menu's Feeds row is a bookmark.
      */
     static final String FEEDS_PAGE_LINK = "fb://feeds?source=bookmark";
+
+    /** Facebook's screen for a page that isn't a tab, the one the Menu's Feeds row opens the page on. */
+    static final String PAGE_SCREEN = "com.facebook.katana.immersiveactivity.ImmersiveActivity";
+
+    /** The fragment Facebook's link map gives the Feeds page ({@code fb://recent_feed}) on that screen. */
+    static final int FEEDS_FRAGMENT = 1055;
+
+    /**
+     * The launch link the Menu's Feeds row hands the page. No tab answers to it, so Facebook's
+     * check for a tab that owns the page finds none and leaves the page open.
+     */
+    static final String FEEDS_LAUNCH_LINK = "fb://recent_feed?source=tab";
 
     /** The start-up hooks, by the index their log lines are counted under. */
     static final int SANITIZE_HOOK = 0, POSITION_HOOK = 1, KEEP_HOOK = 2;
@@ -469,8 +484,15 @@ public final class StartTabRoute {
                         + " so the Feeds page stays closed.");
                 return;
             }
+            // The Menu row's extras, so the screen shows the page instead of switching to Home.
             activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(FEEDS_PAGE_LINK))
-                    .setPackage(activity.getPackageName()));
+                    .setPackage(activity.getPackageName())
+                    .setClassName(activity.getPackageName(), PAGE_SCREEN)
+                    .putExtra("target_fragment", FEEDS_FRAGMENT)
+                    .putExtra("feed_type", "most_recent")
+                    .putExtra("extra_launch_uri", FEEDS_LAUNCH_LINK)
+                    .putExtra("presentation_type", "BOOKMARK")
+                    .putExtra("should_show_nav_bar", true));
             HookStatus.bound(FamilyNames.START_TAB, "feeds page");
             debug(() -> "the tab bar has no feeds tab, so opened the Feeds page over Home.");
         } catch (Throwable failure) {

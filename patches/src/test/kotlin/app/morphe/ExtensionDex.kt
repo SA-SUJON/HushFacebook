@@ -7,6 +7,7 @@ package app.morphe
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.android.tools.smali.dexlib2.iface.ClassDef
+import com.android.tools.smali.dexlib2.iface.value.IntEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.LongEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 import java.nio.ByteBuffer
@@ -39,6 +40,14 @@ internal object ExtensionDex {
             ?: throw AssertionError("$type in $PAYLOAD has no static field $field")
         return (declared.initialValue as? StringEncodedValue)?.value
             ?: throw AssertionError("$type.$field in $PAYLOAD starts with no string: ${declared.initialValue}")
+    }
+
+    /** The value a static final int field of [type] starts with, as javac wrote it into the class. */
+    fun intConstant(type: String, field: String): Int {
+        val declared = classDef(type).staticFields.firstOrNull { it.name == field }
+            ?: throw AssertionError("$type in $PAYLOAD has no static field $field")
+        return (declared.initialValue as? IntEncodedValue)?.value
+            ?: throw AssertionError("$type.$field in $PAYLOAD starts with no int: ${declared.initialValue}")
     }
 
     /** The value a static final long field of [type] starts with, as javac wrote it into the class. */
