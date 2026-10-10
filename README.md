@@ -522,7 +522,7 @@ Send the link to an app, under Downloads, doesn't go online either. It hands a `
 
 Neither does Facebook's Whitehat settings. It starts Facebook's own screen, or hands `https://www.facebook.com/whitehat` to your browser when that screen isn't on the phone.
 
-Support Hushfacebook, at the end of the settings home page, doesn't go online itself either. It hands `https://ko-fi.com/X8K126YVER` to your browser.
+Support Hushfacebook, at the end of the settings home page, doesn't go online itself either. It hands the Ko-fi page linked at the top of this README, on `ko-fi.com`, to your browser.
 
 ## Where the patches come from
 
