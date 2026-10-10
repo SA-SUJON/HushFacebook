@@ -4,7 +4,7 @@ Every Hushfacebook release, newest first.
 
 ## 0.9.0 (2026-10-09)
 
-* **Facebook:** This release gathers everything since v0.8.0 and brings 86 patches for Facebook 581.0.0.45.58, up from 85. The new one is `Share sheet items`, which takes the items you pick off Facebook's share sheet. Morphe Manager's default selection now holds every patch but three, and after an update the settings page tells you which switches start off now. New switches hide the share sheet's Send to group buttons, share a post's own link instead of a /share/ link, play reels once and hide the Follow link on posts. Morphe Manager 1.34.0 or newer is required.
+* **Facebook:** This release gathers everything since v0.8.0 and brings 86 patches for Facebook 582.0.0.50.54, up from 85. The new one is `Share sheet items`, which takes the items you pick off Facebook's share sheet. Morphe Manager's default selection now holds every patch but three, and after an update the settings page tells you which switches start off now. New switches hide the share sheet's Send to group buttons, share a post's own link instead of a /share/ link, play reels once and hide the Follow link on posts. Morphe Manager 1.34.0 or newer is required.
 
 ### Added
 
@@ -49,10 +49,11 @@ Every Hushfacebook release, newest first.
 * **Tooling:** A release patches each Facebook fixture once instead of twice. The pre-push gate now patches the fixtures with the release bundle from `build/release` when the patch sources or the version change, and keeps each passing run with a stamp naming the bundle, APK, patch list and CLI. `build-release-receipt.ps1 -AppliedDir` reads a kept run whose stamp matches and runs every check on it, and patches any other fixture as before.
 * **Tooling:** `scripts/release/release.ps1` runs the whole release in five stages, each refusing to start until the one before it is done. `source` cuts the CHANGELOG, bumps the version, writes the patch list and checks the translations, and puts the tree back if a step fails. `preflight` adds the release text tests, the translation check and a draft of the GitHub notes to its quick checks. `bundle` builds from the pushed source commit and writes the receipt from the gate's kept runs plus `SHA256SUMS.txt`. `publish` tags, creates the release and downloads every asset back to compare it. `index` writes `patches-bundle.json`, the README and the bug form from the published release and the gate's test counts, then updates the repository description. The pre-push gate now runs the release text tests and the script contract tests when only `tools/` changes, and the phone smoke report checks when `phone-smoke.ps1` changes.
 * **Tooling:** The marketing script no longer writes `assets/readme-hero.png`, which has been separate artwork since the quieter hero. The social preview it still builds says "Safe mode built in" in place of "Recovery built in", which people read as a promise about Messenger's chat backup PIN.
+* **Tooling:** Every patch finds its places in Facebook 582. That build moves more text into lookup lists, reads its config flags through new helpers or straight from the config, and folds some classes into their parents or into one shared object, so the patches and their fixture checks now accept each of those forms.
 
 ### Removed
 
-* **Facebook:** Hushfacebook now targets Facebook 581.0.0.45.58 only, the newest stable release, in its arm64-v8a and 32-bit builds. If you're still on 580.0.0.51.74 or 577.0.0.50.72, update Facebook to 581 before you patch. From here on each release moves to the newest stable Facebook and drops the one before.
+* **Facebook:** Hushfacebook now targets Facebook 582.0.0.50.54 only, the newest stable release, in its arm64-v8a and 32-bit builds. If you're still on 581.0.0.45.58, 580.0.0.51.74 or 577.0.0.50.72, update Facebook to 582 before you patch. From here on each release moves to the newest stable Facebook and drops the one before.
 
 ## 0.8.0 (2026-10-08)
 
