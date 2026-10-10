@@ -1162,3 +1162,15 @@ Share sheet items to hide	Itens ocultos ao compartilhar
 None. The share sheet shows everything Facebook offers.	Nenhum. Ao compartilhar, aparece tudo o que o Facebook oferece.
 Hidden: %s	Ocultos: %s
 Hide from the share sheet	Ocultar ao compartilhar
+# context: last item of the opened list of default patches a build lacks, after eight names; the count of patches not named, always 2 or more
+%1$d more	mais %1$d
+# context: title of the one-time note under the status card after an update, one switch: a switch that started on in earlier versions starts off now
+%1$d switch starts off now	%1$d opção agora começa desligada
+# context: title of that note when several switches start off now
+%1$d switches start off now	%1$d opções agora começam desligadas
+# context: summary of that note while its list of switch names is closed; a tap opens it
+After this update, a switch you had on may be off now. Tap to see which.	Depois desta atualização, uma opção que você tinha ativado pode estar desligada. Toque para ver quais.
+# context: that note's summary once opened, one switch; the placeholder is the switch's title as the settings show it
+Now off: %1$s. Turn it back on in its section if you want it. Tap again to hide this note.	Agora desligada: %1$s. Ative de novo na seção dela se quiser. Toque de novo para ocultar este aviso.
+# context: that note's summary once opened, several switches; the placeholder is their titles joined as a list
+Now off: %1$s. Turn back on the ones you want in their sections. Tap again to hide this note.	Agora desligadas: %1$s. Ative de novo as que quiser nas seções delas. Toque de novo para ocultar este aviso.

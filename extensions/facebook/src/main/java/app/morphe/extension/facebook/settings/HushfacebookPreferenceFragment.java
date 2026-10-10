@@ -126,6 +126,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     static final String MISSING_RESTORE_TRUST = "action_missing_restore_trust";
     /** The key of the row naming the default patches this build lacks. It stores nothing either. */
     static final String MISSING_DEFAULTS = "action_missing_default_patches";
+    /** How many of the missing patches that row names before it counts the rest. */
+    static final int MISSING_NAMES_SHOWN = 8;
 
     /** Thrown by the next initialize() and then cleared: how a test reaches the recovery page. */
     static volatile RuntimeException failNextInitialization;
@@ -296,11 +298,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         setPreferenceScreen(screen);
 
         screen.addPreference(statusCard(context));
-        screen.addPreference(jumpRow(context));
         // The export row below reads these; registering twice keeps one.
         PatchFamily.registerDiagnostics();
         LogBufferManager.registerReportSection(ReleaseCheck.REPORT);
         Set<PatchFamily> build = PatchFamily.inThisBuild();
+        // Right under the card, once, for someone a default change turned switches off for.
+        Preference startsOff = StartsOffNote.row(context, build);
+        if (startsOff != null) screen.addPreference(startsOff);
+        screen.addPreference(jumpRow(context));
 
         // The sections in the order they come on the page, each in its category page's class.
         FeedPages.opening(this, screen, context, build);
@@ -483,8 +488,8 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     /**
      * Under the card when this build lacks a patch Morphe Manager selects by default, or null when
      * it has them all. A patch left out is the usual answer to "ads still show" (#29, #35). A tap
-     * opens and closes the list of names, which runs past eighty for a build patched with one
-     * patch picked, and lists the patches that joined the selection for a build made before they did.
+     * opens and closes the list of names, which would run past eighty for a build patched with one
+     * patch picked, so it names {@link #MISSING_NAMES_SHOWN} and counts the rest.
      */
     @Nullable
     private static Preference missingDefaultsRow(Context context, Set<PatchFamily> build) {
@@ -493,6 +498,14 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         if (missing.isEmpty()) return null;
         List<String> names = new ArrayList<>();
         for (String name : missing) names.add(L10n.isolate(name));
+        // A build patched with a selection saved before 32 patches joined the default one lacks all
+        // of them, and the names ran on for a screen. Past a few the rest are a count: Manager's
+        // default selection brings them all, and the diagnostic report names every one.
+        if (names.size() > MISSING_NAMES_SHOWN + 1) {
+            int more = names.size() - MISSING_NAMES_SHOWN;
+            names = new ArrayList<>(names.subList(0, MISSING_NAMES_SHOWN));
+            names.add(L10n.f("%1$d more", more));
+        }
         String closed = L10n.t("Tap to see which.");
         String open = L10n.quantity(missing.size(),
                 "Not in this build: %1$s. Morphe Manager selects it by default. Patch again with it selected to "

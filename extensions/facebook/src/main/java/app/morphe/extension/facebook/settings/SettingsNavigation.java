@@ -290,6 +290,9 @@ final class SettingsNavigation extends BaseAdapter {
             for (Section section : sections) if (!section.primary) visible.add(section.link);
         } else {
             visible.add(screen.getPreference(0));
+            // Only after an update that turned switches off, until it's opened: its own line under the card.
+            Preference startsOff = screen.findPreference(StartsOffNote.KEY);
+            if (startsOff != null) visible.add(startsOff);
             // Only in a build that lacks Restore screens on a re-signed install: its own line under the card.
             Preference restore = screen.findPreference(HushfacebookPreferenceFragment.MISSING_RESTORE_TRUST);
             if (restore != null) visible.add(restore);

@@ -1268,3 +1268,15 @@ Share sheet items to hide	Beim Teilen ausgeblendete Einträge
 None. The share sheet shows everything Facebook offers.	Keine. Beim Teilen zeigt Facebook alles, was es anbietet.
 Hidden: %s	Ausgeblendet: %s
 Hide from the share sheet	Beim Teilen ausblenden
+# context: last item of the opened list of default patches a build lacks, after eight names; the count of patches not named, always 2 or more
+%1$d more	%1$d weitere
+# context: title of the one-time note under the status card after an update, one switch: a switch that started on in earlier versions starts off now
+%1$d switch starts off now	%1$d Schalter startet jetzt ausgeschaltet
+# context: title of that note when several switches start off now
+%1$d switches start off now	%1$d Schalter starten jetzt ausgeschaltet
+# context: summary of that note while its list of switch names is closed; a tap opens it
+After this update, a switch you had on may be off now. Tap to see which.	Nach diesem Update kann ein Schalter, den du an hattest, jetzt aus sein. Tippe, um zu sehen, welche.
+# context: that note's summary once opened, one switch; the placeholder is the switch's title as the settings show it
+Now off: %1$s. Turn it back on in its section if you want it. Tap again to hide this note.	Jetzt aus: %1$s. Schalte ihn in seinem Abschnitt wieder ein, wenn du ihn willst. Tippe noch einmal, um diesen Hinweis auszublenden.
+# context: that note's summary once opened, several switches; the placeholder is their titles joined as a list
+Now off: %1$s. Turn back on the ones you want in their sections. Tap again to hide this note.	Jetzt aus: %1$s. Schalte die, die du willst, in ihren Abschnitten wieder ein. Tippe noch einmal, um diesen Hinweis auszublenden.

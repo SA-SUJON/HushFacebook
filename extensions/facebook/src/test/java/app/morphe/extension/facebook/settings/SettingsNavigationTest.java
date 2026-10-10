@@ -38,6 +38,7 @@ import app.morphe.extension.facebook.misc.FacebookSignature;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.SettingsContextRule;
 import app.morphe.extension.shared.settings.BaseSettings;
+import app.morphe.extension.shared.settings.BooleanSetting;
 import app.morphe.extension.shared.settings.FailingStore;
 import app.morphe.extension.shared.settings.HushfacebookPause;
 import app.morphe.extension.shared.settings.PauseForTests;
@@ -750,6 +751,143 @@ public class SettingsNavigationTest {
         assertEquals(9, list().getCount());
         assertFalse(contains(HushfacebookPreferenceFragment.MISSING_RESTORE_TRUST));
         assertFalse(contains(HushfacebookPreferenceFragment.MISSING_DEFAULTS));
+    }
+
+    /**
+     * A build patched before 32 patches joined the default selection lacks them all, and the opened
+     * row named every one. Past nine it names eight and counts the rest, and nine are all named.
+     */
+    @Test public void aBuildLackingManyDefaultsNamesEightAndCountsTheRest() {
+        List<String> names = new ArrayList<>();
+        for (int lacking : new int[]{9, 10}) {
+            controller.close();
+            PatchFamily.inBuildForTests = EnumSet.allOf(PatchFamily.class);
+            PatchFamily.inBuildForTests.remove(PatchFamily.MATERIAL_YOU_THEME);
+            names.clear();
+            for (PatchFamily family : PatchFamily.values()) {
+                if (names.size() == lacking) break;
+                if (!PatchFamily.DEFAULT_SELECTION.contains(family) || family == PatchFamily.RESTORE_TRUST) continue;
+                PatchFamily.inBuildForTests.remove(family);
+                names.add(L10n.isolate(family.patchName));
+            }
+            controller = Robolectric.buildActivity(Activity.class).setup().visible();
+            dialog = SettingsL10nTest.show(controller.get());
+            page = page(dialog);
+
+            Preference row = (Preference) list().getItemAtPosition(position(HushfacebookPreferenceFragment.MISSING_DEFAULTS));
+            assertEquals(lacking + " default patches aren't in this build", String.valueOf(row.getTitle()));
+            tap(HushfacebookPreferenceFragment.MISSING_DEFAULTS);
+            List<String> shown = lacking == 9 ? names : new ArrayList<>(names.subList(0, 8));
+            if (lacking == 10) shown.add("2 more");
+            assertEquals("Not in this build: " + L10n.join(shown) + ". Morphe Manager selects them by default. Patch "
+                    + "again with them selected to get what they do.", String.valueOf(row.getSummary()));
+        }
+    }
+
+    /**
+     * After an update from a build made before 32 patches joined the default selection, a note
+     * right under the card names the switches that start off now and that nobody set: one turned
+     * back on isn't named, and nor is one stored off, which someone chose. A tap opens the names
+     * and the note is read, a second tap takes it off the page, and it doesn't come back.
+     */
+    @Test public void anUpdateShowsWhichSwitchesStartOffNowOnce() {
+        forgetStartedOn();
+        Settings.TAP_TO_PLAY.save(true);
+        // Off and stored, the way a build before stored a switch someone turned off.
+        assertTrue(Setting.preferences.preferences.edit().putBoolean(Settings.HIDE_REELS_TAB.key, false).commit());
+        StartsOffNote.Stored.STATE.save(StartsOffNote.SHOW);
+        try {
+            recreate();
+            assertEquals(1, position(StartsOffNote.KEY));
+            Preference note = (Preference) list().getItemAtPosition(1);
+            assertEquals("28 switches start off now", String.valueOf(note.getTitle()));
+            assertEquals("After this update, a switch you had on may be off now. Tap to see which.",
+                    String.valueOf(note.getSummary()));
+
+            tap(StartsOffNote.KEY);
+            List<String> names = new ArrayList<>();
+            for (BooleanSetting setting : StartsOffNote.startedOn()) {
+                if (setting != Settings.TAP_TO_PLAY && setting != Settings.HIDE_REELS_TAB) {
+                    names.add(SwitchLabels.title(setting));
+                }
+            }
+            assertEquals(28, names.size());
+            assertEquals("Now off: " + L10n.join(names) + ". Turn back on the ones you want in their sections. Tap again "
+                    + "to hide this note.", String.valueOf(note.getSummary()));
+            assertTrue(String.valueOf(note.getSummary()).contains("Hide Reels in the feed"));
+            assertFalse(String.valueOf(note.getSummary()).contains("Tap to play"));
+            assertFalse(String.valueOf(note.getSummary()).contains("Hide the Reels tab"));
+            assertEquals(StartsOffNote.DONE, (int) StartsOffNote.Stored.STATE.savedValue());
+            assertFalse("the note changed a switch", Settings.HIDE_FEED_REELS.savedValue());
+
+            tap(StartsOffNote.KEY);
+            assertFalse("a second tap left the note", contains(StartsOffNote.KEY));
+            assertNull(page.findPreference(StartsOffNote.KEY));
+            recreate();
+            assertFalse("the note came back", contains(StartsOffNote.KEY));
+
+            // Owed but with nothing left to name, as when the build has none of those patches, there's no note.
+            StartsOffNote.Stored.STATE.save(StartsOffNote.SHOW);
+            controller.close();
+            PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS, PatchFamily.REELS_TAB);
+            controller = Robolectric.buildActivity(Activity.class).setup().visible();
+            dialog = SettingsL10nTest.show(controller.get());
+            page = page(dialog);
+            assertFalse(contains(StartsOffNote.KEY));
+        } finally {
+            StartsOffNote.Stored.STATE.resetToDefault();
+            forgetStartedOn();
+        }
+    }
+
+    /** Every switch the note can name, back to its default and out of the store. */
+    private static void forgetStartedOn() {
+        for (BooleanSetting setting : StartsOffNote.startedOn()) {
+            setting.resetToDefault();
+            assertTrue(Setting.preferences.preferences.edit().remove(setting.key).commit());
+        }
+    }
+
+    /**
+     * Owed only to an install an earlier build ran on: Hushfacebook first started before the APK
+     * running now went in. Decided at the first start and never again, so a fresh install of this
+     * build that later updates never sees it.
+     */
+    @Test public void theNoteIsOwedOnlyWhenAnEarlierBuildRanHere() {
+        Context app = RuntimeEnvironment.getApplication();
+        long firstStart = BaseSettings.FIRST_TIME_APP_LAUNCHED.savedValue();
+        try {
+            StartsOffNote.Stored.STATE.resetToDefault();
+            BaseSettings.FIRST_TIME_APP_LAUNCHED.save(1_000L);
+            StartsOffNote.installedAtForTests = 2_000L;
+            StartsOffNote.onFacebookStart(app);
+            assertEquals(StartsOffNote.SHOW, (int) StartsOffNote.Stored.STATE.savedValue());
+
+            // Read, it stays read through a later update.
+            StartsOffNote.Stored.STATE.save(StartsOffNote.DONE);
+            StartsOffNote.installedAtForTests = 3_000L;
+            StartsOffNote.onFacebookStart(app);
+            assertEquals(StartsOffNote.DONE, (int) StartsOffNote.Stored.STATE.savedValue());
+
+            // A fresh install's first start comes after its APK went in.
+            StartsOffNote.Stored.STATE.resetToDefault();
+            StartsOffNote.installedAtForTests = 500L;
+            StartsOffNote.onFacebookStart(app);
+            assertEquals(StartsOffNote.DONE, (int) StartsOffNote.Stored.STATE.savedValue());
+            // And a later update finds it decided.
+            StartsOffNote.installedAtForTests = 5_000L;
+            StartsOffNote.onFacebookStart(app);
+            assertEquals(StartsOffNote.DONE, (int) StartsOffNote.Stored.STATE.savedValue());
+
+            assertFalse("no first start known", StartsOffNote.updated(-1, 2_000L));
+            assertFalse("no install time known", StartsOffNote.updated(1_000L, 0));
+            assertFalse(StartsOffNote.updated(2_000L, 2_000L));
+            assertTrue(StartsOffNote.updated(1_999L, 2_000L));
+        } finally {
+            StartsOffNote.installedAtForTests = null;
+            StartsOffNote.Stored.STATE.resetToDefault();
+            BaseSettings.FIRST_TIME_APP_LAUNCHED.save(firstStart);
+        }
     }
 
     /** Without its patch a line names the patch to add, can't be tapped and says nothing is installed. */

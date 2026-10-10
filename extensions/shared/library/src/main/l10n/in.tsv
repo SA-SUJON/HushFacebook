@@ -1268,3 +1268,15 @@ Share sheet items to hide	Item yang disembunyikan saat berbagi
 None. The share sheet shows everything Facebook offers.	Tidak ada. Menu berbagi menampilkan semua yang ditawarkan Facebook.
 Hidden: %s	Disembunyikan: %s
 Hide from the share sheet	Sembunyikan dari menu berbagi
+# context: last item of the opened list of default patches a build lacks, after eight names; the count of patches not named, always 2 or more
+%1$d more	%1$d lainnya
+# context: title of the one-time note under the status card after an update, one switch: a switch that started on in earlier versions starts off now
+%1$d switch starts off now	%1$d sakelar kini mulai dalam keadaan mati
+# context: title of that note when several switches start off now
+%1$d switches start off now	%1$d sakelar kini mulai dalam keadaan mati
+# context: summary of that note while its list of switch names is closed; a tap opens it
+After this update, a switch you had on may be off now. Tap to see which.	Setelah pembaruan ini, sakelar yang tadinya kamu nyalakan mungkin kini mati. Ketuk untuk melihat yang mana.
+# context: that note's summary once opened, one switch; the placeholder is the switch's title as the settings show it
+Now off: %1$s. Turn it back on in its section if you want it. Tap again to hide this note.	Kini mati: %1$s. Nyalakan lagi di bagiannya jika kamu mau. Ketuk lagi untuk menyembunyikan catatan ini.
+# context: that note's summary once opened, several switches; the placeholder is their titles joined as a list
+Now off: %1$s. Turn back on the ones you want in their sections. Tap again to hide this note.	Kini mati: %1$s. Nyalakan lagi yang kamu mau di bagiannya masing-masing. Ketuk lagi untuk menyembunyikan catatan ini.

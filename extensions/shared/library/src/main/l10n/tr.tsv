@@ -1268,3 +1268,15 @@ Share sheet items to hide	Paylaşırken gizlenecek öğeler
 None. The share sheet shows everything Facebook offers.	Hiçbiri. Paylaşım menüsü Facebook'un sunduğu her şeyi gösterir.
 Hidden: %s	Gizlenenler: %s
 Hide from the share sheet	Paylaşım menüsünden gizle
+# context: last item of the opened list of default patches a build lacks, after eight names; the count of patches not named, always 2 or more
+%1$d more	%1$d tane daha
+# context: title of the one-time note under the status card after an update, one switch: a switch that started on in earlier versions starts off now
+%1$d switch starts off now	%1$d anahtar artık kapalı başlıyor
+# context: title of that note when several switches start off now
+%1$d switches start off now	%1$d anahtar artık kapalı başlıyor
+# context: summary of that note while its list of switch names is closed; a tap opens it
+After this update, a switch you had on may be off now. Tap to see which.	Bu güncellemeden sonra açık tuttuğun bir anahtar artık kapalı olabilir. Hangileri olduğunu görmek için dokun.
+# context: that note's summary once opened, one switch; the placeholder is the switch's title as the settings show it
+Now off: %1$s. Turn it back on in its section if you want it. Tap again to hide this note.	Artık kapalı: %1$s. İstersen bölümünden yeniden aç. Bu notu gizlemek için yeniden dokun.
+# context: that note's summary once opened, several switches; the placeholder is their titles joined as a list
+Now off: %1$s. Turn back on the ones you want in their sections. Tap again to hide this note.	Artık kapalı: %1$s. İstediklerini bölümlerinden yeniden aç. Bu notu gizlemek için yeniden dokun.
