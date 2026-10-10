@@ -147,12 +147,13 @@
     {
       "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/LinkCleaner.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/misc/OwnPostLink.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/misc/sharelinks/**"
       ],
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
       "license": "GPL-3.0-only",
-      "changes": "Written for Hushfacebook: the tracking keys Facebook adds to shared and opened links, taken out offline with everything else in the link left as written, and the hooks on the methods of Facebook 577 and 580 that add them."
+      "changes": "Written for Hushfacebook: the tracking keys Facebook adds to shared and opened links, taken out offline with everything else in the link left as written, and the hooks on the methods of Facebook 577 and 580 that add them. Also a switch that hands out a shared post's own address in place of the facebook.com/share/ link Facebook keeps for it, hooked where Facebook 581 builds a post's share link from that cache."
     },
     {
       "paths": [

@@ -1332,3 +1332,7 @@ Its switch is %1$s, in %2$s.	Der Schalter dafür ist %1$s, unter %2$s.
 Hide group buttons in the share sheet	Gruppen-Buttons beim Teilen ausblenden
 # context: that switch's summary. Send to group and Send separately are the buttons Facebook's share sheet shows when two or more people are picked
 Takes away Send to group when you pick two or more people, and the share sheet's own ways to start a new group, so nothing you share makes a group chat by accident. Send separately stays.	Entfernt „An Gruppe senden“, wenn du zwei oder mehr Personen auswählst, und die Möglichkeiten, beim Teilen eine neue Gruppe zu starten, damit beim Teilen nicht aus Versehen ein Gruppenchat entsteht. „Einzeln senden“ bleibt.
+# context: switch title under Links in Hushfacebook settings, right after Remove tracking from shared links
+Share the post's own link	Eigenen Link des Beitrags teilen
+# context: that switch's summary. Copy link is the share sheet item of that name; facebook.com/share/ is a web address and stays as written
+Copy link and the share sheet's other link shares give the post's own facebook.com address instead of a facebook.com/share/ link made for that one share.	„Link kopieren“ und die anderen Wege, beim Teilen einen Link zu senden, geben die eigene facebook.com-Adresse des Beitrags statt eines facebook.com/share/-Links, der nur für dieses eine Teilen erstellt wird.

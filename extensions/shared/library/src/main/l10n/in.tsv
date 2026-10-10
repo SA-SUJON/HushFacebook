@@ -1332,3 +1332,7 @@ Its switch is %1$s, in %2$s.	Sakelarnya %1$s, di %2$s.
 Hide group buttons in the share sheet	Sembunyikan tombol grup saat berbagi
 # context: that switch's summary. Send to group and Send separately are the buttons Facebook's share sheet shows when two or more people are picked
 Takes away Send to group when you pick two or more people, and the share sheet's own ways to start a new group, so nothing you share makes a group chat by accident. Send separately stays.	Menghapus “Kirim ke grup” saat Anda memilih dua orang atau lebih, beserta cara membuat grup baru saat berbagi, agar tidak ada yang Anda bagikan membuat obrolan grup tanpa sengaja. “Kirim terpisah” tetap ada.
+# context: switch title under Links in Hushfacebook settings, right after Remove tracking from shared links
+Share the post's own link	Bagikan tautan asli postingan
+# context: that switch's summary. Copy link is the share sheet item of that name; facebook.com/share/ is a web address and stays as written
+Copy link and the share sheet's other link shares give the post's own facebook.com address instead of a facebook.com/share/ link made for that one share.	“Salin tautan” dan cara lain untuk membagikan tautan memberikan alamat facebook.com asli postingan, bukan tautan facebook.com/share/ yang dibuat khusus untuk satu kali berbagi itu.

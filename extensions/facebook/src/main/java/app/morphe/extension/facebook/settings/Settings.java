@@ -663,6 +663,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_sanitize_sharing_links", TRUE);
 
     /**
+     * A shared post's link is its own address, not the facebook.com/share/ link Facebook makes for
+     * each share (#98). Copy link and the share sheet's other link shares take theirs from the
+     * same place.
+     */
+    public static final BooleanSetting SHARE_POST_OWN_LINK =
+            new BooleanSetting("hushfacebook_share_post_own_link", FALSE);
+
+    /**
      * Facebook's own update prompts, which a build signed with the patcher's key can't act on:
      * the Meta App Manager promotions, the push that has the manager look for an update, and the
      * chat promotions aimed at versions below a ceiling.

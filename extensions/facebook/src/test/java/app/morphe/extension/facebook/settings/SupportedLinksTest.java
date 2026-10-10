@@ -93,6 +93,7 @@ public class SupportedLinksTest {
         ScreenColors.shown = null;
         Settings.OPEN_LINKS_EXTERNALLY.resetToDefault();
         Settings.SANITIZE_SHARING_LINKS.resetToDefault();
+        Settings.SHARE_POST_OWN_LINK.resetToDefault();
     }
 
     private static Map<String, Integer> hosts(int facebook, int mobile) {
@@ -353,16 +354,18 @@ public class SupportedLinksTest {
     }
 
     /**
-     * The row sits under the two link switches and changes neither: selecting addresses in Android
-     * decides which app gets a link, and the switches decide what Facebook does with one.
+     * The row sits under the three link switches and changes none of them: selecting addresses in
+     * Android decides which app gets a link, and the switches decide what Facebook does with one.
      */
     @Test
     public void theLinkSwitchesStayAsTheyAre() throws Exception {
         PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.EXTERNAL_BROWSER, PatchFamily.SANITIZE_SHARING_LINKS);
         boolean external = !Settings.OPEN_LINKS_EXTERNALLY.defaultValue;
         boolean sanitize = !Settings.SANITIZE_SHARING_LINKS.defaultValue;
+        boolean ownLink = !Settings.SHARE_POST_OWN_LINK.defaultValue;
         Settings.OPEN_LINKS_EXTERNALLY.save(external);
         Settings.SANITIZE_SHARING_LINKS.save(sanitize);
+        Settings.SHARE_POST_OWN_LINK.save(ownLink);
         answer = state(true, hosts(NONE, NONE));
         HushfacebookPreferenceFragment page = show(true);
         Preference row = page.findPreference(KEY);
@@ -370,10 +373,12 @@ public class SupportedLinksTest {
         assertEquals("Links", String.valueOf(links.getTitle()));
         assertEquals(Settings.OPEN_LINKS_EXTERNALLY.key, links.getPreference(0).getKey());
         assertEquals(Settings.SANITIZE_SHARING_LINKS.key, links.getPreference(1).getKey());
-        assertEquals(row, links.getPreference(2));
+        assertEquals(Settings.SHARE_POST_OWN_LINK.key, links.getPreference(2).getKey());
+        assertEquals(row, links.getPreference(3));
         assertTrue(row.getOnPreferenceClickListener().onPreferenceClick(row));
         assertEquals(external, Settings.OPEN_LINKS_EXTERNALLY.get());
         assertEquals(sanitize, Settings.SANITIZE_SHARING_LINKS.get());
+        assertEquals(ownLink, Settings.SHARE_POST_OWN_LINK.get());
     }
 
     /**

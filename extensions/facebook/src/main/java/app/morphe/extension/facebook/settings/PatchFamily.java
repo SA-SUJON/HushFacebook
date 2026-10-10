@@ -137,7 +137,7 @@ public enum PatchFamily {
     EXTERNAL_BROWSER(FamilyNames.EXTERNAL_BROWSER, "externalBrowser", null,
             Settings.OPEN_LINKS_EXTERNALLY),
     SANITIZE_SHARING_LINKS(FamilyNames.SANITIZE_SHARING_LINKS, "sanitizeSharingLinks", null,
-            Settings.SANITIZE_SHARING_LINKS),
+            Settings.SANITIZE_SHARING_LINKS, Settings.SHARE_POST_OWN_LINK),
     UPDATE_PROMPTS(FamilyNames.UPDATE_PROMPTS, "updatePrompts", null,
             Settings.STOP_UPDATE_PROMPTS),
     STORY_DOWNLOAD(FamilyNames.STORY_DOWNLOAD, "storyDownload", null,

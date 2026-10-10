@@ -273,6 +273,9 @@ final class AppPages {
             links.addPreference(toggle(context, Settings.SANITIZE_SHARING_LINKS,
                     L10n.t("Removes tracking tags like mibextid from links you share or copy. A facebook.com/share/ link is "
                             + "unique to each share, so Facebook can still trace it.")));
+            links.addPreference(toggle(context, Settings.SHARE_POST_OWN_LINK,
+                    L10n.t("Copy link and the share sheet's other link shares give the post's own facebook.com address "
+                            + "instead of a facebook.com/share/ link made for that one share.")));
         }
         if (build.contains(PatchFamily.SHARE_SHEET_ITEMS)) {
             links.addPreference(shareItemsRow(context));

@@ -99,6 +99,7 @@ import app.morphe.extension.facebook.misc.ScreenTransitionsForTests;
 import app.morphe.extension.facebook.misc.Screenshots;
 import app.morphe.extension.facebook.misc.ExternalBrowser;
 import app.morphe.extension.facebook.misc.LinkCleaner;
+import app.morphe.extension.facebook.misc.OwnPostLink;
 import app.morphe.extension.facebook.misc.ShareSheetGroups;
 import app.morphe.extension.facebook.navigation.BottomTabBar;
 import app.morphe.extension.facebook.navigation.TabBarScrollAway;
@@ -678,10 +679,14 @@ public class PausedHooksTest {
                 NotificationKindsForTests::blocksEventInvite,
                 NotificationKindsForTests::blocksLiveVideo,
                 NotificationKindsForTests::blocksReaction));
-        // A shared link loses what the app added to it.
-        probes.put(PatchFamily.SANITIZE_SHARING_LINKS, Collections.singletonList(() -> {
+        // A shared link loses what the app added to it, and a post's /share/ link gives way to
+        // its own address.
+        probes.put(PatchFamily.SANITIZE_SHARING_LINKS, Arrays.asList(() -> {
             String shared = "https://www.facebook.com/share/p/1AbCdEf/?mibextid=WC7FNe";
             return !shared.equals(LinkCleaner.sanitizeShared(shared));
+        }, () -> {
+            String own = "https://www.facebook.com/story.php?story_fbid=1&id=2";
+            return own.equals(OwnPostLink.shareLink("https://www.facebook.com/share/p/1AbCdEf/", own));
         }));
         // Both Meta App Manager promotion filters fail, the force-sync push is skipped, and the
         // chat filter that targets older versions fails.
