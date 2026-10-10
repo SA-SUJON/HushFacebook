@@ -49,7 +49,7 @@ val holdAnalyticsUploadsPatch = bytecodePatch(
             superclassChain(PAPAYA_SERVICE).mapNotNull { classDefByOrNull(it) }
                 .flatMap { it.methods.filter(::isJobStart) }.take(1).toList(),
         )
-        val gate = jobStart?.let(::papayaGate)
+        val gate = jobStart?.let { papayaGate(it) { type -> classDefByOrNull(type) } }
         if (jobStart != null && gate == null) missing += "the Papaya gate in ${jobStart.definingClass}->onStartJob"
         val kickOff = one(
             "XAnalytics' foreground upload",

@@ -8,6 +8,13 @@
       "license": "GPL-3.0-only"
     },
     {
+      "paths": ["patches/src/main/kotlin/app/morphe/patches/facebook/shared/MobileConfigReads.kt"],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook from Facebook 582: one check for each way a build reads a MobileConfig flag (straight from the config, through a static helper, or through a helper that casts its argument to the config first), shared by the patches that hook a flag read."
+    },
+    {
       "paths": [
         "extensions/shared/**",
         "patches/src/main/kotlin/app/morphe/util/**",

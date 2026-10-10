@@ -10,6 +10,7 @@ import app.morphe.PatchContexts
 import app.morphe.patches.facebook.comments.summaries.descriptor
 import app.morphe.patches.facebook.feed.FixtureDex
 import app.morphe.patches.facebook.feed.methodsHolding
+import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.misc.extension.SETTINGS_STATUS
 import app.morphe.patches.facebook.misc.sharesheet.shareSheetHookPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -110,8 +111,16 @@ class HideMetaUpsellsFixtureTest {
                 }
                 assertTrue("$name: no screen reads the Edits flags",
                     flagReaders.any { !it.definingClass.startsWith(LANDING_CONFIG.removeSuffix(";")) })
+                // 582's feed query asks a string table for the name, and the table holds it like any other holder.
                 val pillClasses = FixtureDex.classesHolding(bundle, EDITS_PILL_PARAMETER)
-                val gates = pillClasses.flatMap { classDef -> classDef.methods.map { it to editsPillGates(it) } }.filter { it.second.isNotEmpty() }
+                val tables = pillClasses.associateBy { it.type }
+                val table: (MethodReference) -> Method? = { call -> tables[call.definingClass]?.let { resolveStatic(it, call) } }
+                val tableCallers = FixtureDex.methodsWhere(bundle, { dex -> dex.methodSection.any { it.definingClass in tables } }) {
+                    editsPillGates(it, table).isNotEmpty()
+                }
+                val gates = (pillClasses.flatMap { it.methods } + tableCallers)
+                    .distinctBy { "${it.definingClass}->${it.name}${it.parameterTypes}${it.returnType}" }
+                    .map { it to editsPillGates(it, table) }.filter { it.second.isNotEmpty() }
                 assertTrue("$name: the feed's query sets the Edits pill from no gate", gates.any { (_, found) -> found.any { !it.boxed } })
 
                 // Threads: one capability names itself, with one should-show answer.
@@ -175,7 +184,8 @@ class HideMetaUpsellsFixtureTest {
                 assertTrue("$name: $IMMUTABLE_LIST has no copyOf(Collection)", definesImmutableCopy(immutableList))
 
                 val readerClasses = FixtureDex.classes(bundle,
-                    (flagReaders + labelAskers + imagineAskers + storyBuilders + shareLists).map { it.definingClass }.toSet())
+                    (flagReaders + labelAskers + imagineAskers + storyBuilders + shareLists + gates.map { it.first })
+                        .map { it.definingClass }.toSet())
                 val pool = (kept.values + readerClasses.values + pillClasses + capabilities + components +
                     ctaTableHolders + ctaSocketHolders + listOfNotNull(calledClasses[ctaCheck.definingClass]) +
                     composerEnums + storyEnums + shareEnums + immutableList +
