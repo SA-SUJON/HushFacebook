@@ -22,7 +22,7 @@ import org.junit.Test
 
 /**
  * What each declared Facebook build lacks of the four target lists, which is exactly what the patch
- * log names when it's patched: 581 lacks six suggested feed units older builds carried, and has
+ * log names when it's patched: 582 lacks six suggested feed units older builds carried, and has
  * every ad prefetch scheduler, ad telemetry class and Audience Network component.
  * A new fixture that changes any of it fails here, naming the target, before a release says
  * something about it that isn't so.
