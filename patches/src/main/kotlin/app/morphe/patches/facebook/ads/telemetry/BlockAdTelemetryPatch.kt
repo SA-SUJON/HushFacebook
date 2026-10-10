@@ -12,12 +12,15 @@ import app.morphe.patches.shared.compat.AppCompatibilities
 import app.morphe.patches.facebook.misc.extension.facebookExtensionPatch
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.extension.handleTargets
+import app.morphe.patches.facebook.misc.extension.localRegisterCount
 import app.morphe.patches.facebook.misc.extension.patchLog
 import app.morphe.patcher.StringComparisonType
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.util.findMutableMethodOf
 import app.morphe.util.returnEarly
 import com.android.tools.smali.dexlib2.iface.Method
 
@@ -51,14 +54,42 @@ internal val AD_ID_JOBS = listOf(
 /**
  * Strings that each mark the one void method sending an identifier, which returns at once: the
  * advertising ID to Facebook as a GraphQL mutation, the advertising ID, App Manager id and device
- * id in a launch event, and an ad view or click registered with Android's attribution. The method
+ * id in a launch event, an ad view or click registered with Android's attribution, and the
+ * advertising ID with the preinstall metadata in the first login screen's install event. The method
  * names are Redex's, so the strings find them.
  */
 internal val AD_ID_SENDERS = listOf(
     "ReportAdvertiserIDMutation",
     "fb4a_launch_custom_data",
     "https://www.facebook.com/privacy_sandbox/mobile/register/source?tracking_data=",
+    "app_new_install",
 )
+
+/**
+ * The content provider other apps on the phone ask for the advertising ID (a kept name). Its query
+ * logs the asking app's package as an inferred app launch, then answers with the ID, its limit
+ * tracking flag and the Android ID. When Google Play services has no ID, Facebook answers one row
+ * of nulls, which is what the query answers at once instead.
+ */
+internal const val ATTRIBUTION_PROVIDER = "Lcom/facebook/katana/provider/AttributionIdProvider\$Impl;"
+
+private val QUERY_PARAMETERS =
+    listOf("Landroid/net/Uri;", "[Ljava/lang/String;", "Ljava/lang/String;", "[Ljava/lang/String;", "Ljava/lang/String;")
+
+private const val NO_AD_ID_ROW = """
+    const-string v0, "aid"
+    const-string v1, "androidid"
+    const-string v2, "limit_tracking"
+    filled-new-array { v0, v1, v2 }, [Ljava/lang/String;
+    move-result-object v0
+    new-instance v1, Landroid/database/MatrixCursor;
+    invoke-direct { v1, v0 }, Landroid/database/MatrixCursor;-><init>([Ljava/lang/String;)V
+    const/4 v0, 0x0
+    filled-new-array { v0, v0, v0 }, [Ljava/lang/String;
+    move-result-object v0
+    invoke-virtual { v1, v0 }, Landroid/database/MatrixCursor;->addRow([Ljava/lang/Object;)V
+    return-object v1
+"""
 
 @Suppress("unused")
 val blockAdTelemetryPatch = bytecodePatch(
@@ -90,6 +121,7 @@ val blockAdTelemetryPatch = bytecodePatch(
         // classes above, so a missing one is an info line rather than a warning.
         AD_ID_JOBS.forEach { type -> neuterOrReason(type)?.let { patchLog.info("$PATCH: $it.") } }
         AD_ID_SENDERS.forEach { marker -> stopSenderOrReason(marker)?.let { patchLog.info("$PATCH: $it.") } }
+        answerNoAdIdOrReason()?.let { patchLog.info("$PATCH: $it.") }
 
         enableStatus("adTelemetry")
     }
@@ -111,5 +143,20 @@ internal fun BytecodePatchContext.stopSenderOrReason(marker: String): String? {
     }
     mutable.singleOrNull()?.returnEarly()
         ?: return "${sender.definingClass}->${sender.name} matched ${mutable.size} methods to change, so that send keeps running"
+    return null
+}
+
+/** Whether [method] has ContentProvider.query's five-argument shape and a body. */
+internal fun isProviderQuery(method: Method) = method.returnType == "Landroid/database/Cursor;" &&
+    method.parameterTypes.map(Any::toString) == QUERY_PARAMETERS && method.implementation != null
+
+/** Null once the attribution provider's query answers the no-ID row at once, or why nothing changed. */
+internal fun BytecodePatchContext.answerNoAdIdOrReason(): String? {
+    val queries = classDefByOrNull(ATTRIBUTION_PROVIDER)?.methods?.filter(::isProviderQuery)
+        ?: return "this build has no $ATTRIBUTION_PROVIDER, so other apps can still ask it for the advertising ID"
+    val query = queries.singleOrNull()
+        ?: return "$ATTRIBUTION_PROVIDER has ${queries.size} query methods, expected 1, so other apps can still ask it for the advertising ID"
+    if (query.localRegisterCount() < 3) return "$ATTRIBUTION_PROVIDER->${query.name} has under 3 locals, so other apps can still ask it for the advertising ID"
+    mutableClassDefBy(ATTRIBUTION_PROVIDER).findMutableMethodOf(query).addInstructions(0, NO_AD_ID_ROW)
     return null
 }
