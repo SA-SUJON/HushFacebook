@@ -14,6 +14,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.media.resume.TRACK_START
 import app.morphe.patches.facebook.media.resume.VIDEO_PLAYER_PARAMS
 import app.morphe.patches.facebook.media.resume.paramsGetters
@@ -36,6 +37,7 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 internal const val PATCH = "Keep the reel speed"
 
@@ -279,7 +281,8 @@ private fun BytecodePatchContext.lowerSpeedFloor() {
     val floors = speedFloors(method)
     val floor = floors.singleOrNull()
         ?: refuse("expected ${method.definingClass}->${method.name} to load ${HERO_FLOOR}f once, found ${floors.size}")
-    if (!callsFloatMax(method)) refuse("${method.definingClass}->${method.name} keeps no speed over a floor")
+    val helpers = { call: MethodReference -> classDefByOrNull(call.definingClass)?.let { resolveStatic(it, call) } }
+    if (!callsFloatMax(method, helpers)) refuse("${method.definingClass}->${method.name} keeps no speed over a floor")
     val register = (method.implementation!!.instructions.elementAt(floor) as OneRegisterInstruction).registerA
     mutableClassDefBy(method.definingClass).findMutableMethodOf(method)
         .replaceInstruction(floor, "const v$register, 0x${SLOWEST.toRawBits().toString(16)}")
