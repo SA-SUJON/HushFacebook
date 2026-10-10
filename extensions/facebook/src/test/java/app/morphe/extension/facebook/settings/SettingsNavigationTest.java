@@ -825,13 +825,20 @@ public class SettingsNavigationTest {
      * and the note is read, a second tap takes it off the page, and it doesn't come back.
      */
     @Test public void anUpdateShowsWhichSwitchesStartOffNowOnce() {
+        // The open page drops a stored value that equals its default, which would undo the
+        // stored-off switch below, so it's written with no page listening.
+        controller.close();
+        ShadowLooper.idleMainLooper();
         forgetStartedOn();
         Settings.TAP_TO_PLAY.save(true);
         // Off and stored, the way a build before stored a switch someone turned off.
         assertTrue(Setting.preferences.preferences.edit().putBoolean(Settings.HIDE_REELS_TAB.key, false).commit());
         StartsOffNote.Stored.STATE.save(StartsOffNote.SHOW);
         try {
-            recreate();
+            controller = Robolectric.buildActivity(Activity.class).setup().visible();
+            dialog = SettingsL10nTest.show(controller.get());
+            page = page(dialog);
+            assertTrue("the stored-off switch was dropped", Setting.preferences.preferences.contains(Settings.HIDE_REELS_TAB.key));
             assertEquals(1, position(StartsOffNote.KEY));
             Preference note = (Preference) list().getItemAtPosition(1);
             assertEquals("28 switches start off now", String.valueOf(note.getTitle()));
