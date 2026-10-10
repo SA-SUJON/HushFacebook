@@ -20,6 +20,7 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+* **Facebook:** `Open on a chosen tab` set to Feeds opens the Feeds page over Home when your tab bar has no Feeds tab, on the filter **Feeds opens on** picks. Back goes to Home.
 * **Facebook:** `Open links in external browser` sends out links written in capitals, like a Page post's HTTPS://SHOP.EXAMPLE. Android reads the start of a link letter for letter, so your browser didn't recognize it, and the link opened in Facebook's own browser with a "No external browser took the link" message. Links that an app on your phone claims, a video site's for example, now reach that app even when they're written in capitals.
 * **Facebook:** **Offer to download copied links** saves reels and videos from copied share links again, the facebook.com/share/r/ and /share/v/ kind that Facebook's Copy link gives you. Facebook answered Android's own way of asking with a page instead of the video's address, so every share link said "Couldn't find the video in that link" and opened in Facebook.
 
