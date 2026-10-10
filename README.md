@@ -163,6 +163,8 @@ Morphe Manager's default selection has every patch but three: `AMOLED black them
 
 Nothing else needs Expert mode. The patches that used to be opt-in, like `Hide the Reels tab` and `Tap to play`, are in every build now with their switches off, so a fresh patch looks like the Facebook you know until you turn them on in Hushfacebook settings. In Manager's Expert mode the patches sit in groups named for what they touch, like Theme, Navigation, Playback and Privacy.
 
+If you patched in Expert mode before, Manager remembers the patches you picked back then, so the ones that are new to the default selection stay out. Tap **Enable recommended patches** on the patch list to get the default selection, then add back any extras you want, like a theme.
+
 Updating from v0.8.0 or older? If you'd picked one of those patches before and never changed its switch, the switch now starts off, so check it in Hushfacebook settings after you update. The [changelog](CHANGELOG.md) lists every switch this affects.
 
 Many patches go in with some or all of their switches off, and the table above says which. A few need more than the switch:

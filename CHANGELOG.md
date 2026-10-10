@@ -15,6 +15,7 @@ Every Hushfacebook release, newest first.
 
 ### Changed
 
+* **Facebook:** The README tells people who patched in Manager's Expert mode before how to pick up the patches that are new to the default selection, since Manager keeps an Expert selection as it was.
 * **Facebook:** Clearer wording in a few places. The Tab to open on summary names the switch you'd actually turn off (Hide the Friends tab) instead of the patch name. The save toast for a video WhatsApp may refuse says to open Downloads in Hushfacebook settings to fix it. One save toast got its missing period, and the Pause list spells "recolored" like the rest of the app.
 
 ## 0.9.0 (2026-10-10)
