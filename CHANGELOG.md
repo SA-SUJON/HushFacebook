@@ -6,7 +6,16 @@ Every Hushfacebook release, newest first.
 
 ### Fixed
 
+* **Facebook:** Open and Share on a finished save only answer their own buttons now. Another app on the phone could send Facebook the same request with a guessed file address and get it to open or share a video or photo Facebook had saved, with no tap from you.
+* **Facebook:** When a piece of Hushfacebook fails to load, Facebook keeps running. An error like that at app start or while opening a screen used to close Facebook every time, and pausing Hushfacebook didn't help.
+* **Facebook:** The **Share sheet items to hide** list closes with the settings page when you rotate the phone or Facebook closes the screen. It used to stay up over a window that was already gone, and it now follows the page's colors too.
+* **Facebook:** On a Facebook build that reads the loop setting in a way the reel hook can't use, the play reels once switch is refused while patching. Before, that build's reel player would fail to load.
+* **Accessibility:** The Lock Facebook cover tells a screen reader that Facebook is locked, marks its heading, and reads the reason line out when it changes.
 * **Tooling:** The release's index step now moves the Facebook build in the repository description along with the version and patch count. After the 582 port it had left the description on 581, and the release facts check refused the index push until it was set by hand.
+
+### Changed
+
+* **Facebook:** Clearer wording in a few places. The Tab to open on summary names the switch you'd actually turn off (Hide the Friends tab) instead of the patch name. The save toast for a video WhatsApp may refuse says to open Downloads in Hushfacebook settings to fix it. One save toast got its missing period, and the Pause list spells "recolored" like the rest of the app.
 
 ## 0.9.0 (2026-10-10)
 
