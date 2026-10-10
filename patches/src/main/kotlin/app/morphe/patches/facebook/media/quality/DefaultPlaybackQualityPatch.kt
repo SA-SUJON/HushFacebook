@@ -13,6 +13,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.holdsString
+import app.morphe.patches.facebook.feed.resolveStatic
 import app.morphe.patches.facebook.misc.extension.enableStatus
 import app.morphe.patches.facebook.misc.settings.settingsPatch
 import app.morphe.patches.shared.compat.AppCompatibilities
@@ -152,10 +153,11 @@ private fun BytecodePatchContext.findOriginAnchors(evaluator: ClassDef, construc
     val config = classDefByOrNull(ABR_CONFIGURATION) ?: refuse("this build has no $ABR_CONFIGURATION")
     val preferences = config.fields.singleOrNull { it.name == PLAYBACK_PREFERENCES && !AccessFlags.STATIC.isSet(it.accessFlags) }
         ?: refuse("$ABR_CONFIGURATION has no $PLAYBACK_PREFERENCES")
-    val origins = originReads(config, preferences.type, STORIES_ORIGIN)
+    val tables = { call: MethodReference -> classDefByOrNull(call.definingClass)?.let { resolveStatic(it, call) } }
+    val origins = originReads(config, preferences.type, STORIES_ORIGIN, tables)
     val origin = origins.singleOrNull()
         ?: refuse("expected one origin $ABR_CONFIGURATION compares with \"$STORIES_ORIGIN\", found ${origins.size}")
-    val subOrigins = originReads(config, preferences.type, REELS_SUB_ORIGIN)
+    val subOrigins = originReads(config, preferences.type, REELS_SUB_ORIGIN, tables)
     val subOrigin = subOrigins.singleOrNull()
         ?: refuse("expected one sub-origin $ABR_CONFIGURATION compares with \"$REELS_SUB_ORIGIN\", found ${subOrigins.size}")
     if (origin.name == subOrigin.name) refuse("the origin and the sub-origin are both ${origin.name}")
