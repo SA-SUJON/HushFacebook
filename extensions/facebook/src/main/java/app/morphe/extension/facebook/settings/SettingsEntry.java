@@ -129,7 +129,9 @@ public final class SettingsEntry {
             TextSize.application(context);
             // Only with the theme in the build, so its class and palette aren't loaded otherwise.
             if (SettingsStatus.materialYouTheme()) MaterialYouTheme.watchWindows(context);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
+            // Throwable, as in every hook: an Error here, from a class that fails to load or set
+            // itself up, would end Facebook at every start, paused or not.
             Logger.printException(() -> "Settings entry: could not watch activities", ex);
         }
         ReleaseCheck.onFacebookStart();
@@ -321,7 +323,7 @@ public final class SettingsEntry {
         try {
             SavedFileActions.receive(activity.getIntent());
             noteIntent(activity.getIntent());
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             Logger.printException(() -> "Settings entry: onActivityCreate failure", ex);
         }
     }
@@ -331,7 +333,7 @@ public final class SettingsEntry {
         try {
             SavedFileActions.receive(intent);
             noteIntent(intent);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             Logger.printException(() -> "Settings entry: onNewIntent failure", ex);
         }
     }

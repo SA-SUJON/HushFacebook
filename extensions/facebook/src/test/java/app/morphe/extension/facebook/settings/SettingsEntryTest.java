@@ -322,6 +322,48 @@ public class SettingsEntryTest {
         assertFalse(report, report.contains("FAKE LINE"));
     }
 
+    /**
+     * The settings patch puts three calls into Facebook's own frames: its application's start and
+     * every screen's onCreate and onNewIntent. An Error under them, from a Hushfacebook class that
+     * fails to load or set itself up, has to stop there as an exception does. Caught as an
+     * Exception only, it ended Facebook at every start or screen, and Pause couldn't help, since
+     * these calls run paused too.
+     */
+    @Test public void anErrorUnderTheStartAndScreenHooksStaysOutOfFacebook() throws Exception {
+        FailingApplication failing = new FailingApplication(RuntimeEnvironment.getApplication());
+        SettingsEntry.onApplicationCreate(failing);
+        app.morphe.extension.shared.Utils.awaitBackgroundTasksForTests();
+        assertTrue("the start never asked for the lifecycle watch, so nothing threw", failing.asked > 0);
+
+        int[] read = {0};
+        Intent broken = new Intent() {
+            @Override public String getAction() {
+                read[0]++;
+                throw new NoClassDefFoundError("a class missing from the build");
+            }
+        };
+        ActivityController<Activity> activity = Robolectric.buildActivity(Activity.class).create();
+        activity.get().setIntent(broken);
+        SettingsEntry.onActivityCreate(activity.get());
+        SettingsEntry.onNewIntent(activity.get(), broken);
+        org.junit.Assert.assertEquals("both screen hooks read the intent", 2, read[0]);
+    }
+
+    /** An application whose lifecycle watch can't be set up: asking throws an Error, not an exception. */
+    private static final class FailingApplication extends android.app.Application {
+        int asked;
+
+        FailingApplication(android.content.Context base) {
+            attachBaseContext(base);
+        }
+
+        @Override
+        public void registerActivityLifecycleCallbacks(ActivityLifecycleCallbacks callbacks) {
+            asked++;
+            throw new NoClassDefFoundError("a class missing from the build");
+        }
+    }
+
     private static List<String> titles(HushfacebookPreferenceFragment page) {
         ListView list = page.getView().findViewById(android.R.id.list);
         List<String> titles = new ArrayList<>();
