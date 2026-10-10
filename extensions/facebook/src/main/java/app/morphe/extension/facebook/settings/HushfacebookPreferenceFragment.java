@@ -1084,7 +1084,21 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setEntries(entries);
         row.setEntryValues(values);
         row.setValue(Settings.COMMENT_ORDER.savedValue().name());
+        pickTurnsOn(row, Settings.COMMENT_ORDER, Settings.DEFAULT_COMMENT_ORDER);
         return row;
+    }
+
+    /**
+     * A pick in [row] other than [list]'s default turns on [toggle], the switch the list works
+     * under. The switch starts off, so a pick on its own used to change nothing until the switch
+     * was found too. The switch's own row shows it on through the page's usual sync. Turning the
+     * switch off afterwards keeps the pick, and a pick while it's on changes only the list.
+     */
+    static void pickTurnsOn(ListPreference row, EnumSetting<?> list, BooleanSetting toggle) {
+        row.setOnPreferenceChangeListener((preference, value) -> {
+            if (!toggle.savedValue() && !list.defaultValue.name().equals(String.valueOf(value))) toggle.save(true);
+            return true;
+        });
     }
 
     /** What the list and its summary call [order]: the name Facebook's own sort menu gives it. */
@@ -1362,6 +1376,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setEntries(entries);
         row.setEntryValues(values);
         row.setValue(Settings.PLAYBACK_QUALITY.savedValue().name());
+        pickTurnsOn(row, Settings.PLAYBACK_QUALITY, Settings.DEFAULT_PLAYBACK_QUALITY);
         return row;
     }
 
@@ -1389,6 +1404,7 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
         row.setEntries(entries);
         row.setEntryValues(values);
         row.setValue(setting.savedValue().name());
+        pickTurnsOn(row, setting, Settings.DEFAULT_PLAYBACK_QUALITY);
         return row;
     }
 

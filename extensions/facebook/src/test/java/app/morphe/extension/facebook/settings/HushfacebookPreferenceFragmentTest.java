@@ -15,6 +15,7 @@ import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.SwitchPreference;
@@ -1212,6 +1213,73 @@ public class HushfacebookPreferenceFragmentTest {
                 assertFalse(Settings.DEFAULT_PLAYBACK_QUALITY.key.equals(row.getKey()));
             }
         }
+    }
+
+    /**
+     * Default comment order and Default playback quality start off, so a pick in one of their lists
+     * turns the switch on and its row shows it on. The list's default changes nothing and leaves
+     * the switch alone, a pick while it's on changes only the list, and turning the switch off
+     * keeps the pick.
+     */
+    @Test
+    public void aPickInAListTurnsItsSwitchOn() {
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.DEFAULT_COMMENT_ORDER, PatchFamily.PLAYBACK_QUALITY,
+                PatchFamily.SPONSORED_POSTS);
+        try (ActivityController<Activity> controller = Robolectric.buildActivity(Activity.class).setup()) {
+            HushfacebookPreferenceFragment page = new HushfacebookPreferenceFragment();
+            controller.get().getFragmentManager().beginTransaction().add(android.R.id.content, page).commitNow();
+            SwitchPreference orderSwitch = (SwitchPreference) page.findPreference(Settings.DEFAULT_COMMENT_ORDER.key);
+            ListPreference order = (ListPreference) page.findPreference(Settings.COMMENT_ORDER.key);
+            assertFalse(orderSwitch.isChecked());
+
+            pick(order, "FACEBOOK");
+            assertFalse("Facebook's choice turned the switch on", Settings.DEFAULT_COMMENT_ORDER.savedValue());
+            pick(order, "NEWEST");
+            assertEquals(CommentOrder.NEWEST, Settings.COMMENT_ORDER.savedValue());
+            assertTrue(Settings.DEFAULT_COMMENT_ORDER.savedValue());
+            assertTrue("the switch's row doesn't show it on", orderSwitch.isChecked());
+
+            // Off by its own row, the pick stays, and a pick with the switch on leaves it on.
+            orderSwitch.setChecked(false);
+            ShadowLooper.idleMainLooper();
+            assertFalse(Settings.DEFAULT_COMMENT_ORDER.savedValue());
+            assertEquals(CommentOrder.NEWEST, Settings.COMMENT_ORDER.savedValue());
+            orderSwitch.setChecked(true);
+            ShadowLooper.idleMainLooper();
+            pick(order, "ALL_COMMENTS");
+            assertEquals(CommentOrder.ALL_COMMENTS, Settings.COMMENT_ORDER.savedValue());
+            assertTrue(Settings.DEFAULT_COMMENT_ORDER.savedValue());
+
+            // The playback quality and its Reels and Stories lists work under one switch.
+            SwitchPreference qualitySwitch = (SwitchPreference) page.findPreference(Settings.DEFAULT_PLAYBACK_QUALITY.key);
+            ListPreference stories = (ListPreference) page.findPreference(Settings.STORIES_PLAYBACK_QUALITY.key);
+            pick(stories, "SAME");
+            assertFalse("Same as videos turned the switch on", Settings.DEFAULT_PLAYBACK_QUALITY.savedValue());
+            pick(stories, "HIGHEST");
+            assertEquals(SurfaceQuality.HIGHEST, Settings.STORIES_PLAYBACK_QUALITY.savedValue());
+            assertTrue(Settings.DEFAULT_PLAYBACK_QUALITY.savedValue());
+            assertTrue("the switch's row doesn't show it on", qualitySwitch.isChecked());
+            qualitySwitch.setChecked(false);
+            ShadowLooper.idleMainLooper();
+            ListPreference quality = (ListPreference) page.findPreference(Settings.PLAYBACK_QUALITY.key);
+            pick(quality, "P720");
+            assertEquals(PlaybackQuality.P720, Settings.PLAYBACK_QUALITY.savedValue());
+            assertTrue(qualitySwitch.isChecked());
+            assertEquals(SurfaceQuality.HIGHEST, Settings.STORIES_PLAYBACK_QUALITY.savedValue());
+        } finally {
+            Settings.DEFAULT_COMMENT_ORDER.resetToDefault();
+            Settings.COMMENT_ORDER.resetToDefault();
+            Settings.DEFAULT_PLAYBACK_QUALITY.resetToDefault();
+            Settings.PLAYBACK_QUALITY.resetToDefault();
+            Settings.STORIES_PLAYBACK_QUALITY.resetToDefault();
+        }
+    }
+
+    /** A pick the way a list's own dialog sends one: its change listener first, then the value if it agrees. */
+    private static void pick(ListPreference row, String value) {
+        Preference.OnPreferenceChangeListener listener = row.getOnPreferenceChangeListener();
+        if (listener == null || listener.onPreferenceChange(row, value)) row.setValue(value);
+        ShadowLooper.idleMainLooper();
     }
 
     /**
