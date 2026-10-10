@@ -40,10 +40,13 @@ class MenuSectionsFixtureTest {
     /**
      * The id of "%1$s, header. Section is %2$s. Double-tap to %3$s the section." in each build, the
      * label TalkBack reads on the Menu's group headers ("Upgrades, header. Section is expanded.").
-     * Read from assets/strings/default.frsc.xz, where Facebook keeps its English strings.
+     * Read from Facebook's English string pack. Up to 581 that's assets/strings/default.frsc.xz. 582
+     * ships it as default.frsc.spo (SuperPack, which nothing outside Facebook reads), and the app
+     * unpacks it on first launch into app_strings/uncompressed_default.frsc.xz, a plain FRSC table,
+     * where this id was read (stock 582 on an emulator, 2026-10-10).
      */
     private val headerLabel = mapOf(
-        "581.0.0.45.58" to 0x7f14044e,
+        "582.0.0.50.54" to 0x7f140452,
     )
 
     private val testKeys = listOf(UPGRADES_TEST_KEY, ALSO_FROM_META_TEST_KEY)
