@@ -736,6 +736,37 @@ public class MaterialYouThemeTest {
     }
 
     /**
+     * 582's comment rows (#37) load their background as a shape of #252728 through the rerouted
+     * getDrawable and draw it from a drawable of their own, which no view walk reaches. As it loads,
+     * the flat fill takes the palette in dark mode on its own copy of the state; light mode and a fill
+     * that changes when pressed keep Facebook's.
+     */
+    @Test
+    public void aCommentRowsShapeTakesThePaletteAsItLoads() {
+        GradientDrawable row = filled(0xFF252728);
+        Drawable sibling = row.getConstantState().newDrawable();
+
+        DarkMode.answer(true);
+        assertEquals("the same drawable", row, MaterialYouTheme.recolour(row));
+        assertEquals("the row", palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728), fill(row));
+        assertEquals("the resource's other drawables", 0xFF252728, fill(sibling));
+        LayerDrawable layered = new LayerDrawable(new Drawable[] {filled(0xFF252728)});
+        MaterialYouTheme.recolour(layered);
+        assertEquals("a layer", palette.sameLightness(TonePalette.NEUTRAL, 0xFF252728), fill(layered.getDrawable(0)));
+        GradientDrawable pressable = new GradientDrawable();
+        ColorStateList pressed = new ColorStateList(new int[][] {{android.R.attr.state_pressed}, {}},
+                new int[] {0xFF3B3C3E, 0xFF252728});
+        pressable.setColor(pressed);
+        MaterialYouTheme.recolour(pressable);
+        assertEquals("a fill that changes when pressed", pressed, pressable.getColor());
+
+        DarkMode.answer(false);
+        GradientDrawable light = filled(0xFF252728);
+        MaterialYouTheme.recolour(light);
+        assertEquals("light mode", 0xFF252728, fill(light));
+    }
+
+    /**
      * The comment sheet's rows (issue #37): code that resolves SURFACE_BACKGROUND into a TypedValue
      * and reads its data gets #252728 from the night item, which no colour call sees. A colour value
      * takes the palette in dark mode; a dimension, a flag or a reference keeps its bits, and so does

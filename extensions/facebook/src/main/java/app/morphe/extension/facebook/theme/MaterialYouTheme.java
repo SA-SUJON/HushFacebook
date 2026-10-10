@@ -334,7 +334,8 @@ public final class MaterialYouTheme {
      * #252728 (issue #37). Facebook keeps that colour only in its default configuration, and the
      * night style can't move a token some code reads as a plain colour when no system tone sits
      * close to it. A colour drawable of one of the {@link #SURFACES} takes the palette here, as a
-     * colour read with {@code getColor} does; any other drawable comes back as it was.
+     * colour read with {@code getColor} does, and so does a shape's flat fill ({@link #recolour});
+     * any other drawable comes back as it was.
      */
     public static Drawable getDrawable(Context context, int id) {
         return recolour(context.getDrawable(id));
@@ -371,11 +372,18 @@ public final class MaterialYouTheme {
 
     /**
      * The drawable with its colour from {@link #withoutToken}, on a copy of its state: drawables of
-     * one resource share it, and light mode reads the same resource.
+     * one resource share it, and light mode reads the same resource. A shape's flat fill, alone or as
+     * a layer, takes the palette as a sheet's does ({@link #recolourShapes}), without AMOLED: on 582
+     * each comment row loads a rectangle of SURFACE_BACKGROUND's #252728 this way, and a #313238 one
+     * for a pressed row, and keeps them inside a drawable of its own, where no view's background walk
+     * sees them (#37).
      */
     @Nullable
     static Drawable recolour(@Nullable Drawable drawable) {
-        if (!(drawable instanceof ColorDrawable)) return drawable;
+        if (!(drawable instanceof ColorDrawable)) {
+            if (!SettingsStatus.amoledTheme()) recolourShapes(drawable);
+            return drawable;
+        }
         ColorDrawable plain = (ColorDrawable) drawable;
         int color = plain.getColor();
         int themed = withoutToken(color);
