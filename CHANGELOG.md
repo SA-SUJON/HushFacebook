@@ -13,6 +13,7 @@ Every Hushfacebook release, newest first.
 * **Facebook:** After an update, the settings page names the switches that now start off, so you can turn back on the ones you used.
 * **Facebook:** Export settings now carries your Share sheet items picks, including item types this version doesn't name, and the import preview says how many it will hide.
 * **Facebook:** The settings home page ends with Support Hushfacebook, which opens the Ko-fi page in your browser.
+* **Facebook:** Privacy now ends with a map of where ads and tracking are blocked. Each line takes you to its switch, says it was set when you patched, or names the patch to add, and the blocks that cost something say what they cost.
 * **Tooling:** `scripts/phone-smoke.ps1` walks a patched Facebook on a phone through the feed, Watch, Reels, notifications and Marketplace, saves a full diagnostic report from Hushfacebook settings and pulls it. It fails when a hook family reports anything missing, ambiguous or thrown, when a family you name with `-ExpectInvoked` never ran, or when Facebook crashed during the walk. A crash the report kept from before the walk doesn't count. `scripts/test-phone-smoke.ps1` checks the report reading without a phone.
 
 ### Fixed

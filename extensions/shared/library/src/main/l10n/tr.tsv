@@ -1290,3 +1290,41 @@ Your list of share sheet items to hide will hold %1$d items.	Paylaşırken gizle
 Support Hushfacebook	Hushfacebook'u destekle
 # context: that row's summary; Ko-fi is a tipping site's name and stays as it is
 Buy me a coffee on Ko-fi	Ko-fi'de bana bir kahve ısmarla
+# context: heading row at the end of the Privacy settings page, above a list of the places Facebook shows ads or reports usage
+Where ads and tracking are blocked	Reklamların ve takibin engellendiği yerler
+# context: that heading's summary; build means this patched copy of Facebook, switch is a settings toggle
+The places Facebook shows ads or reports what you do, and what this build does about each. A line with a switch takes you to it.	Facebook'un reklam gösterdiği ya da ne yaptığınızı bildirdiği yerler ve bu sürümün her biri için yaptıkları. Anahtarı olan bir satır sizi o anahtara götürür.
+# context: a line of that list: ads between posts in the news feed
+Ads in the feed	Akıştaki reklamlar
+# context: a line of that list: ads among the posts on someone's profile
+Ads on profiles	Profillerdeki reklamlar
+# context: a line of that list: ads between stories
+Ads in Stories	Hikayelerdeki reklamlar
+# context: a line of that list: ads between and inside reels
+Ads in Reels	Reels videolarındaki reklamlar
+# context: a line of that list: ads among Facebook search results
+Ads in search results	Arama sonuçlarındaki reklamlar
+# context: a line of that list: sponsored listings in Marketplace, a product name
+Ads in Marketplace	Marketplace'teki reklamlar
+# context: a line of that list: ads inside Facebook's Instant Games, a product name
+Ads in Instant Games	Instant Games reklamları
+# context: a line of that list: ads Facebook downloads in the background before showing them
+Ads downloaded in advance	Önceden indirilen reklamlar
+# context: a line of that list: Facebook's reports used to target ads
+Ad tracking	Reklam takibi
+# context: a line of that list: ads Facebook serves inside other apps on the phone (Audience Network)
+Facebook's ads in other apps	Diğer uygulamalardaki Facebook reklamları
+# context: added to that line's summary: what blocking it does to those other apps; rewarded ads give a reward for watching
+Those apps show their own ads or none, and their rewarded ads may fail.	Bu uygulamalar kendi reklamlarını gösterir ya da hiç göstermez, ödüllü reklamları da çalışmayabilir.
+# context: a line of that list: the usage statistics Facebook uploads in the background
+Usage statistics uploads	Kullanım istatistiği yüklemeleri
+# context: added to that line's summary: what else holding the uploads stops, and when a change of its switch takes effect
+Facebook's on-phone learning jobs stop too, and a change applies after Facebook restarts.	Facebook'un telefondaki öğrenme görevleri de durur ve bir değişiklik Facebook yeniden başladıktan sonra geçerli olur.
+# context: a line of that list: the list of watched reels Facebook is sent
+Reel watch history	Reels izleme geçmişi
+# context: added to that line's summary: what not sending the history costs
+Reels you've already seen may come back.	Daha önce izlediğiniz reeller geri gelebilir.
+# context: summary of a line in that list whose patch works with no switch, from the moment the app was patched
+Blocked since you patched. There's no switch for it.	Yamaladığından beri engelli. Bunun için anahtar yok.
+# context: summary of a line in that list with a switch; %1$s is the switch's name, %2$s the settings page it's on
+Its switch is %1$s, in %2$s.	Anahtarı %1$s, %2$s bölümünde.

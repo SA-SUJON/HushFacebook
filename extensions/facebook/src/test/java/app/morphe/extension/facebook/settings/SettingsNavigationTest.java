@@ -958,6 +958,98 @@ public class SettingsNavigationTest {
         assertEquals(before, savedValues());
     }
 
+    private static final List<String> ADS_MAP = Arrays.asList("Where ads and tracking are blocked", "Ads in the feed",
+            "Ads on profiles", "Ads in Stories", "Ads in Reels", "Ads in search results", "Ads in Marketplace",
+            "Ads in Instant Games", "Ads downloaded in advance", "Ad tracking", "Facebook's ads in other apps",
+            "Usage statistics uploads", "Reel watch history");
+
+    /**
+     * Privacy ends with the map of where ads and tracking are blocked. With every patch in, each
+     * line with a switch opens the page the line names on that switch's row, a patch with no
+     * switch says patching set it, the blocks that cost something say what, and nothing saved changes.
+     */
+    @Test public void theAdsMapEndsPrivacyAndEachLineWithASwitchOpensIt() {
+        Map<String, Object> before = savedValues();
+        page.navigation.navigate("Privacy");
+        List<String> titles = titles();
+        assertEquals(ADS_MAP, titles.subList(titles.size() - ADS_MAP.size(), titles.size()));
+        assertEquals("Its switch is " + L10n.isolate("Hide sponsored posts") + ", in " + L10n.isolate("News feed") + ".",
+                summaryOf("Ads in the feed"));
+        assertEquals("Blocked since you patched. There's no switch for it. Those apps show their own ads or none, and "
+                + "their rewarded ads may fail.", summaryOf("Facebook's ads in other apps"));
+        assertEquals("Its switch is " + L10n.isolate("Hold back analytics uploads") + ", in " + L10n.isolate("Privacy")
+                + ". Facebook's on-phone learning jobs stop too, and a change applies after Facebook restarts.",
+                summaryOf("Usage statistics uploads"));
+        assertTrue(summaryOf("Reel watch history").endsWith(" Reels you've already seen may come back."));
+        while (page.navigation.back()) { }
+
+        int switches = 0;
+        for (AdsMap.Line line : AdsMap.lines()) {
+            page.navigation.navigate("Privacy");
+            BooleanSetting setting = line.setting();
+            if (setting == null) {
+                assertNull(line.title, line.section);
+                assertFalse(line.title + " can be tapped", list().getAdapter().isEnabled(titles().indexOf(line.title)));
+                assertTrue(summaryOf(line.title).startsWith("Blocked since you patched. There's no switch for it."));
+            } else {
+                switches++;
+                tap("action_show_" + setting.key);
+                layout(dialog.getView(), 1200);
+                int row = position(setting.key);
+                assertTrue(setting.key + " wasn't opened", row >= 0);
+                assertEquals(line.title, line.section,
+                        String.valueOf(((Preference) list().getItemAtPosition(row)).getParent().getTitle()));
+                assertTrue(setting.key + " is off screen at " + row + " of " + list().getFirstVisiblePosition() + ".."
+                                + list().getLastVisiblePosition(),
+                        row >= list().getFirstVisiblePosition() && row <= list().getLastVisiblePosition());
+            }
+            while (page.navigation.back()) { }
+        }
+        assertEquals(9, switches);
+        assertEquals(before, savedValues());
+    }
+
+    /**
+     * A build without a line's patch says which patch to choose, still says what that block would
+     * cost, and the line can't be tapped. One that's in keeps its link.
+     */
+    @Test public void anAdsMapLineWithoutItsPatchNamesThePatchAndWhatItCosts() {
+        controller.close();
+        PatchFamily.inBuildForTests = EnumSet.of(PatchFamily.SPONSORED_POSTS, PatchFamily.AD_PREFETCH);
+        controller = Robolectric.buildActivity(Activity.class).setup().visible();
+        dialog = SettingsL10nTest.show(controller.get());
+        page = page(dialog);
+        Map<String, Object> before = savedValues();
+        page.navigation.navigate("Privacy");
+        List<String> expected = new ArrayList<>(Arrays.asList("Lock Facebook", "Lock after"));
+        expected.addAll(ADS_MAP);
+        assertEquals(expected, titles());
+
+        assertTrue(list().getAdapter().isEnabled(titles().indexOf("Ads in the feed")));
+        assertEquals("Blocked since you patched. There's no switch for it.", summaryOf("Ads downloaded in advance"));
+        assertEquals("Not in this build. To block this, choose the " + L10n.isolate("Disable Audience Network")
+                + " patch in Morphe Manager and patch again. Those apps show their own ads or none, and their rewarded "
+                + "ads may fail.", summaryOf("Facebook's ads in other apps"));
+        assertEquals("Not in this build. To block this, choose the " + L10n.isolate("Hold back analytics uploads")
+                + " patch in Morphe Manager and patch again. Facebook's on-phone learning jobs stop too, and a change "
+                + "applies after Facebook restarts.", summaryOf("Usage statistics uploads"));
+        for (AdsMap.Line line : AdsMap.lines()) {
+            if (line.family == PatchFamily.SPONSORED_POSTS) continue;
+            assertFalse(line.title + " can be tapped", list().getAdapter().isEnabled(titles().indexOf(line.title)));
+            if (line.family == PatchFamily.AD_PREFETCH) continue;
+            assertTrue(line.title, summaryOf(line.title).startsWith("Not in this build. To block this, choose the "
+                    + L10n.isolate(line.family.patchName) + " patch"));
+        }
+        assertEquals(-1, position("action_show_" + Settings.HIDE_SPONSORED_REELS.key));
+        assertEquals(before, savedValues());
+    }
+
+    private String summaryOf(String title) {
+        int row = titles().indexOf(title);
+        assertTrue("No visible row " + title, row >= 0);
+        return String.valueOf(((Preference) list().getItemAtPosition(row)).getSummary());
+    }
+
     @Test public void recreationKeepsTheCategoryAndSearchQuery() {
         page.navigation.open(page.findPreference(Settings.TAP_TO_PLAY.key));
         recreate();

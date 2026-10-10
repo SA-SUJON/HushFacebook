@@ -1184,3 +1184,41 @@ Your list of share sheet items to hide will hold %1$d items.	Sua lista de itens 
 Support Hushfacebook	Apoie o Hushfacebook
 # context: that row's summary; Ko-fi is a tipping site's name and stays as it is
 Buy me a coffee on Ko-fi	Me pague um café no Ko-fi
+# context: heading row at the end of the Privacy settings page, above a list of the places Facebook shows ads or reports usage
+Where ads and tracking are blocked	Onde anúncios e rastreamento são bloqueados
+# context: that heading's summary; build means this patched copy of Facebook, switch is a settings toggle
+The places Facebook shows ads or reports what you do, and what this build does about each. A line with a switch takes you to it.	Os lugares onde o Facebook mostra anúncios ou informa o que você faz, e o que esta versão faz em cada um. Uma linha com uma opção leva você até ela.
+# context: a line of that list: ads between posts in the news feed
+Ads in the feed	Anúncios no feed
+# context: a line of that list: ads among the posts on someone's profile
+Ads on profiles	Anúncios em perfis
+# context: a line of that list: ads between stories
+Ads in Stories	Anúncios nos Stories
+# context: a line of that list: ads between and inside reels
+Ads in Reels	Anúncios nos Reels
+# context: a line of that list: ads among Facebook search results
+Ads in search results	Anúncios nos resultados de pesquisa
+# context: a line of that list: sponsored listings in Marketplace, a product name
+Ads in Marketplace	Anúncios no Marketplace
+# context: a line of that list: ads inside Facebook's Instant Games, a product name
+Ads in Instant Games	Anúncios no Instant Games
+# context: a line of that list: ads Facebook downloads in the background before showing them
+Ads downloaded in advance	Anúncios baixados antes da hora
+# context: a line of that list: Facebook's reports used to target ads
+Ad tracking	Rastreamento de anúncios
+# context: a line of that list: ads Facebook serves inside other apps on the phone (Audience Network)
+Facebook's ads in other apps	Anúncios do Facebook em outros apps
+# context: added to that line's summary: what blocking it does to those other apps; rewarded ads give a reward for watching
+Those apps show their own ads or none, and their rewarded ads may fail.	Esses apps mostram os próprios anúncios ou nenhum, e os anúncios com recompensa deles podem falhar.
+# context: a line of that list: the usage statistics Facebook uploads in the background
+Usage statistics uploads	Envio de estatísticas de uso
+# context: added to that line's summary: what else holding the uploads stops, and when a change of its switch takes effect
+Facebook's on-phone learning jobs stop too, and a change applies after Facebook restarts.	As tarefas de aprendizado do Facebook no celular também param, e uma mudança vale depois que o Facebook reinicia.
+# context: a line of that list: the list of watched reels Facebook is sent
+Reel watch history	Histórico de Reels assistidos
+# context: added to that line's summary: what not sending the history costs
+Reels you've already seen may come back.	Reels que você já viu podem voltar.
+# context: summary of a line in that list whose patch works with no switch, from the moment the app was patched
+Blocked since you patched. There's no switch for it.	Bloqueado desde que você aplicou os patches. Não há opção para isso.
+# context: summary of a line in that list with a switch; %1$s is the switch's name, %2$s the settings page it's on
+Its switch is %1$s, in %2$s.	A opção é %1$s, em %2$s.

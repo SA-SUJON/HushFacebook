@@ -335,7 +335,8 @@ final class AppPages {
 
     /**
      * Privacy, in every build for Lock Facebook: who can open Facebook on this phone, what Facebook
-     * sends home in the background, and what it shows others while you write and read.
+     * sends home in the background, and what it shows others while you write and read. The map of
+     * where ads and tracking are blocked ends it.
      */
     static void privacy(HushfacebookPreferenceFragment page, PreferenceScreen screen, Context context,
             Set<PatchFamily> build) {
@@ -380,5 +381,6 @@ final class AppPages {
                     L10n.t("People you chat with in Facebook's own chats can't see that you've read their messages. The chat "
                             + "can stay unread on this phone.")));
         }
+        AdsMap.add(page, privacy, context, build);
     }
 }

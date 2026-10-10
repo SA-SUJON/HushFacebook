@@ -1290,3 +1290,41 @@ Your list of share sheet items to hide will hold %1$d items.	Daftar item yang di
 Support Hushfacebook	Dukung Hushfacebook
 # context: that row's summary; Ko-fi is a tipping site's name and stays as it is
 Buy me a coffee on Ko-fi	Traktir aku secangkir kopi di Ko-fi
+# context: heading row at the end of the Privacy settings page, above a list of the places Facebook shows ads or reports usage
+Where ads and tracking are blocked	Tempat iklan dan pelacakan diblokir
+# context: that heading's summary; build means this patched copy of Facebook, switch is a settings toggle
+The places Facebook shows ads or reports what you do, and what this build does about each. A line with a switch takes you to it.	Tempat Facebook menampilkan iklan atau melaporkan apa yang Anda lakukan, dan apa yang dilakukan build ini di masing-masing. Baris yang punya sakelar membawa Anda ke sakelar itu.
+# context: a line of that list: ads between posts in the news feed
+Ads in the feed	Iklan di Kabar Beranda
+# context: a line of that list: ads among the posts on someone's profile
+Ads on profiles	Iklan di profil
+# context: a line of that list: ads between stories
+Ads in Stories	Iklan di Cerita
+# context: a line of that list: ads between and inside reels
+Ads in Reels	Iklan di Reels
+# context: a line of that list: ads among Facebook search results
+Ads in search results	Iklan di hasil pencarian
+# context: a line of that list: sponsored listings in Marketplace, a product name
+Ads in Marketplace	Iklan di Marketplace
+# context: a line of that list: ads inside Facebook's Instant Games, a product name
+Ads in Instant Games	Iklan di Instant Games
+# context: a line of that list: ads Facebook downloads in the background before showing them
+Ads downloaded in advance	Iklan yang diunduh lebih dulu
+# context: a line of that list: Facebook's reports used to target ads
+Ad tracking	Pelacakan iklan
+# context: a line of that list: ads Facebook serves inside other apps on the phone (Audience Network)
+Facebook's ads in other apps	Iklan Facebook di aplikasi lain
+# context: added to that line's summary: what blocking it does to those other apps; rewarded ads give a reward for watching
+Those apps show their own ads or none, and their rewarded ads may fail.	Aplikasi itu menampilkan iklannya sendiri atau tidak sama sekali, dan iklan berhadiahnya bisa gagal.
+# context: a line of that list: the usage statistics Facebook uploads in the background
+Usage statistics uploads	Unggahan statistik penggunaan
+# context: added to that line's summary: what else holding the uploads stops, and when a change of its switch takes effect
+Facebook's on-phone learning jobs stop too, and a change applies after Facebook restarts.	Tugas pembelajaran Facebook di ponsel juga berhenti, dan perubahan berlaku setelah Facebook dimulai ulang.
+# context: a line of that list: the list of watched reels Facebook is sent
+Reel watch history	Riwayat tontonan reel
+# context: added to that line's summary: what not sending the history costs
+Reels you've already seen may come back.	Reel yang sudah Anda tonton bisa muncul lagi.
+# context: summary of a line in that list whose patch works with no switch, from the moment the app was patched
+Blocked since you patched. There's no switch for it.	Diblokir sejak Anda menambal. Tidak ada sakelar untuknya.
+# context: summary of a line in that list with a switch; %1$s is the switch's name, %2$s the settings page it's on
+Its switch is %1$s, in %2$s.	Sakelarnya %1$s, di %2$s.
