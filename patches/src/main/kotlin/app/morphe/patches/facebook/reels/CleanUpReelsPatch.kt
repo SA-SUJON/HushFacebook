@@ -29,6 +29,7 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val DECLUTTER = "$EXTENSION_PACKAGE/reels/ReelDeclutter;"
 internal const val FILTER_CHIPS = "$DECLUTTER->filterChips(Ljava/lang/Object;)[Ljava/lang/Object;"
@@ -86,8 +87,9 @@ private fun BytecodePatchContext.filterChips() {
     if (!hasCopyOfArray(immutableList)) {
         throw PatchException("$PATCH: ImmutableList has no public static copyOf(Object[]) to rebuild the chip list with")
     }
+    val tables = { call: MethodReference -> classDefByOrNull(call.definingClass)?.let { resolveStatic(it, call) } }
     val builders = classDefByStrings(CHIP_ANCHOR, StringComparisonType.EQUALS)
-        .flatMap { owner -> chipListBuilders(owner).map { owner to it } }
+        .flatMap { owner -> chipListBuilders(owner, tables).map { owner to it } }
     val (owner, builder) = builders.singleOrNull() ?: throw PatchException(
         "$PATCH: expected one ImmutableList builder naming every hidden chip (${HIDDEN_CHIPS.joinToString()}), " +
             "found ${builders.size}",
