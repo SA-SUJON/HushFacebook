@@ -26,7 +26,9 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * <p>A tray holds one bucket per person or Page with a story. Every answer of the tray's fetch,
  * from the network or the cache, becomes one tray data object, and both of Facebook's trays, the
  * classic one and the unified one, draw from it. The hook goes first in that object's one
- * constructor and hands its bucket list to {@link #keptBuckets}.
+ * constructor and hands its bucket list to {@link #keptBuckets}. Home's tray comes inside the feed
+ * instead, as does a single story shown in the feed, and Facebook's tray parser builds what those
+ * draw, so a second hook goes first in that parser and hands it the same kind of list (#313, #317).
  *
  * <p>A bucket is a suggestion when Facebook marks it as one: its is_story_bucket_suggested flag is
  * true, or its first label is SUGGESTED. Those are the two things the tray's own card reads before
@@ -243,7 +245,8 @@ public final class SuggestedStories {
     }
 
     /**
-     * Injection point, first in the constructor of the tray data. Answers the list it was handed,
+     * Injection point, first in the constructor of the tray data and first in the tray parser that
+     * Home's tray and a story shown in the feed go through (#313, #317). Answers the list it was handed,
      * or an ImmutableList of the same buckets in the same order without the ones whose switch is
      * on, which takes the list's place. Never throws.
      *

@@ -17,6 +17,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -232,6 +233,37 @@ internal fun namesItsType(classDef: ClassDef): Boolean =
 internal fun isLabelHelper(method: Method, buckets: Set<String>, label: String): Boolean =
     method.isStatic() && method.implementation != null && method.returnType == label &&
         method.parameters().size == 1 && method.parameters().single() in buckets
+
+/*
+ * Home's tray on 585 (2026-10-30, issues #313 and #317). On Home the Stories tray comes inside the
+ * feed as a feed unit, and so does a single story shown in the feed. Their builders (585
+ * LX/0chr;->A01, the tray unit's parser, and LX/0C48;->A01, the inline story's component) hand the
+ * unit's tree buckets to the one method holding the trace name [TRAY_PARSE] (585 LX/0C4B;->A00),
+ * which turns them into the StoryBuckets the tray draws. That list never goes through the tray
+ * data's constructor, so Home kept drawing the buckets the filter took out of the light fetch's copy.
+ * Its elements are the same tree buckets, behind the bucket interface.
+ */
+
+/** Kept trace name of the parser that turns a tray's tree buckets into the buckets it draws. */
+internal const val TRAY_PARSE = "StoriesTrayParser.parse"
+
+/** Whether [method] is the tray parser: the trace name, one ImmutableList in and an ImmutableList back. */
+internal fun isTrayParse(method: Method): Boolean =
+    method.returnType == IMMUTABLE_LIST && listParameters(method).size == 1 && holdsString(method, TRAY_PARSE)
+
+/** Whether [method] hands its declared parameter [index] to a call. */
+internal fun passesOn(method: Method, index: Int): Boolean {
+    val register = method.parameterRegisterNumber(index)
+    return method.body().any { instruction ->
+        instruction.methodReference() != null && when (instruction) {
+            is FiveRegisterInstruction -> register in listOf(
+                instruction.registerC, instruction.registerD, instruction.registerE, instruction.registerF, instruction.registerG,
+            ).take(instruction.registerCount)
+            is RegisterRangeInstruction -> register in instruction.startRegister until instruction.startRegister + instruction.registerCount
+            else -> false
+        }
+    }
+}
 
 /*
  * The cards beside Create story (2026-10-04, issue #21). Facebook calls them the swipe right top

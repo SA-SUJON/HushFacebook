@@ -69,6 +69,11 @@ class SuggestedStoriesFixtureTest {
         ),
     )
 
+    /** The tray parser's registers and the register of its bucket list, per build (issues #313 and #317). */
+    private val expectedParser = mapOf(
+        AppCompatibilities.FACEBOOK_TARGET_VERSION to (7 to 5),
+    )
+
     /** The query builders that set skip_srtt_item_list, per build and then by ABI (issue #21). */
     private val expectedSkips = mapOf(
         AppCompatibilities.FACEBOOK_TARGET_VERSION to mapOf(
@@ -190,6 +195,50 @@ class SuggestedStoriesFixtureTest {
                 assertEquals("${tray.bucket}->$owner()$ownerType", reference(ownerStub[1]))
                 assertEquals(Opcode.IF_EQZ, ownerStub[3].opcode)
                 assertEquals("$ownerType->$TYPE_NAME()Ljava/lang/String;", reference(ownerStub[4]))
+                checked += version
+            }
+        }
+        assertEquals("a declared build has no fixture", versions, checked)
+    }
+
+    /**
+     * Issues #313 and #317: Home's tray and a story shown in the feed come inside the feed and build
+     * their buckets in the one method holding StoriesTrayParser.parse, never through the tray data's
+     * constructor. Its one ImmutableList is the tree buckets, which it hands on. The hook goes first
+     * there, in the list's own register, and Facebook's code follows unchanged.
+     */
+    @Test
+    fun `each declared build's tray parser filters its buckets first`() {
+        val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
+        assertEquals("the declared builds", expectedParser.keys, versions)
+        val checked = mutableSetOf<String>()
+        for (version in versions) {
+            for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
+                val classes = FixtureDex.classesHolding(bundle, TRAY_PARSE)
+                val holders = classes.flatMap { methodsHolding(it, TRAY_PARSE) }
+                assertEquals("${bundle.name}: methods holding \"$TRAY_PARSE\"", 1, holders.size)
+
+                val context = PatchContexts.of(classes + ExtensionDex.classDef(SUGGESTED_STORIES))
+                val (parser, list) = with(context) { trayParser() }
+                assertEquals("${bundle.name}: the parser", holders.single().definingClass to holders.single().name,
+                    parser.definingClass to parser.name)
+                assertEquals("${bundle.name}: the bucket list is the parser's second parameter", 1, list)
+
+                val method = with(context) { mutableClassDefBy(parser.definingClass) }.methods.single { it.name == parser.name && isTrayParse(it) }
+                val (registers, register) = expectedParser.getValue(version)
+                assertEquals("${bundle.name}: parser registers", registers, method.implementation!!.registerCount)
+                val own = body(method)
+                method.keepOnlyUnsuggestedBuckets(list)
+                val hooked = body(method)
+                assertEquals("${bundle.name}: three instructions in", own.size + 3, hooked.size)
+                assertEquals(KEPT_BUCKETS, reference(hooked[0]))
+                val call = hooked[0] as RegisterRangeInstruction
+                assertEquals("${bundle.name}: the list's register", register to 1, call.startRegister to call.registerCount)
+                assertEquals(Opcode.MOVE_RESULT_OBJECT, hooked[1].opcode)
+                assertEquals(register, (hooked[1] as OneRegisterInstruction).registerA)
+                assertEquals(Opcode.CHECK_CAST, hooked[2].opcode)
+                assertEquals(IMMUTABLE_LIST, ((hooked[2] as ReferenceInstruction).reference as TypeReference).type)
+                assertEquals("${bundle.name}: Facebook's own code follows", own.map { it.opcode }, hooked.drop(3).map { it.opcode })
                 checked += version
             }
         }

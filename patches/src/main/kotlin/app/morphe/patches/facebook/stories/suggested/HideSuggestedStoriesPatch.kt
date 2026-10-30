@@ -72,6 +72,10 @@ internal class TrayBuckets(
  * by their bucket type, each behind its own switch: the People you may know cards and the Find
  * friends from contacts card. Everything else in the list stays.
  *
+ * Home's tray comes inside the feed and never goes through that constructor, so the same filter
+ * also goes first in the parser that turns its buckets, and a story shown in the feed, into what the
+ * tray draws (issues #313 and #317).
+ *
  * The cards beside Create story, such as "Share music you love", come in a list of their own that
  * the tray's fetch can ask the server to leave out. Each fetch's answer to that goes through the
  * extension first, which asks for it when Hide story prompts is on (issue #21).
@@ -96,6 +100,11 @@ val hideSuggestedStoriesPatch = bytecodePatch(
         mutableClassDefBy(tray.constructor.definingClass).methods
             .single { it.name == "<init>" }
             .keepOnlyUnsuggestedBuckets(tray.list)
+        val (parser, list) = trayParser()
+        val parameters = parser.parameterTypes.map { it.toString() }
+        mutableClassDefBy(parser.definingClass).methods
+            .single { it.name == parser.name && it.returnType == parser.returnType && it.parameterTypes.map { p -> p.toString() } == parameters }
+            .keepOnlyUnsuggestedBuckets(list)
         hookPromptCardSkips()
         enableStatus("suggestedStories")
     }
@@ -204,6 +213,23 @@ internal fun BytecodePatchContext.trayBuckets(): TrayBuckets {
         constructor, list, flag.definingClass, flag.name, type.name, type.returnType, helper, label.type,
         seen?.name, owner?.name, owner?.returnType,
     )
+}
+
+/**
+ * The tray parser Home's tray and a story shown in the feed build their buckets with, and which of
+ * its parameters is the tree bucket list: the one method holding [TRAY_PARSE], with one ImmutableList
+ * in and one back, that hands the list on.
+ */
+internal fun BytecodePatchContext.trayParser(): Pair<Method, Int> {
+    val parsers = classDefByStrings(TRAY_PARSE, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        .flatMap { classDef -> classDef.methods.filter(::isTrayParse) }
+    val parser = parsers.singleOrPatchException("$PATCH: the tray parser holding \"$TRAY_PARSE\" with an ImmutableList in and out")
+    val list = listParameters(parser).single()
+    if (!passesOn(parser, list)) {
+        throw PatchException("$PATCH: ${parser.definingClass}->${parser.name} doesn't hand its bucket list on")
+    }
+    return parser to list
 }
 
 private fun requirePublic(classDef: ClassDef, what: String) {
