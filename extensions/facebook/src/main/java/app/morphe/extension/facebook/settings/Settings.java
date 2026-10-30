@@ -1067,9 +1067,12 @@ public class Settings extends BaseSettings {
     /**
      * A tap on the reel above a comment sheet that stops part way up goes to the reel, which plays
      * or pauses, instead of closing the sheet
-     * ({@link app.morphe.extension.facebook.comments.FullHeightComments#tapThrough}, #315). Needs
-     * Open comments at full height's popover hook, and does nothing while that switch keeps sheets
-     * at full height. Off by default.
+     * ({@link app.morphe.extension.facebook.comments.FullHeightComments#tapThrough}, #315). The
+     * Reels tab's sheet, which fills the screen with the reel showing through its header, plays or
+     * pauses the reel through Tap to play's player bridge instead
+     * ({@link app.morphe.extension.facebook.comments.FullHeightComments#watchHeader}). Needs Open
+     * comments at full height's hooks, and does nothing while that switch keeps sheets at full
+     * height. Off by default.
      */
     public static final BooleanSetting TAP_REELS_ABOVE_COMMENTS =
             new BooleanSetting("hushfacebook_tap_reels_above_comments", FALSE);

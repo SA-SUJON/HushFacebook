@@ -12,6 +12,10 @@ import static org.robolectric.Shadows.shadowOf;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Looper;
+import android.os.SystemClock;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
@@ -31,6 +35,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import java.util.function.BooleanSupplier;
+
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -46,8 +52,10 @@ import app.morphe.extension.shared.settings.PauseForTests;
  * is hidden, at once or at the first layout after the video lands, and so is a watch-and-comment
  * sheet's header over the reel playing behind it, while a post's header stays. With Tap a reel
  * above its comments on (#315), a part-height sheet opened from the reel viewer stays open on a tap
- * outside it and passes that tap on, counted, and one from anywhere else is left to Facebook. Off,
- * paused, or before the settings are ready, nothing changes.
+ * outside it and passes that tap on, counted, and one from anywhere else is left to Facebook. The
+ * Reels tab's full-screen sheet keeps a tap on the reel showing through its header for the reel,
+ * counted, while the sound button and a drag keep theirs, and with no reel found the tap closes it.
+ * Off, paused, or before the settings are ready, nothing changes.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
@@ -108,13 +116,21 @@ public class FullHeightCommentsTest {
 
     @Rule public final SettingsContextRule settingsContext = new SettingsContextRule();
 
+    private BooleanSupplier bridge;
+
     @Before
     public void start() {
         HookStatus.clear();
+        bridge = FullHeightComments.reelTap;
+        FullHeightComments.reelTap = () -> {
+            reelTaps++;
+            return reelFound;
+        };
     }
 
     @After
     public void restore() {
+        FullHeightComments.reelTap = bridge;
         PauseForTests.resume();
         Settings.OPEN_COMMENTS_FULL_HEIGHT.resetToDefault();
         Settings.TAP_REELS_ABOVE_COMMENTS.resetToDefault();
@@ -360,6 +376,139 @@ public class FullHeightCommentsTest {
     public void aMissingDialogIsLeftToFacebook() {
         Settings.TAP_REELS_ABOVE_COMMENTS.save(true);
         assertFalse(FullHeightComments.tapThrough(null, 20));
+    }
+
+    /**
+     * The Reels tab's sheet as 585 draws it: a see-through header over the comment list, the reel's
+     * tap area filling it, whose tap closes the sheet, with the small sound button inside.
+     */
+    private ViewGroup reelsTabSheet(Activity screen) {
+        LinearLayout content = new LinearLayout(screen);
+        content.setOrientation(LinearLayout.VERTICAL);
+        FrameLayout header = new FrameLayout(screen);
+        header.setId(HEADER);
+        FrameLayout tapArea = new FrameLayout(screen);
+        tapArea.setOnClickListener(view -> closed++);
+        View sound = new View(screen);
+        sound.setOnClickListener(view -> sounds++);
+        tapArea.addView(sound, new FrameLayout.LayoutParams(20, 20, Gravity.BOTTOM | Gravity.END));
+        header.addView(tapArea, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        content.addView(header, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
+        content.addView(new FrameLayout(screen), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+        return content;
+    }
+
+    private static void show(Activity screen, ViewGroup sheet) {
+        screen.setContentView(sheet);
+        shadowOf(Looper.getMainLooper()).idle();
+    }
+
+    private static Activity screen() {
+        return Robolectric.buildActivity(Activity.class).setup().get();
+    }
+
+    /** A finger down at one spot and up at another, in the sheet's own coordinates. */
+    private static void touch(ViewGroup sheet, float x, float y, float toX, float toY) {
+        long now = SystemClock.uptimeMillis();
+        sheet.dispatchTouchEvent(MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, x, y, 0));
+        if (toX != x || toY != y) {
+            sheet.dispatchTouchEvent(MotionEvent.obtain(now, now + 50, MotionEvent.ACTION_MOVE, toX, toY, 0));
+        }
+        sheet.dispatchTouchEvent(MotionEvent.obtain(now, now + 100, MotionEvent.ACTION_UP, toX, toY, 0));
+        shadowOf(Looper.getMainLooper()).idle();
+    }
+
+    private static void tapReel(ViewGroup sheet) {
+        touch(sheet, 30, 30, 30, 30);
+    }
+
+    private int closed;
+    private int sounds;
+    private int reelTaps;
+    private boolean reelFound = true;
+
+    @Test
+    public void onATapOnTheReelAboveTheReelsTabsCommentsPlaysOrPausesItAndTheSheetStays() {
+        Settings.TAP_REELS_ABOVE_COMMENTS.save(true);
+        Activity screen = screen();
+        ViewGroup sheet = reelsTabSheet(screen);
+        show(screen, sheet);
+        FullHeightComments.watchHeader(sheet, HEADER, true);
+        tapReel(sheet);
+        tapReel(sheet);
+        assertEquals("the taps didn't reach the reel", 2, reelTaps);
+        assertEquals("a tap on the reel closed the sheet", 0, closed);
+        assertEquals("the header over the reel was hidden", View.VISIBLE, header(sheet).getVisibility());
+        assertEquals(FamilyNames.FULL_HEIGHT_COMMENTS + ": invoked 1, 1 found, 0 missing. Counted: "
+                + FullHeightComments.REEL_TAPPED + " 2", statusLine());
+    }
+
+    @Test
+    public void aReelsTabSheetSetUpBeforeItsFirstLayoutTakesTheTapsOnceLaidOut() {
+        Settings.TAP_REELS_ABOVE_COMMENTS.save(true);
+        Activity screen = screen();
+        ViewGroup sheet = reelsTabSheet(screen);
+        // Facebook sets the views up before the sheet is laid out, when every view is still 0 by 0.
+        FullHeightComments.watchHeader(sheet, HEADER, true);
+        show(screen, sheet);
+        tapReel(sheet);
+        assertEquals(1, reelTaps);
+        assertEquals(0, closed);
+    }
+
+    @Test
+    public void theSoundButtonAndADragAboveTheCommentsKeepTheirOwnTouches() {
+        Settings.TAP_REELS_ABOVE_COMMENTS.save(true);
+        Activity screen = screen();
+        ViewGroup sheet = reelsTabSheet(screen);
+        show(screen, sheet);
+        FullHeightComments.watchHeader(sheet, HEADER, true);
+        View header = header(sheet);
+        touch(sheet, header.getWidth() - 10, header.getHeight() - 10, header.getWidth() - 10, header.getHeight() - 10);
+        assertEquals("the sound button lost its tap", 1, sounds);
+        touch(sheet, 30, 30, 30, 150);
+        assertEquals("a tap on the sound button or a drag played or paused the reel", 0, reelTaps);
+        assertEquals("a drag closed the sheet", 0, closed);
+    }
+
+    @Test
+    public void withNoReelFoundATapAboveTheCommentsClosesTheSheetAsBefore() {
+        Settings.TAP_REELS_ABOVE_COMMENTS.save(true);
+        reelFound = false;
+        Activity screen = screen();
+        ViewGroup sheet = reelsTabSheet(screen);
+        show(screen, sheet);
+        FullHeightComments.watchHeader(sheet, HEADER, true);
+        tapReel(sheet);
+        assertEquals(1, reelTaps);
+        assertEquals("the tap was lost", 1, closed);
+        assertEquals(FamilyNames.FULL_HEIGHT_COMMENTS + ": invoked 1, 1 found, 0 missing", statusLine());
+    }
+
+    @Test
+    public void offPausedOrOnAPostsSheetATapAboveTheCommentsClosesTheSheet() {
+        Activity screen = screen();
+        ViewGroup off = reelsTabSheet(screen);
+        show(screen, off);
+        FullHeightComments.watchHeader(off, HEADER, true);
+        tapReel(off);
+        assertEquals("off, the tap went to the reel", 1, closed);
+
+        Settings.TAP_REELS_ABOVE_COMMENTS.save(true);
+        ViewGroup post = reelsTabSheet(screen);
+        show(screen, post);
+        FullHeightComments.watchHeader(post, HEADER, false);
+        tapReel(post);
+        assertEquals("a sheet that isn't over a reel sent its tap to one", 2, closed);
+
+        ViewGroup paused = reelsTabSheet(screen);
+        show(screen, paused);
+        FullHeightComments.watchHeader(paused, HEADER, true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        tapReel(paused);
+        assertEquals("paused, the tap went to the reel", 3, closed);
+        assertEquals(0, reelTaps);
     }
 
     @Test
