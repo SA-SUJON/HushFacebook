@@ -74,8 +74,9 @@ internal class TrayBuckets(
  *
  * Home's tray comes inside the feed and never goes through that constructor, so the same filter
  * also goes first in the parser that turns its buckets, and a story shown in the feed, into what the
- * tray draws (issues #313 and #317). Home's tray only asks for its next page after a drag, so when
- * the filter leaves its row too short to drag, the extension asks for it (TrayPaging.kt).
+ * tray draws (issues #313 and #317). Home's tray loads its next page when one of its last buckets
+ * comes into view, so when the filter leaves its row a bucket or two and then gray placeholders, the
+ * extension lets a placeholder coming into view load it (TrayPaging.kt).
  *
  * The cards beside Create story, such as "Share music you love", come in a list of their own that
  * the tray's fetch can ask the server to leave out. Each fetch's answer to that goes through the

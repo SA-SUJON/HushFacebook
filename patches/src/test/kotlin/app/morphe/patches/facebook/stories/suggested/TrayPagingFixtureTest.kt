@@ -13,9 +13,11 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.RegisterRangeInstruction
-import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import org.junit.Assert.assertEquals
@@ -24,31 +26,24 @@ import org.junit.Test
 import java.io.File
 
 /**
- * Issue #317: on every declared build one scroll listener outside the extension holds
- * "load_next_page" in a (RecyclerView, int) settle check that reads the last tile in view, and has
- * an onScrolled. The patch reads its pager field and the pager's has-next and load calls, makes it
- * a StoriesTrayPaging.Pager whose method makes those calls on that field, and hands the extension
- * the listener and its row first thing in onScrolled.
+ * Issue #317: on every declared build one class outside the extension handles the Stories tray's
+ * tiles coming into view, with a (String, int) method holding "placeholder_bucket_id" whose
+ * placeholder path reads a MobileConfig flag before loading the next page, and one placeholder tile
+ * calls it. The patch hands the extension every tile first thing in that method, lets the flag
+ * answer through the extension, adds the Pager method that shows the handler a placeholder again,
+ * and tells the extension first thing when a placeholder leaves view.
  */
 class TrayPagingFixtureTest {
-    /** The listener, its pager field and the pager's has-next and load methods, per build and then by the bundle's ABI. */
+    /** The tile handler, its tile method and the placeholder tile's leaving method, per build and then by the bundle's ABI. */
     private val expected = mapOf(
         AppCompatibilities.FACEBOOK_TARGET_VERSION to mapOf(
-            "arm64-v8a" to listOf("LX/0CYa;", "A01", "GnF", "J2o"),
-            "armeabi-v7a" to listOf("LX/0CYd;", "A01", "GnD", "J2m"),
+            "arm64-v8a" to listOf("LX/02fs;", "I0l", "LX/04p7;->IlM"),
+            "armeabi-v7a" to listOf("LX/02fs;", "I0j", "LX/04pD;->IlK"),
         ),
     )
 
-    /**
-     * The fetch surface field and the pager call after the load, the row's layout field, the
-     * holder field and its bucket list, per build and then by the bundle's ABI.
-     */
-    private val expectedReads = mapOf(
-        AppCompatibilities.FACEBOOK_TARGET_VERSION to mapOf(
-            "arm64-v8a" to listOf("A02", "Bdj", "mLayout", "A03", "LX/024Y;->A07"),
-            "armeabi-v7a" to listOf("A02", "Bdi", "mLayout", "A03", "LX/024Y;->A07"),
-        ),
-    )
+    /** The placeholder-load flag the handler reads on 585. */
+    private val flagKey = 0x101029900041f52L
 
     private fun <T> Map<String, Map<String, T>>.pin(version: String, bundle: File): T =
         getValue(version)[bundle.name.substringAfter("-$version-").substringBefore(".apkm")]
@@ -63,72 +58,70 @@ class TrayPagingFixtureTest {
         return "${call.definingClass}->${call.name}(${call.parameterTypes.joinToString("")})${call.returnType}"
     }
 
+    private fun literal(instruction: Instruction): Long? = when (instruction) {
+        is WideLiteralInstruction -> instruction.wideLiteral
+        is NarrowLiteralInstruction -> instruction.narrowLiteral.toLong()
+        else -> null
+    }
+
     @Test
-    fun `each declared build's tray listener asks its pager for the next page on the extension's word`() {
+    fun `each declared build's tray tile handler loads the next page for a placeholder on the extension's word`() {
         val versions = AppCompatibilities.facebook().single().targets.mapNotNull { it.version }.toSet()
         assertEquals("the declared builds", expected.keys, versions)
         val checked = mutableSetOf<String>()
         for (version in versions) {
             for (bundle in Fixtures.files { it.extension == "apkm" && it.name.contains("-$version-") }) {
-                val classes = FixtureDex.classesHolding(bundle, LOAD_NEXT_PAGE)
-                val context = PatchContexts.of(classes + ExtensionDex.classDef(TRAY_PAGING))
+                val (handler, shownName, hiddenName) = expected.pin(version, bundle)
+                val context = PatchContexts.of(FixtureDex.classesHolding(bundle, PLACEHOLDER_BUCKET) + ExtensionDex.classDef(TRAY_PAGING))
                 val anchors = with(context) { trayPagingAnchors() }
-                val (listener, field, hasNext, loadNext) = expected.pin(version, bundle)
-                assertEquals("${bundle.name}: the listener", listener, anchors.listener)
-                assertEquals("${bundle.name}: the pager field", field, anchors.pager.name)
-                assertEquals("${bundle.name}: the pager's has-next", hasNext, anchors.hasNext.name)
-                assertEquals("${bundle.name}: the pager's load", loadNext, anchors.loadNext.name)
-                assertEquals("${bundle.name}: both calls on the field's type", anchors.pager.type, anchors.loadNext.definingClass)
-                val (surface, settled, layout, holder, buckets) = expectedReads.pin(version, bundle)
-                assertEquals("${bundle.name}: the fetch surface", surface, anchors.surface?.name)
-                assertEquals("${bundle.name}: the pager call after the load", settled, anchors.settled?.name)
-                assertEquals("${bundle.name}: the row's layout", listOf(RECYCLER_VIEW, layout), listOf(anchors.layout.definingClass, anchors.layout.name))
-                assertEquals("${bundle.name}: the last-tile read", "Landroidx/recyclerview/widget/LinearLayoutManager;", anchors.lastVisible.definingClass)
-                assertEquals("${bundle.name}: the holder", listOf(listener, holder), listOf(anchors.holder.definingClass, anchors.holder.name))
-                assertEquals("${bundle.name}: the bucket list", buckets, "${anchors.buckets.definingClass}->${anchors.buckets.name}")
-                assertEquals("${bundle.name}: the holder holds the list", anchors.holder.type, anchors.buckets.definingClass)
+                assertEquals("${bundle.name}: the tile handler", handler, anchors.handler)
+                assertEquals("${bundle.name}: its tile method", shownName, anchors.shown.name)
+                assertEquals("${bundle.name}: the placeholder leaving view", hiddenName, "${anchors.hidden.definingClass}->${anchors.hidden.name}")
+                assertEquals("${bundle.name}: a MobileConfig boolean", listOf(MOBILE_CONFIG, "Z"), listOf(anchors.flag.definingClass, anchors.flag.returnType))
 
-                val scrolled = body(anchors.onScrolled)
+                val shown = body(anchors.shown)
+                val read = anchors.flagResult - 1
+                val key = shown.subList(0, read).mapNotNull(::literal).lastOrNull()
+                assertEquals("${bundle.name}: the placeholder-load flag", flagKey, key)
+                val flagRegister = (shown[anchors.flagResult] as OneRegisterInstruction).registerA
+                val hiddenBody = body(anchors.hidden)
+
                 with(context) { pageShortTrays(anchors) }
-                val mutable = with(context) { mutableClassDefBy(anchors.listener) }
-                assertTrue("${bundle.name}: the listener is a Pager", TRAY_PAGER in mutable.interfaces)
+                val mutable = with(context) { mutableClassDefBy(handler) }
+                assertTrue("${bundle.name}: the handler is a Pager", TRAY_PAGER in mutable.interfaces)
 
-                val onScrolled = mutable.methods.single { it.name == anchors.onScrolled.name && scrolledMethod(mutable) == it }
-                val hooked = body(onScrolled)
-                assertEquals("${bundle.name}: one instruction in onScrolled", scrolled.size + 1, hooked.size)
-                assertEquals(WATCH_TRAY, reference(hooked[0]))
-                val watch = hooked[0] as RegisterRangeInstruction
-                val registers = onScrolled.implementation!!.registerCount
-                assertEquals("${bundle.name}: the listener and its row", (registers - 4) to 2, watch.startRegister to watch.registerCount)
-                assertEquals("${bundle.name}: Facebook's own code follows", scrolled.map { it.opcode }, hooked.drop(1).map { it.opcode })
+                val hooked = body(mutable.methods.single { it.name == shownName && isTileShown(it) })
+                assertEquals("${bundle.name}: three instructions in the tile method", shown.size + 3, hooked.size)
+                assertEquals(TILE_SHOWN, reference(hooked[0]))
+                val handed = hooked[0] as RegisterRangeInstruction
+                val registers = anchors.shown.implementation!!.registerCount
+                assertEquals("${bundle.name}: the handler, the bucket id and the position", (registers - 3) to 3, handed.startRegister to handed.registerCount)
+                assertEquals("${bundle.name}: Facebook's own code up to the flag", shown.subList(0, anchors.flagResult + 1).map { it.opcode },
+                    hooked.subList(1, anchors.flagResult + 2).map { it.opcode })
+                val asked = hooked[anchors.flagResult + 2]
+                assertEquals(PLACEHOLDER_PAGES, reference(asked))
+                assertEquals("${bundle.name}: the flag in", flagRegister to 1,
+                    (asked as RegisterRangeInstruction).startRegister to asked.registerCount)
+                val answer = hooked[anchors.flagResult + 3]
+                assertEquals(Opcode.MOVE_RESULT, answer.opcode)
+                assertEquals("${bundle.name}: the answer back in the flag's register", flagRegister, (answer as OneRegisterInstruction).registerA)
+                assertEquals("${bundle.name}: Facebook's own code after it", shown.drop(anchors.flagResult + 1).map { it.opcode },
+                    hooked.drop(anchors.flagResult + 4).map { it.opcode })
 
-                val load = mutable.methods.single { it.name == LOAD_NEXT_PAGE_METHOD }
-                assertTrue("${bundle.name}: an interface method", load.parameterTypes.isEmpty() && load.returnType == "Z")
-                val made = body(load)
-                assertEquals(Opcode.IGET_OBJECT, made[0].opcode)
-                val read = (made[0] as ReferenceInstruction).reference as FieldReference
-                assertEquals("${bundle.name}: reads the pager field", listOf(listener, field, anchors.pager.type),
-                    listOf(read.definingClass, read.name, read.type))
-                val calls = made.filter { it.opcode == Opcode.INVOKE_INTERFACE }
-                assertEquals("${bundle.name}: has-next, load, then the call after it", listOf(hasNext, loadNext, settled), calls.map { call(it).name })
-                assertEquals(LOAD_NEXT_PAGE, made.firstNotNullOf { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string })
-                val trigger = calls[1] as FiveRegisterInstruction
-                assertEquals("${bundle.name}: the pager and its trigger", 2, trigger.registerCount)
-                val surfaceRead = made.mapNotNull { ((it as? ReferenceInstruction)?.reference as? FieldReference) }
-                assertEquals("${bundle.name}: the surface gates the call after the load", listOf(field, surface), surfaceRead.map { it.name })
+                val made = mutable.methods.single { it.name == SHOW_PLACEHOLDER_METHOD }
+                assertEquals("${bundle.name}: the Pager method", listOf("I") to "V", made.parameterTypes.map { it.toString() } to made.returnType)
+                val showing = body(made)
+                assertEquals(PLACEHOLDER_BUCKET, ((showing[0] as ReferenceInstruction).reference as StringReference).string)
+                assertEquals("$handler->$shownName(Ljava/lang/String;I)V", reference(showing[1]))
+                val passed = showing[1] as FiveRegisterInstruction
+                assertEquals("${bundle.name}: the handler, the id, then the position", listOf(1, 0, 2),
+                    listOf(passed.registerC, passed.registerD, passed.registerE))
 
-                val lastTile = mutable.methods.single { it.name == LAST_TILE_METHOD }
-                assertEquals("${bundle.name}: the last tile of a View", listOf("Landroid/view/View;") to "I",
-                    lastTile.parameterTypes.map { it.toString() } to lastTile.returnType)
-                val tileCalls = body(lastTile).mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
-                assertEquals(listOf(LAST_VISIBLE), tileCalls.map { it.name })
-                val tileRead = body(lastTile).firstNotNullOf { (it as? ReferenceInstruction)?.reference as? FieldReference }
-                assertEquals(layout, tileRead.name)
-
-                val count = mutable.methods.single { it.name == BUCKET_COUNT_METHOD }
-                assertTrue("${bundle.name}: a count", count.parameterTypes.isEmpty() && count.returnType == "I")
-                val countReads = body(count).mapNotNull { (it as? ReferenceInstruction)?.reference as? FieldReference }
-                assertEquals("${bundle.name}: the holder, then its list", listOf(holder, "A07"), countReads.map { it.name })
+                val tile = with(context) { mutableClassDefBy(anchors.hidden.definingClass) }
+                val leaving = body(tile.methods.single { it.name == anchors.hidden.name && it.parameterTypes.size == anchors.hidden.parameterTypes.size })
+                assertEquals("${bundle.name}: one instruction in the leaving method", hiddenBody.size + 1, leaving.size)
+                assertEquals(PLACEHOLDER_HIDDEN, reference(leaving[0]))
+                assertEquals("${bundle.name}: Facebook's own code follows", hiddenBody.map { it.opcode }, leaving.drop(1).map { it.opcode })
                 checked += version
             }
         }

@@ -6,7 +6,7 @@ package app.morphe.extension.facebook.stories;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.view.View;
+import android.os.SystemClock;
 
 import androidx.annotation.Nullable;
 
@@ -21,59 +21,62 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * Loads the next page of Home's Stories tray when the tray filters leave its row short (#317).
  *
  * <p>While the tray has a next page, its row ends in three gray placeholder tiles. Facebook loads
- * that page from the row's scroll listener when a drag settles with the last bucket in view, but it
- * skips the load once the placeholders themselves fill the view past the buckets, and loading from
- * a placeholder coming into view is switched off for some accounts. With Pages', watched or
- * suggested stories filtered out, a page of 17 buckets can come down to one, the placeholders take
- * the rest of the row, and the next page never loads.
+ * that page when one of the tray's last buckets comes into view, and when a placeholder comes into
+ * view only behind a server flag that's off for some accounts. With Pages', watched or suggested
+ * stories filtered out, a tray of 15 buckets can come down to one, which comes into view before the
+ * tray knows it has a next page, the placeholders take the rest of the row, and the next page never
+ * loads.
  *
- * <p>The patch makes that listener a {@link Pager}: it reads the last tile in view and the kept
- * bucket count the way the listener does, and asks the pager for the next page the way the listener
- * does after a drag. It hands the listener and its RecyclerView to {@link #watch} first thing in
- * onScrolled. Each time the filter leaves buckets out, {@link #droppedBuckets} waits for the row to
- * settle and asks for the next page while the last kept bucket or a placeholder is in view. Each
- * filtered page repeats it, and so does a scroll that stops at the row's end, so the tray keeps
- * paging until the kept stories fill the row or there are no more pages. Ten pages in a row that add
- * no kept story stop it, so a tray of nothing but suggestions isn't paged forever. Nothing changes
- * while the filters keep every bucket.
+ * <p>The patch hands {@link #placeholderPages} that flag's answer, and while the filters are leaving
+ * buckets out it answers yes, so a placeholder coming into view loads the next page the way it does
+ * for accounts with the flag on. Facebook still loads nothing while a fetch is running or when the
+ * tray has no next page. A page whose buckets are all filtered out changes nothing in view, so no
+ * placeholder comes into view again: once such a page settles with a placeholder still in view,
+ * {@link #check} shows the tray's tile handler that placeholder again. Ten asks while the kept
+ * count stays the same stop it, so a tray of nothing but suggestions isn't paged forever. Nothing
+ * changes while the filters keep every bucket.
  */
 public final class StoriesTrayPaging {
     /** Counted under its own name each time the tray is asked for its next page. */
     static final String ROUTE = "Stories tray paging";
     static final String NEXT_PAGE = "next page";
-    static final String LAST_PAGE = "no next page";
     static final String GAVE_UP = "stopped, no kept stories";
 
-    /** How long a filtered page or a scroll gets to settle before the row's end is checked. */
+    /** The bucket id the tray's placeholder tiles hand the tile handler. */
+    static final String PLACEHOLDER = "placeholder_bucket_id";
+
+    /**
+     * How long a filtered page gets to settle before the row is checked, and how long after an ask
+     * the other placeholders coming into view with it ask nothing more.
+     */
     static final long SETTLE_MS = 600;
 
-    /** Pages in a row that may add no kept story before paging stops. */
+    /** Asks that may add no kept story before paging stops. */
     static final int MAX_EMPTY_PAGES = 10;
 
-    /** The tray's scroll listener, with the methods the patch adds to it. */
+    /** The tray's tile handler, with the method the patch adds to it. */
     public interface Pager {
-        /** Asks the tray's pager for its next page. False when the pager has no next page. */
-        boolean hushLoadNextPage();
-
-        /** The row's last tile in view, as Facebook's own check reads it, or -1. */
-        int hushLastTile(View recycler);
-
-        /** How many buckets the tray holds after the filters, or -1. */
-        int hushBucketCount();
+        /** Hands the handler a placeholder at {@code position} coming into view, as the tile does. */
+        void hushShowPlaceholder(int position);
     }
 
     private static WeakReference<Pager> pager = new WeakReference<>(null);
-    private static WeakReference<View> tray = new WeakReference<>(null);
 
-    /** A filtered page is waiting for a tray to page from. */
-    private static volatile boolean pending;
-
-    /** The filters have left buckets out this session, so a scroll to the row's end pages too. */
+    /** The filters have left buckets out this session. */
     private static volatile boolean filtered;
 
-    /** The bucket count when the tray was last asked for a page, and the asks since it last grew. */
-    private static int askedAt = -1;
-    private static int emptyPages;
+    /** Placeholders in view, and the position of the last one to come into view. */
+    private static int placeholdersInView;
+    private static int lastPlaceholder = -1;
+
+    /** The tray's kept bucket count, and the asks since it last changed. */
+    private static int kept = -1;
+    private static int asks;
+    private static boolean gaveUp;
+    private static long askedAt = Long.MIN_VALUE / 2;
+
+    /** The extension is showing the handler a placeholder itself. */
+    private static boolean showing;
 
     @Nullable private static Handler main;
     private static final Runnable CHECK = StoriesTrayPaging::check;
@@ -82,34 +85,97 @@ public final class StoriesTrayPaging {
     }
 
     /**
-     * Injection point, first thing in the onScrolled of Home's tray's scroll listener, which
-     * RecyclerView also calls after a layout that changes which tiles show. Remembers the latest
-     * tray. Never throws.
+     * Injection point, first thing in the tray's tile handler when a tile comes into view.
+     * Remembers the handler and counts the placeholders in view. Never throws.
      *
-     * @param listener the scroll listener, made a {@link Pager} by the patch.
-     * @param recycler the tray's RecyclerView.
+     * @param handler  the tile handler, made a {@link Pager} by the patch.
+     * @param bucketId the tile's bucket id, {@link #PLACEHOLDER} for a placeholder.
+     * @param position the tile's position in the row.
      */
-    public static void watch(@Nullable Object listener, @Nullable View recycler) {
+    public static void tileShown(@Nullable Object handler, @Nullable String bucketId, int position) {
         try {
-            if (!(listener instanceof Pager) || recycler == null) return;
-            if (pager.get() != listener) {
-                pager = new WeakReference<>((Pager) listener);
-                askedAt = -1;
-                emptyPages = 0;
+            synchronized (StoriesTrayPaging.class) {
+                if (showing) return;
+                if (handler instanceof Pager && pager.get() != handler) pager = new WeakReference<>((Pager) handler);
+                if (!PLACEHOLDER.equals(bucketId)) return;
+                if (placeholdersInView++ == 0 && filtered) {
+                    Logger.printDebug(() -> "Stories tray: gray tiles in view from " + position);
+                }
+                lastPlaceholder = position;
             }
-            if (tray.get() != recycler) tray = new WeakReference<>(recycler);
-            if (pending || filtered) schedule();
         } catch (Throwable failure) {
-            HookStatus.threw(FamilyNames.SUGGESTED_STORIES, "tray paging watch", failure);
+            HookStatus.threw(FamilyNames.SUGGESTED_STORIES, "tray paging tile", failure);
         }
     }
 
-    /** The tray filter left buckets out of a page: check the row's end once it settles. Never throws. */
-    static void droppedBuckets() {
+    /** Injection point, first thing when a placeholder tile leaves view. Never throws. */
+    public static void placeholderHidden() {
         try {
-            pending = true;
-            filtered = true;
-            schedule();
+            synchronized (StoriesTrayPaging.class) {
+                if (placeholdersInView > 0) placeholdersInView--;
+            }
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.SUGGESTED_STORIES, "tray paging tile", failure);
+        }
+    }
+
+    /**
+     * Injection point, the tile handler's server flag for loading the next page when a placeholder
+     * comes into view, read after Facebook's check that no fetch is running. Answers yes while the
+     * filters are leaving buckets out, once per placeholder coming into view and at most
+     * {@link #MAX_EMPTY_PAGES} times while the kept count stays the same. Never throws.
+     *
+     * @param flag the server's answer, which stands when it's yes.
+     */
+    public static boolean placeholderPages(boolean flag) {
+        if (flag) {
+            if (filtered) Logger.printDebug(() -> "Stories tray: Facebook loads the next page for a gray tile itself");
+            return true;
+        }
+        try {
+            synchronized (StoriesTrayPaging.class) {
+                if (!filtered) return false;
+                long now = SystemClock.uptimeMillis();
+                // The placeholders come into view together, and the first one asked.
+                if (!showing && now - askedAt < SETTLE_MS) return false;
+                if (asks >= MAX_EMPTY_PAGES) {
+                    if (!gaveUp) {
+                        gaveUp = true;
+                        FeedFilterCounters.sawKind(ROUTE, GAVE_UP);
+                        Logger.printDebug(() -> "Stories tray: " + MAX_EMPTY_PAGES + " pages added no kept stories, so it stopped paging");
+                    }
+                    return false;
+                }
+                asks++;
+                askedAt = now;
+                final int count = kept;
+                FeedFilterCounters.sawList(ROUTE, 1);
+                FeedFilterCounters.sawKind(ROUTE, NEXT_PAGE);
+                Logger.printDebug(() -> "Stories tray: " + count + " kept, a gray tile in view, asked for its next page");
+                return true;
+            }
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.SUGGESTED_STORIES, "tray paging", failure);
+            return false;
+        }
+    }
+
+    /**
+     * The tray filter went through the tray, which holds every page loaded so far. A kept count
+     * that changed starts the ask count again; a page that left buckets out gets the row checked
+     * once it settles. Never throws.
+     */
+    static void sawTray(int keptBuckets, int droppedBuckets) {
+        try {
+            synchronized (StoriesTrayPaging.class) {
+                if (droppedBuckets > 0) filtered = true;
+                if (keptBuckets != kept) {
+                    kept = keptBuckets;
+                    asks = 0;
+                    gaveUp = false;
+                }
+            }
+            if (filtered) schedule();
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.SUGGESTED_STORIES, "tray paging", failure);
         }
@@ -122,57 +188,47 @@ public final class StoriesTrayPaging {
         handler.postDelayed(CHECK, SETTLE_MS);
     }
 
-    /** Asks for the next page when the watched tray shows the end of its kept buckets. */
+    /** Shows the handler the last placeholder again while one is in view. */
     static void check() {
         try {
-            View recycler = tray.get();
-            Pager listener = pager.get();
-            // No tray on screen yet: the first filtered page comes before Home lays its tray out,
-            // and watch() schedules the check again when it does.
-            if (recycler == null || listener == null || !recycler.isAttachedToWindow()) return;
-            pending = false;
-            int buckets = listener.hushBucketCount();
-            int last = listener.hushLastTile(recycler);
-            if (!showsBucketsEnd(last, buckets)) return;
-
-            if (askedAt >= 0 && buckets <= askedAt) emptyPages++;
-            else emptyPages = 0;
-            askedAt = buckets;
-            if (emptyPages >= MAX_EMPTY_PAGES) {
-                if (emptyPages == MAX_EMPTY_PAGES) {
-                    FeedFilterCounters.sawKind(ROUTE, GAVE_UP);
-                    Logger.printDebug(() -> "Stories tray: " + MAX_EMPTY_PAGES + " pages added no kept stories, so it stopped paging");
+            Pager handler;
+            int position;
+            synchronized (StoriesTrayPaging.class) {
+                handler = pager.get();
+                position = lastPlaceholder;
+                if (handler == null || placeholdersInView <= 0) {
+                    final boolean noTray = handler == null;
+                    Logger.printDebug(() -> "Stories tray: " + (noTray ? "no tray yet" : "no gray tile in view"));
+                    return;
                 }
-                return;
+                showing = true;
             }
-            boolean asked = listener.hushLoadNextPage();
-            FeedFilterCounters.sawList(ROUTE, 1);
-            FeedFilterCounters.sawKind(ROUTE, asked ? NEXT_PAGE : LAST_PAGE);
-            Logger.printDebug(() -> "Stories tray: " + buckets + " kept, tile " + last + " in view, "
-                    + (asked ? "asked for its next page" : "no next page"));
+            try {
+                handler.hushShowPlaceholder(position);
+            } finally {
+                synchronized (StoriesTrayPaging.class) {
+                    showing = false;
+                }
+            }
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.SUGGESTED_STORIES, "tray paging", failure);
             Logger.printException(() -> "Stories tray: could not ask for the next page", failure);
         }
     }
 
-    /**
-     * Whether the row's last tile in view is the tray's last kept bucket or a tile after it, the
-     * placeholders. Facebook's check reads a tile's position as its bucket's index, so this pages
-     * one bucket early at most, as Facebook's own check does.
-     */
-    static boolean showsBucketsEnd(int lastTile, int buckets) {
-        return lastTile >= 0 && buckets >= 0 && lastTile >= buckets - 1;
-    }
-
-    /** Forgets the tray and any waiting page, for tests. */
+    /** Forgets the tray and its counts, for tests. */
     static void reset() {
-        pager = new WeakReference<>(null);
-        tray = new WeakReference<>(null);
-        pending = false;
-        filtered = false;
-        askedAt = -1;
-        emptyPages = 0;
+        synchronized (StoriesTrayPaging.class) {
+            pager = new WeakReference<>(null);
+            filtered = false;
+            placeholdersInView = 0;
+            lastPlaceholder = -1;
+            kept = -1;
+            asks = 0;
+            gaveUp = false;
+            askedAt = Long.MIN_VALUE / 2;
+            showing = false;
+        }
         if (main != null) main.removeCallbacks(CHECK);
     }
 }

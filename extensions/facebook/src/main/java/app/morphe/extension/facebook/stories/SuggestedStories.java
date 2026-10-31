@@ -297,12 +297,12 @@ public final class SuggestedStories {
                 } else {
                     answer = copy;
                     for (String kind : left) FeedFilterCounters.removed(ROUTE, 1, kind);
-                    StoriesTrayPaging.droppedBuckets();
                 }
             }
 
             // What a tray held, as kinds and how many of each, never whose stories they are.
             final int shown = buckets.size() - left.size();
+            StoriesTrayPaging.sawTray(shown, left.size());
             final String off = switches.offNote();
             Logger.printDebug(() -> "Stories tray: " + buckets.size() + " buckets, " + shown + " kept. Kinds: "
                     + summary(kinds) + off);

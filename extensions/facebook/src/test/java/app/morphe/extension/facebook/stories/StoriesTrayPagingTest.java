@@ -5,72 +5,59 @@
 package app.morphe.extension.facebook.stories;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
-import android.app.Activity;
 import android.os.Looper;
-import android.view.View;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import app.morphe.extension.shared.diagnostics.FeedFilterCounters;
 import app.morphe.extension.shared.diagnostics.HookStatus;
 
 /**
- * Issue #317: a filtered tray whose last kept bucket or placeholders are in view asks for its next
- * page once it settles, even when the placeholders leave the row room to scroll.
+ * Issue #317: while the filters leave buckets out of Home's tray, a gray placeholder coming into
+ * view loads the tray's next page even with the server flag off, and a page that adds nothing in
+ * view is followed by another while a placeholder is still in view.
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 30)
 public class StoriesTrayPagingTest {
-    /** Stands in for the tray's scroll listener once the patch has made it a Pager. */
-    static final class Listener implements StoriesTrayPaging.Pager {
-        int asked;
-        boolean hasNext = true;
-        int lastTile;
-        int buckets;
-        View readFrom;
+    /**
+     * Stands in for the tray's tile handler once the patch has made it a Pager: hands the extension
+     * each tile and asks the flag for a placeholder, as the patched method does.
+     */
+    static final class Handler implements StoriesTrayPaging.Pager {
+        boolean flag;
+        boolean fetching;
+        final List<Integer> loads = new ArrayList<>();
 
-        @Override public boolean hushLoadNextPage() {
-            if (!hasNext) return false;
-            asked++;
-            return true;
+        void show(String bucketId, int position) {
+            StoriesTrayPaging.tileShown(this, bucketId, position);
+            if (!StoriesTrayPaging.PLACEHOLDER.equals(bucketId) || fetching) return;
+            if (StoriesTrayPaging.placeholderPages(flag)) loads.add(position);
         }
 
-        @Override public int hushLastTile(View recycler) {
-            readFrom = recycler;
-            return lastTile;
-        }
-
-        @Override public int hushBucketCount() {
-            return buckets;
+        @Override public void hushShowPlaceholder(int position) {
+            show(StoriesTrayPaging.PLACEHOLDER, position);
         }
     }
 
-    private View row;
-    private final Listener listener = new Listener();
+    private final Handler handler = new Handler();
 
     @Before public void setUp() {
         StoriesTrayPaging.reset();
         FeedFilterCounters.clear();
         HookStatus.clear();
-        Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
-        row = new View(activity);
-        activity.setContentView(row);
-        // The one kept bucket at 1 after Create story, and the three placeholders after it in view.
-        listener.buckets = 1;
-        listener.lastTile = 4;
     }
 
     @After public void tearDown() {
@@ -90,109 +77,114 @@ public class StoriesTrayPagingTest {
         return "";
     }
 
-    @Test public void aFilteredRowShowingItsPlaceholdersAsksForItsNextPageOnceItSettles() {
-        StoriesTrayPaging.watch(listener, row);
-        StoriesTrayPaging.droppedBuckets();
-        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(StoriesTrayPaging.SETTLE_MS / 2));
-        assertEquals("not before the row settles", 0, listener.asked);
-        settle();
-        assertEquals(1, listener.asked);
-        assertSame("the last tile is read from the watched row", row, listener.readFrom);
+    /** The one kept bucket at 1 after Create story, then the three placeholders coming into view. */
+    private void showShortRow() {
+        handler.show("bucket", 1);
+        handler.show(StoriesTrayPaging.PLACEHOLDER, 2);
+        handler.show(StoriesTrayPaging.PLACEHOLDER, 3);
+        handler.show(StoriesTrayPaging.PLACEHOLDER, 4);
+    }
+
+    @Test public void aFilteredRowsPlaceholdersLoadTheNextPageOnce() {
+        StoriesTrayPaging.sawTray(1, 14);
+        showShortRow();
+        assertEquals("the first placeholder in view asks, the two with it don't", List.of(2), handler.loads);
         assertTrue(line(), line().contains("Kinds: " + StoriesTrayPaging.NEXT_PAGE + " 1"));
-        settle();
-        assertEquals("once per filtered page", 1, listener.asked);
     }
 
-    @Test public void aFilteredPageBeforeTheTrayLaysOutWaitsForIt() {
-        StoriesTrayPaging.droppedBuckets();
+    @Test public void anUnfilteredTrayKeepsTheServersAnswer() {
+        StoriesTrayPaging.sawTray(15, 0);
+        showShortRow();
         settle();
-        assertEquals(0, listener.asked);
-        StoriesTrayPaging.watch(listener, row);
-        settle();
-        assertEquals(1, listener.asked);
-    }
-
-    @Test public void aRowOfKeptStoriesPastTheScreenWaitsForAScrollToItsEnd() {
-        listener.buckets = 12;
-        listener.lastTile = 4;
-        StoriesTrayPaging.watch(listener, row);
-        StoriesTrayPaging.droppedBuckets();
-        settle();
-        assertEquals(0, listener.asked);
+        assertEquals(List.of(), handler.loads);
         assertEquals("", line());
-        listener.lastTile = 11;
-        StoriesTrayPaging.watch(listener, row);
-        settle();
-        assertEquals("a scroll to the last bucket pages once the filters have left one out", 1, listener.asked);
+
+        handler.flag = true;
+        handler.show(StoriesTrayPaging.PLACEHOLDER, 5);
+        assertEquals("the flag on still loads", List.of(5), handler.loads);
+        assertEquals("and isn't counted as ours", "", line());
     }
 
-    @Test public void scrollingAnUnfilteredTrayNeverAsks() {
-        StoriesTrayPaging.watch(listener, row);
+    @Test public void aPageWithNothingKeptIsFollowedByAnotherWhileAPlaceholderIsInView() {
+        StoriesTrayPaging.sawTray(1, 14);
+        showShortRow();
+        // The next page arrives with nothing kept, so nothing new comes into view.
+        StoriesTrayPaging.sawTray(1, 18);
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(StoriesTrayPaging.SETTLE_MS / 2));
+        assertEquals("not before the page settles", 1, handler.loads.size());
         settle();
-        assertEquals(0, listener.asked);
+        assertEquals("the last placeholder in view is shown again", List.of(2, 4), handler.loads);
+    }
+
+    @Test public void placeholdersOutOfViewAreLeftAlone() {
+        StoriesTrayPaging.sawTray(1, 14);
+        showShortRow();
+        for (int tile = 0; tile < 3; tile++) StoriesTrayPaging.placeholderHidden();
+        StoriesTrayPaging.sawTray(1, 18);
+        settle();
+        assertEquals(List.of(2), handler.loads);
+        StoriesTrayPaging.placeholderHidden();
+        StoriesTrayPaging.sawTray(1, 20);
+        settle();
+        assertEquals("never counts below none", List.of(2), handler.loads);
+    }
+
+    @Test public void aFetchRunningAsksNothing() {
+        StoriesTrayPaging.sawTray(1, 14);
+        handler.fetching = true;
+        showShortRow();
+        settle();
+        assertEquals(List.of(), handler.loads);
         assertEquals("", line());
-    }
-
-    @Test public void aTrayWithNoNextPageIsCountedAndLeftAlone() {
-        listener.hasNext = false;
-        StoriesTrayPaging.watch(listener, row);
-        StoriesTrayPaging.droppedBuckets();
-        settle();
-        assertEquals(0, listener.asked);
-        assertTrue(line(), line().contains("Kinds: " + StoriesTrayPaging.LAST_PAGE + " 1"));
     }
 
     @Test public void pagesThatAddNoKeptStoryStopAfterTheLimit() {
-        StoriesTrayPaging.watch(listener, row);
+        StoriesTrayPaging.sawTray(1, 14);
+        showShortRow();
         for (int page = 0; page < StoriesTrayPaging.MAX_EMPTY_PAGES + 3; page++) {
-            StoriesTrayPaging.droppedBuckets();
+            StoriesTrayPaging.sawTray(1, 18 + page);
             settle();
         }
-        assertEquals(StoriesTrayPaging.MAX_EMPTY_PAGES, listener.asked);
+        assertEquals(StoriesTrayPaging.MAX_EMPTY_PAGES, handler.loads.size());
         assertTrue(line(), line().contains(StoriesTrayPaging.GAVE_UP + " 1"));
 
-        listener.buckets = 2;
-        StoriesTrayPaging.droppedBuckets();
+        StoriesTrayPaging.sawTray(2, 40);
         settle();
-        assertEquals("a page that adds a kept story starts it again", StoriesTrayPaging.MAX_EMPTY_PAGES + 1, listener.asked);
+        assertEquals("a page that adds a kept story starts it again", StoriesTrayPaging.MAX_EMPTY_PAGES + 1, handler.loads.size());
     }
 
-    @Test public void aNewTrayStartsItsOwnCount() {
-        StoriesTrayPaging.watch(listener, row);
-        for (int page = 0; page < StoriesTrayPaging.MAX_EMPTY_PAGES; page++) {
-            StoriesTrayPaging.droppedBuckets();
-            settle();
-        }
-        Listener fresh = new Listener();
-        fresh.buckets = 1;
-        fresh.lastTile = 4;
-        StoriesTrayPaging.watch(fresh, row);
-        StoriesTrayPaging.droppedBuckets();
+    @Test public void theHandlersOwnShowingIsntCountedAsATileInView() {
+        StoriesTrayPaging.sawTray(1, 14);
+        showShortRow();
+        StoriesTrayPaging.sawTray(1, 18);
         settle();
-        assertEquals(1, fresh.asked);
+        // Three came into view, the extension showed one again, and three leave.
+        for (int tile = 0; tile < 3; tile++) StoriesTrayPaging.placeholderHidden();
+        StoriesTrayPaging.sawTray(1, 20);
+        settle();
+        assertEquals(List.of(2, 4), handler.loads);
     }
 
-    @Test public void onlyAPatchedListenerIsWatched() {
-        StoriesTrayPaging.watch(new Object(), row);
-        StoriesTrayPaging.watch(listener, null);
-        StoriesTrayPaging.droppedBuckets();
+    @Test public void noTrayYetIsLeftAlone() {
+        StoriesTrayPaging.sawTray(1, 14);
         settle();
-        assertEquals(0, listener.asked);
+        StoriesTrayPaging.check();
+        assertEquals(List.of(), handler.loads);
+        assertTrue(HookStatus.missing().toString(), HookStatus.missing().isEmpty());
     }
 
-    @Test public void aDetachedRowIsLeftAlone() {
-        StoriesTrayPaging.watch(listener, new View(row.getContext()));
-        StoriesTrayPaging.droppedBuckets();
+    @Test public void aHandlerThatThrowsIsRecordedAndLetGo() {
+        StoriesTrayPaging.Pager broken = position -> {
+            throw new IllegalStateException("gone");
+        };
+        StoriesTrayPaging.sawTray(1, 14);
+        StoriesTrayPaging.tileShown(broken, StoriesTrayPaging.PLACEHOLDER, 2);
         settle();
-        assertEquals(0, listener.asked);
-    }
-
-    @Test public void theBucketsEndIsTheLastBucketOrATileAfterIt() {
-        assertTrue("a placeholder", StoriesTrayPaging.showsBucketsEnd(4, 1));
-        assertTrue("the last bucket", StoriesTrayPaging.showsBucketsEnd(1, 1));
-        assertTrue("one before the last, as Facebook's check reads it", StoriesTrayPaging.showsBucketsEnd(10, 11));
-        assertFalse(StoriesTrayPaging.showsBucketsEnd(4, 12));
-        assertFalse("nothing read", StoriesTrayPaging.showsBucketsEnd(-1, 1));
-        assertFalse("nothing read", StoriesTrayPaging.showsBucketsEnd(4, -1));
+        assertTrue(HookStatus.missing().toString(), HookStatus.missing().toString().contains("tray paging"));
+        StoriesTrayPaging.tileShown(handler, "bucket", 1);
+        StoriesTrayPaging.tileShown(handler, StoriesTrayPaging.PLACEHOLDER, 2);
+        StoriesTrayPaging.sawTray(1, 18);
+        settle();
+        assertEquals("the next check still runs", List.of(2), handler.loads);
     }
 }
