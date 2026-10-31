@@ -454,6 +454,8 @@ public class ColdStartHooksTest {
         assertEquals("a search saved before the context was kept off Recent", "list", recent.get("filter"));
         assertEquals("a filter read before the context kept its kind", "kind", SearchDateRange.kind(new Object(), "kind"));
         assertTrue("a sheet flag read before the context kept its answer", SearchDateRange.bottomSheet(true));
+        assertEquals("a sheet callback read before the context was kept", "callback",
+                SearchDateRange.callback(new Object(), Thread.State.NEW, "callback"));
         // A push can start Facebook, so the notification hook can run this early.
         assertFalse("a trending video push before the context was blocked", NotificationKindsForTests.blocksTrendingVideo());
         assertFalse("a birthday push before the context was blocked", NotificationKindsForTests.blocksBirthday());

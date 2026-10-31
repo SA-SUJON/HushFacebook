@@ -12,6 +12,7 @@ import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.methodsHolding
 import app.morphe.patches.shared.compat.AppCompatibilities
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -24,9 +25,10 @@ import java.io.File
  * Search date range on every Facebook build the bundle declares, both ABIs of each. One method
  * holds the filter tap mutation, reads a filter's kind through an interface call answering the enum
  * that holds all three kinds, and then reads the bottom sheet flag with a mobile config call tested
- * with if-nez. The filter's interface keeps the getName the extension reads by reflection. Patched,
- * the flag's answer goes through the extension first and the kind goes through it with the filter,
- * and the rest of Facebook's code stays as it was.
+ * with if-nez. Before that read, the filter sheet's own callback is tested by an if-eqz jumping to
+ * it, and with a callback the tap goes there. The filter's interface keeps the getName the extension
+ * reads by reflection. Patched, the callback, the kind and the flag each go through the extension
+ * first, and the rest of Facebook's code stays as it was.
  */
 class SearchDateRangeFixtureTest {
     private fun bundles(check: (File) -> Unit) {
@@ -73,27 +75,48 @@ class SearchDateRangeFixtureTest {
         assertTrue("$where: the filter interface ${filter.type} keeps a getName()String",
             filter.methods.any { it.name == "getName" && it.parameterTypes.isEmpty() && it.returnType == "Ljava/lang/String;" })
 
+        // The filter sheet's own callback is tested before the kind read, and with one the tap goes to it.
+        val sheet = callbackTest(method, read)
+        assertTrue("$where tests the filter sheet's callback right before its kind read", sheet != null)
+        sheet!!
+        val invoked = original[sheet.test + 1] as ReferenceInstruction
+        assertTrue("$where: the callback is what runs when it's there",
+            original[sheet.test + 1].opcode == Opcode.INVOKE_INTERFACE &&
+                (invoked as FiveRegisterInstruction).registerC == sheet.callback &&
+                (invoked.reference as MethodReference).definingClass == sheet.callbackType)
+
         val owner = FixtureDex.classes(bundle, setOf(method.definingClass)).values.single()
         val context = PatchContexts.of(listOf(owner))
         val mutable = context.mutableClassDefBy(owner.type).methods.single { it.descriptor() == method.descriptor() }
         mutable.hookFlag(read)
         mutable.hookKind(read)
+        mutable.hookCallback(sheet)
         val patched = mutable.implementation!!.instructions.toList().filter { it.opcode != Opcode.NOP }
         val stock = original.filter { it.opcode != Opcode.NOP }
-        assertEquals("$where gains the kind's three and the flag's two instructions", stock.size + 5, patched.size)
-        val atKind = read.call + 1
+        assertEquals("$where gains the callback's three, the kind's three and the flag's two instructions",
+            stock.size + 8, patched.size)
+        assertEquals("$where: the callback is handed over", CALLBACK,
+            (patched[sheet.test] as ReferenceInstruction).reference.toString())
+        assertEquals("$where: its answer goes back to the callback's register", sheet.callback,
+            (patched[sheet.test + 1] as OneRegisterInstruction).registerA)
+        assertEquals("$where: and is cast to the callback", Opcode.CHECK_CAST, patched[sheet.test + 2].opcode)
+        assertEquals("$where: then Facebook tests it", Opcode.IF_EQZ, patched[sheet.test + 3].opcode)
+        val atKind = read.call + 3 + 1
         assertEquals("$where: the kind is handed over", KIND, (patched[atKind + 1] as ReferenceInstruction).reference.toString())
         assertEquals("$where: its answer goes back to the kind's register", read.kind,
             (patched[atKind + 2] as OneRegisterInstruction).registerA)
         assertEquals("$where: and is cast to the kind", Opcode.CHECK_CAST, patched[atKind + 3].opcode)
         assertEquals("$where: the flag is handed over", BOTTOM_SHEET,
-            (patched[read.flagResult + 4] as ReferenceInstruction).reference.toString())
+            (patched[read.flagResult + 7] as ReferenceInstruction).reference.toString())
         assertEquals("$where: the rest of Facebook's code stays",
             stock.map { it.opcode },
-            patched.filterIndexed { index, _ -> index !in (atKind + 1..atKind + 3) && index !in (read.flagResult + 4..read.flagResult + 5) }
-                .map { it.opcode })
+            patched.filterIndexed { index, _ ->
+                index !in (sheet.test..sheet.test + 2) && index !in (atKind + 1..atKind + 3) &&
+                    index !in (read.flagResult + 7..read.flagResult + 8)
+            }.map { it.opcode })
     }
 
     @Test
-    fun `each declared build reads a filter's kind and then the sheet flag in one place and hooks both`() = bundles(::tap)
+    fun `each declared build reads a filter's kind, the sheet flag and the sheet callback in one place and hooks all three`() =
+        bundles(::tap)
 }

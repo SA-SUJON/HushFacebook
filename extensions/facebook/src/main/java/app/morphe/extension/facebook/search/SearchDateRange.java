@@ -24,6 +24,11 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * Facebook shows the newer filter screen as a bottom sheet behind a server flag, and that sheet
  * only knows lists and toggles, so the flag is answered false for the same tap and Facebook takes
  * the screen that has the picker.
+ *
+ * <p>The search tabs' "Filter results" sheet drills into a filter's choices inside the sheet. It
+ * hands the tap handler its own callback, and a tap with a callback goes to it and never reaches
+ * the kind. For the date filter with the switch on, {@link #callback} answers no callback, so the
+ * tap carries on to the kind and the picker.
  */
 public final class SearchDateRange {
     /** The name Facebook gives the Posted date filter. */
@@ -37,6 +42,9 @@ public final class SearchDateRange {
 
     /** The member the report names once the bottom sheet flag has been asked about. */
     static final String SHEET_FLAG = "bottom sheet flag";
+
+    /** The member the report names once a sheet's own tap callback has been asked about. */
+    static final String SHEET_CALLBACK = "sheet tap callback";
 
     /** What the report counts each time the date filter opens as a range. */
     static final String OPENED = "Date filter opened as a range";
@@ -63,7 +71,11 @@ public final class SearchDateRange {
                 return facebookKind;
             }
             Enum<?> current = (Enum<?>) facebookKind;
-            if (DATE_RANGE.equals(current.name()) || !FILTER.equals(filterName(filter))) return facebookKind;
+            String name = filterName(filter);
+            if (DATE_RANGE.equals(current.name()) || !FILTER.equals(name)) {
+                Logger.printDebug(() -> "Search date range: filter " + name + " keeps " + current.name());
+                return facebookKind;
+            }
             for (Object constant : current.getDeclaringClass().getEnumConstants()) {
                 if (DATE_RANGE.equals(((Enum<?>) constant).name())) {
                     remapped = true;
@@ -95,11 +107,39 @@ public final class SearchDateRange {
         return !mine && facebookSheet;
     }
 
+    /**
+     * The hook where a tap on a filter checks for a sheet's own callback, handed the filter, the
+     * kind Facebook read and the callback. No callback comes back for the Posted date filter while
+     * the switch is on, so the tap reaches {@link #kind}; otherwise, and for a throw, the callback.
+     */
+    public static Object callback(Object filter, Object facebookKind, Object facebookCallback) {
+        try {
+            HookStatus.bound(FAMILY, SHEET_CALLBACK);
+            if (facebookCallback == null || !(facebookKind instanceof Enum) || !Utils.settingsReady()
+                    || !Settings.SEARCH_DATE_RANGE.get()) {
+                return facebookCallback;
+            }
+            String name = filterName(filter);
+            if (DATE_RANGE.equals(((Enum<?>) facebookKind).name()) || !FILTER.equals(name)) {
+                Logger.printDebug(() -> "Search date range: the sheet keeps filter " + name);
+                return facebookCallback;
+            }
+            Logger.printDebug(() -> "Search date range: the sheet hands the date filter on to the picker");
+            return null;
+        } catch (Throwable failure) {
+            HookStatus.threw(FAMILY, SHEET_CALLBACK, failure);
+            return facebookCallback;
+        }
+    }
+
     /** The filter's name, from the getName its interface keeps; null when it has none. */
     static String filterName(Object filter) {
         if (filter == null) return null;
         try {
             Method name = filter.getClass().getMethod("getName");
+            // Facebook's filter classes needn't be public, and a public method of one still
+            // refuses a caller from another package.
+            name.setAccessible(true);
             Object value = name.invoke(filter);
             return value instanceof String ? (String) value : null;
         } catch (ReflectiveOperationException | RuntimeException notAFilter) {

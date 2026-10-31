@@ -958,7 +958,9 @@ public class PausedHooksTest {
                     SearchDateRange.kind(new SearchDateRangeTest.Filter("rp_creation_time"),
                             SearchDateRangeTest.Kind.MULTI_CHOICE);
                     return !SearchDateRange.bottomSheet(true);
-                }));
+                },
+                () -> SearchDateRange.callback(new SearchDateRangeTest.Filter("rp_creation_time"),
+                        SearchDateRangeTest.Kind.MULTI_CHOICE, "callback") == null));
         // XAnalytics' upload and uploader resume are skipped, and the Papaya job finishes unrun.
         probes.put(PatchFamily.ANALYTICS_UPLOADS, Arrays.asList(
                 AnalyticsUploads::holdXAnalyticsUpload,

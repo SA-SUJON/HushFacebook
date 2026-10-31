@@ -6,6 +6,7 @@ package app.morphe.extension.facebook.search;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -26,7 +27,8 @@ import app.morphe.extension.shared.settings.PauseForTests;
 
 /**
  * Search date range (#279): with its switch on, the Posted date filter answers the date range
- * kind and the bottom sheet flag answers off for that same tap. Every other filter, and every
+ * kind, the bottom sheet flag answers off for that same tap, and the filter sheet's own tap
+ * callback is skipped for it. Every other filter, and every
  * answer with the switch off, paused, or before the settings are ready, is Facebook's own.
  */
 @RunWith(RobolectricTestRunner.class)
@@ -129,6 +131,25 @@ public class SearchDateRangeTest {
             assertSame(Kind.MULTI_CHOICE, SearchDateRange.kind(POSTED, Kind.MULTI_CHOICE));
             assertTrue(SearchDateRange.bottomSheet(true));
         });
+    }
+
+    @Test
+    public void inTheFilterSheetThePostedDateFilterSkipsTheSheetsOwnCallback() {
+        Settings.SEARCH_DATE_RANGE.save(true);
+        Object callback = new Object();
+        assertNull("the date filter stayed in the sheet", SearchDateRange.callback(POSTED, Kind.MULTI_CHOICE, callback));
+        assertSame(callback, SearchDateRange.callback(new Filter("rp_author"), Kind.MULTI_CHOICE, callback));
+        assertSame(callback, SearchDateRange.callback(POSTED, Kind.DATE_RANGE_PICKER, callback));
+        assertNull("a tap with no callback gained one", SearchDateRange.callback(POSTED, Kind.MULTI_CHOICE, null));
+    }
+
+    @Test
+    public void offOrPausedTheSheetKeepsItsCallback() {
+        Object callback = new Object();
+        assertSame(callback, SearchDateRange.callback(POSTED, Kind.MULTI_CHOICE, callback));
+        Settings.SEARCH_DATE_RANGE.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertSame(callback, SearchDateRange.callback(POSTED, Kind.MULTI_CHOICE, callback));
     }
 
     @Test

@@ -24,8 +24,10 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val PATCH = "Search date range"
@@ -36,6 +38,8 @@ internal const val TAP_FILTER = "choiceActionSheetTapFilter"
 private const val SEARCH_DATE_RANGE = "$EXTENSION_PACKAGE/search/SearchDateRange;"
 internal const val KIND = "$SEARCH_DATE_RANGE->kind(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
 internal const val BOTTOM_SHEET = "$SEARCH_DATE_RANGE->bottomSheet(Z)Z"
+internal const val CALLBACK =
+    "$SEARCH_DATE_RANGE->callback(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
 
 /** The kinds a filter declares, as the enum's constants are named; the kind class holds all of them. */
 internal val FILTER_KINDS = listOf("DATE_RANGE_PICKER", "MULTI_CHOICE", "TIME_PICKER")
@@ -66,6 +70,13 @@ internal const val FLAG_REACH = 12
  * holds all of [FILTER_KINDS], with the flag, a static mobile config call answering a boolean, read
  * within [FLAG_REACH] instructions after it and tested with if-nez. In the default selection with
  * its switch off, so nothing changes until it's turned on.
+ *
+ * The search tabs' "Filter results" sheet (585 `LX/0k33`, "search_filter_drilldown_level") hands the
+ * tap handler its own callback (`LX/0k6D;->A07`), which shows the filter's choices inside the sheet.
+ * Facebook reads the kind once before that, and a tap with a callback goes to the callback and returns,
+ * so the hooked read never runs. That test is the if-eqz jumping straight to the hooked read, and the
+ * extension is handed the filter, that first kind and the callback before it. For the date filter
+ * with the switch on it answers no callback, and the tap carries on to the picker.
  */
 @Suppress("unused")
 val searchDateRangePatch = bytecodePatch(
@@ -89,10 +100,15 @@ val searchDateRangePatch = bytecodePatch(
                 "$PATCH: expected one method holding \"$TAP_FILTER\" that reads a filter's kind and then the bottom " +
                     "sheet flag, found ${found.size}: ${found.joinToString { it.first.descriptor() }}",
             )
+        val sheet = callbackTest(tap, read)
+            ?: throw PatchException(
+                "$PATCH: ${tap.descriptor()} has no test of the filter sheet's own callback jumping to its kind read",
+            )
         val method = mutableClassDefBy(tap.definingClass).methods.single { it.descriptor() == tap.descriptor() }
-        // The flag first: asking for the kind moves every later instruction down.
+        // The last first: each hook moves every later instruction down.
         method.hookFlag(read)
         method.hookKind(read)
+        method.hookCallback(sheet)
         enableStatus("searchDateRange")
     }
 }
@@ -153,6 +169,65 @@ internal fun kindRead(method: Method, classOf: (String) -> ClassDef?): KindRead?
         KindRead(index, filter, kind, reference.returnType, flagCall + 1, flag)
     }
     return reads.singleOrNull()
+}
+
+/** Where a tap handler tests for a filter sheet's own callback, which skips the kind read when there is one. */
+internal class CallbackTest(
+    /** The index of the if-eqz on the callback; with none it jumps to the kind read. */
+    val test: Int,
+    /** The register the filter is in. */
+    val filter: Int,
+    /** The register Facebook's first read of the kind landed in. */
+    val kind: Int,
+    /** The register the callback is in. */
+    val callback: Int,
+    /** The callback's type, as the field it was read from declares it. */
+    val callbackType: String,
+)
+
+/**
+ * The one if-eqz in [method] that jumps straight to [read]'s kind call, right after the same kind call
+ * on the same filter, its move-result and its if-eqz, or null. The register it tests was last loaded
+ * from an instance field, whose type the hook casts back to.
+ */
+internal fun callbackTest(method: Method, read: KindRead): CallbackTest? {
+    val code = method.implementation?.instructions?.toList() ?: return null
+    val address = IntArray(code.size + 1)
+    for (at in code.indices) address[at + 1] = address[at] + code[at].codeUnits
+    val kindCall = (code[read.call] as ReferenceInstruction).reference
+    val tests = (3 until read.call).mapNotNull { at ->
+        val test = code[at]
+        if (test.opcode != Opcode.IF_EQZ || address[at] + (test as OffsetInstruction).codeOffset != address[read.call]) {
+            return@mapNotNull null
+        }
+        val first = code[at - 3]
+        val landing = code[at - 2]
+        val kindTest = code[at - 1]
+        if (first.opcode != Opcode.INVOKE_INTERFACE || (first as ReferenceInstruction).reference != kindCall) return@mapNotNull null
+        if ((first as FiveRegisterInstruction).registerC != read.filter) return@mapNotNull null
+        if (landing.opcode != Opcode.MOVE_RESULT_OBJECT || kindTest.opcode != Opcode.IF_EQZ) return@mapNotNull null
+        val kind = (landing as OneRegisterInstruction).registerA
+        if ((kindTest as OneRegisterInstruction).registerA != kind) return@mapNotNull null
+        val callback = (test as OneRegisterInstruction).registerA
+        val load = (at - 4 downTo 0).firstOrNull { code[it].opcode == Opcode.IGET_OBJECT &&
+            (code[it] as OneRegisterInstruction).registerA == callback } ?: return@mapNotNull null
+        val field = (code[load] as ReferenceInstruction).reference as? FieldReference ?: return@mapNotNull null
+        if (maxOf(read.filter, kind, callback) > 15 || callback == kind || callback == read.filter) return@mapNotNull null
+        CallbackTest(at, read.filter, kind, callback, field.type)
+    }
+    return tests.singleOrNull()
+}
+
+/** Before the callback is tested, the extension is handed the filter, the first kind and the callback, and its answer goes back. */
+internal fun MutableMethod.hookCallback(test: CallbackTest) {
+    addInstructions(
+        test.test,
+        """
+            invoke-static { v${test.filter}, v${test.kind}, v${test.callback} }, $CALLBACK
+            move-result-object v${test.callback}
+            check-cast v${test.callback}, ${test.callbackType}
+        """,
+    )
 }
 
 /** After the flag is read, the extension is handed it and its answer goes back into the register. */
