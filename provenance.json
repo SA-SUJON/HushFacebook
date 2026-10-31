@@ -1050,9 +1050,11 @@
       "paths": [
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/PlaybackQuality.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/QualityChoice.java",
+        "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/QualityList.java",
         "extensions/facebook/src/main/java/app/morphe/extension/facebook/media/SurfaceQuality.java",
         "patches/src/main/kotlin/app/morphe/patches/facebook/media/quality/DefaultPlaybackQualityPatch.kt",
-        "patches/src/main/kotlin/app/morphe/patches/facebook/media/quality/QualityAnchors.kt"
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/quality/QualityAnchors.kt",
+        "patches/src/main/kotlin/app/morphe/patches/facebook/media/quality/QualityRow.kt"
       ],
       "origin": "original",
       "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
