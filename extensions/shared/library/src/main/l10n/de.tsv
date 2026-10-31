@@ -1889,6 +1889,10 @@ Hides the People you may know row Facebook shows when you open search. Your rece
 Don't save search history	Suchverlauf nicht speichern
 # context: summary of that switch; searches already in the history are the user's own past searches, which stay until the user deletes them
 What you search for, and the pages and profiles you open from a search, aren't added to your Facebook search history. Searches already there stay until you delete them.	Was du suchst und die Seiten und Profile, die du aus einer Suche öffnest, werden nicht in deinen Facebook-Suchverlauf aufgenommen. Suchen, die schon dort sind, bleiben, bis du sie löschst.
+# context: switch title under Search; on, the Date posted filter in post search asks for a from and to month instead of a list of years; Date posted is Facebook's own filter name in search results
+Search date range	Datumsbereich in der Suche
+# context: summary of that switch; Date posted is Facebook's own filter name in post search results, named here as Facebook shows it
+The Date posted filter in post search asks for a from and to month, in place of a list of years.	Der Filter „Gepostet am“ in der Beitragssuche fragt nach einem Von- und Bis-Monat statt nach einer Liste von Jahren.
 # context: switch title under Reels and Watch; the audio line is the scrolling line at the bottom of a reel naming its sound, like "Name · Original audio" or a song title
 Hide the audio line on reels	Audiozeile bei Reels ausblenden
 # context: summary of that switch; "Original audio" is Facebook's own label, so use the wording Facebook shows in this language

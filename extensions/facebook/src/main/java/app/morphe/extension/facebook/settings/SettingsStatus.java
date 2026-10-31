@@ -426,6 +426,10 @@ public final class SettingsStatus {
         return false;
     }
 
+    public static boolean searchDateRange() {
+        return false;
+    }
+
     public static boolean menuSettingsRow() {
         return false;
     }

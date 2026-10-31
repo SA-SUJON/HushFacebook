@@ -1604,6 +1604,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_dont_save_search_history", FALSE);
 
     /**
+     * The Posted date filter in post search opens Facebook's own from and to month picker in place
+     * of the list of years ({@link app.morphe.extension.facebook.search.SearchDateRange}, #279).
+     * Off by default.
+     */
+    public static final BooleanSetting SEARCH_DATE_RANGE =
+            new BooleanSetting("hushfacebook_search_date_range", FALSE);
+
+    /**
      * The For you section of searches Facebook suggests, on the search screen before anything is
      * typed (#80), found by the module name Facebook gives its entry. Recent searches, the search box
      * and the suggestions while typing stay. Part of Hide suggested and promoted posts, off until picked.

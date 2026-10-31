@@ -254,6 +254,8 @@ public enum PatchFamily {
             Settings.HIDE_META_AI_IN_SEARCH),
     SEARCH_HISTORY(FamilyNames.SEARCH_HISTORY, "searchHistory", null,
             Settings.DONT_SAVE_SEARCH_HISTORY),
+    SEARCH_DATE_RANGE(FamilyNames.SEARCH_DATE_RANGE, "searchDateRange", null,
+            Settings.SEARCH_DATE_RANGE),
     ANALYTICS_UPLOADS(FamilyNames.ANALYTICS_UPLOADS, "analyticsUploads", null,
             Settings.HOLD_ANALYTICS_UPLOADS, Settings.HOLD_CAMERA_ROLL_PROCESSING),
     SCREENSHOTS(FamilyNames.SCREENSHOTS, "allowScreenshots", null,

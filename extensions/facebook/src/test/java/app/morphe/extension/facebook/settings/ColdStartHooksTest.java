@@ -119,6 +119,7 @@ import app.morphe.extension.facebook.reels.ReelMidCardsForTests;
 import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.reels.TapShowsControls;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
+import app.morphe.extension.facebook.search.SearchDateRange;
 import app.morphe.extension.facebook.search.SearchHistory;
 import app.morphe.extension.facebook.stories.StoryAdvance;
 import app.morphe.extension.facebook.stories.StorySeenForTests;
@@ -451,6 +452,8 @@ public class ColdStartHooksTest {
         Map<Object, Object> recent = new HashMap<>();
         SearchHistory.keepRecent(recent, "filter", "list");
         assertEquals("a search saved before the context was kept off Recent", "list", recent.get("filter"));
+        assertEquals("a filter read before the context kept its kind", "kind", SearchDateRange.kind(new Object(), "kind"));
+        assertTrue("a sheet flag read before the context kept its answer", SearchDateRange.bottomSheet(true));
         // A push can start Facebook, so the notification hook can run this early.
         assertFalse("a trending video push before the context was blocked", NotificationKindsForTests.blocksTrendingVideo());
         assertFalse("a birthday push before the context was blocked", NotificationKindsForTests.blocksBirthday());

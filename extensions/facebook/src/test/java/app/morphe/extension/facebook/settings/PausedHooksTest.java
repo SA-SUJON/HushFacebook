@@ -161,6 +161,8 @@ import app.morphe.extension.facebook.reels.SeenStateSendForTests;
 import app.morphe.extension.facebook.reels.TapShowsControls;
 import app.morphe.extension.facebook.search.MetaAiSearchForTests;
 import app.morphe.extension.facebook.search.PreSearchSectionsForTests;
+import app.morphe.extension.facebook.search.SearchDateRange;
+import app.morphe.extension.facebook.search.SearchDateRangeTest;
 import app.morphe.extension.facebook.search.SearchHistory;
 import app.morphe.extension.facebook.stories.StoryAdvance;
 import app.morphe.extension.facebook.stories.StorySeenForTests;
@@ -948,6 +950,15 @@ public class PausedHooksTest {
             SearchHistory.keepRecent(recent, "filter", "list");
             return recent.isEmpty();
         }));
+        // The Posted date filter keeps its list of years.
+        probes.put(PatchFamily.SEARCH_DATE_RANGE, Arrays.asList(
+                () -> SearchDateRange.kind(new SearchDateRangeTest.Filter("rp_creation_time"),
+                        SearchDateRangeTest.Kind.MULTI_CHOICE) == SearchDateRangeTest.Kind.DATE_RANGE_PICKER,
+                () -> {
+                    SearchDateRange.kind(new SearchDateRangeTest.Filter("rp_creation_time"),
+                            SearchDateRangeTest.Kind.MULTI_CHOICE);
+                    return !SearchDateRange.bottomSheet(true);
+                }));
         // XAnalytics' upload and uploader resume are skipped, and the Papaya job finishes unrun.
         probes.put(PatchFamily.ANALYTICS_UPLOADS, Arrays.asList(
                 AnalyticsUploads::holdXAnalyticsUpload,

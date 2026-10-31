@@ -283,9 +283,9 @@ public class PatchFamilyTest {
                 PatchFamily.SYSTEM_FONT, PatchFamily.SYSTEM_EMOJI, PatchFamily.HAPTICS,
                 PatchFamily.SCREEN_TRANSITIONS, PatchFamily.VIDEO_DOWNLOAD, PatchFamily.START_TAB,
                 PatchFamily.REELS_TAB, PatchFamily.META_UPSELLS, PatchFamily.SHARE_SHEET_ITEMS,
-                PatchFamily.SEARCH_HISTORY, PatchFamily.ANALYTICS_UPLOADS, PatchFamily.SCREENSHOTS, PatchFamily.SCREENSHOT_DETECTION,
+                PatchFamily.SEARCH_HISTORY, PatchFamily.SEARCH_DATE_RANGE, PatchFamily.ANALYTICS_UPLOADS, PatchFamily.SCREENSHOTS, PatchFamily.SCREENSHOT_DETECTION,
                 PatchFamily.TYPING_INDICATOR, PatchFamily.READ_RECEIPTS, PatchFamily.ACCENT_COLOR);
-        assertEquals(35, joined.size());
+        assertEquals(36, joined.size());
         for (PatchFamily family : joined) {
             assertTrue(family.patchName + " isn't in the default selection",
                     PatchFamily.DEFAULT_SELECTION.contains(family));
@@ -442,7 +442,7 @@ public class PatchFamilyTest {
                         + "tab, Hide the Reels tab dot, Hide tab badges, Hide tabs, Tab bar at the bottom, Force dark "
                         + "mode, Hide the Get Messenger card, Clean up Facebook's chat list, Open Messenger from the "
                         + "top bar, Hide Menu promotions, Hide Meta upsells, Share sheet items, Hide Meta AI in search, "
-                        + "Don't save search history, Hold back analytics uploads, Allow screenshots, Block screenshot detection, Hide typing indicator, "
+                        + "Don't save search history, Search date range, Hold back analytics uploads, Allow screenshots, Block screenshot detection, Hide typing indicator, "
                         + "Hide read receipts, Send chat photos and videos at original quality, Block promotional "
                         + "notifications, Block ad telemetry, Disable Audience Network, AMOLED black theme, Material "
                         + "You theme, Accent color, Badge and logo colors, Restore screens on re-signed builds, Start on x86 devices, "
@@ -465,7 +465,7 @@ public class PatchFamilyTest {
                         + "the Reels tab, Hide the Reels tab dot, Hide tab badges, Hide tabs, Tab bar at the bottom, "
                         + "Force dark mode, Hide the Get Messenger card, Clean up Facebook's chat list, Open "
                         + "Messenger from the top bar, Hide Menu promotions, Hide Meta upsells, Share sheet items, Hide "
-                        + "Meta AI in search, Don't save search history, Hold back analytics uploads, Allow screenshots, Block screenshot detection, Hide "
+                        + "Meta AI in search, Don't save search history, Search date range, Hold back analytics uploads, Allow screenshots, Block screenshot detection, Hide "
                         + "typing indicator, Hide read receipts, Send chat photos and videos at original quality, "
                         + "Block promotional notifications, Block ad telemetry, Disable Audience Network, Accent "
                         + "color, Badge and logo colors, Restore screens on re-signed builds, Start on x86 devices, Install beside Meta's "

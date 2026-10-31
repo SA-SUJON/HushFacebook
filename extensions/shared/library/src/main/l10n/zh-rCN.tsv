@@ -1884,6 +1884,10 @@ Hides the People you may know row Facebook shows when you open search. Your rece
 Don't save search history	不保存搜索记录
 # context: summary of that switch; searches already in the history are the user's own past searches, which stay until the user deletes them
 What you search for, and the pages and profiles you open from a search, aren't added to your Facebook search history. Searches already there stay until you delete them.	你搜索的内容，以及你从搜索中打开的主页和个人资料，都不会加入你的 Facebook 搜索记录。已有的搜索会保留，直到你删除。
+# context: switch title under Search; on, the Date posted filter in post search asks for a from and to month instead of a list of years; Date posted is Facebook's own filter name in search results
+Search date range	搜索日期范围
+# context: summary of that switch; Date posted is Facebook's own filter name in post search results, named here as Facebook shows it
+The Date posted filter in post search asks for a from and to month, in place of a list of years.	帖子搜索中的发布日期筛选会让你选择起止月份，而不是年份列表。
 # context: switch title under Reels and Watch; the audio line is the scrolling line at the bottom of a reel naming its sound, like "Name · Original audio" or a song title
 Hide the audio line on reels	隐藏 Reels 上的音频行
 # context: summary of that switch; "Original audio" is Facebook's own label, so use the wording Facebook shows in this language
