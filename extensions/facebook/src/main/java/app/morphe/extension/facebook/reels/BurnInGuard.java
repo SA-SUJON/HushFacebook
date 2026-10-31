@@ -57,7 +57,8 @@ import app.morphe.extension.shared.settings.Setting;
  * Facebook's views carry no ids to know a reel by, and the Reels tab and a reel or video opened full
  * screen are built differently, but each plays on one surface that fills the screen. A reel takes
  * about 87% of an S22's window with the tab bar showing, a tall video in the feed about 58% and a
- * landscape one about 26%.
+ * landscape one about 26%. Facebook's camera and story editor fill the screen with a preview too,
+ * and their shutter and tools are never dimmed ({@link #camera}).
  *
  * <p>The dim: once the Reels screen has gone the Dim after choice ({@link BurnInWait}) without a
  * touch, what shows beside the video is drawn at {@link #IDLE_LEVEL} of what Facebook draws it at,
@@ -102,6 +103,8 @@ public final class BurnInGuard {
      * the video a view that takes taps covers for a tap on it to be a tap on the video.
      */
     static final float REELS_SHARE = 0.7f;
+    /** The package of Facebook's camera and story editor screens (585: InspirationCameraActivity). */
+    static final String CAMERA_PACKAGE = "com.facebook.inspiration.";
     /** How long the content stays in one place. */
     static final long SHIFT_EVERY_MS = 120_000L;
     static final float STEP_DP = 2f;
@@ -264,7 +267,7 @@ public final class BurnInGuard {
             BurnInMode mode = mode();
             watchLayouts(mode != BurnInMode.OFF);
             long now = SystemClock.uptimeMillis();
-            List<View> surfaces = mode == BurnInMode.OFF || decor == null
+            List<View> surfaces = mode == BurnInMode.OFF || decor == null || camera(activity)
                     ? Collections.<View>emptyList() : surfaces(decor);
             boolean on = decor != null && reelOf(decor, surfaces) != null;
             if (!on && guarding && mode != BurnInMode.OFF && decor != null) {
@@ -304,6 +307,11 @@ public final class BurnInGuard {
                 HookStatus.threw(FAMILY, "burn-in guard put back", again);
             }
         }
+    }
+
+    /** Whether [activity] is Facebook's camera or story editor, whose full-screen picture is a preview. */
+    static boolean camera(Activity activity) {
+        return activity.getClass().getName().startsWith(CAMERA_PACKAGE);
     }
 
     /** The video the Reels screen in [decor] plays, or null when [decor] isn't showing it. */

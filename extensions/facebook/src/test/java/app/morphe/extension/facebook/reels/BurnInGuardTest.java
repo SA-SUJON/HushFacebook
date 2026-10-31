@@ -6,6 +6,7 @@ package app.morphe.extension.facebook.reels;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -21,6 +22,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+
+import com.facebook.inspiration.activity.InspirationCameraActivity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -167,6 +170,38 @@ public class BurnInGuardTest {
         assertUp("a 58% video");
         assertSame("touches aren't watched off the Reels screen", before, activity.getWindow().getCallback());
         assertEquals(-1L, BurnInGuard.nextPassAtForTests());
+    }
+
+    /** The camera's preview fills the screen as a reel does, and its shutter stays as it is (S22, 585). */
+    @Test
+    public void theCameraIsLeftAlone() {
+        ActivityController<InspirationCameraActivity> camera = Robolectric.buildActivity(InspirationCameraActivity.class).setup();
+        try {
+            Activity screen = camera.get();
+            FrameLayout frame = new FrameLayout(screen);
+            screen.setContentView(frame);
+            frame.addView(new TextureView(screen), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            View shutter = new View(screen);
+            shutter.setOnClickListener(view -> { });
+            place(frame, shutter, W / 2 - 90, H - 400, W / 2 + 90, H - 220);
+            View decor = screen.getWindow().getDecorView();
+            decor.measure(View.MeasureSpec.makeMeasureSpec(W, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(H, View.MeasureSpec.EXACTLY));
+            decor.layout(0, 0, W, H);
+            camera.windowFocusChanged(true);
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            assertNotNull("the preview fills the screen", BurnInGuard.reelOf(decor));
+            Settings.BURN_IN_GUARD.save(BurnInMode.DIM_AND_SHIFT);
+
+            BurnInGuard.resumed(screen);
+            after(IDLE * 3);
+
+            assertEquals("the shutter", 1f, shutter.getAlpha(), 0f);
+            assertEquals("the screen stays put", 0f, frame.getTranslationX(), 0f);
+            assertEquals(-1L, BurnInGuard.nextPassAtForTests());
+        } finally {
+            camera.close();
+        }
     }
 
     @Test
