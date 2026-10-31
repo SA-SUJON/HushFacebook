@@ -45,6 +45,8 @@ Changes in each Hushfacebook version, newest first.
 
 ### Fixed
 
+* **Facebook:** `Turn off double tap to like` now covers photos on Home too, so a double tap on a single photo, a collage or the photo flyout no longer likes the post or plays the heart (Refs #220).
+* **Facebook:** `Hide posts from groups you're not in` now also catches group posts that only name their group next to the poster's name or point to it in an attachment, and Debug logging shows which part of the post named the group (Refs #195).
 * **Facebook:** With `Always use Clean mode` on, the Clean mode button over a reel works both ways now. Before, its first tap brought the buttons back but the icon kept its "Turn off" label, and tapping it again did nothing. Now each tap switches Clean mode off or back on for the reel you're watching, and the label follows. Ads still don't get the button, same as in Facebook (Refs #304).
 * **Facebook:** `Hide prompts and promos under reels` now also takes away the "Made with Edits" line under the caption of a reel made in Meta's Edits app. Facebook draws that line on its own, apart from the chips under a reel, so the switch hid the Edits chip and missed the line (Refs #314).
 * **Facebook:** `Keep the original audio` now also works when Facebook gives you its Languages menu in the video player. With that menu on, Facebook kept every dubbed track of a reel and played the one in your phone's language, so the switch changed nothing. Now the reel keeps only the track it was made with. With the switch off Facebook picks the audio the way it always has (Refs #148).
