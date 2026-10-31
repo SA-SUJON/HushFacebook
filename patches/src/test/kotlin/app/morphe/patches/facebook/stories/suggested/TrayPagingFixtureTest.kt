@@ -39,6 +39,17 @@ class TrayPagingFixtureTest {
         ),
     )
 
+    /**
+     * The fetch surface field and the pager call after the load, the row's layout field, the
+     * holder field and its bucket list, per build and then by the bundle's ABI.
+     */
+    private val expectedReads = mapOf(
+        AppCompatibilities.FACEBOOK_TARGET_VERSION to mapOf(
+            "arm64-v8a" to listOf("A02", "Bdj", "mLayout", "A03", "LX/024Y;->A07"),
+            "armeabi-v7a" to listOf("A02", "Bdi", "mLayout", "A03", "LX/024Y;->A07"),
+        ),
+    )
+
     private fun <T> Map<String, Map<String, T>>.pin(version: String, bundle: File): T =
         getValue(version)[bundle.name.substringAfter("-$version-").substringBefore(".apkm")]
             ?: throw AssertionError("${bundle.name} has no pin")
@@ -68,6 +79,14 @@ class TrayPagingFixtureTest {
                 assertEquals("${bundle.name}: the pager's has-next", hasNext, anchors.hasNext.name)
                 assertEquals("${bundle.name}: the pager's load", loadNext, anchors.loadNext.name)
                 assertEquals("${bundle.name}: both calls on the field's type", anchors.pager.type, anchors.loadNext.definingClass)
+                val (surface, settled, layout, holder, buckets) = expectedReads.pin(version, bundle)
+                assertEquals("${bundle.name}: the fetch surface", surface, anchors.surface?.name)
+                assertEquals("${bundle.name}: the pager call after the load", settled, anchors.settled?.name)
+                assertEquals("${bundle.name}: the row's layout", listOf(RECYCLER_VIEW, layout), listOf(anchors.layout.definingClass, anchors.layout.name))
+                assertEquals("${bundle.name}: the last-tile read", "Landroidx/recyclerview/widget/LinearLayoutManager;", anchors.lastVisible.definingClass)
+                assertEquals("${bundle.name}: the holder", listOf(listener, holder), listOf(anchors.holder.definingClass, anchors.holder.name))
+                assertEquals("${bundle.name}: the bucket list", buckets, "${anchors.buckets.definingClass}->${anchors.buckets.name}")
+                assertEquals("${bundle.name}: the holder holds the list", anchors.holder.type, anchors.buckets.definingClass)
 
                 val scrolled = body(anchors.onScrolled)
                 with(context) { pageShortTrays(anchors) }
@@ -84,17 +103,32 @@ class TrayPagingFixtureTest {
                 assertEquals("${bundle.name}: Facebook's own code follows", scrolled.map { it.opcode }, hooked.drop(1).map { it.opcode })
 
                 val load = mutable.methods.single { it.name == LOAD_NEXT_PAGE_METHOD }
-                assertTrue("${bundle.name}: an interface method", load.parameterTypes.isEmpty() && load.returnType == "V")
+                assertTrue("${bundle.name}: an interface method", load.parameterTypes.isEmpty() && load.returnType == "Z")
                 val made = body(load)
                 assertEquals(Opcode.IGET_OBJECT, made[0].opcode)
                 val read = (made[0] as ReferenceInstruction).reference as FieldReference
                 assertEquals("${bundle.name}: reads the pager field", listOf(listener, field, anchors.pager.type),
                     listOf(read.definingClass, read.name, read.type))
                 val calls = made.filter { it.opcode == Opcode.INVOKE_INTERFACE }
-                assertEquals("${bundle.name}: has-next, then load", listOf(hasNext, loadNext), calls.map { call(it).name })
+                assertEquals("${bundle.name}: has-next, load, then the call after it", listOf(hasNext, loadNext, settled), calls.map { call(it).name })
                 assertEquals(LOAD_NEXT_PAGE, made.firstNotNullOf { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string })
-                val trigger = calls.last() as FiveRegisterInstruction
+                val trigger = calls[1] as FiveRegisterInstruction
                 assertEquals("${bundle.name}: the pager and its trigger", 2, trigger.registerCount)
+                val surfaceRead = made.mapNotNull { ((it as? ReferenceInstruction)?.reference as? FieldReference) }
+                assertEquals("${bundle.name}: the surface gates the call after the load", listOf(field, surface), surfaceRead.map { it.name })
+
+                val lastTile = mutable.methods.single { it.name == LAST_TILE_METHOD }
+                assertEquals("${bundle.name}: the last tile of a View", listOf("Landroid/view/View;") to "I",
+                    lastTile.parameterTypes.map { it.toString() } to lastTile.returnType)
+                val tileCalls = body(lastTile).mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
+                assertEquals(listOf(LAST_VISIBLE), tileCalls.map { it.name })
+                val tileRead = body(lastTile).firstNotNullOf { (it as? ReferenceInstruction)?.reference as? FieldReference }
+                assertEquals(layout, tileRead.name)
+
+                val count = mutable.methods.single { it.name == BUCKET_COUNT_METHOD }
+                assertTrue("${bundle.name}: a count", count.parameterTypes.isEmpty() && count.returnType == "I")
+                val countReads = body(count).mapNotNull { (it as? ReferenceInstruction)?.reference as? FieldReference }
+                assertEquals("${bundle.name}: the holder, then its list", listOf(holder, "A07"), countReads.map { it.name })
                 checked += version
             }
         }
