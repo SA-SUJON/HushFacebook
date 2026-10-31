@@ -16,6 +16,7 @@ import java.util.Set;
 import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.misc.AppLock;
 import app.morphe.extension.facebook.notifications.PushDiagnostics;
+import app.morphe.extension.facebook.reels.BurnInMode;
 import app.morphe.extension.facebook.theme.MaterialYouTheme;
 import app.morphe.extension.shared.L10n;
 import app.morphe.extension.shared.Logger;
@@ -113,7 +114,8 @@ public enum PatchFamily {
     REEL_DECLUTTER(FamilyNames.REEL_DECLUTTER, "reelDeclutter", null,
             Settings.HIDE_REEL_CHIPS, Settings.HIDE_REEL_FOLLOW_BUTTON, Settings.HIDE_VIDEO_SUBSCRIBE_BUTTON,
             Settings.HIDE_REEL_SOCIAL_FOOTER, Settings.HIDE_REEL_THREADS_CARDS, Settings.REEL_CLEAN_MODE, Settings.PLAY_REELS_ONCE,
-            Settings.ORIGINAL_AUDIO, Settings.HIDE_REEL_SEARCH_PILL, Settings.HIDE_VIEWER_TOP_BUTTONS, Settings.HIDE_REEL_COUNTS,
+            Settings.ORIGINAL_AUDIO, Settings.HIDE_REEL_SEARCH_PILL, Settings.HIDE_VIEWER_TOP_BUTTONS, Settings.BURN_IN_STAY_DIM,
+            Settings.HIDE_REEL_COUNTS,
             Settings.HIDE_REEL_SAVE_BUTTON, Settings.HIDE_REEL_WHATSAPP_BUTTON, Settings.HIDE_REEL_LIKE_BUTTON,
             Settings.HIDE_REEL_COMMENT_BUTTON, Settings.HIDE_REEL_SHARE_BUTTON, Settings.SHOW_REEL_COMMENT_BUTTON,
             Settings.HIDE_REEL_SOUND_BUTTON, Settings.HIDE_REEL_AUDIO_LINE,
@@ -530,6 +532,13 @@ public enum PatchFamily {
                 if (setting != Settings.NOTIFICATION_QUIET_HOURS) anyOn |= setting.savedValue();
             }
         }
+        // Burn-in guard runs by its list; Stay dim when I tap does nothing with the guard off (#288).
+        if (this == REEL_DECLUTTER) {
+            anyOn = Settings.BURN_IN_GUARD.savedValue() != BurnInMode.OFF;
+            for (BooleanSetting setting : switches) {
+                if (setting != Settings.BURN_IN_STAY_DIM) anyOn |= setting.savedValue();
+            }
+        }
         if (this == POST_WORDS) {
             anyOn = Settings.HIDE_POSTS_WITH_WORDS.savedValue() || Settings.HIDE_POSTS_FROM_SOURCES.savedValue()
                     || Settings.HIDE_PHOTO_POSTS.savedValue() || Settings.HIDE_VIDEO_POSTS.savedValue()
@@ -545,6 +554,11 @@ public enum PatchFamily {
         for (int i = 0; i < switches.size(); i++) {
             if (i > 0) line.append(", ");
             BooleanSetting setting = switches.get(i);
+            // Burn-in guard's two lists, which no switch holds, sit before its switch (#288).
+            if (setting == Settings.BURN_IN_STAY_DIM) {
+                line.append(Settings.BURN_IN_GUARD.key).append('=').append(Settings.BURN_IN_GUARD.savedValue()).append(", ")
+                        .append(Settings.BURN_IN_WAIT.key).append('=').append(Settings.BURN_IN_WAIT.savedValue()).append(", ");
+            }
             line.append(setting.key).append(setting.savedValue() ? "=on" : "=off");
         }
         line.append(')');

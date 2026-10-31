@@ -2283,3 +2283,25 @@ The Subscribe button some authors get there instead, which subscribes with one t
 Fix washed-out video colors	Soluk video renklerini düzelt
 # context: summary under that switch; Disable HW overlays and developer options are Android's own setting names, use the names Android shows in this language
 Videos and reels draw together with the rest of the screen, like Disable HW overlays in developer options. Try it if reels look pale until something covers them. Uses a little more battery.	Videolar ve Reels, Geliştirici seçeneklerindeki HW katmanlarını devre dışı bırak gibi ekranın geri kalanıyla birlikte çizilir. Reels bir şey üstünü kapatana kadar soluk görünüyorsa dene. Biraz daha fazla pil kullanır.
+# context: Reels and Watch: title of the list that fades a full-screen video's buttons while the screen sits untouched, so they don't burn into an OLED screen (#288)
+Burn-in guard	Ekran yanığı koruması
+Dim when idle	Boştayken karart
+Dim when idle and shift	Boştayken karart ve kaydır
+On the Reels screen, the buttons, caption and bars fade when you leave them alone. Touching one of them brings them back.	Reels ekranında düğmeler, açıklama ve çubuklar onlara dokunmadığınızda soluklaşır. Birine dokunmak onları geri getirir.
+On the Reels screen, the buttons, caption and bars fade when you leave them alone, and the screen moves a step every 2 minutes. Touching one of them brings them back.	Reels ekranında düğmeler, açıklama ve çubuklar onlara dokunmadığınızda soluklaşır ve ekran her 2 dakikada bir biraz kayar. Birine dokunmak onları geri getirir.
+Off. It can fade a reel's buttons while the screen sits untouched, so they don't burn into an OLED screen.	Kapalı. Ekrana dokunulmadığı sürece bir reel'in düğmelerini soluklaştırabilir, böylece OLED ekranda iz bırakmazlar.
+# context: Reels and Watch: title of the list that sets how long the screen goes untouched before Burn-in guard fades it
+Dim after	Soluklaştırma süresi
+At once	Hemen
+# context: a choice in the Dim after list; %1$d is 2, 5 or 10
+After %1$d seconds	%1$d saniye sonra
+# context: summary under Dim after; %1$s is the chosen wait, At once or After 5 seconds
+%1$s. Tapping the video and double-tapping it to like don't count as a touch, so the buttons stay faded.	%1$s. Videoya dokunmak ve beğenmek için iki kez dokunmak dokunuş sayılmaz, bu yüzden düğmeler soluk kalır.
+# context: Reels: Burn-in guard's switch that keeps the faded buttons faded while you tap
+Stay dim when I tap	Dokununca soluk kalsın
+Once Burn-in guard fades the buttons, they stay faded on Reels whatever you tap or swipe, the next reel too. They still work. Leaving Reels brings them back.	Ekran yanığı koruması düğmeleri soldurduktan sonra, Reels'te neye dokunur ya da kaydırırsan kaydır soluk kalırlar, sonraki reel'de de. Yine çalışırlar. Reels'ten çıkınca geri gelirler.
+# context: settings import preview; %1$s is a Burn-in guard choice such as Dim when idle
+Burn-in guard will be set to %1$s.	Ekran yanığı koruması %1$s olarak ayarlanacak.
+Burn-in guard will dim the Reels screen as soon as you stop touching it.	Ekran yanığı koruması, dokunmayı bıraktığın anda Reels ekranını soluklaştıracak.
+# context: settings import preview; %1$d is 2, 5 or 10
+Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	Ekran yanığı koruması, %1$d saniye dokunulmadığında Reels ekranını soluklaştıracak.

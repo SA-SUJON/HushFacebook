@@ -2283,3 +2283,25 @@ The Subscribe button some authors get there instead, which subscribes with one t
 Fix washed-out video colors	Sửa màu video bị nhạt
 # context: summary under that switch; Disable HW overlays and developer options are Android's own setting names, use the names Android shows in this language
 Videos and reels draw together with the rest of the screen, like Disable HW overlays in developer options. Try it if reels look pale until something covers them. Uses a little more battery.	Video và reel được vẽ cùng phần còn lại của màn hình, giống Tắt lớp phủ HW trong Tùy chọn cho nhà phát triển. Hãy thử nếu reel trông nhạt màu cho đến khi có gì đó che lên. Tốn pin hơn một chút.
+# context: Reels and Watch: title of the list that fades a full-screen video's buttons while the screen sits untouched, so they don't burn into an OLED screen (#288)
+Burn-in guard	Chống lưu ảnh màn hình
+Dim when idle	Làm mờ khi để yên
+Dim when idle and shift	Làm mờ khi để yên và dịch chuyển
+On the Reels screen, the buttons, caption and bars fade when you leave them alone. Touching one of them brings them back.	Trên màn hình Reels, các nút, chú thích và thanh sẽ mờ đi khi bạn để yên. Chạm vào một trong số đó sẽ hiện lại chúng.
+On the Reels screen, the buttons, caption and bars fade when you leave them alone, and the screen moves a step every 2 minutes. Touching one of them brings them back.	Trên màn hình Reels, các nút, chú thích và thanh sẽ mờ đi khi bạn để yên, và màn hình dịch đi một chút sau mỗi 2 phút. Chạm vào một trong số đó sẽ hiện lại chúng.
+Off. It can fade a reel's buttons while the screen sits untouched, so they don't burn into an OLED screen.	Tắt. Có thể làm mờ các nút của reel khi không ai chạm vào màn hình, để chúng không bị lưu ảnh trên màn hình OLED.
+# context: Reels and Watch: title of the list that sets how long the screen goes untouched before Burn-in guard fades it
+Dim after	Làm mờ sau
+At once	Ngay lập tức
+# context: a choice in the Dim after list; %1$d is 2, 5 or 10
+After %1$d seconds	Sau %1$d giây
+# context: summary under Dim after; %1$s is the chosen wait, At once or After 5 seconds
+%1$s. Tapping the video and double-tapping it to like don't count as a touch, so the buttons stay faded.	%1$s. Chạm vào video và chạm hai lần để thích không được tính là chạm, nên các nút vẫn mờ.
+# context: Reels: Burn-in guard's switch that keeps the faded buttons faded while you tap
+Stay dim when I tap	Vẫn mờ khi tôi chạm
+Once Burn-in guard fades the buttons, they stay faded on Reels whatever you tap or swipe, the next reel too. They still work. Leaving Reels brings them back.	Khi Chống lưu ảnh màn hình đã làm mờ các nút, chúng vẫn mờ trên Reels dù bạn chạm hay vuốt gì, kể cả ở reel tiếp theo. Các nút vẫn hoạt động. Rời khỏi Reels sẽ hiện lại chúng.
+# context: settings import preview; %1$s is a Burn-in guard choice such as Dim when idle
+Burn-in guard will be set to %1$s.	Chống lưu ảnh màn hình sẽ được đặt thành %1$s.
+Burn-in guard will dim the Reels screen as soon as you stop touching it.	Chống lưu ảnh màn hình sẽ làm mờ màn hình Reels ngay khi bạn ngừng chạm vào.
+# context: settings import preview; %1$d is 2, 5 or 10
+Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	Chống lưu ảnh màn hình sẽ làm mờ màn hình Reels sau %1$d giây không chạm.

@@ -6,6 +6,7 @@ Changes in each Hushfacebook version, newest first.
 
 ### Added
 
+* **Facebook:** New `Burn-in guard` under Reels and Watch, part of `Clean up Reels`. While a reel or video fills the screen, its buttons, caption and bars fade when you leave them alone, so they don't burn into an OLED screen, and `Dim when idle and shift` also moves the screen a step every 2 minutes. Tapping the video or double-tapping it to like doesn't bring them back. Tapping a button or swiping does. `Dim after` sets how long it waits, from at once to 10 seconds. With `Stay dim when I tap` on, they stay faded whatever you tap until you leave the video. It's off by default and needs no restart (Refs #288).
 * **Facebook:** New `Hide the top right buttons on opened videos` under Reels and Watch, part of `Clean up Reels`. When you open a reel or a video full screen, Search and the button next to it leave the top bar. Back stays, and so does More at the bottom of the side buttons, where Download is. It's off by default and needs no restart (Refs #311).
 * **Facebook:** New `Hide the pull down to lock hint` under Reels and Watch. Holding a reel or a video for 2x then shows the plain 2x pill without the "Pull down to lock 2x speed" line, and pulling down still locks the speed. It needs no restart (Refs #289).
 * **Facebook:** New `Hide the emoji row on comments` under Comments and writing takes away the row of emoji Facebook puts over the comment box. Typing and the box's buttons stay, and you can still type emoji from your keyboard (Refs #290).

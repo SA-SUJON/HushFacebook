@@ -6,6 +6,8 @@
  */
 package app.morphe.extension.facebook.settings;
 
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.burnInGuardRow;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.burnInWaitRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.category;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.downloadActionRow;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.fileNameRow;
@@ -141,6 +143,12 @@ final class VideoPages {
             reels.addPreference(toggle(context, Settings.HIDE_VIEWER_TOP_BUTTONS,
                     L10n.t("Takes Search and the button next to it off the top of a video or reel you open. Back "
                             + "stays, and so does More at the bottom of the side buttons, where Download is.")));
+            // Burn-in guard (#288): read on each pass, so a change shows right away.
+            reels.addPreference(burnInGuardRow(context));
+            reels.addPreference(burnInWaitRow(context));
+            reels.addPreference(toggle(context, Settings.BURN_IN_STAY_DIM,
+                    L10n.t("Once Burn-in guard fades the buttons, they stay faded on Reels whatever you tap or swipe, "
+                            + "the next reel too. They still work. Leaving Reels brings them back.")));
             // The sidebar buttons are built as each reel is, so a change shows from the next reel.
             reels.addPreference(toggle(context, Settings.HIDE_REEL_COUNTS,
                     L10n.t("Takes the numbers away from under a reel's Like, Comment and Share icons. "

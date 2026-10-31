@@ -19,6 +19,8 @@ import app.morphe.extension.facebook.feed.SeenPosts;
 import app.morphe.extension.facebook.media.PlaybackQuality;
 import app.morphe.extension.facebook.media.RecentlyWatched;
 import app.morphe.extension.facebook.media.SurfaceQuality;
+import app.morphe.extension.facebook.reels.BurnInMode;
+import app.morphe.extension.facebook.reels.BurnInWait;
 import app.morphe.extension.facebook.reels.FeedVideoControls;
 import app.morphe.extension.facebook.reels.ReelsOrder;
 import app.morphe.extension.facebook.misc.AppLock;
@@ -597,6 +599,30 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting HIDE_VIEWER_TOP_BUTTONS =
             new BooleanSetting("hushfacebook_hide_viewer_top_buttons", FALSE);
+
+    /**
+     * Burn-in guard on the Reels screen ({@link app.morphe.extension.facebook.reels.BurnInGuard},
+     * #288): once the screen has gone {@link #BURN_IN_WAIT} without a touch, what shows beside the
+     * video fades, and with {@link BurnInMode#DIM_AND_SHIFT} the screen also moves a step every two
+     * minutes. Off by default. Read on each pass, so a change shows without a restart.
+     */
+    public static final EnumSetting<BurnInMode> BURN_IN_GUARD =
+            new EnumSetting<>("hushfacebook_burn_in_guard", BurnInMode.OFF);
+
+    /**
+     * Dim after: how long the Reels screen goes untouched before Burn-in guard dims it (#288). A tap
+     * on the video, or a double tap to like it, doesn't start it over. Five seconds by default.
+     */
+    public static final EnumSetting<BurnInWait> BURN_IN_WAIT =
+            new EnumSetting<>("hushfacebook_burn_in_wait", BurnInWait.FIVE_SECONDS);
+
+    /**
+     * Stay dim when I tap (#288): once Burn-in guard has dimmed the Reels screen, no tap or swipe on
+     * it brings the controls back, the next reel included, and they still work. Leaving Reels does.
+     * Off by default.
+     */
+    public static final BooleanSetting BURN_IN_STAY_DIM =
+            new BooleanSetting("hushfacebook_burn_in_stay_dim", FALSE);
 
     /**
      * The numbers under a reel's Like, Comment and Share icons go, and the icons stay where they are

@@ -43,6 +43,8 @@ import java.util.Set;
 
 import app.morphe.extension.facebook.coexist.FamilySignatureTrust;
 import app.morphe.extension.facebook.comments.CommentOrder;
+import app.morphe.extension.facebook.reels.BurnInMode;
+import app.morphe.extension.facebook.reels.BurnInWait;
 import app.morphe.extension.facebook.reels.ReelsOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
@@ -91,6 +93,8 @@ import app.morphe.extension.facebook.settings.ValueRows.SeenKeepRow;
 import app.morphe.extension.facebook.settings.ValueRows.BreakRow;
 import app.morphe.extension.facebook.settings.ValueRows.PauseLengthRow;
 import app.morphe.extension.facebook.settings.ValueRows.WatchedKeepRow;
+import app.morphe.extension.facebook.settings.ValueRows.BurnInGuardRow;
+import app.morphe.extension.facebook.settings.ValueRows.BurnInWaitRow;
 import app.morphe.extension.facebook.settings.ValueRows.AccentRow;
 import app.morphe.extension.facebook.settings.ValueRows.BackgroundRow;
 import app.morphe.extension.facebook.settings.ValueRows.HeaderTextRow;
@@ -1741,6 +1745,88 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
     }
 
     /**
+     * Burn-in guard on the Reels screen (#288). Like the watched entries row, its values are the
+     * setting's own names and its summary says what the choice does.
+     */
+    static BurnInGuardRow burnInGuardRow(Context context) {
+        BurnInGuardRow row = new BurnInGuardRow(context);
+        row.setKey(Settings.BURN_IN_GUARD.key);
+        row.setTitle(L10n.t("Burn-in guard"));
+        row.setDialogTitle(L10n.t("Burn-in guard"));
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        BurnInMode[] choices = BurnInMode.values();
+        CharSequence[] entries = new CharSequence[choices.length];
+        CharSequence[] values = new CharSequence[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            entries[i] = burnInLabel(choices[i]);
+            values[i] = choices[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.BURN_IN_GUARD.savedValue().name());
+        return row;
+    }
+
+    /** What the list and the sentences about it call [mode]. */
+    static String burnInLabel(BurnInMode mode) {
+        switch (mode) {
+            case DIM:
+                return L10n.t("Dim when idle");
+            case DIM_AND_SHIFT:
+                return L10n.t("Dim when idle and shift");
+            default:
+                return L10n.t("Off");
+        }
+    }
+
+    /** What the choice does, for the row's summary. */
+    static String burnInSummary(BurnInMode mode) {
+        switch (mode) {
+            case DIM:
+                return L10n.t("On the Reels screen, the buttons, caption and bars fade when you leave them alone. "
+                        + "Touching one of them brings them back.");
+            case DIM_AND_SHIFT:
+                return L10n.t("On the Reels screen, the buttons, caption and bars fade when you leave them alone, and "
+                        + "the screen moves a step every 2 minutes. Touching one of them brings them back.");
+            default:
+                return L10n.t("Off. It can fade a reel's buttons while the screen sits untouched, so they don't burn "
+                        + "into an OLED screen.");
+        }
+    }
+
+    /** How long the Reels screen goes untouched before Burn-in guard dims it (#288). */
+    static BurnInWaitRow burnInWaitRow(Context context) {
+        BurnInWaitRow row = new BurnInWaitRow(context);
+        row.setKey(Settings.BURN_IN_WAIT.key);
+        row.setTitle(L10n.t("Dim after"));
+        row.setDialogTitle(L10n.t("Dim after"));
+        row.setNegativeButtonText(L10n.t("Cancel"));
+        BurnInWait[] choices = BurnInWait.values();
+        CharSequence[] entries = new CharSequence[choices.length];
+        CharSequence[] values = new CharSequence[choices.length];
+        for (int i = 0; i < choices.length; i++) {
+            entries[i] = burnInWaitLabel(choices[i]);
+            values[i] = choices[i].name();
+        }
+        row.setEntries(entries);
+        row.setEntryValues(values);
+        row.setValue(Settings.BURN_IN_WAIT.savedValue().name());
+        return row;
+    }
+
+    /** What the list and the sentences about it call [wait]. */
+    static String burnInWaitLabel(BurnInWait wait) {
+        if (wait == BurnInWait.AT_ONCE) return L10n.t("At once");
+        return L10n.f("After %1$d seconds", (int) (wait.millis / 1000));
+    }
+
+    /** What the choice does, for the row's summary. */
+    static String burnInWaitSummary(BurnInWait wait) {
+        return L10n.f("%1$s. Tapping the video and double-tapping it to like don't count as a touch, so the buttons "
+                + "stay faded.", burnInWaitLabel(wait));
+    }
+
+    /**
      * How large Facebook's text is. Like the comment order row, its values are the setting's own
      * names and its summary says what the choice does.
      */
@@ -2266,6 +2352,10 @@ public final class HushfacebookPreferenceFragment extends AbstractPreferenceFrag
             ((PauseLengthRow) listPreference).showSummary();
         } else if (listPreference instanceof WatchedKeepRow) {
             ((WatchedKeepRow) listPreference).showSummary();
+        } else if (listPreference instanceof BurnInGuardRow) {
+            ((BurnInGuardRow) listPreference).showSummary();
+        } else if (listPreference instanceof BurnInWaitRow) {
+            ((BurnInWaitRow) listPreference).showSummary();
         } else if (listPreference instanceof BreakRow) {
             ((BreakRow) listPreference).showSummary();
         } else if (listPreference instanceof TextSizeRow) {

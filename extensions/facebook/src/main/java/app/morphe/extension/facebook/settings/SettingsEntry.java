@@ -68,6 +68,7 @@ import app.morphe.extension.facebook.navigation.MarketplaceFilterButton;
 import app.morphe.extension.facebook.navigation.ReelsTab;
 import app.morphe.extension.facebook.navigation.TranslucentBars;
 import app.morphe.extension.facebook.notifications.PushDiagnostics;
+import app.morphe.extension.facebook.reels.BurnInGuard;
 import app.morphe.extension.facebook.reels.FeedVideoAlone;
 import app.morphe.extension.facebook.reels.ViewerTopBar;
 import app.morphe.extension.facebook.stories.StorySeenButton;
@@ -184,9 +185,11 @@ public final class SettingsEntry {
             }
             // Open feed videos on their own, a Clean up Reels switch: which screen is in front.
             // And the top bar of the full-screen player, another (#311): looked through after each layout.
+            // And Burn-in guard (#288): the activity in front, for a video filling the screen.
             if (SettingsStatus.reelDeclutter()) {
                 FeedVideoAlone.watch(context);
                 ViewerTopBar.watch(context);
+                BurnInGuard.install(context);
             }
             // An Audience Network component an earlier install turned on goes back off (#168).
             if (SettingsStatus.audienceNetwork()) AudienceNetwork.keepOff(context);

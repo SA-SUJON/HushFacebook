@@ -2278,3 +2278,25 @@ The Subscribe button some authors get there instead, which subscribes with one t
 Fix washed-out video colors	修复视频颜色发白
 # context: summary under that switch; Disable HW overlays and developer options are Android's own setting names, use the names Android shows in this language
 Videos and reels draw together with the rest of the screen, like Disable HW overlays in developer options. Try it if reels look pale until something covers them. Uses a little more battery.	视频和 Reels 会与屏幕其余部分一起绘制，效果同开发者选项中的“停用 HW 叠加层”。如果 Reels 在被别的东西盖住之前一直显得发白，可以试试。会多耗一点电。
+# context: Reels and Watch: title of the list that fades a full-screen video's buttons while the screen sits untouched, so they don't burn into an OLED screen (#288)
+Burn-in guard	防烧屏保护
+Dim when idle	闲置时淡化
+Dim when idle and shift	闲置时淡化并位移
+On the Reels screen, the buttons, caption and bars fade when you leave them alone. Touching one of them brings them back.	在 Reels 画面中，未操作的按钮、说明文字和栏会淡化。触碰其中一项即可恢复显示。
+On the Reels screen, the buttons, caption and bars fade when you leave them alone, and the screen moves a step every 2 minutes. Touching one of them brings them back.	在 Reels 画面中，未操作的按钮、说明文字和栏会淡化，画面也会每 2 分钟位移一次。触碰其中一项即可恢复显示。
+Off. It can fade a reel's buttons while the screen sits untouched, so they don't burn into an OLED screen.	已关闭。可在未触碰屏幕时淡化 Reels 按钮，避免 OLED 屏幕烧屏。
+# context: Reels and Watch: title of the list that sets how long the screen goes untouched before Burn-in guard fades it
+Dim after	淡化延迟
+At once	立即
+# context: a choice in the Dim after list; %1$d is 2, 5 or 10
+After %1$d seconds	%1$d 秒后
+# context: summary under Dim after; %1$s is the chosen wait, At once or After 5 seconds
+%1$s. Tapping the video and double-tapping it to like don't count as a touch, so the buttons stay faded.	%1$s。点按视频和双击点赞不算触碰，因此按钮会保持淡化。
+# context: Reels: Burn-in guard's switch that keeps the faded buttons faded while you tap
+Stay dim when I tap	点按时保持淡化
+Once Burn-in guard fades the buttons, they stay faded on Reels whatever you tap or swipe, the next reel too. They still work. Leaving Reels brings them back.	防烧屏保护淡化按钮后，无论在 Reels 点按或滑动什么，按钮都会保持淡化，下一个 Reel 也一样。按钮仍可使用，离开 Reels 后会恢复显示。
+# context: settings import preview; %1$s is a Burn-in guard choice such as Dim when idle
+Burn-in guard will be set to %1$s.	防烧屏保护将设为 %1$s。
+Burn-in guard will dim the Reels screen as soon as you stop touching it.	停止触碰后，防烧屏保护会立即淡化 Reels 画面。
+# context: settings import preview; %1$d is 2, 5 or 10
+Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	防烧屏保护会在 %1$d 秒未触碰后淡化 Reels 画面。

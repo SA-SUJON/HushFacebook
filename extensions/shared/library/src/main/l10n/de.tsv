@@ -2283,3 +2283,25 @@ The Subscribe button some authors get there instead, which subscribes with one t
 Fix washed-out video colors	Blasse Videofarben beheben
 # context: summary under that switch; Disable HW overlays and developer options are Android's own setting names, use the names Android shows in this language
 Videos and reels draw together with the rest of the screen, like Disable HW overlays in developer options. Try it if reels look pale until something covers them. Uses a little more battery.	Videos und Reels werden zusammen mit dem restlichen Bildschirm gezeichnet, wie mit HW-Overlays deaktivieren in den Entwickleroptionen. Probier es, wenn Reels blass aussehen, bis etwas sie verdeckt. Braucht etwas mehr Akku.
+# context: Reels and Watch: title of the list that fades a full-screen video's buttons while the screen sits untouched, so they don't burn into an OLED screen (#288)
+Burn-in guard	Einbrennschutz
+Dim when idle	Abdunkeln bei Inaktivität
+Dim when idle and shift	Abdunkeln bei Inaktivität und verschieben
+On the Reels screen, the buttons, caption and bars fade when you leave them alone. Touching one of them brings them back.	Auf dem Reels-Bildschirm werden Schaltflächen, Beschreibung und Leisten blasser, wenn du sie in Ruhe lässt. Eine Berührung auf einem davon holt sie zurück.
+On the Reels screen, the buttons, caption and bars fade when you leave them alone, and the screen moves a step every 2 minutes. Touching one of them brings them back.	Auf dem Reels-Bildschirm werden Schaltflächen, Beschreibung und Leisten blasser, wenn du sie in Ruhe lässt, und der Bildschirm rückt alle 2 Minuten ein Stück weiter. Eine Berührung auf einem davon holt sie zurück.
+Off. It can fade a reel's buttons while the screen sits untouched, so they don't burn into an OLED screen.	Aus. Kann die Schaltflächen eines Reels blasser machen, solange niemand den Bildschirm berührt, damit sie sich nicht in einen OLED-Bildschirm einbrennen.
+# context: Reels and Watch: title of the list that sets how long the screen goes untouched before Burn-in guard fades it
+Dim after	Abdunkeln nach
+At once	Sofort
+# context: a choice in the Dim after list; %1$d is 2, 5 or 10
+After %1$d seconds	Nach %1$d Sekunden
+# context: summary under Dim after; %1$s is the chosen wait, At once or After 5 seconds
+%1$s. Tapping the video and double-tapping it to like don't count as a touch, so the buttons stay faded.	%1$s. Tippen aufs Video und Doppeltippen zum Liken zählen nicht als Berührung, die Schaltflächen bleiben also blass.
+# context: Reels: Burn-in guard's switch that keeps the faded buttons faded while you tap
+Stay dim when I tap	Gedimmt bleiben, wenn ich tippe
+Once Burn-in guard fades the buttons, they stay faded on Reels whatever you tap or swipe, the next reel too. They still work. Leaving Reels brings them back.	Sobald der Einbrennschutz die Schaltflächen abblendet, bleiben sie bei Reels abgeblendet, egal was du tippst oder wischst, auch beim nächsten Reel. Sie funktionieren weiterhin. Wenn du Reels verlässt, sind sie wieder da.
+# context: settings import preview; %1$s is a Burn-in guard choice such as Dim when idle
+Burn-in guard will be set to %1$s.	Der Einbrennschutz wird auf %1$s gesetzt.
+Burn-in guard will dim the Reels screen as soon as you stop touching it.	Der Einbrennschutz dunkelt den Reels-Bildschirm ab, sobald du ihn nicht mehr berührst.
+# context: settings import preview; %1$d is 2, 5 or 10
+Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	Der Einbrennschutz dunkelt den Reels-Bildschirm nach %1$d Sekunden ohne Berührung ab.

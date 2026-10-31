@@ -7,6 +7,8 @@
 package app.morphe.extension.facebook.settings;
 
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.backgroundSummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.burnInSummary;
+import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.burnInWaitSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.commentOrderSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.downloadActionSummary;
 import static app.morphe.extension.facebook.settings.HushfacebookPreferenceFragment.feedsSubtabSummary;
@@ -65,6 +67,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import app.morphe.extension.facebook.comments.CommentOrder;
+import app.morphe.extension.facebook.reels.BurnInMode;
+import app.morphe.extension.facebook.reels.BurnInWait;
 import app.morphe.extension.facebook.reels.ReelsOrder;
 import app.morphe.extension.facebook.download.DownloadQuality;
 import app.morphe.extension.facebook.download.FileNameTemplate;
@@ -1373,6 +1377,84 @@ final class ValueRows {
                 if (candidate.name().equals(getValue())) keep = candidate;
             }
             setSummary(watchedKeepSummary(keep));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The Burn-in guard row (#288). Its summary follows its value, whoever sets it: the person or an
+     * import.
+     */
+    static final class BurnInGuardRow extends PlainSummaryList {
+        BurnInGuardRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            BurnInMode mode = BurnInMode.OFF;
+            for (BurnInMode candidate : BurnInMode.values()) {
+                if (candidate.name().equals(getValue())) mode = candidate;
+            }
+            setSummary(burnInSummary(mode));
+        }
+
+        @Override
+        protected void onBindView(View view) {
+            super.onBindView(view);
+            showAllText(view);
+            ScreenColors.row(view, this);
+            view.setAccessibilityDelegate(new RowSemantics(this, Button.class));
+        }
+
+        /** Its list takes the screen's colours, as the other rows' dialogs do. */
+        @Override
+        protected void showDialog(Bundle state) {
+            super.showDialog(state);
+            if (getDialog() instanceof AlertDialog) ScreenColors.dialog((AlertDialog) getDialog());
+        }
+    }
+
+    /**
+     * The Dim after row, Burn-in guard's wait (#288). Its summary follows its value, whoever sets it:
+     * the person or an import.
+     */
+    static final class BurnInWaitRow extends PlainSummaryList {
+        BurnInWaitRow(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            showSummary();
+        }
+
+        void showSummary() {
+            BurnInWait wait = BurnInWait.FIVE_SECONDS;
+            for (BurnInWait candidate : BurnInWait.values()) {
+                if (candidate.name().equals(getValue())) wait = candidate;
+            }
+            setSummary(burnInWaitSummary(wait));
         }
 
         @Override

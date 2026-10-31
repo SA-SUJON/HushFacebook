@@ -2283,3 +2283,25 @@ The Subscribe button some authors get there instead, which subscribes with one t
 Fix washed-out video colors	Corregir colores apagados en vídeos
 # context: summary under that switch; Disable HW overlays and developer options are Android's own setting names, use the names Android shows in this language
 Videos and reels draw together with the rest of the screen, like Disable HW overlays in developer options. Try it if reels look pale until something covers them. Uses a little more battery.	Los vídeos y reels se dibujan junto con el resto de la pantalla, como Inhabilitar superposiciones HW en las opciones para desarrolladores. Pruébalo si los reels se ven pálidos hasta que algo los tapa. Gasta un poco más de batería.
+# context: Reels and Watch: title of the list that fades a full-screen video's buttons while the screen sits untouched, so they don't burn into an OLED screen (#288)
+Burn-in guard	Protección contra quemado
+Dim when idle	Atenuar en reposo
+Dim when idle and shift	Atenuar en reposo y desplazar
+On the Reels screen, the buttons, caption and bars fade when you leave them alone. Touching one of them brings them back.	En la pantalla de Reels, los botones, la descripción y las barras se atenúan cuando no los tocas. Tocar uno de ellos los devuelve.
+On the Reels screen, the buttons, caption and bars fade when you leave them alone, and the screen moves a step every 2 minutes. Touching one of them brings them back.	En la pantalla de Reels, los botones, la descripción y las barras se atenúan cuando no los tocas, y la pantalla se mueve un poco cada 2 minutos. Tocar uno de ellos los devuelve.
+Off. It can fade a reel's buttons while the screen sits untouched, so they don't burn into an OLED screen.	Desactivado. Puede atenuar los botones de un reel mientras no se toca la pantalla, para que no se quemen en una pantalla OLED.
+# context: Reels and Watch: title of the list that sets how long the screen goes untouched before Burn-in guard fades it
+Dim after	Atenuar tras
+At once	Al instante
+# context: a choice in the Dim after list; %1$d is 2, 5 or 10
+After %1$d seconds	Después de %1$d segundos
+# context: summary under Dim after; %1$s is the chosen wait, At once or After 5 seconds
+%1$s. Tapping the video and double-tapping it to like don't count as a touch, so the buttons stay faded.	%1$s. Tocar el video y tocarlo dos veces para dar me gusta no cuentan como un toque, así que los botones siguen atenuados.
+# context: Reels: Burn-in guard's switch that keeps the faded buttons faded while you tap
+Stay dim when I tap	Seguir atenuado al tocar
+Once Burn-in guard fades the buttons, they stay faded on Reels whatever you tap or swipe, the next reel too. They still work. Leaving Reels brings them back.	Cuando la Protección contra quemado atenúa los botones, siguen atenuados en Reels toques o deslices lo que sea, también en el siguiente reel. Siguen funcionando. Al salir de Reels vuelven.
+# context: settings import preview; %1$s is a Burn-in guard choice such as Dim when idle
+Burn-in guard will be set to %1$s.	La Protección contra quemado quedará en %1$s.
+Burn-in guard will dim the Reels screen as soon as you stop touching it.	La Protección contra quemado atenuará la pantalla de Reels en cuanto dejes de tocarla.
+# context: settings import preview; %1$d is 2, 5 or 10
+Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	La Protección contra quemado atenuará la pantalla de Reels tras %1$d segundos sin tocarla.
