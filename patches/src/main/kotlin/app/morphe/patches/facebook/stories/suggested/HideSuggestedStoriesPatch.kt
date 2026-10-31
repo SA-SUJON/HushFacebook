@@ -74,7 +74,8 @@ internal class TrayBuckets(
  *
  * Home's tray comes inside the feed and never goes through that constructor, so the same filter
  * also goes first in the parser that turns its buckets, and a story shown in the feed, into what the
- * tray draws (issues #313 and #317).
+ * tray draws (issues #313 and #317). Home's tray only asks for its next page after a drag, so when
+ * the filter leaves its row too short to drag, the extension asks for it (TrayPaging.kt).
  *
  * The cards beside Create story, such as "Share music you love", come in a list of their own that
  * the tray's fetch can ask the server to leave out. Each fetch's answer to that goes through the
@@ -105,6 +106,7 @@ val hideSuggestedStoriesPatch = bytecodePatch(
         mutableClassDefBy(parser.definingClass).methods
             .single { it.name == parser.name && it.returnType == parser.returnType && it.parameterTypes.map { p -> p.toString() } == parameters }
             .keepOnlyUnsuggestedBuckets(list)
+        pageShortTrays(trayPagingAnchors())
         hookPromptCardSkips()
         enableStatus("suggestedStories")
     }

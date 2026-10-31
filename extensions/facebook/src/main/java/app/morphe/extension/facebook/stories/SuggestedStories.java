@@ -297,6 +297,7 @@ public final class SuggestedStories {
                 } else {
                     answer = copy;
                     for (String kind : left) FeedFilterCounters.removed(ROUTE, 1, kind);
+                    StoriesTrayPaging.droppedBuckets();
                 }
             }
 
