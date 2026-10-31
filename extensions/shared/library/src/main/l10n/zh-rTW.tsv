@@ -1721,6 +1721,8 @@ Hide the Facebook logo	隱藏 Facebook 標誌
 Hides the Facebook logo in the top bar. The empty spot is the same size and still opens Hushfacebook settings when you press and hold it. Restart Facebook to see the change.	隱藏頂端列的 Facebook 標誌。空白區域大小不變，長按仍可開啟 Hushfacebook 設定。重新啟動 Facebook 後生效。
 Hide the Create button	隱藏建立按鈕
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	從頂端列移除用來建立貼文、Reels 和限時動態的 + 按鈕。重新啟動 Facebook 後生效。
+Hide the search button	隱藏搜尋按鈕
+Takes the search button out of the top bar. Restart Facebook to see the change.	從頂端列移除搜尋按鈕。重新啟動 Facebook 後生效。
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	隱藏貼文上的計數
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

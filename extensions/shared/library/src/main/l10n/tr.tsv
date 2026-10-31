@@ -1719,6 +1719,8 @@ Hide the Facebook logo	Facebook logosunu gizle
 Hides the Facebook logo in the top bar. The empty spot is the same size and still opens Hushfacebook settings when you press and hold it. Restart Facebook to see the change.	Üst çubuktaki Facebook logosunu gizler. Boş alan aynı boyuttadır ve uzun basıldığında yine Hushfacebook ayarlarını açar. Değişikliği görmek için Facebook'u yeniden başlatın.
 Hide the Create button	Oluştur düğmesini gizle
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	Gönderi, reels ve hikâye oluşturmak için kullanılan + düğmesini üst çubuktan kaldırır. Değişikliği görmek için Facebook'u yeniden başlatın.
+Hide the search button	Arama düğmesini gizle
+Takes the search button out of the top bar. Restart Facebook to see the change.	Arama düğmesini üst çubuktan kaldırır. Değişikliği görmek için Facebook'u yeniden başlatın.
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	Gönderilerdeki sayıları gizle
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

@@ -1719,6 +1719,8 @@ Hide the Facebook logo	Sembunyikan logo Facebook
 Hides the Facebook logo in the top bar. The empty spot is the same size and still opens Hushfacebook settings when you press and hold it. Restart Facebook to see the change.	Menyembunyikan logo Facebook di bilah atas. Ruang kosongnya berukuran sama dan tetap membuka pengaturan Hushfacebook saat ditekan lama. Mulai ulang Facebook untuk melihat perubahannya.
 Hide the Create button	Sembunyikan tombol Buat
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	Menghapus tombol + untuk membuat postingan, reel, dan cerita dari bilah atas. Mulai ulang Facebook untuk melihat perubahannya.
+Hide the search button	Sembunyikan tombol cari
+Takes the search button out of the top bar. Restart Facebook to see the change.	Menghapus tombol cari dari bilah atas. Mulai ulang Facebook untuk melihat perubahannya.
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	Sembunyikan angka di postingan
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

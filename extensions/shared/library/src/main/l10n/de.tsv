@@ -1719,6 +1719,8 @@ Hide the Facebook logo	Facebook-Logo ausblenden
 Hides the Facebook logo in the top bar. The empty spot is the same size and still opens Hushfacebook settings when you press and hold it. Restart Facebook to see the change.	Blendet das Facebook-Logo in der oberen Leiste aus. Die leere Stelle ist genauso groß und öffnet bei langem Drücken weiterhin die Hushfacebook-Einstellungen. Starte Facebook neu, um die Änderung zu sehen.
 Hide the Create button	Erstellen-Button ausblenden
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	Nimmt den Plus-Button zum Erstellen von Beiträgen, Reels und Storys aus der oberen Leiste. Starte Facebook neu, um die Änderung zu sehen.
+Hide the search button	Such-Button ausblenden
+Takes the search button out of the top bar. Restart Facebook to see the change.	Nimmt den Such-Button aus der oberen Leiste. Starte Facebook neu, um die Änderung zu sehen.
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	Zahlen bei Beiträgen ausblenden
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

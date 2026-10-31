@@ -1719,6 +1719,8 @@ Hide the Facebook logo	Ẩn logo Facebook
 Hides the Facebook logo in the top bar. The empty spot is the same size and still opens Hushfacebook settings when you press and hold it. Restart Facebook to see the change.	Ẩn logo Facebook trên thanh trên cùng. Chỗ trống có cùng kích thước và vẫn mở phần cài đặt Hushfacebook khi nhấn giữ. Hãy khởi động lại Facebook để thấy thay đổi.
 Hide the Create button	Ẩn nút Tạo
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	Gỡ nút + để tạo bài viết, thước phim và tin khỏi thanh trên cùng. Hãy khởi động lại Facebook để thấy thay đổi.
+Hide the search button	Ẩn nút tìm kiếm
+Takes the search button out of the top bar. Restart Facebook to see the change.	Gỡ nút tìm kiếm khỏi thanh trên cùng. Hãy khởi động lại Facebook để thấy thay đổi.
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	Ẩn số đếm trên bài viết
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language
