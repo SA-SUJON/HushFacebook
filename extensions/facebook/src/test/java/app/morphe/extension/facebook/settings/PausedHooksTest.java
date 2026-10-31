@@ -638,13 +638,16 @@ public class PausedHooksTest {
         // A Reels rerank that put an older reel first hands the newer one the first slot.
         probes.put(PatchFamily.NEWEST_REELS_FIRST, Collections.singletonList(NewestReelsForTests::putsTheNewestFirst));
         // A double tap on a reel finds no handler and no heart, the reel like helper finds no key and
-        // sends no like from a double tap, and a feed attachment leaves its double tap unhandled.
+        // sends no like from a double tap, a feed attachment leaves its double tap unhandled, and a
+        // photo on Home reports no double tap and sends no like.
         probes.put(PatchFamily.DOUBLE_TAP_LIKE, Arrays.asList(
                 () -> DoubleTapLike.handler(new Object()) == null,
                 () -> DoubleTapLike.heart(new Object()) == null,
                 () -> DoubleTapLike.likeKey("reel") == null,
                 () -> DoubleTapLike.holdBackLike("DOUBLE_TAP"),
-                DoubleTapLike::holdBackTap));
+                DoubleTapLike::holdBackTap,
+                () -> DoubleTapLike.holdBackFeedTap(null),
+                DoubleTapLike::holdBackFeedLike));
         // Facebook's double-tap skip test, read as off, is answered on.
         probes.put(PatchFamily.DOUBLE_TAP_SKIP, Collections.singletonList(() -> DoubleTapSkip.flag(false)));
         // A reel tap gets the controls in place of the pause, they stay up longer, and the unified player hides them.

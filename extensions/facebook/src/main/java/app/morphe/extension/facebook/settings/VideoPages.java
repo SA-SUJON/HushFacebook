@@ -207,8 +207,8 @@ final class VideoPages {
         subheading(reels, L10n.t("Video controls"));
         if (build.contains(PatchFamily.DOUBLE_TAP_LIKE)) {
             reels.addPreference(toggle(context, Settings.TURN_OFF_DOUBLE_TAP_LIKE,
-                    L10n.t("A double tap on a reel or video no longer likes it or shows a heart. A single tap and the Like "
-                            + "button work as before.")));
+                    L10n.t("A double tap on a reel, a video or a photo in the feed no longer likes it or shows a heart. "
+                            + "A single tap and the Like button work as before.")));
         }
         if (build.contains(PatchFamily.DOUBLE_TAP_SKIP)) {
             // Read as each player is set up, so a change shows on the next reel or video.

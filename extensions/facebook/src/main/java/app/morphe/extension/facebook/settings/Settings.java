@@ -844,8 +844,8 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_original_chat_media", FALSE);
 
     /**
-     * A double tap on a reel or a video left without Facebook's like: no heart, no like sent. A
-     * single tap and the Like button do what they always did. Starts off.
+     * A double tap on a reel, a video or a photo on Home left without Facebook's like: no heart, no
+     * like sent. A single tap and the Like button do what they always did. Starts off.
      */
     public static final BooleanSetting TURN_OFF_DOUBLE_TAP_LIKE =
             new BooleanSetting("hushfacebook_turn_off_double_tap_like", FALSE);

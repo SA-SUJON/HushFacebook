@@ -3740,7 +3740,7 @@
     },
     {
       "name": "Turn off double tap to like",
-      "description": "Stops a double tap on a reel or video from liking it, so you don't like things by accident. A single tap still plays or pauses, and the Like button still works. Starts off. Turn it on in Hushfacebook settings > Reels and Watch.",
+      "description": "Stops a double tap on a reel, a video or a photo in the feed from liking it, so you don't like things by accident. A single tap still plays, pauses or opens the photo, and the Like button still works. Starts off. Turn it on in Hushfacebook settings > Reels and Watch.",
       "category": "Reels",
       "use": true,
       "dependencies": [

@@ -326,6 +326,8 @@ public class ColdStartHooksTest {
         assertNotNull("a double tap like before the context lost its key", DoubleTapLike.likeKey("reel"));
         assertFalse("a like from a double tap before the context was held back", DoubleTapLike.holdBackLike("DOUBLE_TAP"));
         assertFalse("an attachment's double tap before the context was left unhandled", DoubleTapLike.holdBackTap());
+        assertFalse("a photo's double tap on Home before the context went unreported", DoubleTapLike.holdBackFeedTap(null));
+        assertFalse("the feed's double-tap like before the context was held back", DoubleTapLike.holdBackFeedLike());
         // In a build with Hold a reel for 2x, so each answer is the context check's.
         ReelHoldForTests.withHold(() -> {
             assertFalse("a long press on a reel before the context went to the speed-up", ReelHold.longPress(false));
