@@ -31,6 +31,7 @@ import java.util.Collections;
 
 import app.morphe.extension.facebook.media.TapToPlayForTests.Autoplay;
 import app.morphe.extension.facebook.media.TapToPlayForTests.Trigger;
+import app.morphe.extension.facebook.reels.FeedVideoAlone;
 import app.morphe.extension.facebook.settings.FamilyNames;
 import app.morphe.extension.facebook.settings.Settings;
 import app.morphe.extension.shared.SettingsContextRule;
@@ -1014,6 +1015,97 @@ public class TapToPlayTest {
         TapToPlay.screenCreated(viewer, now + 40_100);
         TapToPlay.nonTapGesture();
         assertFalse("a reel after a swipe", reelAt(new Object(), now + 40_500));
+    }
+
+    /** A start on [player] at [now] that isn't a reel's: BY_AUTOPLAY on a plain video's player. */
+    private static boolean plainVideoAt(Object player, long now) {
+        return TapToPlay.decide(player, Trigger.BY_AUTOPLAY.name(), false, now, "");
+    }
+
+    /**
+     * #239: a plain video tapped in the feed opens Facebook's player, which starts it once the viewer
+     * has loaded, past the tap window, with BY_AUTOPLAY on a player that isn't a reel's. That start
+     * plays, through Facebook's own restarts, whether or not a screen of its own opened, and one
+     * video takes it.
+     */
+    @Test
+    public void aFeedVideoTapPlaysThePlainVideoItsPlayerOpens() {
+        long now = 100_000;
+        tapAt(now - 300);
+        TapToPlay.feedVideoOpened(now - 200);
+        Object video = new Object();
+        assertTrue("the plain video the tap opened", plainVideoAt(video, now + 1_500));
+        assertTrue("it plays through Facebook's own restarts", TapToPlay.armed(video));
+        assertFalse("another video after it with no tap of its own", plainVideoAt(new Object(), now + 1_600));
+
+        tapAt(now + 20_000);
+        TapToPlay.feedVideoOpened(now + 20_100);
+        Activity viewer = Robolectric.buildActivity(Activity.class).setup().get();
+        TapToPlay.screenCreated(viewer, now + 20_200);
+        TapToPlay.activityResumed(viewer);
+        assertTrue("a feed reel the tap opened in a screen of its own", reelAt(new Object(), now + 21_500));
+        assertFalse("which leaves nothing for a second video", plainVideoAt(new Object(), now + 21_600));
+    }
+
+    /**
+     * A player opening with no tap, or over two seconds after one, isn't a feed video someone tapped,
+     * and a start past ten seconds, a feed coming back into view and a swipe in between all leave the
+     * video waiting.
+     */
+    @Test
+    public void aFeedVideoPlayerWithNoTapOrALateStartStillWaits() {
+        long now = 100_000;
+        TapToPlay.feedVideoOpened(now);
+        assertFalse("a player opening with no tap", plainVideoAt(new Object(), now + 1_500));
+
+        tapAt(now + 10_000);
+        TapToPlay.feedVideoOpened(now + 10_000 + TapToPlay.SCREEN_AFTER_TAP_MS + 1);
+        assertFalse("a player opening over two seconds after the tap", plainVideoAt(new Object(), now + 13_000));
+
+        tapAt(now + 20_000);
+        TapToPlay.feedVideoOpened(now + 20_100);
+        assertFalse("a start past ten seconds",
+                plainVideoAt(new Object(), now + 20_100 + TapToPlay.TAPPED_SCREEN_WINDOW_MS + 1));
+        assertFalse("and it's gone after that", plainVideoAt(new Object(), now + 30_300));
+
+        tapAt(now + 40_000);
+        TapToPlay.feedVideoOpened(now + 40_100);
+        assertFalse("the feed coming back isn't the video", decide(new Object(), Trigger.BY_FRAGMENT_RESUME, now + 41_500));
+        assertTrue("the video's own start still has it", plainVideoAt(new Object(), now + 41_600));
+
+        tapAt(now + 50_000);
+        TapToPlay.feedVideoOpened(now + 50_100);
+        TapToPlay.nonTapGesture();
+        assertFalse("a start after a swipe", plainVideoAt(new Object(), now + 51_500));
+    }
+
+    /**
+     * Clean up Reels' hooks tell it a feed video opened its player whatever that patch's own switch
+     * says, and only for a video opened from a feed.
+     */
+    @Test
+    public void cleanUpReelsTellsItAFeedVideoOpened() {
+        TapToPlayForTests.tapEnded(300);
+        FeedVideoAlone.reelsViewerOpening("user_timeline::feed_story");
+        assertTrue("a page's video post opened from its timeline",
+                plainVideoAt(new Object(), SystemClock.uptimeMillis() + 1_500));
+
+        TapToPlayForTests.tapEnded(300);
+        FeedVideoAlone.reelsViewerOpening("fb_shorts_tab::reels_tab");
+        assertFalse("the reels viewer opened from the Reels tab",
+                plainVideoAt(new Object(), SystemClock.uptimeMillis() + 1_500));
+
+        TapToPlayForTests.tapEnded(300);
+        FeedVideoAlone.feedVideoTapped();
+        assertTrue("a video tapped in a feed, through the Warion step",
+                plainVideoAt(new Object(), SystemClock.uptimeMillis() + 1_500));
+
+        Settings.TAP_TO_PLAY.save(false);
+        TapToPlayForTests.tapEnded(300);
+        FeedVideoAlone.feedVideoTapped();
+        Settings.TAP_TO_PLAY.save(true);
+        assertFalse("nothing recorded while the switch was off",
+                plainVideoAt(new Object(), SystemClock.uptimeMillis() + 1_500));
     }
 
     /** Only a fresh screen while the switch is on counts, through the activity watcher. */
