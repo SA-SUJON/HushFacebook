@@ -3187,7 +3187,7 @@
       ],
       "compatiblePackages": {
         "com.facebook.katana": [
-          "584.0.0.51.56"
+          "585.0.0.47.54"
         ]
       },
       "compatibility": [
@@ -3202,11 +3202,11 @@
           ],
           "targets": [
             {
-              "version": "584.0.0.51.56",
+              "version": "585.0.0.47.54",
               "experimental": false,
               "versionCodes": {
-                "ARM64_V8A": 475817393,
-                "ARMEABI_V7A": 475817404
+                "ARM64_V8A": 476015655,
+                "ARMEABI_V7A": 476015543
               }
             }
           ]
