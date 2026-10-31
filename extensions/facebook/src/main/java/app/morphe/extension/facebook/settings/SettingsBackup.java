@@ -209,6 +209,7 @@ public final class SettingsBackup {
             Settings.PLAY_REELS_ONCE,
             Settings.ORIGINAL_AUDIO,
             Settings.HIDE_REEL_SEARCH_PILL,
+            Settings.HIDE_VIEWER_TOP_BUTTONS,
             Settings.HIDE_REEL_COUNTS,
             Settings.HIDE_REEL_SAVE_BUTTON,
             Settings.HIDE_REEL_WHATSAPP_BUTTON,

@@ -6,6 +6,7 @@ Changes in each Hushfacebook version, newest first.
 
 ### Added
 
+* **Facebook:** New `Hide the top right buttons on opened videos` under Reels and Watch, part of `Clean up Reels`. When you open a reel or a video full screen, Search and the button next to it leave the top bar. Back stays, and so does More at the bottom of the side buttons, where Download is. It's off by default and needs no restart (Refs #311).
 * **Facebook:** New `Hide the pull down to lock hint` under Reels and Watch. Holding a reel or a video for 2x then shows the plain 2x pill without the "Pull down to lock 2x speed" line, and pulling down still locks the speed. It needs no restart (Refs #289).
 * **Facebook:** New `Hide the emoji row on comments` under Comments and writing takes away the row of emoji Facebook puts over the comment box. Typing and the box's buttons stay, and you can still type emoji from your keyboard (Refs #290).
 * **Facebook:** `Badge and logo colors` has a third box, `Selected tab color`, under Appearance. Type a color code like #2ECC71 and the selected tab in the tab bar takes it after a restart. It wins over Material You's accent when both are on, blank keeps Facebook's own color, and settings backups carry it (Refs #297).

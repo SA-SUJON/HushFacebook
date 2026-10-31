@@ -137,6 +137,10 @@ final class VideoPages {
             reels.addPreference(toggle(context, Settings.HIDE_REEL_SEARCH_PILL,
                     L10n.t("Hides the search suggestion under a reel's caption, the magnifier with a question to look up, "
                             + "the one at the top of its comments and the search bar over reels you open from a profile.")));
+            // Asked after each layout of the full-screen player, so a change shows right away.
+            reels.addPreference(toggle(context, Settings.HIDE_VIEWER_TOP_BUTTONS,
+                    L10n.t("Takes Search and the button next to it off the top of a video or reel you open. Back "
+                            + "stays, and so does More at the bottom of the side buttons, where Download is.")));
             // The sidebar buttons are built as each reel is, so a change shows from the next reel.
             reels.addPreference(toggle(context, Settings.HIDE_REEL_COUNTS,
                     L10n.t("Takes the numbers away from under a reel's Like, Comment and Share icons. "

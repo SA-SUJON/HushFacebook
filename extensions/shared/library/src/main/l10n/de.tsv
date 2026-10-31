@@ -1705,6 +1705,8 @@ Hide who is typing in comments	Wer gerade kommentiert, ausblenden
 Takes away the line that says someone is typing a comment. Your own typing is a separate switch under Privacy.	Entfernt die Zeile, die anzeigt, dass jemand gerade einen Kommentar schreibt. Dein eigenes Tippen hat einen eigenen Schalter unter Datenschutz.
 Hide the search pill on reels	Suchvorschlag bei Reels ausblenden
 Hides the search suggestion under a reel's caption, the magnifier with a question to look up, the one at the top of its comments and the search bar over reels you open from a profile.	Blendet den Suchvorschlag unter der Beschreibung eines Reels aus, die Lupe mit einer Frage zum Nachschlagen, den über seinen Kommentaren und die Suchleiste über Reels, die du von einem Profil aus öffnest.
+Hide the top right buttons on opened videos	Buttons oben rechts bei geöffneten Videos ausblenden
+Takes Search and the button next to it off the top of a video or reel you open. Back stays, and so does More at the bottom of the side buttons, where Download is.	Nimmt die Suche und den Button daneben oben aus einem geöffneten Video oder Reel. Zurück bleibt, und Mehr unten bei den Buttons an der Seite, wo Download ist, bleibt auch.
 # context: switch title under Appearance; the button is Facebook's Messenger icon in the top bar of Home
 Hide the Messenger button	Messenger-Button ausblenden
 # context: summary of that switch; the other top bar buttons move over to fill the space; Hushfacebook is the app's name

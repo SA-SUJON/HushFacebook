@@ -590,6 +590,15 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_reel_search_pill", FALSE);
 
     /**
+     * Search and the button beside it at the top of a video or reel opened full screen, the Reels
+     * profile button over a reel and More over a feed video ({@link
+     * app.morphe.extension.facebook.reels.ViewerTopBar}, #311). Back stays, and so does More at the
+     * foot of the side buttons, which holds Download. Asked after each layout of the screen.
+     */
+    public static final BooleanSetting HIDE_VIEWER_TOP_BUTTONS =
+            new BooleanSetting("hushfacebook_hide_viewer_top_buttons", FALSE);
+
+    /**
      * The numbers under a reel's Like, Comment and Share icons go, and the icons stay where they are
      * ({@link app.morphe.extension.facebook.reels.ReelDeclutter#countText}, #180). Off by default.
      * A change shows on the buttons drawn after it.

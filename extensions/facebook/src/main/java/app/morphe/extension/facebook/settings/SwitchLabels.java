@@ -146,6 +146,7 @@ final class SwitchLabels {
         if (setting == Settings.PLAY_REELS_ONCE) return L10n.t("Play reels once");
         if (setting == Settings.ORIGINAL_AUDIO) return L10n.t("Keep the original audio");
         if (setting == Settings.HIDE_REEL_SEARCH_PILL) return L10n.t("Hide the search pill on reels");
+        if (setting == Settings.HIDE_VIEWER_TOP_BUTTONS) return L10n.t("Hide the top right buttons on opened videos");
         if (setting == Settings.HIDE_REEL_COUNTS) return L10n.t("Hide counts on reels");
         if (setting == Settings.HIDE_REEL_SAVE_BUTTON) return L10n.t("Hide Save on reels");
         if (setting == Settings.HIDE_REEL_WHATSAPP_BUTTON) return L10n.t("Hide WhatsApp on reels");

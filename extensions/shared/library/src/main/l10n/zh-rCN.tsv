@@ -1700,6 +1700,8 @@ Hide who is typing in comments	隐藏评论中谁在输入
 Takes away the line that says someone is typing a comment. Your own typing is a separate switch under Privacy.	移除提示有人正在输入评论的那一行。你自己的输入状态由“隐私”下的另一个开关控制。
 Hide the search pill on reels	隐藏 Reels 上的搜索胶囊
 Hides the search suggestion under a reel's caption, the magnifier with a question to look up, the one at the top of its comments and the search bar over reels you open from a profile.	隐藏 Reels 说明文字下方的搜索建议（即带问题的放大镜，用于查找相关内容）、评论顶部的那一个，以及从个人主页打开的 Reels 顶部的搜索栏。
+Hide the top right buttons on opened videos	隐藏已打开视频右上角的按钮
+Takes Search and the button next to it off the top of a video or reel you open. Back stays, and so does More at the bottom of the side buttons, where Download is.	去掉你打开的视频或 Reels 顶部的搜索和旁边的按钮。返回按钮保留，侧边按钮最下方放着下载的更多按钮也保留。
 # context: switch title under Appearance; the button is Facebook's Messenger icon in the top bar of Home
 Hide the Messenger button	隐藏 Messenger 按钮
 # context: summary of that switch; the other top bar buttons move over to fill the space; Hushfacebook is the app's name
