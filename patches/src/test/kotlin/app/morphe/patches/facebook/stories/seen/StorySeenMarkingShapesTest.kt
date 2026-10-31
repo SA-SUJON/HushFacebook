@@ -176,6 +176,8 @@ class StorySeenMarkingShapesTest {
         assertEquals(bucketType, found.hasUnwatched.definingClass)
         assertEquals("A0X", found.override.name)
         assertEquals(regularType, found.override.definingClass)
+        assertEquals("the tree a Highlights bucket's type is read from (#165)", "A01", found.tree.name)
+        assertEquals(regularType, found.tree.definingClass)
     }
 
     @Test

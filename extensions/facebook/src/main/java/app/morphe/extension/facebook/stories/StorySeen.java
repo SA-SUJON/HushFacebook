@@ -97,6 +97,9 @@ public final class StorySeen {
     static final String BUCKET_TYPE = "DirectMessageThreadBucket";
     static final String SEEN_FIELD = "is_bucket_seen_by_viewer";
 
+    /** Facebook's story bucket, which keeps its name. */
+    private static final String REGULAR_BUCKET = "com.facebook.audience.snacks.model.RegularStoryBucket";
+
     /**
      * Each copy of a bucket Facebook builds carries what its servers sent, so a copy built moments
      * after the last mark still reads unwatched and needs its own: a cold start builds the tray four
@@ -139,9 +142,32 @@ public final class StorySeen {
         @Override public String storyId(Object card) { return text(storyIdOf(card)); }
         @Override public boolean hasUnwatched(Object bucket) { return hasUnwatchedOf(bucket); }
         @Override public void publishWatched(Object bucket, String bucketId) {
-            publishSeen(sessionOf(bucket), bucketId, BUCKET_TYPE, SEEN_FIELD, true);
+            Object session = sessionOf(bucket);
+            String own = isRegular(bucket) ? text(bucketTypeOf(bucket)) : null;
+            for (String type : typesFor(own)) publishSeen(session, bucketId, type, SEEN_FIELD, true);
+            Logger.printDebug(() -> "Story views: published a " + own + " bucket as watched");
         }
     };
+
+    /**
+     * The tree types a bucket goes out as watched under: Facebook's own, and the bucket's when it
+     * has another. A Highlights tile's bucket is no DirectMessageThreadBucket, so a publish under
+     * that name alone never reached its ring, and it stayed lit however often it was watched (#165).
+     */
+    static List<String> typesFor(@Nullable String own) {
+        List<String> types = new ArrayList<>(2);
+        types.add(BUCKET_TYPE);
+        if (own != null && !own.isEmpty() && !own.equals(BUCKET_TYPE)) types.add(own);
+        return types;
+    }
+
+    /** Whether [bucket] is a RegularStoryBucket, the one kind whose tree the patch reads its type from. */
+    private static boolean isRegular(Object bucket) {
+        for (Class<?> type = bucket.getClass(); type != null; type = type.getSuperclass()) {
+            if (REGULAR_BUCKET.equals(type.getName())) return true;
+        }
+        return false;
+    }
 
     private static volatile Stories stories = PATCHED;
 
@@ -573,6 +599,11 @@ public final class StorySeen {
 
     /** Filled in by the patch: the FbUserSession the bucket was built for. */
     public static Object sessionOf(Object bucket) {
+        return UNPATCHED;
+    }
+
+    /** Filled in by the patch: the GraphQL type of a RegularStoryBucket's tree, its getTypeName(). */
+    public static Object bucketTypeOf(Object bucket) {
         return UNPATCHED;
     }
 

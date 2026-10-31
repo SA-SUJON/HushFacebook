@@ -24,6 +24,7 @@ import org.robolectric.annotation.Config;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import app.morphe.extension.facebook.settings.FamilyNames;
@@ -424,5 +425,18 @@ public class StorySeenMarkingTest {
         });
         assertFalse("Facebook's own start was overruled", StorySeen.watchedHere("s1"));
         assertTrue(statusLine(), statusLine().contains("threw"));
+    }
+
+    @Test
+    public void aHighlightsBucketGoesOutUnderItsOwnTypeToo() {
+        // Highlights tiles are XFBStoryHighlightDeliveryBucket trees on 585, which a
+        // DirectMessageThreadBucket publish never reached, so their rings stayed lit (#165).
+        assertEquals(Arrays.asList(StorySeen.BUCKET_TYPE, "XFBStoryHighlightDeliveryBucket"),
+                StorySeen.typesFor("XFBStoryHighlightDeliveryBucket"));
+        // Negative controls: a bucket of Facebook's own type, or one whose type couldn't be read,
+        // goes out once, as before.
+        assertEquals(Collections.singletonList(StorySeen.BUCKET_TYPE), StorySeen.typesFor(StorySeen.BUCKET_TYPE));
+        assertEquals(Collections.singletonList(StorySeen.BUCKET_TYPE), StorySeen.typesFor(null));
+        assertEquals(Collections.singletonList(StorySeen.BUCKET_TYPE), StorySeen.typesFor(""));
     }
 }
