@@ -210,11 +210,20 @@ val hideSuggestedPostsPatch = bytecodePatch(
         } catch (exception: PatchException) {
             patchLog.warning("${exception.message}, so Home asks for groups' join states only when Facebook does.")
         }
-        // Debug logging's shape of a kept story posted to no profile: where else it names a group (#195).
+        // A story posted to no profile names its group in its title or an attachment, and Debug logging says which (#195).
         try {
             fillStoryShapeStubs()
         } catch (exception: PatchException) {
-            patchLog.warning("${exception.message}, so Debug logging can't say what a story posted to no profile carries.")
+            patchLog.warning(
+                "${exception.message}, so Hide posts from groups you're not in can't read a group a post's title or " +
+                    "attachment names, and Debug logging can't say what a story posted to no profile carries.",
+            )
+        }
+        // A title's group is a bare entity, read again as the class the join state stub takes (#195).
+        try {
+            fillStoryTargetClassStub()
+        } catch (exception: PatchException) {
+            patchLog.warning("${exception.message}, so Hide posts from groups you're not in can't read a group a post's title names.")
         }
         // The search screen's For you and People you may know rows, and Debug logging's names for every row there (#80).
         try {
