@@ -747,8 +747,10 @@ public class PausedHooksTest {
                 () -> StoryPhoto.menuTitle(new UnmarkedPhotoStoryCard()) != null,
                 // The recorder runs in every player Facebook builds, not only in stories.
                 PlayerSourcesForTests::recordsAPlayer));
-        // Every reel's sidebar gets the Download button, and a reel whose caption was seen gets Copy caption.
-        probes.put(PatchFamily.REEL_DOWNLOAD, Arrays.asList(ReelDownload::showsButton, ReelCaptionForTests::addsTheRow));
+        // Every reel's sidebar gets the Download button, a reel on Facebook's older button layout gets
+        // the newer one so it has the button too, and a reel whose caption was seen gets Copy caption.
+        probes.put(PatchFamily.REEL_DOWNLOAD, Arrays.asList(ReelDownload::showsButton,
+                () -> ReelDownload.verticalUfi(false), ReelCaptionForTests::addsTheRow));
         // A video post's menu gets Download to phone, a video comment's sheet gets Save video, and
         // the video recorder keeps a player. Its copied-link option reads the clipboard as a screen
         // comes to the front.
