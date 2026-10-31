@@ -6,6 +6,7 @@ package app.morphe.patches.facebook.search.daterange
 
 import app.morphe.patcher.StringComparisonType
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
@@ -82,8 +83,7 @@ val searchDateRangePatch = bytecodePatch(
         requireStatusMethod("searchDateRange")
         val holders = classDefByStrings(TAP_FILTER, StringComparisonType.EQUALS)
             .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
-        val found = holders.flatMap { holder -> methodsHolding(holder, TAP_FILTER) }
-            .mapNotNull { method -> kindRead(method) { type -> mutableClassDefBy(type) }?.let { method to it } }
+        val found = kindReads(holders)
         val (tap, read) = found.singleOrNull()
             ?: throw PatchException(
                 "$PATCH: expected one method holding \"$TAP_FILTER\" that reads a filter's kind and then the bottom " +
@@ -112,6 +112,15 @@ internal class KindRead(
     /** The register the flag lands in. */
     val flag: Int,
 )
+
+/**
+ * Each method of [holders] holding [TAP_FILTER], with where it reads a filter's kind and then the flag.
+ * A type Facebook doesn't define, such as String, is looked up as no class: as a patch class it threw
+ * and stopped patching.
+ */
+internal fun BytecodePatchContext.kindReads(holders: List<ClassDef>) =
+    holders.flatMap { holder -> methodsHolding(holder, TAP_FILTER) }
+        .mapNotNull { method -> kindRead(method) { type -> classDefByOrNull(type) }?.let { method to it } }
 
 /**
  * The one place [method] reads a filter's kind and then the flag, or null when there isn't exactly

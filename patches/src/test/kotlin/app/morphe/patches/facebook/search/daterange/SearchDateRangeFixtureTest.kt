@@ -44,16 +44,15 @@ class SearchDateRangeFixtureTest {
 
     private fun tap(bundle: File) {
         val holders = FixtureDex.classesHolding(bundle, TAP_FILTER).filterNot { it.type.startsWith(EXTENSION_CLASSES) }
-        val kindTypes = mutableMapOf<String, com.android.tools.smali.dexlib2.iface.ClassDef?>()
-        // The kind enum lives in another dex of the bundle, so every class the reads name is fetched on demand.
-        val found = holders.flatMap { methodsHolding(it, TAP_FILTER) }.mapNotNull { method ->
-            val wanted = method.implementation!!.instructions
+        // The kind enum lives in another dex of the bundle, so every class the tap handlers name is fetched. String and
+        // the other framework types they answer stay out of the pool, as they are out of Facebook's, and the patch's
+        // own lookup has to pass over them.
+        val named = holders.flatMap { methodsHolding(it, TAP_FILTER) }.flatMap { method ->
+            method.implementation!!.instructions
                 .mapNotNull { ((it as? ReferenceInstruction)?.reference as? MethodReference)?.returnType }
-                .filter { it.startsWith("L") }.toSet()
-            val classes = FixtureDex.classes(bundle, wanted)
-            kindTypes.putAll(classes)
-            kindRead(method) { classes[it] }?.let { method to it }
-        }
+        }.filter { it.startsWith("L") }.toSet()
+        val found = PatchContexts.of((holders + FixtureDex.classes(bundle, named).values).distinctBy { it.type })
+            .kindReads(holders)
         assertEquals("${bundle.name}: one method reads a filter's kind and then the flag, found ${found.map { it.first.descriptor() }}",
             1, found.size)
         val (method, read) = found.single()
