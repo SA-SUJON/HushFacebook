@@ -46,6 +46,7 @@ Changes in each Hushfacebook version, newest first.
 
 ### Fixed
 
+* **Facebook:** `Hide For you in search` and `Hide "People you may know" in search` now also reach the rows Facebook draws on the first page of the search screen before you type. On some accounts Facebook builds that first page on its own, apart from the rows further down, and the switches only ever saw the later ones, so For you stayed. Debug logging now says which part of Facebook handed over each row (Refs #285).
 * **Facebook:** With `Skip silent parts` on, reels no longer drop to low quality a few seconds in and lose their Quality row. Facebook counted the frames a skip jumps over as frames its video decoder couldn't keep up with, and switched to the SD file. Those checks now sit out while silent parts are skipped, and a real decoder error still falls back the way it did (Refs #286).
 * **Facebook:** `Turn off double tap to like` now covers photos on Home too, so a double tap on a single photo, a collage or the photo flyout no longer likes the post or plays the heart (Refs #220).
 * **Facebook:** `Hide posts from groups you're not in` now also catches group posts that only name their group next to the poster's name or point to it in an attachment, and Debug logging shows which part of the post named the group (Refs #195).

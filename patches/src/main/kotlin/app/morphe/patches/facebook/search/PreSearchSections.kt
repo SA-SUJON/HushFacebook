@@ -12,6 +12,7 @@ import app.morphe.patches.facebook.feed.aidetected.EXTENSION_CLASSES
 import app.morphe.patches.facebook.feed.methodsHolding
 import app.morphe.patches.facebook.layout.theme.branchTargets
 import app.morphe.patches.facebook.misc.extension.EXTENSION_PACKAGE
+import app.morphe.util.classDefForEachReferencing
 import app.morphe.util.findMutableMethodOf
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
@@ -19,6 +20,7 @@ import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
@@ -57,6 +59,21 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  * LX/0m9k), then the node for the module the same way (ENJ to LX/0lzS), both null tests jumping to
  * one empty row. The "rendered_modules" key moved into the node's own accessor (LX/0m9k;->FH8, whose
  * tree class LX/08Hl loads it), which the section logs; the extension reads it off the node as before.
+ *
+ * The section only draws the entries after the first page (#285, read from 584 and 585 on 2026-10-31).
+ * The first page can go to a builder naming itself "nullstate_nt_head_network" (584 LX/9O3;->A0T, 585
+ * arm64 LX/09mr;->A0X), which walks the same list and reads each entry's node and module in 584's
+ * shape, both null tests jumping back to the loop, then builds a row straight from each module. A
+ * reporter's search screen came wholly from there, so their Debug log had no line from the section.
+ * That builder gets the same hook with its own entry point, and a null node leaves the entry out.
+ *
+ * Facebook's older null-state query ("FetchNTSearchNullStateQuery") reads nodes of the same type in a
+ * static loop body (Builder, Iterator) that adds each module to a list: 584 inline (LX/hb3;->A1C, the
+ * entry's "node" tree, then the concrete reader keyed by the hashCode of the node's type name, then
+ * the module), 585 through the node tree's own accessor holding that key (LX/07oD;->ALc, asked through
+ * its interface LX/0lzW from LX/0mDW;->A00). Each tests the node for null and returns, so the hook
+ * goes right after the node is kept and a null leaves the entry out. That query may not ask for
+ * "rendered_modules", in which case its Debug lines say none and its rows stay.
  */
 
 /** The name the pre-search section gives itself. */
@@ -70,6 +87,23 @@ internal const val PRE_SEARCH_ENTRY =
 
 internal const val PRE_SEARCH_NODE =
     "$EXTENSION_PACKAGE/search/PreSearchSections;->node(Ljava/lang/Object;)Ljava/lang/Object;"
+
+/** The name the builder of the list's first page gives itself (#285). */
+internal const val PRE_SEARCH_HEAD = "nullstate_nt_head_network"
+
+internal const val PRE_SEARCH_HEAD_NODE =
+    "$EXTENSION_PACKAGE/search/PreSearchSections;->headNode(Ljava/lang/Object;)Ljava/lang/Object;"
+
+internal const val PRE_SEARCH_QUERY_NODE =
+    "$EXTENSION_PACKAGE/search/PreSearchSections;->queryNode(Ljava/lang/Object;)Ljava/lang/Object;"
+
+/** The tree reader that reads a field as a concrete type, which it names by its name's hashCode. */
+internal const val CONCRETE_READER = "getCachedNullableConcreteReinterpret"
+
+/** The pre-search entries' node type, as a tree names a concrete type: its name's hashCode. */
+internal val NULL_STATE_NODE_KEY = "SearchNullStateNativeTemplatesResult".hashCode()
+
+private const val LIST_BUILDER = "Lcom/google/common/collect/ImmutableList\$Builder;"
 
 private const val PAGINABLE_LIST_READER = "getCachedPaginableTreeList"
 
@@ -215,21 +249,147 @@ internal fun BytecodePatchContext.hookPreSearchSections() {
     val sites = preSearchSites(section, entry, entryInterfaces)
     val site = sites.singleOrNull()
         ?: throw PatchException("${section.type} reads an entry's module in ${sites.size} places, expected one")
-    if (site.node > 15 || site.module > 15) {
-        throw PatchException("${section.type}->${site.method.name} keeps an entry past v15")
-    }
-    // A label on the null test stays there, so a jump to it would skip the call.
-    if (site.read + 1 in branchTargets(site.method.implementation!!.instructions.toList())) {
-        throw PatchException("${section.type}->${site.method.name} jumps to the null test of what it keeps")
-    }
     val hand = if (site.byNode) "invoke-static { v${site.node} }, $PRE_SEARCH_NODE"
     else "invoke-static { v${site.node}, v${site.module} }, $PRE_SEARCH_ENTRY"
-    mutableClassDefBy(section.type).findMutableMethodOf(site.method).addInstructions(
-        site.read + 1,
+    handOver(site.method, site.read + 1, listOf(site.node, site.module), site.kept, site.type, hand)
+}
+
+/** The classes outside the extension with a method naming them [PRE_SEARCH_HEAD]. */
+internal fun BytecodePatchContext.preSearchHeads(): List<ClassDef> =
+    classDefByStrings(PRE_SEARCH_HEAD, StringComparisonType.EQUALS)
+        .filterNot { it.type.startsWith(EXTENSION_CLASSES) }
+        .distinctBy { it.type }
+        .filter { head -> head.methods.any { holds(it, PRE_SEARCH_HEAD) } }
+
+/**
+ * The first page's builder reads each entry the way 584's section does, node and module each tested
+ * for null, so it's found by the section's own sites and hands over the node the same way. Refuses
+ * unless the builder, the entry class and one such site are found.
+ */
+internal fun BytecodePatchContext.hookPreSearchHead() {
+    val entry = preSearchEntryType() ?: throw PatchException("no single entry class for \"$PRE_SEARCH_LIST\"")
+    val heads = preSearchHeads()
+    val head = heads.singleOrNull()
+        ?: throw PatchException("expected one class naming itself \"$PRE_SEARCH_HEAD\", found ${heads.size}")
+    val entryInterfaces = classDefByOrNull(entry)?.interfaces?.toSet() ?: emptySet()
+    val sites = preSearchSites(head, entry, entryInterfaces).filter { it.byNode }
+    val site = sites.singleOrNull()
+        ?: throw PatchException("${head.type} reads an entry's node in ${sites.size} places, expected one")
+    handOver(site.method, site.read + 1, listOf(site.node), site.node, site.type, "invoke-static { v${site.node} }, $PRE_SEARCH_HEAD_NODE")
+}
+
+/** Where the null-state query keeps an entry's [node] of [type], tested for null at [test]. */
+internal data class PreSearchQuerySite(val method: Method, val test: Int, val node: Int, val type: String)
+
+/**
+ * Each place in a static (Builder, Iterator) loop body that reads a node of the entries' type, keeps
+ * it, maybe casts it, and tests it for null: read inline with [CONCRETE_READER] and the type's key
+ * (584), or through an accessor holding both (585), asked of its class or an interface it declares.
+ * The entry class's own accessor isn't one, since the section and the head read that.
+ */
+internal fun BytecodePatchContext.preSearchQuerySites(entry: String): List<PreSearchQuerySite> {
+    val sites = mutableListOf<PreSearchQuerySite>()
+    val accessors = mutableListOf<Method>()
+    classDefForEachReferencing(names = listOf(CONCRETE_READER)) { classDef ->
+        if (classDef.type.startsWith(EXTENSION_CLASSES)) return@classDefForEachReferencing
+        for (method in classDef.methods) {
+            if (isQueryBody(method)) {
+                sites += querySites(method) { code, at -> readsNodeInline(code, at) }
+            } else if (classDef.type != entry && isNodeAccessor(method)) {
+                accessors += method
+            }
+        }
+    }
+    if (accessors.isEmpty()) return sites
+    val owners = accessors.flatMap { listOf(it.definingClass) + (classDefByOrNull(it.definingClass)?.interfaces.orEmpty()) }.toSet()
+    val names = accessors.map { it.name }.toSet()
+    classDefForEachReferencing(types = owners) { classDef ->
+        if (classDef.type.startsWith(EXTENSION_CLASSES)) return@classDefForEachReferencing
+        for (method in classDef.methods.filter(::isQueryBody)) {
+            sites += querySites(method) { code, at ->
+                val ref = (code[at] as ReferenceInstruction).reference as MethodReference
+                ref.definingClass in owners && ref.name in names && ref.parameterTypes.isEmpty()
+            }
+        }
+    }
+    return sites
+}
+
+private fun isQueryBody(method: Method) =
+    AccessFlags.STATIC.isSet(method.accessFlags) && method.returnType == "V" &&
+        method.parameterTypes.map(CharSequence::toString) == listOf(LIST_BUILDER, "Ljava/util/Iterator;")
+
+/** An instance method with no parameters answering an object read with [CONCRETE_READER] and the node type's key. */
+private fun isNodeAccessor(method: Method): Boolean {
+    if (AccessFlags.STATIC.isSet(method.accessFlags) || method.parameterTypes.isNotEmpty() || !method.returnType.startsWith("L")) {
+        return false
+    }
+    val code = method.implementation?.instructions?.toList() ?: return false
+    return code.indices.any { readsNodeInline(code, it) }
+}
+
+/** [CONCRETE_READER] called at [at] with a register loaded with the node type's key just before. */
+private fun readsNodeInline(code: List<Instruction>, at: Int): Boolean {
+    val call = code[at] as? FiveRegisterInstruction ?: return false
+    if (((call as ReferenceInstruction).reference as? MethodReference)?.name != CONCRETE_READER) return false
+    val registers = listOf(call.registerC, call.registerD, call.registerE, call.registerF, call.registerG).take(call.registerCount)
+    return (maxOf(0, at - 6) until at).any { index ->
+        val key = code[index] as? NarrowLiteralInstruction
+        key != null && key.narrowLiteral == NULL_STATE_NODE_KEY && (key as OneRegisterInstruction).registerA in registers
+    }
+}
+
+/** The calls in [method] that [reads] says read the node, kept, maybe cast, then tested for null. */
+private fun querySites(method: Method, reads: (List<Instruction>, Int) -> Boolean): List<PreSearchQuerySite> {
+    val code = method.implementation?.instructions?.toList() ?: return emptyList()
+    return code.indices.mapNotNull { at ->
+        if (code[at].opcode !in QUERY_CALLS || !reads(code, at)) return@mapNotNull null
+        if (code.getOrNull(at + 1)?.opcode != Opcode.MOVE_RESULT_OBJECT) return@mapNotNull null
+        val node = (code[at + 1] as OneRegisterInstruction).registerA
+        val cast = code.getOrNull(at + 2)?.takeIf { it.opcode == Opcode.CHECK_CAST && (it as OneRegisterInstruction).registerA == node }
+        val test = if (cast != null) at + 3 else at + 2
+        if (code.getOrNull(test)?.opcode != Opcode.IF_EQZ || (code[test] as OneRegisterInstruction).registerA != node) {
+            return@mapNotNull null
+        }
+        val type = cast?.let { ((it as ReferenceInstruction).reference as TypeReference).type }
+            ?: ((code[at] as ReferenceInstruction).reference as MethodReference).returnType
+        PreSearchQuerySite(method, test, node, type)
+    }
+}
+
+private val QUERY_CALLS = setOf(Opcode.INVOKE_VIRTUAL, Opcode.INVOKE_INTERFACE)
+
+/**
+ * Right before the query's null test of the node, hand the node to the extension and keep its answer
+ * cast back to what was there, so a null leaves the entry out. Refuses unless the entry class and one
+ * query site are found.
+ */
+internal fun BytecodePatchContext.hookPreSearchQuery() {
+    val entry = preSearchEntryType() ?: throw PatchException("no single entry class for \"$PRE_SEARCH_LIST\"")
+    val sites = preSearchQuerySites(entry)
+    val site = sites.singleOrNull()
+        ?: throw PatchException("the null-state query reads an entry's node in ${sites.size} places, expected one")
+    handOver(site.method, site.test, listOf(site.node), site.node, site.type, "invoke-static { v${site.node} }, $PRE_SEARCH_QUERY_NODE")
+}
+
+/**
+ * Adds [hand] at [at] in [method], its answer kept in [kept] and cast back to [type]. Refuses a
+ * register past v15 among [registers], or a jump onto [at], which would skip the call.
+ */
+private fun BytecodePatchContext.handOver(method: Method, at: Int, registers: List<Int>, kept: Int, type: String, hand: String) {
+    if (registers.any { it > 15 }) {
+        throw PatchException("${method.definingClass}->${method.name} keeps an entry past v15")
+    }
+    // A label on the null test stays there, so a jump to it would skip the call.
+    if (at in branchTargets(method.implementation!!.instructions.toList())) {
+        throw PatchException("${method.definingClass}->${method.name} jumps to the null test of what it keeps")
+    }
+    mutableClassDefBy(method.definingClass).findMutableMethodOf(method).addInstructions(
+        at,
         """
             $hand
-            move-result-object v${site.kept}
-            check-cast v${site.kept}, ${site.type}
+            move-result-object v$kept
+            check-cast v$kept, $type
         """,
     )
 }
