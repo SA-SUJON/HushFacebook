@@ -371,6 +371,7 @@ public final class SettingsBackup {
             Settings.HIDE_FACEBOOK_LOGO,
             Settings.HIDE_CREATE_BUTTON,
             Settings.HIDE_SEARCH_BUTTON,
+            Settings.SEARCH_WITH_PICTURE,
             Settings.FORCE_DARK_MODE,
             Settings.AMOLED_FLAT_CARDS,
             Settings.AMOLED_FEED_GAPS,

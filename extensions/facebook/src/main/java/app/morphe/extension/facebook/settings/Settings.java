@@ -2118,6 +2118,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_hide_search_button", FALSE, true);
 
     /**
+     * Pressing and holding the top bar's search button opens Google Lens (#245,
+     * {@link app.morphe.extension.facebook.search.PictureSearch}). The long press is set as the bar
+     * makes the button, so turning it on waits for a restart.
+     */
+    public static final BooleanSetting SEARCH_WITH_PICTURE =
+            new BooleanSetting("hushfacebook_search_with_picture", FALSE, true);
+
+    /**
      * Facebook's dark mode controller answers dark whatever its own setting says
      * ({@link app.morphe.extension.facebook.theme.ForceDarkMode}), for tablets whose Facebook
      * settings have no Dark mode row. Facebook asks as each screen applies its theme, so a change

@@ -123,6 +123,10 @@ final class HushfacebookPages {
                             + "Restart Facebook to see the change.")));
             tabs.addPreference(toggle(context, Settings.HIDE_SEARCH_BUTTON,
                     L10n.t("Takes the search button out of the top bar. Restart Facebook to see the change.")));
+            tabs.addPreference(toggle(context, Settings.SEARCH_WITH_PICTURE,
+                    L10n.t("Press and hold the search button to open Google Lens, then point the camera at something "
+                            + "or pick a picture to find out what it is. The picture goes to Google, not Facebook. "
+                            + "Restart Facebook to see the change.")));
         }
         if (build.contains(PatchFamily.HIDDEN_TABS)) {
             subheading(tabs, L10n.t("Tabs to hide"));

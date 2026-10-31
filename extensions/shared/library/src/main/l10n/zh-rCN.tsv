@@ -1723,6 +1723,9 @@ Hide the Create button	隐藏创建按钮
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	从顶栏移除用于创建帖子、Reels 和快拍的 + 按钮。重启 Facebook 后可看到更改。
 Hide the search button	隐藏搜索按钮
 Takes the search button out of the top bar. Restart Facebook to see the change.	从顶栏移除搜索按钮。重启 Facebook 后可看到更改。
+Search with a picture	用图片搜索
+Press and hold the search button to open Google Lens, then point the camera at something or pick a picture to find out what it is. The picture goes to Google, not Facebook. Restart Facebook to see the change.	长按搜索按钮打开 Google Lens，然后将相机对准某样东西或选择一张图片，即可知道它是什么。图片会发送给 Google，而不是 Facebook。重启 Facebook 后可看到更改。
+No app on this phone can open Google Lens	这部手机上没有可以打开 Google Lens 的应用
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	隐藏帖子上的数字
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

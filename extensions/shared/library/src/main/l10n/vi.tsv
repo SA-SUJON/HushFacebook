@@ -1728,6 +1728,9 @@ Hide the Create button	Ẩn nút Tạo
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	Gỡ nút + để tạo bài viết, thước phim và tin khỏi thanh trên cùng. Hãy khởi động lại Facebook để thấy thay đổi.
 Hide the search button	Ẩn nút tìm kiếm
 Takes the search button out of the top bar. Restart Facebook to see the change.	Gỡ nút tìm kiếm khỏi thanh trên cùng. Hãy khởi động lại Facebook để thấy thay đổi.
+Search with a picture	Tìm kiếm bằng hình ảnh
+Press and hold the search button to open Google Lens, then point the camera at something or pick a picture to find out what it is. The picture goes to Google, not Facebook. Restart Facebook to see the change.	Nhấn giữ nút tìm kiếm để mở Google Lens, rồi hướng máy ảnh vào thứ gì đó hoặc chọn một hình ảnh để biết đó là gì. Hình ảnh được gửi tới Google, không phải Facebook. Hãy khởi động lại Facebook để thấy thay đổi.
+No app on this phone can open Google Lens	Không có ứng dụng nào trên điện thoại này mở được Google Lens
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	Ẩn số đếm trên bài viết
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

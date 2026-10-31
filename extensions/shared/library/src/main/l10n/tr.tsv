@@ -1728,6 +1728,9 @@ Hide the Create button	Oluştur düğmesini gizle
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	Gönderi, reels ve hikâye oluşturmak için kullanılan + düğmesini üst çubuktan kaldırır. Değişikliği görmek için Facebook'u yeniden başlatın.
 Hide the search button	Arama düğmesini gizle
 Takes the search button out of the top bar. Restart Facebook to see the change.	Arama düğmesini üst çubuktan kaldırır. Değişikliği görmek için Facebook'u yeniden başlatın.
+Search with a picture	Resimle ara
+Press and hold the search button to open Google Lens, then point the camera at something or pick a picture to find out what it is. The picture goes to Google, not Facebook. Restart Facebook to see the change.	Google Lens'i açmak için arama düğmesine basılı tutun, ardından kamerayı bir şeye doğrultun ya da ne olduğunu öğrenmek için bir resim seçin. Resim Facebook'a değil, Google'a gider. Değişikliği görmek için Facebook'u yeniden başlatın.
+No app on this phone can open Google Lens	Bu telefondaki hiçbir uygulama Google Lens'i açamıyor
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	Gönderilerdeki sayıları gizle
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

@@ -1728,6 +1728,9 @@ Hide the Create button	Sembunyikan tombol Buat
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	Menghapus tombol + untuk membuat postingan, reel, dan cerita dari bilah atas. Mulai ulang Facebook untuk melihat perubahannya.
 Hide the search button	Sembunyikan tombol cari
 Takes the search button out of the top bar. Restart Facebook to see the change.	Menghapus tombol cari dari bilah atas. Mulai ulang Facebook untuk melihat perubahannya.
+Search with a picture	Cari dengan gambar
+Press and hold the search button to open Google Lens, then point the camera at something or pick a picture to find out what it is. The picture goes to Google, not Facebook. Restart Facebook to see the change.	Tekan lama tombol cari untuk membuka Google Lens, lalu arahkan kamera ke sesuatu atau pilih gambar untuk mengetahui apa itu. Gambar dikirim ke Google, bukan Facebook. Mulai ulang Facebook untuk melihat perubahannya.
+No app on this phone can open Google Lens	Tidak ada aplikasi di ponsel ini yang bisa membuka Google Lens
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	Sembunyikan angka di postingan
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

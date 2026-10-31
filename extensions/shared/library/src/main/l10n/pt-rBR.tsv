@@ -1614,6 +1614,9 @@ Hide the Create button	Ocultar o botão Criar
 Takes the + button for making a post, reel or story out of the top bar. Restart Facebook to see the change.	Tira da barra superior o botão + para criar publicações, reels e stories. Reinicie o Facebook para ver a mudança.
 Hide the search button	Ocultar o botão de busca
 Takes the search button out of the top bar. Restart Facebook to see the change.	Tira o botão de busca da barra superior. Reinicie o Facebook para ver a mudança.
+Search with a picture	Buscar com uma imagem
+Press and hold the search button to open Google Lens, then point the camera at something or pick a picture to find out what it is. The picture goes to Google, not Facebook. Restart Facebook to see the change.	Toque e segure o botão de busca para abrir o Google Lens. Depois aponte a câmera para algo ou escolha uma imagem para descobrir o que é. A imagem vai para o Google, não para o Facebook. Reinicie o Facebook para ver a mudança.
+No app on this phone can open Google Lens	Nenhum app neste celular consegue abrir o Google Lens
 # context: switch title under News feed; the counts are the numbers on the Like, Comment and Share buttons under a post
 Hide counts on posts	Ocultar os números nas publicações
 # context: summary of that switch; Like, Comment and Share are Facebook's own button labels, so use Facebook's wording in your language

@@ -297,6 +297,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_FACEBOOK_LOGO) return L10n.t("Hide the Facebook logo");
         if (setting == Settings.HIDE_CREATE_BUTTON) return L10n.t("Hide the Create button");
         if (setting == Settings.HIDE_SEARCH_BUTTON) return L10n.t("Hide the search button");
+        if (setting == Settings.SEARCH_WITH_PICTURE) return L10n.t("Search with a picture");
         if (setting == Settings.FORCE_DARK_MODE) return L10n.t("Force dark mode");
         if (setting == Settings.AMOLED_FLAT_CARDS) return L10n.t("Black cards");
         if (setting == Settings.AMOLED_FEED_GAPS) return L10n.t("Lines between posts");
