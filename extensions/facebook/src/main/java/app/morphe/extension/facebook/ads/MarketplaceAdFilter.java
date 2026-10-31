@@ -301,6 +301,7 @@ public final class MarketplaceAdFilter {
             if (MarketplaceListingAge.listingPage(trackingName)) {
                 MarketplaceListingAge.Answer dated = newListingAnswer();
                 if (dated == null) return text;
+                Logger.printDebug(() -> "Listing date: reading a listing page's answer whole");
                 String read = dated.read(text);
                 String rest = dated.end();
                 return rest == null ? read : read + rest;
@@ -313,6 +314,7 @@ public final class MarketplaceAdFilter {
             return rest.isEmpty() ? read : read + rest;
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.SPONSORED_MARKETPLACE, SEARCH_ANSWER, failure);
+            Logger.printDebug(() -> "Marketplace answer: reading it threw " + failure.getClass().getName());
             return text;
         }
     }
@@ -357,11 +359,13 @@ public final class MarketplaceAdFilter {
                 } else {
                     dated = newListingAnswer();
                     listingAnswers.put(request, dated);
+                    if (dated != null) Logger.printDebug(() -> "Listing date: reading a listing page's answer in pieces");
                 }
             }
             return dated == null ? piece : dated.read(piece);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.SPONSORED_MARKETPLACE, LISTING_DATE, failure);
+            Logger.printDebug(() -> "Listing date: reading the answer threw " + failure.getClass().getName());
             synchronized (listingAnswers) {
                 listingAnswers.put(request, null);
             }

@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import app.morphe.extension.shared.L10n;
+import app.morphe.extension.shared.Logger;
 
 /**
  * When a Marketplace listing went up, on the listing's own page (#303). Facebook only says so for a
@@ -138,6 +139,8 @@ final class MarketplaceListingAge {
             try {
                 root = MarketplaceSearchAds.Parser.whole(text);
             } catch (Exception unreadable) {
+                Logger.printDebug(() -> "Listing date: a payload didn't read (" + unreadable.getClass().getSimpleName()
+                        + "), passed on as it came");
                 return text;
             }
             List<MarketplaceSearchAds.Value> listings = new ArrayList<>();
@@ -147,20 +150,32 @@ final class MarketplaceListingAge {
                 String id = string(text, listing.member(text, ID));
                 if (seconds != null && id != null) times.put(id, seconds);
             }
+            int untimed = 0, unwritten = 0, dated = 0;
             for (MarketplaceSearchAds.Value listing : listings) {
                 Long seconds = seconds(text, listing.member(text, CREATION_TIME));
                 if (seconds == null) {
                     String id = string(text, listing.member(text, ID));
                     if (id != null) seconds = times.get(id);
                 }
-                if (seconds == null) continue;
+                if (seconds == null) {
+                    untimed++;
+                    continue;
+                }
                 MarketplaceSearchAds.Value place = listing.member(text, LOCATION_TEXT);
                 MarketplaceSearchAds.Value line = place == null || place.kind != '{' ? null : place.member(text, TEXT);
-                if (line == null || line.kind != '"') continue;
                 String label = label(seconds, now);
-                if (label == null) continue;
+                if (line == null || line.kind != '"' || label == null) {
+                    unwritten++;
+                    continue;
+                }
                 String was = text.substring(line.start + 1, line.end - 1);
                 line.replace('"' + (was.isEmpty() ? "" : was + DOT) + escape(label) + '"');
+                dated++;
+            }
+            if (!listings.isEmpty()) {
+                int noTime = untimed, noLine = unwritten, wrote = dated;
+                Logger.printDebug(() -> "Listing date: dated " + wrote + " place lines in a payload, "
+                        + noTime + " with no time, " + noLine + " with no line or a time out of range");
             }
             if (!root.changed) return text;
             StringBuilder out = new StringBuilder(text.length() + 64);
