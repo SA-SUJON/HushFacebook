@@ -195,7 +195,12 @@ val hideSuggestedPostsPatch = bytecodePatch(
         }
         // A friend's post in a group you're not in is an ordinary story; its group's join state tells it apart (#195).
         try {
-            fillGroupJoinStubs()
+            if (fillGroupJoinStubs().targetGroup == null) {
+                patchLog.warning(
+                    "GraphQLStory declares no $STORY_TARGET_GROUP_FIELD, so Hide posts from groups you're not in " +
+                        "reads a post's group from its $STORY_TARGET_FIELD alone.",
+                )
+            }
         } catch (exception: PatchException) {
             patchLog.warning("${exception.message}, so Hide posts from groups you're not in keeps every post.")
         }
