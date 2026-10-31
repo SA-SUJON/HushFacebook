@@ -45,6 +45,7 @@ Changes in each Hushfacebook version, newest first.
 
 ### Fixed
 
+* **Facebook:** With `Skip silent parts` on, reels no longer drop to low quality a few seconds in and lose their Quality row. Facebook counted the frames a skip jumps over as frames its video decoder couldn't keep up with, and switched to the SD file. Those checks now sit out while silent parts are skipped, and a real decoder error still falls back the way it did (Refs #286).
 * **Facebook:** `Turn off double tap to like` now covers photos on Home too, so a double tap on a single photo, a collage or the photo flyout no longer likes the post or plays the heart (Refs #220).
 * **Facebook:** `Hide posts from groups you're not in` now also catches group posts that only name their group next to the poster's name or point to it in an attachment, and Debug logging shows which part of the post named the group (Refs #195).
 * **Facebook:** With `Always use Clean mode` on, the Clean mode button over a reel works both ways now. Before, its first tap brought the buttons back but the icon kept its "Turn off" label, and tapping it again did nothing. Now each tap switches Clean mode off or back on for the reel you're watching, and the label follows. Ads still don't get the button, same as in Facebook (Refs #304).
