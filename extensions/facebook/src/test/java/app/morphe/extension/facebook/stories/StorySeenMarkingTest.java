@@ -58,13 +58,18 @@ public class StorySeenMarkingTest {
         }
     }
 
-    /** Facebook's classes: a card is its id, and publishing a bucket marks it watched, as the consistency publish does. */
+    /**
+     * Facebook's classes: a card is its id, and publishing a bucket marks it watched, as the
+     * consistency publish does. A bucket's answer asks the hook first, as the patched one does.
+     */
     private final List<String> published = new ArrayList<>();
     private final StorySeen.Stories stories = new StorySeen.Stories() {
         @Override public String bucketId(Object bucket) { return ((Bucket) bucket).id; }
         @Override public List<?> cards(Object bucket) { return ((Bucket) bucket).cards; }
         @Override public String storyId(Object card) { return (String) card; }
-        @Override public boolean hasUnwatched(Object bucket) { return ((Bucket) bucket).unwatched; }
+        @Override public boolean hasUnwatched(Object bucket) {
+            return !StorySeen.readsWatched(bucket) && ((Bucket) bucket).unwatched;
+        }
         @Override public void publishWatched(Object bucket, String bucketId) {
             published.add(bucketId);
             ((Bucket) bucket).unwatched = false;
@@ -255,6 +260,82 @@ public class StorySeenMarkingTest {
         assertTrue(published.isEmpty());
         assertTrue(RuntimeEnvironment.getApplication().getSharedPreferences(SeenBuckets.FILE, Context.MODE_PRIVATE)
                 .getAll().isEmpty());
+    }
+
+    @Test
+    public void aBucketKeptAsWatchedReadsWatchedTheFirstTimeTheTrayAsks() {
+        Bucket friend = new Bucket("b1", "s1", "s2");
+        StorySeen.viewed(friend, "s1", helper, false);
+        StorySeen.viewed(friend, "s2", helper, false);
+        heldBack();
+        idle();
+
+        // #165: Facebook started again and draws the tray before building a single bucket.
+        StorySeen.useForTests(stories);
+        HookStatus.clear();
+        assertFalse("the ring came back blue", stories.hasUnwatched(new Bucket("b1", "s1", "s2")));
+        assertTrue(statusLine(), statusLine().contains(StorySeen.READ_WATCHED));
+
+        // Built, it's still published, since only Facebook's own answer counts for that.
+        built(new Bucket("b1", "s1", "s2"));
+        assertEquals(2, published.size());
+
+        // A new story, a bucket never watched here, or one with no cards read as Facebook sends them.
+        assertTrue(stories.hasUnwatched(new Bucket("b1", "s1", "s2", "s3")));
+        assertTrue(stories.hasUnwatched(new Bucket("b2", "s2")));
+        assertTrue(stories.hasUnwatched(new Bucket("b1")));
+        Bucket sentWatched = new Bucket("b2", "t1");
+        sentWatched.unwatched = false;
+        assertFalse(stories.hasUnwatched(sentWatched));
+        assertFalse(StorySeen.readsWatched(null));
+    }
+
+    @Test
+    public void aLightweightBucketReadsWatchedWhenItsOneCardWasWatchedHere() {
+        // A cold start's lightweight bucket holds one card, its preview story, which needn't be
+        // the newest the bucket had when it was watched.
+        Bucket friend = new Bucket("b1", "s1", "s2");
+        StorySeen.viewed(friend, "s1", helper, false);
+        StorySeen.viewed(friend, "s2", helper, false);
+        StorySeen.useForTests(stories);
+        assertFalse(stories.hasUnwatched(new Bucket("b1", "s2")));
+        assertFalse(stories.hasUnwatched(new Bucket("b1", "s1")));
+
+        // Its placeholder card, or a story not watched here, leaves Facebook's answer.
+        assertTrue(stories.hasUnwatched(new Bucket("b1", "lightweight_loading_card_in_bucket_b1")));
+        assertTrue(stories.hasUnwatched(new Bucket("b1", "s3")));
+
+        // Watched partway isn't kept as watched at all.
+        Bucket other = new Bucket("b2", "t1", "t2");
+        StorySeen.viewed(other, "t1", helper, false);
+        assertTrue(stories.hasUnwatched(new Bucket("b2", "t1")));
+    }
+
+    @Test
+    public void offOrPausedABucketReadsAsFacebookSendsIt() {
+        StorySeen.viewed(new Bucket("b1", "s1"), "s1", helper, false);
+        Settings.VIEW_STORIES_ANONYMOUSLY.save(false);
+        assertTrue(stories.hasUnwatched(new Bucket("b1", "s1")));
+        Settings.VIEW_STORIES_ANONYMOUSLY.save(true);
+        PauseForTests.pause(HushfacebookPause.Reason.SWITCH);
+        assertTrue(stories.hasUnwatched(new Bucket("b1", "s1")));
+        PauseForTests.resume();
+        assertFalse(stories.hasUnwatched(new Bucket("b1", "s1")));
+    }
+
+    @Test
+    public void aFailureReadingABucketLeavesFacebooksAnswerAndIsReported() {
+        StorySeen.viewed(new Bucket("b1", "s1"), "s1", helper, false);
+        HookStatus.clear();
+        StorySeen.useForTests(new StorySeen.Stories() {
+            @Override public String bucketId(Object bucket) { return "b1"; }
+            @Override public List<?> cards(Object bucket) { throw new IllegalStateException("renamed"); }
+            @Override public String storyId(Object card) { return (String) card; }
+            @Override public boolean hasUnwatched(Object bucket) { return true; }
+            @Override public void publishWatched(Object bucket, String bucketId) { }
+        });
+        assertFalse(StorySeen.readsWatched(new Bucket("b1", "s1")));
+        assertTrue(statusLine(), statusLine().contains("threw"));
     }
 
     @Test

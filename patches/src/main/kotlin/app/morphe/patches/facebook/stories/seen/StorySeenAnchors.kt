@@ -414,6 +414,8 @@ internal class StoryBuckets(
     val session: Field,
     /** StoryBucket's method answering whether a story isn't watched yet, which RegularStoryBucket overrides. */
     val hasUnwatched: Method,
+    /** RegularStoryBucket's override of [hasUnwatched], reading is_bucket_seen_by_viewer. */
+    val override: Method,
 )
 
 /** The instructions that load a 32-bit constant into a register. */
@@ -452,7 +454,7 @@ internal fun storyBuckets(bucket: ClassDef, regular: ClassDef): StoryBuckets? {
             !AccessFlags.STATIC.isSet(it.accessFlags) && !AccessFlags.FINAL.isSet(it.accessFlags)
     } ?: return null
     if (bucket.methods.none { it.name == "getId" && it.parameterTypes.isEmpty() && it.returnType == STRING }) return null
-    return StoryBuckets(cards, session, hasUnwatched)
+    return StoryBuckets(cards, session, hasUnwatched, override)
 }
 
 /**
@@ -479,6 +481,40 @@ internal fun MutableMethod.hearBucketMade() {
     requireThisIntact(PATCH, listOf(at))
     val self = localRegisterCount()
     addInstructions(at, "invoke-static/range { v$self .. v$self }, $BUCKET_MADE")
+}
+
+/*
+ * The ring from the first frame (#165, read from 585 arm64 on 2026-10-31).
+ *
+ * A publish only reaches the copies of a bucket that exist when it's made, and a cold start draws
+ * the tray first with LightweightLoadingBucket (built by LightNodeQueryBucketSource from the tray's
+ * light query), which never runs RegularStoryBucket's constructor. Its answer comes from
+ * StoryBucket's own method, which reads its tree's is_bucket_seen_by_viewer for it and answers yes
+ * outright for the end card, error and server-generated buckets; RegularStoryBucket overrides it
+ * and doesn't call it. A hook goes first in both, so the tray, the viewer and their logging all
+ * hear the same answer.
+ */
+internal const val READS_WATCHED = "$STORY_SEEN->readsWatched(${OBJECT})Z"
+
+/**
+ * First thing in a bucket's answer to whether it has a story not watched yet: a bucket the
+ * extension reads as watched answers no, and every other bucket goes on to Facebook's own answer.
+ * This is read before anything writes it, and the one local the answer needs is free there.
+ */
+internal fun MutableMethod.answerWatchedFirst() {
+    requireLocals(PATCH, 1)
+    val self = localRegisterCount()
+    addInstructionsWithLabels(
+        0,
+        """
+            invoke-static/range { v$self .. v$self }, $READS_WATCHED
+            move-result v0
+            if-eqz v0, :facebook
+            const/4 v0, 0x0
+            return v0
+        """,
+        ExternalLabel("facebook", getInstruction(0)),
+    )
 }
 
 /*

@@ -53,6 +53,12 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  * newest card is published as watched again. A newer story changes the newest card, so it shows as
  * new. Nothing about a story leaves the phone.
  *
+ * <p>A publish lands after the tray has drawn, and a cold start draws it first with lightweight
+ * buckets that never reach {@link #bucketMade}, so those rings came back blue after each restart
+ * until the full buckets arrived (#165). {@link #readsWatched} goes first in the bucket's own answer
+ * to whether it has a story not watched yet, so a bucket kept here reads watched from the first
+ * time the tray asks.
+ *
  * <p>The viewer opens a bucket at its first card whose seen flag is false. Facebook sets that flag
  * as cards play, in memory only, and its servers set it from their view records, which a held-back
  * view never makes. So after a restart a bucket watched partway, or one that got a new card, opened
@@ -83,6 +89,9 @@ public final class StorySeen {
 
     /** What Hook status counts each card the viewer passed over, picking where a bucket opens, under (#218). */
     static final String PASSED_OVER = "opened past a card watched here";
+
+    /** What Hook status counts each time a bucket answered Facebook as watched, under (#165). */
+    static final String READ_WATCHED = "read as watched here";
 
     /** The type and field of the tree Facebook publishes for a bucket when its servers take a report. */
     static final String BUCKET_TYPE = "DirectMessageThreadBucket";
@@ -135,6 +144,9 @@ public final class StorySeen {
     };
 
     private static volatile Stories stories = PATCHED;
+
+    /** Set while the code here asks a bucket for Facebook's own answer, or reads one itself. */
+    private static final ThreadLocal<boolean[]> ASKING = ThreadLocal.withInitial(() -> new boolean[1]);
     private static volatile SeenBuckets store;
     /** Every card watched with the switch on, by its own id (#218). */
     private static volatile SeenBuckets cardStore;
@@ -360,6 +372,56 @@ public final class StorySeen {
     }
 
     /**
+     * Injection point, first thing in the story bucket's answer to whether it has a story not
+     * watched yet: StoryBucket's own, which answers for the lightweight buckets a cold start draws
+     * the tray with, and RegularStoryBucket's. True for a bucket watched to the end here whose
+     * newest card is still the one it had then, or was watched here itself (a lightweight bucket's
+     * one card is its preview story), so the answer is no and the ring is grey the first time it's
+     * drawn (#165). Facebook's answer stands for every other bucket, with the switch off or paused,
+     * and while the code here asks. Never throws.
+     */
+    public static boolean readsWatched(@Nullable Object bucket) {
+        boolean[] asking = ASKING.get();
+        if (bucket == null || asking[0]) return false;
+        asking[0] = true;
+        try {
+            if (!Utils.settingsReady() || !Settings.VIEW_STORIES_ANONYMOUSLY.get()) return false;
+            SeenBuckets seen = store();
+            if (seen == null) return false;
+            Stories access = stories;
+            String bucketId = access.bucketId(bucket);
+            long now = System.currentTimeMillis();
+            String watched = bucketId == null ? null : seen.newestWatched(bucketId, now);
+            if (watched == null) return false;
+            String newest = newestStory(bucket, access);
+            if (newest == null) return false;
+            if (!watched.equals(newest)) {
+                SeenBuckets cards = cardStore();
+                if (cards == null || cards.newestWatched(newest, now) == null) return false;
+            }
+            HookStatus.counted(FamilyNames.STORY_SEEN, READ_WATCHED);
+            return true;
+        } catch (Throwable failure) {
+            HookStatus.threw(FamilyNames.STORY_SEEN, "story bucket read", failure);
+            return false;
+        } finally {
+            asking[0] = false;
+        }
+    }
+
+    /** The bucket's own answer, Facebook's, past {@link #readsWatched}. */
+    private static boolean facebooksAnswer(Object bucket, Stories access) {
+        boolean[] asking = ASKING.get();
+        boolean was = asking[0];
+        asking[0] = true;
+        try {
+            return access.hasUnwatched(bucket);
+        } finally {
+            asking[0] = was;
+        }
+    }
+
+    /**
      * The views are held back, so the buckets watched to the end since the last send go out as
      * watched, on the main thread. Never throws.
      */
@@ -384,7 +446,7 @@ public final class StorySeen {
             Stories access = stories;
             for (Object bucket : buckets) {
                 String bucketId = access.bucketId(bucket);
-                if (bucketId != null && access.hasUnwatched(bucket)) publish(bucket, bucketId, access);
+                if (bucketId != null && facebooksAnswer(bucket, access)) publish(bucket, bucketId, access);
             }
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.STORY_SEEN, "watched story buckets", failure);
@@ -398,7 +460,7 @@ public final class StorySeen {
             SeenBuckets seen = store();
             String watched = seen == null ? null : seen.newestWatched(bucketId, System.currentTimeMillis());
             Stories access = stories;
-            if (watched == null || !access.hasUnwatched(bucket) || !watched.equals(newestStory(bucket, access))) return;
+            if (watched == null || !facebooksAnswer(bucket, access) || !watched.equals(newestStory(bucket, access))) return;
             publish(bucket, bucketId, access);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.STORY_SEEN, "watched story bucket", failure);
