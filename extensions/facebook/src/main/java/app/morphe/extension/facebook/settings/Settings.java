@@ -2268,6 +2268,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_show_full_post_text", FALSE);
 
     /**
+     * A post's three-dot menu gets See who shared, which opens Facebook's own list of the people
+     * who shared it ({@link app.morphe.extension.facebook.feed.WhoShared}). A change shows on the
+     * next menu opened.
+     */
+    public static final BooleanSetting SEE_WHO_SHARED =
+            new BooleanSetting("hushfacebook_see_who_shared", FALSE);
+
+    /**
      * Posts and reel captions keep the language they were written in, with Facebook's See
      * translation link under them ({@link app.morphe.extension.facebook.feed.AutoTranslation}). A
      * change shows on the posts and reels drawn after it.

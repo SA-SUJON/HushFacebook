@@ -132,7 +132,7 @@ public class TreeJNI {
     }
 
     public final boolean hasFieldValue(int key) {
-        return booleans.containsKey(key);
+        return booleans.containsKey(key) || numbers.containsKey(key);
     }
 
     public boolean isValidGraphServicesJNIModel() {

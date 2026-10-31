@@ -970,6 +970,11 @@ Keep post dates	保留貼文日期
 Shows the post's date under the poster's name instead of Facebook's rotating details, which can go blank on some phones.	在發布者名稱下顯示貼文日期，取代 Facebook 輪流顯示的詳細資訊，後者可能在部分手機上變成空白。
 Show full post text	顯示完整貼文文字
 Posts in the feed show all of their text, so there's no See more to tap.	動態中的貼文會顯示全部文字，不用再點「顯示更多」。
+# context: switch title under News feed and the row it adds to a post's three-dot menu; it opens the list of people who shared the post
+See who shared	查看誰分享了
+Adds See who shared to a post's menu. It opens Facebook's list of the people who shared it.	在貼文選單中加入「查看誰分享了」，開啟 Facebook 上分享這則貼文的使用者清單。
+# context: message shown when tapping that row doesn't open the list
+Couldn't open the list of shares.	無法開啟分享清單。
 # context: switch title under News feed; the Feeds header is the row at the top of the Feeds tab with Feeds, the menu and search, and the filters under it, All, Favorites, Friends, Groups and Pages
 Hide the Feeds header	隱藏動態消息標題列
 # context: description of that switch; the Feeds tab is where Facebook lists posts by those filters, and the title row is the one with the tab's name

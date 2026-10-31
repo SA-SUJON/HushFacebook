@@ -875,6 +875,15 @@
     },
     {
       "paths": [
+        "patches/src/main/kotlin/app/morphe/patches/facebook/feed/whoshared/**"
+      ],
+      "origin": "original",
+      "upstream": "https://github.com/SysAdminDoc/Hushfacebook",
+      "license": "GPL-3.0-only",
+      "changes": "Written for Hushfacebook: a See who shared row in a post's menu. In Facebook 584 the list of people who shared a post opens through one public static (Context, GraphQLStory, String) method holding the message Activity is required to launch reshares list, and only share count rows behind a server test call it. The patch finds that launcher by its shape and message, writes the call to it into the extension's openList stub, and adds the row through the same post menu hook Download any video uses, so the list and what it shows are Facebook's."
+    },
+    {
+      "paths": [
         "patches/src/main/kotlin/app/morphe/patches/facebook/feed/posttext/**"
       ],
       "origin": "original",

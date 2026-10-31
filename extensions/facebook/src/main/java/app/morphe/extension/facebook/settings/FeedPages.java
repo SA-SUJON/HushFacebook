@@ -301,6 +301,10 @@ final class FeedPages {
                         L10n.t("Holding a post's text still copies all of it, and also opens the text in a box where you "
                                 + "can select just the part you want and copy that.")));
             }
+            if (build.contains(PatchFamily.WHO_SHARED)) {
+                feed.addPreference(toggle(context, Settings.SEE_WHO_SHARED,
+                        L10n.t("Adds See who shared to a post's menu. It opens Facebook's list of the people who shared it.")));
+            }
             if (build.contains(PatchFamily.AUTO_TRANSLATION)) {
                 // Each post and reel reads the answer as it's drawn, so a change shows on the next ones.
                 feed.addPreference(toggle(context, Settings.TURN_OFF_AUTO_TRANSLATION,

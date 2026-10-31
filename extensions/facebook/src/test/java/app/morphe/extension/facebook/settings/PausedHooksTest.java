@@ -94,6 +94,7 @@ import app.morphe.extension.facebook.feed.ProfileSuggestionsForTests;
 import app.morphe.extension.facebook.feed.RelatedPosts;
 import app.morphe.extension.facebook.misc.AppLockForTests;
 import app.morphe.extension.facebook.feed.TypedFeedUnit;
+import app.morphe.extension.facebook.feed.WhoSharedForTests;
 import app.morphe.extension.facebook.font.OwnFont;
 import app.morphe.extension.facebook.comments.DefaultCommentOrderForTests;
 import app.morphe.extension.facebook.comments.CommentSheetOptions;
@@ -485,6 +486,8 @@ public class PausedHooksTest {
         probes.put(PatchFamily.POST_DATES, Collections.singletonList(() -> !PostDates.cycling(true)));
         // A post's cut text is answered with null, so Facebook keeps the whole text with no See more.
         probes.put(PatchFamily.FULL_POST_TEXT, Collections.singletonList(() -> FullPostText.cut(new SpannableString("x")) == null));
+        // A shared post's menu gets the See who shared row below Facebook's.
+        probes.put(PatchFamily.WHO_SHARED, Collections.singletonList(WhoSharedForTests::addsARow));
         // A post marked for automatic translation reads as one to translate on request, and the
         // reels footer hears a caption can't be translated by itself, so it asks for nothing.
         probes.put(PatchFamily.AUTO_TRANSLATION, Arrays.asList(AutoTranslationForTests::keepsThePost,

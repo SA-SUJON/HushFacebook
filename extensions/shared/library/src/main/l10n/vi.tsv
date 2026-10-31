@@ -966,6 +966,11 @@ Keep post dates	Giữ ngày đăng bài
 Shows the post's date under the poster's name instead of Facebook's rotating details, which can go blank on some phones.	Hiện ngày đăng dưới tên người đăng thay cho thông tin luân phiên của Facebook, vốn có thể trống trên một số điện thoại.
 Show full post text	Hiện toàn bộ nội dung bài viết
 Posts in the feed show all of their text, so there's no See more to tap.	Bài viết trong bảng feed hiện toàn bộ nội dung, nên không cần nhấn Xem thêm.
+# context: switch title under News feed and the row it adds to a post's three-dot menu; it opens the list of people who shared the post
+See who shared	Xem ai đã chia sẻ
+Adds See who shared to a post's menu. It opens Facebook's list of the people who shared it.	Thêm Xem ai đã chia sẻ vào menu của bài viết. Mục này mở danh sách của Facebook gồm những người đã chia sẻ bài viết.
+# context: message shown when tapping that row doesn't open the list
+Couldn't open the list of shares.	Không mở được danh sách lượt chia sẻ.
 # context: switch title under News feed; the Feeds header is the row at the top of the Feeds tab with Feeds, the menu and search, and the filters under it, All, Favorites, Friends, Groups and Pages
 Hide the Feeds header	Ẩn đầu trang Bảng feed
 # context: description of that switch; the Feeds tab is where Facebook lists posts by those filters, and the title row is the one with the tab's name

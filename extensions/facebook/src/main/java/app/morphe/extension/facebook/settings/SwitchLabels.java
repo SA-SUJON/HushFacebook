@@ -57,6 +57,7 @@ final class SwitchLabels {
         if (setting == Settings.HIDE_META_AI_QUESTIONS) return L10n.t("Hide Meta AI questions under posts");
         if (setting == Settings.KEEP_POST_DATES) return L10n.t("Keep post dates");
         if (setting == Settings.SHOW_FULL_POST_TEXT) return L10n.t("Show full post text");
+        if (setting == Settings.SEE_WHO_SHARED) return L10n.t("See who shared");
         if (setting == Settings.TURN_OFF_AUTO_TRANSLATION) return L10n.t("Turn off auto-translation");
         if (setting == Settings.HIDE_FEEDS_HEADER) return L10n.t("Hide the Feeds header");
         if (setting == Settings.BLOCK_RETURN_REFRESH) return L10n.t("Keep feed position on return");

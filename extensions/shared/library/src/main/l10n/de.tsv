@@ -966,6 +966,11 @@ Keep post dates	Beitragsdatum behalten
 Shows the post's date under the poster's name instead of Facebook's rotating details, which can go blank on some phones.	Zeigt unter dem Namen des Absenders das Datum des Beitrags statt der wechselnden Angaben von Facebook, die auf manchen Telefonen leer bleiben.
 Show full post text	Ganzen Beitragstext zeigen
 Posts in the feed show all of their text, so there's no See more to tap.	Beiträge im Feed zeigen ihren ganzen Text, du musst also nicht auf Mehr ansehen tippen.
+# context: switch title under News feed and the row it adds to a post's three-dot menu; it opens the list of people who shared the post
+See who shared	Wer hat geteilt
+Adds See who shared to a post's menu. It opens Facebook's list of the people who shared it.	Fügt dem Menü eines Beitrags Wer hat geteilt hinzu. Es öffnet die Facebook-Liste der Personen, die ihn geteilt haben.
+# context: message shown when tapping that row doesn't open the list
+Couldn't open the list of shares.	Die Liste der Teilungen konnte nicht geöffnet werden.
 # context: switch title under News feed; the Feeds header is the row at the top of the Feeds tab with Feeds, the menu and search, and the filters under it, All, Favorites, Friends, Groups and Pages
 Hide the Feeds header	Feeds-Kopfzeile ausblenden
 # context: description of that switch; the Feeds tab is where Facebook lists posts by those filters, and the title row is the one with the tab's name

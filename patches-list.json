@@ -3177,6 +3177,44 @@
       "options": []
     },
     {
+      "name": "See who shared",
+      "description": "Adds See who shared to a post's menu, which opens Facebook's list of the people who shared it. Starts off. Turn it on in Hushfacebook settings > News feed.",
+      "category": "Feed",
+      "use": true,
+      "dependencies": [
+        "BytecodePatch",
+        "Hushfacebook settings"
+      ],
+      "compatiblePackages": {
+        "com.facebook.katana": [
+          "584.0.0.51.56"
+        ]
+      },
+      "compatibility": [
+        {
+          "name": "Facebook",
+          "packageName": "com.facebook.katana",
+          "description": null,
+          "appIconColor": 550655,
+          "signatures": [
+            "911d604446084ca7f4760b775bfc160fa8702441240a7258645d7a72c4312d27",
+            "e3f9e1e0cf99d0e56a055ba65e241b3399f7cea524326b0cdd6ec1327ed0fdc1"
+          ],
+          "targets": [
+            {
+              "version": "584.0.0.51.56",
+              "experimental": false,
+              "versionCodes": {
+                "ARM64_V8A": 475817393,
+                "ARMEABI_V7A": 475817404
+              }
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Send chat photos and videos at original quality",
       "description": "Photos and videos you send from chats that open inside Facebook go out as the originals instead of smaller copies, so they arrive sharp. Very large files are still shrunk. Starts off. Turn it on in Hushfacebook settings > Chats and Messenger.",
       "category": "Chats",

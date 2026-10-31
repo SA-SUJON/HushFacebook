@@ -966,6 +966,11 @@ Keep post dates	Pertahankan tanggal postingan
 Shows the post's date under the poster's name instead of Facebook's rotating details, which can go blank on some phones.	Menampilkan tanggal postingan di bawah nama pemosting, bukan keterangan bergantian milik Facebook yang bisa kosong di beberapa ponsel.
 Show full post text	Tampilkan teks postingan lengkap
 Posts in the feed show all of their text, so there's no See more to tap.	Postingan di feed menampilkan seluruh teksnya, jadi tidak perlu mengetuk Lihat selengkapnya.
+# context: switch title under News feed and the row it adds to a post's three-dot menu; it opens the list of people who shared the post
+See who shared	Lihat siapa yang membagikan
+Adds See who shared to a post's menu. It opens Facebook's list of the people who shared it.	Menambahkan Lihat siapa yang membagikan ke menu postingan. Ini membuka daftar Facebook berisi orang yang membagikannya.
+# context: message shown when tapping that row doesn't open the list
+Couldn't open the list of shares.	Tidak bisa membuka daftar yang membagikan.
 # context: switch title under News feed; the Feeds header is the row at the top of the Feeds tab with Feeds, the menu and search, and the filters under it, All, Favorites, Friends, Groups and Pages
 Hide the Feeds header	Sembunyikan bagian atas Feed
 # context: description of that switch; the Feeds tab is where Facebook lists posts by those filters, and the title row is the one with the tab's name
