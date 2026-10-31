@@ -29,6 +29,7 @@ Changes in each Hushfacebook version, newest first.
 * **Facebook:** Long-press a comment with a video in it and its menu has `Save video` now, when `Download any video` is on. It saves at the quality you picked under Downloads, like Download to phone on a post, and the file name leaves out who commented. With downloads set to send links instead, the row is `Send to app` (Refs #318).
 * **Facebook:** New `Fix washed-out video colors` under Video and audio, part of `Turn off HDR brightness`. On some phones a reel looks pale and faded until something like the comments covers part of it, and Android's `Disable HW overlays` developer option fixes it. This switch does the same for Facebook alone: videos draw together with the rest of the screen, which costs a little more battery. It's off by default and shows from the next video (Refs #308).
 * **Facebook:** New `Hide the search button` under Tabs and navigation takes the search button out of Home's top bar, and the buttons beside it close up. It works on both versions of the top bar Facebook hands out. It's off by default and shows after a restart (Refs #321).
+* **Facebook:** A Marketplace listing's page now says when it went up, after its place, like "Moncton, NB · Listed 3 weeks ago (Oct 12, 2026)". Facebook only says that on brand new listings, but it sends the time for every one. It's on by default as `Show when listings went up` under Marketplace and shows from the next listing you open (Refs #303).
 
 ### Changed
 

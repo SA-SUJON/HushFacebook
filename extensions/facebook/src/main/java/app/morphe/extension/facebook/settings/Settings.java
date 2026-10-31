@@ -482,6 +482,14 @@ public class Settings extends BaseSettings {
                     Setting.parent(MARKETPLACE_ADVANCED_SEARCH));
 
     /**
+     * A listing's own page says when it was listed, after its place
+     * ({@link app.morphe.extension.facebook.ads.MarketplaceListingAge}). Read as each listing page
+     * loads, so a change shows on the next one.
+     */
+    public static final BooleanSetting MARKETPLACE_LISTING_DATE =
+            new BooleanSetting("hushfacebook_marketplace_listing_date", TRUE);
+
+    /**
      * A seller's Marketplace page always offers View profile, which opens the seller's regular
      * Facebook profile ({@link app.morphe.extension.facebook.navigation.MarketplaceSellerProfile}).
      * Off or paused, the page asks Facebook's experiment flag again, which shows it to some accounts.

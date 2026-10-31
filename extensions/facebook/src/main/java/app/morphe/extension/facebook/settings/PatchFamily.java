@@ -106,7 +106,7 @@ public enum PatchFamily {
             Settings.HIDE_POST_COMMENT_BUTTON, Settings.HIDE_POST_SHARE_BUTTON, Settings.HIDE_POST_SEND_BUTTON),
     SPONSORED_MARKETPLACE(FamilyNames.SPONSORED_MARKETPLACE, "sponsoredMarketplace", null,
             Settings.HIDE_SPONSORED_MARKETPLACE_LISTINGS, Settings.MARKETPLACE_ADVANCED_SEARCH,
-            Settings.MARKETPLACE_FILTERS_BUTTON),
+            Settings.MARKETPLACE_FILTERS_BUTTON, Settings.MARKETPLACE_LISTING_DATE),
     GAME_ADS(FamilyNames.GAME_ADS, "gameAds", null,
             Settings.BLOCK_GAME_ADS, Settings.ANSWER_REWARDED_GAME_ADS),
     AFFILIATE_LINKS(FamilyNames.AFFILIATE_LINKS, "affiliateLinks", null,

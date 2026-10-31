@@ -2251,6 +2251,11 @@ Advanced Marketplace search	Tìm kiếm Marketplace nâng cao
 Lets you type rules into Marketplace search. Put a word in quotes, like "word", to keep only titles with it, put a minus in front, like -word, to hide titles with it, and add in:place to keep listings in that place.	Cho phép bạn nhập quy tắc vào ô tìm kiếm Marketplace. Đặt một từ trong ngoặc kép, như "từ", để chỉ giữ tiêu đề có từ đó, thêm dấu trừ phía trước, như -từ, để ẩn tiêu đề có từ đó, và thêm in:nơi để chỉ giữ tin đăng ở nơi đó.
 Adv. Filters button	Nút Bộ lọc NC
 Adds an Adv. Filters button under Marketplace's Filters on search results. It opens lists of words to keep, words to hide and places, and writes the rules into the search for you.	Thêm nút Bộ lọc NC dưới Bộ lọc của Marketplace trong kết quả tìm kiếm. Nút này mở danh sách từ cần giữ, từ cần ẩn và nơi chốn, rồi viết quy tắc vào ô tìm kiếm cho bạn.
+# context: switch title and summary under Marketplace; a listing is something for sale
+Show when listings went up	Hiện thời điểm đăng tin
+A listing's page says how long ago it was listed and the date, next to its place. Facebook only shows it for new listings.	Trang của tin đăng hiện tin đã đăng bao lâu và ngày đăng, cạnh địa điểm. Facebook chỉ hiện điều này với tin mới.
+# context: added after a listing's place on its Marketplace page, like Moncton, NB; %1$s is how long ago in your language from the phone, like 3 weeks ago, %2$s is the date
+Listed %1$s (%2$s)	Đã đăng %1$s (%2$s)
 How Adv. Filters works	Cách Bộ lọc NC hoạt động
 Type a word or a phrase and tap Add. A phrase of more than one word has to be in the title as written. A term matches anywhere in a title, so cat also matches cats. Put it in quotes with a space after it, like "cat ", to leave out cats. Go puts these into the search box and searches again.	Nhập một từ hoặc cụm từ rồi nhấn Thêm. Cụm từ có nhiều hơn một từ phải có trong tiêu đề đúng như đã viết. Một từ khớp ở bất kỳ đâu trong tiêu đề, nên cat cũng khớp với cats. Đặt nó trong ngoặc kép với một dấu cách phía sau, như "cat ", để loại cats ra. Đi sẽ đưa những mục này vào ô tìm kiếm và tìm lại.
 You can also type "word", -word or in:place straight into the search box.	Bạn cũng có thể nhập "từ", -từ hoặc in:nơi thẳng vào ô tìm kiếm.

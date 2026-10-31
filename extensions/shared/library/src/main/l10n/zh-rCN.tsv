@@ -2246,6 +2246,11 @@ Advanced Marketplace search	Marketplace 高级搜索
 Lets you type rules into Marketplace search. Put a word in quotes, like "word", to keep only titles with it, put a minus in front, like -word, to hide titles with it, and add in:place to keep listings in that place.	让你在 Marketplace 搜索中输入规则。给词语加上引号，例如 "词语"，只保留标题含有它的商品；在前面加减号，例如 -词语，隐藏标题含有它的商品；添加 in:地点，只保留位于该地点的商品。
 Adv. Filters button	高级筛选按钮
 Adds an Adv. Filters button under Marketplace's Filters on search results. It opens lists of words to keep, words to hide and places, and writes the rules into the search for you.	在搜索结果中 Marketplace 的“筛选”下方添加“高级筛选”按钮。它会打开要保留的词语、要隐藏的词语和地点的列表，并帮你把规则写进搜索。
+# context: switch title and summary under Marketplace; a listing is something for sale
+Show when listings went up	显示商品发布时间
+A listing's page says how long ago it was listed and the date, next to its place. Facebook only shows it for new listings.	商品页面会在位置旁显示发布了多久以及发布日期。Facebook 只对新商品显示这些。
+# context: added after a listing's place on its Marketplace page, like Moncton, NB; %1$s is how long ago in your language from the phone, like 3 weeks ago, %2$s is the date
+Listed %1$s (%2$s)	%1$s发布（%2$s）
 How Adv. Filters works	高级筛选的用法
 Type a word or a phrase and tap Add. A phrase of more than one word has to be in the title as written. A term matches anywhere in a title, so cat also matches cats. Put it in quotes with a space after it, like "cat ", to leave out cats. Go puts these into the search box and searches again.	输入一个词或短语，然后点按“添加”。由多个词组成的短语必须按原样出现在标题中。词语可匹配标题中的任意位置，所以 cat 也会匹配 cats。给它加上引号并在后面加一个空格，例如 "cat "，就能排除 cats。“搜索”会把这些放进搜索框并重新搜索。
 You can also type "word", -word or in:place straight into the search box.	你也可以直接在搜索框中输入 "词语"、-词语 或 in:地点。
