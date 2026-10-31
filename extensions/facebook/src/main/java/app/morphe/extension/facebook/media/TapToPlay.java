@@ -79,6 +79,10 @@ import app.morphe.extension.shared.diagnostics.HookStatus;
  *       between, came from that tap, like the Reels tab's, and waits.</li>
  * </ul>
  *
+ * <p>With {@link Settings#TAP_TO_PLAY_STORIES} on, a video story's start follows a rule of its
+ * own instead, whether this switch is on or off ({@link #decideStory}): the tap that opened the
+ * story, or moved to it, doesn't count, so it waits for a touch on the story itself (#261).
+ *
  * <p>Every other start is held, and the player stays where it was, showing its first frame or its
  * cover. Facebook's own Autoplay setting reads Off while the switch is on and Inline feed video
  * controls is off ({@link #autoplaySetting}), so the surfaces that ask it draw their play button,
@@ -186,6 +190,10 @@ public final class TapToPlay {
     private static volatile WeakReference<Object> heldReel = new WeakReference<>(null);
     /** Whether a run of reels is going: a tap played a waiting reel, and nothing was held since. */
     private static volatile boolean reelRun;
+    /** The player whose story start was last held, weakly, until a tap of its own plays it. */
+    private static volatile WeakReference<Object> heldStory = new WeakReference<>(null);
+    /** When {@link #heldStory} was first held, on the uptime clock. */
+    private static volatile long heldStoryAt;
     /** The player last let through while Facebook showed in the picture-in-picture window, weakly. */
     private static volatile WeakReference<Object> windowPlayer = new WeakReference<>(null);
     /** When the screen came back from that window, on the uptime clock, or {@link #NOT_BACK}. */
@@ -294,6 +302,8 @@ public final class TapToPlay {
             HookStatus.invoked(FamilyNames.TAP_TO_PLAY);
             HookStatus.bound(FamilyNames.TAP_TO_PLAY, "player rebind");
             ARMED.disarmUnlessArmedSince(player, SystemClock.uptimeMillis() - BIND_GRACE_MS);
+            // The story viewer can bind the next story to the same player: it waits on its own.
+            if (player != null && player == heldStory.get()) heldStory = new WeakReference<>(null);
         } catch (Throwable failure) {
             HookStatus.threw(FamilyNames.TAP_TO_PLAY, "player rebind", failure);
         }
@@ -524,6 +534,13 @@ public final class TapToPlay {
                 failNext = null;
                 throw failure;
             }
+            if (groot && player != null && storiesWait() && playsStory(player)) {
+                HookStatus.bound(FamilyNames.TAP_TO_PLAY, "story start");
+                String name = trigger instanceof Enum ? ((Enum<?>) trigger).name() : null;
+                boolean allowed = decideStory(player, name, SystemClock.uptimeMillis(), path);
+                if (!allowed) PictureInPicture.startHeld(player);
+                return allowed;
+            }
             if (!on()) {
                 // Starts going ahead with the switch off aren't a run of reels the person started.
                 reelRun = false;
@@ -546,6 +563,62 @@ public final class TapToPlay {
 
     private static boolean on() {
         return Utils.settingsReady() && Settings.TAP_TO_PLAY.get();
+    }
+
+    /** Whether video stories wait for a tap of their own, with Tap to play on or off (#261). */
+    private static boolean storiesWait() {
+        return Utils.settingsReady() && Settings.TAP_TO_PLAY_STORIES.get();
+    }
+
+    /** Reads a player's PlayerOrigin, from the getter the patch fills. Tests put a stand-in here. */
+    interface Origins {
+        @Nullable Object of(Object player);
+    }
+
+    static volatile Origins origins = FeedVideoControls::playerOrigin;
+
+    /** Whether [player] plays a story: its PlayerOrigin is the story viewer's. */
+    private static boolean playsStory(Object player) {
+        Object origin = origins.of(player);
+        return origin != null && isStoryOrigin(origin.toString());
+    }
+
+    /**
+     * Whether a PlayerOrigin's text, "origin::subOrigin" or just "origin", is a story's. The story
+     * viewer's players say fb_stories_video_view, and a story opened from somewhere else carries
+     * the story viewer as its sub-origin. A reel's sub-origin makes it a reel.
+     */
+    static boolean isStoryOrigin(@Nullable String origin) {
+        if (origin == null) return false;
+        int split = origin.indexOf("::");
+        String main = split < 0 ? origin : origin.substring(0, split);
+        String sub = split < 0 ? null : origin.substring(split + 2);
+        return QualityChoice.surfaceOf(main, sub) == QualityChoice.Surface.STORY;
+    }
+
+    /**
+     * The story rule, with the clock passed in. A story's start goes ahead when its player is
+     * armed, for a media control, or when it's the player last held for a story and a tap ended
+     * after that hold, no more than {@link #TAP_WINDOW_MS} ago. The tap that opened the story, or
+     * moved to it, ended before its first start, so the story waits for one of its own: touch and
+     * hold it, then let go, and the story viewer asks to play again. Arms the player when it lets
+     * the start through.
+     */
+    static boolean decideStory(Object player, @Nullable String trigger, long now, String path) {
+        boolean armed = ARMED.armed(player);
+        long sinceTap = TapClock.msSinceTap(now);
+        boolean control = trigger != null && CONTROLS.contains(trigger);
+        boolean waiting = player == heldStory.get();
+        boolean tapped = waiting && sinceTap >= 0 && sinceTap <= TAP_WINDOW_MS && now - sinceTap > heldStoryAt;
+        boolean allowed = armed || control || tapped;
+        if (allowed && (!armed || control)) ARMED.arm(player, now);
+        if (allowed && waiting) heldStory = new WeakReference<>(null);
+        if (!allowed && !waiting) {
+            heldStory = new WeakReference<>(player);
+            heldStoryAt = now;
+        }
+        logDecision(allowed, trigger, sinceTap, armed, path + (tapped ? " (a story you tapped)" : " (a story)"));
+        return allowed;
     }
 
     /**
@@ -727,6 +800,9 @@ public final class TapToPlay {
         front = new WeakReference<>(null);
         heldReel = new WeakReference<>(null);
         reelRun = false;
+        heldStory = new WeakReference<>(null);
+        heldStoryAt = 0;
+        origins = FeedVideoControls::playerOrigin;
         forgetWindow();
         LINK_OPENED_AT.set(NO_LINK);
         dropTappedScreen();

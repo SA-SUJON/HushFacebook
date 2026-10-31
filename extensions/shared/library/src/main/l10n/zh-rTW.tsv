@@ -2326,3 +2326,7 @@ Burn-in guard will be set to %1$s.	防烙印保護將設為 %1$s。
 Burn-in guard will dim the Reels screen as soon as you stop touching it.	停止觸碰後，防烙印保護會立即淡化 Reels 畫面。
 # context: settings import preview; %1$d is 2, 5 or 10
 Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	防烙印保護會在 %1$d 秒未觸碰後淡化 Reels 畫面。
+Mute stories	限時動態靜音
+Video stories wait for a tap	影片限時動態等待點按
+Stories start with the sound off every time you open Facebook. Tap a speaker or press volume up to hear them, and they stay on until you mute again.	每次開啟 Facebook 時，限時動態都會以靜音播放。點按喇叭或按下音量增加鍵即可聽到聲音，聲音會保持開啟，直到你再次靜音。
+Video stories don't start by themselves. Touch and hold a story, then let go, to play it. Works with Tap to play on or off.	影片限時動態不會自動開始播放。長按限時動態後放開即可播放。無論「點按播放」開啟或關閉皆可使用。

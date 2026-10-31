@@ -2322,3 +2322,7 @@ Burn-in guard will be set to %1$s.	Ekran yanığı koruması %1$s olarak ayarlan
 Burn-in guard will dim the Reels screen as soon as you stop touching it.	Ekran yanığı koruması, dokunmayı bıraktığın anda Reels ekranını soluklaştıracak.
 # context: settings import preview; %1$d is 2, 5 or 10
 Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	Ekran yanığı koruması, %1$d saniye dokunulmadığında Reels ekranını soluklaştıracak.
+Mute stories	Hikayeleri sessize al
+Video stories wait for a tap	Video hikayeler dokunmanı bekler
+Stories start with the sound off every time you open Facebook. Tap a speaker or press volume up to hear them, and they stay on until you mute again.	Hikayeler Facebook'u her açtığında sessiz başlar. Duymak için bir hoparlöre dokun veya sesi açma tuşuna bas. Ses, yeniden sessize alana kadar açık kalır.
+Video stories don't start by themselves. Touch and hold a story, then let go, to play it. Works with Tap to play on or off.	Video hikayeler kendiliğinden başlamaz. Oynatmak için bir hikayeye basılı tut, sonra bırak. "Oynatmak için dokun" açıkken de kapalıyken de çalışır.

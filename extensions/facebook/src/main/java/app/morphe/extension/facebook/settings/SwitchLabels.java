@@ -195,6 +195,7 @@ final class SwitchLabels {
         if (setting == Settings.COPY_REEL_CAPTION) return L10n.t("Copy reel captions");
         if (setting == Settings.TAP_TO_PLAY) return L10n.t("Tap to play");
         if (setting == Settings.TAP_TO_PLAY_REELS_AFTER_FIRST) return L10n.t("Only the first reel waits");
+        if (setting == Settings.TAP_TO_PLAY_STORIES) return L10n.t("Video stories wait for a tap");
         if (setting == Settings.INLINE_FEED_VIDEO_CONTROLS) return L10n.t("Inline feed video controls");
         if (setting == Settings.FEED_VIDEO_CAST_BUTTON) return L10n.t("Cast button on feed videos");
         if (setting == Settings.RESUME_LONG_VIDEOS) return L10n.t("Resume long videos");
@@ -209,6 +210,7 @@ final class SwitchLabels {
         if (setting == Settings.DRAW_VIDEOS_WITH_THE_SCREEN) return L10n.t("Fix washed-out video colors");
         if (setting == Settings.SKIP_SILENT_PARTS) return L10n.t("Skip silent parts");
         if (setting == Settings.KEEP_FEED_VIDEOS_MUTED) return L10n.t("Keep feed videos muted");
+        if (setting == Settings.MUTE_STORIES) return L10n.t("Mute stories");
         if (setting == Settings.KEEP_PROGRESS_BAR) return L10n.t("Keep the progress bar");
         if (setting == Settings.KEEP_PROGRESS_BAR_TIME) return L10n.t("Show a reel's time");
         if (setting == Settings.TAP_TO_SEEK) return L10n.t("Tap the bar to seek");

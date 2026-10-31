@@ -2322,3 +2322,7 @@ Burn-in guard will be set to %1$s.	Chống lưu ảnh màn hình sẽ được �
 Burn-in guard will dim the Reels screen as soon as you stop touching it.	Chống lưu ảnh màn hình sẽ làm mờ màn hình Reels ngay khi bạn ngừng chạm vào.
 # context: settings import preview; %1$d is 2, 5 or 10
 Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	Chống lưu ảnh màn hình sẽ làm mờ màn hình Reels sau %1$d giây không chạm.
+Mute stories	Tắt tiếng tin
+Video stories wait for a tap	Tin video chờ bạn nhấn
+Stories start with the sound off every time you open Facebook. Tap a speaker or press volume up to hear them, and they stay on until you mute again.	Tin luôn bắt đầu không có tiếng mỗi khi bạn mở Facebook. Nhấn vào biểu tượng loa hoặc nhấn tăng âm lượng để nghe, và âm thanh sẽ bật cho đến khi bạn tắt tiếng lại.
+Video stories don't start by themselves. Touch and hold a story, then let go, to play it. Works with Tap to play on or off.	Tin video không tự phát. Nhấn giữ một tin rồi thả ra để phát. Hoạt động dù "Nhấn để phát" bật hay tắt.

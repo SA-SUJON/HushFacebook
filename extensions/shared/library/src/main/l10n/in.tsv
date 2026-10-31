@@ -2322,3 +2322,7 @@ Burn-in guard will be set to %1$s.	Pelindung burn-in akan diatur ke %1$s.
 Burn-in guard will dim the Reels screen as soon as you stop touching it.	Pelindung burn-in akan meredupkan layar Reels begitu kamu berhenti menyentuhnya.
 # context: settings import preview; %1$d is 2, 5 or 10
 Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	Pelindung burn-in akan meredupkan layar Reels setelah %1$d detik tanpa sentuhan.
+Mute stories	Bisukan Cerita
+Video stories wait for a tap	Cerita video menunggu ketukan
+Stories start with the sound off every time you open Facebook. Tap a speaker or press volume up to hear them, and they stay on until you mute again.	Cerita selalu mulai tanpa suara setiap kali kamu membuka Facebook. Ketuk ikon speaker atau tekan tombol volume naik untuk mendengarnya, dan suara tetap menyala sampai kamu membisukannya lagi.
+Video stories don't start by themselves. Touch and hold a story, then let go, to play it. Works with Tap to play on or off.	Cerita video tidak mulai sendiri. Tekan lama sebuah cerita, lalu lepaskan, untuk memutarnya. Berfungsi saat "Ketuk untuk memutar" menyala maupun mati.

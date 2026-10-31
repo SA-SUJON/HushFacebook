@@ -33,6 +33,7 @@ Changes in each Hushfacebook version, newest first.
 * **Facebook:** New `Hide the search button` under Tabs and navigation takes the search button out of Home's top bar, and the buttons beside it close up. It works on both versions of the top bar Facebook hands out. It's off by default and shows after a restart (Refs #321).
 * **Facebook:** A Marketplace listing's page now says when it went up, after its place, like "Moncton, NB · Listed 3 weeks ago (Oct 12, 2026)". Facebook only says that on brand new listings, but it sends the time for every one. It's on by default as `Show when listings went up` under Marketplace and shows from the next listing you open (Refs #303).
 * **Facebook:** New `See who shared` adds a row to a post's three-dot menu that opens Facebook's own list of the people who shared it, for photo posts and videos. Facebook only shows that list from the share count for some accounts, so this gets you there on any post that's been shared. It starts off, under News feed (Refs #283).
+* **Facebook:** Two new story switches under Video and audio. `Mute stories` (with `Keep feed videos muted`) starts every story with the sound off each time you open Facebook, until you tap a speaker or press volume up. `Video stories wait for a tap` (with `Tap to play`) keeps a video story from playing by itself, so it won't start until you touch and hold it and let go. Both start off and work with the switches above them on or off (Refs #261).
 
 ### Changed
 

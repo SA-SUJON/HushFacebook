@@ -1149,6 +1149,14 @@ public class Settings extends BaseSettings {
             new BooleanSetting("hushfacebook_tap_to_play_reels_after_first", FALSE);
 
     /**
+     * A story's video waits for a touch on the story itself: one that ends after the story first
+     * tried to start, so the tap that opened the story doesn't count (#261). Works with
+     * {@link #TAP_TO_PLAY} on or off. Off, stories follow that switch as before.
+     */
+    public static final BooleanSetting TAP_TO_PLAY_STORIES =
+            new BooleanSetting("hushfacebook_tap_to_play_stories", FALSE);
+
+    /**
      * A separate feed play/pause button. Native video taps still open fullscreen. Starts off. With
      * {@link #TAP_TO_PLAY} on it keeps Facebook's Autoplay setting as chosen, since the feed binds a
      * player to a video only while autoplay is allowed (#239).
@@ -1322,6 +1330,15 @@ public class Settings extends BaseSettings {
      */
     public static final BooleanSetting KEEP_FEED_VIDEOS_MUTED =
             new BooleanSetting("hushfacebook_keep_feed_videos_muted", FALSE, true);
+
+    /**
+     * Stories play with their sound off until you turn the sound on with a speaker tap or the
+     * volume up key, and again from each new session
+     * ({@link app.morphe.extension.facebook.media.StorySound}, #261). Works with
+     * {@link #KEEP_FEED_VIDEOS_MUTED} on or off.
+     */
+    public static final BooleanSetting MUTE_STORIES =
+            new BooleanSetting("hushfacebook_mute_stories", FALSE);
 
     /**
      * A reel's progress bar stays full size, thumb and all, and a full-screen video's controls stay

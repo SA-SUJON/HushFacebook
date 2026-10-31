@@ -2317,3 +2317,7 @@ Burn-in guard will be set to %1$s.	防烧屏保护将设为 %1$s。
 Burn-in guard will dim the Reels screen as soon as you stop touching it.	停止触碰后，防烧屏保护会立即淡化 Reels 画面。
 # context: settings import preview; %1$d is 2, 5 or 10
 Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	防烧屏保护会在 %1$d 秒未触碰后淡化 Reels 画面。
+Mute stories	快拍静音
+Video stories wait for a tap	视频快拍等待点按
+Stories start with the sound off every time you open Facebook. Tap a speaker or press volume up to hear them, and they stay on until you mute again.	每次打开 Facebook 时，快拍都会静音播放。点按扬声器或按音量加键即可听到声音，声音会一直开启，直到你再次静音。
+Video stories don't start by themselves. Touch and hold a story, then let go, to play it. Works with Tap to play on or off.	视频快拍不会自动开始播放。长按快拍然后松开即可播放。无论“点按播放”开启还是关闭都有效。

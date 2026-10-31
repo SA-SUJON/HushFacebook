@@ -2322,3 +2322,7 @@ Burn-in guard will be set to %1$s.	Der Einbrennschutz wird auf %1$s gesetzt.
 Burn-in guard will dim the Reels screen as soon as you stop touching it.	Der Einbrennschutz dunkelt den Reels-Bildschirm ab, sobald du ihn nicht mehr berührst.
 # context: settings import preview; %1$d is 2, 5 or 10
 Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	Der Einbrennschutz dunkelt den Reels-Bildschirm nach %1$d Sekunden ohne Berührung ab.
+Mute stories	Stories stummschalten
+Video stories wait for a tap	Video-Stories warten auf Antippen
+Stories start with the sound off every time you open Facebook. Tap a speaker or press volume up to hear them, and they stay on until you mute again.	Stories starten jedes Mal ohne Ton, wenn du Facebook öffnest. Tippe auf einen Lautsprecher oder drücke Lauter, um sie zu hören. Der Ton bleibt an, bis du wieder stummschaltest.
+Video stories don't start by themselves. Touch and hold a story, then let go, to play it. Works with Tap to play on or off.	Video-Stories starten nicht von selbst. Halte eine Story gedrückt und lass dann los, um sie abzuspielen. Funktioniert mit „Zum Abspielen tippen“ an oder aus.

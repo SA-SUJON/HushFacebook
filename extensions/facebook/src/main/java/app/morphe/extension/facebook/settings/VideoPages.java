@@ -285,6 +285,10 @@ final class VideoPages {
                 playback.addPreference(toggle(context, Settings.TAP_TO_PLAY_REELS_AFTER_FIRST,
                         L10n.t("With the switch above on, after you play one reel, the reels you swipe to play on their own. The "
                                 + "feed, Watch and stories always wait.")));
+                // Asked at each story video's start, so it applies to the next story you open.
+                playback.addPreference(toggle(context, Settings.TAP_TO_PLAY_STORIES,
+                        L10n.t("Video stories don't start by themselves. Touch and hold a story, then let go, to play it. "
+                                + "Works with Tap to play on or off.")));
                 playback.addPreference(toggle(context, Settings.INLINE_FEED_VIDEO_CONTROLS,
                         L10n.t("Adds a play/pause button to feed videos. Tap the video itself to open it full screen. Live videos and ads keep their own controls. "
                                 + "With Tap to play on too, Facebook's own Autoplay setting stays as you set it so the button can show, and videos still wait for your tap.")));
@@ -342,6 +346,10 @@ final class VideoPages {
                 playback.addPreference(toggle(context, Settings.KEEP_FEED_VIDEOS_MUTED,
                         L10n.t("Videos in your feed start with the sound off every time you open Facebook, and only you "
                                 + "turn it on. Tap a video's speaker or press volume up to hear it.")));
+                // Asked at each story's volume, so the next story you open shows it.
+                playback.addPreference(toggle(context, Settings.MUTE_STORIES,
+                        L10n.t("Stories start with the sound off every time you open Facebook. Tap a speaker or press "
+                                + "volume up to hear them, and they stay on until you mute again.")));
             }
             subheading(playback, L10n.t("Controls and picture-in-picture"));
             if (build.contains(PatchFamily.FRAME_STEP)) {

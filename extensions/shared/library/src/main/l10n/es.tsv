@@ -2322,3 +2322,7 @@ Burn-in guard will be set to %1$s.	La Protección contra quemado quedará en %1$
 Burn-in guard will dim the Reels screen as soon as you stop touching it.	La Protección contra quemado atenuará la pantalla de Reels en cuanto dejes de tocarla.
 # context: settings import preview; %1$d is 2, 5 or 10
 Burn-in guard will dim the Reels screen after %1$d seconds without a touch.	La Protección contra quemado atenuará la pantalla de Reels tras %1$d segundos sin tocarla.
+Mute stories	Silenciar historias
+Video stories wait for a tap	Las historias de vídeo esperan a que toques
+Stories start with the sound off every time you open Facebook. Tap a speaker or press volume up to hear them, and they stay on until you mute again.	Las historias empiezan sin sonido cada vez que abres Facebook. Toca un altavoz o sube el volumen para oírlas, y el sonido sigue activado hasta que vuelvas a silenciarlo.
+Video stories don't start by themselves. Touch and hold a story, then let go, to play it. Works with Tap to play on or off.	Las historias de vídeo no empiezan solas. Mantén pulsada una historia y luego suéltala para reproducirla. Funciona con «Toca para reproducir» activado o desactivado.
