@@ -25,7 +25,8 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
  *   Search, and the Reels profile button over a reel or More over a feed video. Its kept
  *   setPipChromeVisibility(I)V loads the bar's id, finds the bar with findViewById on the screen and
  *   sets its visibility, and nothing else. The id is read from there, never written down (585:
- *   0x7f0a22e7, which Watch's header shares on the main screen).
+ *   0x7f0a22e7). A feed video opened on the main screen gets the same bar in a layer laid over the
+ *   tabs, and the Reels tab's header has the id as well, inside the tab pages.
  * - The buttons are Litho hosts with no ids, so the extension takes them from the bar by place
  *   (ViewerTopBar.java). The patch only fills the extension's id stub.
  */

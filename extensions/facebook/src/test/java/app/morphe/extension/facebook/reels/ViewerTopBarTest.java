@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 
 import com.facebook.katana.immersiveactivity.ImmersiveActivity;
 import com.facebook.litho.ComponentHost;
@@ -118,21 +119,43 @@ public class ViewerTopBarTest {
     }
 
     @Test
-    public void anotherScreenIsLeftAlone() {
+    public void theReelsTabsHeaderIsLeftAlone() {
         Settings.HIDE_VIEWER_TOP_BUTTONS.save(true);
         Activity main = Robolectric.buildActivity(Activity.class).setup().get();
-        FrameLayout root = new FrameLayout(main);
-        LithoView header = new LithoView(main);
-        header.setId(BAR_ID);
-        place(root, header, 0, 0, 1080, 199);
-        button(header, 17, 89, 130, 202);
-        ComponentHost watchSearch = button(header, 838, 98, 939, 199);
-        main.setContentView(root);
+        ComponentHost[] header = reelsTab(main);
 
         ViewerTopBar.resumed(main);
-        layOut();
+        layOut(main);
 
-        assertEquals(View.VISIBLE, watchSearch.getVisibility());
+        assertEquals(View.VISIBLE, header[0].getVisibility());
+        assertEquals(View.VISIBLE, header[1].getVisibility());
+        assertEquals(View.VISIBLE, header[2].getVisibility());
+    }
+
+    @Test
+    public void aFeedVideoOpenedOverTheMainScreenTakesTheButtons() {
+        // S22, 585: the player is its own layer of the content view, beside the tabs, and its bar
+        // has the id the Reels tab's header has inside the pages (#311).
+        Settings.HIDE_VIEWER_TOP_BUTTONS.save(true);
+        Activity main = Robolectric.buildActivity(Activity.class).setup().get();
+        ComponentHost[] header = reelsTab(main);
+        FrameLayout player = new FrameLayout(main);
+        main.addContentView(player, new FrameLayout.LayoutParams(1080, 2181));
+        LithoView playerBar = new LithoView(main);
+        playerBar.setId(BAR_ID);
+        place(player, playerBar, 0, 0, 1080, 338);
+        ComponentHost playerBack = button(playerBar, 23, 112, 91, 180);
+        ComponentHost playerSearch = button(playerBar, 838, 98, 939, 199);
+        ComponentHost playerMore = button(playerBar, 962, 98, 1063, 199);
+
+        ViewerTopBar.resumed(main);
+        layOut(main);
+
+        assertEquals(View.VISIBLE, playerBack.getVisibility());
+        assertEquals(View.INVISIBLE, playerSearch.getVisibility());
+        assertEquals(View.INVISIBLE, playerMore.getVisibility());
+        assertEquals(View.VISIBLE, header[1].getVisibility());
+        assertEquals(View.VISIBLE, header[2].getVisibility());
     }
 
     @Test
@@ -221,7 +244,25 @@ public class ViewerTopBarTest {
         return false;
     }
 
-    private ComponentHost button(ViewGroup parent, int left, int top, int right, int bottom) {
+    /**
+     * The main screen with the Reels tab showing, as 585 lays it out: its header, Menu, Search and
+     * the profile button, inside the tab pages that slide sideways. Answers those three buttons.
+     */
+    private static ComponentHost[] reelsTab(Activity main) {
+        HorizontalScrollView tabs = new HorizontalScrollView(main);
+        main.setContentView(tabs);
+        FrameLayout page = new FrameLayout(main);
+        tabs.addView(page, new FrameLayout.LayoutParams(1080, 2106));
+        LithoView header = new LithoView(main);
+        header.setId(BAR_ID);
+        place(page, header, 0, 0, 1080, 338);
+        return new ComponentHost[]{
+                button(header, 11, 45, 135, 146),
+                button(header, 838, 45, 939, 146),
+                button(header, 962, 45, 1063, 146)};
+    }
+
+    private static ComponentHost button(ViewGroup parent, int left, int top, int right, int bottom) {
         ComponentHost host = new ComponentHost(parent.getContext());
         host.setClickable(true);
         place(parent, host, left, top, right, bottom);
@@ -236,7 +277,11 @@ public class ViewerTopBarTest {
     }
 
     private void layOut() {
-        activity.getWindow().getDecorView().requestLayout();
+        layOut(activity);
+    }
+
+    private static void layOut(Activity screen) {
+        screen.getWindow().getDecorView().requestLayout();
         shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100));
     }
 }

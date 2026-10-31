@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.widget.HorizontalScrollView;
 
 import androidx.annotation.Nullable;
 
@@ -37,6 +38,12 @@ import app.morphe.extension.shared.settings.Setting;
  * profile button's at 962,98-1063,199). The patch hands over the bar's id, which Facebook's own
  * setPipChromeVisibility finds the bar by ({@link #barId}).
  *
+ * <p>A video opened from the feed mostly doesn't get that screen: the player is laid over the main
+ * screen, a layer of its own under the content view with the same bar in it (S22, 585). The Reels
+ * tab's header there has the same id too, Menu where Back would be, inside the tab pages that slide
+ * sideways. So past the full-screen player screens, each layer of the content view is looked
+ * through for the bar, and one with a sideways-paging view above it is a tab's header and stays.
+ *
  * <p>The buttons are Litho hosts with no ids, and their labels change with the language, so with
  * the switch on every clickable host in the bar that sits past its middle, away from Back, and in
  * Back's row is made invisible after each layout of the screen. Back stays, and so does More at
@@ -52,6 +59,9 @@ public final class ViewerTopBar {
     static final String HIDDEN = "Viewer top bar button hidden";
 
     static final String HOST = "com.facebook.litho.ComponentHost";
+    /** The pagers whose pages hold the main screen's tabs. */
+    private static final String VIEW_PAGER = "androidx.viewpager.widget.ViewPager";
+    private static final String VIEW_PAGER2 = "androidx.viewpager2.widget.ViewPager2";
 
     /** How many levels under the bar a button is looked for. 585's sit 2 to 5 down. */
     static final int MAX_DEPTH = 8;
@@ -100,11 +110,10 @@ public final class ViewerTopBar {
         @Override public void onActivityDestroyed(Activity activity) { watched.remove(activity); }
     }
 
-    /** A full-screen player screen in front starts being looked through after each layout. */
+    /** A screen in front starts being looked through after each layout. */
     static void resumed(Activity activity) {
         try {
-            if (watched.containsKey(activity) || !FeedVideoAlone.PLAYER_SCREENS.contains(activity.getClass().getName())) return;
-            if (id() == 0) return;
+            if (watched.containsKey(activity) || id() == 0) return;
             Window window = activity.getWindow();
             View decor = window == null ? null : window.peekDecorView();
             if (decor == null) return;
@@ -135,9 +144,38 @@ public final class ViewerTopBar {
 
     private static void laidOut(Activity activity) {
         int id = id();
-        if (id == 0) return;
-        View bar = activity.findViewById(id);
-        if (bar != null) tidy(bar);
+        if (id == 0 || (hidden.isEmpty() && !on())) return;
+        if (FeedVideoAlone.PLAYER_SCREENS.contains(activity.getClass().getName())) {
+            View bar = activity.findViewById(id);
+            if (bar != null) tidy(bar);
+            return;
+        }
+        View content = activity.findViewById(android.R.id.content);
+        if (!(content instanceof ViewGroup)) return;
+        ViewGroup layers = (ViewGroup) content;
+        for (int i = 0; i < layers.getChildCount(); i++) {
+            View bar = layers.getChildAt(i).findViewById(id);
+            if (bar != null && !paged(bar, layers)) tidy(bar);
+        }
+    }
+
+    /** Whether a view between [bar] and [top] pages sideways, as the main screen's tabs do. */
+    static boolean paged(View bar, View top) {
+        ViewParent parent = bar.getParent();
+        while (parent instanceof View && parent != top) {
+            if (pages((View) parent)) return true;
+            parent = parent.getParent();
+        }
+        return false;
+    }
+
+    private static boolean pages(View view) {
+        if (view instanceof HorizontalScrollView) return true;
+        for (Class<?> type = view.getClass(); type != null && type != View.class; type = type.getSuperclass()) {
+            String name = type.getName();
+            if (VIEW_PAGER.equals(name) || VIEW_PAGER2.equals(name)) return true;
+        }
+        return false;
     }
 
     /** Whether the bar's far buttons go now. */
